@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.11 2005-03-11 12:30:44 matthew Exp $
+ * $Id: pledge.php,v 1.12 2005-03-11 12:53:58 chris Exp $
  * 
  */
 
@@ -154,33 +154,18 @@ function pledge_is_successful($pledge_id) {
  * Return true if EMAIL may validly sign PLEDGE. This function locks rows in
  * pledges and signers with select ... for update / lock tables. */
 function pledge_is_valid_to_sign($pledge_id, $email) {
-    $r = db_getRow('
-                select comparison, target, date, email
-                from pledges
-                where id = ? and confirmed
-                for update', $pledge_id);
-    if (is_null($r))
-        return PLEDGE_NONE;
-    else if ($r['date'] < date('Y-m-d'))
-        return PLEDGE_FINISHED;
-    else if ($email == $r['email'])
-        return PLEDGE_SIGNED;
-    
-    if ($r['comparison'] == 'exactly') {
-        db_query('lock table signers in row shared mode');
-        $num = db_getOne('select count(id) from signers where pledge_id = ?', $pledge_id);
-        if ($num >= $r['target'])
-            return PLEDGE_FULL;
-    }
-
-    if (db_getOne('
-            select id
-            from signers
-            where pledge_id = ? and email = ?
-            for update', array($pledge_id, $email)))
-        return PLEDGE_SIGNED;
-
-    return PLEDGE_OK;
+    $resmap = array(
+            'ok' => PLEDGE_OK,
+            'none' => PLEDGE_NONE,
+            'finished' => PLEDGE_FINISHED,
+            'signed' => PLEDGE_SIGNED,
+            'full' => PLEDGE_FULL,
+        );
+    $r = db_getOne('select pledge_is_valid_to_sign(?, ?, null)', array($pledge_id, $email));
+    if (array_key_exists($r, $resmap))
+        return $resmap[$r];
+    else
+        err("Bad result $r from pledge_is_valid_to_sign");
 }
 
 /* pledge_confirm TOKEN

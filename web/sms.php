@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.3 2005-03-09 18:10:21 francis Exp $
+ * $Id: sms.php,v 1.4 2005-03-11 20:14:31 chris Exp $
  * 
  */
 
@@ -24,19 +24,87 @@ $errs = importparams(
                             '/^1$/',                        "", 0),
             array('f',      '/^1$/',                        "", 0)
         );
-            
-page_header('SMS');
 
-if (is_null($q_token)) {
-    print <<<EOF
+function bad_token($x) {
+    if (is_null($x)) {
+        err("Oops");
+    } else {
+        $x = htmlspecialchars($x);
+        print <<<EOF
             <p>
-        Sorry, we can't make sense of the code '$q_h_unchecked_token'. Please
+        Sorry, we can't make sense of the code '$x'. Please
         could you re-check the address you typed in; the last part of it should
         be two groups of four letters and numbers, joined by a hyphen ("-"),
         something like "1234-abcd"
             </p>'
 EOF;
-} else if (is_null($errs)) {
+    }
+}
+
+function oops($r, $what) {
+    print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
+    if ($r == PLEDGE_FULL || $r == PLEDGE_FINISHED) {
+        /* Print a fuller explanation in this (common) case */
+        $how = ($r == PLEDGE_FULL ? /* XXX i18n */
+                    "somebody else beat you to the last place on that pledge"
+                    : "the pledge finished");
+        print <<<EOF
+<p>Unfortunately, $what, $how.
+We're very sorry &mdash; better luck next time!</p>
+EOF;
+    } else {
+        print "<p>" . htmlspecialchars(pledge_strerror($r)) . "</p>";
+        if (!pledge_is_permanent_error($r))
+            print "<p><strong>Please try again a bit later.</strong></p>";
+    }
+    exit();
+}
+            
+page_header('SMS');
+
+if (is_null($q_token)) {
+    bad_token($q_unchecked_token);
+} else {
+    /* Four cases:
+     *  1. User has not signed pledge
+     *  2. User has signed but not converted
+     *  3. User has signed and converted
+     *  4. Token is not valid */
+    $pledge_id = null;
+    $signer_id = db_getOne('select id from signers where token = ? for update', $q_token);
+    if (!isset($signer_id)) {
+        /* Case 1. Add signature, if we can. */
+        $r = db_getRow('
+                    select pledge_id, recipient
+                    from pledge_outgoingsms, outgoingsms
+                    where token = ?
+                        and pledge_outgoingsms.outgoingsms_id = outgoingsms.id
+                    ', $q_token);
+        if (!isset($r))
+            bad_token($q_token);
+        $pledge_id = $r['pledge_id'];
+        $mobile = $r['recipient'];
+
+        /* Now we need to ascertain whether the user can actually sign this
+         * pledge. */
+        $f = pledge_is_valid_to_sign($pledge_id, null, $mobile);
+        if ($f != PLEDGE_OK) {
+            oops($f, "before our SMS to you was delivered");
+        }
+        
+        $signer_id = db_getOne("select nextval('signers_id_idx')");
+        db_query('
+                insert into signers (id, pledge_id, mobile, signtime, token)
+                values (?, ?, ?, current_timestamp, ?)
+            ', array($signer_id, $pledge_id, $r['recipient'], $q_token));
+        db_commit();
+    } else {
+        /* One of cases 2 or 3. If the user has converted, warn them;
+         * otherwise proceed. */
+    }
+
+
+if (is_null($errs)) {
     /* Check that we can actually sign up. */
     $p = preg_replace("/[^\d]/", '', $q_phone);
     $ss = db_getRow('select id, mobile, pledge_id from signers where token = ?', $q_token);

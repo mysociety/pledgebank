@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.6 2005-03-11 18:33:20 francis Exp $
+ * $Id: confirm.php,v 1.7 2005-03-11 20:14:31 chris Exp $
  * 
  */
 
@@ -124,12 +124,15 @@ td {
 function oops($r) {
     global $q_f;
     print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
-    if ($r == PLEDGE_FULL) {
+    if ($r == PLEDGE_FULL || $r == PLEDGE_FINISHED) {
         /* Print a fuller explanation in this (common) case */
         $what = $q_f ? 'filling in the form' : 'waiting for our email to arrive'; /* XXX l18n */
+        $how = ($r == PLEDGE_FULL ?
+                    "somebody else beat you to the last place on that pledge"
+                    : "the pledge finished");
         print <<<EOF
-<p>Unfortunately, while you were $what, somebody else beat you to the last
-place on that pledge. We're very sorry &mdash; better luck next time!</p>
+<p>Unfortunately, while you were $what, $how.
+We're very sorry &mdash; better luck next time!</p>
 EOF;
     } else {
         print "<p>" . htmlspecialchars(pledge_strerror($r)) . "</p>";

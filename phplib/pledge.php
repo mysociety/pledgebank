@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.15 2005-03-11 18:33:20 francis Exp $
+ * $Id: pledge.php,v 1.16 2005-03-11 20:14:31 chris Exp $
  * 
  */
 
@@ -172,10 +172,10 @@ function pledge_is_successful($pledge_id) {
     return $num >= $target;
 }
 
-/* pledge_is_valid_to_sign PLEDGE EMAIL
- * Return true if EMAIL may validly sign PLEDGE. This function locks rows in
- * pledges and signers with select ... for update / lock tables. */
-function pledge_is_valid_to_sign($pledge_id, $email) {
+/* pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
+ * Return true if EMAIL/MOBILE may validly sign PLEDGE. This function locks
+ * rows in pledges and signers with select ... for update / lock tables. */
+function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null) {
     $resmap = array(
             'ok' => PLEDGE_OK,
             'none' => PLEDGE_NONE,
@@ -183,7 +183,7 @@ function pledge_is_valid_to_sign($pledge_id, $email) {
             'signed' => PLEDGE_SIGNED,
             'full' => PLEDGE_FULL,
         );
-    $r = db_getOne('select pledge_is_valid_to_sign(?, ?, null)', array($pledge_id, $email));
+    $r = db_getOne('select pledge_is_valid_to_sign(?, ?, ?)', array($pledge_id, $email, $mobile));
     if (array_key_exists($r, $resmap))
         return $resmap[$r];
     else

@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.19 2005-03-30 11:17:35 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.20 2005-03-30 11:23:23 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -235,7 +235,7 @@ sub run_gathering_process () {
     # network outages.
 
     # Polling status of messages. We need to supply a simple query for the
-    # messages to inspect (such as "BatchID > ..."), but must not query too
+    # messages to inspect (such as "BatchID >= ..."), but must not query too
     # often or too long.
     use constant min_polling_age => 120;        # give it 2 mins before asking
     use constant max_polling_age => 28 * 3600;  # 28 hours; apparently standard
@@ -280,7 +280,7 @@ sub run_gathering_process () {
         if (defined($min_id)) {
             my %p = (
                     strMethod => 'getReceipts',
-                    strWhere => "BatchID > $min_id"
+                    strWhere => "BatchID >= $min_id"
                 );
 
             print_log('debug', "get receipts: query is '$p{strWhere}'");
@@ -672,5 +672,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.19 2005-03-30 11:17:35 sandpit Exp $
+$Id: pbsmsd,v 1.20 2005-03-30 11:23:23 sandpit Exp $
 

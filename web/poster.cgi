@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.11 2005-03-07 14:24:51 sandpit Exp $
+# $Id: poster.cgi,v 1.12 2005-03-17 09:20:39 francis Exp $
 #
 
 import os
@@ -83,7 +83,36 @@ while fcgi.isFCGI():
         day = date.day
         date = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
 
-        def draw_pledge(x, y):
+        def draw_short_pledge(x, y):
+            text = "\"%s\"" % title
+            size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
+            c.setFont("Helvetica", size)
+            c.drawCentredString(x, (y-1)*cm, text)
+
+            text = "Deadline: %s" % date
+            size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
+            c.setFont("Helvetica", size)
+            c.drawCentredString(x, (y-2)*cm, text)
+
+            text = "www.pledgebank.com/%s" % ref
+            size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
+            c.setFont("Helvetica", size)
+            c.drawCentredString(x, (y-3)*cm, text)
+
+        def draw_short_pledge(x, y):
+            """
+                $html .= '<p>Please support me by signing up, and by encouraging
+                    other people to do the same. I am using the charitable service
+                    PledgeBank.com to gather support.</p>
+                
+                    <p>It will only take you a few seconds - sign up free at ';
+                $html .= '<strong>www.pledgebank.com/' .  htmlspecialchars($r['ref']) . "</strong>";
+                $html .= '<p>Or text <strong>';
+                $html .= 'pledge ' . htmlspecialchars($r['ref']);
+                $html .= '</strong>  to <strong>12345</strong> (cost 25p)';
+                $html .= '<p>This pledge closes on ' . prettify($r['date']). '. ';
+                $html .= 'Thanks!';
+            """
             text = "\"%s\"" % title
             size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
             c.setFont("Helvetica", size)
@@ -111,13 +140,32 @@ while fcgi.isFCGI():
                 c.line(0,y*cm,21*cm,y*cm)
                 c.setFont("ZapfDingbats",24)
                 c.drawString(1*cm, y*cm-8, '"')
-                draw_pledge(10.5*cm/2, y)
-                draw_pledge(10.5*cm*3/2, y)
+                draw_short_pledge(10.5*cm/2, y)
+                draw_short_pledge(10.5*cm*3/2, y)
             c.rotate(-90)
             c.setFont("ZapfDingbats",24)
             c.drawString(-29*cm, 10.5*cm-8, '"')
             c.showPage()
 
+        def flyers():
+            #c.setStrokeColorRGB(0.5, 1, 0.5)
+            #c.setFillColorRGB(0.61, 0.5, 0.72)
+            c.setStrokeColorRGB(0,0,0)
+            c.setFillColorRGB(0,0,0)
+            # c.setLineWidth(1)
+            c.setDash(3,3)
+            c.line(10.5*cm, 0, 10.5*cm, 30*cm)
+            for y in (5,10,15,20,25,30):
+                c.line(0,y*cm,21*cm,y*cm)
+                c.setFont("ZapfDingbats",24)
+                c.drawString(1*cm, y*cm-8, '"')
+                draw_long_pledge(10.5*cm/2, y)
+                draw_long_pledge(10.5*cm*3/2, y)
+            c.rotate(-90)
+            c.setFont("ZapfDingbats",24)
+            c.drawString(-29*cm, 10.5*cm-8, '"')
+            c.showPage()
+ 
         # c.rotate(90)
         #import reportlab.rl_config
         #reportlab.rl_config.warnOnMissingFontGlyphs = 0
@@ -173,6 +221,8 @@ while fcgi.isFCGI():
         if type == "cards":
             cards()
         elif type == "tearoff":
+            tearoff()
+        elif type == "flyers":
             tearoff()
         else:
             raise Exception, "Unknown type '%s'" % type

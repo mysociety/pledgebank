@@ -1,24 +1,45 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -w -I../perllib -I../../perllib
 use strict;
 
-use Test::More 'no_plan';
-BEGIN { use_ok "MS::PDF" };
+use PBPDF;
 
-#use MS::PDF;
+#use PBPDF;
 
-my $pdf = MS::PDF->new( { 'pledge-id' => 0,
-			  'target' => 100,
-			  'name' => 'whales',
-			  'text' => 'stop using whale blubber as insulation',
-			  'sms' => 12345,
+my $pdf = PBPDF->new( { 
+                'poster-type' => 'friendly-flyer',
+
+                'pledge-id' => 0,
+                'ref' => 'wharfmeet',
+
+                'text' => 'will attend the Wharfdale road traffic calming measures meeting on 15/03/2005',
+                'target' => '20',
+                'people' => 'other local people',
+                'people-text' => 'come along too',
+
+                'author' => 'Tom Steinberg',
+                'date' => '15th March 2005',
+                'sms' => 12345,
 		      });
 
-isa_ok($pdf, 'MS::PDF', 'Object');
+=comment
+my $pdf = PBPDF->new( { 
+                'poster-type' => 'original',
+                'pledge-id' => 0,
+                'target' => 20,
+                'ref' => 'wharfmeet',
+                'text' => 'will attend the Wharfdale road traffic calming measures meeting on 15/03/2005',
+                'sms' => 12345,
+		      });
+=cut
 
 my $filename;
-ok($filename = $pdf->make('A4'),'Made PDF');
+$filename = $pdf->make('A5');
+if (!$filename) {
+    exit 1;
+}
 
-`mv $filename /home/francis/tmp/pdfs/0.pdf`;
+`mv $filename test.pdf`;
+exit 0;
 
 # if you need CGI output, just re-open $filename as FILE, print some
 # headers + <FILE> to STDOUT, close FILE, and unlink $filename.

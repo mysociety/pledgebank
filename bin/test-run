@@ -21,17 +21,19 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.4 2005-03-15 15:13:28 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.5 2005-03-17 09:20:37 francis Exp $';
 
 use strict;
 require 5.8.0;
 
 use Data::Dumper;
-use Carp;
+use Carp qw(verbose);
 
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
 use mySociety::WebTestHarness;
+
+#DBI->trace(1);
 
 our $base_url = mySociety::Config::get('BASE_URL');
 our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
@@ -105,7 +107,7 @@ sub confirm_signature {
     if ($target_reached) {
         $wth->browser_check_contents("Your signature has made this pledge reach its target!");
     } else {
-        $wth->browser_check_contents("Thank you for confirming your signature");
+        $wth->browser_check_contents("Thanks for subscribing");
     }
     $wth->log_watcher_check();
 }

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.13 2005-03-16 16:58:35 chris Exp $
+ * $Id: confirm.php,v 1.14 2005-03-17 09:20:39 francis Exp $
  * 
  */
 
@@ -163,18 +163,7 @@ td {
         print '<tr align="center">';
         for ($cols=0; $cols<2; $cols++) {
             print '<td>';
-            print pledge_sentence($r, array('firstperson' => 'includename', 'html' => true));
-            print '<p>Please support me by signing up, and by encouraging
-                other people to do the same. I am using the charitable service
-                PledgeBank.com to gather support.</p>
-            
-                <p>It will only take you a few seconds - sign up free at ';
-            print '<strong>www.pledgebank.com/' .  htmlspecialchars($r['ref']) . "</strong>";
-            print '<p>Or text <strong>';
-            print 'pledge ' . htmlspecialchars($r['ref']);
-            print '</strong>  to <strong>12345</strong> (cost 25p)';
-            print '<p>This pledge closes on ' . prettify($r['date']). '. ';
-            print 'Thanks!';
+            print get_flyer_text($r, array());
             print '</td>';
         }
         print '</tr>';

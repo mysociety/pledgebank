@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.38 2005-03-16 16:58:35 chris Exp $
+-- $Id: schema.sql,v 1.39 2005-03-17 09:20:38 francis Exp $
 --
 
 -- secret
@@ -68,8 +68,8 @@ create table pledges (
 );
 
 -- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
--- Is the given PLEDGE valid for EMAIL or MOBILE to sign? One of EMAIL or
--- MOBILE may be null. Returns one of:
+-- Whether the given PLEDGE is valid for EMAIL or MOBILE to sign. One of EMAIL
+-- or MOBILE may be null. Returns one of:
 --      ok          pledge is OK to sign
 --      none        no such pledge exists
 --      finished    pledge has expired
@@ -169,7 +169,7 @@ create table outgoingsms (
             or status = 'none'
         )
     
-    -- XXX extra fields for billing?
+    -- XXX add extra fields for billing
 );
 
 create unique index outgoingsms_foreignid_idx on outgoingsms(foreignid);
@@ -281,7 +281,7 @@ create function signers_combine_2(integer, integer)
             where id = id1;
 
         if success then
-            -- pledge was successful and now we're removing a signer, so record
+            -- pledge was successful and now we''re removing a signer, so record
             -- this fact
             update pledges set removedsigneraftersuccess = true
                 where id = t_pledge_id;

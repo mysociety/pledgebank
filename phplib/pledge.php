@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.25 2005-03-16 16:58:35 chris Exp $
+ * $Id: pledge.php,v 1.26 2005-03-17 09:20:39 francis Exp $
  * 
  */
 
@@ -196,6 +196,25 @@ function pledge_sentence($r, $params = array()) {
     $s = preg_replace('#\.\.#', '.', $s);
 
     return $s;
+}
+
+/* get_flyer_text PLEDGE [PARAMS]
+ * Given a pledge data associated array, returns the text for use on flyer.
+ */
+function get_flyer_text($r, $params = array()) {
+    $html = pledge_sentence($r, array('firstperson'=>'includename', 'html'=>true));
+    $html .= '<p>Please support me by signing up, and by encouraging
+        other people to do the same. I am using the charitable service
+        PledgeBank.com to gather support.</p>
+    
+        <p>It will only take you a few seconds - sign up free at ';
+    $html .= '<strong>www.pledgebank.com/' .  htmlspecialchars($r['ref']) . "</strong>";
+    $html .= '<p>Or text <strong>';
+    $html .= 'pledge ' . htmlspecialchars($r['ref']);
+    $html .= '</strong>  to <strong>12345</strong> (cost 25p)';
+    $html .= '<p>This pledge closes on ' . prettify($r['date']). '. ';
+    $html .= 'Thanks!';
+    return $html;
 }
 
 /* pledge_is_successful PLEDGE

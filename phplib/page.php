@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.11 2005-03-29 07:39:56 francis Exp $
+// $Id: page.php,v 1.12 2005-04-01 17:34:01 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -33,7 +33,8 @@ function page_header($title, $params = array()) {
 <hr class="v"><?
         if (array_key_exists('noprint', $params) and $params['noprint'])
             print '</div> <!-- noprint -->';
-    }
+    } ?>
+<div id="content"><?    
 
     // Warn that we are on a testing site
     if (OPTION_PB_STAGING) {
@@ -49,8 +50,6 @@ function page_header($title, $params = array()) {
 <em>Note: On this test site, the date is faked to be <?=$pb_today?></em></p><?
     }
 
-    // Begin content
-?><div id="content"><?
 }
 
 /* page_footer PARAMS

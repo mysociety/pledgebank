@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.4 2005-03-03 11:22:16 chris Exp $
+# $Id: SMS.pm,v 1.5 2005-03-04 18:54:38 chris Exp $
 #
 
 package PB::SMS;
@@ -116,7 +116,7 @@ sub receive_sms ($$$$$) {
             # conversion-to-email message.
             my $signers_id = dbh()->selectrow_array('select id from signers where outgoingsms_id = ? for update', {}, $id);
             return 0 if (!defined($signers_id));
-            dbh()->do('update signers set confirmed = true where id = ?', {}, $signers_id);
+            dbh()->do('update signers set confirmed = true, outgoingsms_id = null where id = ?', {}, $signers_id);
             return 1;
         }]
     );

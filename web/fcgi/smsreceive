@@ -17,7 +17,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: smsreceive,v 1.2 2005-03-03 01:21:46 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: smsreceive,v 1.3 2005-03-04 18:54:38 chris Exp $';
 
 use strict;
 
@@ -123,18 +123,17 @@ while (my $q = new CGI::Fast()) {
             # At this point we try to guess whether the message is a delivery
             # report for a message which we have sent, or an incoming message.
             my $isreport = 0;
-            if (my $message =~ m#^REPORT ([^ ]) ([A-Z]+)$#) {
-                my ($sent_smsid, $status) = @_;
+            if ($message =~ m#^REPORT ([^ ]+) ([A-Z]+)$#) {
+                my ($sent_smsid, $status) = ($1, $2);
                 my $msg_recipient = dbh()->selectrow_array('
                         select recipient from outgoingsms where foreignid = ? for update
                     ', {}, $sent_smsid);
                 if (defined($msg_recipient) && $msg_recipient eq $sender) {
-                    if ($status =~ m#^(delivered|failed|buffered|rejected|none)$#) {
+                    if ($status =~ m#^(delivered|failed|buffered|rejected|none)$#i) {
                         # This is probably a delivery report.
                         $isreport = 1;
                         $status = lc($status);
-                        dbh()->do('update outgoingsms set status = ? where foreignid = ?');
-                        dbh()->commit();
+                        dbh()->do('update outgoingsms set status = ? where foreignid = ?', {}, $status, $sent_smsid);
                     } else {
                         warn "message '$message' from $sender to $recipient matches delivery report pattern but has bad status '$status'\n";
                     }
@@ -146,13 +145,14 @@ while (my $q = new CGI::Fast()) {
 
             if (!$isreport) {
                 PB::SMS::receive_sms($sender, $recipient, $message, $q->param('smsid'), $whensent);
-                dbh()->commit();
             }
 
             $resp = "OK - message received and logged\n";
         } else {
             $resp = "OK - message has been received before\n";
         }
+
+        dbh()->commit();
 
         print $q->header(
                     -type => 'text/plain; charset=utf-8',

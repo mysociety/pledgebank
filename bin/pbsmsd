@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.2 2005-03-03 11:22:16 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.3 2005-03-04 18:54:38 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -123,13 +123,13 @@ sub run_sending_process () {
                         $p{smsmsg} = encode('iso-8859-15', $message, Encode::FB_CROAK);
                     };
                     if ($@) {
-                        print_log('debug', "#$id cannot be expressed in ISO-8859-15; trying UCS-2");
+                        print_log('debug', "outgoing #$id cannot be expressed in ISO-8859-15; trying UCS-2");
                         my $u = encode('ucs-2', $message, Encode::FB_CROAK);
                         $p{smsucs2} = unpack('h*', $u);
                     }
                 };
                 if ($@) {
-                    print_log('err', "#$id, '$message', cannot be expressed in ISO-8859-15 or UCS-2; abandoning message");
+                    print_log('err', "outgoing #$id, '$message', cannot be expressed in ISO-8859-15 or UCS-2; abandoning message");
                     dbh()->do('delete from outgoingsms where id = ?', {}, $id);
                 } else {
                     # We're OK to attempt sending.
@@ -137,25 +137,25 @@ sub run_sending_process () {
                     eval {
                         local $SIG{ALRM} = sub { die "timed out in eval\n"; };
                         alarm(300);
-                        print_log('debug', "#$id: attempting to send by HTTP POST");
+                        print_log('debug', "outgoing #$id: attempting to send by HTTP POST");
                         my $resp = $ua->post('http://sms.mxtelecom.com/SMSSend', \%p);
                         alarm(0);
                         if (!defined($resp)) {
                             $! ||= '(no error)';
-                            print_log('warning', "#$id: no response from user-agent; system error: $!");
+                            print_log('warning', "outgoing #$id: no response from user-agent; system error: $!");
                             ($status, $extra) = ('systemerror', $!);
                         } elsif ($resp->code() != 200) {
-                            print_log('warning', "#$id: failure to send; HTTP status: " . $resp->status_line());
+                            print_log('warning', "outgoing #$id: failure to send; HTTP status: " . $resp->status_line());
                             foreach (split(/\r?\n/, $resp->content())) {
-                                print_log('warning', "#$id: remote error: $_");
+                                print_log('warning', "outgoing #$id: remote error: $_");
                             }
                             ($status, $extra) = ('httperror', $resp->status_line());
                         } else {
-                            print_log('info', "#$id: sent");
+                            print_log('info', "outgoing #$id: sent");
                             # Now extract the ID from the result.
                             my $foreignid = $resp->content();
                             $foreignid =~ s#\s*$##gs;
-                            print_log('debug', "#$id: foreign ID is $foreignid");
+                            print_log('debug', "outgoing #$id: foreign ID is $foreignid");
                             dbh()->do('update outgoingsms set foreignid = ? where id = ?', {}, $foreignid, $id);
                             ($status, $extra) = ('success', undef);
                         }
@@ -452,5 +452,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.2 2005-03-03 11:22:16 chris Exp $
+$Id: pbsmsd,v 1.3 2005-03-04 18:54:38 chris Exp $
 

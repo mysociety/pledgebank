@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.30 2005-03-14 13:07:21 francis Exp $
+-- $Id: schema.sql,v 1.31 2005-03-15 13:02:45 chris Exp $
 --
 
 -- secret
@@ -221,19 +221,128 @@ create unique index signers_pledge_id_mobile_idx on signers(pledge_id, mobile);
 -- Ditto emails.
 create unique index signers_pledge_id_email_idx on signers(pledge_id, email);
 
--- This is a table which records the number of SMSs sent to any individual
--- phone number on any given pledge. The point here is that somebody may send
--- a subscription request, not receive the reply message and then (perhaps
--- impatiently) send a further signup request.
-create table pledges_outgoingsms (
-    pledge_id integer not null references pledges(id),
-    outgoingsms_id integer not null references outgoingsms(id),
-    -- Since the URL in the SMS probably has to be typed in by the user, have
-    -- a short unique token rather than using the Magic of Cryptography(TM).
-    token text not null
+-- Subscription by SMS. The punter sends us a message, and we reply with a
+-- reverse-billed one, recording the mapping from pledge to outgoing SMS in
+-- this table. We also send them a token (part of a URL) which they may use
+-- to convert their subscription to a normal email subscription. If we get a
+-- delivery report for the outgoing SMS, or if the user gives us the token
+-- before we receive any such report, we sign them up and remove the
+-- references to pledges and outgoingsms here. The token then remains only
+-- for the purpose of converting an SMS to a normal subscription.
+--
+-- We may send out multiple SMSs to one mobile phone for one pledge. But we
+-- only allow one subscription per mobile phone. So we need to check that when
+-- signing up a user from SMS.
+create table smssubscription (
+    token text not null,
+    pledge_id integer references pledges(id),
+    signer_id integer references signers(id),
+    outgoingsms_id integer references outgoingsms(id),
+    check (
+        (pledge_id is not null
+            and signer_id is null
+            and outgoingsms_id is not null)
+        or (pledge_id is null
+            and signer_id is not null
+            and outgoingsms_id is null)
+    )
 );
 
-create unique index pledges_outgoingsms_token_idx on pledges_outgoingsms(token);
+create unique index smssubscription_token_idx on smssubscription(token);
+
+-- smssubscription_sign ID TOKEN
+-- Sign up from an SMS subscription. Supply either the ID of an outgoing SMS
+-- subscription message; or a TOKEN sent in such a message. Returns a code as
+-- from pledge_is_valid_to_sign.
+create or replace function smssubscription_sign(integer, text)
+    returns text as '
+    declare
+        p record;
+        t_outgoingsms_id integer;
+        t_pledge_id integer;
+        t_signer_id integer;
+        t_token text;
+        status text;
+        t_mobile text;
+    begin
+        t_outgoingsms_id := $1;
+        t_token := $2;
+    
+        -- If we have a token not an ID, then get the ID.
+        if t_outgoingsms_id is null then
+            if t_token is null then
+                raise exception ''must supply a signer ID or a token'';
+            end if;
+        
+            select into p outgoingsms_id, signer_id
+                from smssubscription
+                where "token" = token
+                for update;
+
+            if not found then
+                raise exception ''bad token %'', t_token;
+            end if;
+
+            if p.signer_id is not null then
+                -- Already signed this pledge; mark all subscription requests
+                -- with this token with the appropriate signer ID, and return
+                -- ok.
+                update smssubscription
+                    set signer_id = p.signer_id, outgoingsms_id = null,
+                        pledge_id = null
+                    where token = t_token;
+                return ''ok'';
+            else
+                t_outgoingsms_id := p.outgoingsms_id;
+            end if;
+        end if;
+        
+        -- Find out the mobile phone number for this user
+        t_mobile := (
+            select recipient from outgoingsms
+            where id = t_outgoingsms_id
+        );
+        
+        if t_mobile is null then
+            raise exception ''bad outgoing SMS ID #%'', t_outgoingsms_id;
+        end if;
+
+        -- select ... for update is not allowed in a subselect
+        select into p pledge_id from smssubscription
+            where outgoingsms_id = t_outgoingsms_id
+            for update;
+        t_pledge_id = p.pledge_id;
+
+        -- Check whether we can sign up under this number
+        status = pledge_is_valid_to_sign(t_pledge_id, null, t_mobile);
+
+        if status <> ''ok'' then
+            return status;
+        end if;
+        
+        t_signer_id := (
+            select nextval(''signers_id_seq'')
+        );
+
+        insert into signers (id, pledge_id, mobile, signtime)
+            values (t_signer_id, t_pledge_id, t_mobile, current_timestamp);
+
+        if t_token is null then
+            t_token = (
+                select token from smssubscription
+                where outgoingsms_id = t_outgoingsms_id
+                -- already grabbed lock above
+            );
+        end if;
+        
+        update smssubscription
+            set signer_id = t_signer_id, outgoingsms_id = null,
+                pledge_id = null
+            where token = t_token;
+
+        return ''ok'';
+    end;
+' language 'plpgsql';
 
 -- Stores randomly generated tokens and serialised hash arrays associated
 -- with them.

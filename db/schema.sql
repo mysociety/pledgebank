@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.36 2005-03-16 14:57:00 chris Exp $
+-- $Id: schema.sql,v 1.37 2005-03-16 15:04:43 chris Exp $
 --
 
 -- secret
@@ -427,7 +427,7 @@ create function smssubscription_sign(integer, text)
 create table token (
     scope text not null,        -- what bit of code is using this token
     token text not null,
-    data text not null,
+    data bytea not null,
     created timestamp not null,
     primary key (scope, token)
 );

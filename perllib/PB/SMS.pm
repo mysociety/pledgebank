@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.14 2005-03-29 19:55:10 sandpit Exp $
+# $Id: SMS.pm,v 1.15 2005-03-30 16:10:05 sandpit Exp $
 #
 
 package PB::SMS;
@@ -18,7 +18,7 @@ package PB::SMS;
 use strict;
 
 use mySociety::DBHandle qw(dbh);
-use mySociety::Util qw(print_log);
+use mySociety::Util qw(print_log ordinal);
 
 use PB;
 
@@ -349,10 +349,15 @@ sub receive_sms ($$$$$$) {
                                 . "-"
                                 . unpack('h*', mySociety::Util::random_bytes(2));
 
+                # Tell the user how many people have signed. This isn't
+                # reliable but is Good Enough for these purposes.
+                my $numsigned = dbh()->selectrow_array('select count(id) from signers where pledge_id = ?', {}, $pledge_id) + 1;
+
                 my ($new_id) =
                     send_sms(
                             $sender,
-                            sprintf('Thanks for pledging! Visit %s/S/%s to sign up for email and more.',
+                            sprintf('Thanks - you are the %s person to pledge! Please go to %s/S/%s for more info.',
+                                    ordinal($numsigned),
                                     mySociety::Config::get('BASE_URL'),
                                     $token
                             ));

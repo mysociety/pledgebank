@@ -79,7 +79,7 @@ function pluralize(t) {
 <p>if <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" name="people" value="<?=htmlentities($_POST['people']) ?>">
 other <input type="text" id="type" name="type" size="30" value="people"> sign<span id="signplural"></span> up before <input title="Deadline date" type="text" name="date" value="<?=htmlentities($_POST['date']) ?>">.</p>
 
-<p>Choose a unique reference for your pledge:<br>http://pledgebank.com/<input type="text" size="10" name="ref" value="<?=htmlentities($_POST['ref']) ?>"> <small>(letters, numbers, -, _)</small>
+<p>Choose a unique reference for your pledge:<br>http://pledgebank.com/<input type="text" size="10" name="ref" value="<?=htmlentities($_POST['ref']) ?>"> <small>(letters, numbers, -)</small>
 <p>Name: <input type="text" size="20" name="name" value="<?=htmlentities($_POST['name']) ?>">
 Email: <input type="text" size="30" name="email" value="<?=htmlentities($_POST['email']) ?>">
 &nbsp;

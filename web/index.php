@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.111 2005-04-04 00:55:03 francis Exp $
+// $Id: index.php,v 1.112 2005-04-04 09:33:07 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -91,7 +91,7 @@ function report_form() {
         print '<p>You are reporting the signature "' . htmlspecialchars($r['name']) . '" on the pledge "' . htmlspecialchars($r['title']) . '"</p>';
         print '<p>Please give a (short) reason for reporting this signature:</p>';
         print '<textarea name="reason" rows="5" cols="50"></textarea>';
-        print '<p><input type="submit" value="Submit"></p>';
+        print '<p><input name="submit" type="submit" value="Submit"></p>';
         print '</form>';
     }
 }

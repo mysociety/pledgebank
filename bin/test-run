@@ -15,11 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-# Tests to do:
-# Check other private pages are private (e.g. flyers)
-# Send SMS messages somehow without costing us a fortune
-
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.18 2005-04-01 12:08:54 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.19 2005-04-04 09:33:03 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -242,13 +238,39 @@ sub do_public_succeeding_pledge {
     # Make the pledge
     set_pb_date('1982-02-01');
     my $pledge_action_completion = 'make sure a pledge can be completed';
+    my $pledge_ref = "automatedtest";
     create_pledge(0, 
         { title => $pledge_action_completion, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
-            date => 'tomorrow', ref => 'automatedtest',
+            date => 'tomorrow', ref => $pledge_ref,
         },
         {  }
     );
+
+    # Mail pledge to friends
+    $b->get($base_url . "/$pledge_ref");
+    $b->follow_link(text_regex => qr/Email pledge/) or die "Email pledge to friends link not founm";
+    $wth->browser_check_contents("Email this pledge");
+    my $friend_message = "Hello you!";
+    $b->submit_form(form_name => 'pledge',
+        fields => { 
+            fromname => name_n(0), fromemail => email_n(0), 
+            frommessage => $friend_message,
+            email1 =>  email_n(10),
+            email2 =>  email_n(11),
+            email3 =>  email_n(12),
+            # deliberate gap
+            email5 =>  email_n(13),
+            },
+        button => 'submit') or die "Failed to submit friend emailing form";
+    $wth->browser_check_contents("Thanks very much for spreading the word");
+    $wth->log_watcher_check();
+    for (my $i = 10; $i <= 13; $i++) {
+        my $content = $wth->email_get_containing('%To: '.email_n($i).  '%thought you would be interested%');
+        $content =~ m#$base_url/$pledge_ref# or die "Failed to find pledge link in friend email";
+        $content =~ m#$friend_message# or die "Failed to find message in friend email";
+        $content =~ m## or die "Failed to find pledge link in friend email";
+    }
 
     # Sign it a few times
     for (my $i = 1; $i <= 3; ++$i) {
@@ -303,7 +325,7 @@ sub do_public_succeeding_pledge {
     $b->get($base_url);
     $wth->browser_check_no_contents($pledge_action_completion);
     # Pledge should say the right things
-    $b->get($base_url . "/automatedtest");
+    $b->get($base_url . "/$pledge_ref");
     $wth->browser_check_contents("This pledge is now closed");
     $wth->browser_check_no_contents("Sign me up");
     $wth->browser_check_contents("This pledge has been successful!");

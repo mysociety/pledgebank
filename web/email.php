@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: email.php,v 1.3 2005-04-04 00:55:03 francis Exp $
+// $Id: email.php,v 1.4 2005-04-04 09:33:07 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -39,7 +39,10 @@ page_header($title);
 $fromname = get_http_var('fromname');
 $fromemail = get_http_var('fromemail');
 $frommessage = get_http_var('frommessage');
-$emails = get_http_var('email');
+$emails = array();
+for ($i = 1; $i <= 5; $i++) {
+    $emails[] = get_http_var("email$i");
+}
 if ($fromname && $fromemail && $emails) {
     if (sizeof($emails)>5)
         err("Trying to use us for SPAMMING!?!?!");
@@ -93,21 +96,21 @@ function view_pledge($ref, $r) {
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <h2>Email this pledge</h2>
 <p>
-Please enter your details so that we can send your message to your
-contacts:  we will not give or sell your email address to anyone else.
+Please enter these details so that we can send your message to your contacts.
+We will not give or sell either your or their email address to anyone else.
 </p>
-<div class="formrow">Your name: <input type="text" name="fromname" value="" size="20">
-Email: <input type="text" name="fromemail" value="" size="30"></div>
+<div class="formrow">Your name: <input type="text" name="fromname" value="" size="18">
+Email: <input type="text" name="fromemail" value="" size="26"></div>
 <p>Add a message, if you want:</p>
 <div class="formrow"><textarea name="frommessage" rows="5" cols="60"></textarea></div>
 <p>Other people's email addresses:</p>
 <style type="text/css">.formrow { margin-bottom: 3px; margin-left: 5em; }</style>
-<div class="formrow"><input type="text" name="email[]" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email[]" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email[]" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email[]" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email[]" value="" size="40"></div>
-<p><input type="submit" value="Send"></p>
+<div class="formrow"><input type="text" name="email1" value="" size="40"></div>
+<div class="formrow"><input type="text" name="email2" value="" size="40"></div>
+<div class="formrow"><input type="text" name="email3" value="" size="40"></div>
+<div class="formrow"><input type="text" name="email4" value="" size="40"></div>
+<div class="formrow"><input type="text" name="email5" value="" size="40"></div>
+<p><input name="submit" type="submit" value="Send"></p>
 </form>
 
 <?

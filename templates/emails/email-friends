@@ -5,11 +5,11 @@ interested in the following pledge from PledgeBank.com.
 
 '<?=$values['sentence_third']?>'
 
-Support them by signing up now.  It'll only take a few seconds, and is free.
+<?=$values['from_message']?>Support them by signing up now.  It'll only take a few seconds, and is free.
 
 <?=$values['pledge_url']?>
 
-<?=$values['from_message']?>This pledge closes on <?=$values['pretty_date']?>, so be sure to sign it before
+This pledge closes on <?=$values['pretty_date']?>, so be sure to sign it before
 then!
 
 <?=$values['signature']?>

@@ -19,7 +19,7 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.14 2005-03-29 14:23:14 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.15 2005-03-30 18:12:05 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -27,6 +27,7 @@ require 5.8.0;
 use Data::Dumper;
 use Carp qw(verbose);
 use Storable;
+use FindBin;
 
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
@@ -49,7 +50,7 @@ print "Set up web test harness...\n" if $verbose > 0;
 our $wth = new mySociety::WebTestHarness('PB_');
 $wth->log_watcher_setup($httpd_error_log);
 $wth->database_drop_reload('../db/schema.sql');
-$wth->email_setup();
+$wth->email_setup("$FindBin::Bin/../../services/EvEl/bin/eveld");
 our $b = $wth->browser_get_agent();
 
 # Syntax check all .php files
@@ -284,6 +285,11 @@ sub do_public_succeeding_pledge {
         }
         # Check got success emails
         my $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
+        if ($i == 0) {
+            # TODO: We need to grab link for creator to send mail here
+            #print $confirmation_email;
+            #exit;
+        }
     }
     $wth->log_watcher_check();
     # ... complete partial signature

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.19 2005-03-29 07:39:56 francis Exp $
+ * $Id: confirm.php,v 1.20 2005-03-30 18:12:05 francis Exp $
  * 
  */
 
@@ -56,7 +56,7 @@ if ($q_type == 'pledge') {
     $title = db_getOne('select title from pledges where id = ?',
                         $data['pledge_id']);
                         
-    page_header("$title - Sign up", array('nonav' => true));
+    page_header("Sign up to '$title'", array('nonav' => true));
 
     $r = PLEDGE_ERROR;
     $f1 = null;

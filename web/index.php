@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.83 2005-03-15 18:47:01 chris Exp $
+// $Id: index.php,v 1.84 2005-03-15 19:09:38 sandpit Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -167,7 +167,8 @@ the door of that neighbour whose name you've forgotten.</li>
 <p><strong>if</strong> <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'3') ?>">
 <input type="text" id="type" name="type" size="67" value="other local people"></p>
 
-<p><strong>will</strong> <input type="text" id="signup" name="signup" size="74" value="do the same"></p>
+<p><strong>will</strong> <input type="text" id="signup" name="signup"
+size="74" value="do the same">.</p>
 
 <p>The other people must sign up before <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']['iso']) ?>"></p>
 

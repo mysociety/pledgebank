@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.9 2005-03-15 16:37:33 francis Exp $
+ * $Id: confirm.php,v 1.10 2005-03-15 19:09:38 sandpit Exp $
  * 
  */
 
@@ -35,14 +35,14 @@ if ($q_type == 'pledge') {
     }
 
     /* Success. */
-    page_header(
-            db_getOne('select title from pledges where id = ?', $pledge_id)
-            . ' - Confirm', array('nonav'=>true)
-        );
+    $q = db_query('select * from pledges where id = ?', $pledge_id);
+    $r = db_fetch_array($q);
+    page_header($r['title'] . ' - Confirm', array('nonav'=>true));
     db_commit();
+    $url = "/" . urlencode($r['ref']);
     ?>
-    <p>Thank you for confirming your pledge. It is now live, and people can sign up
-    to it. OTHER STUFF.</p>
+    <p>Thank you for confirming your pledge. It is now live, and people can 
+    <a href="<?=$url?>">sign up to it</a>.</p>
     <?  advertise_flyers($pledge_id);
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
@@ -82,7 +82,7 @@ function advertise_flyers($pledge_id) {
 ?>
 
 <p align="center">
-Important Notice - You will massively increase the chance of this pledge being
+<strong>Important Notice</strong> - You will massively increase the chance of this pledge being
 a success if 
 <script type="text/javascript">
     document.write('<a href="javascript: window.print()">print this page out</a>,');
@@ -99,15 +99,18 @@ now and post them next time you go out to the shops. We also have more
 
 <style type="text/css">
 table {
-    border: none;
-    margin: 0 auto;
+    margin: 10pt;
     max-width: 90%;
+    border-collapse: collapse;
+    border: dashed 1px black;
 }
 td {
-    border: solid 2px black;
+    font-size: 83%;
+    border: dashed 1px black;
+    padding: 10pt;
 }
 </style>
-<table border="1" cellpadding="10" cellspacing="20"><?
+<table><?
     
     for ($rows = 0; $rows<4; $rows++) {
         print '<tr align="center">';
@@ -118,8 +121,8 @@ td {
                 other people to do the same. I am using the charitable service
                 PledgeBank.com to gather support.</p>
             
-                <p>It will only take you a few seconds - sign up free at:</b>';
-            print '<br><strong>www.pledgebank.com/' . htmlspecialchars($r['ref']) . "</strong";
+                <p>It will only take you a few seconds - sign up free at ';
+            print '<strong>www.pledgebank.com/' .  htmlspecialchars($r['ref']) . "</strong>";
             print '<p>Or text <strong>';
             print 'pledge ' . htmlspecialchars($r['ref']);
             print '</strong>  to <strong>12345</strong> (cost 25p)';

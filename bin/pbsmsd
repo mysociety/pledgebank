@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.13 2005-03-30 10:23:08 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.14 2005-03-30 10:48:17 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -256,9 +256,14 @@ sub run_gathering_process () {
                             and (laststatuscheck is null or
                                     laststatuscheck < ?)
                         ");
+
+    # Missed messages. We try to extract ranges of missed message IDs, and
+    # query them not too often and not for too long.
     my $s_missed = dbh()->prepare("
                         select gap
                         from incomingsms_foreignid_gap
+                        where lastpolled is null
+                            or (lastpolled > ? and lastpolled < ?)
                         order by gap
                         for update
                         ");
@@ -367,13 +372,15 @@ sub run_gathering_process () {
                             {}, time(), $min_id);
                 }
             }
+        } else {
+            print_log('debug', "get receipts: no outstanding messages to query for");
         }
         dbh()->commit();
 
         #
         # Missed messages
         #
-        $s_missed->execute();
+        $s_missed->execute(time() - max_polling_age, time() - min_polling_interval);
 
         # Try to produce an efficient query to pick up ranges.
         my @qq;
@@ -445,6 +452,22 @@ sub run_gathering_process () {
 
                         PB::SMS::receive_sms($sender, $recipient, $network, PB::SMS::decode_ia5($message), $foreignid, $whensent);
                     }
+
+                    # Record that we've polled these gaps and drop any which
+                    # are too old.
+                    dbh()->do('
+                            update incomingsms_foreignid_gap
+                            set lastpolled = ?
+                            where lastpolled is null
+                                or (lastpolled > ? and lastpolled < ?)',
+                            {}, time() - max_polling_age,
+                                time() - min_polling_interval);
+
+                    my $n = dbh()->do('
+                            delete from incomingsms_foreignid_gap
+                            where lastpolled < ?',
+                            {}, time() - max_polling_age);
+                    print_log('warning', "get missed messages: dropped $n expired outstanding IDs");
                 }
             }
         } else {
@@ -649,5 +672,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.13 2005-03-30 10:23:08 sandpit Exp $
+$Id: pbsmsd,v 1.14 2005-03-30 10:48:17 sandpit Exp $
 

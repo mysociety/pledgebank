@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.24 2005-03-09 18:10:21 francis Exp $
+-- $Id: schema.sql,v 1.25 2005-03-11 11:55:23 chris Exp $
 --
 
 -- secret
@@ -52,6 +52,15 @@ create table pledges (
 
     country text not null default '',
     postcode text not null default '',
+
+    -- When a pledge is successful, we mark it as successful here.
+    success boolean not null default false,
+
+    -- It's possible (hopefully rare) for subscribers to be removed from a
+    -- pledge after it's been marked as successful. But once a pledge has
+    -- been marked as successful we can't undo that (because success emails
+    -- have already been sent out and so forth). So we instead note this here.
+    removedsigneraftersuccess boolean not null default false,
 
     -- We must only notify people that the pledge has been completed once.
     -- This flag is set when we first notice that that has happened.

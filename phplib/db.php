@@ -23,7 +23,7 @@ function db_query($query, $params = array()) {
     global $pbdb;
 	$result = $pbdb->query($query, $params);
     if (DB::isError($result)) {
-        die($result->getMessage());
+	    die($result->getMessage().': "'.$result->getDebugInfo().'"');
     }
 	return $result;
 }

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.7 2005-03-07 18:00:01 francis Exp $
+ * $Id: pb.css,v 1.8 2005-03-08 20:28:22 matthew Exp $
  * 
  */
 
@@ -135,7 +135,7 @@ textarea:hover, textarea:focus, input:hover, input:focus {
 	padding: 3px;
 	border-top: solid 1px #c6b5d3;
 	font-size: 90%;
-	width: 100%;
+	width: 50%;
 	margin: 1em auto 0;
 }
 

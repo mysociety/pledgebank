@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.64 2005-03-08 16:30:53 chris Exp $
+// $Id: index.php,v 1.65 2005-03-08 20:28:22 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -30,12 +30,6 @@ if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
     } else {
         report_form();
     }
-} elseif (get_http_var('confirmp')) {
-    $title = 'Pledge Confirmation';
-    confirm_pledge();
-} elseif (get_http_var('confirms')) {
-    $title = 'Signature Confirmation';
-    confirm_signatory();
 } elseif (get_http_var('add_signatory')) {
     $title = 'Signature addition';
     add_signatory();
@@ -329,7 +323,7 @@ doesn't work, or you have any other suggests or comments.
     $q = db_query("
                 SELECT *, date - CURRENT_DATE AS daysleft
                 FROM pledges
-                WHERE date >= CURRENT_DATE AND password = ''
+                WHERE date >= CURRENT_DATE AND password = '' AND confirmed
                 ORDER BY id
                 DESC LIMIT 5");
     $new = '';
@@ -399,7 +393,7 @@ function add_signatory() {
     global $q_email, $q_ref, $q_pw;
     if (!is_null(importparams(
             array('email',      '//',           ''),
-            array('ref',        '/^[a-z-]+$/i', ''),    /* NB really a reference, not an ID */
+            array('ref',        '/^[a-z0-9-]+$/i', ''),
             array('pw',         '//',           '', null)
             )))
         err("Bad parameters in add_signatory.");
@@ -432,7 +426,7 @@ EOF
         /* Generate a secure URL to send to the user. */
         $token = pledge_email_token($q_email, $r['id']);
         /* ";" is not used in base64 */
-        $url = OPTION_BASE_URL . "C/" . urlencode($q_email) . ";" . $r['id'] . ";$token";
+        $url = OPTION_BASE_URL . "C/" . urlencode($q_email) . ";" . $r['id'] . ';' . urlencode($token);
 
         $success = pb_send_email(
                 $q_email,
@@ -566,7 +560,7 @@ function view_pledge() {
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
 <p style="text-align: left">
 <input type="hidden" name="add_signatory" value="1">
-<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>"
+<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 <input type="submit" name="submit" value="Submit">
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
@@ -607,7 +601,7 @@ if ($detail) {
 function create_new_pledge($data) {
     # 'action', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'date', 'signup', 'country', 'postcode', 'password'
 	$isodate = $data['date']['iso'];
-        $token = pledge_confirmation_token();
+        $token = pledge_email_token($data['email'], $data['ref']);
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)', 
@@ -617,7 +611,7 @@ function create_new_pledge($data) {
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other
 people to sign up to your pledge after you have clicked the link in the email.</p>
 <?
-	$link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirmp=' . $token);
+	$link = OPTION_BASE_URL . 'C/' . urlencode($token);
 	$success = pb_send_email($data['email'], 'New pledge at PledgeBank.com : '.$data['action'], "Thank you for submitting your pledge to PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
 	if ($success) {
             db_commit();
@@ -635,23 +629,6 @@ people to sign up to your pledge after you have clicked the link in the email.</
 }
 
 # Pledger has clicked on link in their email
-function confirm_pledge() {
-	$token = get_http_var('confirmp');
-	$q = db_query('SELECT confirmed FROM pledges WHERE token = ? for update', array($token));
-	$row = db_fetch_array($q);
-	if (!$row) {
-		print '<p>Confirmation token not recognised!</p>';
-		return false;
-	}
-
-	db_query('UPDATE pledges SET confirmed=true,creationtime=CURRENT_TIMESTAMP WHERE token = ?', array($token));
-        db_commit();
-        print <<<EOF
-<p>Thank you for confirming that pledge. It is now live, and people can sign up to it. OTHER STUFF.</p>
-EOF;
-	return 1;
-}
-
 function list_all_pledges() {
     print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
     $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed AND password=\'\'');

@@ -6,23 +6,48 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.1 2005-03-08 16:56:14 chris Exp $
+ * $Id: confirm.php,v 1.2 2005-03-08 20:28:22 matthew Exp $
  * 
  */
 
 require_once "../phplib/db.php";
 require_once "../phplib/pb.php";
+require_once "../phplib/fns.php";
 require_once "../phplib/pledge.php";
 
 require_once "../../phplib/importparams.php";
 
 $err = importparams(
-            array('email',      '/^[^@]+@.+/',      ""),
-            array('pledge',     '/^[1-9][0-9]*$/',  ""),
+            array('email',      '/^[^@]+@.+/',      "", ''),
+            array('pledge',     '/^[1-9][0-9]*$/',  "", ''),
             array('token',      '/.+/',             "")
         );
 
-if (!is_null($err) || pledge_email_token($q_email, $q_pledge, $q_token) != $q_token) 
+if (!is_null($err))
+    err("Sorry -- something seems to have gone wrong");
+
+# Pledge confirmation
+if (!$q_email && !$q_pledge) {
+    $q = db_query('SELECT ref, title, date, confirmed FROM pledges WHERE token = ? for update', array($q_token));
+    $r = db_fetch_array($q);
+    if (!$r) {
+        print '<p>Confirmation token not recognised!</p>';
+        return false;
+    }
+    page_header($r['title'] . ' - Sign Up');
+
+    if ($r['confirmed'] == 'f') {
+        db_query('UPDATE pledges SET confirmed=true, creationtime=CURRENT_TIMESTAMP WHERE token = ?', array($q_token));
+    }
+    db_commit();
+?>
+<p>Thank you for confirming that pledge. It is now live, and people can sign up to it. OTHER STUFF.</p>
+<?  advertise_flyers($r);
+    page_footer();
+    return true;
+}
+
+if (pledge_email_token($q_email, $q_pledge, $q_token) != $q_token) 
     err("Sorry -- something seems to have gone wrong");
 
 $err = importparams(
@@ -68,46 +93,8 @@ if ($q_f && is_null($err)) {
         else {
             /* Otherwise advertise flyers. */
             $r = db_getRow('select ref, title, date from pledges where id = ?', $pledge_id);
-
-?><p><a href="<?=htmlspecialchars($r['ref']) ?>/flyers">View and print Customised Flyers for this pledge</a></p>
-
-<p align="center"><big>Why not <strong>
-<script type="text/javascript">
-    document.write('<a href="javascript: window.print()">HIT PRINT</a>');
-</script>
-<noscript>
-HIT PRINT
-</noscript>
-</strong> now and get these example cards below, for you to cut out and give
-to your friends and neighbours?</big></p>
-
-<style type="text/css">
-table {
-    border: none;
-    margin: 0 auto;
-    max-width: 90%;
-}
-td {
-    border: solid 2px black;
-}
-</style>
-<table border="1" cellpadding="10" cellspacing="20"><?
-    
-            for ($rows = 0; $rows<4; $rows++) {
-                print '<tr align="center">';
-                for ($cols=0; $cols<2; $cols++) {
-                    print '<td>';
-                    print '<strong>"I will ' . htmlspecialchars($r['title']) . '"</strong>';
-                    print '<br>Deadline: ' . prettify($r['date']);
-                    print '<br>www.pledgebank.com/' . htmlspecialchars($r['ref']);
-                    print '</td>';
-                }
-                print '</tr>';
-            }
-
-            print "</table>";
+            advertise_flyers($r);
         }
-
         db_commit();
     } else
         oops($r);
@@ -155,6 +142,46 @@ EOF;
     
     } else
         oops($r);
+}
+page_footer();
+
+function advertise_flyers($r) {
+?><p><a href="<?=htmlspecialchars($r['ref']) ?>/flyers">View and print Customised Flyers for this pledge</a></p>
+
+<p align="center"><big>Why not <strong>
+<script type="text/javascript">
+    document.write('<a href="javascript: window.print()">HIT PRINT</a>');
+</script>
+<noscript>
+HIT PRINT
+</noscript>
+</strong> now and get these example cards below, for you to cut out and give
+to your friends and neighbours?</big></p>
+
+<style type="text/css">
+table {
+    border: none;
+    margin: 0 auto;
+    max-width: 90%;
+}
+td {
+    border: solid 2px black;
+}
+</style>
+<table border="1" cellpadding="10" cellspacing="20"><?
+    
+    for ($rows = 0; $rows<4; $rows++) {
+        print '<tr align="center">';
+        for ($cols=0; $cols<2; $cols++) {
+            print '<td>';
+            print '<strong>"I will ' . htmlspecialchars($r['title']) . '"</strong>';
+            print '<br>Deadline: ' . prettify($r['date']);
+            print '<br>www.pledgebank.com/' . htmlspecialchars($r['ref']);
+            print '</td>';
+        }
+        print '</tr>';
+    }
+    print "</table>";
 }
 
 ?>

@@ -4,8 +4,8 @@ function db_connect() {
 	$vars = array('host'=>'HOST', 'port'=>'PORT', 'dbname'=>'NAME', 'user'=>'USER', 'password'=>'PASS');
 	$connstr = array();
 	foreach ($vars as $k => $v) {
-		if ($c = constant('OPTION_PB_DB_' . $v)) {
-			$connstr[] = $k . '=' . $c;
+		if (defined('OPTION_PB_DB_' . $v)) {
+			$connstr[] = $k . '=' . constant('OPTION_PB_DB_' . $v);
 		}
 	}
 	$connstr = join(' ',$connstr);

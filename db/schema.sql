@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.1 2005-01-07 12:46:42 francis Exp $
+-- $Id: schema.sql,v 1.2 2005-01-07 13:44:05 francis Exp $
 --
 
 create table pledges (
@@ -14,7 +14,7 @@ create table pledges (
   title varchar(255) not null,
   target varchar(50) not null,
   type varchar(50) not null,
-  date int not null,
+  date date not null,
   name varchar(50) not null,
   email varchar(100) not null,
   ref varchar(20) not null,
@@ -24,6 +24,7 @@ create table pledges (
 );
 
 create table signers (
+  id serial not null primary key,
   pledge_id int not null,
 
   signname varchar(50) not null,

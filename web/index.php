@@ -23,7 +23,7 @@ if (get_magic_quotes_gpc()) {
 
 $db = db_connect();
 
-$now = time();
+$today = date('Y-m-d');
 $nowA = array( 'day' => date('d'), 'month' => date('m'), 'year' => date('Y') );
 
 page_header();
@@ -120,7 +120,7 @@ function pledge_form_submitted() {
 }
 
 function front_page() {
-	global $now;
+	global $today;
 ?>
 <p>Welcome to PledgeBank, the site that lets you say "I'll do something if other people will do it too."</p>
 <p id="start"><a href="./?new=1"><strong>Start your own pledge &raquo;</strong></a></p>
@@ -131,7 +131,7 @@ function front_page() {
 <p style="margin-top: 1em; text-align: right"><input type="submit" value="Go"></p>
 </form>
 <h2>Five Newest Pledges</h2>
-<?	$q = db_query('SELECT *,TO_DAYS(date)-TO_DAYS(CURDATE()) AS daysleft FROM pledges WHERE date>=CURDATE() AND confirmed=1 ORDER BY id DESC LIMIT 10');
+<?	$q = db_query('SELECT *, date - CURRENT_DATE AS daysleft FROM pledges WHERE date >= CURRENT_DATE AND confirmed=1 ORDER BY id DESC LIMIT 10');
 	if ($q) {
 		$new = '';
 		$k = 5;
@@ -154,7 +154,12 @@ function front_page() {
 ?>
 
 <h2>Five Highest Signup Pledges</h2>
-<?	$q = db_query('SELECT pledges.*,COUNT(*) AS count,TO_DAYS(date)-TO_DAYS(CURDATE()) AS daysleft FROM pledges,signers WHERE pledges.id=signers.pledge_id AND date>=CURDATE() AND pledges.confirmed=1 AND signers.confirmed=1 GROUP BY pledge_id ORDER BY count DESC');
+<?	$q = db_query('SELECT pledges.id, 
+max(pledges.name), max(pledges.title),max(pledges.date), max(pledges.target), max(pledges.type),
+COUNT(signers.id) AS count,max(date)-CURRENT_DATE
+AS daysleft FROM pledges,signers WHERE pledges.id=signers.pledge_id AND
+pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 GROUP
+BY pledges.id ORDER BY count DESC');
 	if ($q) {
 		$new = '';
 		$k = 5;
@@ -191,7 +196,7 @@ function add_signatory() {
 	$showname = $_POST['showname'] ? 1 : 0;
 	$id = $_POST['pledge_id'];
 
-	$q = db_query('SELECT title,email,confirmed,UNIX_TIMESTAMP(DATE_ADD(date,INTERVAL 1 DAY)) AS epoch FROM pledges WHERE id='.addslashes($id));
+	$q = db_query('SELECT title,email,confirmed,date FROM pledges WHERE id='.addslashes($id));
 	if (!$q) {
 		print '<p>Illegal PledgeBank reference!</p>';
 		return false;
@@ -209,7 +214,7 @@ function add_signatory() {
 		return false;
 	}
 
-	if ($r['epoch']<=$now) {
+	if ($r['date']<$today) {
 		print '<p>You can\'t sign up to a closed Pledge!</p>';
 		return false;
 	}
@@ -221,7 +226,10 @@ function add_signatory() {
 	}
 
 	$token = str_replace('.','X',substr(crypt($id.' '.$email),0,16));
-	$add = db_query('INSERT INTO signers (pledge_id, signname, signemail, showname, signtime, token, confirmed) VALUES ('.addslashes($id).', "'.addslashes($_POST['name']).'", "'.addslashes($email).'", '.$showname.', NOW(), "'.addslashes($token).'", 0)');
+	$add = db_query('INSERT INTO signers (pledge_id, signname,
+        signemail, showname, signtime, token, confirmed) VALUES
+        ('.addslashes($id).', "'.addslashes($_POST['name']).'",
+        "'.addslashes($email).'", '.$showname.', CURRENT_TIMESTAMP, "'.addslashes($token).'", 0)');
 	if ($add) {
 		$link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
 		$success = send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
@@ -301,9 +309,9 @@ function send_success_email($id, $q) {
 
 # Individual pledge page
 function view_pledge() {
-	global $now;
+	global $today;
 
-	$q = db_query('SELECT *,UNIX_TIMESTAMP(DATE_ADD(date,INTERVAL 1 DAY)) AS epoch FROM pledges WHERE id='.addslashes($_GET['pledge']));
+	$q = db_query('SELECT * FROM pledges WHERE id='.addslashes($_GET['pledge']));
 	if (!db_num_rows($q)) {
 		print '<p>Illegal PledgeBank reference!</p>';
 		return false;
@@ -326,7 +334,7 @@ function view_pledge() {
 		$left = $people - $curr;
 
 		$finished = 0;
-		if ($r['epoch']<=$now) {
+		if ($r['date']<$today) {
 			$finished = 1;
 			print '<p class="finished">This pledge is now closed, its deadline has passed.</p>';
 		}
@@ -380,7 +388,13 @@ function view_pledge() {
 function create_new_pledge($db, $action, $people, $type, $date, $name, $email,$ref) {
 	$isodate = "$date[year]-$date[month]-$date[day]";
 	$token = str_replace('.','X',substr(crypt($id.' '.$email),0,16));
-	$add = db_query('INSERT INTO pledges (title, target, type, date, name, email, ref, token, confirmed, creationtime) VALUES ("'.addslashes($action).'", "'.addslashes($people).'", "'.addslashes($type).'", "'.addslashes($isodate).'", "'.addslashes($name).'", "'.addslashes($email).'", "'.addslashes($ref).'", "'.addslashes($token).'", 0, NOW())');
+	$add = db_query('INSERT INTO pledges (title, target, type, date,
+        name, email, ref, token, confirmed, creationtime) VALUES
+        ("'.addslashes($action).'", "'.addslashes($people).'",
+        "'.addslashes($type).'", "'.addslashes($isodate).'",
+        "'.addslashes($name).'", "'.addslashes($email).'",
+        "'.addslashes($ref).'", "'.addslashes($token).'", 0,
+        CURRENT_TIMESTAMP)');
 	if (!$add) {
 		print '<p>Something went wrong adding that to the database: '. db_error().'</p>';
 		return false;

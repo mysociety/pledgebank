@@ -1,5 +1,4 @@
 <?
-
-	define('CONTACTEMAIL', 'matthew-pb@dracos.co.uk');
-
+    // Load configuration file
+    require_once "../conf/general";
 ?>

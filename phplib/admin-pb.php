@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.8 2005-03-14 14:44:38 francis Exp $
+ * $Id: admin-pb.php,v 1.9 2005-03-14 14:55:49 francis Exp $
  * 
  */
 
@@ -148,7 +148,7 @@ class ADMIN_PAGE_PB {
             }
             print '</table>';
         }
-        print '<p><form method="post" action="./"><input type="hidden" name="id" value="' . $pdata['id'] . '"><input type="submit" name="remove" value="Remove pledge permanently"></form>';
+        print '<p><form method="post" action="'.$this->self_link.'"><input type="hidden" name="id" value="' . $pdata['id'] . '"><input type="submit" name="remove" value="Remove pledge permanently"></form>';
     }
 
     function remove_pledge($id) {

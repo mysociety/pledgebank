@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.37 2005-03-01 18:04:04 francis Exp $
+// $Id: index.php,v 1.38 2005-03-02 13:20:38 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -48,7 +48,7 @@ page_footer();
 # --------------------------------------------------------------------
 
 function report_form() {
-    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed=1 AND signers.id=?', array(get_http_var('report')));
+    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed AND signers.id=?', array(get_http_var('report')));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank id!</p>';
 	return false;
@@ -56,7 +56,7 @@ function report_form() {
         $r = db_fetch_array($q);
         print '<form action="./" method="post"><input type="hidden" name="report" value="' . htmlspecialchars(get_http_var('report')) . '">';
         print '<h2>Signature reporting</h2>';
-        print '<p>You are reporting the signature "' . htmlspecialchars($r['signname']) . '" on the pledge "' . htmlspecialchars($r['title']) . '"</p>';
+        print '<p>You are reporting the signature "' . htmlspecialchars($r['name']) . '" on the pledge "' . htmlspecialchars($r['title']) . '"</p>';
         print '<p>Please give a (short) reason for reporting this signature:</p>';
         print '<textarea name="reason" rows="5" cols="50"></textarea>';
         print '<p><input type="submit" value="Submit"></p>';
@@ -65,14 +65,14 @@ function report_form() {
 }
 
 function send_report() {
-    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed=1 AND signers.id=?', array(get_http_var('report')));
+    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed AND signers.id=?', array(get_http_var('report')));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank id!</p>';
 	return false;
     } else {
         $r = db_fetch_array($q);
         $reason = get_http_var('reason');
-        pb_send_email(OPTION_CONTACT_EMAIL, "Signature reporting", "Reporting of '$r[signname]' in pledge '$r[title]'\n\nReason given: $reason\n\n");
+        pb_send_email(OPTION_CONTACT_EMAIL, "Signature reporting", "Reporting of '$r[name]' in pledge '$r[title]'\n\nReason given: $reason\n\n");
         db_query('UPDATE signers SET showname=0,reported=1 WHERE id=?', array(get_http_var('report')));
         print '<p>Thank you for reporting that signature; it will be looked at asap.</p>';
     }
@@ -176,7 +176,7 @@ doesn't work, or you have any other suggests or comments.
     $new = '';
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {
-        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ? AND confirmed=1', array($r['id']));
+        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ? AND confirmed', array($r['id']));
         $days = $r['daysleft'];
         $new .= '<li>' . htmlspecialchars($r['name']) . ' will <a href="' . $r['ref'] . '">' . htmlspecialchars($r['title']) . '</a> if ';
         $new .= comparison_nice($r['comparison']) . ' ' . htmlspecialchars($r['target']) . ' other ' . $r['type'] . ' ';
@@ -199,7 +199,7 @@ doesn't work, or you have any other suggests or comments.
 pledges.signup, pledges.date, pledges.target, pledges.type, pledges.ref, pledges.comparison,
 COUNT(signers.id) AS count, max(date)-CURRENT_DATE
 AS daysleft FROM pledges, signers WHERE pledges.id=signers.pledge_id AND
-pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 AND pledges.password=\'\' GROUP
+pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed AND pledges.password=\'\' GROUP
 BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type,pledges.signup,pledges.ref,pledges.comparison ORDER BY count DESC');
     $new = '';
     $k = 5;
@@ -273,7 +273,7 @@ function add_signatory() {
         }
     }
     if ($comparison=='exactly') {
-        $q = db_query('SELECT * FROM signers WHERE pledge_id=? AND confirmed=1', array($id));
+        $q = db_query('SELECT * FROM signers WHERE pledge_id=? AND confirmed', array($id));
         if ($q) {
             $r = db_fetch_array($q);
             $signedup = db_num_rows($q);
@@ -284,16 +284,16 @@ function add_signatory() {
         }
     }
 	
-    $q = db_query('SELECT signemail FROM signers WHERE pledge_id = ? AND signemail= ?', array($id, $email));
+    $q = db_query('SELECT email FROM signers WHERE pledge_id = ? AND email= ?', array($id, $email));
     if (db_num_rows($q)) {
         print '<p>You have already signed this pledge!</p>';
         return false;
     }
 
     $token = str_replace('.', 'X', substr(crypt($id.' '.$email.microtime()), 12, 16));
-    $add = db_query('INSERT INTO signers (pledge_id, signname,
-        signemail, showname, signtime, token, confirmed) VALUES
-        (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, 0)', 
+    $add = db_query('INSERT INTO signers (pledge_id, name,
+        email, showname, signtime, token, confirmed) VALUES
+        (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, false)', 
         array($id, get_http_var('name'), $email, $showname, $token));
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
     $success = pb_send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
@@ -323,10 +323,10 @@ function confirm_signatory() {
 		return false;
 	}
 
-	db_query('UPDATE signers SET confirmed=1 WHERE token = ?', array($token));
+	db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($token));
 	$success = db_affected_rows();
 	if ($success) {
-		$q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed=1', array($pledge_id));
+		$q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed', array($pledge_id));
 		if ($q) {
 			$r = db_fetch_array($q);
 			$signedup = db_num_rows($q);
@@ -347,7 +347,7 @@ function confirm_signatory() {
 }
 
 function send_success_email($pledge_id) {
-    $q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed=1', array($pledge_id));
+    $q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed', array($pledge_id));
     $r = db_fetch_array($q);
     $globalsuccess = 1;
     $action = $r['title'];
@@ -356,8 +356,8 @@ function send_success_email($pledge_id) {
     $success = pb_send_email($email, 'PledgeBank pledge success!', $body);
     if ($success==0) $globalsuccess = 0;
     while ($r) {
-	$signemail = $r['signemail'];
-	$success = pb_send_email($signemail, 'PledgeBank pledge success!', $body);
+	$email = $r['email'];
+	$success = pb_send_email($email, 'PledgeBank pledge success!', $body);
 	if ($success==0) $globalsuccess = 0;
         $r = db_fetch_array($q);
     }
@@ -408,7 +408,7 @@ function view_pledge() {
         $signup = $r['signup'];
         $detail = $r['detail'];
         $comparison = comparison_nice($r['comparison']);
-	$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id=? ORDER BY id', array($r['id']));
+	$q = db_query('SELECT * FROM signers WHERE confirmed AND pledge_id=? ORDER BY id', array($r['id']));
 	$curr = db_num_rows($q);
 	$left = $people - $curr;
 
@@ -462,7 +462,7 @@ if ($detail) {
 		while ($r = db_fetch_array($q)) {
 			$showname = $r['showname'];
 			if ($showname) {
-                            $out .= '<li>'.htmlspecialchars($r['signname']).' <small>(<a href="./?report='.$r['id'].'">Is this signature suspicious?</a>)</small></li>';
+                            $out .= '<li>'.htmlspecialchars($r['name']).' <small>(<a href="./?report='.$r['id'].'">Is this signature suspicious?</a>)</small></li>';
 			} else {
 				$anon++;
 			}
@@ -481,7 +481,7 @@ function create_new_pledge($action, $people, $type, $date, $name, $email, $ref, 
 	$token = str_replace('.', 'X', substr(crypt($ref.' '.$email.microtime()), 12, 16));
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, password, comparison) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?, ?, ?)', 
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?)', 
         array($action, $people, $type, $signup, $isodate, 
         $name, $email, $ref, $token, $detail, $password, $comparison));
 ?>

@@ -19,7 +19,7 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.13 2005-03-29 14:01:16 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.14 2005-03-29 14:23:14 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -71,6 +71,7 @@ do_public_succeeding_pledge();
 # Check for any unhandled mails or errors
 $wth->email_check_none_left();
 $wth->log_watcher_check();
+print "Everything completed successfully\n";
 
 #############################################################################
 # Functions to make and sign pledges, and so on
@@ -177,9 +178,9 @@ sub set_pb_date {
     dbh()->commit();
 }
 
-# Call daily cron job
-sub call_daily {
-    system("php", "daily", "--verbose") and die "Failed to call daily";
+# Call frequentupdate cron job
+sub call_frequentupdate {
+    system("php", "frequentupdate", "--verbose") and die "Failed to call frequentupdate";
 }
 
 #############################################################################
@@ -224,7 +225,7 @@ sub do_private_failing_pledge {
     # ... make sure completing the partial signing fails
     confirm_signature($pledge_action_private, 2, 'finished');
     # Check failure emails
-    call_daily();
+    call_frequentupdate();
     $wth->email_get_containing('%To: '.email_n(0).  '%your pledge did not meet its target%');
     $wth->email_get_containing('%To: '.email_n(1).  '%sorry to have to inform you that%');
 
@@ -268,7 +269,7 @@ sub do_public_succeeding_pledge {
     # Partially sign pledge before completion state change
     find_and_sign_pledge($pledge_action_completion, 4, 1);
     # Check pledge has completed
-    call_daily();
+    call_frequentupdate();
     $b->get($base_url);
     $wth->browser_check_contents("Target met, pledge still open for 1 day");
     $b->follow_link(text_regex => qr/$pledge_action_completion/) or die "Pledge not appeared on front page";
@@ -290,7 +291,7 @@ sub do_public_succeeding_pledge {
 
     # Check what happens when the pledge expires
     set_pb_date('1982-02-03');
-    call_daily();
+    call_frequentupdate();
     # Front page should no longer have pledge on it
     $b->get($base_url);
     $wth->browser_check_no_contents($pledge_action_completion);

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.15 2005-03-25 20:26:06 francis Exp $
+ * $Id: frequentupdate,v 1.1 2005-03-29 14:23:14 francis Exp $
  *
  */
 
@@ -52,10 +52,11 @@ check_for_expired_pledges();
 function check_for_completed_pledges() {
     global $verbose, $testrun;
 
-    $q = db_query("SELECT * FROM pledges WHERE confirmed AND NOT completionnotified FOR UPDATE");
+    $q = db_query("SELECT *, 
+        (SELECT COUNT(*) FROM signers WHERE pledge_id = pledges.id) as signatures
+        FROM pledges WHERE confirmed AND NOT completionnotified FOR UPDATE");
     while ($r = db_fetch_array($q)) {
-        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', $r['id']);
-        if ($signatures >= $r['target']) {
+        if ($r['signatures'] >= $r['target']) {
             # Success
             if ($testrun)
                 print "Would send success messages for pledge $r[id] ($r[title])\n";

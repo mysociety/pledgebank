@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.105 2005-03-29 14:01:17 francis Exp $
+// $Id: index.php,v 1.106 2005-03-29 14:23:15 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -394,7 +394,7 @@ doesn't work, or you have any other suggests or comments.
     }
 ?>
 
-<h2>... or sign a pledge with lots of signatures</h2><?
+<h2>... or sign a pledge with many signatures</h2><?
 
     $q = db_query("
             SELECT pledges.id, pledges.name, pledges.title, pledges.signup,
@@ -426,7 +426,7 @@ doesn't work, or you have any other suggests or comments.
         $new .= '</li>';
     }
     if (!$new) {
-        print '<p>There are no currently active pledges.</p>';
+        print '<p>There are currently no active pledges.</p>';
     } else {
         print '<ol>'.$new.'</ol>';
     }
@@ -530,6 +530,9 @@ function view_pledge($errors = array()) {
                 print '<p class="finished">This pledge is now closed, as its target has been reached.</p>';
             } else {
                 print '<p class="success">This pledge has been successful!</p>';
+                if (!$finished) {
+                    print '<p align="center">You can still add your name to it, because the deadline hasn\'t been reached yet.</p>';
+                }
             }
 	}
 

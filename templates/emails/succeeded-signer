@@ -12,6 +12,6 @@ Now it is your turn to do what you pledged.  <?=$values['name']?> will
 email you soon to give you any further information you need.
 
 To see who else signed up, please follow this link:
-<?=$values['url']?>
+<?=$values['pledge_url']?>
 
 <?=$values['signature']?>

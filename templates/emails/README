@@ -6,20 +6,16 @@ syntax:
 Values which are available in all emails are:
 
   - title, many body text of the pledge saying what pledge setter will do;
-
   - target, how many people are needed for the pledge to succeed;
-    
   - type, description of the people, e.g. "residents of Eglwysbach";
-
   - signup, description of what pledge signers will do;
-    
-  - date, deadline for pledge failing;
-   
-  - detail, extra description of the pledge.
 
-  - sentence_first, full pledge sentence in first person ("I...").
+  - pretty_date, deadline date in pretty format;
+  - detail, extra description of the pledge;
 
-  - sentence_third, full pledge sentence in third person ("Pledge Setter...").
+  - sentence_first, full pledge sentence in first person ("I...");
+  - sentence_third, full pledge sentence in third person ("Pledge Setter...")
+  - pledge_url, of the pledge page.
 
 The text of each message should be pre-formatted as an email.
 
@@ -69,9 +65,21 @@ Sent to each signer when a pledge fails.
 * succeeded-creator
 Sent to creator when a pledge succeeds.
   - actual, number of people who signed up.
+  - execeeded_or_met, either the word "met" or "exceeded" according to whether
+    pledge went over target or not.
 
 * succeeded-signer
 Sent to each signer when a pledge succeeds.
-  - url, of the pledge page.
+  - execeeded_or_met, either the word "met" or "exceeded" according to whether
+    pledge went over target or not.
+
+**************************************************************************
+
+* email-friends
+Sent by someone to tell their friends about a pledge.
+  - from_name, who sent message
+  - from_email, email address of sender
+  - from_message, if present a pargraph with the message from sender to their
+    friend, including intro and quotes, otherwise empty string
 
 **************************************************************************

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.110 2005-04-01 18:04:14 matthew Exp $
+// $Id: index.php,v 1.111 2005-04-04 00:55:03 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -449,7 +449,7 @@ function add_signatory() {
     if (!is_null($errors))
         return $errors;
 
-    $r = db_getRow('select id, title, password from pledges where ref = ?', $q_ref);
+    $r = db_getRow('select * from pledges where ref = ?', $q_ref);
 
     if (!is_null($r['password']) && (is_null($q_pw) || sha1($q_pw) != $r['password']))
         err("Permission denied");
@@ -575,7 +575,13 @@ if ($r['detail']) {
 ?>
 </form>
 
-<p style="text-align: center"><a href="ical.php?ref=<?=$h_ref ?>">iCal calendar entry</a> | <a href="./<?=$h_ref ?>/flyers" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Comment on this Pledge</a><? if (!$finished) { ?> | <a href="./<?=$h_ref ?>/email">Email this Pledge</a><? } ?></p>
+<? if (!$finished) { ?>
+<p style="text-align: center">
+    <a href="./<?=$h_ref ?>/flyers" title="Stick them places!">Print out customised flyers</a>
+   | <a href="./<?=$h_ref ?>/email">Email pledge to your friends</a>
+   | <a href="ical.php?ref=<?=$h_ref ?>">Add deadline to your calendar</a> 
+</p>
+<? } ?>
 <!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
 
 <h2>Current signatories</h2><?
@@ -642,7 +648,7 @@ people to sign up to your pledge after you have clicked the link in the email.</
 <?
     $url = OPTION_BASE_URL . '/C/' . urlencode($token);
 	$success = pb_send_email_template($data['email'], 'pledge-confirm',
-        array_merge($data, array('url'=>$url)));
+        array_merge($data, array('url'=>$url, 'date'=>$isodate)));
 	if ($success) {
             db_commit();
 ?>

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.12 2005-04-01 17:34:01 matthew Exp $
+// $Id: page.php,v 1.13 2005-04-04 00:55:03 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -29,7 +29,7 @@ function page_header($title, $params = array()) {
         if (array_key_exists('noprint', $params) and $params['noprint'])
             print '<div class="noprint">';
 ?>
-<h1>Pledge<span>Bank</span> &mdash; Not Finished Yet</h1>
+<h1><a href="/"><span class="logo_pledge">Pledge</span><span class="logo_bank">Bank</span></a> &mdash; Not Finished Yet</h1>
 <hr class="v"><?
         if (array_key_exists('noprint', $params) and $params['noprint'])
             print '</div> <!-- noprint -->';

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.75 2005-03-11 21:17:56 chris Exp $
+// $Id: index.php,v 1.76 2005-03-11 21:19:28 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -138,18 +138,18 @@ function pledge_form_one($data = array(), $errors = array()) {
 
 <li> <strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
 to do something when 5 would be enough? Every extra person makes your pledge
-harder to meet.
+harder to meet.</li>
 
 <li> <strong>Think about how your pledge reads.</strong> How will it look to
 someone who picks up a flyer from their doormat? Read your pledge to the person
 next to you, or to your mother, and see if they understand what you're talking
-about. If they don't, you need to rewrite it.
+about. If they don't, you need to rewrite it.</li>
 
 <li> <strong>Don't imagine that your pledge will sell itself.</strong> If
 you've created something, tell the world! Email your friends, print leaflets
 and stick them through your neighbours doors. Focus especially hard on breaking
 outside your circle of friends &mdash; ask your co-workers, put a flyer through
-the door of that neighbour whose name you've forgotten.
+the door of that neighbour whose name you've forgotten.</li>
 
 </ol>
 </div>

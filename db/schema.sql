@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.14 2005-03-03 17:37:31 francis Exp $
+-- $Id: schema.sql,v 1.15 2005-03-04 14:06:50 matthew Exp $
 --
 
 -- secret
@@ -49,6 +49,9 @@ create table pledges (
             comparison = 'atleast' 
             or comparison = 'exactly'
         )
+
+    country text not null default '',
+    postcode text not null default '',
 );
 
 create table outgoingsms (

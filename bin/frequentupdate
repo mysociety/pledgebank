@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.5 2005-04-05 10:49:41 sandpit Exp $
+ * $Id: frequentupdate,v 1.6 2005-04-05 19:04:37 francis Exp $
  *
  */
 
@@ -104,10 +104,14 @@ function send_failure_email($pledge) {
         $globalsuccess = 0;
 
     while ($r = db_fetch_array($q)) {
-        $success = pb_send_email_template($r['email'], 'failed-signer', 
-            array_merge($pledge, array('signer_name'=>$r['name'])));
-        if ($success==0) 
-            $globalsuccess = 0;
+        if ($r['email']) {
+            $success = pb_send_email_template($r['email'], 'failed-signer', 
+                array_merge($pledge, array('signer_name'=>$r['name'])));
+            if ($success==0) 
+                $globalsuccess = 0;
+        } else {
+            // TODO: Send SMS saying failure.
+        }
     }
     return $globalsuccess;
 }
@@ -130,11 +134,13 @@ function send_success_email($pledge) {
 
     $s = db_fetch_array($q);
     while ($s) {
-        $success = pb_send_email_template($s['email'], 'succeeded-signer',
-            array_merge($pledge, array('signer_name'=>$r['name'])));
-        if ($success==0) 
-            $globalsuccess = 0;
-        $s = db_fetch_array($q);
+        if ($s['email']) {
+            $success = pb_send_email_template($s['email'], 'succeeded-signer',
+                array_merge($pledge, array('signer_name'=>$s['name'])));
+            if ($success==0) 
+                $globalsuccess = 0;
+            $s = db_fetch_array($q);
+        }
     }
     return $globalsuccess;
 }

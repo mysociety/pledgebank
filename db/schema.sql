@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.32 2005-03-15 17:02:55 chris Exp $
+-- $Id: schema.sql,v 1.33 2005-03-15 18:46:09 chris Exp $
 --
 
 -- secret
@@ -254,7 +254,7 @@ create unique index smssubscription_token_idx on smssubscription(token);
 -- Sign up from an SMS subscription. Supply either the ID of an outgoing SMS
 -- subscription message; or a TOKEN sent in such a message. Returns a code as
 -- from pledge_is_valid_to_sign.
-create function smssubscription_sign(integer, text)
+create or replace function smssubscription_sign(integer, text)
     returns text as '
     declare
         p record;
@@ -313,10 +313,33 @@ create function smssubscription_sign(integer, text)
             for update;
         t_pledge_id = p.pledge_id;
 
+        -- we use the token to identify all SMS subscription requests to the
+        -- same pledge and phone number.
+        if t_token is null then
+            t_token = (
+                select token from smssubscription
+                where outgoingsms_id = t_outgoingsms_id
+                -- already grabbed lock above
+            );
+        end if;
+
         -- Check whether we can sign up under this number
         status = pledge_is_valid_to_sign(t_pledge_id, null, t_mobile);
 
         if status <> ''ok'' then
+            -- If we have already signed this, then we should update this
+            -- subscription record to point at the existing subscription.
+            if status = ''signed'' then
+                select into p id
+                    from signers
+                    where mobile = t_mobile
+                    for update;
+                -- XXX repeated code
+                update smssubscription
+                    set signer_id = p.id, outgoingsms_id = null,
+                        pledge_id = null
+                    where token = t_token;
+            end if;
             return status;
         end if;
         
@@ -329,14 +352,7 @@ create function smssubscription_sign(integer, text)
         insert into signers (id, pledge_id, mobile, showname, signtime)
             values (t_signer_id, t_pledge_id, t_mobile, true, current_timestamp);
 
-        if t_token is null then
-            t_token = (
-                select token from smssubscription
-                where outgoingsms_id = t_outgoingsms_id
-                -- already grabbed lock above
-            );
-        end if;
-        
+       
         update smssubscription
             set signer_id = t_signer_id, outgoingsms_id = null,
                 pledge_id = null

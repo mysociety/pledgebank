@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.4 2005-03-11 20:14:31 chris Exp $
+ * $Id: sms.php,v 1.5 2005-03-12 00:57:27 francis Exp $
  * 
  */
 
@@ -36,7 +36,7 @@ function bad_token($x) {
         could you re-check the address you typed in; the last part of it should
         be two groups of four letters and numbers, joined by a hyphen ("-"),
         something like "1234-abcd"
-            </p>'
+            </p>
 EOF;
     }
 }
@@ -102,7 +102,7 @@ if (is_null($q_token)) {
         /* One of cases 2 or 3. If the user has converted, warn them;
          * otherwise proceed. */
     }
-
+}
 
 if (is_null($errs)) {
     /* Check that we can actually sign up. */

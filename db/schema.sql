@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.29 2005-03-14 13:06:12 francis Exp $
+-- $Id: schema.sql,v 1.30 2005-03-14 13:07:21 francis Exp $
 --
 
 -- secret
@@ -240,7 +240,7 @@ create unique index pledges_outgoingsms_token_idx on pledges_outgoingsms(token);
 create table token_store (
     token text not null,
     data text not null,
-    when timestamp not null
+    created timestamp not null
 );
 create unique index token_store_token_idx on token_store(token);
 

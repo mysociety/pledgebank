@@ -258,7 +258,7 @@ function confirm_signatory() {
 			$target = $r['target'];
 			if ($signedup == $target) {
 				print '<p><strong>Your signature has made this Pledge reach its target! Woohoo!</strong></p>';
-				if (send_success_email($pledge_id, $q)) {
+				if (send_success_email($pledge_id)) {
 					print '<p><em>An email has been sent to all concerned.</em></p>';
 				} else {
 					print '<p><em>Something went wrong sending a success email.</em></p>';
@@ -271,8 +271,8 @@ function confirm_signatory() {
 <?	}
 }
 
-function send_success_email($id, $q) {
-	db_data_seek($q, 0);
+function send_success_email($pledge_id) {
+    $q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed=1', array($pledge_id));
 	$globalsuccess = 1;
 	while ($r = db_fetch_array($q)) {
 		if (!$action) $action = $r['title'];

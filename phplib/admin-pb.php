@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.1 2005-01-07 16:43:04 francis Exp $
+ * $Id: admin-pb.php,v 1.2 2005-01-07 17:06:16 francis Exp $
  * 
  */
 
@@ -21,16 +21,20 @@ class ADMIN_PAGE_PB {
     }
 
     function list_all_pledges() {
-        print "<h2>All the pledges</h2>";
-        $q = db_query('SELECT ref,title,target,date,name,email FROM pledges');
+        print "<h2>All Pledges</h2>";
+        $q = db_query('SELECT * FROM pledges');
         print '<table border=1
         width=100%><tr><th>Ref</th><th>Title</th><th>Target</th><th>Deadline</th><th>Setter</th></tr>';
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
             print '<tr>';
             print '<td>'.$r['ref'].'</td>';
-            print '<td><a href="./?pledge='.$r['ref'].'">'.$r['title'].'</a></td>';
-            print '<td>'.$r['target'].'</td>';
+            print '<td><a href="./?pledge='.$r['ref'].'">'.$r['title'].'</a>';
+            if ($r['confirmed'] == 0) {
+                print "<br/><b>not confirmed</b>";
+            }
+            print '</td>';
+            print '<td>'.$r['target'].' '.$r['type'].'</td>';
             print '<td>'.prettify($r['date']).'</td>';
             print '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
             print '</tr>';
@@ -46,16 +50,18 @@ class ADMIN_PAGE_PB {
 
         print "<h2>Pledge '" . $pdata['ref'] . "' &mdash; " .  $pdata['title'] . "</h2>";
 
-        if (!$pdata['confirmed'] == 1) {
+        if ($pdata['confirmed'] == 0) {
             print "<p><b>Email address not confirmed</b></p>";
         }
         
         print "<p>Set by: <b>" . $pdata['name'] . " &lt;" .  $pdata['email'] . "&gt;</b>";
         print "<br/>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br/>Deadline: <b>" . prettify($pdata['date']) . "</b>";
+        print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print "</p>";
 
         $q = db_query('SELECT * FROM signers where pledge_id=?', $pdata['id']);
+        print "<p>There are <b>".db_num_rows($q)."</b> signers so far:</p>";
         print '<table border=1 width=100%><tr>
         <th>Signee</th> <th>Time</th> <th>Show name?</th> <th>Confirmed</th> </tr>';
         while ($r = db_fetch_array($q)) {

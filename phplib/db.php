@@ -40,13 +40,9 @@ function db_num_rows($q) {
 	return $q->numRows();
 }
 
-function db_affected_rows($q) {
+function db_affected_rows() {
     global $pbdb;
     return $pbdb->affectedRows();
-}
-
-function db_data_seek($q, $n) {
-	pg_result_seek($q, $n);
 }
 
 ?>

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.47 2005-03-04 17:20:11 matthew Exp $
+// $Id: index.php,v 1.48 2005-03-04 17:58:10 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -202,7 +202,7 @@ function step1_error_check($data) {
     elseif (strlen($data['ref'])<6) $errors[] = 'The reference must be at least six characters long';
     if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors[] = 'The reference must only contain letters, numbers, -';
     $disallowed_refs = array('contact');
-    if (in_array($ref, $disallowed_refs)) $errors[] = 'That reference is not allowed.';
+    if (in_array($data['ref'], $disallowed_refs)) $errors[] = 'That reference is not allowed.';
     $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($data['ref']));
     if ($dupe) $errors[] = 'That reference is already taken!';
     if (!$data['action']) $errors[] = 'Please enter a pledge';
@@ -401,42 +401,73 @@ function add_signatory() {
 
 # Pledgee has clicked on link in their email
 function confirm_signatory() {
-	$token = get_http_var('confirms');
-	$q = db_query('SELECT pledge_id,confirmed FROM signers WHERE token = ?', array($token));
-	$row = db_fetch_array($q);
-	if (!$row) {
-		print '<p>Confirmation token not recognised!</p>';
-		return false;
-	}
+    $token = get_http_var('confirms');
+    $q = db_query('SELECT pledge_id,confirmed FROM signers WHERE token = ?', array($token));
+    $row = db_fetch_array($q);
+    if (!$row) {
+        print '<p>Confirmation token not recognised!</p>';
+        return false;
+    }
 
-	$pledge_id = $row['pledge_id'];
-	$confirmed = ($row['confirmed'] == 't');
-	if ($confirmed) {
-		print '<p>You have already confirmed your signature for this pledge!</p>';
-		return false;
-	}
+    $pledge_id = $row['pledge_id'];
+    $confirmed = ($row['confirmed'] == 't');
+    if ($confirmed) {
+        print '<p>You have already confirmed your signature for this pledge!</p>';
+#        return false;
+    }
 
-	db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($token));
-	$success = db_affected_rows();
-	if ($success) {
-		$q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed AND signers.confirmed', array($pledge_id));
-		if ($q) {
-			$r = db_fetch_array($q);
-			$signedup = db_num_rows($q);
-			$target = $r['target'];
-			if ($signedup == $target) {
-				print '<p><strong>Your signature has made this Pledge reach its target! Woohoo!</strong></p>';
-				if (send_success_email($pledge_id)) {
-					print '<p><em>An email has been sent to all concerned.</em></p>';
-				} else {
-					print '<p><em>Something went wrong sending a success email.</em></p>';
-				}
-			}
-		}	?>
-<p>Thank you for confirming your signature. LINK TO PLEDGE PAGE AND OTHER STUFF HERE.</p>
-<?	} else { ?>
+    db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($token));
+    $success = db_affected_rows();
+    if ($success) {
+        # 
+        $q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed AND signers.confirmed', array($pledge_id));
+        if ($q) {
+            $r = db_fetch_array($q);
+            $signedup = db_num_rows($q);
+            $target = $r['target'];
+            if ($signedup == $target) {
+                print '<p><strong>Your signature has made this Pledge reach its target! Woohoo!</strong></p>';
+                if (send_success_email($pledge_id)) {
+                    print '<p><em>An email has been sent to all concerned.</em></p>';
+                } else {
+                    print '<p><em>Something went wrong sending a success email.</em></p>';
+                }
+            }
+        } ?>
+<p>Thank you for confirming your signature. <a href="<?=$r['ref'] ?>">View pledge page</a>.</p>
+
+<p><a href="<?=$r['ref'] ?>/flyers">View and print Customised Flyers for this pledge</a></p>
+
+<p align="center"><big>Why not <strong>HIT PRINT</strong> now and get these example cards below, for you to cut out and give to your friends and neighbours?</big></p>
+
+<style type="text/css">
+table {
+    border: none;
+    margin: 0 auto;
+    max-width: 90%;
+}
+td {
+    border: solid 2px black;
+}
+</style>
+<table border="1" cellpadding="10" cellspacing="20"><?
+
+for ($rows = 0; $rows<4; $rows++) {
+    print '<tr align="center">';
+    for ($cols=0; $cols<2; $cols++) {
+        print '<td>';
+        print '<strong>"I will ' . $r['title'] . '"</strong>';
+        print '<br>Deadline: ' . prettify($r['date']);
+        print '<br>http://pledgebank.com/' . $r['ref'];
+        print '</td>';
+    }
+    print '</tr>';
+}
+?>
+</table>
+<?  } else { ?>
 <p>Something went wrong confirming your signature, hmm.</p>
-<?	}
+<?  }
 }
 
 function send_success_email($pledge_id) {

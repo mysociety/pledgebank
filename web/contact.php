@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.2 2005-02-22 09:20:57 francis Exp $
+// $Id: contact.php,v 1.3 2005-02-23 11:04:30 francis Exp $
 
 function contact_form($errors = array()) { ?>
 <h2>Contact Us</h2>
@@ -16,10 +16,10 @@ function contact_form($errors = array()) { ?>
 		print '</li></ul>';
 	} ?>
 <form action="./" method="post"><input type="hidden" name="contact" value="1">
-<div class="fr"><label for="name">Name</label>: <input type="text" id="name" name="name" value="<?=htmlentities($_POST['name']) ?>"></div>
-<div class="fr"><label for="email">Email</label>: <input type="text" id="email" name="email" value="<?=htmlentities($_POST['email']) ?>"></div>
-<div class="fr"><label for="subject">Subject</label>: <input type="text" id="subject" name="subject" value="<?=htmlentities($_POST['subject']) ?>"></div>
-<div><label for="message">Message</label>:<br><textarea rows="7" cols="40" name="message" id="message"><?=htmlentities($_POST['message']) ?></textarea></div>
+<div class="fr"><label for="name">Name</label>: <input type="text" id="name" name="name" value="<?=htmlentities($_POST['name']) ?>" size="32"></div>
+<div class="fr"><label for="email">Email</label>: <input type="text" id="email" name="email" value="<?=htmlentities($_POST['email']) ?>" size="32"></div>
+<div class="fr"><label for="subject">Subject</label>: <input type="text" id="subject" name="subject" value="<?=htmlentities($_POST['subject']) ?>" size="50"></div>
+<div><label for="message">Message</label>:<br><textarea rows="7" cols="60" name="message" id="message"><?=htmlentities($_POST['message']) ?></textarea></div>
 <p><input type="submit" value="Send"></p>
 </form>
 <? }

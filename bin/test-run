@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.10 2005-03-08 15:42:32 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.1 2005-03-08 15:51:45 francis Exp $';
 
 use strict;
 require 5.8.0;

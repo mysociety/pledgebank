@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.5 2005-03-04 09:24:57 matthew Exp $
+ * $Id: daily,v 1.6 2005-03-08 15:51:45 francis Exp $
  *
  */
 
@@ -79,14 +79,16 @@ function send_failure_email($row) {
     $subject = 'PledgeBank pledge failure - "' . $action . '"';
     $body = "Dear $name,\n\nWe are sorry to have to tell you that your pledge did not meet its target in the required time.\n\nYou required $target $type, but achieved only $actual.\n\nAh well, better luck next time.";
     $success = pb_send_email($email, $subject, $body);
-    if ($success==0) $globalsuccess = 0;
+    if ($success==0) 
+        $globalsuccess = 0;
 
     $body = "Dear NAME,\n\nWe are sorry to have to inform you that the pledge to which you signed up did not meet its target in the required time.\n\nIt required $target $type, but achieved only $actual.\n\nDon't be disheartened!";
     while ($r = db_fetch_array($q)) {
         $name = $r['name'];
-	$email = $r['email'];
-	$success = pb_send_email($email, $subject, str_replace('NAME', $name, $body));
-	if ($success==0) $globalsuccess = 0;
+        $email = $r['email'];
+        $success = pb_send_email($email, $subject, str_replace('NAME', $name, $body));
+        if ($success==0) 
+            $globalsuccess = 0;
     }
     return $globalsuccess;
 }

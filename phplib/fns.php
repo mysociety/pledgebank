@@ -5,12 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.16 2005-03-30 18:12:05 francis Exp $
+// $Id: fns.php,v 1.17 2005-04-01 10:40:06 francis Exp $
 
 require_once "../../phplib/evel.php";
 
 // $to can be one recipient address in a string, or an array of addresses
-function pb_send_email_template($to, $template_name, $values, $headers = '') {
+function pb_send_email_template($to, $template_name, $values, $headers = array()) {
     $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
     $values['sentence_third'] = pledge_sentence($values['id'], array('firstperson' => false));
 
@@ -32,38 +32,32 @@ function pb_send_email_template($to, $template_name, $values, $headers = '') {
 }
 
 // $to can be one recipient address in a string, or an array of addresses
-function pb_send_email($to, $subject, $message, $headers = '') {
-    if (!strstr($headers, 'From:')) {
-        $headers .= 'From: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n" .
-                    'Reply-To: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n";
+function pb_send_email($to, $subject, $message, $headers = array()) {
+    // Construct parameters
+    $spec = array(
+        '_body_' => $message,
+        'Subject' => $subject,
+    );
+    $spec = array_merge($spec, $headers);
+
+    if (!array_key_exists("From", $spec)) {
+        $spec['From'] = '"PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">";
+        $spec['Reply-To'] = '"PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">";
     }
-    $headers .= 'X-Mailer: PHP/' . phpversion() . "\r\n";
 
     if (!is_array($to)) {
+        // With one recipient, put in header.  Otherwise default to undisclosed recip.
+        $spec['To'] = $to;
         $to = array($to);
     }
 
-    // TODO: remove all this when EvEl can do mail formatting
-    // Send with just one evel_send call and passing $to array
-    $globalsuccess = TRUE;
-    foreach ($to as $oneto) {
-        $wire_message = "To: $oneto\r\n" . 
-                "Subject: $subject\r\n" . 
-                $headers . 
-                "\r\n" .
-                $message;
-
-        // Send the message
-        $result = evel_send($wire_message, $oneto);
-        $error = evel_get_error($result);
-        if ($error) 
-            error_log("pb_send_email: " . $error);
-        $success = $error ? FALSE : TRUE;
-        if (!$success) {
-            $globalsuccess = FALSE;
-        }
-    }
-    return $globalsuccess;
+    // Send the message
+    $result = evel_send($spec, $to);
+    $error = evel_get_error($result);
+    if ($error) 
+        error_log("pb_send_email: " . $error);
+    $success = $error ? FALSE : TRUE;
+    return $success;
 }
 
 /* prettify THING [HTML]

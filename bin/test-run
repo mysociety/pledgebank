@@ -19,7 +19,7 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.16 2005-04-01 07:24:25 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.17 2005-04-01 10:40:05 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -118,8 +118,8 @@ sub confirm_signature {
     
     # Click link in the confirmation email
     my $confirmation_email = $wth->email_get_containing(
-        '%To: '.email_n($who).
         '%Subject: Signing up to \''.$action.'\''.
+        '%To: '.email_n($who).
         '%to confirm your signature%');
     print "Confirmation link not found\n" if ($confirmation_email !~ m#^\s*($base_url.*$)#m);
 #print "Confirm link is $1"; exit; # for testing confirmation links ;)

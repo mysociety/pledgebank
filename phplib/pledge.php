@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.36 2005-04-01 17:34:01 matthew Exp $
+ * $Id: pledge.php,v 1.37 2005-04-06 13:55:47 chris Exp $
  * 
  */
 
@@ -17,11 +17,11 @@ require_once '../../phplib/rabx.php';
 /* pledge_ab64_encode DATA
  * Return a "almost base64" encoding of DATA (a six-bit encoding of
  * URL-friendly characters; specifically the encoded data match
- * /^[0-9A-Za-z.,-]+$/). */
+ * /^[0-9A-Za-z._-]+$/). */
 function pledge_ab64_encode($i) {
     $t = base64_encode($i);
     $t = str_replace("+", ".", &$t);
-    $t = str_replace("/", ",", &$t);
+    $t = str_replace("/", "_", &$t);
     $t = str_replace("=", "-", &$t);
     return $t;
 }

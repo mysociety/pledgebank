@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.8 2005-03-25 18:40:04 matthew Exp $
+// $Id: page.php,v 1.9 2005-03-25 18:41:50 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -20,7 +20,7 @@ function page_header($title, $params = array()) {
     
 ?> PledgeBank - Not Finished Yet</title>
 <style type="text/css" media="all">@import url("/pb.css");</style>
-<link rel="stylesheet" type="text/css" media="print" href="/pbprint.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <script type="text/javascript" src="/pb.js"></script>
 </head>
 <body>
@@ -47,10 +47,10 @@ function page_footer($params = array()) {
 </div>
 <hr class="v"><h2 class="v">Navigation</h2>
 <ul id="nav">
-<li><a href="/">Home</a>
-<li><a href="/new">New Pledge</a>
-<li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a>
-<li><a href="/contact">Contact</a>
+<li><a href="/">Home</a></li>
+<li><a href="/new">New Pledge</a></li>
+<li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li>
+<li><a href="/contact">Contact</a></li>
 </ul>
 <hr class="v">
 <div id="footer"><a href="http://www.mysociety.org/">Built by mySociety</a>.</div>

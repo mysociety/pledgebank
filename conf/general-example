@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.1 2005-01-06 19:22:58 matthew Exp $
+ * $Id: general-example,v 1.2 2005-01-28 12:58:39 matthew Exp $
  * 
  */
 
@@ -37,6 +37,7 @@ define('OPTION_BASE_URL', 'http://sometesthost.' . OPTION_WEB_DOMAIN . '/');
 
 // Domain name for emails to current website
 define('OPTION_EMAIL_DOMAIN', 'sometestdomain.pledgebank.com');
+define('CONTACTEMAIL', 'contact@'.OPTION_EMAIL_DOMAIN);
 // Prefix of return-path local part. All mail for EMAIL_PREFIX(.*)@EMAIL_DOMAIN
 // must be delivered to the bounce processing scripts.
 define('OPTION_EMAIL_PREFIX', 'pb-');

@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w -I../../perllib -I../../../perllib
+#
+# smsreceive:
+# Process received SMS messages.
+#
+# MX Telecom's interface is documented here:
+#  http://www.mxtelecom.com/index.jsp?m=tech/sms/http/receive
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: smsreceive,v 1.1 2005-03-02 20:08:35 chris Exp $';
+
+use strict;
+
+require 5.8.0;
+
+BEGIN {
+    use mySociety::Config;
+    mySociety::Config::set_file('../../conf/general');
+}
+
+use CGI::Fast;
+use DateTime::Format::Strptime;
+use Encode;
+use Error qw(:try);
+use Net::Netmask;
+use utf8;
+
+use mySociety::DBHandle qw(dbh);
+use PB;
+use PB::SMS;
+
+# The only form of authentication which MX Telecom offer for received SMSs is
+# to promise that they originate from a particular set of networks.
+my @allowed_netblocks = map { new Net::Netmask($_) } qw(
+                            83.166.68.0/23 80.87.132.0/26
+                            212.69.46.114
+                        );
+my $D = new DateTime::Format::Strptime(
+                pattern => '%Y-%m-%d %H:%M:%S'
+                # XXX locale and timezone?
+            );
+
+while (my $q = new CGI::Fast()) {
+    binmode(STDOUT, ':utf8');
+    try {
+        throw PB::Error("No REQUEST_METHOD; this program must be run in a CGI/FastCGI environment")
+            if (!exists($ENV{REQUEST_METHOD}));
+        my $ip = $ENV{REMOTE_ADDR};
+        throw PB::Error('REMOTE_ADDR not defined; this program must be run in a CGI/FastCGI environment')
+            unless (defined($ip));
+
+        my $f = 0;
+        foreach (@allowed_netblocks) {
+            if ($_->match($ip)) {
+                $f = 1;
+                last;
+            }
+        }
+
+        throw PB::Error("Attempted access to script from prohibited IP $ip")
+            if (!$f);
+
+        foreach (qw(smsfrom smsto smsdate smsid smsmsg bits)) {
+            throw PB::Error("Client did not supply required parameter '$_'")
+                unless (defined($q->param($_)));
+        }
+
+        # Start by checking whether we've seen this message before.
+        my $resp;
+        
+        if (!defined(dbh()->selectrow_array('select id from incomingsms where foreignid = ? for update', {}, $q->param('smsid')))) {
+            my $message;
+
+            # Parse the date.
+            my $smsdate = $q->param('smsdate');
+            my $whensent;
+            if (!defined($whensent = $D->parse_datetime($smsdate))) {
+                throw PB::Error("Bad value '$smsdate' for smsdate parameter in request");
+            }
+            $whensent = $whensent->epoch();
+
+            # The message could be in one of a variety of formats, described by
+            # the 'bits' parameter.
+            my $bits = $q->param('bits');
+            throw PB::Error("Bad value '$bits' for bits parameter in request")
+                if ($bits !~ m#^(7|8|16)$#);
+
+            if ($bits eq '7') {
+                $message = decode('iso-8859-15', $q->param('smsmsg'))
+            } elsif ($bits eq '8') {
+                my $hex = $q->param('smsmsg');
+                if ($hex =~ m#.{0,2}[^0-9a-f].{0,2}#i) {
+                    throw PB::Error("Supplied hex data is invalid: '...$1...'");
+                }
+                $message = decode('iso-8859-15', unpack('h*', $hex));
+            } elsif ($bits eq '16') {
+                my $ucs2 = $q->param('smsucs2');
+                throw PB::Error('bits=16 but smsucs2 parameter is not present in request')
+                    unless (defined($ucs2));
+                if ($ucs2 =~ m#.{0,2}[^0-9a-f].{0,2}#i) {
+                    throw PB::Error("Supplied UCS2 hex data is invalid: '...$1...'");
+                }
+                my $bytes = unpack('h*', $ucs2);
+                $message = decode('ucs-2', $bytes);
+            }
+
+            my $sender = $q->param('smsfrom');
+            $sender =~ s#^([^+])#+$1#;
+            my $receiver = $q->param('smsto');
+            $receiver =~ s#^([^+])#+$1#;
+
+            PB::SMS::receive_sms($sender, $receiver, $message, $q->param('smsid'), $whensent);
+
+            $resp = "OK - message received and logged\n";
+        } else {
+            $resp = "OK - message has been received before\n";
+        }
+
+        print $q->header(
+                    -type => 'text/plain; charset=utf-8',
+                    -content_length => length($resp)
+                ), $resp;
+    } catch PB::Error with {
+        my $E = shift;
+        my $t = $E->text();
+        print $q->header(
+                    -status => "500 Internal Error: $t",
+                    -type => 'text/plain; charset=utf-8',
+                    -content_length => length($t) + 1
+                ), $t, "\n";
+        warn "Error: $t\n";
+    };  # any other kind of error will kill the script and return HTTP 500 
+        # to the client, which is what we want.
+}

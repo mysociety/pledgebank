@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.49 2005-03-04 18:02:25 matthew Exp $
+// $Id: index.php,v 1.50 2005-03-04 18:24:36 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -95,7 +95,7 @@ function pledge_form($data = array(), $errors = array()) {
 other <input type="text" id="type" name="type" size="30" value="people"> <input type="text" id="signup" name="signup" size="10" value="sign up"> before
 <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']['iso']) ?>">.</p>
 
-<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> <small>(letters, numbers, -; minimum 6 characters)</small></p>
+<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>www.pledgebank.com/<input onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> <small>(letters, numbers, -; minimum 6 characters)</small></p>
 <p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 Email: <input type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <p style="text-align: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
@@ -438,7 +438,14 @@ function confirm_signatory() {
 
 <p><a href="<?=$r['ref'] ?>/flyers">View and print Customised Flyers for this pledge</a></p>
 
-<p align="center"><big>Why not <strong>HIT PRINT</strong> now and get these example cards below, for you to cut out and give to your friends and neighbours?</big></p>
+<p align="center"><big>Why not <strong>
+<script type="text/javascript">
+    document.write('<a href="javascript: window.print()">HIT PRINT</a>');
+</script>
+<noscript>
+HIT PRINT
+</noscript>
+</strong> now and get these example cards below, for you to cut out and give to your friends and neighbours?</big></p>
 
 <style type="text/css">
 table {
@@ -458,7 +465,7 @@ for ($rows = 0; $rows<4; $rows++) {
         print '<td>';
         print '<strong>"I will ' . $r['title'] . '"</strong>';
         print '<br>Deadline: ' . prettify($r['date']);
-        print '<br>http://pledgebank.com/' . $r['ref'];
+        print '<br>www.pledgebank.com/' . $r['ref'];
         print '</td>';
     }
     print '</tr>';
@@ -670,6 +677,10 @@ function pdfs() {
     $ref = get_http_var('pdf');
 	$q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
 	$row = db_fetch_array($q);
+        if (!$row) {
+            print '<p>Illegal PledgeBank reference!</p>';
+            return false;
+        }
         $pdf_cards_url = new_url("../flyers/{$ref}_A4_cards.pdf", false);
         $pdf_tearoff_url = new_url("../flyers/{$ref}_A4_tearoff.pdf", false);
     ?>
@@ -680,7 +691,7 @@ function pdfs() {
 <li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>
 </ul>
 
-<?
+<?  return true;
 }
 
 function search() {

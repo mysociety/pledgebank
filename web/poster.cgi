@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.7 2005-03-04 17:20:11 matthew Exp $
+# $Id: poster.cgi,v 1.8 2005-03-04 18:24:36 matthew Exp $
 #
 
 import os
@@ -53,7 +53,7 @@ if os.path.exists(outdir + '/' + outfile):
     output_file(outdir + '/' + outfile)
     sys.exit()
 
-db = PgSQL.connect('::pb:matthew:')
+db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
 q = db.cursor()
 q.execute('SELECT title, date FROM pledges WHERE ref = %s', ref)
 (title,date) = q.fetchone()
@@ -90,7 +90,7 @@ def draw_pledge(x, y):
     c.setFont("Helvetica", size)
     c.drawCentredString(x, (y-2)*cm, text)
 
-    text = "http://pledgebank.com/%s" % ref
+    text = "www.pledgebank.com/%s" % ref
     size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
     c.setFont("Helvetica", size)
     c.drawCentredString(x, (y-3)*cm, text)
@@ -135,7 +135,7 @@ def tearoff():
     c.setFont("Helvetica", size*0.8)
     text = "Deadline: %s" % date
     c.drawCentredString(x, (y-3)*cm, text)
-    text = "http://pledgebank.com/%s" % ref
+    text = "www.pledgebank.com/%s" % ref
     c.drawCentredString(x, (y-5)*cm, text)
     c.setDash(3,3)
     stripheight = 8*cm
@@ -151,7 +151,7 @@ def tearoff():
         c.setFont("Helvetica", 9)
         text = "Deadline: %s" % date
         c.drawCentredString(stripheight/2, (1.2-x)*cm, text)
-        text = "http://pledgebank.com/%s" % ref
+        text = "www.pledgebank.com/%s" % ref
         c.drawCentredString(stripheight/2, (0.7-x)*cm, text)
     c.showPage()
 
@@ -173,5 +173,4 @@ elif type == "tearoff":
 else:
     raise Exception, "Unknown type '%s'" % type
 c.save()
-
 output_file(outdir + '/' + outfile)

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.80 2005-03-14 14:57:58 francis Exp $
+// $Id: index.php,v 1.81 2005-03-14 15:28:58 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -207,7 +207,7 @@ function pledge_form_two($data, $errors = array()) {
 
 <p style="text-align: center">Your pledge looks like this so far:</p>
 <div class="tips" style="text-align: center">
-<p style="margin-top: 0">&quot;<? $row = $data; unset($row['date']); print pledge_sentence(false, true, true, $row) ?>&quot;</p>
+<p style="margin-top: 0">&quot;<? $row = $data; unset($row['date']); print pledge_sentence($row, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($isodate) ?></strong></p>
 <p style="text-align: right">&mdash; <?=htmlspecialchars($data['name']) ?></p>
 </div>
@@ -367,11 +367,8 @@ doesn't work, or you have any other suggests or comments.
     $new = '';
     while ($r = db_fetch_array($q)) {
         $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
-        $new .= '<li><a href="'
-                        . htmlspecialchars($r['ref'])
-                        . '">'
-                    . pledge_sentence($r['id'], false, true)
-                    . "</a>"
+        $new .= '<li>'
+                    . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref']))
                     . " (${r['daysleft']} "
                         . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
                         . " left), "
@@ -405,11 +402,8 @@ doesn't work, or you have any other suggests or comments.
     $new = '';
     while ($r = db_fetch_array($q)) {
         $signatures = $r['count'];
-        $new .= '<li><a href="'
-                        . htmlspecialchars($r['ref'])
-                        . '">'
-                    . pledge_sentence($r['id'], false, true)
-                    . "</a>"
+        $new .= '<li>'
+                    . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref']))
                     . " (${r['daysleft']} "
                         . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
                         . " left), "
@@ -563,7 +557,8 @@ function view_pledge($errors = array()) {
 <form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=$h_ref ?>">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <div class="c">
-<p style="margin-top: 0">&quot;<?=pledge_sentence(0, true, true, $r) ?>&quot;</p>
+<p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true,
+'html'=>true)) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
 
 <p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></p>

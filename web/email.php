@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: email.php,v 1.1 2005-03-11 16:57:09 matthew Exp $
+// $Id: email.php,v 1.2 2005-03-14 15:28:58 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -45,7 +45,7 @@ if ($fromname && $fromemail && $emails) {
         err("Trying to use us for SPAMMING!?!?!");
     $subject = 'I saw this pledge and thought of you';
     $body = "$fromname thought you would be interested in the following pledge from PledgeBank.com:\n\n";
-    $body .= pledge_sentence(false, false, false, $r)."\nDeadline: ".prettify($r['date'], false)."\nURI: ".OPTION_BASE_URL.$r['ref']."\n\n";
+    $body .= pledge_sentence($r)."\nDeadline: ".prettify($r['date'], false)."\nURI: ".OPTION_BASE_URL.$r['ref']."\n\n";
     $body .= "They added the following message:\n\n--------\n$frommessage\n--------\n\n";
     $body .= "All the best,\nPledgeBank.com\n";
     $success = 1;
@@ -89,7 +89,8 @@ function view_pledge($ref, $r) {
 <form class="pledge" name="pledge" action="email" method="post"><input type="hidden" name="ref" value="<?=$h_ref ?>">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <div class="c">
-<p style="margin-top: 0">&quot;<?=pledge_sentence(0, true, true, $r) ?>&quot;</p>
+<p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 
+'html'=>true)) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
 
 <p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target :) )':', '.prettify($left).' more needed') ?></p>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.19 2005-03-14 13:07:21 francis Exp $
+ * $Id: pledge.php,v 1.20 2005-03-14 15:28:57 francis Exp $
  * 
  */
 
@@ -125,15 +125,22 @@ function pledge_is_permanent_error($e) {
     return ($e > PLEDGE_ERROR);
 }
 
-/* pledge_sentence PLEDGE FIRSTPERSON [HTML]
+/* pledge_sentence PLEDGE PARAMS
  * Return a sentence describing what each signer agrees to do ("$pledgecreator
- * will ...  if ..."). If FIRSTPERSON is true, then the sentence is "I
- * will...". If HTML is true, encode entities and add <strong> tags around
- * strategic bits.
+ * will ...  if ...").  PLEDGE is either a pledge id number, or an array of
+ * pledge data from the database.  
+ * If PARAMS['firstperson'] is true, then the sentence is "I will...".  
+ * If PARAMS['html'] is true, encode entities and add <strong> tags around
+ * strategic bits. 
+ * If PARAMS['href'] contains a URL, then the main part of the returned
+ * sentence will be a link to that URL escaped.
  * XXX i18n -- this won't work at all in other languages */
-function pledge_sentence($pledge_id = false, $firstperson = false, $html = false, $r = array()) {
-    if (!$r)
-        $r = db_getRow('select * from pledges where id = ?', $pledge_id);
+function pledge_sentence($r, $params = array()) {
+    $html = array_key_exists('html', $params) ? $params['html'] : false;
+    $firstperson = array_key_exists('firstperson', $params) ? $params['firstperson'] : false;
+    
+    if (!is_array($r))
+        $r = db_getRow('select * from pledges where id = ?', $r);
     if (!$r)
         err(pledge_strerror(PLEDGE_NONE));
 
@@ -141,7 +148,14 @@ function pledge_sentence($pledge_id = false, $firstperson = false, $html = false
         $r = array_map('htmlspecialchars', $r);
         
     $s = ($firstperson ? "I" : $r['name'])
-            . " will <strong>${r['title']}</strong> if "
+            . " will <strong>";
+    if (array_key_exists('href', $params)) {
+            $s .= "<a href=\"".urlencode($params['href'])."\">"
+            . $r['title'] . "<a>";
+    } else {
+            $s .= $r['title'];
+    }
+    $s .= "</strong> if "
             . '<strong>';
     //if (isset($r['comparison']))
     //    $s .= ($r['comparison'] == 'exactly' ? 'exactly' : 'at least');

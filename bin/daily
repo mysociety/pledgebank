@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.10 2005-03-14 12:56:22 francis Exp $
+ * $Id: daily,v 1.11 2005-03-14 15:28:57 francis Exp $
  *
  */
 
@@ -140,7 +140,7 @@ function send_success_email($pledge) {
     if ($success==0) 
         $globalsuccess = 0;
 
-    $body = 'Congratulations! You said "' . pledge_sentence($pledge['id'], true, false) . '", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL."/".$pledge['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
+    $body = 'Congratulations! You said "' . pledge_sentence($pledge['id'], array('firstperson' => true)) . '", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL."/".$pledge['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
     $s = db_fetch_array($q);
     while ($s) {
         $success = pb_send_email($s['email'], $subject, $body);

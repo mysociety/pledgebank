@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.5 2005-03-01 17:27:27 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.6 2005-03-01 18:04:03 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -94,10 +94,15 @@ for (my $i = 1; $i < 4; ++$i) {
     $wth->log_watcher_check();
 }
 # Check it has completed
+print "Final checks...\n" if $verbose > 0;
 $b->get($base_url);
 $b->follow_link(text_regex => qr/finish running this test harness/) or die "Pledge not appeared on front page";
 $wth->browser_check_contents("This pledge has been successful!");
 $wth->log_watcher_check();
+# Check got success emails
+for (my $i = 0; $i < 4; ++$i) {
+    $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
+}
 
 # Or any unhandled emails or errors
 $wth->email_check_none_left();

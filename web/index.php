@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.36 2005-03-01 17:53:23 matthew Exp $
+// $Id: index.php,v 1.37 2005-03-01 18:04:04 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -351,7 +351,7 @@ function send_success_email($pledge_id) {
     $r = db_fetch_array($q);
     $globalsuccess = 1;
     $action = $r['title'];
-    $body = 'Congratulations! You said "I will '.$r['title'].' if .'.comparison_nice($r['comparison']).' '.$r['target'].' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\nhttp://staging.pledgebank.com/".$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
+    $body = 'Congratulations! You said "I will '.$r['title'].' if '.comparison_nice($r['comparison']).' '.$r['target'].' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL.$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
     $email = $r['email'];
     $success = pb_send_email($email, 'PledgeBank pledge success!', $body);
     if ($success==0) $globalsuccess = 0;

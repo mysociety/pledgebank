@@ -8,13 +8,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.3 2005-02-11 14:51:56 matthew Exp $
+ * $Id: daily,v 1.4 2005-03-01 18:04:03 francis Exp $
  *
  */
 
 $short_opts = 'd';
 $long_opts = array('debug');
 require_once 'phpcgi';
+print_r($options);
+exit;
 $debug = isset($options[0][0][0]) ? 1 : 0;
 
 $today = date('Y-m-d');

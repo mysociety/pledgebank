@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.1 2005-03-30 18:12:05 francis Exp $
+ * $Id: announce.php,v 1.2 2005-04-04 11:25:21 francis Exp $
  * 
  */
 
@@ -69,21 +69,21 @@ if ($q_submit) {
 
 if (!sizeof($errors) && $q_submit) {
     // Send message
-    $to = array();
     $q = db_query('select email from signers where pledge_id = ?', $pledge['id']);
-    while ($r = db_fetch_row($q)) {
-        array_push($to, $r[0]);
+    $globalsuccess = true;
+    while ($r = db_fetch_array($q)) {
+        $success = pb_send_email($r['email'], "Announcement from ${pledge['name']} about '${pledge['title']}' at PledgeBank.com", $q_message_body);
+        if (!$success)
+            $globalsuccess = false;
     }
 
-    $success = pb_send_email($to, "Announcement from ${pledge['name']} about '${pledge['title']}' at PledgeBank.com", $q_message_body);
-
-    if (!$success) 
+    if (!$globalsuccess) 
         print "<p>Sorry, we failed to send your message properly.  Please try again!</p>";
     else {
         print "<p>Your message has been sent to all the people who signed your pledge.  
         Thanks, and enjoy carrying out you pledge!</p>";
         // Last of all, destroy the token
-        # pledge_token_destroy('signup-web', $q_token);
+        pledge_token_destroy('signup-web', $q_token);
     }
 } else {
     

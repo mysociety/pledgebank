@@ -123,7 +123,7 @@ function front_page() {
 ?>
 <p>Welcome to PledgeBank, the site that lets you say "I'll do something
 if other people will do it too." </p>
-<p>The site is still in development, it isn't finshed yet.   Hopefully
+<p>The site is still in development, it isn't finished yet.   Hopefully
 it'll be ready in February.
 If you'd like to use PledgeBank when it is launched, or have any good
 ideas for organisations who might like to use it, email <a

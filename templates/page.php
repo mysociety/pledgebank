@@ -6,7 +6,7 @@ function page_header() { ?>
 <style type="text/css">@import url("pb.css");</style>
 </head>
 <body>
-<h1>Pledge<span>Bank</span> &mdash Not Finished Yet</h1>
+<h1>Pledge<span>Bank</span> &mdash; Not Finished Yet</h1>
 <hr class="v"><div id="content">
 <? }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.25 2005-02-22 23:01:29 matthew Exp $
+// $Id: index.php,v 1.26 2005-02-23 00:50:24 matthew Exp $
 
 require_once "../conf/general";
 include_once '../templates/page.php';
@@ -24,7 +24,9 @@ if ($_GET['search']) {
 
 page_header();
 
-if ($_GET['confirmp']) confirm_pledge();
+if (ctype_digit($_GET['report'])) report_form();
+elseif (ctype_digit($_POST['report'])) send_report();
+elseif ($_GET['confirmp']) confirm_pledge();
 elseif ($_GET['confirms']) confirm_signatory();
 elseif ($_POST['add_signatory']) add_signatory();
 elseif ($_GET['pledge']) view_pledge();
@@ -43,6 +45,37 @@ page_footer();
 
 # --------------------------------------------------------------------
 
+function report_form() {
+    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed=1 AND signers.id=?', array($_GET['report']));
+    if (!db_num_rows($q)) {
+        print '<p>Illegal PledgeBank id!</p>';
+	return false;
+    } else {
+        $r = db_fetch_array($q);
+        print '<form action="./" method="post"><input type="hidden" name="report" value="'.$_GET['report'].'">';
+        print '<h2>Signature reporting</h2>';
+        print '<p>You are reporting the signature "'.$r['signname'].'" on the pledge "'.$r['title'].'"</p>';
+        print '<p>Please give a (short) reason for reporting this signature:</p>';
+        print '<textarea name="reason" rows="5" cols="50"></textarea>';
+        print '<p><input type="submit" value="Submit"></p>';
+        print '</form>';
+    }
+}
+
+function send_report() {
+    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed=1 AND signers.id=?', array($_POST['report']));
+    if (!db_num_rows($q)) {
+        print '<p>Illegal PledgeBank id!</p>';
+	return false;
+    } else {
+        $r = db_fetch_array($q);
+        $reason = $_POST['reason'];
+        pb_send_email(OPTION_CONTACT_EMAIL, "Signature reporting", "Reporting of '$r[signname]' in pledge '$r[title]'\n\nReason given: $reason\n\n");
+        db_query('UPDATE signers SET showname=0,reported=1 WHERE id=?', array($_POST['report']));
+        print '<p>Thank you for reporting that signature; it will be looked at asap.</p>';
+    }
+}
+
 function pledge_form($errors = array()) {
 # <!-- <p><big><strong>Before people can create pledges we should have a stiff warning page, with few, select, bold words about what makes for good &amp; bad pledges (we want to try to get people to keep their target numbers down).</strong></big></p> -->
 	if (sizeof($errors)) {
@@ -59,7 +92,8 @@ function pledge_form($errors = array()) {
 other <input type="text" id="type" name="type" size="30" value="people"> <input type="text" id="signup" name="signup" size="10" value="sign up"> before
 <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<?=htmlspecialchars($_POST['date']) ?>">.</p>
 
-<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input type="text" size="20" name="ref" value="<?=htmlspecialchars($_POST['ref']) ?>"> <small>(letters, numbers, -)</small>
+<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input type="text" size="20" name="ref" value="<?=htmlspecialchars($_POST['ref']) ?>"> <small>(letters, numbers, -)</small></p>
+<!-- <p>Do you want this pledge to be visible around the site? <input type="checkbox" checked name="open" value="1"> Yes</p> -->
 <p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars($_POST['name']) ?>">
 Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($_POST['email']) ?>">
 &nbsp;
@@ -82,6 +116,7 @@ function pledge_form_submitted() {
 	$email = $_POST['email'];
 	$ref = $_POST['ref'];
         $detail = $_POST['detail'];
+        $open = $_POST['open']; if ($open) $open=1; else $open = 0;
         $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($ref));
         if ($dupe) $errors[] = 'That reference is already taken!';
         $signup = $_POST['signup']; if (!$signup) $signup = 'sign up';
@@ -98,7 +133,7 @@ function pledge_form_submitted() {
 	if (sizeof($errors)) {
 		pledge_form($errors);
 	} else {
-		create_new_pledge($action,$people,$type,$date,$name,$email,$ref,$signup,$detail);
+		create_new_pledge($action,$people,$type,$date,$name,$email,$ref,$signup,$detail,$open);
 	}
 }
 
@@ -122,7 +157,7 @@ doesn't work, or you have any other suggests or comments.
 <p style="margin-top: 1em; text-align: right"><input type="submit" value="Go"></p>
 </form>
 <h2>Sign up to one of our five newest pledges</h2>
-<?	$q = db_query('SELECT *, date - CURRENT_DATE AS daysleft FROM pledges WHERE date >= CURRENT_DATE AND confirmed=1 ORDER BY id DESC LIMIT 10');
+<?	$q = db_query('SELECT *, date - CURRENT_DATE AS daysleft FROM pledges WHERE date >= CURRENT_DATE AND confirmed=1 AND open=1 ORDER BY id DESC LIMIT 10');
     $new = '';
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {
@@ -148,7 +183,7 @@ doesn't work, or you have any other suggests or comments.
 pledges.signup, pledges.date, pledges.target, pledges.type, pledges.ref,
 COUNT(signers.id) AS count, max(date)-CURRENT_DATE
 AS daysleft FROM pledges, signers WHERE pledges.id=signers.pledge_id AND
-pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 GROUP
+pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 AND pledges.open=1 GROUP
 BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type,pledges.signup,pledges.ref ORDER BY count DESC');
     $new = '';
     $k = 5;
@@ -168,15 +203,9 @@ BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.typ
     }
 }
 
-function view_faq() { ?>
-<h2>FAQ</h2>
-<dl>
-<dt>So what's this all about, then?
-<dd>A Bank. Of Pledges.
-<dt>And who do we have to thank for this?
-<dd>MySociety.
-</dl>
-<? }
+function view_faq() {
+    include 'faq.php';
+}
 
 # Someone wishes to sign a pledge
 function add_signatory() {
@@ -216,7 +245,7 @@ function add_signatory() {
 		return false;
 	}
 
-	$token = str_replace('.','X',substr(crypt($id.' '.$email),0,16));
+	$token = str_replace('.', 'X', substr(crypt($id.' '.$email.microtime()), 12, 16));
 	$add = db_query('INSERT INTO signers (pledge_id, signname,
         signemail, showname, signtime, token, confirmed) VALUES
         (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, 0)', 
@@ -313,7 +342,7 @@ function view_pledge() {
         $signup = $r['signup'];
         $detail = $r['detail'];
 
-	$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id=?', array($r['id']));
+	$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id=? ORDER BY id', array($r['id']));
 	$curr = db_num_rows($q);
 	$left = $people - $curr;
 
@@ -362,7 +391,7 @@ if ($detail) {
 		while ($r = db_fetch_array($q)) {
 			$showname = $r['showname'];
 			if ($showname) {
-				$out .= '<li>'.htmlspecialchars($r['signname']).'</li>';
+                            $out .= '<li>'.htmlspecialchars($r['signname']).' <small>(<a href="./?report='.$r['id'].'">Is this signature suspicious?</a>)</small></li>';
 			} else {
 				$anon++;
 			}
@@ -376,14 +405,14 @@ if ($detail) {
 }
 
 # Someone has submitted a new pledge
-function create_new_pledge($action, $people, $type, $date, $name, $email, $ref, $signup, $detail) {
+function create_new_pledge($action, $people, $type, $date, $name, $email, $ref, $signup, $detail, $open) {
 	$isodate = $date['iso'];
-	$token = str_replace('.','X',substr(crypt($id.' '.$email),0,16));
+	$token = str_replace('.', 'X', substr(crypt($id.' '.$email.microtime()), 12, 16));
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
-        name, email, ref, token, confirmed, creationtime, detail) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?)', 
+        name, email, ref, token, confirmed, creationtime, detail, open) VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?, ?)', 
         array($action, $people, $type, $signup, $isodate, 
-        $name, $email, $ref, $token, $detail));
+        $name, $email, $ref, $token, $detail, $open));
 ?>
 <p>Thank you very much for submitting your pledge:</p>
 <div id="pledge">
@@ -431,7 +460,7 @@ function confirm_pledge() {
 
 function list_all_pledges() {
         print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
-        $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed=1');
+        $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed=1 AND open=1');
         print '<table><tr><th>Title</th><th>Target</th><th>Deadline</th><th>Creator</th><th>Short name</th></tr>';
         while ($r = db_fetch_row($q)) {
                 $r[0] = '<a href="'.$r[4].'">'.$r[0].'</a>';

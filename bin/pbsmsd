@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.15 2005-03-30 10:52:07 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.16 2005-03-30 11:03:11 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -217,7 +217,7 @@ sub parse_csv_fields ($) {
     my @rows;
     foreach my $line (split(/\r\n/, $_[0])) {
         my %fields;
-        while ($line =~ m#([^=]+)="([^"]+)"(,|$)#g) {
+        while ($line =~ m#([^=]+)="((?:[^"]|\\.)*)"(,|$)#g) {
             my $v = $2;
             $v =~ s#\\(.)#$1#g;
             $fields{$1} = $v;
@@ -668,5 +668,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.15 2005-03-30 10:52:07 sandpit Exp $
+$Id: pbsmsd,v 1.16 2005-03-30 11:03:11 sandpit Exp $
 

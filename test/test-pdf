@@ -18,7 +18,7 @@ isa_ok($pdf, 'MS::PDF', 'Object');
 my $filename;
 ok($filename = $pdf->make('A4'),'Made PDF');
 
-`mv $filename /home/ejhp98/projects/pledgebank/output/0.pdf`;
+`mv $filename /home/francis/tmp/pdfs/0.pdf`;
 
 # if you need CGI output, just re-open $filename as FILE, print some
 # headers + <FILE> to STDOUT, close FILE, and unlink $filename.

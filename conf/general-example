@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.4 2005-02-24 12:18:02 francis Exp $
+ * $Id: general-example,v 1.5 2005-03-02 20:12:23 chris Exp $
  * 
  */
 
@@ -46,6 +46,18 @@ define('OPTION_EMAIL_PREFIX', 'pb-');
 define('OPTION_PHP_DEBUG_LEVEL', 0);
 // Is this a staging site?  Affects how errors are displayed.
 define('OPTION_PB_STAGING', 1);
+
+// By default, no SMS service.
+define('OPTION_PB_SMS_MODE', 'none');
+
+// SMS sending and receiving may be done over HTTP via the MX Telecom
+// aggregator.  Access to this service is authenticated by this username and
+// password.
+/*
+define('OPTION_PB_SMS_MODE', 'mxtelecom');
+define('OPTION_PB_SMS_MXTELECOM_USER', 'username');
+define('OPTION_PB_SMS_MXTELECOM_PASS', 'password');
+*/
 
 // Log file (used in test harness, and later in admin scripts)
 define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');

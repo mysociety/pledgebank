@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.7 2005-03-29 13:59:28 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.8 2005-03-29 15:40:02 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -115,8 +115,8 @@ sub run_sending_process () {
                         intPremium => ($ispremium ? 25 : 0)     # XXX
                     );
 
-                # Now we need to send the message. That means finding a
-                # character set in which it can be expressed.
+                # Now we need to send the message. That means trying to
+                # encode it in IA5.
                 eval {
                     $p{strMessage} = PB::SMS::encode_ia5($message);
                 };
@@ -380,5 +380,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.7 2005-03-29 13:59:28 chris Exp $
+$Id: pbsmsd,v 1.8 2005-03-29 15:40:02 chris Exp $
 

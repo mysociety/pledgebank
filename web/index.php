@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.52 2005-03-04 18:53:40 chris Exp $
+// $Id: index.php,v 1.53 2005-03-06 22:03:44 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -75,7 +75,7 @@ page_footer();
 # --------------------------------------------------------------------
 
 function report_form() {
-    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed AND signers.id=?', array(get_http_var('report')));
+    $q = db_query('SELECT title, signers.name AS name FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed AND signers.id=?', array(get_http_var('report')));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank id!</p>';
 	return false;

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.2 2005-01-07 17:06:16 francis Exp $
+ * $Id: admin-pb.php,v 1.3 2005-01-07 17:22:57 francis Exp $
  * 
  */
 
@@ -60,8 +60,11 @@ class ADMIN_PAGE_PB {
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print "</p>";
 
+        $q = db_query('SELECT COUNT(*) FROM signers where pledge_id=?  and confirmed=1', $pdata['id']);
+        $r = db_fetch_row($q);
+        $confirmed = $r[0];
         $q = db_query('SELECT * FROM signers where pledge_id=?', $pdata['id']);
-        print "<p>There are <b>".db_num_rows($q)."</b> signers so far:</p>";
+        print "<p>There are <b>$confirmed</b> confirmed signers, and <b>".db_num_rows($q)."</b> unconfirmed so far:</p>";
         print '<table border=1 width=100%><tr>
         <th>Signee</th> <th>Time</th> <th>Show name?</th> <th>Confirmed</th> </tr>';
         while ($r = db_fetch_array($q)) {

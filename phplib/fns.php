@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.10 2005-03-11 16:57:07 matthew Exp $
+// $Id: fns.php,v 1.11 2005-03-11 19:14:54 francis Exp $
 
 function pb_send_email($to, $subject, $message, $headers = '') {
     if (!strstr($headers, 'From:')) {
@@ -38,7 +38,9 @@ function prettify($s, $html = true) {
 function parse_date($date) {
 	$now = time();
 	$error = 0;
-	if (!$date) return;
+	if (!$date)  {
+        return null;
+    }
 
 	$date = preg_replace('#((\b([a-z]|on|an|of|in|the|year of our lord))|(?<=\d)(st|nd|rd|th))\b#','',$date);
 
@@ -71,10 +73,13 @@ function parse_date($date) {
 			$error = 1;
 		}
 	}
-        if (!$epoch && $day && $month && $year)
-            $epoch = mktime(0,0,0,$month,$day,$year);
+    if (!$epoch && $day && $month && $year)
+        $epoch = mktime(0,0,0,$month,$day,$year);
 
-        return array('iso'=>"$year-$month-$day", 'epoch'=>$epoch, 'day'=>$day, 'month'=>$month, 'year'=>$year, 'error'=>$error);
+    if ($epoch == 0) 
+        return null;
+
+    return array('iso'=>"$year-$month-$day", 'epoch'=>$epoch, 'day'=>$day, 'month'=>$month, 'year'=>$year, 'error'=>$error);
 }
 
 ?>

@@ -17,12 +17,11 @@
 
 # Tests to do:
 # Try to sign up to an expired pledge
-# Signing up to a pledge after midnight of failure should be disallowed
 # Test exactly vs. at least works
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.3 2005-03-11 18:33:20 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.4 2005-03-15 15:13:28 francis Exp $';
 
 use strict;
 require 5.8.0;

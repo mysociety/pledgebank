@@ -1,3 +1,19 @@
+Pledge states
+=============
+
+1. Can new people sign up?
+Tested for by pledge_is_valid_to_sign plpgsql function.
+
+2. Has pledge been successful?
+Which we test for with the success flag.
+
+3. Has pledge expired?
+We test for by comparing pledges.date with current_timestamp
+
+
+Earlier notes:
+--------------
+
 Organiser:	* Name, Email, Nature of problem, Minimum threshold, Deadline by which pledges must be in, Optional: email addresses to alert
 User:		* Name, Email, Pledges, Project
 TIME'S UP! - What happens?

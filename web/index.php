@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.33 2005-02-28 09:59:34 chris Exp $
+// $Id: index.php,v 1.34 2005-02-28 19:26:29 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -426,7 +426,7 @@ function view_pledge() {
 	}
 ?>
 <p>Here is the pledge:</p>
-<form id="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
+<form id="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 <input type="hidden" name="pw" value="<?=htmlspecialchars($pw) ?>">
 <input type="hidden" name="add_signatory" value="1">
 <p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($action) ?></strong> if <strong><?=htmlspecialchars($comparison) ?></strong> <strong><?=htmlspecialchars($people) ?></strong> <?=htmlspecialchars($type) ?> <?=($signup=='sign up'?'will do the same':$signup) ?>&quot;</p>
@@ -442,7 +442,7 @@ function view_pledge() {
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
 <br>Show my name on this pledge: <input type="checkbox" name="showname" value="1" checked>
 &nbsp;
-<input type="submit" value="Submit"></p>
+<input type="submit" name="submit" value="Submit"></p>
 </div>
 <? }
 

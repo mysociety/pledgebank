@@ -8,14 +8,14 @@
 # * apache configured to serve ../web on OPTION_BASE_URL
 # * a database with name ending "_testharness"; this script will drop and remake the
 #   database, so make sure it is never used for anything important
-# * email addresses (@emails below) configured to pipe to ./mailin.pl with fast
+# * email addresses (email_n below) configured to pipe to ./mailin.pl with fast
 #   local delivery
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.3 2005-02-28 17:49:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.4 2005-02-28 19:26:28 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -33,7 +33,8 @@ use mySociety::DBHandle qw(dbh);
 
 our $base_url = mySociety::Config::get('BASE_URL');
 our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
-our @emails = ( 'pbharness+1@owl', 'pbharness+2@owl', 'pbharness+2@owl' );
+sub email_n { my $n = shift; return "pbharness+$n\@owl"; }
+my $verbose = 1;
 
 our $dbhost = mySociety::Config::get('PB_DB_HOST', undef);
 our $dbport = mySociety::Config::get('PB_DB_PORT', undef);
@@ -42,6 +43,7 @@ our $dbuser = mySociety::Config::get('PB_DB_USER');
 our $dbpass = mySociety::Config::get('PB_DB_PASS');
 
 # Drop and recreate database from schema
+print "Remaking database $dbname...\n" if $verbose > 0;
 die "Database will be dropped, so for safety must be called '_testharness'" if ($dbname !~ m/_testharness$/);
 # ... make connection with no database name and drop and remake databse
 my $connstr = 'dbi:Pg:';
@@ -60,6 +62,7 @@ dbh()->do($schema);
 dbh()->commit();
 
 # Incoming mail, prepare table to store it
+print "Preparing for incoming mail...\n" if $verbose > 0;
 dbh()->do("create table testharness_mail (
   id serial not null primary key,
   content text not null default '')");
@@ -73,17 +76,19 @@ sub get_email_containing {
         $mails = dbh()->selectall_arrayref("select id, content from testharness_mail
             where content like ?", {}, $check);
         $got = scalar @$mails;
-        die "Email containing '$check' not found even after $c sec wait" if ($got == 0 && $c > 4);
+        die "Email containing '$check' not found even after $c sec wait" if ($got == 0 && $c > 6);
         die "Too many emails found containing '$check'" if ($got > 1);
         $c++;
         sleep 1;
     }
     my ($id, $content) = @{$mails->[0]};
     dbh()->do("delete from testharness_mail where id = ?", {}, $id);
+    dbh()->commit();
     return $content;
 }
 
 # Syntax check all .php files
+print "Syntax check all PHP files...\n" if $verbose > 0;
 find(\&check_php_syntax, "../../pb/"); # TODO reenable
 sub check_php_syntax {
     if (m/\.php$/) {
@@ -93,6 +98,7 @@ sub check_php_syntax {
 }
 
 # Create web browsing agent, check for errors automatically
+print "Set up web browsing agent...\n" if $verbose > 0;
 our $b = new WWW::Mechanize(autocheck => 1);
 sub check_content_contains {
     my $check = shift;
@@ -104,6 +110,7 @@ sub check_content_contains {
 }
 
 # Set up HTTP log file watcher
+print "Set up HTTP error log watcher...\n" if $verbose > 0;
 our $http_logobj = new mySociety::Logfile($httpd_error_log);
 our $http_logoffset = $http_logobj->lastline();
 # Returns error text if there are new errors since last call,
@@ -123,27 +130,58 @@ sub check_for_log_errors {
 }
 
 # Check that we can detect PHP errors
+print "Confirm we can detect errors...\n" if $verbose > 0;
 $b->get($base_url . "/test.php?error=1" );
 die "Unable to detect errors from PHP" if !get_log_errors();
 
 # Create a new pledge, starting at the home page
+print "Create new pledge...\n" if $verbose > 0;
 $b->get($base_url);
 $b->follow_link(text_regex => qr/Start your own pledge/) or die "Start your own pledge link missing";
-$b->content =~ m/New Pledge/ or die "Start own pledge page not recognised";
+check_content_contains("New Pledge");
 $b->submit_form(form_name => 'pledge',
     fields => { action => 'finish running this test harness', 
         people => '3', type => 'automated lines of code', signup => 'sign up',
         date => 'tomorrow', ref => 'automatedtest',
-        name => 'Peter Setter', email => $emails[0] },
-    button => 'submit') or die "failed to submit form";
+        name => 'Peter Setter', email => email_n(0) },
+    button => 'submit') or die "Failed to submit creating form";
 check_content_contains("An email has been sent");
 check_for_log_errors();
-
-# Confirm pledge
-my $confirmation_email = get_email_containing('%To confirm your email address%');
+print "Confirming new pledge...\n" if $verbose > 0;
+my $confirmation_email = get_email_containing(
+    '%To: '.email_n(0).'%To confirm your email address%');
 print "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
 $b->get($1);
 check_content_contains("Thank you for confirming that pledge");
+
+# Sign it a few times
+for (my $i = 1; $i < 4; ++$i) {
+    print "Signing the pledge $i...\n" if $verbose > 0;
+    $b->get($base_url);
+    $b->follow_link(text_regex => qr/finish running this test harness/) or die "Pledge not appeared on front page";
+    check_content_contains("Sign me up");
+    $b->submit_form(form_name => 'pledge',
+        fields => { name => "Siegfried Signer $i", email => email_n($i) },
+        button => 'submit') or die "Failed to submit signing form";
+    check_content_contains("An email has been sent to the address you gave to confirm it is yours");
+    check_for_log_errors();
+}
+for (my $i = 1; $i < 4; ++$i) {
+    print "Confirming signature $i...\n" if $verbose > 0;
+    $confirmation_email = get_email_containing(
+        '%To: '.email_n($i).'%To confirm your email address%');
+    print "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
+    $b->get($1);
+    if ($i == 3) {
+        check_content_contains("Your signature has made this Pledge reach its target!");
+    } else {
+        check_content_contains("Thank you for confirming your signature");
+    }
+}
+# Check it has completed
+$b->get($base_url);
+$b->follow_link(text_regex => qr/finish running this test harness/) or die "Pledge not appeared on front page";
+check_content_contains("This pledge has been successful!");
 
 # Or any unhandled emails
 sleep 2;

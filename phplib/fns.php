@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.8 2005-02-24 12:18:02 francis Exp $
+// $Id: fns.php,v 1.9 2005-03-06 22:20:14 matthew Exp $
 
 function pb_send_email($to, $subject, $message, $headers = '') {
 	$headers = $headers . 
@@ -21,6 +21,9 @@ function prettify($s) {
 		list(,$y,$m,$d) = $m;
 		return date('j<\sup>S</\sup> F Y', mktime(12,0,0,$m,$d,$y));
 	}
+        if (ctype_digit($s)) {
+            return number_format($s);
+        }
 	return $s;
 }
 

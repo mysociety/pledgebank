@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.53 2005-03-06 22:03:44 matthew Exp $
+// $Id: index.php,v 1.54 2005-03-06 22:20:16 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -314,12 +314,12 @@ doesn't work, or you have any other suggests or comments.
         $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ? AND confirmed', array($r['id']));
         $days = $r['daysleft'];
         $new .= '<li>' . htmlspecialchars($r['name']) . ' will <a href="' . $r['ref'] . '">' . htmlspecialchars($r['title']) . '</a> if ';
-        $new .= comparison_nice($r['comparison']) . ' ' . htmlspecialchars($r['target']) . ' other ' . $r['type'] . ' ';
+        $new .= comparison_nice($r['comparison']) . ' ' . htmlspecialchars(prettify($r['target'])) . ' other ' . $r['type'] . ' ';
         $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
         $new .= ' (';
         $new .= $days . ' '.make_plural($days,'day').' left';
 #			$new .= 'by '.htmlspecialchars($r['date']);
-        $new .= ', '.($r['target']-$signatures).' more needed)</li>'."\n";
+        $new .= ', '.prettify($r['target']-$signatures).' more needed)</li>'."\n";
         $k--;
     }
     if (!$new) {
@@ -342,7 +342,7 @@ BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.typ
         $days = $r['daysleft'];
         $new .= '<li>'.$r['count'].' '.make_plural($r['count'],'pledge').' : '.htmlspecialchars($r['name']).' will <a href="'.$r['ref'].'">';
         $new .= htmlspecialchars($r['title']).'</a> if ';
-        $new .= comparison_nice($r['comparison']) . ' ' . htmlspecialchars($r['target']).' other ' . htmlspecialchars($r['type']) . ' ';
+        $new .= comparison_nice($r['comparison']) . ' ' . htmlspecialchars(prettify($r['target'])).' other ' . htmlspecialchars($r['type']) . ' ';
         $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
         $new .= ' (';
         $new .= 'by '.prettify(htmlspecialchars($r['date']));
@@ -543,7 +543,7 @@ function send_success_email($pledge_id) {
     $r = db_fetch_array($q);
     $globalsuccess = 1;
     $action = $r['title'];
-    $body = 'Congratulations! You said "I will '.$r['title'].' if '.comparison_nice($r['comparison']).' '.$r['target'].' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL.$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
+    $body = 'Congratulations! You said "I will '.$r['title'].' if '.comparison_nice($r['comparison']).' '.prettify($r['target']).' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL.$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
     $success = pb_send_email($r['email'], 'PledgeBank pledge success!', $body);
     if ($success==0) 
         $globalsuccess = 0;
@@ -624,10 +624,10 @@ function view_pledge() {
 <form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 <input type="hidden" name="pw" value="<?=htmlspecialchars($pw) ?>">
 <input type="hidden" name="add_signatory" value="1">
-<p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($action) ?></strong> if <strong><?=htmlspecialchars($comparison) ?></strong> <strong><?=htmlspecialchars($people) ?></strong> <?=htmlspecialchars($type) ?> <?=($signup=='sign up'?'will do the same':$signup) ?>&quot;</p>
+<p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($action) ?></strong> if <strong><?=htmlspecialchars($comparison) ?></strong> <strong><?=htmlspecialchars(prettify($people)) ?></strong> <?=htmlspecialchars($type) ?> <?=($signup=='sign up'?'will do the same':$signup) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($date) ?></strong></p>
 
-<p style="text-align: center; font-style: italic;"><?=$curr ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.(-$left).' over target :) )':', '.$left.' more needed') ?></p>
+<p style="text-align: center; font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target :) )':', '.prettify($left).' more needed') ?></p>
 
 <? if (!$finished) { ?>
 <div style="text-align: left; margin-left: 50%;">

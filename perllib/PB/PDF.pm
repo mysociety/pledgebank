@@ -1,4 +1,4 @@
-package PBPDF;
+package PB::PDF;
 use strict;
 
 use File::Temp ();
@@ -266,12 +266,12 @@ OUTPUT
 
             } else {
 
-            # todo - resize and rotate xoform accordingly
-            warn "Paper size: $paper_size ($num_rows,$per_row). Rotate: $rotate";
-            $form->rotate(90) if ($rotate);
-            $form->rotate($form_width,$form_height);
+                # todo - resize and rotate xoform accordingly
+                warn "Paper size: $paper_size ($num_rows,$per_row). Rotate: $rotate";
+                $form->rotate(90) if ($rotate);
+                $form->rotate($form_width,$form_height);
 
-            foreach my $row (1 .. $num_rows) {
+                foreach my $row (1 .. $num_rows) {
                     foreach my $col (1 .. $per_row) {
                     warn "Copy: $row,$col";
                     $gfx->formimage($form,
@@ -286,6 +286,7 @@ OUTPUT
             $new_pdf->end;
             chmod(0644,$scaled_filename);
             unlink ($tmp_filename);
+            print "scaled one $scaled_filename\n";
             return $scaled_filename;
 
         }
@@ -383,11 +384,11 @@ __END__
 
 =head1 NAME
 
-PBPDF - create PDF posters and flyers for PledgeBank.
+PB::PDF - create PDF posters and flyers for PledgeBank.
 
 =head1 SYNOPSIS
 
-my $pdf = PBPDF->new( { 
+my $pdf = PB::PDF->new( { 
               'poster-type' => 'original',
               'pledge-id' => 0,
               'target' => 100,

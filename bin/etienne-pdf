@@ -1,11 +1,45 @@
 #!/usr/bin/perl -w -I../perllib -I../../perllib
 use strict;
 
-use PBPDF;
+use PB::PDF;
+use Data::Dumper;
+my $pdf;
 
-#use PBPDF;
+=comment
+#testing PDF::API2
+    my $loadpdf = PDF::API2->open("test.pdf") or die "failed";
 
-my $pdf = PBPDF->new( { 
+    $pdf = PDF::API2->new(-file => "foo.pdf");
+    $pdf->preferences(-fitb => 1); # viewer shows full page
+    my ($page_width,$page_height,$page_margin) = (595.27,842.89,36);
+    my $page_centre = $page_width / 2;
+    $pdf->mediabox($page_width,$page_height);
+    my $page = $pdf->page;
+    my $text = $page->text;
+    my $gfx = $page->gfx();
+    $gfx->rect($page_margin,$page_margin,
+#           300,100);
+           $page_width-(2*$page_margin),$page_height-(2*$page_margin));
+    $gfx->stroke;
+    $gfx->endpath();
+
+    my $form = $pdf->importPageIntoForm($loadpdf,1);
+    print Dumper($form);
+    $form->{'rotate'} = 90;
+#    print Dumper($form->{'scale'});
+#    $form->scale(0.5);
+    $gfx->formimage($form, 200, 200);
+
+    $pdf->finishobjects($page,$text,$gfx);
+    $pdf->saveas;
+    $pdf->end;
+    exit;
+=cut
+
+
+#use PB::PDF;
+
+$pdf = PB::PDF->new( { 
                 'poster-type' => 'friendly-flyer',
 
                 'pledge-id' => 0,
@@ -22,7 +56,7 @@ my $pdf = PBPDF->new( {
 		      });
 
 =comment
-my $pdf = PBPDF->new( { 
+my $pdf = PB::PDF->new( { 
                 'poster-type' => 'original',
                 'pledge-id' => 0,
                 'target' => 20,
@@ -33,7 +67,7 @@ my $pdf = PBPDF->new( {
 =cut
 
 my $filename;
-$filename = $pdf->make('A5');
+$filename = $pdf->make('A4');
 if (!$filename) {
     exit 1;
 }

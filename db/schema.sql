@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.34 2005-03-15 18:50:02 chris Exp $
+-- $Id: schema.sql,v 1.35 2005-03-16 14:07:20 chris Exp $
 --
 
 -- secret
@@ -212,7 +212,12 @@ create table signers (
     signtime timestamp not null,
   
     -- Name has been reported
-    reported boolean not null default false
+    reported boolean not null default false,
+
+    check (
+        (name is not null and email is not null and mobile is null)
+        or (name is null and email is null and mobile is not null)
+    )
 );
 
 -- There may be only one signature on any given pledge from any given mobile
@@ -220,6 +225,60 @@ create table signers (
 create unique index signers_pledge_id_mobile_idx on signers(pledge_id, mobile);
 -- Ditto emails.
 create unique index signers_pledge_id_email_idx on signers(pledge_id, email);
+
+-- signers_combine_2 ID1 ID2
+-- Given the IDs ID1 and ID2 of two signers of a pledge, coalesce them into one
+-- signer combining the two. One signer should have a name and email address,
+-- and the other a mobile phone number only. The ID of the remaining signer is
+-- the ID of the signer with the email address. If the pledge was successful
+-- before this combination took place, set the removedsigneraftersuccessflag to
+-- record this fact. This function has no return value, and raises an exception
+-- if any of its preconditions are not met.
+create function signers_combine_2(integer, integer)
+    returns void as '
+    declare
+        id1 integer;
+        id2 integer;
+        t_pledge_id integer;
+        t_mobile text;
+    begin
+        -- Lock the signers table.
+        lock table signers in share mode;
+
+        if (select pledge_id from signers where id = $1)
+            <> (select pledge_id from signers where id = $2) then
+            raise exception ''ID1 and ID2 must be signers to the same pledge'';
+        end if;
+        
+        t_pledge_id := (select pledge_id from signers where id = $1);
+
+        if (select email from signers where id = $1) is not null
+            and (select email from signers where id = $2) is null then
+            id1 := $1;
+            id2 := $2;
+        elsif (select email from signers where id = $1) is null
+            and (select email from signers where id = $2) is not null then
+            id1 := $2;
+            id2 := $1;
+        else
+            raise exception ''exactly one of ID1, ID2 must have an email address set'';
+        end if;
+
+        t_mobile = (select mobile from signers where id = id2);
+        
+        delete from smssubscription where signer_id = id2;
+        delete from signers where id = id2;
+
+        update signers
+            set mobile = t_mobile
+            where id = id1;
+
+        update pledges set removedsigneraftersuccess = true
+            where id = t_pledge_id and success;
+
+        return;
+    end;
+' language 'plpgsql';
 
 -- Subscription by SMS. The punter sends us a message, and we reply with a
 -- reverse-billed one, recording the mapping from pledge to outgoing SMS in
@@ -254,7 +313,7 @@ create unique index smssubscription_token_idx on smssubscription(token);
 -- Sign up from an SMS subscription. Supply either the ID of an outgoing SMS
 -- subscription message; or a TOKEN sent in such a message. Returns a code as
 -- from pledge_is_valid_to_sign.
-create or replace function smssubscription_sign(integer, text)
+create function smssubscription_sign(integer, text)
     returns text as '
     declare
         p record;

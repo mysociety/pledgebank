@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.34 2005-03-29 08:58:01 francis Exp $
+ * $Id: pledge.php,v 1.35 2005-03-29 15:34:24 francis Exp $
  * 
  */
 
@@ -180,7 +180,7 @@ function pledge_sentence($r, $params = array()) {
     } else {
             $s .= "<strong>" . $r['title'] . "</strong>";
     }
-    $s .= " if "
+    $s .= " but only if "
             . '<strong>';
     $s .= prettify($r['target'])
             . '</strong>'

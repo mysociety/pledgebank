@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.11 2005-03-02 23:27:20 matthew Exp $
+-- $Id: schema.sql,v 1.12 2005-03-03 01:21:46 chris Exp $
 --
 
 -- secret
@@ -57,6 +57,8 @@ create table outgoingsms (
     recipient text not null,
     -- Message, as UTF-8.
     message text not null,
+    -- when the message was submitted.
+    whensubmitted integer not null,
     
     -- When we tried to submit the message to the server last, how many times
     -- we've attempted this, and what the result was on the most recent
@@ -149,4 +151,4 @@ create table signers (
   reported boolean not null default false
 );
 
-
+create unique index signers_outgoingsms_id_idx on signers(outgoingsmsid_idx);

@@ -5,12 +5,19 @@
 #
 # MX Telecom's interface is documented here:
 #  http://www.mxtelecom.com/index.jsp?m=tech/sms/http/receive
+# The same script will also be used for processing delivery status reports, as
+# described in:
+#  http://www.mxtelecom.com/uk/index.jsp?m=tech/sms/http/reports
+# Actually this is a mess, because there's no way to distinguish a report from
+# a real incoming message; we're unlikely to make that mistake in the absence
+# of malice, so in this case it doesn't matter too much, but still a poor
+# effort.
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: smsreceive,v 1.1 2005-03-02 20:08:35 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: smsreceive,v 1.2 2005-03-03 01:21:46 chris Exp $';
 
 use strict;
 
@@ -70,8 +77,9 @@ while (my $q = new CGI::Fast()) {
 
         # Start by checking whether we've seen this message before.
         my $resp;
+        my $smsid = $q->param('smsid');
         
-        if (!defined(dbh()->selectrow_array('select id from incomingsms where foreignid = ? for update', {}, $q->param('smsid')))) {
+        if (!defined(dbh()->selectrow_array('select id from incomingsms where foreignid = ? for update', {}, $smsid))) {
             my $message;
 
             # Parse the date.
@@ -109,10 +117,37 @@ while (my $q = new CGI::Fast()) {
 
             my $sender = $q->param('smsfrom');
             $sender =~ s#^([^+])#+$1#;
-            my $receiver = $q->param('smsto');
-            $receiver =~ s#^([^+])#+$1#;
+            my $recipient = $q->param('smsto');
+            $recipient =~ s#^([^+])#+$1#;
 
-            PB::SMS::receive_sms($sender, $receiver, $message, $q->param('smsid'), $whensent);
+            # At this point we try to guess whether the message is a delivery
+            # report for a message which we have sent, or an incoming message.
+            my $isreport = 0;
+            if (my $message =~ m#^REPORT ([^ ]) ([A-Z]+)$#) {
+                my ($sent_smsid, $status) = @_;
+                my $msg_recipient = dbh()->selectrow_array('
+                        select recipient from outgoingsms where foreignid = ? for update
+                    ', {}, $sent_smsid);
+                if (defined($msg_recipient) && $msg_recipient eq $sender) {
+                    if ($status =~ m#^(delivered|failed|buffered|rejected|none)$#) {
+                        # This is probably a delivery report.
+                        $isreport = 1;
+                        $status = lc($status);
+                        dbh()->do('update outgoingsms set status = ? where foreignid = ?');
+                        dbh()->commit();
+                    } else {
+                        warn "message '$message' from $sender to $recipient matches delivery report pattern but has bad status '$status'\n";
+                    }
+                } else {
+                    # Ho-hum.
+                    warn "message '$message' from $sender to $recipient matches delivery report pattern but does not match any sent message\n";
+                }
+            }
+
+            if (!$isreport) {
+                PB::SMS::receive_sms($sender, $recipient, $message, $q->param('smsid'), $whensent);
+                dbh()->commit();
+            }
 
             $resp = "OK - message received and logged\n";
         } else {

@@ -1,0 +1,205 @@
+#!/usr/bin/perl -w
+#
+# pbsmsd:
+# Pledgebank SMS daemon.
+#
+# This does two things: managing the sending of SMS messages from the outgoing
+# message queue, and calling code to process messages which have been received.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.1 2005-03-03 01:21:46 chris Exp $';
+
+use strict;
+require 5.8.0;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use Error qw(:try);
+use Getopt::Long;
+use LWP::UserAgent;
+use HTTP::Request;
+use HTTP::Response;
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::PIDFile;
+use mySociety::Util qw(print_log);
+
+use PB;
+use PB::SMS;
+
+# Variable set in signal handler to indicate termination.
+my $foad = 0;
+
+
+# run_sending_process
+# Process the SMS sending queue.
+sub run_sending_process () {
+    # We attempt to send messages for which there have been no previous sending
+    # attempts; or, if a previous attempt has failed, on an exponential backoff
+    # schedule. With the default one-minute interval and maximum of ten
+    # attempts the last delivery attempt will occur about four hours after the
+    # first delivery attempt.
+    use constant send_max_attempts => 10;
+    use constant send_retry_interval => 60;
+    my $s = dbh()->prepare("
+                    select id from outgoingsms
+                    where lastsendattempt is null
+                        or (lastsendstatus <> 'success'
+                            and lastsendattempt < ? - ? * (2 ^ (numsendattempts - 1))
+                            and numsendattempts < ?)
+                    order by random()
+                ");
+
+    my $ua = new LWP::UserAgent(
+                    agent => "PledgeBank pbsmsd $rcsid",
+                );
+
+    while (!$foad) {
+        $s->execute(time(), send_retry_interval, send_max_attempts);
+        while (my $id = $s->fetchrow_array()) {
+            # Grab a lock on the message, assuming that it still needs to be sent.
+            my ($recipient, $msg, $numattempts) =
+                dbh()->selectrow_array("
+                    select recipient, message, numattempts from outgoingsms
+                    where lastsendattempt is null
+                        or (lastsendstatus <> 'success'
+                            and lastsendattempt < ? - ? * (2 ^ (numsendattempts - 1)))
+                    for update", {}, time(), send_retry_interval);
+            next if (!defined($recipient));
+            if ($numattempts >= send_max_attempts) {
+                # Give up.
+                my $howlong = time() - dbh()->selectrow_array('select whensubmitted from outgoingsms where id = ?', {}, $id);
+                my @t = ();
+                foreach ([86400, 'd'], [3600, 'h'], [60, 'm'], [1, 's']) {
+                    if ($howlong > $_->[0]) {
+                        push(@t, int($howlong / $_->[0]) . " " . $_->[1]);
+                        $howlong = $howlong % $_->[0];
+                    }
+                }
+                print_log('info', "giving up on delivery of #$id after " . join(' ', @t));
+                dbh()->do('delete from outgoingsms where id = ?', {}, $id);
+            } else {
+                # Assemble parameters for message.
+                # http://www.mxtelecom.com/uk/index.jsp?m=tech/sms/http/send#params
+                $recipient =~ s/^\+//;
+                my %p = (
+                        user => mySociety::Config::get('PB_SMS_MXTELECOM_USER'),
+                        pass => mySociety::Config::get('PB_SMS_MXTELECOM_USER'),
+                        smsto => $recipient,
+                        note => "message #$id; send attempt "
+                                        . ($numattempts + 1),
+                        # bitfield:
+                        #   2 = receive success reports;
+                        #   4 = receive failure reports
+                        report => 6,
+
+                        # 2 means "split using user-data header"
+                        # XXX review this
+                        split => 2
+                    );
+
+                # Now we need to send the message. That means finding a
+                # character set in which it can be expressed.
+                eval {
+                    eval {
+                        $p{smsmsg} = encode('iso-8859-15', $message, Encode::FB_CROAK);
+                    };
+                    if ($@) {
+                        print_log('debug', "#$id cannot be expressed in ISO-8859-15; trying UCS-2");
+                        my $u = encode('ucs-2', $message, Encode::FB_CROAK);
+                        $p{smsucs2} = unpack('h*', $u);
+                    }
+                }
+                if ($@) {
+                    print_log('error', "#$id, '$message', cannot be expressed in ISO-8859-15 or UCS-2; abandoning message")
+                    dbh()->do('delete from outgoingsms where id = ?', {}, $id);
+                } else {
+                    # We're OK to attempt sending.
+                    my ($status, $extra);
+                    eval {
+                        local $SIG{ALRM} = sub { die "timed out in eval\n"; };
+                        alarm(300);
+                        my $resp = $ua->post('http://sms.mxtelecom.com/SMSSend', \%p);
+                        alarm(0);
+                        if (!defined($resp)) {
+                            $! ||= '(no error)';
+                            print_log('warning', "#$id: no response from user-agent; system error: $!");
+                            ($status, $extra) = ('systemerror', $!);
+                        } elsif ($resp->code() != 200) {
+                            print_log('warning', "#$id: failure to send; HTTP status: " . $resp->status_line());
+                            ($status, $extra) = ('httperror', $resp->status_line());
+                        } else {
+                            print_log('info', "#$id: sent");
+                            ($status, $extra) = ('success', undef);
+                        }
+                    };
+                    if ($@) {
+                        ($status, $extra) = ('systemerror', $@);
+                    }
+                    dbh()->do('
+                            update outgoingsms
+                            set lastsendattempt = ?, lastsendstatus = ?,
+                                lastsendextrastatus = ?
+                            where id = ?', {}, time(), $status, $extra);
+                }
+            }
+            dbh()->commit();
+        }
+
+        # Pause for a bit.
+        # XXX could probably be a bit more intelligent than this! In particular
+        # (a) under heavy traffic we shouldn't wait at all; (b) under very
+        # light traffic we should probably wait for longer; (c) if we seem to
+        # be suffering some kind of connectivity or other failure (e.g. all
+        # message sending attempts fail) we should hold off for quite a while.
+        sleep(10);
+    }
+}
+
+# run_processing_process
+# Process any received messages.
+sub run_processing_process () {
+    # We process sent and received messages alternately. The limit clauses are
+    # there so that in the presence of heavy traffic we maintain acceptable
+    # latency in processing messages in both directions.
+    my $s_sent = dbh()->prepare("
+                        select id from outgoingsms
+                        where status = 'delivered'
+                            or status = 'failed'
+                            or status = 'rejected'
+                        order by random()
+                        limit ?");
+    my $s_received = dbh()->prepare("
+                        select id from incomingsms
+                        order by random()
+                        limit ?");
+
+    use constant processing_batch => 20;
+    while (!$foad) {
+        my $n;
+        my $delay = 10;
+        $s_sent->execute(processing_batch);
+        $n = 0;
+        while (my $id = $s_sent->fetchrow_array()) {
+            ++$n;
+        }
+        $delay = 0 if ($n == processing_batch);
+
+        $n = 0;
+        while (my $id = $s_sent->fetchrow_array()) {
+            ++$n;
+        }
+        $delay = 0 if ($n == processing_batch);
+
+        sleep($delay) if ($delay);
+    }
+}

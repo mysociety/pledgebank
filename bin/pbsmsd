@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.21 2005-04-04 09:44:09 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.22 2005-04-04 11:52:01 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -259,7 +259,7 @@ sub run_gathering_process () {
                         select gap
                         from incomingsms_foreignid_gap
                         where firstpolled is null
-                            or (firstpolled > ? and lastpolled < ?)
+                            or lastpolled < ?
                         order by gap
                         for update
                         ");
@@ -374,7 +374,7 @@ sub run_gathering_process () {
         #
         # Missed messages
         #
-        $s_missed->execute(time() - max_polling_age, time() - min_polling_interval);
+        $s_missed->execute(time() - min_polling_interval);
 
         # Try to produce an efficient query to pick up ranges.
         my @qq;
@@ -678,5 +678,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.21 2005-04-04 09:44:09 sandpit Exp $
+$Id: pbsmsd,v 1.22 2005-04-04 11:52:01 sandpit Exp $
 

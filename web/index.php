@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.98 2005-03-25 16:31:31 matthew Exp $
+// $Id: index.php,v 1.99 2005-03-25 16:52:59 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -369,14 +369,17 @@ doesn't work, or you have any other suggests or comments.
     $new = '';
     while ($r = db_fetch_array($q)) {
         $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
-        $new .= '<li>'
-                    . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref']))
-                    . " (${r['daysleft']} "
+        $new .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
+        if ($r['target'] - $signatures <= 0) {
+            $new .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
+        } else {
+            $new .= "(${r['daysleft']} "
                         . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
                         . " left), "
                     . prettify($r['target'] - $signatures)
-                    . " more needed"
-                    . "</li>";
+                    . " more needed";
+        }
+        $new .= '</li>';
     }
     if (!$new) {
         print '<p>No pledges yet!</p>';
@@ -404,14 +407,17 @@ doesn't work, or you have any other suggests or comments.
     $new = '';
     while ($r = db_fetch_array($q)) {
         $signatures = $r['count'];
-        $new .= '<li>'
-                    . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref']))
-                    . " (${r['daysleft']} "
+        $new .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
+        if ($r['target'] - $signatures <= 0) {
+            $new .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
+        } else {
+            $new .= "(${r['daysleft']} "
                         . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
                         . " left), "
                     . prettify($r['target'] - $signatures)
-                    . " more needed"
-                    . "</li>";
+                    . " more needed";
+        }
+        $new .= '</li>';
     }
     if (!$new) {
         print '<p>No pledges yet!</p>';

@@ -5,9 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.13 2005-03-23 12:49:28 francis Exp $
+// $Id: fns.php,v 1.14 2005-03-23 17:24:11 francis Exp $
 
 function pb_send_email_template($to, $template_name, $values, $headers = '') {
+    $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
+    $values['sentence_third'] = pledge_sentence($values['id'], array('firstperson' => false));
+
     if (file_exists("../templates/emails/$template_name")) {
         ob_start();
         require "../templates/emails/$template_name";

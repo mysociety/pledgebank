@@ -1,9 +1,11 @@
-Subject: PledgeBank pledge failure - '<?=$values['title']?>'
-
-Dear <?=$values['signer_name']?>,
+Subject: Pledge failed - '<?=$values['title']?>' at PledgeBank.com
 
 We are sorry to have to inform you that the pledge to which you signed up did
 not meet its target in the required time.  It required <?=$values['target']?> <?=$values['type']?>, 
 but achieved only <?=$values['actual']?>.
 
 Don't be disheartened!
+
+-- 
+PledgeBank.com
+a mySociety project

@@ -1,10 +1,14 @@
 Subject: Signing up to '<?=$values['title']?>' at PledgeBank.com
 
-Thank you for signing a pledge at PledgeBank. To confirm your
-email address, please click on this link:
+Please click on the link below to confirm your signature on the
+pledge at the bottom of this email:
 
 <?=$values['url']?>
 
---
+
+The pledge says:
+'<?=$values['sentence_third']?>'
+
+-- 
 PledgeBank.com
 a mySociety project

@@ -1,10 +1,10 @@
-Subject: You cannot sign up to your own '<?=$values['title']?>' pledge at PledgeBank.com
+Subject: You cannot sign your own pledge - '<?=$values['title']?>' at PledgeBank.com
 
 Thanks for signing up by SMS to this pledge at PledgeBank, but according to our
 records you are the creator of this pledge!
 
 Good luck with your pledge!
 
---
+-- 
 PledgeBank.com
 a mySociety project

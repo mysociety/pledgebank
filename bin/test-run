@@ -21,7 +21,7 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.6 2005-03-23 12:49:19 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.7 2005-03-23 17:24:11 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -60,7 +60,7 @@ $wth->php_check_syntax("../../pb/templates/emails/", qr//);
 # Check that we can detect PHP errors
 print "Confirm we can detect errors...\n" if $verbose > 0;
 $b->get($base_url . "/test.php?error=1" );
-#die "Unable to detect errors from PHP" if !$wth->log_watcher_get_errors();
+die "Unable to detect errors from PHP" if !$wth->log_watcher_get_errors();
 
 #############################################################################
 # Functions to make and sign pledges, and so on
@@ -102,7 +102,7 @@ sub confirm_signature {
     my $confirmation_email = $wth->email_get_containing(
         '%To: '.email_n($who).
         '%Subject: Signing up to \''.$action.'\''.
-        '%To confirm%');
+        '%to confirm your signature%');
     print "Confirmation link not found\n" if ($confirmation_email !~ m#^\s*($base_url.*$)#m);
     $b->get($1);
     if ($target_reached) {
@@ -134,7 +134,7 @@ sub create_pledge {
     $wth->browser_check_contents("You must now click on the link within the email we've just sent you");
     $wth->log_watcher_check();
     my $confirmation_email = $wth->email_get_containing(
-        '%To: '.email_n($who).'%To confirm your email%');
+        '%To: '.email_n($who).'%to confirm that you%');
     die "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
     $b->get($1);
     $wth->browser_check_contents("Thank you for confirming your pledge");
@@ -212,7 +212,7 @@ for (my $i = 0; $i <= 3; ++$i) {
         $wth->browser_check_contents(name_n($i));
     }
     # Check got success emails
-    my $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
+    my $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Woohoo%');
 }
 $wth->log_watcher_check();
 

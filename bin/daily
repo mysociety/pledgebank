@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.12 2005-03-23 12:49:19 francis Exp $
+ * $Id: daily,v 1.13 2005-03-23 17:24:11 francis Exp $
  *
  */
 
@@ -122,17 +122,18 @@ function send_success_email($pledge) {
 
     $globalsuccess = 1;
     $title = $pledge['title'];
-    $success = pb_send_email_template($pledge['email'], 'succeeded-creator', $pledge);
+    $url = "http://www.pledgebank.com/WILL_BE_ANNOUNCE_LIST_TOKEN";
+    $success = pb_send_email_template($pledge['email'], 'succeeded-creator', 
+            array_merge($pledge, array('url'=>$url)));
     if ($success==0) 
         $globalsuccess = 0;
 
     $url = OPTION_BASE_URL . "/" . $pledge['ref'];
-    $sentence = pledge_sentence($pledge['id'], array('firstperson' => false));
     $s = db_fetch_array($q);
     while ($s) {
         $success = pb_send_email_template($s['email'], 'succeeded-signer',
             array_merge($pledge, array('signer_name'=>$r['name'],
-                'url'=>$url, 'sentence'=>$sentence)));
+                'url'=>$url)));
         if ($success==0) 
             $globalsuccess = 0;
         $s = db_fetch_array($q);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.94 2005-03-23 12:49:35 francis Exp $
+// $Id: index.php,v 1.95 2005-03-23 17:24:12 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -616,10 +616,11 @@ function create_new_pledge($data) {
     $token = pledge_email_token($data['email'], $data['ref']);
     if ($data['visibility'] == 'all')
         $data['password'] = null;
-	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
+    $data['id'] = db_getOne("select nextval('pledges_id_seq')");
+	$add = db_query('INSERT INTO pledges (id, title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)', 
-        array($data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password']));
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)', 
+        array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password']));
 ?>
 <h2>Now check your email...</h2>
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other

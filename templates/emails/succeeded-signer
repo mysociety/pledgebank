@@ -1,15 +1,19 @@
-Subject: PledgeBank pledge completion - '<?=$values['title']?>'
+Subject: Pledge successful - '<?=$values['title']?>' at PledgeBank.com
 
-Congratulations! 
+Woohoo! 
 
-You signed up to '<?=$values['sentence']?>'
-and it has happened!
+We are pleased to tell you that the pledge you signed up to <?=($values['actual']>$values['target']?'exceeded':'met')?> its 
+target in the required time.
+
+The pledge says:
+'<?=$values['sentence_third']?>'
+
+Now it is your turn to do what you pledged.  <?=$values['name']?> will
+hopefully email you soon to give you any further information you need.
 
 To see who else signed up, please follow this link:
-
 <?=$values['url']?>
 
-You should also visit this page to be reminded what the pledge was about.
-
-Many thanks,
-PledgeBank
+-- 
+PledgeBank.com
+a mySociety project

@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: db.php,v 1.11 2005-03-04 18:53:40 chris Exp $
+// $Id: db.php,v 1.12 2005-03-04 22:12:58 matthew Exp $
 
 require_once "DB.php";
 
@@ -114,7 +114,7 @@ function db_commit () {
  * Roll back current transaction. */
 function db_rollback () {
     global $pbdb;
-    $pbdb->commit();
+    $pbdb->rollback();
 }
 
 ?>

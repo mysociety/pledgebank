@@ -1,14 +1,14 @@
 Subject: Pledge successful - '<?=$values['title']?>' at PledgeBank.com
 
-Woohoo!
+Congratulations!
 
 We are pleased to tell you that your pledge <?=($values['actual']>$values['target']?'exceeded':'met')?> its target in the required time.
 
 Next, click on the link below and write a message to tell everyone who
-signed the pledge what happens next.
+signed the pledge what you want them to do next.
 
 <?=$values['url']?>
 
 -- 
-PledgeBank.com
+www.PledgeBank.com
 a mySociety project

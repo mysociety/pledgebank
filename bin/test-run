@@ -22,7 +22,7 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.8 2005-03-24 11:05:22 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.9 2005-03-24 12:31:39 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -224,7 +224,7 @@ sub do_public_succeeding_pledge {
             $wth->browser_check_contents(name_n($i));
         }
         # Check got success emails
-        my $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Woohoo%');
+        my $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
     }
     $wth->log_watcher_check();
     # To do, make extra signature and check works

@@ -4,8 +4,9 @@ We are sorry to have to inform you that the pledge to which you signed up did
 not meet its target in the required time.  It required <?=$values['target']?> <?=$values['type']?>, 
 but achieved only <?=$values['actual']?>.
 
-Don't be disheartened!
+Don't be disheartened - why not return to www.pledgebank.com and try again, or
+try something else?
 
 -- 
-PledgeBank.com
+www.PledgeBank.com
 a mySociety project

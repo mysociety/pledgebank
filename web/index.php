@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.73 2005-03-11 21:06:38 francis Exp $
+// $Id: index.php,v 1.74 2005-03-11 21:06:57 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -148,7 +148,7 @@ about. If they don't, you need to rewrite it.
 <li> <strong>Don't imagine that your pledge will sell itself.</strong> If
 you've created something, tell the world! Email your friends, print leaflets
 and stick them through your neighbours doors. Focus especially hard on breaking
-outside your circle of friends - ask your co-workers, put a flyer through the
+outside your circle of friends &mdash; ask your co-workers, put a flyer through the
 door of that neighbour who's name you've forgotten.
 
 </ol>

@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.14 2005-03-17 17:50:38 francis Exp $
+# $Id: poster.cgi,v 1.15 2005-03-17 18:01:22 francis Exp $
 #
 
 import os
@@ -135,10 +135,10 @@ def flyer(c, x1, y1, x2, y2, size):
     # Scale font sizes - with minimum for extreme cases
     large_writing = size * 35
     small_writing = size * 20
-    if small_writing < 7:
-        small_writing = 7
-    if large_writing < 7:
-        large_writing = 7
+    if small_writing < 6:
+        small_writing = 6
+    if large_writing < 6:
+        large_writing = 6
 
     # Set up styles
     p_head = ParagraphStyle('normal', alignment = TA_CENTER, spaceBefore = 0, spaceAfter = size*20, 
@@ -150,7 +150,7 @@ def flyer(c, x1, y1, x2, y2, size):
 
     # Draw all the text
     story = [
-        Paragraph(('''I, %s, will %s if %s %s will %s. ''' % (pledge['name'], pledge['title'],
+        Paragraph(1*('''I, %s, will %s if %s %s will %s. ''' % (pledge['name'], pledge['title'],
             pledge['target'], pledge['type'], pledge['signup'])), p_head),
 
         Paragraph('', p_normal),
@@ -255,7 +255,7 @@ while fcgi.isFCGI():
         incgi = False
         ref = 'automatedtest'
         size = 'A4'
-        type = 'flyers1'
+        type = 'flyers16'
         suffix = 'pdf'
 
     if incgi:
@@ -288,18 +288,24 @@ while fcgi.isFCGI():
             pledge['signup'] = "too"
 
         c = canvas.Canvas(outdir + '/' + outfile)
-        if type == "cards":
-            cards()
-        elif type == "tearoff":
-            tearoff()
-        elif type == "flyers16":
-            flyers(16)
-        elif type == "flyers4":
-            flyers(4)
-        elif type == "flyers1":
-            flyers(1)
-        else:
-            raise Exception, "Unknown type '%s'" % type
+        try:
+            if type == "cards":
+                cards()
+            elif type == "tearoff":
+                tearoff()
+            elif type == "flyers16":
+                flyers(16)
+            elif type == "flyers4":
+                flyers(4)
+            elif type == "flyers1":
+                flyers(1)
+            else:
+                raise Exception, "Unknown type '%s'" % type
+        except Exception, e:
+            print >>sys.stderr, e
+            c.setStrokeColorRGB(0,0,0)
+            c.setFont("Helvetica", 15)
+            c.drawCentredString(10.5*cm, 25*cm, str(e))
         c.save()
         output_file(outdir + '/' + outfile)
 

@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.4 2005-03-17 18:11:00 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.5 2005-03-24 15:33:57 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -46,7 +46,6 @@ use PB::SMS;
 
 # Variable set in signal handler to indicate termination.
 my $foad = 0;
-
 
 # run_sending_process
 # Process the SMS sending queue.
@@ -312,96 +311,22 @@ try {
 
 print_log('info', "starting up; 1 processing process, $numprocesses sender processes");
 
-my $schld = new POSIX::SigSet(POSIX::SIGCHLD) or die "sigset: $!";
-sub block_sigchld ($) {
-    if ($_[0]) {
-        sigprocmask(POSIX::SIG_BLOCK, $schld);
-    } else {
-        sigprocmask(POSIX::SIG_UNBLOCK, $schld);
-    }
-}
-
-# Hash of child PID -> [process type, start time].
-my %children;
-
-# Simple signal handler to set a flag when we should quit/restart.
-$SIG{TERM} = $SIG{INT} = $SIG{HUP} = sub {
-        $foad = eval "POSIX::SIG$_[0]"; # sooooo ugly.
-    };
-
-# Make sure we can wait for expired child processes.
-$SIG{CHLD} = sub { };
-
-while ($foad == 0) {
-    block_sigchld(1);
-    # Count the number of sender and processing processes.
-    my @tostart = ( );
-    if (scalar(grep { $_->[0] eq 'processing' } values(%children)) < 1) {
-        push(@tostart, ['processing', \&run_processing_process]);
-    }
-    for (my $i = scalar(grep { $_->[0] eq 'sending' } values(%children)); $i <= $numprocesses; ++$i) {
-        push(@tostart, ['sending', \&run_sending_process]);
-    }
-    foreach my $what (@tostart) {
-        my $pid = fork();
-        if (!defined($pid)) {
-            print_log('err', "fork: $!");
-        } elsif ($pid == 0) {
-            try {
-                &{$what->[1]}();
-            } catch Error with {
-                my $E = shift;
-                print_log('err', "$what->[0] process failed with error $E");
-                exit(1);
-            };
-            exit(0);
-        } else {
-            print_log('info', "started new $what->[0] child process, PID $pid");
-            $children{$pid} = [$what->[0], time()];
-        }
-    }
-    
-    # XXX detect case where we're childless?
-
-    # See long rant about perl and EINTR in fyrqd source code for why we don't
-    # just call wait here.
-    block_sigchld(0);
-    while ((my $terminated = waitpid(-1, WNOHANG)) > 0) {
-        block_sigchld(1);
-
-        if (exists($children{$terminated})) {
-            if ($? & 127) {
-                print_log('err', "child $children{$terminated}->[0] process, PID $terminated, killed by signal " . ($? & 127));
-            } elsif ($? >> 8) {
-                print_log('err', "child $children{$terminated}->[0] process, PID $terminated, exited with error status " . ($? >> 8));
-            } else {
-                print_log('info', "child $children{$terminated}->[0] process, PID $terminated, exited normally");
-            }
-            
-            if ($children{$terminated} > time() - 10) {
-                print_log('err', "child $children{$terminated}->[0] process, PID $terminated, lived for only " . (time() - $children{$terminated}) . " seconds; holding off before restarting it");
-                sleep(5); # XXX we won't reap other children during this time, obviously
-            }
-            
-            delete($children{$terminated});
-        }
-        block_sigchld(0);
-    }
-
-    sleep(5);
-}
-
-kill(POSIX::SIGTERM, keys %children);
+# Main loop.
+$SIG{TERM} = sub { $foad = POSIX::SIGTERM }; # so children know to exit
+my $termsig = mySociety::Util::manage_child_processes({
+        processing =>   [1, \&run_processing_process],
+        sending =>      [$numprocesses, \&run_sending_process]
+    });
 
 undef($pidfile);
 
-if ($foad == SIGHUP) {
-    print_log('notice', "restarting on signal $foad");
+if ($termsig == SIGHUP) {
+    print_log('notice', "restarting on signal $termsig");
     { exec($FindBin::Script, @ARGV); }
     print_log('err', "exec: $!");
     exit(1);
 } else {
-    print_log('notice', "shutting down on signal $foad");
+    print_log('notice', "shutting down on signal $termsig");
 }
 
 exit(0);
@@ -452,5 +377,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.4 2005-03-17 18:11:00 sandpit Exp $
+$Id: pbsmsd,v 1.5 2005-03-24 15:33:57 chris Exp $
 

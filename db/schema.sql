@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.10 2005-03-02 22:02:15 chris Exp $
+-- $Id: schema.sql,v 1.11 2005-03-02 23:27:20 matthew Exp $
 --
 
 -- secret
@@ -143,7 +143,10 @@ create table signers (
   -- subscription to an email one later.
   token text not null,
   confirmed boolean not null default false,
-  outgoingsms_id integer references outgoingsms(id)
+  outgoingsms_id integer references outgoingsms(id),
+
+  -- Name has been reported
+  reported boolean not null default false
 );
 
 

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.13 2005-03-30 11:53:42 francis Exp $
+ * $Id: admin-pb.php,v 1.14 2005-03-30 12:01:16 francis Exp $
  * 
  */
 
@@ -23,7 +23,7 @@ class ADMIN_PAGE_PB {
 
     function pledge_header($sort) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
-        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Setter', 'c'=>'Creation Time');
+        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time');
         foreach ($cols as $s => $col) {
             print '<th>';
             if ($sort != $s) print '<a href="'.$this->self_link.'&s='.$s.'">';
@@ -116,15 +116,22 @@ class ADMIN_PAGE_PB {
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print "</p>";
 
-        $query = 'SELECT name as signname,email as signemail,date_trunc(\'second\',signtime) AS signtime,showname FROM signers WHERE pledge_id=?';
+        $query = 'SELECT name as signname,email as signemail,mobile as signmobile,date_trunc(\'second\',signtime) AS signtime,showname FROM signers WHERE pledge_id=?';
         if ($sort=='t') $query .= ' ORDER BY signtime DESC';
         elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
         $q = db_query($query, $pdata['id']);
         $out = array();
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
-            $e = $r['signemail'];
-            $out[$e] = '<td>'.$r['signname'].'<br>'.$e.'</td>';
+            $e = array();
+            if ($r['signname'])
+                array_push($e, $r['signname']);
+            if ($r['signemail'])
+                array_push($e, $r['signemail']);
+            if ($r['signmobile'])
+                array_push($e, $r['signmobile']);
+            $e = join("<br>", $e);
+            $out[$e] = '<td>'.$e.'</td>';
             $out[$e] .= '<td>'.prettify($r['signtime']).'</td>';
             $out[$e] .= '<td align="center">'.($r['showname']?'Yes':'No').'</td>';
         }
@@ -139,7 +146,7 @@ class ADMIN_PAGE_PB {
         }
         if (count($out)) {
             print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
-            $cols = array('e'=>'Signee', 't'=>'Time', 'n'=>'Show name?');
+            $cols = array('e'=>'Signer', 't'=>'Time', 'n'=>'Show name?');
             foreach ($cols as $s => $col) {
                 print '<th>';
                 if ($sort != $s) print '<a href="'.$this->self_link.'&pledge='.$pledge.'&amp;s='.$s.'">';

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.97 2005-03-25 11:05:59 francis Exp $
+// $Id: index.php,v 1.98 2005-03-25 16:31:31 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -562,7 +562,7 @@ if ($r['detail']) {
 ?>
 </form>
 
-<p style="text-align: center"><a href="./<?=$h_ref ?>/flyers" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Comment on this Pledge</a><? if (!$finished) { ?> | <a href="./<?=$h_ref ?>/email">Email this Pledge</a><? } ?></p>
+<p style="text-align: center"><a href="ical.php?ref=<?=$h_ref ?>">iCal calendar entry</a> | <a href="./<?=$h_ref ?>/flyers" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Comment on this Pledge</a><? if (!$finished) { ?> | <a href="./<?=$h_ref ?>/email">Email this Pledge</a><? } ?></p>
 <!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
 
 <h2>Current signatories</h2><?

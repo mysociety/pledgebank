@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.56 2005-03-07 15:13:39 francis Exp $
+// $Id: index.php,v 1.57 2005-03-07 15:58:57 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -41,7 +41,7 @@ if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
     add_signatory();
 } elseif (get_http_var('pledge') == 'new') {
     $title = 'Create a New Pledge';
-    pledge_form();
+    pledge_form_one();
 } elseif (get_http_var('pledge') == 'faq') {
     $title = 'Frequently Asked Questions';
     view_faq();
@@ -130,7 +130,7 @@ function send_report() {
     }
 }
 
-function pledge_form($data = array(), $errors = array()) {
+function pledge_form_one($data = array(), $errors = array()) {
 # <!-- <p><big><strong>Before people can create pledges we should have a stiff warning page, with few, select, bold words about what makes for good &amp; bad pledges (we want to try to get people to keep their target numbers down).</strong></big></p> -->
 	if (sizeof($errors)) {
 		print '<div id="errors"><ul><li>';
@@ -209,7 +209,7 @@ If yes, enter your postcode so that local people can find your pledge:
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input type="submit" value="Submit">
+<input type="submit" name="submit" value="Submit">
 </p>
 
 <?
@@ -233,7 +233,7 @@ function pledge_form_submitted() {
     unset($data['data']);
     $data = array_merge($stepdata, $data);
     if (sizeof($errors)) {
-        pledge_form($data, $errors);
+        pledge_form_one($data, $errors);
     } else {
         pledge_form_two($data);
     }
@@ -290,7 +290,7 @@ function pledge_form_two_submitted() {
 
     $errors = step1_error_check($data);
     if (sizeof($errors)) {
-        pledge_form($data, $errors);
+        pledge_form_one($data, $errors);
         return;
     }
 
@@ -628,7 +628,7 @@ if ($detail) {
 function create_new_pledge($data) {
     # 'action', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'date', 'signup', 'country', 'postcode', 'password'
 	$isodate = $data['date']['iso'];
-        $token = confirmation_token();
+        $token = pledge_confirmation_token();
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)', 

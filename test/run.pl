@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.7 2005-03-02 16:52:33 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.8 2005-03-07 15:58:57 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -59,7 +59,12 @@ $b->submit_form(form_name => 'pledge',
         people => '3', type => 'automated lines of code', signup => 'sign up',
         date => 'tomorrow', ref => 'automatedtest',
         name => name_n(0), email => email_n(0) },
-    button => 'submit') or die "Failed to submit creating form";
+    button => 'submit') or die "Failed to submit creating form stage 1";
+$wth->browser_check_contents("Step 2");
+$wth->log_watcher_check();
+$b->submit_form(form_name => 'pledge',
+    fields => { },
+    button => 'submit') or die "Failed to submit creating form stage 2";
 $wth->browser_check_contents("An email has been sent");
 $wth->log_watcher_check();
 print "Confirming new pledge...\n" if $verbose > 0;

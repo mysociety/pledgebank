@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.20 2005-03-07 17:25:34 chris Exp $
+-- $Id: schema.sql,v 1.21 2005-03-07 18:19:14 chris Exp $
 --
 
 -- secret
@@ -51,7 +51,11 @@ create table pledges (
         ),
 
     country text not null default '',
-    postcode text not null default ''
+    postcode text not null default '',
+
+    -- We must only notify people that the pledge has been completed once.
+    -- This flag is set when we first notice that that has happened.
+    completionnotified boolean not null default false
 );
 
 create table outgoingsms (

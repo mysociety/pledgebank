@@ -52,8 +52,8 @@ addEvent(window, 'load', greyOutInputs);
 function greyOutInputs() {
     for (var j = 0; j < greyed.length; j++) {
         d = document.getElementById(greyed[j][0])
-        if (d.value == '') d.value = greyed[j][1]
-        if (d.value == greyed[j][1]) d.style.color = '#999999'
+        if (d && d.value == '') d.value = greyed[j][1]
+        if (d && d.value == greyed[j][1]) d.style.color = '#999999'
     }
 }
 

@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.1 2005-03-02 20:08:35 chris Exp $
+# $Id: SMS.pm,v 1.2 2005-03-02 22:03:19 chris Exp $
 #
 
 package PB::SMS;
@@ -56,7 +56,7 @@ sub send_sms ($$) {
     return @ids;
 }
 
-=item receive_sms SENDER RECEIVER MESSAGE FOREIGNID WHENSENT
+=item receive_sms SENDER RECIPIENT MESSAGE FOREIGNID WHENSENT
 
 Record a received SMS message in the database. Returns the ID of the received
 message.
@@ -65,7 +65,7 @@ message.
 sub receive_sms ($$$$$) {
     my ($sender, $receiver, $msg, $foreignid, $whensent) = @_;
     my $id = dbh()->selectrow_array("select nextval('incomingsms_id_seq')");
-    dbh()->do('insert into incomingsms (id, sender, receiver, message, foreignid, whenreceived, whensent) values (?, ?, ?, ?, ?, ?, ?)', {}, $id, $sender, $receiver, $msg, $foreignid, time(), $whensent);
+    dbh()->do('insert into incomingsms (id, sender, recipient, message, foreignid, whenreceived, whensent) values (?, ?, ?, ?, ?, ?, ?)', {}, $id, $sender, $receiver, $msg, $foreignid, time(), $whensent);
     dbh()->commit();
     return $id;
 }

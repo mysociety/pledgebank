@@ -7,6 +7,7 @@ include_once '../templates/page.php';
 include_once 'contact.php';
 include_once '../phplib/db.php';
 include_once '../phplib/fns.php';
+include_once '../../phplib/utility.php';
 
 # Crappy cross-PHP installation checking
 # From http://uk.php.net/manual/en/security.magicquotes.disabling.php
@@ -135,7 +136,7 @@ function front_page() {
     while ($k && $r = db_fetch_array($q)) {
         $days = $r['daysleft'];
         $new .= '<li>' . htmlentities($r['name']) . ' will <a href="./?pledge=' . $r['id'] . '">' . htmlentities($r['title']) . '</a> if ' . htmlentities($r['target']) . ' other ' . $r['type'] . ' will too (';
-        $new .= $days . ' '.pluralize($days,'day').' left';
+        $new .= $days . ' '.make_plural($days,'day').' left';
 #			$new .= 'by '.htmlentities($r['date']);
         $new .= ')</li>'."\n";
         $k--;
@@ -158,7 +159,7 @@ BY pledges.id ORDER BY count DESC');
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {
         $days = $r['daysleft'];
-        $new .= '<li>'.$r['count'].' '.pluralize($r['count'],'pledge').' : '.htmlentities($r['name']).' will <a href="./?pledge='.$r['id'].'">'.htmlentities($r['title']).'</a> if '.htmlentities($r['target']).' other ' . htmlentities($r['type']) . ' will too (';
+        $new .= '<li>'.$r['count'].' '.make_plural($r['count'],'pledge').' : '.htmlentities($r['name']).' will <a href="./?pledge='.$r['id'].'">'.htmlentities($r['title']).'</a> if '.htmlentities($r['target']).' other ' . htmlentities($r['type']) . ' will too (';
         $new .= 'by '.prettify(htmlentities($r['date']));
         $new .= ')</li>'."\n";
         $k--;
@@ -329,7 +330,7 @@ function view_pledge() {
 <p style="margin-top: 0">&quot;I will <strong><?=htmlentities($action) ?></strong> if <strong><?=htmlentities($people) ?></strong> <?=htmlentities($type) ?> will do the same&quot;</p>
 <p>Deadline: <strong><?=prettify($date) ?></strong></p>
 
-<p style="text-align: center; font-style: italic;"><?=$curr ?> <?=pluralize($curr,'person has','people have') ?> signed up<?=($left<0?' ('.(-$left).' over target :) )':', '.$left.' more needed') ?></p>
+<p style="text-align: center; font-style: italic;"><?=$curr ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.(-$left).' over target :) )':', '.$left.' more needed') ?></p>
 
 <? if (!$finished) { ?>
 <div style="text-align: left; margin-left: 50%">
@@ -359,7 +360,7 @@ function view_pledge() {
 		}
 		print '<ul>'.$out;
 		if ($anon) {
-			print '<li>Plus '.$anon.' '.pluralize($anon,'other').' who did not want to give their name</li>';
+			print '<li>Plus '.$anon.' '.make_plural($anon,'other').' who did not want to give their name</li>';
 		}
 		print '</ul>';
 	}

@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.6 2005-03-04 16:12:24 matthew Exp $
+# $Id: poster.cgi,v 1.7 2005-03-04 17:20:11 matthew Exp $
 #
 
 import os
@@ -15,31 +15,42 @@ from posix import environ
 from time import time
 from pyPgSQL import PgSQL
 
-#print "Content-Type: text/html\r\n\r\n"
-
 sys.path.append("../../pylib")
 import mysociety.config
 mysociety.config.set_file("../conf/general")
 
-path_info = environ.get('PATH_INFO').split('/')[1:]
+path_info = environ.get('PATH_INFO').split('_')
 if len(path_info)>0:
-    ref = path_info[0]
-if len(path_info)>1:
+    ref = path_info[0][1:]
+
+if len(path_info)>1 and path_info[1]:
     size = path_info[1]
 else:
     size = 'A4'
-if len(path_info)>2:
+
+if len(path_info)>2 and path_info[2]:
     type = path_info[2]
+    (type, suffix) = type.split('.')
 else:
     type = 'cards'
+    suffix = 'pdf'
+
+if suffix == 'pdf':
+    print "Content-Type: application/pdf\r\n\r\n"
+else:
+    print "Content-Type: text/plain\r\n\r\n"
 
 outdir = mysociety.config.get("PB_PDF_CACHE")
 outfile = "%s_%s_%s.pdf" % (ref, size, type)
 
+def output_file(filename):
+    f = file(filename, 'rb')
+    content = f.read()
+    f.close()
+    print content
+
 if os.path.exists(outdir + '/' + outfile):
-    print "Location: %s/%s" % (mysociety.config.get('PB_PDF_URL'), outfile)
-    print
-    print "<h1>301 Found</h1>"
+    output_file(outdir + '/' + outfile)
     sys.exit()
 
 db = PgSQL.connect('::pb:matthew:')
@@ -163,9 +174,4 @@ else:
     raise Exception, "Unknown type '%s'" % type
 c.save()
 
-print "Location: %s/%s" % (mysociety.config.get('PB_PDF_URL'), outfile)
-print
-print "<h1>301 Found</h1>"
-
-#print "Content-Type: text/html\r\n\r\n"
-#print mysociety.config.get("BASE_URL")
+output_file(outdir + '/' + outfile)

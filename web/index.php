@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.46 2005-03-04 16:12:24 matthew Exp $
+// $Id: index.php,v 1.47 2005-03-04 17:20:11 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -32,10 +32,10 @@ elseif (get_http_var('add_signatory')) add_signatory();
 elseif (get_http_var('pledge') == 'new') pledge_form();
 elseif (get_http_var('pledge') == 'faq') view_faq();
 elseif (get_http_var('pledge') == 'all') list_all_pledges();
+elseif (get_http_var('pledge') == 'contact') contact_form();
 elseif (get_http_var('pledge')) view_pledge();
 elseif (get_http_var('newpost')==1) pledge_form_submitted();
 elseif (get_http_var('newpost')==2) pledge_form_two_submitted();
-elseif (get_http_var('contact')) contact_form();
 elseif (get_http_var('contactpost')) contact_form_submitted();
 elseif (get_http_var('admin')=='pledgebank') admin();
 elseif (get_http_var('pdf')) pdfs();
@@ -201,6 +201,8 @@ function step1_error_check($data) {
     if (!$data['ref']) $errors[] = 'Please enter a PledgeBank reference';
     elseif (strlen($data['ref'])<6) $errors[] = 'The reference must be at least six characters long';
     if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors[] = 'The reference must only contain letters, numbers, -';
+    $disallowed_refs = array('contact');
+    if (in_array($ref, $disallowed_refs)) $errors[] = 'That reference is not allowed.';
     $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($data['ref']));
     if ($dupe) $errors[] = 'That reference is already taken!';
     if (!$data['action']) $errors[] = 'Please enter a pledge';
@@ -546,7 +548,7 @@ if ($detail) {
 ?>
 </form>
 
-<p style="text-align: center"><a href="./?pdf=<?=get_http_var('pledge') ?>" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="" onclick="return false">Email this Pledge</a><? } ?></p>
+<p style="text-align: center"><a href="./<?=get_http_var('pledge') ?>/flyers" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="" onclick="return false">Email this Pledge</a><? } ?></p>
 <!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
 
 <h2>Current signatories</h2><?
@@ -637,8 +639,8 @@ function pdfs() {
     $ref = get_http_var('pdf');
 	$q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
 	$row = db_fetch_array($q);
-        $pdf_cards_url = new_url("poster.cgi/$ref/A4/cards", false);
-        $pdf_tearoff_url = new_url("poster.cgi/$ref/A4/tearoff", false);
+        $pdf_cards_url = new_url("../flyers/{$ref}_A4_cards.pdf", false);
+        $pdf_tearoff_url = new_url("../flyers/{$ref}_A4_tearoff.pdf", false);
     ?>
 <h2>Customised Flyers</h2>
 <p>Below you can generate <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.71 2005-03-11 18:33:20 francis Exp $
+// $Id: index.php,v 1.72 2005-03-11 19:38:37 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -130,9 +130,33 @@ function pledge_form_one($data = array(), $errors = array()) {
 		print '<div id="errors"><ul><li>';
 		print join ('</li><li>', $errors);
 		print '</li></ul></div>';
-	}
+	} else {
 ?>
-<!-- <p>To create a new pledge, please fill in the form below.</p> -->
+<div class="tips">
+<h2>Top Tips for Successful Pledges</h2>
+<ol>
+
+<li> <strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
+to do something when 5 would be enough? Every extra person makes your pledge
+harder to meet.
+
+<li> <strong>Think about how your pledge reads.</strong> How will it look to
+someone who picks up a flyer from their doormat? Read your pledge to the person
+next to you, or to your mother, and see if they understand what you're talking
+about. If they don't, you need to rewrite it.
+
+<li> <strong>Don't imagine that your pledge will sell itself.</strong> If
+you've created something, tell the world! Email your friends, print leaflets
+and stick them through your neighbours doors. Focus especially hard on breaking
+outside your circle of friends - ask your co-workers, put a flyer through the
+door of that neighbour who's name you've forgotten.
+
+</ol>
+</div>
+<?
+    }
+?>
+
 <form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
 <h2>New Pledge &#8211; Step 1</h2>
 <div class="c">

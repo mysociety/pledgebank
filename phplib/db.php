@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: db.php,v 1.14 2005-03-11 10:09:09 matthew Exp $
+// $Id: db.php,v 1.15 2005-04-05 14:07:41 sandpit Exp $
 
 require_once "DB.php";
 require_once "../../phplib/utility.php";

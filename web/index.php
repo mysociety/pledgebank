@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.42 2005-03-04 13:16:42 matthew Exp $
+// $Id: index.php,v 1.43 2005-03-04 13:56:26 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -78,7 +78,7 @@ function send_report() {
     }
 }
 
-function pledge_form($errors = array()) {
+function pledge_form($data = array(), $errors = array()) {
 # <!-- <p><big><strong>Before people can create pledges we should have a stiff warning page, with few, select, bold words about what makes for good &amp; bad pledges (we want to try to get people to keep their target numbers down).</strong></big></p> -->
 	if (sizeof($errors)) {
 		print '<div id="errors"><ul><li>';
@@ -89,21 +89,25 @@ function pledge_form($errors = array()) {
 <!-- <p>To create a new pledge, please fill in the form below.</p> -->
 <form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
 <h2>New Pledge &#8210; Step 1</h2>
-<p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="action" id="action" value="<?=htmlspecialchars(get_http_var('action')) ?>" size="82"></p>
+<p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="action" id="action" value="<? if (isset($data['action'])) print htmlspecialchars($data['action']) ?>" size="82"></p>
 <p>if <select name="comparison"><option value="atleast">at least</option><option value="exactly">exactly</option></select>
-<input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="people" name="people" value="<?=(get_http_var('people')?htmlspecialchars(get_http_var('people')):'3') ?>">
+<input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="people" name="people" value="<?=(isset($data['people'])?htmlspecialchars($data['people']):'3') ?>">
 other <input type="text" id="type" name="type" size="30" value="people"> <input type="text" id="signup" name="signup" size="10" value="sign up"> before
-<input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<?=htmlspecialchars(get_http_var('date')) ?>">.</p>
+<input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']['iso']) ?>">.</p>
 
-<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>"> <small>(letters, numbers, -; minimum 6 characters)</small></p>
-<p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars(get_http_var('name')) ?>">
-Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
+<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> <small>(letters, numbers, -; minimum 6 characters)</small></p>
+<p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+Email: <input type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <p style="text-align: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
 <hr style="color: #522994; background-color: #522994; height: 1px; border: none;" >
 <h3>Optional Information</h3>
 <p id="moreinfo" style="text-align: left">More details about your pledge:
-<br><textarea name="moreinfo" rows="10" cols="60"><?=htmlspecialchars(get_http_var('moreinfo')) ?></textarea>
-<p style="text-align: right;"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
+<br><textarea name="moreinfo" rows="10" cols="60"><? if (isset($data['moreinfo'])) print htmlspecialchars($data['moreinfo']) ?></textarea>
+<p style="text-align: right;">
+<? if (sizeof($data)) {
+    print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
+} ?>
+<input type="submit" name="submit" value="Next &gt;&gt;"></p>
 </form>
 <? }
 
@@ -114,19 +118,22 @@ function pledge_form_two($data, $errors = array()) {
         print '</li></ul></div>';
     }
 
-    $v = get_http_var('visibility'); if ($v!='password') $v = 'all';
-    $local = get_http_var('local');
+    $v = 'all';
+    if (isset($data['visibility'])) {
+        $v = $data['visibility']; if ($v!='password') $v = 'all';
+    }
+    $local = (isset($data['local'])) ? $data['local'] : 0;
     $isodate = $data['date']['iso'];
 ?>
+<p>You entered the following:</p>
 <div class="pledge">
-<h2>You entered the following:</h2>
 <p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($data['action']) ?></strong> if <strong><?=htmlspecialchars($data['people']) ?></strong> <?=htmlspecialchars($data['type']) ?> <?=($data['signup']=='sign up'?'will do the same':$data['signup']) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($isodate) ?></strong></p>
 <p style="text-align: right">&mdash; <?=htmlspecialchars($data['name']) ?></p>
 </div>
 
 <form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="2">
-<h2>New Pledge &#8210; Step 2</h2>
+<h2>New Pledge &#8210; Step 2 (optional)</h2>
 
 <p>Where does your pledge apply?
 <select name="country"><option>Global<option>UK</select>
@@ -138,7 +145,7 @@ function pledge_form_two($data, $errors = array()) {
 <br>
 <span id="postcode_line">
 If yes, enter your postcode so that local people can find your pledge:
-<input type="text" name="postcode" id="postcode" value="<?=htmlspecialchars(get_http_var('postcode')) ?>">
+<input type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
 </span>
 </p>
 
@@ -148,7 +155,8 @@ If yes, enter your postcode so that local people can find your pledge:
 <input type="text" id="password" name="password" value="">
 </p>
 
-<p><input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
+<p style="text-align: right;">
+<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 <input type="submit" value="Submit">
 </p>
 
@@ -156,10 +164,8 @@ If yes, enter your postcode so that local people can find your pledge:
 }
 
 function pledge_form_submitted() {
-    global $today;
-    $errors = array();
     $data = array();
-    $fields = array('action', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'date', 'signup');
+    $fields = array('action', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'date', 'signup', 'data');
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
@@ -168,6 +174,22 @@ function pledge_form_submitted() {
     $data['date'] = parse_date($data['date']);
     if (!$data['signup']) $data['signup'] = 'sign up';
 
+    $errors = step1_error_check($data);
+
+    $stepdata = unserialize(base64_decode($data['data']));
+    if ($stepdata && !is_array($stepdata)) $errors[] = 'Transferring the data between steps failed!';
+    unset($data['data']);
+    $data = array_merge($stepdata, $data);
+    if (sizeof($errors)) {
+        pledge_form($data, $errors);
+    } else {
+        pledge_form_two($data);
+    }
+}
+
+function step1_error_check($data) {
+    global $today;
+    $errors = array();
     if (!$data['people']) $errors[] = 'Please enter a target';
     elseif (!ctype_digit($data['people']) || $data['people'] < 1) $errors[] = 'The target must be a positive number';
     elseif ($data['people'] > 100) {
@@ -187,11 +209,7 @@ function pledge_form_submitted() {
     if ($data['date']['error']) $errors[] = 'Please enter a valid date';
     if (!$data['name']) $errors[] = 'Please enter your name';
     if (!$data['email']) $errors[] = 'Please enter your email address';
-    if (sizeof($errors)) {
-        pledge_form($errors);
-    } else {
-        pledge_form_two($data);
-    }
+    return $errors;
 }
 
 function pledge_form_two_submitted() {
@@ -201,17 +219,28 @@ function pledge_form_two_submitted() {
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
+
+    $step1data = unserialize(base64_decode($data['data']));
+    if (!$step1data) $errors[] = 'Transferring the data from Step 1 to Step 2 failed :(';
+    unset($data['data']);
+    $data = array_merge($step1data, $data);
+    
     if (!$data['local']) $data['postcode'] = '';
     if ($data['visibility'] != 'password') { $data['visibility'] = 'all'; $data['password'] = ''; }
     if ($data['local'] && !$data['postcode']) $errors[] = 'Please enter a postcode';
     if ($data['visibility'] == 'password' && !$data['password']) $errors[] = 'Please enter a password';
-    $step1data = unserialize(base64_decode($data['data']));
-    if (!$step1data) $errors[] = 'Transferring the data from Step 1 to Step 2 failed :(';
     if (sizeof($errors)) {
-        pledge_form_two($step1data, $errors);
-    } else {
-        create_new_pledge(array_merge($step1data, $data));
+        pledge_form_two($data, $errors);
+        return;
     }
+
+    $errors = step1_error_check($data);
+    if (sizeof($errors)) {
+        pledge_form($data, $errors);
+        return;
+    }
+
+    create_new_pledge($data);
 }
 
 function front_page() {

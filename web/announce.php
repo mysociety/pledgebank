@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.3 2005-04-04 11:58:40 chris Exp $
+ * $Id: announce.php,v 1.4 2005-04-04 12:04:37 chris Exp $
  * 
  */
 
@@ -27,8 +27,6 @@ if (!is_null($err))
     err("Sorry -- something seems to have gone wrong. "
         . join(",", array_values($err)));
 
-/* OK, that wasn't a pledge confirmation token. So we must be signing a
- * pledge. */
 $data = pledge_token_retrieve('announce-post', $q_token);
 if (!$data)
     err("No such token");
@@ -70,14 +68,11 @@ if ($q_submit) {
 if (!sizeof($errors) && $q_submit) {
     // Send message
     $q = db_query('select email from signers where pledge_id = ?', $pledge['id']);
-    $globalsuccess = true;
-    while ($r = db_fetch_array($q)) {
-        $success = pb_send_email($r['email'], "Announcement from ${pledge['name']} about '${pledge['title']}' at PledgeBank.com", $q_message_body);
-        if (!$success)
-            $globalsuccess = false;
-    }
+    $addrs = array();
+    while ($r = db_fetch_array($q))
+        array_push($addrs, $r['email']);
 
-    if (!$globalsuccess) 
+    if (!pb_send_email($addrs, "Announcement from ${pledge['name']} about '${pledge['title']}' at PledgeBank.com", $q_message_body))
         print "<p>Sorry, we failed to send your message properly.  Please try again!</p>";
     else {
         print "<p>Your message has been sent to all the people who signed your pledge.  

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.78 2005-03-14 10:45:32 francis Exp $
+// $Id: index.php,v 1.79 2005-03-14 11:17:11 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -562,7 +562,7 @@ function view_pledge($errors = array()) {
 <p style="margin-top: 0">&quot;<?=pledge_sentence(0, true, true, $r) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
 
-<p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target :) )':', '.prettify($left).' more needed') ?></p>
+<p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></p>
 </div>
 <? if (!$finished) { ?>
 <div style="margin-left: 50%;">

@@ -1,0 +1,3 @@
+#!/bin/sh
+PEAR_EXTENSION_DIR=/usr/local/share/pear exec /usr/local/bin/php "$@"
+

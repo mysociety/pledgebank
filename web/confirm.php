@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.11 2005-03-16 09:13:24 sandpit Exp $
+ * $Id: confirm.php,v 1.12 2005-03-16 15:22:52 chris Exp $
  * 
  */
 
@@ -49,11 +49,10 @@ if ($q_type == 'pledge') {
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
      * pledge. */
-    $data = pledge_random_token_retrieve($q_token);
-    print_r($data);
+    $data = pledge_token_retrieve('signup-web', $q_token);
+    pledge_token_destroy('signup-web', $q_token);
 
-    $q = db_query('select * from pledges where id = ?', $pledge_id);
-    $r = db_fetch_array($q);
+    $r = db_getRow('select * from pledges where id = ?', $data['pledge_id']);
     page_header(htmlspecialchars($r['title']) . ' - Sign Up', array('nonav'=>true));
 
     /* Sign them up. */
@@ -73,6 +72,11 @@ if ($q_type == 'pledge') {
         }
         db_commit();
     } else {
+        if (pledge_is_permanent_error($r)) {
+            db_rollback();  /* just in case -- shouldn't matter though */
+            pledge_token_destroy('signup-web', $q_token);
+            db_commit();
+        }
         oops($r);
     }
 }

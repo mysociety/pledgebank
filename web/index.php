@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.84 2005-03-15 19:09:38 sandpit Exp $
+// $Id: index.php,v 1.85 2005-03-16 15:22:52 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -466,7 +466,7 @@ EOF
         /* Generate a secure URL to send to the user. */
         $data = array('email' => $q_email, 'name' => $q_name, 
                 'showname' => $q_showname, 'pledge_id' => $r['id']);
-        $token = pledge_random_token_store($data);
+        $token = pledge_token_store('signup-web', $data);
         db_commit();
         $url = OPTION_BASE_URL . "/I/" . $token;
 

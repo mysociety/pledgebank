@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.31 2005-02-25 18:47:20 matthew Exp $
+// $Id: index.php,v 1.32 2005-02-28 09:49:02 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -54,9 +54,9 @@ function report_form() {
 	return false;
     } else {
         $r = db_fetch_array($q);
-        print '<form action="./" method="post"><input type="hidden" name="report" value="'.get_http_var('report').'">';
+        print '<form action="./" method="post"><input type="hidden" name="report" value="' . htmlspecialchars(get_http_var('report')) . '">';
         print '<h2>Signature reporting</h2>';
-        print '<p>You are reporting the signature "'.$r['signname'].'" on the pledge "'.$r['title'].'"</p>';
+        print '<p>You are reporting the signature "' . htmlspecialchars($r['signname']) . '" on the pledge "' . htmlspecialchars($r['title']) . '"</p>';
         print '<p>Please give a (short) reason for reporting this signature:</p>';
         print '<textarea name="reason" rows="5" cols="50"></textarea>';
         print '<p><input type="submit" value="Submit"></p>';
@@ -381,6 +381,7 @@ function view_pledge() {
 	    return false;
 	}
         $password = $r['password'];
+        $pw = '';
         if ($password) {
             if ($pw = get_http_var('pw')) {
                 if ($pw != $password) {

@@ -1,3 +1,14 @@
+/*
+ * pb.js
+ * Javascript parts of PledgeBank website.
+ * 
+ * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+ * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
+ *
+ * $Id: pb.js,v 1.3 2005-02-22 09:20:57 francis Exp $
+ * 
+ */
+
 var greyed = [ ['action', '<Enter your pledge>'], ['date', '<Date>'] ]
 
 function addEvent(obj, evType, fn){ 

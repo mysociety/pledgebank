@@ -1,4 +1,12 @@
 <?
+// db.php:
+// Interface to database for PledgeBank
+// TODO:  Perhaps get rid of this file, as PEAR's DB is good enough alone.
+//
+// Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+// Email: francis@mysociety.org. WWW: http://www.mysociety.org
+//
+// $Id: db.php,v 1.9 2005-02-22 09:20:56 francis Exp $
 
 require_once "DB.php";
 

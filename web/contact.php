@@ -1,4 +1,11 @@
 <?
+// contact.php:
+// Contact us form for PledgeBank.
+//
+// Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+// Email: matthew@mysociety.org. WWW: http://www.mysociety.org
+//
+// $Id: contact.php,v 1.2 2005-02-22 09:20:57 francis Exp $
 
 function contact_form($errors = array()) { ?>
 <h2>Contact Us</h2>

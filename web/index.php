@@ -1,6 +1,11 @@
 <?
-
-/* Insert standard copyright thing here */
+// index.php:
+// Main code for PledgeBank website.
+//
+// Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+// Email: matthew@mysociety.org. WWW: http://www.mysociety.org
+//
+// $Id: index.php,v 1.24 2005-02-22 09:20:57 francis Exp $
 
 require_once "../conf/general";
 include_once '../templates/page.php';

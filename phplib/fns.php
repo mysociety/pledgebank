@@ -1,4 +1,11 @@
 <?
+// fns.php:
+// General functions for PledgeBank
+//
+// Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+// Email: matthew@mysociety.org. WWW: http://www.mysociety.org
+//
+// $Id: fns.php,v 1.7 2005-02-22 09:20:56 francis Exp $
 
 function pb_send_email($to, $subject, $message, $headers = '') {
 	$headers = $headers . 

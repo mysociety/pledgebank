@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.7 2005-02-23 15:45:00 francis Exp $
+// $Id: page.php,v 1.8 2005-03-04 09:04:42 francis Exp $
 
 function page_header($title) { ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -14,9 +14,16 @@ function page_header($title) { ?>
 <script type="text/javascript" src="pb.js"></script>
 </head>
 <body>
+<?
+    if (OPTION_PB_STAGING) {
+        print "<i>This is a test site for developers only.  You
+        probably want <a href=\"http://www.pledgebank.com\">the real site</a>.</i>";
+    }
+?>
 <h1>Pledge<span>Bank</span> &mdash; Not Finished Yet</h1>
 <hr class="v"><div id="content">
-<? }
+<? 
+}
 
 function page_footer() { ?>
 </div>

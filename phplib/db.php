@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: db.php,v 1.13 2005-03-08 17:17:27 chris Exp $
+// $Id: db.php,v 1.14 2005-03-11 10:09:09 matthew Exp $
 
 require_once "DB.php";
 require_once "../../phplib/utility.php";
@@ -48,6 +48,8 @@ function db_secret() {
  * failure. */
 function db_query($query, $params = array()) {
     global $pbdb;
+    if (!is_array($params))
+        $params = array($params);
     if (!isset($pbdb))
         db_connect();
     $result = $pbdb->query($query, $params);

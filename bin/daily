@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.7 2005-03-09 18:10:20 francis Exp $
+ * $Id: daily,v 1.8 2005-03-11 10:09:08 matthew Exp $
  *
  */
 
@@ -46,34 +46,36 @@ include_once '../../phplib/utility.php';
 
 db_connect();
 
-$q = db_query('SELECT id, title, target, type, date+1 AS date, name, email FROM pledges WHERE confirmed');
+$q = db_query("SELECT id, title, target, type, name, email FROM pledges WHERE confirmed AND date = '$today'-1 AND NOT completionnotified FOR UPDATE");
 while ($r = db_fetch_array($q)) {
-    $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ? AND confirmed', array($r['id']));
-
-    # Out of time
-    if ($r['date'] == $today) {
-        if ($signatures < $r['target']) {
-            # Failure
-            if ($testrun)
-                print "Would send failure messages for pledge $r[id] ($r[title])\n";
-            elseif (!send_failure_email($r))
-                print "Failure sending one or more failure messages to pledgees of pledge $r[id] ($r[title])\n";
-            elseif ($verbose)
+    $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', $r['id']);
+    if ($signatures < $r['target']) {
+        # Failure
+        if ($testrun)
+            print "Would send failure messages for pledge $r[id] ($r[title])\n";
+        elseif (!send_failure_email($r))
+            print "Failure sending one or more failure messages to pledgees of pledge $r[id] ($r[title])\n";
+        else {
+            db_query('UPDATE pledges SET completionnotified = true WHERE id = ?', $r['id']);
+            if ($verbose)
                 print "Failure messages sent for pledge $r[id] ($r[title])\n";
-        } else {
-            # Email pledge creator with success
-            $subject = 'PledgeBank pledge completion - "' . $r['title'] . '"';
-            $body = "Dear $r[name],\n\nWe are pleased to tell you that your pledge " . ($signatures>$r['target']?'exceeded':'met') . " its target in the required time.\n\nWoohoo!.";
-            if ($testrun)
-                print "Would send success message to pledge creator for pledge $r[id] ($r[title])\n";
-            elseif (!pb_send_email($r['email'], $subject, $body))
-                print "Failure sending success message to pledge creator, pledge $r[id] ($r[title])\n";
-            elseif ($verbose)
+        }
+    } else {
+        # Email pledge creator with success
+        $subject = 'PledgeBank pledge completion - "' . $r['title'] . '"';
+        $body = "Dear $r[name],\n\nWe are pleased to tell you that your pledge " . ($signatures>$r['target']?'exceeded':'met') . " its target in the required time.\n\nWoohoo!.";
+        if ($testrun)
+            print "Would send success message to pledge creator for pledge $r[id] ($r[title])\n";
+        elseif (!pb_send_email($r['email'], $subject, $body))
+            print "Failure sending success message to pledge creator, pledge $r[id] ($r[title])\n";
+        else {
+            db_query('UPDATE pledges SET completionnotified = true WHERE id = ?', $r['id']);
+            if ($verbose)
                 print "Success message sent to pledge creator for pledge $r[id] ($r[title])\n";
         }
-        continue;
     }
 }
+db_commit();
 
 # ------------------------------------------
 
@@ -87,7 +89,7 @@ function send_failure_email($row) {
     $name = $row['name'];
     $email = $row['email'];
 
-    $q = db_query('SELECT name, email FROM signers WHERE pledge_id=? AND confirmed', array($pledge_id));
+    $q = db_query('SELECT name, email FROM signers WHERE pledge_id=?', array($pledge_id));
     $actual = db_num_rows($q);
 
     $subject = 'PledgeBank pledge failure - "' . $action . '"';

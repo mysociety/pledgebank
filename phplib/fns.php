@@ -2,9 +2,9 @@
 
 function pb_send_email($to, $subject, $message, $headers = '') {
 	$headers = $headers . 
-	"From: PledgeBank.com <" . CONTACTEMAIL . ">\r\n" .
-	"Reply-To: PledgeBank.com <" . CONTACTEMAIL . ">\r\n" .
-	"X-Mailer: PHP/" . phpversion();
+	'From: "PledgeBank.com" <' . CONTACTEMAIL . ">\r\n" .
+	'Reply-To: "PledgeBank.com" <' . CONTACTEMAIL . ">\r\n" .
+	'X-Mailer: PHP/' . phpversion();
 	$success = mail ($to, $subject, $message, $headers);
 	return $success;
 }
@@ -20,7 +20,7 @@ function prettify($s) {
 # Stolen from my railway script
 # TODO: Return an epoch instead?
 function parse_date($date) {
-	global $now;
+	$now = time();
 	$error = 0;
 	if (!$date) return;
 

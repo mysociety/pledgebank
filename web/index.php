@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.90 2005-03-17 18:01:22 francis Exp $
+// $Id: index.php,v 1.91 2005-03-17 18:49:39 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -703,8 +703,8 @@ function pdfs() {
 <li><a href="<?=$pdf_flyers1_url?>">Big poster (A4)</a></li>
 <li><a href="<?=$pdf_flyers4_url?>">Flyers for getting out and giving to people, 4 per page (A4)</a></li>
 <li><a href="<?=$pdf_flyers16_url?>">Flyers for getting out and giving to people, 16 per page (A4)</a></li>
-<li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
-<li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>
+<!--<li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
+<li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>-->
 </ul>
 <?  return true;
 }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.82 2005-03-14 16:43:18 francis Exp $
+// $Id: index.php,v 1.83 2005-03-15 18:47:01 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -590,22 +590,47 @@ if ($r['detail']) {
 <!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
 
 <h2>Current signatories</h2><?
-		$out = '<li>'.htmlspecialchars($r['name']).' (Pledge Author)</li>';
-		$anon = 0;
-		while ($r = db_fetch_array($q)) {
-			$showname = ($r['showname'] == 't');
-			if ($showname) {
-                            $out .= '<li>'.htmlspecialchars($r['name']).' <small>(<a href="./?report='.$r['id'].'">Is this signature suspicious?</a>)</small></li>';
-			} else {
-				$anon++;
-			}
-		}
-		print '<ul>'.$out;
-		if ($anon) {
-			print '<li>Plus '.$anon.' '.make_plural($anon,'other').' who did not want to give their name</li>';
-		}
-		print '</ul>';
-	}
+        $out = '<li>'
+                . htmlspecialchars($r['name'])
+                . ' (Pledge Author)</li>';
+        $anon = 0;
+        $unknownname = 0;
+        while ($r = db_fetch_array($q)) {
+            $showname = ($r['showname'] == 't');
+            if ($showname) {
+                if (isset($r['name'])) {
+                    $out .= '<li>'
+                            . htmlspecialchars($r['name'])
+                            .' <small>(<a href="./?report='
+                                . htmlspecialchars($r['id'])
+                            . '">Is this signature suspicious?</a>)</small></li>';
+                } else {
+                    ++$unknownname;
+                }
+            } else {
+                $anon++;
+            }
+        }
+        print '<ul>'.$out;
+        if ($anon || $unknownname) {
+            /* XXX i18n-a-go-go */
+            $extra = '';
+            if ($anon)
+                $extra .= "Plus $anon "
+                            . make_plural($anon, 'other')
+                            . ' who did not want to give their '
+                            . make_plural($anon, 'name');
+            if ($unknownname)
+                $extra .= ($anon ? ', and' : 'Plus')
+                            . " $unknownname "
+                            . make_plural($unknownname, 'other')
+                            . ' whose '
+                            . make_plural($unknownname, 'name')
+                            . " we don't know.";
+            print "<li>$extra</li>";
+        }
+        print '</ul>';
+    }
 }
 
 # Someone has submitted a new pledge

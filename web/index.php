@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.77 2005-03-12 00:57:49 francis Exp $
+// $Id: index.php,v 1.78 2005-03-14 10:45:32 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -32,7 +32,9 @@ if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
     }
 } elseif (get_http_var('add_signatory')) {
     $title = 'Signature addition';
-    add_signatory();
+    $errors = add_signatory();
+    if (is_array($errors))
+        view_pledge($errors);
 } elseif (get_http_var('pledge') == 'new') {
     $title = 'Create a New Pledge';
     pledge_form_one();
@@ -427,14 +429,15 @@ function add_signatory() {
     global $today;
 
     global $q_email, $q_name, $q_showname, $q_ref, $q_pw;
-    if (!is_null(importparams(
+    $errors = importparams(
             array('email',      '/^[^@]+@.+/',     'Please give your email'),
             array('name',       '/[a-z]/i',        'Please give your name'),
             array('ref',        '/^[a-z0-9-]+$/i', ''),
             array('showname',   '//',              'Please enter showname', 0),
             array('pw',         '//',              '', null)
-            )))
-        err("Bad parameters in add_signatory.");
+            );
+    if (!is_null($errors))
+        return $errors;
 
     $r = db_getRow('select id, title, password from pledges where ref = ?', $q_ref);
 
@@ -502,10 +505,17 @@ few minutes, making sure that you carefully check the email address you give.
 }
 
 # Individual pledge page
-function view_pledge() {
+function view_pledge($errors = array()) {
     global $today, $title;
 
-    $ref = get_http_var('pledge'); $h_ref = htmlspecialchars($ref);
+	if (sizeof($errors)) {
+		print '<div id="errors"><ul><li>';
+		print join ('</li><li>', $errors);
+		print '</li></ul></div>';
+    }
+
+    $ref = get_http_var('pledge'); 
+    $h_ref = htmlspecialchars($ref);
     $q = db_query('SELECT * FROM pledges WHERE ref=?', array($ref));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank reference!</p>';
@@ -520,16 +530,16 @@ function view_pledge() {
         if (!deal_with_password('pledge', $ref, $r['password']))
             return false;
 
-        $title = "'I will " . $r['title'] . "'";
+    $title = "'I will " . $r['title'] . "'";
 	$q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($r['id']));
 	$curr = db_num_rows($q);
 	$left = $r['target'] - $curr;
 
 	$finished = 0;
 	if ($r['date'] < $today) {
-            $finished = 1;
+        $finished = 1;
 	    print '<p class="finished">This pledge is now closed, as its deadline has passed.</p>';
-        }
+    }
 	if ($left <= 0) {
             if ($r['comparison'] == 'exactly') {
                 $finished = 1;
@@ -538,8 +548,14 @@ function view_pledge() {
                 print '<p class="success">This pledge has been successful!</p>';
             }
 	}
+
+    if (get_http_var('add_signatory'))
+        $showname = get_http_var('showname') ? 'checked' : '';
+    else
+        $showname = 'checked';
+
 ?>
-<p>Here is the pledge:</p>
+<p></p>
 <form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=$h_ref ?>">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <div class="c">
@@ -553,11 +569,12 @@ function view_pledge() {
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
 <p>
 <input type="hidden" name="add_signatory" value="1">
+<input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 Name: <input type="text" name="name" value="<?=htmlspecialchars(get_http_var('name'))?>">
 <br /> Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
-<br /> <input type="checkbox" name="showname" value="1" <?=get_http_var('showname') ? 'checked' : '' ?>> Show my name on this pledge 
+<br /> <input type="checkbox" name="showname" value="1" <?=$showname?>> Show my name on this pledge 
 <br /><input type="submit" name="submit" value="Submit">
 </p>
 </div>

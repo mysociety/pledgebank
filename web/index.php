@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.48 2005-03-04 17:58:10 matthew Exp $
+// $Id: index.php,v 1.49 2005-03-04 18:02:25 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -102,7 +102,7 @@ Email: <input type="text" size="30" name="email" value="<? if (isset($data['emai
 <hr style="color: #522994; background-color: #522994; height: 1px; border: none;" >
 <h3>Optional Information</h3>
 <p id="moreinfo" style="text-align: left">More details about your pledge:
-<br><textarea name="moreinfo" rows="10" cols="60"><? if (isset($data['moreinfo'])) print htmlspecialchars($data['moreinfo']) ?></textarea>
+<br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 <p style="text-align: right;">
 <? if (sizeof($data)) {
     print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
@@ -687,7 +687,7 @@ function search() {
     global $today;
     $id = db_getOne('SELECT id FROM pledges WHERE ref = ?', array(get_http_var('search')));
     if ($id) {
-        Header("Location: get_http_var(search)"); # TODO: should be absolute?
+        Header("Location: " . get_http_var('search')); # TODO: should be absolute?
         exit;
     }
     $q = db_query('SELECT date,ref,title FROM pledges WHERE title ILIKE \'%\' || ? || \'%\' ORDER BY date', array(get_http_var('search')));

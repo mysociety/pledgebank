@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.7 2005-03-11 20:14:31 chris Exp $
+ * $Id: confirm.php,v 1.8 2005-03-14 14:32:04 francis Exp $
  * 
  */
 
@@ -26,7 +26,7 @@ if (!is_null($err))
     err("Sorry -- something seems to have gone wrong");
 
 
-if ($type == 'pledge') {
+if ($q_type == 'pledge') {
     /* Pledges are confirmed by saving a token in the database and sending it to
      * the user. */
     $pledge_id = pledge_confirm($q_token);
@@ -46,7 +46,7 @@ if ($type == 'pledge') {
     <?  advertise_flyers($pledge_id);
     page_footer();
     exit;
-} elseif ($type == 'signature') {
+} elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
      * pledge. */
     $data = pledge_random_token_retrieve($q_token);

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: index.php,v 1.3 2005-01-28 17:02:03 matthew Exp $
+ * $Id: index.php,v 1.4 2005-03-14 14:32:04 francis Exp $
  * 
  */
 
@@ -28,7 +28,7 @@ $pages = array(
     new ADMIN_PAGE_PHPINFO,
 );
 
-admin_page_display(str_replace("http://", "", OPTION_BASE_URL), $pages);
+admin_page_display(str_replace("http://", "", OPTION_BASE_URL . "/"), $pages);
 
 ?>
 

@@ -5,13 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francsi@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: test.php,v 1.1 2005-02-24 12:18:02 francis Exp $
+// $Id: test.php,v 1.2 2005-03-14 14:32:04 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
 require_once '../phplib/fns.php';
-
-print page_header("Test harness");
 
 if (get_http_var('error')) {
     // Deliberately cause error by looking something up in an array which is not
@@ -20,6 +18,5 @@ if (get_http_var('error')) {
     $some_variable = $some_array['hello'];
 }
 
-print "<p>Just testing</p>";
-print page_footer();
+phpinfo();
 

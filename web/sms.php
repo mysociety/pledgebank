@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.9 2005-03-23 12:49:35 francis Exp $
+ * $Id: sms.php,v 1.10 2005-03-29 15:06:23 francis Exp $
  * 
  */
 
@@ -261,15 +261,15 @@ pledge succeeds, rather than sending an SMS.</p>
 <p>
 Phone number: <input type="text" name="phone" value="$q_unchecked_h_phone"><br/>
 EOF;
-    if ($errs && array_key_exists('phone', $errs))
-        print "<em>" . htmlspecialchars($errs['phone']) . "</em><br/>";
-    print <<<EOF
-Email: <input type="text" name="email" value="$q_unchecked_h_email"><br/>
-EOF;
     if ($errs && array_key_exists('email', $errs))
         print "<em>" . htmlspecialchars($errs['email']) . "</em><br/>";
     print <<<EOF
 Name: <input type="text" name="name" value="$q_unchecked_h_name"><br/>
+EOF;
+    if ($errs && array_key_exists('phone', $errs))
+        print "<em>" . htmlspecialchars($errs['phone']) . "</em><br/>";
+    print <<<EOF
+Email: <input type="text" name="email" size="30" value="$q_unchecked_h_email"><br/>
 EOF;
     if ($errs && array_key_exists('name', $errs))
         print "<em>" . htmlspecialchars($errs['name']) . "</em><br/>";

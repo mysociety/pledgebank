@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.5 2005-02-23 11:00:00 francis Exp $
+-- $Id: schema.sql,v 1.6 2005-02-28 09:47:52 chris Exp $
 --
 
 create table pledges (
@@ -35,9 +35,14 @@ create table pledges (
 
   -- confirmation stuff
   token varchar(50) not null,
-  confirmed int not null
+  confirmed int not null,
+
+  -- password for private pledges
+  password varchar(50) not null default '',
+
+  -- "at least" vs. "exactly"
+  comparison boolean not null default false
 );
-create index message_created_idx on message(created);
 
 create table signers (
   id serial not null primary key,

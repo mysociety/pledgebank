@@ -100,7 +100,7 @@ function pledge_form_submitted() {
 	$ref = $_POST['ref'];
 	if (!$action) $errors[] = 'Please enter a pledge';
 	if (!$people) $errors[] = 'Please enter a target';
-	if ($people == "" || !ctype_digit($people) || $people < 1) $errors[] = 'The target must be a number';
+	elseif (!ctype_digit($people) || $people < 1) $errors[] = 'The target must be a positive number';
 	if (!$date) $errors[] = 'Please enter a deadline';
 	if (!$type) $errors[] = 'Please enter a type';
 	if ($date['year']<$nowA['year'] || ($date['year']==$nowA['year'] && $date['month']<$nowA['month']) || ($date['year']==$nowA['year'] && $date['month']==$nowA['month'] && $date['day']<=$nowA['day']) ) {
@@ -158,12 +158,12 @@ doesn't work, or you have any other suggests or comments.
 ?>
 
 <h2>Five Highest Signup Pledges</h2>
-<?	$q = db_query('SELECT pledges.id, 
-max(pledges.name), max(pledges.title),max(pledges.date), max(pledges.target), max(pledges.type),
-COUNT(signers.id) AS count,max(date)-CURRENT_DATE
-AS daysleft FROM pledges,signers WHERE pledges.id=signers.pledge_id AND
+<?	$q = db_query('SELECT pledges.id, pledges.name, pledges.title,
+pledges.date, pledges.target, pledges.type,
+COUNT(signers.id) AS count, max(date)-CURRENT_DATE
+AS daysleft FROM pledges, signers WHERE pledges.id=signers.pledge_id AND
 pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 GROUP
-BY pledges.id ORDER BY count DESC');
+BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type ORDER BY count DESC');
     $new = '';
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.46 2005-03-29 14:58:18 chris Exp $
+-- $Id: schema.sql,v 1.47 2005-03-29 15:17:19 chris Exp $
 --
 
 -- secret
@@ -397,7 +397,7 @@ create function smssubscription_sign(integer, text)
         
             select into p outgoingsms_id, signer_id
                 from smssubscription
-                where "token" = token
+                where token = t_token
                 for update;
 
             if not found then

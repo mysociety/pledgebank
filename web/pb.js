@@ -5,11 +5,11 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.3 2005-02-22 09:20:57 francis Exp $
+ * $Id: pb.js,v 1.4 2005-03-04 09:35:13 matthew Exp $
  * 
  */
 
-var greyed = [ ['action', '<Enter your pledge>'], ['date', '<Date>'] ]
+var greyed = [ ['action', '<Enter your pledge>'], ['date', '<Date>'], ['ref', ''] ]
 
 function addEvent(obj, evType, fn){ 
     if (obj.addEventListener){ 
@@ -68,3 +68,8 @@ function greyOutInputs() {
     }
 }
 
+function checklength(thi) {
+    var l = thi.value.length
+    if (l<6) thi.style.color = '#999999'
+    else thi.style.color = '#000000'
+}

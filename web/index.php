@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.40 2005-03-03 16:35:09 francis Exp $
+// $Id: index.php,v 1.41 2005-03-04 09:35:13 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -92,7 +92,7 @@ function pledge_form($errors = array()) {
 other <input type="text" id="type" name="type" size="30" value="people"> <input type="text" id="signup" name="signup" size="10" value="sign up"> before
 <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<?=htmlspecialchars(get_http_var('date')) ?>">.</p>
 
-<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input type="text" size="20" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>"> <small>(letters, numbers, -)</small></p>
+<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>"> <small>(letters, numbers, -; minimum 6 characters)</small></p>
 <p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars(get_http_var('name')) ?>">
 Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 &nbsp;
@@ -134,6 +134,7 @@ function pledge_form_submitted() {
 	if (!$date) $errors[] = 'Please enter a deadline';
 	if ($date['iso'] < $today) $errors[] = 'The deadline must be in the future';
 	if (!$ref) $errors[] = 'Please enter a PledgeBank reference';
+        if (strlen($ref)<6) $errors[] = 'The reference must be at least six characters long';
 	if (preg_match('/[^a-z0-9-]/i',$ref)) $errors[] = 'The reference must only contain letters, numbers, -';
 	if ($date['error']) $errors[] = 'Please enter a valid date';
 	if (!$name) $errors[] = 'Please enter your name';

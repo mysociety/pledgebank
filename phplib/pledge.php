@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.13 2005-03-11 16:57:07 matthew Exp $
+ * $Id: pledge.php,v 1.14 2005-03-11 17:00:41 matthew Exp $
  * 
  */
 
@@ -266,7 +266,10 @@ function pledge_sign_confirm($token) {
     return $r['pledge_id'];
 }
 
-/* deal_with_password(HTML escaped pledge reference, password entered, actual password) */
+/* deal_with_password(form input name of variable used to pass pledge reference (e.g. pdf for the pdf page),
+        pledge reference, actual password)
+  XXX: Doesn't work with non-index.php pages yet!
+ */
 function deal_with_password($type, $ref, $actual) {
     $h_ref = htmlspecialchars($ref);
     $entered = get_http_var('pw');

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.4 2005-03-10 18:53:00 chris Exp $
+ * $Id: confirm.php,v 1.5 2005-03-11 10:58:09 chris Exp $
  * 
  */
 
@@ -16,6 +16,8 @@ require_once "../phplib/fns.php";
 require_once "../phplib/pledge.php";
 
 require_once "../../phplib/importparams.php";
+
+print $_ENV['QUERY_STRING'];
 
 $err = importparams(
             array('token',      '/.+/',             "")

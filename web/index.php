@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.66 2005-03-09 18:10:21 francis Exp $
+// $Id: index.php,v 1.67 2005-03-11 10:58:09 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -426,7 +426,7 @@ EOF
         /* Generate a secure URL to send to the user. */
         $token = pledge_email_token($q_email, $r['id']);
         /* ";" is not used in base64 */
-        $url = OPTION_BASE_URL . "/C/" . urlencode($q_email) . ";" . $r['id'] . ';' . urlencode($token);
+        $url = OPTION_BASE_URL . "confirm.php?email=" . urlencode($q_email) . "&pledge=" . $r['id'] . '&token=' . urlencode($token);
 
         $success = pb_send_email(
                 $q_email,
@@ -611,7 +611,7 @@ function create_new_pledge($data) {
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other
 people to sign up to your pledge after you have clicked the link in the email.</p>
 <?
-	$link = OPTION_BASE_URL . '/C/' . urlencode($token);
+	$link = OPTION_BASE_URL . 'confirm.php?token=' . urlencode($token);
 	$success = pb_send_email($data['email'], 'New pledge at PledgeBank.com : '.$data['action'], "Thank you for submitting your pledge to PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
 	if ($success) {
             db_commit();

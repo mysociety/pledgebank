@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.6 2005-04-05 15:57:56 sandpit Exp $
+ * $Id: announce.php,v 1.7 2005-04-05 18:16:31 matthew Exp $
  * 
  */
 
@@ -33,7 +33,6 @@ if (!$data)
     err("No such token");
 # Note, we destroy the token later when the message is sent
 
-print_r($data);
 $pledge = db_getRow('
     select *,
         (select count(id) from signers

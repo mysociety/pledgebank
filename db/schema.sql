@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.49 2005-03-30 09:04:44 sandpit Exp $
+-- $Id: schema.sql,v 1.50 2005-03-30 11:24:55 sandpit Exp $
 --
 
 -- secret
@@ -211,9 +211,11 @@ create unique index incomingsms_foreignid_idx on incomingsms(foreignid);
 -- sequence; we request copies of the "gap" messages every so often to ensure
 -- that we're not dropping any. Whenever we receive an incoming SMS with ID
 -- N, we delete any gap N and insert any integers between the maximum gap
--- present in the table and N - 1 inclusive, and N + 1.
+-- present in the table and N - 1 inclusive, and N + 1. The lastpolled field
+-- is there so that we don't keep polling for a missing message forever.
 create table incomingsms_foreignid_gap (
-    gap integer not null primary key
+    gap integer not null primary key,
+    lastpolled integer
 );
 
 create function incomingsms_foreignid_gap_check()

@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Test::More 'no_plan';
+BEGIN { use_ok "MS::PDF" };
+
+#use MS::PDF;
+
+my $pdf = MS::PDF->new( { 'pledge-id' => 0,
+			  'target' => 100,
+			  'name' => 'whales',
+			  'text' => 'stop using whale blubber as insulation',
+			  'sms' => 12345,
+		      });
+
+isa_ok($pdf, 'MS::PDF', 'Object');
+
+my $filename;
+ok($filename = $pdf->make('A4'),'Made PDF');
+
+`mv $filename /home/ejhp98/projects/pledgebank/output/0.pdf`;
+
+# if you need CGI output, just re-open $filename as FILE, print some
+# headers + <FILE> to STDOUT, close FILE, and unlink $filename.
+
+#ok($filename = $pdf->make('A6'),'Made PDF');
+
+

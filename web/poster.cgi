@@ -10,13 +10,16 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.18 2005-03-17 19:16:21 francis Exp $
+# $Id: poster.cgi,v 1.19 2005-03-22 11:07:59 francis Exp $
 #
 
 import os
 import sys
 from time import time
 from pyPgSQL import PgSQL
+import fcgi
+import tempfile
+
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from reportlab.lib.styles import ParagraphStyle
@@ -25,13 +28,15 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph, Frame
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
 
-import fcgi
-
 sys.path.append("../../pylib")
 import mysociety.config
 mysociety.config.set_file("../conf/general")
 
 db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
+
+types = ["cards", "tearoff", "flyers16", "flyers4", "flyers1"]
+sizes = ["A4"]
+formats = ["pdf", "png", "gif"]
 
 def ordinal(day):
     if day==11 or day==12:
@@ -180,9 +185,7 @@ def flyer(c, x1, y1, x2, y2, size):
     return True
 
 def flyers(number):
-    if number not in [1, 4, 16]:
-        raise Exception("Invalid number %d for flyers" % number)
-
+    # Number of flyers to fit on the page
     if number == 1:
         flyers_across = 1
         flyers_down = 1
@@ -192,11 +195,22 @@ def flyers(number):
     elif number == 16:
         flyers_across = 4
         flyers_down = 4
+    else:
+        raise Exception("Invalid number %d for flyers" % number)
 
+    # Just A4 for now
     page_width = 21 * cm
     page_height = 30 * cm
-    flyer_width = page_width / flyers_across
-    flyer_height = page_height / flyers_down
+    # Tweaked to make sure dotted lines are displayed on all edges
+    # (not sure yet why top margin needs to be larger than others)
+    margin_top = 0.4 * cm
+    margin_left = 0.1 * cm
+    margin_bottom = 0.1 * cm
+    margin_right = 0.1 * cm
+
+    # Calculate size of fliers
+    flyer_width = (page_width - margin_left - margin_right) / flyers_across 
+    flyer_height = (page_height - margin_top - margin_bottom) / flyers_down
 
     # Try different font sizes on a hidden canvas to get the largest
     dummyc = canvas.Canvas(None)
@@ -216,14 +230,9 @@ def flyers(number):
     for along in range(0, flyers_across):
         for down in range(0, flyers_down):
             flyer(c, 
-                along * flyer_width, down * flyer_height, 
-                (along + 1) * flyer_width, (down + 1) * flyer_height,
+                along * flyer_width + margin_left, down * flyer_height + margin_bottom, 
+                (along + 1) * flyer_width + margin_left, (down + 1) * flyer_height + margin_bottom,
                 size)
-
-#    flyer(c, 0, 0*cm + 0, 10.5*cm, 0*cm + 15 * cm, size)
-#    flyer(c, 0, 15*cm + 0, 10.5 * cm, 15*cm + 15*cm, size)
-#    flyer(c, flyer_width, 0*cm + 0, 21*cm, 0*cm + 15*cm, size)
-#    flyer(c, flyer_width,10.5*cm, 15*cm + 0, 21*cm, 15*cm + 15*cm, size)
 
 ############################################################################
 
@@ -247,34 +256,70 @@ while fcgi.isFCGI():
             
         if len(path_info)>2 and path_info[2]:
             type = path_info[2]
-            (type, suffix) = type.split('.')
+            (type, format) = type.split('.')
         else:
             type = 'cards'
-            suffix = 'pdf'
+            format = 'pdf'
     else:
         incgi = False
-        ref = 'automatedtest'
-        size = 'A4'
-        type = 'flyers16'
-        suffix = 'pdf'
+
+        from optparse import OptionParser
+        parser = OptionParser()
+        parser.set_usage("""
+    ./poster.cgi REF [OPTIONS]
+
+Generates a poster or flyer for PledgeBank in PDF and other formats.  Designed
+to be run as a FastCGI script, but can be run on the command line for testing.
+REF is the PledgeBank reference of the poster to be printed.  The output
+is sent to standard output.
+
+When run from CGI, files are cached in the directory PB_PDF_CACHE specified
+in conf/general.  This cache is not used on the command line.""")
+        parser.add_option("--size", dest="size", default="A4",
+            help=", ".join(sizes));
+        parser.add_option("--type", dest="type", default="flyers4",
+            help=", ".join(types));
+        parser.add_option("--format", dest="format", default="pdf",
+            help=", ".join(formats));
+        (options, args) = parser.parse_args()
+        if len(args) <> 1:
+            parser.print_help()
+            print >>sys.stderr, "specify Pledgebank ref"
+            sys.exit(1)
+        ref = args[0] 
+        size = options.size
+        type = options.type 
+        format = options.format
 
     if incgi:
-        if suffix == 'pdf':
+        if format == 'pdf':
             req.out.write("Content-Type: application/pdf\r\n\r\n")
+        elif format == 'png':
+            req.out.write("Content-Type: image/png\r\n\r\n")
+        elif format == 'gif':
+            req.out.write("Content-Type: image/gif\r\n\r\n")
         else:
             req.out.write("Content-Type: text/plain\r\n\r\n")
 
-    outdir = mysociety.config.get("PB_PDF_CACHE")
-    outfile = "%s_%s_%s.pdf" % (ref, size, type)
+    if not size in sizes:
+        raise Exception, "Unknown size '%s'" % size
+    if not type in types:
+        raise Exception, "Unknown type '%s'" % type
+    if not format in formats:
+        raise Exception, "Unknown format '%s'" % format
 
-    def output_file(filename):
+    outdir = mysociety.config.get("PB_PDF_CACHE")
+    outpdf = "%s_%s_%s.pdf" % (ref, size, type)
+    outfile = "%s_%s_%s.%s" % (ref, size, type, format)
+
+    def file_to_stdout(filename):
         f = file(filename, 'rb')
         content = f.read()
         f.close()
         req.out.write(content)
 
     if os.path.exists(outdir + '/' + outfile) and incgi:
-        output_file(outdir + '/' + outfile)
+        file_to_stdout(outdir + '/' + outfile)
     else:
         q = db.cursor()
         pledge = {}
@@ -288,7 +333,9 @@ while fcgi.isFCGI():
             pledge['signup'] = "too"
         sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
-        c = canvas.Canvas(outdir + '/' + outfile)
+        # Generate PDF file
+        (tmpfile, tmpfilename) = tempfile.mkstemp()
+        c = canvas.Canvas(tmpfilename)
         try:
             if type == "cards":
                 cards()
@@ -308,7 +355,12 @@ while fcgi.isFCGI():
             c.setFont("Helvetica", 15)
             c.drawCentredString(10.5*cm, 25*cm, str(e))
         c.save()
-        output_file(outdir + '/' + outfile)
+        os.rename(tmpfilename, outdir + '/' + outpdf)
+            
+        # Generate any other file type
+        os.spawnlp(os.P_WAIT, "convert", "convert", outdir + '/' + outpdf, outdir + '/' + outfile)
+
+        file_to_stdout(outdir + '/' + outfile)
 
     req.Finish()
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.15 2005-03-17 09:33:52 sandpit Exp $
+ * $Id: confirm.php,v 1.16 2005-03-22 11:07:59 francis Exp $
  * 
  */
 
@@ -127,6 +127,7 @@ page_footer(array('nonav'=>true));
  * Print some stuff advertising flyers for PLEDGE. */
 function advertise_flyers($pledge_id) {
     $r = db_getRow('select * from pledges where id = ?', $pledge_id);
+    $png_flyers4_url = new_url("../flyers/{$r['ref']}_A4_flyers4.png", false);
 ?>
 
 <div class="noprint">
@@ -146,6 +147,9 @@ now and post them next time you go out to the shops. We also have more
 
 </div> <!-- noprint -->
 
+<img src="<?=$png_flyers4_url?>" alt="Flyers">
+
+<!--
 <style type="text/css">
 table {
     margin: 10pt;
@@ -170,7 +174,10 @@ td {
         }
         print '</tr>';
     }
-    print "</table>";
+?>
+    </table>
+    -->
+<?
 }
 
 /* oops CODE

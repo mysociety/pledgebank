@@ -9,12 +9,6 @@ function pb_send_email($to, $subject, $message, $headers = '') {
 	return $success;
 }
 
-function pluralize($n, $singular, $plural='') {
-	if ($n==1) return $singular;
-	if ($plural) return $plural;
-	return $singular.'s';
-}
-
 function prettify($s) {
 	if (preg_match('#^(\d{4})-(\d\d)-(\d\d)$#',$s,$m)) {
 		list(,$y,$m,$d) = $m;

@@ -18,7 +18,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.2 2005-03-29 15:23:32 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.3 2005-03-29 15:29:52 chris Exp $';
 
 use strict;
 
@@ -94,9 +94,9 @@ while (my $q = new CGI::Fast()) {
 
             PB::SMS::receive_sms($sender, $recipient, $P{intDeliverer}, PB::SMS::decode_ia5($message), $smsid, $whensent);
 
-            $resp = "OK\n";
+            $resp = "OK";
         } else {
-            $resp = "OK\n";
+            $resp = "OK";
         }
 
         dbh()->commit();

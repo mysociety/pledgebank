@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.10 2005-03-29 19:55:08 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.11 2005-03-30 09:11:37 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -241,6 +241,7 @@ sub run_gathering_process () {
     # Polling status of messages. We need to supply a simple query for the
     # messages to inspect (such as "BatchID > ..."), but must not query too
     # often or too long.
+    use constant min_polling_age => 120;        # give it 2 mins before asking
     use constant max_polling_age => 28 * 3600;  # 28 hours; apparently standard
     use constant min_polling_interval => 1800;
 
@@ -251,6 +252,7 @@ sub run_gathering_process () {
                                 or (status <> 'delivered'
                                     and status <> 'failed'))
                             and lastsendattempt > ?
+                            and lastsendattempt < ?
                             and (laststatuscheck is null or
                                     laststatuscheck > ?)
                         ");
@@ -272,7 +274,7 @@ sub run_gathering_process () {
         #
         # Receipts
         #
-        $s_status->execute(time() - max_polling_age, time() - min_polling_interval);
+        $s_status->execute(time() - max_polling_age, time() - min_polling_age, time() - min_polling_interval);
         my $min_id = $s_status->fetchrow_array();
         if (defined($min_id)) {
             my %p = (
@@ -280,6 +282,7 @@ sub run_gathering_process () {
                     strWhere => "BatchID > $min_id"
                 );
 
+            print_log('debug', "get receipts: query is '$p{strWhere}'");
             my $result = do_post_request("get receipts", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
             if (ref($result) eq 'ARRAY') {
                 if ($result->[0] eq 'system error') {
@@ -349,7 +352,7 @@ sub run_gathering_process () {
                                 update outgoingsms
                                 set laststatuscheck = ?
                                 where foreignid = ?',
-                                {}, $foreignid, time());
+                                {}, time(), $foreignid);
                     }
                 }
             }
@@ -635,5 +638,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.10 2005-03-29 19:55:08 sandpit Exp $
+$Id: pbsmsd,v 1.11 2005-03-30 09:11:37 sandpit Exp $
 

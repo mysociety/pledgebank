@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.6 2005-03-25 20:26:07 francis Exp $
+ * $Id: pb.php,v 1.7 2005-03-29 07:08:49 francis Exp $
  * 
  */
 
@@ -21,6 +21,8 @@ require_once 'page.php';
 
 /* Date which PledgeBank application believes it is */
 $pb_today = db_getOne('select pb_current_date()');
+$pb_timestamp = substr(db_getOne('select pb_current_timestamp()'), 0, 19);
+$pb_time = strtotime($pb_timestamp);
 
 /* Output buffering: PHP's output buffering is broken, because it does not
  * affect headers. However, it's worth using it anyway, because in the common

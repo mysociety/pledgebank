@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.14 2005-03-23 17:24:11 francis Exp $
+// $Id: fns.php,v 1.15 2005-03-29 07:08:49 francis Exp $
 
 function pb_send_email_template($to, $template_name, $values, $headers = '') {
     $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
@@ -57,7 +57,8 @@ function prettify($s, $html = true) {
 
 # Stolen from my railway script
 function parse_date($date) {
-	$now = time();
+    global $pb_time;
+	$now = $pb_time;
 	$error = 0;
 	if (!$date)  {
         return null;
@@ -80,11 +81,11 @@ function parse_date($date) {
 		if (preg_match('#next\s+(sun|sunday|mon|monday|tue|tues|tuesday|wed|wednes|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday)\b#i',$date,$m)) {
 			$date = preg_replace('#next#i','this',$date);
 			if ($dayofweek == 5) {
-				$now = strtotime('3 days');
+				$now = strtotime('3 days', $now);
 			} elseif ($dayofweek == 4) {
-				$now = strtotime('4 days');
+				$now = strtotime('4 days', $now);
 			} else {
-				$now = strtotime('5 days');
+				$now = strtotime('5 days', $now);
 			}
 		}
 		$t = strtotime($date,$now);

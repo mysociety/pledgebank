@@ -6,14 +6,11 @@
 # This does two things: managing the sending of SMS messages from the outgoing
 # message queue, and calling code to process messages which have been received.
 #
-# XXX a lot of this is boilerplate copied from fyrqd; we should probably try to
-# modularise the common code.
-#
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.9 2005-03-29 19:00:08 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.10 2005-03-29 19:55:08 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -62,6 +59,7 @@ sub do_post_request ($$$) {
                     agent => "PledgeBank pbsmsd $rcsid",
                 );
 
+    my $R;
     eval {
         local $SIG{ALRM} = sub { die "timed out in eval\n"; };
         alarm(300);
@@ -71,23 +69,25 @@ sub do_post_request ($$$) {
         if (!defined($resp)) {
             $! ||= '(no error)';
             print_log('warning', "$what: no response from user-agent; system error: $!");
-            return ['systemerror', $!];
+            $R = ['systemerror', $!];
         } elsif ($resp->code() != 200) {
             print_log('warning', "$what: failure to send; HTTP status: " . $resp->status_line());
             foreach (split(/\r?\n/, $resp->content())) {
                 print_log('warning', "$what: remote error: $_");
             }
-            return ['httperror', $resp->status_line()];
+            $R = ['httperror', $resp->status_line()];
         } else {
             print_log('debug', "$what: did POST; " . length($resp->content()) . " bytes returned");
-            return $resp->content();
+            $R = $resp->content();
         }
     };
     if ($@) {
         $@ =~ s#\n##gs;
         print_log('warning', "$what: $@");
-        return ['systemerror', $@];
+        $R = ['systemerror', $@];
     }
+
+    return $R;
 }
 
 # run_sending_process
@@ -216,14 +216,15 @@ sub run_sending_process () {
 # a number of comma-separated key="value" tuples; values may contain characters
 # escaped with backslashes. Returns a reference to a list on success or undef
 # on failure.
+use Data::Dumper;
 sub parse_csv_fields ($) {
     my @rows;
     foreach my $line (split(/\r\n/, $_[0])) {
-        my %fields =
-            ($line =~ m#(?:([^=]+)="((?:[^"]|\\.)*)"(?:,|$))+#)
-        return undef if (!%fields);
-        foreach (values %fields) {
-            s/\\(.)/$1/g;
+        my %fields;
+        while ($line =~ m#([^=]+)="([^"]+)"(,|$)#g) {
+            my $v = $2;
+            $v =~ s#\\(.)#$1#g;
+            $fields{$1} = $v;
         }
         push(@rows, \%fields);
     }
@@ -246,9 +247,12 @@ sub run_gathering_process () {
     my $s_status = dbh()->prepare("
                         select min(foreignid) from outgoingsms
                         where lastsendstatus = 'success'
-                            and status <> 'delivered and status <> 'failed'
+                            and (status is null
+                                or (status <> 'delivered'
+                                    and status <> 'failed'))
                             and lastsendattempt > ?
-                            and laststatuscheck > ?
+                            and (laststatuscheck is null or
+                                    laststatuscheck > ?)
                         ");
     my $s_missed = dbh()->prepare("
                         select gap
@@ -258,7 +262,7 @@ sub run_gathering_process () {
                         ");
 
     my $D = new DateTime::Format::Strptime(
-                pattern => '%Y%m%d%H%M%S'
+                pattern => '%Y-%m-%d %H:%M:%S'
                 # XXX locale and timezone?
             );
 
@@ -268,76 +272,84 @@ sub run_gathering_process () {
         #
         # Receipts
         #
-        my $min_id = $s_status->execute(time() - max_polling_age, time() - min_polling_interval);
-        my %p = (
-                strMethod => 'getReceipts',
-                strWhere => "BatchID > $min_id"
-            );
+        $s_status->execute(time() - max_polling_age, time() - min_polling_interval);
+        my $min_id = $s_status->fetchrow_array();
+        if (defined($min_id)) {
+            my %p = (
+                    strMethod => 'getReceipts',
+                    strWhere => "BatchID > $min_id"
+                );
 
-        my $result = do_post_request("get receipts", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
-        if (ref($result) eq 'ARRAY') {
-            if ($result->[0] eq 'system error') {
-                print_log('warning', "get receipts: system error: $result->[1]");
+            my $result = do_post_request("get receipts", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
+            if (ref($result) eq 'ARRAY') {
+                if ($result->[0] eq 'system error') {
+                    print_log('warning', "get receipts: system error: $result->[1]");
+                } else {
+                    print_log('warning', "get receipts: HTTP error: $result->[1]");
+                }
             } else {
-                print_log('warning', "get receipts: HTTP error: $result->[1]");
-            }
-        } else {
-            my $r = parse_csv_fields($result);
-            if (!$r) {
-                print_log('warning', "get receipts: bad returned value: '" . substr($result, 0, 40) . "...'");
-            } else {
-                foreach (@$r) {
-                    my %f = %$_;
-                    foreach (qw(BatchID DeliveryStatus DeliveryTime)) {
-                        if (!exists($f{$_})) {
-                            print_log('warning', "get receipts: bad line from remote side (missing field '$_')")
+                my $r = parse_csv_fields($result);
+                if (!$r) {
+                    print_log('warning', "get receipts: bad returned value: '" . substr($result, 0, 40) . "...'");
+                } else {
+                    foreach (@$r) {
+                        my %f = %$_;
+                        foreach (qw(BatchID DeliveryStatus DeliveryTime)) {
+                            if (!exists($f{$_})) {
+                                print_log('warning', "get receipts: bad line from remote side (missing field '$_')")
+                            }
                         }
-                    }
-                    my $foreignid = $f{BatchID};
-                    my $old_status = dbh()->selectrow_array('
-                                        select status
-                                        from outgoingsms
-                                        where foreignid = ?
-                                        for update', {}, $foreignid);
-                    next unless defined($old_status);
+                        my $foreignid = $f{BatchID};
+                        next unless (defined(dbh()->selectrow_array('
+                                select id from outgoingsms
+                                where foreignid = ?
+                                for update',
+                                {}, $foreignid)));
 
-                    my $s = lc($f{DeliveryStatus});
+                        my $s = lc($f{DeliveryStatus});
 
-                    if ($s eq 'null') {
-                        # NULL is a rare condition which means that the
-                        # message couldn't be passed on to the partner; we
-                        # should respond to it with resubmission.
-                        print_log('warning', "get receipts: message with foreign ID $foreignid had NULL status; resubmitting for transmission");
+                        if ($s eq 'null') {
+                            # NULL is a rare condition which means that the
+                            # message couldn't be passed on to the partner; we
+                            # should respond to it with resubmission.
+                            print_log('warning', "get receipts: message with foreign ID $foreignid had NULL status; resubmitting for transmission");
+                            dbh()->do('
+                                    update outgoingsms
+                                    set numsendattempts = 0,
+                                        lastsendattempt = null,
+                                        lastsendstatus = null,
+                                        lastsendextrastatus = null,
+                                        foreignid = null,
+                                        status = null,
+                                        laststatuscheck = null
+                                    where foreignid = ? ', {}, $foreignid);
+                        } else {
+                            my %statusmap = (
+                                    acked => 'buffered',
+                                    'buffered phone' => 'buffered',
+                                    'buffered smsc' => 'buffered',
+                                    'delivered' => 'delivered',
+                                    'lost notification' => 'none',
+                                    'non delivered' => 'failed'
+                                );
+                            if (!exists($statusmap{$s})) {
+                                print_log('warning', "get receipts: message with foreign ID $foreignid has unknown status '$f{DeliveryStatus}'");
+                            } else {
+                                print_log('debug', "get receipts: message with foreign ID $foreignid: $statusmap{$s}");
+                                dbh()->do('
+                                            update outgoingsms
+                                            set status = ?, laststatuscheck = ?
+                                            where foreignid = ?',
+                                            {}, $statusmap{$s}, time(),
+                                                $foreignid);
+                            }
+                        }
+                        
                         dbh()->do('
                                 update outgoingsms
-                                set numsendattempts = 0,
-                                    lastsendattempt = null,
-                                    lastsendstatus = null,
-                                    lastsendextrastatus = null,
-                                    foreignid = null,
-                                    status = null,
-                                    laststatuscheck = null
-                                where foreignid = ? ', {}, $foreignid);
-                    } else {
-                        my %statusmap = (
-                                acked => 'buffered',
-                                'buffered phone' => 'buffered',
-                                'buffered smsc' => 'buffered',
-                                'delivered' => 'buffered',
-                                'lost notification' => 'none',
-                                'non delivered' => 'failed'
-                            );
-                        if (!exists($statusmap{$s})) {
-                            print_log('warning', "get receipts: message with foreign ID $foreignid has unknown status '$f{DeliveryStatus}'");
-                        } else {
-                            print_log('debug', "get receipts: message with foreign ID $foreignid: $statusmap{$s}");
-                            dbh()->do('
-                                        update outgoingsms
-                                        set status = ?
-                                        where foreignid = ? and status = ?',
-                                        {}, $statusmap{$s}, $fields{BatchID},
-                                            $old_status);
-                        }
+                                set laststatuscheck = ?
+                                where foreignid = ?',
+                                {}, $foreignid, time());
                     }
                 }
             }
@@ -368,19 +380,19 @@ sub run_gathering_process () {
             $prev = $n;
         }
 
-        if (defined($first)) {
-            if ($first == $prev) {
-                push(@qq, "Sequence = $first");
-            } else {
-                push(@qq, "Sequence >= $first and Sequence <= $prev");
-            }
-        }
+        # Don't add the last @qq clause, because there will always be one row
+        # in the gaps table, referring to a message which hasn't arrived yet.
+        # (It has the ID of the highest-numbered message yet received, plus
+        # one). That means that if we miss a single message in an outage we
+        # won't collect it until receipt of at least one other later message,
+        # but that's probably acceptable.
 
         if (@qq) {
-            %p = (
+            my %p = (
                     strMethod => 'getInbound',
-                    strWhere => join(" or ", map { "($_)" } @qq);
+                    strWhere => join(" or ", map { "($_)" } @qq)
                 );
+            print_log('debug', "get missed messages: query is '$p{strWhere}'");
             my $result = do_post_request("get missed messages", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
             if (ref($result) eq 'ARRAY') {
                 if ($result->[0] eq 'system error') {
@@ -552,7 +564,7 @@ try {
     exit(1);
 };
 
-print_log('info', "starting up; 1 processing process, $numprocesses sender processes");
+print_log('info', "starting up; 1 processing process, 1 gathering process, $numprocesses sender processes");
 
 # Main loop.
 $SIG{TERM} = $SIG{INT} = sub { $foad = POSIX::SIGTERM }; # so children know to exit
@@ -560,6 +572,7 @@ $SIG{TERM} = $SIG{INT} = sub { $foad = POSIX::SIGTERM }; # so children know to e
     # --debug, and still shut down cleanly.
 my $termsig = mySociety::Util::manage_child_processes({
         processing =>   [1, \&run_processing_process],
+        gathering =>    [1, \&run_gathering_process],
         sending =>      [$numprocesses, \&run_sending_process]
     });
 
@@ -622,5 +635,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.9 2005-03-29 19:00:08 chris Exp $
+$Id: pbsmsd,v 1.10 2005-03-29 19:55:08 sandpit Exp $
 

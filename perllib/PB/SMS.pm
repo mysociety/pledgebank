@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.13 2005-03-29 15:24:03 sandpit Exp $
+# $Id: SMS.pm,v 1.14 2005-03-29 19:55:10 sandpit Exp $
 #
 
 package PB::SMS;
@@ -171,7 +171,7 @@ sub receive_sms ($$$$$$) {
 @PB::SMS::delivered_handlers = (
         ['sms-signup',
         sub ($$$$$) {
-            my ($id, $text, $sender) = @_;
+            my ($id, $text, $sender, $recipient) = @_;
             # Add signer who has signed up by SMS and received a 
             # conversion-to-email message.
             my ($pledge_id, $token) =
@@ -192,7 +192,7 @@ sub receive_sms ($$$$$$) {
 
             if ($r eq 'signed') {
                 # Already signed, but that's OK.
-                print_log('debug', "#$id delivered, but $sender already signed up to pledge id $pledge_id");
+                print_log('debug', "#$id delivered, but $recipient already signed up to pledge id $pledge_id");
                 return 1;
             } elsif ($r ne 'ok') {
                 my %errormsg = (
@@ -202,14 +202,14 @@ sub receive_sms ($$$$$$) {
                     );
                 die "smssubscription returned unexpected result '$r' for $sender on pledge $pledge_id"
                     unless (exists($errormsg{$r}));
-                print_log('debug', "#$id delivered, but $sender cannot sign up because pledge $pledge_id is $r");
+                print_log('debug', "#$id delivered, but $recipient cannot sign up because pledge $pledge_id is $r");
                 send_sms(
                         $sender,
                         $errormsg{$r}
                     );
                 return 1;
             } else {
-                print_log('debug', "#$id delivered, and $sender signed up to pledge id $pledge_id");
+                print_log('debug', "#$id delivered, and $recipient signed up to pledge id $pledge_id");
                 return 1;
             }
         }]

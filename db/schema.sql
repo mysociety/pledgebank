@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.51 2005-04-04 09:44:11 sandpit Exp $
+-- $Id: schema.sql,v 1.52 2005-04-06 14:47:31 chris Exp $
 --
 
 -- secret
@@ -267,6 +267,9 @@ create table signers (
   
     -- Name has been reported
     reported boolean not null default false,
+
+    -- Success/failure has been notified for this signer.
+    pledgecompletionnotified boolean not null default false,
 
     check (
         (name is not null and email is not null)

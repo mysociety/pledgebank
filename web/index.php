@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.26 2005-02-23 00:50:24 matthew Exp $
+// $Id: index.php,v 1.27 2005-02-23 11:05:32 francis Exp $
 
 require_once "../conf/general";
 include_once '../templates/page.php';
@@ -142,7 +142,7 @@ function front_page() {
 <p>Welcome to PledgeBank, the site that lets you say "I'll do something
 if other people will do it too." </p>
 <p>The site is still in development, it isn't finished yet.   Hopefully
-it'll be ready in February.
+it'll be ready soon.
 If you'd like to use PledgeBank when it is launched, or have any good
 ideas for organisations who might like to use it, email <a
 href="mailto:pb@mysociety.org">Tom Steinberg</a>.  You can also <a

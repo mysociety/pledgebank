@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.61 2005-03-07 18:00:01 francis Exp $
+// $Id: index.php,v 1.62 2005-03-07 18:12:14 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -660,7 +660,7 @@ people to sign up to your pledge after you have clicked the link in the email.</
 	$link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirmp=' . $token);
 	$success = pb_send_email($data['email'], 'New pledge at PledgeBank.com : '.$data['action'], "Thank you for submitting your pledge to PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
 	if ($success) {
-//            db_commit();
+            db_commit();
 ?>
 <?		
         global $title;

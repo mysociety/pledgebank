@@ -89,6 +89,8 @@ function pledge_form_submitted() {
 	$name = $_POST['name'];
 	$email = $_POST['email'];
 	$ref = $_POST['ref'];
+        $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($ref));
+        if ($dupe) $errors[] = 'That reference is already taken!';
         $signup = $_POST['signup']; if (!$signup) $signup = 'sign up';
 	if (!$action) $errors[] = 'Please enter a pledge';
 	if (!$people) $errors[] = 'Please enter a target';

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.5 2005-03-08 15:45:02 chris Exp $
+ * $Id: pledge.php,v 1.6 2005-03-08 17:18:11 chris Exp $
  * 
  */
 
@@ -74,23 +74,27 @@ function pledge_permanent_error($e) {
     return ($e < 100);
 }
 
-/* pledge_sentence PLEDGE [HTML]
- * Return a sentence describing what each signer agrees to do ("I will ...
- * if ..."). If HTML is true, encode entities and add <strong> tags around
- * strategic bits. */
-function pledge_sentence($pledge_id, $html = false) {
-    $r = db_getOne('select * from pledges where pledge_id = ?', $pledge_id);
+/* pledge_sentence PLEDGE FIRSTPERSON [HTML]
+ * Return a sentence describing what each signer agrees to do ("$pledgecreator
+ * will ...  if ..."). If FIRSTPERSON is true, then the sentence is "I
+ * will...". If HTML is true, encode entities and add <strong> tags around
+ * strategic bits.
+ * XXX i18n -- this won't work at all in other languages */
+function pledge_sentence($pledge_id, $firstperson, $html = false) {
+    $r = db_getRow('select * from pledges where id = ?', $pledge_id);
     if (!$r)
         err(pledge_strerror(PLEDGE_NONE));
+
     if ($html)
         $r = array_map('htmlspecialchars', $r);
         
-    $s = "I will <strong>$r['title']</strong> if "
+    $s = ($firstperson ? "I" : $r['name'])
+            . " will <strong>${r['title']}</strong> if "
             . '<strong>'
                 . ($r['comparison'] == 'exactly' ? 'exactly' : 'at least')
-                . " $r['target']"
+                . " ${r['target']}"
                 . '</strong>'
-            . " other $r['type'] "
+            . " other ${r['type']} "
             . ($r['signup'] == 'sign up' ? 'will too' : $r['signup'])
             . ".";
     if (!$html)
@@ -105,7 +109,7 @@ function pledge_is_successful($pledge_id) {
     $target = db_getOne('
                     select target
                     from pledges
-                    where pledge_id = ?
+                    where id = ?
                     for update', $pledge_id);
     $num = db_getOne('
                     select count(id)
@@ -122,22 +126,26 @@ function pledge_is_valid_to_sign($pledge_id, $email) {
     $r = db_getRow('
                 select comparison, target, date, email
                 from pledges
-                where id = ? and confirmed for update', array($pledge));
+                where id = ? and confirmed for update', $pledge_id);
     if (is_null($r))
         return PLEDGE_NONE;
-    else if ($r['date'] < today())
+    else if ($r['date'] < date('Y-m-d'))
         return PLEDGE_FINISHED;
     else if ($email == $r['email'])
         return PLEDGE_SIGNED;
     
-    if ($comparison == 'exactly') {
+    if ($r['comparison'] == 'exactly') {
         db_query('lock table signers in row shared mode');
-        $num = db_getOne('select count(id) from signers where pledge_id = ?', $pledge);
+        $num = db_getOne('select count(id) from signers where pledge_id = ?', $pledge_id);
         if ($num >= $r['target'])
             return PLEDGE_FULL;
     }
 
-    if (isset(db_getOne('select id from signers where pledge_id = ? and email = ? for update', array($pledge_id, $email))))
+    if (db_getOne('
+            select id
+            from signers
+            where pledge_id = ? and email = ?
+            for update', array($pledge_id, $email)))
         return PLEDGE_SIGNED;
 
     return PLEDGE_OK;
@@ -168,25 +176,19 @@ function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
                 insert into signers (
                     id,
                     pledge_id,
-                    converts_signer_id,
                     name, email, showname,
-                    signtime,
-                    token, confirmed
+                    signtime
                 ) values (
                     ?,
                     ?,
-                    ?,
                     ?, ?, ?,
-                    current_timestamp,
-                    ?, false
+                    current_timestamp
                 )', array(
                     $id,
                     $pledge_id,
-                    $converts,
-                    $name, $email, $showname ? 't' : 'f',
-                    #
-                    $token)))
-        return "Unable to insert signer into database"; /* XXX should get an error message, somehow */
+                    $name, $email, $showname ? 't' : 'f')
+                ))
+        return PLEDGE_ERROR;
 
     /* Done. */
     return array($id, $token);

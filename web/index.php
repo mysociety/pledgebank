@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.92 2005-03-17 19:37:29 francis Exp $
+// $Id: index.php,v 1.93 2005-03-22 11:47:56 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -603,9 +603,10 @@ if ($r['detail']) {
                 if (isset($r['name'])) {
                     $out .= '<li>'
                             . htmlspecialchars($r['name'])
-                            .' <small>(<a href="./?report='
-                                . htmlspecialchars($r['id'])
-                            . '">Is this signature suspicious?</a>)</small></li>';
+                            #.' <small>(<a href="./?report='
+                            #    . htmlspecialchars($r['id'])
+                            #. '">Is this signature suspicious?</a>)</small>'
+                            . '</li>';
                 } else {
                     ++$unknownname;
                 }

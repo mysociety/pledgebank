@@ -115,7 +115,7 @@ doesn't work, or you have any other suggests or comments.
 <input type="text" id="s" name="search" size="10" value=""></p>
 <p style="margin-top: 1em; text-align: right"><input type="submit" value="Go"></p>
 </form>
-<h2>Five Newest Pledges</h2>
+<h2>Sign up to one of our five newest pledges</h2>
 <?	$q = db_query('SELECT *, date - CURRENT_DATE AS daysleft FROM pledges WHERE date >= CURRENT_DATE AND confirmed=1 ORDER BY id DESC LIMIT 10');
     $new = '';
     $k = 5;
@@ -178,16 +178,16 @@ function add_signatory() {
 
 	$email = $_POST['email'];
 	$showname = $_POST['showname'] ? 1 : 0;
-	$id = $_POST['pledge_id'];
+	$ref = $_POST['pledge_id'];
 
-	$q = db_query('SELECT title,email,confirmed,date,ref FROM pledges WHERE id=?', array($id));
+	$q = db_query('SELECT id,title,email,confirmed,date FROM pledges WHERE ref=?', array($ref));
 	if (!$q) {
 		print '<p>Illegal PledgeBank reference!</p>';
 		return false;
 	}
 
 	$r = db_fetch_array($q);
-        $action = $r['title']; $ref = $r['ref'];
+        $action = $r['title']; $id = $r['id'];
 
 	if (!$r['confirmed']) {
 		print '<p>Illegal PledgeBank reference!</p>';
@@ -287,10 +287,7 @@ function send_success_email($pledge_id) {
 function view_pledge() {
     global $today;
 
-    if (ctype_digit($_GET['pledge']))
-        $q = db_query('SELECT * FROM pledges WHERE id=?',array($_GET['pledge']));
-    else
-        $q = db_query('SELECT * FROM pledges WHERE ref=?', array($_GET['pledge']));
+    $q = db_query('SELECT * FROM pledges WHERE ref=?', array($_GET['pledge']));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank reference!</p>';
 	return false;
@@ -421,10 +418,10 @@ function confirm_pledge() {
 
 function list_all_pledges() {
         print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
-        $q = db_query('SELECT id,title,target,date,name,ref FROM pledges WHERE confirmed=1');
-        print '<table><tr><th>ID</th><th>Title</th><th>Target</th><th>Date</th><th>Name</th><th>Ref</th></tr>';
+        $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed=1');
+        print '<table><tr><th>Title</th><th>Target</th><th>Deadline</th><th>Creator</th><th>Short name</th></tr>';
         while ($r = db_fetch_row($q)) {
-                $r[1] = '<a href="'.$r[5].'">'.$r[1].'</a>';
+                $r[0] = '<a href="'.$r[4].'">'.$r[0].'</a>';
                 print '<tr><td>'.join('</td><td>',array_map('prettify',$r)).'</td></tr>';        }
         print '</table>';
 }

@@ -15,7 +15,7 @@ function page_footer() { ?>
 </div>
 <hr class="v"><h2 class="v">Navigation</h2>
 <ul id="nav"><li><a href="./">Home</a><li><a href="./?all=1">Pledges</a><li><a href="./?faq=1"><acronym title="Frequently Asked Questions">FAQ</acronym></a><li><a href="./?contact=1">Contact</a></ul>
-<hr class="v"><div id="footer">Lots of useful stuff. &copy; MySociety 2004.</div>
+<hr class="v"><div id="footer">Built by <a href="http://www.mysociety.org/">mySociety</a></div>
 </body></html>
 <? }
 

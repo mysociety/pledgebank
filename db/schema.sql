@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.18 2005-03-04 18:36:36 chris Exp $
+-- $Id: schema.sql,v 1.19 2005-03-07 17:23:38 chris Exp $
 --
 
 -- secret
@@ -125,33 +125,33 @@ create table incomingsms (
 create unique index incomingsms_foreignid_idx on incomingsms(foreignid);
 
 create table signers (
-  id serial not null primary key,
-  pledge_id int not null,
+    id serial not null primary key,
+    pledge_id int not null,
 
-  -- Who has signed the pledge.
-  -- Name may be null because we allow users to sign up by SMS without giving
-  -- their name.
-  name text,
-  email text,
-  mobile text,
+    -- Who has signed the pledge.
+    -- Name may be null because we allow users to sign up by SMS without giving
+    -- their name.
+    name text,
+    email text,
+    mobile text,
   
-  -- whether they want their name public
-  showname boolean not null default false,
+    -- whether they want their name public
+    showname boolean not null default false,
+      
+    -- when they signed
+    signtime timestamp not null,
   
-  -- when they signed
-  signtime timestamp not null,
-  
-  -- Confirmation stuff. For email signers we send them a token and only regard
-  -- them as signed up when they have supplied it back to us. SMS signers are
-  -- regarded as confirmed as soon as the reply SMS has been received by their
-  -- phone, but we send them a token allowing them to convert their
-  -- subscription to an email one later.
-  token text not null,
-  confirmed boolean not null default false,
-  outgoingsms_id integer references outgoingsms(id),
+    -- Confirmation stuff. For email signers we send them a token and only
+    -- regard them as signed up when they have supplied it back to us. SMS
+    -- signers are regarded as confirmed as soon as the reply SMS has been
+    -- received by their phone, but we send them a token allowing them to
+    -- convert their subscription to an email one later.
+    token text not null,
+    confirmed boolean not null default false,
+    outgoingsms_id integer references outgoingsms(id),
 
-  -- Name has been reported
-  reported boolean not null default false
+    -- Name has been reported
+    reported boolean not null default false
 );
 
 create unique index signers_outgoingsms_id_idx on signers(outgoingsms_id);

@@ -26,6 +26,10 @@ db_connect();
 
 $today = date('Y-m-d');
 
+if ($_GET['search']) {
+    $search_results = search();
+}
+
 page_header();
 
 if ($_GET['confirmp']) confirm_pledge();
@@ -40,6 +44,7 @@ elseif ($_POST['contact']) contact_form_submitted();
 elseif ($_GET['all']) list_all_pledges();
 elseif ($_GET['admin']=='pledgebank') admin();
 elseif ($_GET['pdf']) pdfs();
+elseif ($_GET['search']) print $search_results;
 else front_page();
 
 page_footer();
@@ -115,10 +120,10 @@ href="mailto:help@pledgebank.com">email us</a> if it just
 doesn't work, or you have any other suggests or comments. 
 </p>
 <p id="start"><a href="./?new=1"><strong>Start your own pledge &raquo;</strong></a></p>
-<form id="search" onsubmit="return false" action="" method="get">
+<form id="search" action="./" method="get">
 <h2>Search</h2>
 <p><label for="s">Enter a PledgeBank Reference, or a search string:</label>
-<input type="text" id="s" name="s" size="10" value=""></p>
+<input type="text" id="s" name="search" size="10" value=""></p>
 <p style="margin-top: 1em; text-align: right"><input type="submit" value="Go"></p>
 </form>
 <h2>Five Newest Pledges</h2>
@@ -461,4 +466,36 @@ function pdfs() {
 <?
 }
 
+function search() {
+    global $today;
+    $id = db_getOne('SELECT id FROM pledges WHERE ref = ?', array($_GET['search']));
+    if ($id) {
+        Header("Location: $_GET[search]"); # TODO: should be absolute?
+        exit;
+    }
+    $q = db_query('SELECT date,ref,title FROM pledges WHERE title LIKE \'%\' || ? || \'%\' ORDER BY date', array($_GET['search']));
+    if (!db_num_rows($q)) {
+        return '<p>Sorry, we could find nothing that matched "' . htmlspecialchars($_GET['search']) . '".</p>';
+    } else {
+        $closed = ''; $open = '';
+        while ($r = db_fetch_array($q)) {
+            $text = '<li><a href="' . $r['ref'] . '">' . $r['title'] . '</a></li>';
+            if ($r['date']>$today) {
+                $open .= $text;
+            } else {
+                $closed .= $text;
+            }
+        }
+        $out = '';
+        if ($open) {
+            $out = '<p>The following currently open pledges matched your search term "' . htmlspecialchars($_GET['search']) . '":</p>';
+            $out .= '<ul>' . $open . '</ul>';
+        }
+        if ($closed) {
+            $out .= '<p>The following are closed pledges that match your search term:</p>';
+            $out .= '<ul>' . $closed . '</ul>';
+        }
+        return $out;
+    }
+}
 ?>

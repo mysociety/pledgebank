@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.43 2005-03-29 08:58:00 francis Exp $
+-- $Id: schema.sql,v 1.44 2005-03-29 13:22:22 chris Exp $
 --
 
 -- secret
@@ -131,6 +131,8 @@ create table outgoingsms (
     recipient text not null,
     -- Message, as UTF-8.
     message text not null,
+    -- Whether this is a premium reverse-billed message, or a "bulk" one.
+    ispremium boolean not null default false,
     -- when the message was submitted.
     whensubmitted integer not null,
     
@@ -168,14 +170,18 @@ create table outgoingsms (
             or status = 'buffered'
             or status = 'rejected'
             or status = 'none'
-        )
+        ),
+    
+    -- When we last tried to discover the status of this message.
+    numstatuschecks integer not null default 0,
+    laststatuscheck integer
     
     -- XXX add extra fields for billing
 );
 
 create unique index outgoingsms_foreignid_idx on outgoingsms(foreignid);
--- This is for an extra, paranoid check on delivery report messages.
-create index outgoingsms_recipient_idx on outgoingsms(recipient);
+create index outgoingsms_lastsendstatus_idx on outgoingsms(lastsendstatus);
+create index outgoingsms_status_idx on outgoingsms(status);
 
 create table incomingsms (
     id serial not null primary key,
@@ -186,7 +192,9 @@ create table incomingsms (
     -- Text of the message, transcoded to UTF-8.
     message text not null,
     -- ID assigned by the deliverer.
-    foreignid text not null,
+    foreignid integer not null,
+    -- Network code.
+    network integer not null,
     -- When we received the message.
     whenreceived integer not null,
     -- When the message says it was sent.
@@ -194,6 +202,46 @@ create table incomingsms (
 );
 
 create unique index incomingsms_foreignid_idx on incomingsms(foreignid);
+
+-- This table records gaps in the sequence of foreign IDs for incoming SMS
+-- messages. Foreign IDs are allocated sequentially by the sender, but they do
+-- not try redelivery of messages which could not be delivered owing to a
+-- network outage or whatever. So occasionally gaps will appear in the
+-- sequence; we request copies of the "gap" messages every so often to ensure
+-- that we're not dropping any. Whenever we receive an incoming SMS with ID
+-- N, we delete any gap N and insert any integers between the maximum gap
+-- present in the table and N - 1 inclusive, and N + 1.
+create table incomingsms_foreignid_gap (
+    gap integer not null primary key
+);
+
+create function incomingsms_foreignid_gap_check()
+    returns trigger as '
+    declare
+        maxgap integer;
+    begin
+        lock table incomingsms_foreignid_gap in share mode;
+
+        maxgap = (select max(gap) from incomingsms_foreignid_gap);
+        if maxgap is null then
+            insert into incomingsms_foreignid_gap (gap)
+                values (new.foreignid + 1);
+        elsif new.foreignid >= maxgap then
+            insert into incomingsms_foreignid_gap (gap)
+                values (new.foreignid + 1);
+            for i in maxgap + 1 .. new.foreignid - 1 loop
+                insert into incomingsms_foreignid_gap (gap)
+                    values (i);
+            end loop;
+        end if;
+
+        delete from incomingsms_foreignid_gap where gap = new.foreignid;
+        return null;
+    end;
+' language 'plpgsql';
+
+create trigger incomingsms_insert_trigger after insert on incomingsms
+    for each row execute procedure incomingsms_foreignid_gap_check();
 
 create table signers (
     id serial not null primary key,

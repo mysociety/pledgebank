@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.10 2005-03-16 17:26:21 chris Exp $
+# $Id: SMS.pm,v 1.11 2005-03-29 13:22:22 chris Exp $
 #
 
 package PB::SMS;
@@ -31,6 +31,41 @@ sub is_valid_number ($) {
         return 1;
     } else {
         return 0;
+    }
+}
+
+=item decode_ia5 DATA
+
+Convert DATA, which is in the bastardised variant of IA5 spoken by mobile
+'phones, into UTF8.
+
+=cut
+sub decode_ia5 ($) {
+    # IA5 to UNICODE for first 32 characters.
+    my @repl = (
+            #  0
+            0x40, 0xa3, 0x24, 0xa5, 0xe8, 0xe9, 0xf9, 0xec,
+            #  8
+            0xf2, 0xc7, 0x0a, 0xd8, 0xf8, 0x0d, 0xc5, 0xe5,
+            # 10
+            0x394, 0x5f, 0x3a6, 0x393, 0x39b, 0x3a9, 0x3a0, 0x3a8,
+            # 18
+            0x3a3, 0x398, 0x39e, 0x1b, 0xe6, 0xdf, 0xc9
+        );
+    $repl[0x40] = 0xa1;
+    @repl[0x5b .. 0x60] = (0xc4, 0xd6, 0xd1, 0xdc, 0xa7, 0xbf);
+    @repl[0x7b .. 0x7f] = (0xe4, 0xf6, 0xf1, 0xfc, 0xe0);
+
+    my @octets = split(//, $_[0]);
+    my $ret = '';
+    foreach (@octets) {
+        throw PB::Error("Character in IA5 input had value $_; should be <128")
+            if ($_ > 127);
+        if (exists($repl[$_])) {
+            $ret .= sprintf('%c', $repl[$_]);
+        } else {
+            $ret .= sprintf('%c', $_);
+        }
     }
 }
 

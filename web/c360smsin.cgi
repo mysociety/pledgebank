@@ -1,0 +1,109 @@
+#!/usr/bin/perl -w -I../perllib -I../../perllib
+#
+# c360smsin.cgi:
+# Process received SMS messages.
+#
+# The protocol used here is that agreed with Greg Jackson at C360. Individual
+# SMSs result in POST requests to this form with parameters as follows:
+# 
+#   intSequence                 C360 message sequence number
+#   intTransactionID            ID assigned by their partner
+#   intTime                     YYYYMMDDHHMMSS timestamp for message
+#   intDestination              number to which message was sent
+#   intOriginatingNumber        sending phone
+#   intDeliverer                network
+#   strData                     message data (IA5)
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.1 2005-03-29 13:22:22 chris Exp $';
+
+use strict;
+
+require 5.8.0;
+
+BEGIN {
+    use mySociety::Config;
+    mySociety::Config::set_file('../conf/general');
+}
+
+use CGI::Fast;
+use DateTime::Format::Strptime;
+use Encode;
+use Error qw(:try);
+use Net::Netmask;
+use utf8;
+
+use mySociety::DBHandle qw(dbh);
+use PB;
+use PB::SMS;
+
+my $D = new DateTime::Format::Strptime(
+                pattern => '%Y%m%d%H%M%S'
+                # XXX locale and timezone?
+            );
+
+while (my $q = new CGI::Fast()) {
+    binmode(STDOUT, ':utf8');
+    try {
+        throw PB::Error("No REQUEST_METHOD; this program must be run in a CGI/FastCGI environment")
+            if (!exists($ENV{REQUEST_METHOD}));
+        my $ip = $ENV{REMOTE_ADDR};
+        throw PB::Error('REMOTE_ADDR not defined; this program must be run in a CGI/FastCGI environment')
+            unless (defined($ip));
+
+        foreach (qw(intSequence intTransactionID intTime intDestination intOriginatingNumber intDeliverer strData)) {
+            throw PB::Error("Client did not supply required parameter '$_'")
+                unless (defined($q->param($_)));
+
+            throw PB::Error("Bad value '" . $q->param($_) . "' for required parameter '$_'")
+                if ($_ =~ /^int/ && $q->param($_) =~ /[^\d]/);
+        }
+
+        # Start by checking whether we've seen this message before.
+        my $resp = 'bad';
+        my $smsid = $q->param('intSequence');
+        
+        if (!defined(dbh()->selectrow_array('select id from incomingsms where foreignid = ? for update', {}, $smsid))) {
+            my $message;
+
+            # Parse the date.
+            my $smsdate = $q->param('smsdate');
+            my $whensent;
+            if (!defined($whensent = $D->parse_datetime($smsdate))) {
+                throw PB::Error("Bad value '$smsdate' for smsdate parameter in request");
+            }
+            $whensent = $whensent->epoch();
+
+            my $sender = $q->param('intOriginatingNumber');
+            $sender =~ s#^([^+])#+$1#;
+            my $recipient = $q->param('intDestination');
+#            $recipient =~ s#^([^+])#+$1#;      # destination is a short code
+
+            PB::SMS::receive_sms($sender, $recipient, PB::SMS::decode_ia5($message), $smsid, $whensent);
+
+            $resp = "OK\n";
+        } else {
+            $resp = "OK\n";
+        }
+
+        dbh()->commit();
+
+        print $q->header(
+                    -type => 'text/plain; charset=utf-8',
+                    -content_length => length($resp)
+                ), $resp;
+    } catch PB::Error with {
+        my $E = shift;
+        my $t = $E->text();
+        print $q->header(
+                    -status => "500 Internal Error: $t",
+                    -type => 'text/plain; charset=utf-8',
+                    -content_length => length($t) + 1
+                ), $t, "\n";
+        warn "Error: $t\n";
+    };  # any other kind of error will kill the script and return HTTP 500 
+        # to the client, which is what we want.
+}

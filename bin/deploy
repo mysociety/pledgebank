@@ -1,0 +1,66 @@
+#!/bin/sh
+#
+# deploy:
+# Update installation of PledgeBank from CVS.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: francis@mysociety.org; WWW: http://www.mysociety.org/
+#
+# $Id: deploy,v 1.1 2005-01-07 18:47:34 francis Exp $
+#
+
+set -e
+
+# Check who and where we are, and include useful functions
+PB_BIN=`pwd`
+MYSOCIETY_BIN=$PB_BIN/../../bin
+EXPECTED_HOST=very.unfortu.net
+SCRIPT_COMMAND=pb/bin/deploy
+. ../../shlib/deployfns
+
+# User to load test schema
+PSQL_SCHEMATEST_USER=pgsql
+
+# Which virtual server to update
+PB_VHOST=$1
+[ x$PB_VHOST = x ] && die "specify target vhost directory as single argument"
+[ ! -d $PB_VHOST ] && die "specify target vhost directory as single argument"
+
+# Pledge Bank
+PB_NAME="PledgeBank.com"
+PB_UNAME=pb
+PB_DEPLOYSPACE=$PB_VHOST/deployspace
+hostname=$( echo $PB_VHOST | sed 's@/$@@' | sed 's@^.*/@@' )
+PB_DB_UNIX_USER=pb
+
+# Main body of script
+fmt << END
+This will update $hostname from CVS and gracefully restart 
+Apache.  It will warn you first if any database schemas need
+upgrading, or config files fixing.  These get fixed in the deploy
+space, i.e. the place where the "cvs export" happens to, before
+copying over to the live server.
+
+Press RETURN to continue.
+END
+read DUMMY
+
+warn "Exporting from CVS..."
+cvs_export $PB_UNAME $PB_VHOST $PB_DEPLOYSPACE
+
+warn "Checking config files..."
+check_config_files $PB_DEPLOYSPACE/mysociety/pb/conf
+
+warn "Checking database schemas..."
+read_conf $PB_DEPLOYSPACE/mysociety/pb/conf/general
+check_pgsql_schema $PB_DB_UNIX_USER $PB_DEPLOYSPACE/mysociety/pb/db/schema.sql $OPTION_PB_DB_NAME $OPTION_PB_DB_USER $OPTION_PB_DB_PASS 
+
+warn "Stopping services..."
+down_notice $PB_VHOST $PB_NAME
+
+warn "Rsyncing new data files..."
+rsync_across $PB_DEPLOYSPACE $PB_VHOST
+
+warn "Starting services..."
+apachectl graceful
+up_notice $PB_VHOST

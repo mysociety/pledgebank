@@ -5,54 +5,56 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.27 2005-02-23 11:05:32 francis Exp $
+// $Id: index.php,v 1.28 2005-02-23 15:45:00 francis Exp $
 
-require_once "../conf/general";
-include_once '../templates/page.php';
-include_once 'contact.php';
-include_once '../phplib/db.php';
-include_once '../phplib/fns.php';
-include_once '../../phplib/utility.php';
+require_once "../phplib/pb.php";
+require_once '../phplib/db.php';
+require_once '../phplib/fns.php';
+
+require_once 'contact.php';
+
+#$foo = array("foo");
+#$x = $foo['hello'];
 
 db_connect();
 
 $today = date('Y-m-d');
 
-if ($_GET['search']) {
+if (get_http_var('search')) {
     $search_results = search();
 }
 
-page_header();
-
-if (ctype_digit($_GET['report'])) report_form();
-elseif (ctype_digit($_POST['report'])) send_report();
-elseif ($_GET['confirmp']) confirm_pledge();
-elseif ($_GET['confirms']) confirm_signatory();
-elseif ($_POST['add_signatory']) add_signatory();
-elseif ($_GET['pledge']) view_pledge();
-elseif ($_GET['new']) pledge_form();
-elseif ($_POST['new']) pledge_form_submitted();
-elseif ($_GET['faq']) view_faq();
-elseif ($_GET['contact']) contact_form();
-elseif ($_POST['contact']) contact_form_submitted();
-elseif ($_GET['all']) list_all_pledges();
-elseif ($_GET['admin']=='pledgebank') admin();
-elseif ($_GET['pdf']) pdfs();
-elseif ($_GET['search']) print $search_results;
+page_header("NOTITLE");
+if (get_http_var('report') && ctype_digit(get_http_var('report'))) report_form();
+elseif (get_http_var('report') && ctype_digit(get_http_var('report'))) send_report();
+elseif (get_http_var('confirmp')) confirm_pledge();
+elseif (get_http_var('confirms')) confirm_signatory();
+elseif (get_http_var('add_signatory')) add_signatory();
+elseif (get_http_var('pledge')) view_pledge();
+elseif (get_http_var('new')) pledge_form();
+elseif (get_http_var('new')) pledge_form_submitted();
+elseif (get_http_var('faq')) view_faq();
+elseif (get_http_var('contact')) contact_form();
+elseif (get_http_var('contact')) contact_form_submitted();
+elseif (get_http_var('all')) list_all_pledges();
+elseif (get_http_var('admin')=='pledgebank') admin();
+elseif (get_http_var('pdf')) pdfs();
+elseif (get_http_var('search')) print $search_results;
 else front_page();
+
 
 page_footer();
 
 # --------------------------------------------------------------------
 
 function report_form() {
-    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed=1 AND signers.id=?', array($_GET['report']));
+    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed=1 AND signers.id=?', array(get_http_var('report')));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank id!</p>';
 	return false;
     } else {
         $r = db_fetch_array($q);
-        print '<form action="./" method="post"><input type="hidden" name="report" value="'.$_GET['report'].'">';
+        print '<form action="./" method="post"><input type="hidden" name="report" value="'.get_http_var('report').'">';
         print '<h2>Signature reporting</h2>';
         print '<p>You are reporting the signature "'.$r['signname'].'" on the pledge "'.$r['title'].'"</p>';
         print '<p>Please give a (short) reason for reporting this signature:</p>';
@@ -63,15 +65,15 @@ function report_form() {
 }
 
 function send_report() {
-    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed=1 AND signers.id=?', array($_POST['report']));
+    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed=1 AND signers.id=?', array(get_http_var('report')));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank id!</p>';
 	return false;
     } else {
         $r = db_fetch_array($q);
-        $reason = $_POST['reason'];
+        $reason = get_http_var('reason');
         pb_send_email(OPTION_CONTACT_EMAIL, "Signature reporting", "Reporting of '$r[signname]' in pledge '$r[title]'\n\nReason given: $reason\n\n");
-        db_query('UPDATE signers SET showname=0,reported=1 WHERE id=?', array($_POST['report']));
+        db_query('UPDATE signers SET showname=0,reported=1 WHERE id=?', array(get_http_var('report')));
         print '<p>Thank you for reporting that signature; it will be looked at asap.</p>';
     }
 }
@@ -87,39 +89,39 @@ function pledge_form($errors = array()) {
 <!-- <p>To create a new pledge, please fill in the form below.</p> -->
 <form id="pledge" method="post" action="./"><input type="hidden" name="new" value="1">
 <h2>New Pledge</h2>
-<p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="action" id="action" value="<?=htmlspecialchars($_POST['action']) ?>" size="82"></p>
-<p>if <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" name="people" value="<?=htmlspecialchars($_POST['people']) ?>">
+<p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="action" id="action" value="<?=htmlspecialchars(get_http_var('action')) ?>" size="82"></p>
+<p>if <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" name="people" value="<?=htmlspecialchars(get_http_var('people')) ?>">
 other <input type="text" id="type" name="type" size="30" value="people"> <input type="text" id="signup" name="signup" size="10" value="sign up"> before
-<input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<?=htmlspecialchars($_POST['date']) ?>">.</p>
+<input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<?=htmlspecialchars(get_http_var('date')) ?>">.</p>
 
-<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input type="text" size="20" name="ref" value="<?=htmlspecialchars($_POST['ref']) ?>"> <small>(letters, numbers, -)</small></p>
+<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input type="text" size="20" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>"> <small>(letters, numbers, -)</small></p>
 <!-- <p>Do you want this pledge to be visible around the site? <input type="checkbox" checked name="open" value="1"> Yes</p> -->
-<p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars($_POST['name']) ?>">
-Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($_POST['email']) ?>">
+<p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars(get_http_var('name')) ?>">
+Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 &nbsp;
 <input type="submit" value="Submit"></p>
 <hr style="color: #522994; background-color: #522994; height: 1px; border: none;" >
 <h3>Optional Information</h3>
 <p id="moreinfo" style="text-align: left">More details about your pledge:
-<br><textarea name="moreinfo" rows="10" cols="60"><?=htmlspecialchars($_POST['moreinfo']) ?></textarea>
+<br><textarea name="moreinfo" rows="10" cols="60"><?=htmlspecialchars(get_http_var('moreinfo')) ?></textarea>
 <input type="submit" value="Submit">
 </form>
 <? }
 
 function pledge_form_submitted() {
 	global $today;
-	$action = $_POST['action']; if ($action=='<Enter your pledge>') $action = '';
-	$people = $_POST['people'];
-	$type = $_POST['type']; if (!$type) $type = 'people';
+	$action = get_http_var('action'); if ($action=='<Enter your pledge>') $action = '';
+	$people = get_http_var('people');
+	$type = get_http_var('type'); if (!$type) $type = 'people';
 	$date = parse_date($_REQUEST['date']);
-	$name = $_POST['name'];
-	$email = $_POST['email'];
-	$ref = $_POST['ref'];
-        $detail = $_POST['detail'];
-        $open = $_POST['open']; if ($open) $open=1; else $open = 0;
+	$name = get_http_var('name');
+	$email = get_http_var('email');
+	$ref = get_http_var('ref');
+        $detail = get_http_var('detail');
+        $open = get_http_var('open'); if ($open) $open=1; else $open = 0;
         $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($ref));
         if ($dupe) $errors[] = 'That reference is already taken!';
-        $signup = $_POST['signup']; if (!$signup) $signup = 'sign up';
+        $signup = get_http_var('signup'); if (!$signup) $signup = 'sign up';
 	if (!$action) $errors[] = 'Please enter a pledge';
 	if (!$people) $errors[] = 'Please enter a target';
 	elseif (!ctype_digit($people) || $people < 1) $errors[] = 'The target must be a positive number';
@@ -211,9 +213,9 @@ function view_faq() {
 function add_signatory() {
     global $today;
 
-	$email = $_POST['email'];
-	$showname = $_POST['showname'] ? 1 : 0;
-	$ref = $_POST['pledge_id'];
+	$email = get_http_var('email');
+	$showname = get_http_var('showname') ? 1 : 0;
+	$ref = get_http_var('pledge_id');
 
 	$q = db_query('SELECT id,title,email,confirmed,date FROM pledges WHERE ref=?', array($ref));
 	if (!$q) {
@@ -249,7 +251,7 @@ function add_signatory() {
 	$add = db_query('INSERT INTO signers (pledge_id, signname,
         signemail, showname, signtime, token, confirmed) VALUES
         (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, 0)', 
-        array($id, $_POST['name'], $email, $showname, $token));
+        array($id, get_http_var('name'), $email, $showname, $token));
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
     $success = pb_send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
     if ($success) { ?>
@@ -263,7 +265,7 @@ function add_signatory() {
 
 # Pledgee has clicked on link in their email
 function confirm_signatory() {
-	$token = $_GET['confirms'];
+	$token = get_http_var('confirms');
 	$q = db_query('SELECT pledge_id,confirmed FROM signers WHERE token = ?', array($token));
 	$row = db_fetch_array($q);
 	if (!$row) {
@@ -322,7 +324,7 @@ function send_success_email($pledge_id) {
 function view_pledge() {
     global $today;
 
-    $q = db_query('SELECT * FROM pledges WHERE ref=?', array($_GET['pledge']));
+    $q = db_query('SELECT * FROM pledges WHERE ref=?', array(get_http_var('pledge')));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank reference!</p>';
 	return false;
@@ -356,7 +358,7 @@ function view_pledge() {
 	}
 ?>
 <p>Here is the pledge:</p>
-<form id="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($_GET['pledge']) ?>">
+<form id="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 <input type="hidden" name="add_signatory" value="1">
 <p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($action) ?></strong> if <strong><?=htmlspecialchars($people) ?></strong> <?=htmlspecialchars($type) ?> <?=($signup=='sign up'?'will do the same':$signup) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($date) ?></strong></p>
@@ -366,8 +368,8 @@ function view_pledge() {
 <? if (!$finished) { ?>
 <div style="text-align: left; margin-left: 50%;">
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
-<p style="text-align: left">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars($_POST['name']) ?>">
-<br>Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($_POST['email']) ?>">
+<p style="text-align: left">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars(get_http_var('name')) ?>">
+<br>Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
 <br>Show my name on this pledge: <input type="checkbox" name="showname" value="1" checked>
 &nbsp;
@@ -382,7 +384,7 @@ if ($detail) {
 ?>
 </form>
 
-<p style="text-align: center"><a href="./?pdf=<?=$_GET['pledge'] ?>" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="" onclick="return false">Email this Pledge</a><? } ?></p>
+<p style="text-align: center"><a href="./?pdf=<?=get_http_var('pledge') ?>" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="" onclick="return false">Email this Pledge</a><? } ?></p>
 <!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
 
 <h2>Current signatories</h2><?
@@ -434,7 +436,7 @@ function create_new_pledge($action, $people, $type, $date, $name, $email, $ref, 
 
 # Pledger has clicked on link in their email
 function confirm_pledge() {
-	$token = $_GET['confirmp'];
+	$token = get_http_var('confirmp');
 	$q = db_query('SELECT confirmed FROM pledges WHERE token = ?', array($token));
 	$row = db_fetch_array($q);
 	if (!$row) {
@@ -469,7 +471,7 @@ function list_all_pledges() {
 }
 
 function pdfs() {
-        if (!$_GET['pdf']) {
+        if (!get_http_var('pdf')) {
 } ?>
 <h2>Customised Flyers</h2>
 <p>Below you can generate PDFs containing your pledge data, to print out, display, hand out, or whatever.</p>
@@ -497,14 +499,14 @@ function pdfs() {
 
 function search() {
     global $today;
-    $id = db_getOne('SELECT id FROM pledges WHERE ref = ?', array($_GET['search']));
+    $id = db_getOne('SELECT id FROM pledges WHERE ref = ?', array(get_http_var('search')));
     if ($id) {
-        Header("Location: $_GET[search]"); # TODO: should be absolute?
+        Header("Location: get_http_var(search)"); # TODO: should be absolute?
         exit;
     }
-    $q = db_query('SELECT date,ref,title FROM pledges WHERE title ILIKE \'%\' || ? || \'%\' ORDER BY date', array($_GET['search']));
+    $q = db_query('SELECT date,ref,title FROM pledges WHERE title ILIKE \'%\' || ? || \'%\' ORDER BY date', array(get_http_var('search')));
     if (!db_num_rows($q)) {
-        return '<p>Sorry, we could find nothing that matched "' . htmlspecialchars($_GET['search']) . '".</p>';
+        return '<p>Sorry, we could find nothing that matched "' . htmlspecialchars(get_http_var('search')) . '".</p>';
     } else {
         $closed = ''; $open = '';
         while ($r = db_fetch_array($q)) {
@@ -517,7 +519,7 @@ function search() {
         }
         $out = '';
         if ($open) {
-            $out = '<p>The following currently open pledges matched your search term "' . htmlspecialchars($_GET['search']) . '":</p>';
+            $out = '<p>The following currently open pledges matched your search term "' . htmlspecialchars(get_http_var('search')) . '":</p>';
             $out .= '<ul>' . $open . '</ul>';
         }
         if ($closed) {

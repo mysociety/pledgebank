@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.76 2005-03-11 21:19:28 chris Exp $
+// $Id: index.php,v 1.77 2005-03-12 00:57:49 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -202,21 +202,29 @@ function pledge_form_two($data, $errors = array()) {
     else
         $comparison = $data['comparison'];
 ?>
+
+<p style="text-align: center">Your pledge looks like this so far:</p>
+<div class="tips" style="text-align: center">
+<p style="margin-top: 0">&quot;<? $row = $data; unset($row['date']); print pledge_sentence(false, true, true, $row) ?>&quot;</p>
+<p>Deadline: <strong><?=prettify($isodate) ?></strong></p>
+<p style="text-align: right">&mdash; <?=htmlspecialchars($data['name']) ?></p>
+</div>
+
 <form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="2">
 <p style="float: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
 
-<h2>New Pledge &#8211; Step 2 (optional)</h2>
+<h2>New Pledge &#8211; Step 2 (optional details)</h2>
 
 <p id="moreinfo">More details about your pledge:
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
-<p>Would you like the pledge to stop accepting new subscribers when it
+<p>Should the pledge stop accepting new subscribers when it
 is fulfilled?
 <input type="radio" name="comparison" value="exactly"<?=($comparison == 'exactly') ? ' checked' : '' ?>> Yes
 <input type="radio" name="comparison" value="atleast"<?=($comparison == 'atleast') ? ' checked' : '' ?>> No
 </p>
 
-<p>Where does your pledge apply?
+<p>Which country does your pledge apply to?
 <select name="country"><option>Global<option>UK</select>
 </p>
 
@@ -242,13 +250,6 @@ If yes, enter your postcode so that local people can find your pledge:
 </p>
 
 </form>
-
-<p>Your pledge looks like this so far:</p>
-<div class="pledge" style="text-align: center">
-<p style="margin-top: 0">&quot;<? $row = $data; unset($row['date']); print pledge_sentence(false, true, true, $row) ?>&quot;</p>
-<p>Deadline: <strong><?=prettify($isodate) ?></strong></p>
-<p style="text-align: right">&mdash; <?=htmlspecialchars($data['name']) ?></p>
-</div>
 
 <?
 }

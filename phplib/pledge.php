@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.16 2005-03-11 20:14:31 chris Exp $
+ * $Id: pledge.php,v 1.17 2005-03-12 00:57:49 francis Exp $
  * 
  */
 
@@ -143,12 +143,12 @@ function pledge_sentence($pledge_id = false, $firstperson = false, $html = false
     $s = ($firstperson ? "I" : $r['name'])
             . " will <strong>${r['title']}</strong> if "
             . '<strong>';
-    if (isset($r['comparison']))
-        $s .= ($r['comparison'] == 'exactly' ? 'exactly' : 'at least');
+    //if (isset($r['comparison']))
+    //    $s .= ($r['comparison'] == 'exactly' ? 'exactly' : 'at least');
     $s .= ' ' . prettify($r['target'])
             . '</strong>'
-            . " ${r['type']} "
-            . ($r['signup'] == 'sign up' ? 'will too' : $r['signup'])
+            . " ${r['type']} will "
+            . ($r['signup'] == 'do the same' ? 'too' : $r['signup'])
             . ".";
     if (!$html)
         $s = preg_replace('#</?strong>#', '', $s);

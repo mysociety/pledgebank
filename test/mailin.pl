@@ -17,17 +17,9 @@ use File::Slurp;
 
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
-use mySociety::DBHandle qw(dbh);
+use mySociety::WebTestHarness;
 
-our $dbhost = mySociety::Config::get('PB_DB_HOST', undef);
-our $dbport = mySociety::Config::get('PB_DB_PORT', undef);
-our $dbname  = mySociety::Config::get('PB_DB_NAME');
-our $dbuser = mySociety::Config::get('PB_DB_USER');
-our $dbpass = mySociety::Config::get('PB_DB_PASS');
-
-mySociety::DBHandle::configure(Name => $dbname, User => $dbuser, Password => $dbpass, 
-        Host => $dbhost, Port => $dbport);
+our $wth = new mySociety::WebTestHarness('PB_');
 my $slurped = read_file(\*STDIN);
-dbh()->do("insert into testharness_mail (content) values (?)", {}, $slurped);
-dbh()->commit();
+$wth->email_incoming($slurped);
 

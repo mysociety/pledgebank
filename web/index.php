@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.34 2005-02-28 19:26:29 francis Exp $
+// $Id: index.php,v 1.35 2005-03-01 17:27:28 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -348,8 +348,9 @@ function confirm_signatory() {
 
 function send_success_email($pledge_id) {
     $q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed=1', array($pledge_id));
+    $r = db_fetch_array($q);
 	$globalsuccess = 1;
-        $body = 'Congratulations! You said "I will '.$r['title'].' if .'.comparison_nice($r['comparison']).' '.$r['target'].' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\nhttp://staging.pledgebank.com/".$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
+    $body = 'Congratulations! You said "I will '.$r['title'].' if .'.comparison_nice($r['comparison']).' '.$r['target'].' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\nhttp://staging.pledgebank.com/".$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
 	while ($r = db_fetch_array($q)) {
 		if (!$action) $action = $r['title'];
 		if (!$email) {

@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.1 2005-03-03 12:58:32 francis Exp $
+# $Id: poster.cgi,v 1.2 2005-03-03 16:35:09 francis Exp $
 #
 
 import sys
@@ -24,7 +24,7 @@ form = cgi.FieldStorage()
 title = form.getfirst("title", "")
 date = form.getfirst("date", "")
 ref = form.getfirst("ref", "")
-type = form.getfirst("type", "1")
+type = form.getfirst("type", "cards")
 size = form.getfirst("size", "A4")
 
 title = "I will do something if other people do too"
@@ -33,7 +33,8 @@ date = "1st February 2005"
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 
-outfile = "/home/francis/tmp/pdfs/pledge%d.pdf" % int(time())
+outdir = mysociety.config.get("PB_PDF_CACHE")
+outfile = "pledge%d.pdf" % int(time())
 
 def draw_pledge(x, y):
     text = "\"%s\"" % title
@@ -121,17 +122,18 @@ def tearoff():
 #t.textOut("and some more")
 #c.drawText(t)
 
-c = canvas.Canvas(outfile)
-if type=="1":
+c = canvas.Canvas(outdir + '/' + outfile)
+if type == "cards":
     cards()
-elif type=="2":
+elif type == "tearoff":
     tearoff()
 else:
-    raise Exception, "Problem creating PDF"
+    raise Exception, "Unknown type '%s'" % type
 c.save()
-#print "Location: http://pledgebank.owl/~matthew/%s" % outfile
-#print
-#print "<h1>301 Found</h1>"
 
-print "Content-Type: text/html\r\n\r\n"
-print mysociety.config.get("BASE_URL")
+print "Location: %s/%s" % (mysociety.config.get('PB_PDF_URL'), outfile)
+print
+print "<h1>301 Found</h1>"
+
+#print "Content-Type: text/html\r\n\r\n"
+#print mysociety.config.get("BASE_URL")

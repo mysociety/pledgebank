@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.39 2005-03-02 15:29:47 francis Exp $
+// $Id: index.php,v 1.40 2005-03-03 16:35:09 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -525,37 +525,32 @@ function confirm_pledge() {
 }
 
 function list_all_pledges() {
-        print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
-        $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed AND password=\'\'');
-        print '<table><tr><th>Title</th><th>Target</th><th>Deadline</th><th>Creator</th><th>Short name</th></tr>';
-        while ($r = db_fetch_row($q)) {
-                $r[0] = '<a href="'.$r[4].'">'.$r[0].'</a>';
-                print '<tr><td>'.join('</td><td>',array_map('prettify',$r)).'</td></tr>';        }
-        print '</table>';
+    print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
+    $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed AND password=\'\'');
+    print '<table><tr><th>Title</th><th>Target</th><th>Deadline</th><th>Creator</th><th>Short name</th></tr>';
+    while ($r = db_fetch_row($q)) {
+            $r[0] = '<a href="'.$r[4].'">'.$r[0].'</a>';
+            print '<tr><td>'.join('</td><td>',array_map('prettify',$r)).'</td></tr>';        
+    }
+    print '</table>';
 }
 
 function pdfs() {
-        if (!get_http_var('pdf')) {
-} ?>
+    $ref = get_http_var('pdf');
+	$q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
+	$row = db_fetch_array($q);
+    $pdf_cards_url = new_url("/poster.cgi", false, 
+        'title', $row['title'], 'date', $row['date'], 'ref', $ref,
+        'type', 'cards', 'size', 'A4');
+    $pdf_tearoff_url = new_url("/poster.cgi", false, 
+        'title', $row['title'], 'date', $row['date'], 'ref', $ref,
+        'type', 'tearoff', 'size', 'A4');
+    ?>
 <h2>Customised Flyers</h2>
 <p>Below you can generate PDFs containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
-<li>Tear-off format (like accommodation rental ones)
-<ul><li>A4</ul>
-<li>Sheet of little pledge cards:
-<ul>
-<li>A3
-<li>A4
-<li>A5
-</ul>
-</li>
-<li>Poster format
-<ul>
-<li>Design 1
-<ul><li>A3<li>A4</ul>
-<li>Design 2
-<ul><li>A3<li>A4</ul>
-</ul>
+<li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
+<li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>
 </ul>
 
 <?

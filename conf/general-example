@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.6 2005-03-02 20:13:50 chris Exp $
+ * $Id: general-example,v 1.7 2005-03-03 16:35:09 francis Exp $
  * 
  */
 
@@ -63,6 +63,10 @@ define('OPTION_PB_SMS_NUMBER', '00000');
 define('OPTION_PB_SMS_MXTELECOM_USER', 'username');
 define('OPTION_PB_SMS_MXTELECOM_PASS', 'password');
 */
+
+// Where PDF files are put
+define('OPTION_PB_PDF_CACHE', "/home/francis/tmp/pdfs");
+define('OPTION_PB_PDF_URL', OPTION_BASE_URL . "/pdfs");
 
 // Log file (used in test harness, and later in admin scripts)
 define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');

@@ -1,12 +1,12 @@
 <?php
 /*
  * confirm.php:
- * Confirm a user's subscription to a pledge.
+ * Confirm a user's subscription to a pledge, or creation of a pledge.
  * 
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.3 2005-03-09 18:10:21 francis Exp $
+ * $Id: confirm.php,v 1.4 2005-03-10 18:53:00 chris Exp $
  * 
  */
 
@@ -18,97 +18,75 @@ require_once "../phplib/pledge.php";
 require_once "../../phplib/importparams.php";
 
 $err = importparams(
-            array('email',      '/^[^@]+@.+/',      "", ''),
-            array('pledge',     '/^[1-9][0-9]*$/',  "", ''),
             array('token',      '/.+/',             "")
         );
 
 if (!is_null($err))
     err("Sorry -- something seems to have gone wrong");
 
-# Pledge confirmation
-if (!$q_email && !$q_pledge) {
-print $q_token;
-    $q = db_query('SELECT ref, title, date, confirmed FROM pledges WHERE token = ? for update', array($q_token));
-    print "moose";
-    print db_num_rows($q);
-print "chese";
-    $r = db_fetch_array($q);
-    if (!$r) {
-        err('Confirmation token not recognised!');
-    }
-    page_header($r['title'] . ' - Sign Up');
-
-    if ($r['confirmed'] == 'f') {
-        db_query('UPDATE pledges SET confirmed=true, creationtime=CURRENT_TIMESTAMP WHERE token = ?', array($q_token));
-    }
+/* Pledges are confirmed by saving a token in the database and sending it to
+ * the user. So we can just try confirming the pledge here. */
+$pledge_id = pledge_confirm($q_token);
+if (!pledge_is_error($pledge_id)) {
+    /* Success. */
+    page_header(
+            db_getOne('select title from pledges where id = ?', $pledge_id)
+            . ' - Confirm'
+        );
     db_commit();
 ?>
-<p>Thank you for confirming that pledge. It is now live, and people can sign up to it. OTHER STUFF.</p>
-<?  advertise_flyers($r);
+<p>Thank you for confirming your pledge. It is now live, and people can sign up
+to it. OTHER STUFF.</p>
+<?  advertise_flyers($pledge_id);
     page_footer();
     return true;
-}
+} else {
+    /* OK, that wasn't a pledge confirmation token. So we must be signing a
+     * pledge. */
+    $err = importparams(
+                array('email',      '/^[^@]+@.+/',      "", ''),
+                array('pledge',     '/^[1-9][0-9]*$/',  "", '')
+            );
 
-print "$q_email##$q_pledge##$q_token**". pledge_email_token($q_email, $q_pledge, $q_token);
-if (pledge_email_token($q_email, $q_pledge, $q_token) != $q_token) 
-    err("Sorry -- something seems to have gone wrong");
+    if (pledge_email_token($q_email, $q_pledge, $q_token) != $q_token) 
+        err("Sorry -- something seems to have gone wrong");
 
-$err = importparams(
-            array('name',       '/[a-z]/i',         "Please give your name",
+    $err = importparams(
+                array('name',       '/[a-z]/i',     "Please give your name",
                                                             ''),
-            array('showname',   '/^[01]$/',         "",     '0'),
-            array('f',          '/^1$/',            "",     '0')
+                array('showname',   '/^[01]$/',     "",     '0'),
+                array('f',          '/^1$/',        "",     '0')
+            );
+            
+    page_header(
+            db_getOne('select title from pledges where id = ?', $pledge_id)
+            . ' - Sign Up'
         );
 
-/* oops CODE
- * Print a message explaining CODE. */
-function oops($r) {
-    global $q_f;
-    print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
-    if ($r == PLEDGE_FULL) {
-        /* Print a fuller explanation in this (common) case */
-        $what = $q_f ? 'filling in the form' : 'waiting for our email to arive'; /* XXX l18n */
-        print <<<EOF
-<p>Unfortunately, while you were $what, somebody else beat you to the last
-place on that pledge. We're very sorry &mdash; better luck next time!</p>
-EOF;
+    if ($q_f && is_null($err)) {
+        /* Have all the information we need; sign them up. */
+        $f1 = pledge_is_successful($q_pledge);
+        $r = pledge_sign($q_pledge, $q_name, $q_showname, $q_email);
+        if (!pledge_is_error($r)) {
+            print "<p>Thank you for confirming your signature!</p>";
+
+            if (!$f1 && pledge_is_successful($q_pledge))
+                /* Has this completed the pledge? */
+                print "<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
+            else {
+                /* Otherwise advertise flyers. */
+                advertise_flyers($q_pledge);
+            }
+            db_commit();
+        } else
+            oops($r);
     } else {
-        print "<p>" . htmlspecialchars(pledge_strerror($r)) . "</p>";
-        if (!pledge_permanent_error($r))
-            print "<p><strong>Please try again a bit later.</strong></p>";
-    }
-}
-
-$pledge = db_getOne('select title from pledges where id = ?', $q_pledge);
-
-page_header("$pledge - Sign Up");
-
-if ($q_f && is_null($err)) {
-    /* Have all the information we need; sign them up. */
-    $f1 = pledge_is_successful($q_pledge);
-    $r = pledge_sign($q_pledge, $q_name, $q_showname, $q_email);
-    if ($r == PLEDGE_OK) {
-        print "<p>Thank you for confirming your signature!</p>";
-
-        if (!$f1 && pledge_is_successful($q_pledge))
-            /* Has this completed the pledge? */
-            print "<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
-        else {
-            /* Otherwise advertise flyers. */
-            $r = db_getRow('select ref, title, date from pledges where id = ?', $pledge_id);
-            advertise_flyers($r);
-        }
-        db_commit();
-    } else
-        oops($r);
-} else {
-    /* Check that there's still a space available on the pledge. */
-    $r = pledge_is_valid_to_sign($q_pledge, $q_email);
-    if ($r == PLEDGE_OK) {
-        /* Produce a form for the punter to sign. */
-        $R = array_map('htmlspecialchars', db_getRow('select * from pledges where id = ?', $q_pledge));
-        print <<<EOF
+        /* Check that there's still a space available on the pledge. */
+        $r = pledge_is_valid_to_sign($q_pledge, $q_email);
+        if ($r == PLEDGE_OK) {
+            /* Produce a form for the punter to sign. */
+            $R = array_map('htmlspecialchars', db_getRow('select * from pledges where id = ?', $q_pledge));
+            print <<<EOF
 <p>Here is the pledge you are signing:</p>
 
 <form class="pledge" name="pledge" method="post">
@@ -119,21 +97,21 @@ if ($q_f && is_null($err)) {
 
 <p style="margin-top: 0">
 EOF
-            . '"'
-                . pledge_sentence($q_pledge, true, true)
                 . '"'
-            . <<<EOF
+                    . pledge_sentence($q_pledge, true, true)
+                    . '"'
+                . <<<EOF
 <div style="text-align: left; margin-left: 50%;">
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
 <p style="text-align: left">
 
 Name: <input type="text" name="name" value="$q_unchecked_h_name"><br />
 EOF;
-        if ($q_f && array_key_exists('name', $err))
-            print "<span class=\"error\">" . htmlspecialchars($err['name']) . "</span><br />";
+            if ($q_f && array_key_exists('name', $err))
+                print "<span class=\"error\">" . htmlspecialchars($err['name']) . "</span><br />";
 
-        $checked = $q_showname ? ' checked' : '';
-        print <<<EOF
+            $checked = $q_showname ? ' checked' : '';
+            print <<<EOF
 Show my name on this pledge: <input type="checkbox" name="showname" value="1"$checked>
 <input type="submit" name="submit" value="Submit">
 EOF;
@@ -143,13 +121,16 @@ EOF;
 
 ?>
 <?
-    
-    } else
-        oops($r);
+        } else
+            oops($r);
+    }
+    page_footer();
 }
-page_footer();
 
-function advertise_flyers($r) {
+/* advertise_flyers PLEDGE
+ * Print some stuff advertising flyers for PLEDGE. */
+function advertise_flyers($pledge_id) {
+    $r = db_getRow('select ref, title, date from pledges where id = ?', $pledge_id);
 ?><p><a href="<?=htmlspecialchars($r['ref']) ?>/flyers">View and print Customised Flyers for this pledge</a></p>
 
 <p align="center"><big>Why not <strong>
@@ -186,6 +167,25 @@ td {
         print '</tr>';
     }
     print "</table>";
+}
+
+/* oops CODE
+ * Print a message explaining CODE. */
+function oops($r) {
+    global $q_f;
+    print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
+    if ($r == PLEDGE_FULL) {
+        /* Print a fuller explanation in this (common) case */
+        $what = $q_f ? 'filling in the form' : 'waiting for our email to arrive'; /* XXX l18n */
+        print <<<EOF
+<p>Unfortunately, while you were $what, somebody else beat you to the last
+place on that pledge. We're very sorry &mdash; better luck next time!</p>
+EOF;
+    } else {
+        print "<p>" . htmlspecialchars(pledge_strerror($r)) . "</p>";
+        if (!pledge_is_permanent_error($r))
+            print "<p><strong>Please try again a bit later.</strong></p>";
+    }
 }
 
 ?>

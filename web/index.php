@@ -121,7 +121,16 @@ function pledge_form_submitted() {
 function front_page() {
 	global $today;
 ?>
-<p>Welcome to PledgeBank, the site that lets you say "I'll do something if other people will do it too."</p>
+<p>Welcome to PledgeBank, the site that lets you say "I'll do something
+if other people will do it too." </p>
+<p>The site is still in development, it isn't finshed yet.   Hopefully
+it'll be ready in February.
+If you'd like to use PledgeBank when it is launched, or have any good
+ideas for organisations who might like to use it, email <a
+href="mailto:pb@mysociety.org">Tom Steinberg</a>.  You can also <a
+href="mailto:help@pledgebank.com">email us</a> if it just
+doesn't work, or you have any other suggests or comments. 
+</p>
 <p id="start"><a href="./?new=1"><strong>Start your own pledge &raquo;</strong></a></p>
 <form id="search" onsubmit="return false" action="" method="get">
 <h2>Search</h2>

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.48 2005-03-29 19:00:08 chris Exp $
+-- $Id: schema.sql,v 1.49 2005-03-30 09:04:44 sandpit Exp $
 --
 
 -- secret
@@ -451,7 +451,6 @@ create function smssubscription_sign(integer, text)
             -- If we have already signed this, then we should update this
             -- subscription record to point at the existing subscription.
             if status = ''signed'' then
-                delete from signers where outgoingsms_id = t_outgoingsms_id;
                 select into p id
                     from signers
                     where mobile = t_mobile

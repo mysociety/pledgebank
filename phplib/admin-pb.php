@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.12 2005-03-25 20:26:07 francis Exp $
+ * $Id: admin-pb.php,v 1.13 2005-03-30 11:53:42 francis Exp $
  * 
  */
 
@@ -106,8 +106,8 @@ class ADMIN_PAGE_PB {
 
         print "<h2>Pledge '" . $pdata['ref'] . "' &mdash; " .  $pdata['title'] . "</h2>";
 
-        if ($pdata['confirmed'] == 0) {
-            print "<p><b>Email address not confirmed</b></p>";
+        if ($pdata['confirmed'] == 'f') {
+            print "<p><i>Pledge creator's email address not confirmed</b></i>";
         }
         
         print "<p>Set by: <b>" . $pdata['name'] . " &lt;" .  $pdata['email'] . "&gt;</b>";

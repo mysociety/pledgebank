@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.109 2005-04-01 18:02:14 matthew Exp $
+// $Id: index.php,v 1.110 2005-04-01 18:04:14 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -697,7 +697,7 @@ function pdfs() {
 <li><a href="<?=$pdf_flyers4_url?>">Flyers for handing out, 4 per page (A4, PDF)</a></li>
 <li><a href="<?=$pdf_flyers8_url?>">Flyers for handing out, 8 per page (A4, PDF, like picture below)</a></li>
 <li><a href="<?=$pdf_flyers16_url?>">Loads of little flyers, 16 per page (A4, PDF)</a></li>
-<!--<li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
+<!-- <li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li> -->
 </ul>
 </div>
 

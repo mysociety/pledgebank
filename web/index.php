@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.50 2005-03-04 18:24:36 matthew Exp $
+// $Id: index.php,v 1.51 2005-03-04 18:49:45 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -21,28 +21,55 @@ if (get_http_var('search')) {
     $search_results = search();
 }
 
-page_header("NOTITLE");
+$title = '';
+ob_start();
 if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
     if (get_http_var('reason')) send_report();
     else report_form();
 }
-elseif (get_http_var('confirmp')) confirm_pledge();
-elseif (get_http_var('confirms')) confirm_signatory();
-elseif (get_http_var('add_signatory')) add_signatory();
-elseif (get_http_var('pledge') == 'new') pledge_form();
-elseif (get_http_var('pledge') == 'faq') view_faq();
-elseif (get_http_var('pledge') == 'all') list_all_pledges();
-elseif (get_http_var('pledge') == 'contact') contact_form();
-elseif (get_http_var('pledge')) view_pledge();
+elseif (get_http_var('confirmp')) {
+    $title = 'Pledge Confirmation';
+    confirm_pledge();
+} elseif (get_http_var('confirms')) {
+    $title = 'Signature Confirmation';
+    confirm_signatory();
+} elseif (get_http_var('add_signatory')) {
+    $title = 'Signature addition';
+    add_signatory();
+} elseif (get_http_var('pledge') == 'new') {
+    $title = 'Create a New Pledge';
+    pledge_form();
+} elseif (get_http_var('pledge') == 'faq') {
+    $title = 'Frequently Asked Questions';
+    view_faq();
+} elseif (get_http_var('pledge') == 'all') {
+    $title = 'All Pledges';
+    list_all_pledges();
+} elseif (get_http_var('pledge') == 'contact') {
+    $title = 'Contact Us';
+    contact_form();
+} elseif (get_http_var('pledge')) view_pledge();
 elseif (get_http_var('newpost')==1) pledge_form_submitted();
 elseif (get_http_var('newpost')==2) pledge_form_two_submitted();
-elseif (get_http_var('contactpost')) contact_form_submitted();
-elseif (get_http_var('admin')=='pledgebank') admin();
-elseif (get_http_var('pdf')) pdfs();
-elseif (get_http_var('search')) print $search_results;
-else front_page();
+elseif (get_http_var('contactpost')) {
+    $title = 'Contact Us';
+    contact_form_submitted();
+} elseif (get_http_var('admin')=='pledgebank') {
+    $title = 'Admin';
+    admin();
+} elseif (get_http_var('pdf')) {
+    $title = 'Pledge Flyers';
+    pdfs();
+} elseif (get_http_var('search')) {
+    $title = 'Search Results';
+    print $search_results;
+} else
+    front_page();
+$body = ob_get_contents();
+ob_end_clean();
 
-
+page_header($title);
+print $body;
 page_footer();
 
 # --------------------------------------------------------------------
@@ -499,7 +526,7 @@ function send_success_email($pledge_id) {
 
 # Individual pledge page
 function view_pledge() {
-    global $today;
+    global $today, $title;
 
     $ref = get_http_var('pledge');
     $q = db_query('SELECT * FROM pledges WHERE ref=?', array($ref));
@@ -533,6 +560,7 @@ function view_pledge() {
         }
 
 	$action = $r['title'];
+        $title = 'I will ' . $action;
 	$people = $r['target'];
 	$type = $r['type'];
 	$date = $r['date'];

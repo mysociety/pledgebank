@@ -5,11 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.12 2005-03-04 17:23:44 matthew Exp $
+// $Id: page.php,v 1.13 2005-03-04 18:49:41 matthew Exp $
 
 function page_header($title) { ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en"><head><title><?=$title?> - PledgeBank - Not Finished Yet</title>
+<html lang="en"><head><title><? if ($title) print $title; ?> - PledgeBank - Not Finished Yet</title>
 <style type="text/css">@import url("/pb.css");</style>
 <script type="text/javascript" src="/pb.js"></script>
 </head>

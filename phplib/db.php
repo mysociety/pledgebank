@@ -6,9 +6,10 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: db.php,v 1.12 2005-03-04 22:12:58 matthew Exp $
+// $Id: db.php,v 1.13 2005-03-08 17:17:27 chris Exp $
 
 require_once "DB.php";
+require_once "../../phplib/utility.php";
 
 /* db_connect
  * Connect a global handle to the database. */
@@ -25,7 +26,20 @@ function db_connect() {
     if (DB::isError($pbdb)) {
         die($pbdb->getMessage());
     }
+    
+    /* Ensure that we have a site shared secret. */
+    $r = $pbdb->query('select secret from secret for update of secret');
+    if (is_null($r))
+        $pbdb->query('insert into secret (secret) values (?)', array(bin2hex(random_bytes(32))));
+    $pbdb->commit();
+    
     $pbdb->autoCommit(false);
+}
+
+/* db_secret
+ * Return the site shared secret. */
+function db_secret() {
+    return db_getOne('select secret from secret');
 }
 
 /* db_query QUERY PARAMETERS
@@ -38,7 +52,7 @@ function db_query($query, $params = array()) {
         db_connect();
     $result = $pbdb->query($query, $params);
     if (DB::isError($result)) {
-        die($result->getMessage().': "'.$result->getDebugInfo().'"');
+        die($result->getMessage().': "'.$result->getDebugInfo().'"; query was: ' . $query);
     }
     return $result;
 }
@@ -53,7 +67,7 @@ function db_getOne($query, $params = array()) {
         db_connect();
     $result = $pbdb->getOne($query, $params);
     if (DB::isError($result)) {
-        die($result->getMessage().': "'.$result->getDebugInfo().'"');
+        die($result->getMessage().': "'.$result->getDebugInfo().'"; query was: ' . $query);
     }
     return $result;
 }
@@ -69,7 +83,7 @@ function db_getRow($query, $params = array()) {
         db_connect();
     $result = $pbdb->getRow($query, $params, DB_FETCHMODE_ASSOC);
     if (DB::isError($result)) {
-        die($result->getMessage().': "'.$result->getDebugInfo().'"');
+        die($result->getMessage().': "'.$result->getDebugInfo().'"; query was: ' . $query);
     }
     return $result;
 }

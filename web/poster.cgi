@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.26 2005-04-05 16:51:20 francis Exp $
+# $Id: poster.cgi,v 1.27 2005-04-05 16:56:11 matthew Exp $
 #
 
 import os
@@ -177,20 +177,20 @@ def flyer(c, x1, y1, x2, y2, size):
 #        c.line(x1,y1+i,x2,y1+i)
 
     # Scale font sizes - with minimum for extreme cases
-    large_writing = size * 35
-    small_writing = size * 20
+    large_writing = size * 20
+    small_writing = size * 12
     if small_writing < 4:
         small_writing = 4
     if large_writing < 4:
         large_writing = 4
 
     # Set up styles
-    p_head = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*20, 
-        fontSize = large_writing, leading = size*37, fontName = 'Transport')
+    p_head = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 0, 
+        fontSize = small_writing, leading = small_writing*1.2, fontName = 'Transport')
     p_normal = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*20, 
-        fontSize = small_writing, leading = size*22, fontName = 'Rockwell')
+        fontSize = small_writing, leading = small_writing*1.2, fontName = 'Rockwell')
     p_nospaceafter = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 1, 
-        fontSize = small_writing, leading = size*22, fontName = 'Rockwell')
+        fontSize = small_writing, leading = small_writing*1.2, fontName = 'Rockwell')
     p_footer = ParagraphStyle('normal', alignment = TA_RIGHT, spaceBefore = 0, spaceAfter = 0,
         fontSize = h_purple*4/5, leading = 0, fontName = 'Transport')
     if (w<h):
@@ -218,30 +218,39 @@ def flyer(c, x1, y1, x2, y2, size):
     dots_body_gap = w/30
     # Draw all the text
     story = [
+#        Paragraph('''
+#            I, <font color="#522994">%s</font>, will %s <b>but only if</b> <font color="#522994">%s</font> %s will %s.
+#            ''' % (
+#                pledge['name'], pledge['title'], pledge['target'],
+#                pledge['type'], pledge['signup']
         Paragraph('''
-            I, <font color="#522994">%s</font>, will %s <b>but only if</b> <font color="#522994">%s</font> %s will %s.
+            <b>If</b> <font color="#522994">%s</font> %s will %s, then <font color="#522994">I</font> will %s.
             ''' % (
-                pledge['name'], pledge['title'], pledge['target'],
-                pledge['type'], pledge['signup']
+                pledge['target'], pledge['type'], pledge['signup'],
+                pledge['title']
             ), p_head),
+        Paragraph(u'<para align="right">\u2014 <font color="#522994">%s</font></para>'.encode('utf-8') % pledge['name'], p_head),
 
         Paragraph('', p_normal),
-        Paragraph(u"<b>Please help me out.</b> There\u2019s nothing to lose \u2013 you only have to go through with it if %s %s will %s.".encode('utf-8') % (
-                pledge['target'], pledge['type'], pledge['signup']
-            ), p_normal),
+        Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994"><b>pledge %s</b></font>
+        to <font color="#522994"><b>%s</b></font> <font size="-2">(cost 25p)</font> or 
+        pledge for free at <font size="+3" color="#522994"><b>%s/%s</b></font>'''
+        % (ref, sms_number, mysociety.config.get('WEB_DOMAIN'), ref), p_normal),
+#        Paragraph(u"<b>Please help me out.</b> There\u2019s nothing to lose \u2013 you only have to go through with it if %s %s will %s.".encode('utf-8') % (
+#            p_normal),
 
-        Paragraph(u"It\u2019s easy and incredibly quick \u2013".encode('utf-8'), p_nospaceafter),
-        Paragraph('''
-            <para leftindent="%f">visit <font color="#522994"><b>%s/%s</b></font> (free)</para>
-            ''' % (dots_body_gap, mysociety.config.get('WEB_DOMAIN'), ref), p_nospaceafter),
-        Paragraph('''
-            <para leftindent="%f">or text <font color="#522994"><b>pledge %s</b></font> to
-            <font color="#522994"><b>%s</b></font> (cost 25p).</para>
-            ''' % (dots_body_gap, ref, sms_number), p_normal),
-        Paragraph('''
-            PledgeBank will keep you updated, for free,
-            on the progress of the pledge.
-            ''', p_normal),
+#        Paragraph(u"It\u2019s easy and incredibly quick \u2013".encode('utf-8'), p_nospaceafter),
+#        Paragraph('''
+#            <para leftindent="%f">visit <font color="#522994"><b>%s/%s</b></font> (free)</para>
+#            ''' % (dots_body_gap, mysociety.config.get('WEB_DOMAIN'), ref), p_nospaceafter),
+#        Paragraph('''
+#            <para leftindent="%f">or text <font color="#522994"><b>pledge %s</b></font> to
+#            <font color="#522994"><b>%s</b></font> (cost 25p).</para>
+#            ''' % (dots_body_gap, ref, sms_number), p_normal),
+#        Paragraph('''
+#           PledgeBank will keep you updated, for free,
+#            on the progress of the pledge.
+#            ''', p_normal),
 
         Paragraph('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
@@ -436,7 +445,7 @@ Files are cached in the directory PB_PDF_CACHE specified in conf/general.""")
         # Generate any other file type
         if format != 'pdf':
             # Call out to "convert" from ImageMagick
-            cmd = ["convert", outdir + '/' + outpdf, outdir + '/' + outfile]
+            cmd = "/home/chris/afpl-gs/bin/gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outdir + '/' + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outdir + '/' + outfile
             child = popen2.Popen3(cmd, True) # capture stderr
             child.tochild.close()
             req.err.write(child.fromchild.read())

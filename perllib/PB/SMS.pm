@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.3 2005-03-03 01:21:50 chris Exp $
+# $Id: SMS.pm,v 1.4 2005-03-03 11:22:16 chris Exp $
 #
 
 package PB::SMS;
@@ -18,6 +18,7 @@ package PB::SMS;
 use strict;
 
 use mySociety::DBHandle qw(dbh);
+use mySociety::Util qw(print_log);
 
 use PB;
 
@@ -53,7 +54,12 @@ sub send_sms ($$) {
     foreach my $recipient (@$r) {
         my $id = dbh()->selectrow_array("select nextval('outgoingsms_id_seq')");
         push(@ids, $id);
-        PB::DB::dbh()->do('insert into outgoingsms (id, recipient, message, whensubmitted) values (?, ?, ?)', {}, $id, $recipient, $msg, time());
+        PB::DB::dbh()->do('
+                insert into outgoingsms
+                    (id, recipient, message, whensubmitted)
+                values (?, ?, ?, ?)',
+                {},
+                $id, $recipient, $msg, time());
     }
     return @ids;
 }
@@ -67,7 +73,13 @@ message. Does not commit.
 sub receive_sms ($$$$$) {
     my ($sender, $receiver, $msg, $foreignid, $whensent) = @_;
     my $id = dbh()->selectrow_array("select nextval('incomingsms_id_seq')");
-    dbh()->do('insert into incomingsms (id, sender, recipient, message, foreignid, whenreceived, whensent) values (?, ?, ?, ?, ?, ?, ?)', {}, $id, $sender, $receiver, $msg, $foreignid, time(), $whensent);
+    dbh()->do('
+            insert into incomingsms
+                (id, sender, recipient, message, foreignid,
+                    whenreceived, whensent)
+            values (?, ?, ?, ?, ?, ?, ?)',
+            {},
+            $id, $sender, $receiver, $msg, $foreignid, time(), $whensent);
     return $id;
 }
 
@@ -117,7 +129,7 @@ sub receive_sms ($$$$$) {
             # Drop pledger who has signed up by SMS but is unable to receive a
             # conversion-to-email message.
             my ($id) = @_;
-            dbh()->do('delete from signers where outgoingsms_id = ?', {}, $id):
+            dbh()->do('delete from signers where outgoingsms_id = ?', {}, $id);
             return 1;
         }]
     );
@@ -132,7 +144,7 @@ sub receive_sms ($$$$$) {
                 # Could be a signup request.
                 my $ref = $1;
                 my $pledge_id = dbh()->selectrow_array('select id from pledges where ref = ?', {}, $ref);
-                if (!defined($pledges_id)) {
+                if (!defined($pledge_id)) {
                     my $ids = dbh()->selectcol_arrayref("select id from pledges where ref ilike '%' || ? || '%'", {}, $ref);
                     if (@$ids != 1) {
                         print_log('warning', "incoming message #$id was request for unknown/ambiguous ref '$ref'");
@@ -141,19 +153,22 @@ sub receive_sms ($$$$$) {
                         $pledge_id = $ids->[0];
                     }
                 }
+                print_log('debug', "incoming message #$id is signup request for pledge $pledge_id ($ref)");
                 # OK, we've got a signup request. Send them a conversion
                 # message and add them to the list.
-                my $token = unpack('h*', random_bytes(2)) . "-" . unpack('h*', random_bytes(2));
-                my $new_id = send_sms(
+                # XXX birthday probability; this will be OK until we have ~64K
+                # or more outstanding conversion SMSs.
+                my $token = unpack('h*', mySociety::Util::random_bytes(2)) . "-" . unpack('h*', mySociety::Util::random_bytes(2));
+                my ($new_id) = send_sms(
                                 $sender,
                                 "Thanks for pledging! Visit http://pledgebank.org/sms/$token to sign up for email and more."
                             );
                 dbh()->do('
                         insert into signers
                             (pledge_id, mobile, signtime, token, outgoingsms_id)
-                        values (?, ?, ?, ?, ?)', 
+                        values (?, ?, current_timestamp, ?, ?)', 
                         {},
-                        $pledge_id, $sender, time(), $token, $new_id);
+                        $pledge_id, $sender, $token, $new_id);
                 return 1;
             } else {
                 # Not a subscription request.

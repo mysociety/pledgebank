@@ -6,11 +6,14 @@
 # This does two things: managing the sending of SMS messages from the outgoing
 # message queue, and calling code to process messages which have been received.
 #
+# XXX a lot of this is boilerplate copied from fyrqd; we should probably try to
+# modularise the common code.
+#
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.1 2005-03-03 01:21:46 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.2 2005-03-03 11:22:16 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -20,16 +23,21 @@ use FindBin;
 use lib "$FindBin::Bin/../perllib";
 use lib "$FindBin::Bin/../../perllib";
 
+use Encode;
 use Error qw(:try);
 use Getopt::Long;
 use LWP::UserAgent;
 use HTTP::Request;
 use HTTP::Response;
+use Pod::Usage;
+use POSIX;
+use Sys::Syslog;
 
 use mySociety::Config;
 BEGIN {
     mySociety::Config::set_file("$FindBin::Bin/../conf/general");
 }
+use mySociety::DBHandle qw(dbh);
 use mySociety::PIDFile;
 use mySociety::Util qw(print_log);
 
@@ -63,13 +71,14 @@ sub run_sending_process () {
                     agent => "PledgeBank pbsmsd $rcsid",
                 );
 
-    while (!$foad) {
+    my $niter = 0;
+    while (!$foad && $niter < 10000) {
         $s->execute(time(), send_retry_interval, send_max_attempts);
         while (my $id = $s->fetchrow_array()) {
             # Grab a lock on the message, assuming that it still needs to be sent.
-            my ($recipient, $msg, $numattempts) =
+            my ($recipient, $message, $numattempts) =
                 dbh()->selectrow_array("
-                    select recipient, message, numattempts from outgoingsms
+                    select recipient, message, numsendattempts from outgoingsms
                     where lastsendattempt is null
                         or (lastsendstatus <> 'success'
                             and lastsendattempt < ? - ? * (2 ^ (numsendattempts - 1)))
@@ -93,7 +102,7 @@ sub run_sending_process () {
                 $recipient =~ s/^\+//;
                 my %p = (
                         user => mySociety::Config::get('PB_SMS_MXTELECOM_USER'),
-                        pass => mySociety::Config::get('PB_SMS_MXTELECOM_USER'),
+                        pass => mySociety::Config::get('PB_SMS_MXTELECOM_PASS'),
                         smsto => $recipient,
                         note => "message #$id; send attempt "
                                         . ($numattempts + 1),
@@ -118,9 +127,9 @@ sub run_sending_process () {
                         my $u = encode('ucs-2', $message, Encode::FB_CROAK);
                         $p{smsucs2} = unpack('h*', $u);
                     }
-                }
+                };
                 if ($@) {
-                    print_log('error', "#$id, '$message', cannot be expressed in ISO-8859-15 or UCS-2; abandoning message")
+                    print_log('err', "#$id, '$message', cannot be expressed in ISO-8859-15 or UCS-2; abandoning message");
                     dbh()->do('delete from outgoingsms where id = ?', {}, $id);
                 } else {
                     # We're OK to attempt sending.
@@ -128,6 +137,7 @@ sub run_sending_process () {
                     eval {
                         local $SIG{ALRM} = sub { die "timed out in eval\n"; };
                         alarm(300);
+                        print_log('debug', "#$id: attempting to send by HTTP POST");
                         my $resp = $ua->post('http://sms.mxtelecom.com/SMSSend', \%p);
                         alarm(0);
                         if (!defined($resp)) {
@@ -136,9 +146,17 @@ sub run_sending_process () {
                             ($status, $extra) = ('systemerror', $!);
                         } elsif ($resp->code() != 200) {
                             print_log('warning', "#$id: failure to send; HTTP status: " . $resp->status_line());
+                            foreach (split(/\r?\n/, $resp->content())) {
+                                print_log('warning', "#$id: remote error: $_");
+                            }
                             ($status, $extra) = ('httperror', $resp->status_line());
                         } else {
                             print_log('info', "#$id: sent");
+                            # Now extract the ID from the result.
+                            my $foreignid = $resp->content();
+                            $foreignid =~ s#\s*$##gs;
+                            print_log('debug', "#$id: foreign ID is $foreignid");
+                            dbh()->do('update outgoingsms set foreignid = ? where id = ?', {}, $foreignid, $id);
                             ($status, $extra) = ('success', undef);
                         }
                     };
@@ -147,9 +165,11 @@ sub run_sending_process () {
                     }
                     dbh()->do('
                             update outgoingsms
-                            set lastsendattempt = ?, lastsendstatus = ?,
-                                lastsendextrastatus = ?
-                            where id = ?', {}, time(), $status, $extra);
+                            set lastsendattempt = ?,
+                                lastsendstatus = ?,
+                                lastsendextrastatus = ?,
+                                numsendattempts = numsendattempts + 1
+                            where id = ?', {}, time(), $status, $extra, $id);
                 }
             }
             dbh()->commit();
@@ -162,7 +182,11 @@ sub run_sending_process () {
         # be suffering some kind of connectivity or other failure (e.g. all
         # message sending attempts fail) we should hold off for quite a while.
         sleep(10);
+
+        ++$niter;
     }
+
+    print_log('info', "sending process shutting down after $niter iterations");
 }
 
 # run_processing_process
@@ -172,34 +196,261 @@ sub run_processing_process () {
     # there so that in the presence of heavy traffic we maintain acceptable
     # latency in processing messages in both directions.
     my $s_sent = dbh()->prepare("
-                        select id from outgoingsms
+                        select id, message, '00000', recipient, status
+                            from outgoingsms
                         where status = 'delivered'
                             or status = 'failed'
                             or status = 'rejected'
                         order by random()
-                        limit ?");
+                        limit 20");
     my $s_received = dbh()->prepare("
-                        select id from incomingsms
+                        select id, message, sender, recipient, null
+                            from incomingsms
                         order by random()
-                        limit ?");
+                        limit 20");
 
-    use constant processing_batch => 20;
-    while (!$foad) {
+    my $niter = 0;
+    while (!$foad && $niter < 10000) {
         my $n;
         my $delay = 10;
-        $s_sent->execute(processing_batch);
-        $n = 0;
-        while (my $id = $s_sent->fetchrow_array()) {
-            ++$n;
+        foreach my $s ($s_sent, $s_received) {
+            $s->execute();
+            $n = 0;
+            while (my ($id, $message, $sender, $recipient, $status) = $s->fetchrow_array()) {
+                my $H;
+                if (!defined($status)) {
+                    $H = \@PB::SMS::received_handlers;
+                } elsif ($status eq 'delivered') {
+                    $H = \@PB::SMS::delivered_handlers;
+                } else {
+                    $H = \@PB::SMS::failed_handlers;
+                }
+                my $result;
+                my $dodelete = 1;
+                foreach (@$H) {
+                    my ($name, $func) = @$_;
+                    eval {
+                        if (defined($status)) {
+                            print_log('debug', "processing outgoing #$id (status $status) with $name");
+                            $result = &$func($id, $message, $sender, $recipient, $status);
+                            print_log('debug', "result of $name is " . (defined($result) ? $result : '(undef)'));
+                        } else {
+                            print_log('debug', "processing incoming #$id with $name");
+                            $result = &$func($id, $message, $sender, $recipient);
+                            print_log('debug', "result of $name is " . (defined($result) ? $result : '(undef)'));
+                        }
+                    };
+                    if ($@) {
+                        if (defined($status)) {
+                            print_log('warning', "while processing outgoing #$id (status $status) with $name: $@");
+                        } else {
+                            print_log('warning', "while processing incoming #$id with $name: $@");
+                        }
+                        $dodelete = 0;
+                        last;
+                    } elsif ($result == 1) {
+                        last;
+                    }
+                }
+                if ($dodelete) {
+                    # Processing is complete, so delete this SMS and commit the
+                    # transaction.
+                    if (defined($status)) {
+                        dbh()->do('delete from outgoingsms where id = ?', {}, $id);
+                    } else {
+                        dbh()->do('delete from incomingsms where id = ?', {}, $id);
+                    }
+                    dbh()->commit();
+                } else {
+                    # Something went wrong; for safety, roll back.
+                    dbh()->rollback();
+                }
+                ++$n;
+            }
+            $delay = 0 if ($n == 20);
         }
-        $delay = 0 if ($n == processing_batch);
-
-        $n = 0;
-        while (my $id = $s_sent->fetchrow_array()) {
-            ++$n;
-        }
-        $delay = 0 if ($n == processing_batch);
 
         sleep($delay) if ($delay);
+        ++$niter;
+    }
+
+    print_log('info', "processing process shutting down after $niter iterations");
+}
+
+# Entry point.
+my $numprocesses = mySociety::Config::get('SMS_DAEMON_SEND_PROCESSES', 5);
+my $pidfilepath = mySociety::Config::get('SMS_DAEMON_PIDFILE', '/var/run/pbsmsd.pid');
+my $nodetach = 0;
+my $help = 0;
+if (!GetOptions(
+        'senderprocesses=i' =>  \$numprocesses,
+        'pidfile=s' =>          \$pidfilepath,
+        'debug' =>              \$nodetach,
+        'help' =>               \$help
+    )) {
+    print_log('err', "bad options; try --help for help");
+    exit(1);
+}
+
+if ($help) {
+    pod2usage(-exitval => 0, -verbose => 1);
+    exit(0);
+}
+
+$numprocesses = 2 if ($numprocesses < 1 or $numprocesses > 100);
+
+mySociety::Util::daemon() unless ($nodetach);
+
+my $pidfile;
+try {
+    $pidfile = new mySociety::PIDFile($pidfilepath);
+} catch mySociety::PIDFile::Error with {
+    my $E = shift;
+    print_log('err', $E->text());
+    exit(1);
+};
+
+print_log('info', "starting up; 1 processing process, $numprocesses sender processes");
+
+my $schld = new POSIX::SigSet(POSIX::SIGCHLD) or die "sigset: $!";
+sub block_sigchld ($) {
+    if ($_[0]) {
+        sigprocmask(POSIX::SIG_BLOCK, $schld);
+    } else {
+        sigprocmask(POSIX::SIG_UNBLOCK, $schld);
     }
 }
+
+# Hash of child PID -> [process type, start time].
+my %children;
+
+# Simple signal handler to set a flag when we should quit/restart.
+$SIG{TERM} = $SIG{INT} = $SIG{HUP} = sub {
+        $foad = eval "POSIX::SIG$_[0]"; # sooooo ugly.
+    };
+
+# Make sure we can wait for expired child processes.
+$SIG{CHLD} = sub { };
+
+while ($foad == 0) {
+    block_sigchld(1);
+    # Count the number of sender and processing processes.
+    my @tostart = ( );
+    if (scalar(grep { $_->[0] eq 'processing' } values(%children)) < 1) {
+        push(@tostart, ['processing', \&run_processing_process]);
+    }
+    for (my $i = scalar(grep { $_->[0] eq 'sending' } values(%children)); $i <= $numprocesses; ++$i) {
+        push(@tostart, ['sending', \&run_sending_process]);
+    }
+    foreach my $what (@tostart) {
+        my $pid = fork();
+        if (!defined($pid)) {
+            print_log('err', "fork: $!");
+        } elsif ($pid == 0) {
+            try {
+                &{$what->[1]}();
+            } catch Error with {
+                my $E = shift;
+                print_log('err', "$what->[0] process failed with error $E");
+                exit(1);
+            };
+            exit(0);
+        } else {
+            print_log('info', "started new $what->[0] child process, PID $pid");
+            $children{$pid} = [$what->[0], time()];
+        }
+    }
+    
+    # XXX detect case where we're childless?
+
+    # See long rant about perl and EINTR in fyrqd source code for why we don't
+    # just call wait here.
+    block_sigchld(0);
+    while ((my $terminated = waitpid(-1, WNOHANG)) > 0) {
+        block_sigchld(1);
+
+        if (exists($children{$terminated})) {
+            if ($? & 127) {
+                print_log('err', "child $children{$terminated}->[0] process, PID $terminated, killed by signal " . ($? & 127));
+            } elsif ($? >> 8) {
+                print_log('err', "child $children{$terminated}->[0] process, PID $terminated, exited with error status " . ($? >> 8));
+            } else {
+                print_log('info', "child $children{$terminated}->[0] process, PID $terminated, exited normally");
+            }
+            
+            if ($children{$terminated} > time() - 10) {
+                print_log('err', "child $children{$terminated}->[0] process, PID $terminated, lived for only " . (time() - $children{$terminated}) . " seconds; holding off before restarting it");
+                sleep(5); # XXX we won't reap other children during this time, obviously
+            }
+            
+            delete($children{$terminated});
+        }
+        block_sigchld(0);
+    }
+
+    sleep(5);
+}
+
+kill(SIGTERM, keys %children);
+
+undef($pidfile);
+
+if ($foad == SIGHUP) {
+    print_log('notice', "restarting on signal $foad");
+    { exec($FindBin::Script, @ARGV); }
+    print_log('err', "exec: $!");
+    exit(1);
+} else {
+    print_log('notice', "shutting down on signal $foad");
+}
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+pbsmsd
+
+=head1 SYNOPSIS
+
+pbsmsd --help | [OPTIONS]
+
+=head1 DESCRIPTION
+
+SMS sending/received-message processing daemon for PledgeBank.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+Display information about using the program.
+
+=item --debug
+
+Don't detach from controlling terminal; log diagnostics to standard error as
+well as the system log.
+
+=item --pidfile PATH
+
+Use PATH as the location of the PID file. By default, uses the value defined in
+the config file, or "/var/run/pbsmsd.pid".
+
+=item --processes NUM
+
+Run NUM SMS sending child processes. By default, uses the value defined in the
+config file, or 2. There is always only one received-message processing
+process.
+
+=back
+
+=head1 COPYRIGHT 
+
+Copyright (c) 2005 UK Citizens Online Democracy
+
+=head1 VERSION
+
+$Id: pbsmsd,v 1.2 2005-03-03 11:22:16 chris Exp $
+

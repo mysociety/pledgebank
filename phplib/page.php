@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.6 2005-03-15 16:37:33 francis Exp $
+// $Id: page.php,v 1.7 2005-03-16 09:13:10 sandpit Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -19,7 +19,8 @@ function page_header($title, $params = array()) {
     if ($title) print htmlspecialchars($title) . " - ";
     
 ?> PledgeBank - Not Finished Yet</title>
-<style type="text/css">@import url("/pb.css");</style>
+<style type="text/css" media="all">@import url("/pb.css");</style>
+<link rel="stylesheet" type="text/css" media="print" href="/pbprint.css" />
 <script type="text/javascript" src="/pb.js"></script>
 </head>
 <body>
@@ -30,9 +31,9 @@ function page_header($title, $params = array()) {
 <hr class="v"><div id="content"><?
     }
     if (OPTION_PB_STAGING) {
-?><p align="center" style="color: #cc0000; background-color: #ffffff">
+?><div class="noprint"><p align="center" style="color: #cc0000; background-color: #ffffff">
 <i>This is a test site for developers only. You probably want
-<a href="http://www.pledgebank.com/">the real site</a>.</i></p><?
+<a href="http://www.pledgebank.com/">the real site</a>.</i></p></div><?
     }
 }
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.10 2005-03-15 19:09:38 sandpit Exp $
+ * $Id: confirm.php,v 1.11 2005-03-16 09:13:24 sandpit Exp $
  * 
  */
 
@@ -37,12 +37,14 @@ if ($q_type == 'pledge') {
     /* Success. */
     $q = db_query('select * from pledges where id = ?', $pledge_id);
     $r = db_fetch_array($q);
-    page_header($r['title'] . ' - Confirm', array('nonav'=>true));
+    page_header(htmlspecialchars($r['title']) . ' - Confirm', array('nonav'=>true));
     db_commit();
     $url = "/" . urlencode($r['ref']);
     ?>
+    <div class="noprint">
     <p>Thank you for confirming your pledge. It is now live, and people can 
     <a href="<?=$url?>">sign up to it</a>.</p>
+    </div>
     <?  advertise_flyers($pledge_id);
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
@@ -50,22 +52,23 @@ if ($q_type == 'pledge') {
     $data = pledge_random_token_retrieve($q_token);
     print_r($data);
 
-    page_header(
-            db_getOne('select title from pledges where id = ?', $data['pledge_id'])
-            . ' - Sign Up', array('nonav'=>true)
-        );
+    $q = db_query('select * from pledges where id = ?', $pledge_id);
+    $r = db_fetch_array($q);
+    page_header(htmlspecialchars($r['title']) . ' - Sign Up', array('nonav'=>true));
 
     /* Sign them up. */
     $f1 = pledge_is_successful($data['pledge_id']);
     $r = pledge_sign($data['pledge_id'], $data['name'], $data['showname'], $data['email']);
     if (!pledge_is_error($r)) {
+        print '<div class="noprint">';
         print "<p>Thanks for subscribing to this pledge!</p>";
 
         if (!$f1 && pledge_is_successful($data['pledge_id']))
             /* Has this completed the pledge? */
-            print "<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
+            print "</div><p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
         else {
             /* Otherwise advertise flyers. */
+            print "</div>";
             advertise_flyers($data['pledge_id']);
         }
         db_commit();
@@ -81,6 +84,7 @@ function advertise_flyers($pledge_id) {
     $r = db_getRow('select * from pledges where id = ?', $pledge_id);
 ?>
 
+<div class="noprint">
 <p align="center">
 <strong>Important Notice</strong> - You will massively increase the chance of this pledge being
 a success if 
@@ -95,7 +99,7 @@ of your neighbours letterboxes. We cannot emphasise this enough - print them
 now and post them next time you go out to the shops. We also have more
 <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers"> attractive PDF versions</a>.</p>
 
-
+</div> <!-- noprint -->
 
 <style type="text/css">
 table {
@@ -112,7 +116,7 @@ td {
 </style>
 <table><?
     
-    for ($rows = 0; $rows<4; $rows++) {
+    for ($rows = 0; $rows<10; $rows++) {
         print '<tr align="center">';
         for ($cols=0; $cols<2; $cols++) {
             print '<td>';

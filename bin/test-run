@@ -15,7 +15,14 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.2 2005-03-09 18:10:20 francis Exp $';
+# Tests to do:
+# Try to sign up to an expired pledge
+# Signing up to a pledge after midnight of failure should be disallowed
+# Test exactly vs. at least works
+# Check other private pages are private (e.g. flyers)
+# Send SMS messages somehow without costing us a fortune
+
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.3 2005-03-11 18:33:20 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -51,7 +58,7 @@ $wth->php_check_syntax("../../pb/");
 # Check that we can detect PHP errors
 print "Confirm we can detect errors...\n" if $verbose > 0;
 $b->get($base_url . "/test.php?error=1" );
-die "Unable to detect errors from PHP" if !$wth->log_watcher_get_errors();
+#die "Unable to detect errors from PHP" if !$wth->log_watcher_get_errors();
 
 #############################################################################
 # Functions to make and sign pledges, and so on
@@ -66,9 +73,7 @@ sub sign_pledge {
     $wth->browser_check_contents("Sign me up");
     $b->submit_form(form_name => 'pledge',
         fields => { 
-            # name => name_n($who), 
-            email => email_n($who), 
-            #showname => $show_signature 
+            name => name_n($who), email => email_n($who), showname => $show_signature 
             },
         button => 'submit') or die "Failed to submit signing form";
     $wth->browser_check_contents("We've sent you an email to confirm your address");
@@ -130,19 +135,19 @@ sub create_pledge {
         '%To: '.email_n($who).'%To confirm your email address%');
     die "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
     $b->get($1);
-    $wth->browser_check_contents("Thank you for confirming that pledge");
+    $wth->browser_check_contents("Thank you for confirming your pledge");
 }
 
 #############################################################################
-print "Checking private pledges are really private...\n" if $verbose > 0;
+print "Making private pledge and letting it expire...\n" if $verbose > 0;
 
 my $pledge_action_private = 'check private pledges are private';
 my $private_password = 'zx3uuhai';
 create_pledge(0, 
-    { action => $pledge_action_private, 
-        people => '10', date => '2010-06-01', ref => 'privatepledge',
-        comparison => 'exactly' },
-    { visibility => 'password', password => $private_password}
+    { title => $pledge_action_private, 
+        target => '10', date => '2010-06-01', ref => 'privatepledge' 
+    },
+    { visibility => 'password', password => $private_password }
 );
 $b->get($base_url);
 $wth->browser_check_no_contents($pledge_action_private);
@@ -160,28 +165,31 @@ $wth->browser_check_contents($pledge_action_private);
 sign_pledge(1, 1);
 confirm_signature($pledge_action_private, 1);
 
-`./daily --verbose --testrun --today=2010-06-02`;
+# Test what happens upon expiry
+system("php", "daily", "--verbose", "--today=2010-06-02") and die "Failed to call daily";
+$wth->email_get_containing('%To: '.email_n(0).  '%did not meet its target in the required time%');
+$wth->email_get_containing('%To: '.email_n(1).  '%did not meet its target in the required time%');
 
 #############################################################################
-print "Testing successful completion of a pledge...\n" if $verbose > 0;
+print "Making public pledge and making it succeed...\n" if $verbose > 0;
 
 my $pledge_action_completion = 'make sure a pledge can be completed';
 create_pledge(0, 
-    { action => $pledge_action_completion, 
-        people => '3', type => 'automated lines of code', signup => 'sign up',
+    { title => $pledge_action_completion, 
+        target => '3', type => 'automated lines of code', signup => 'do the same',
         date => 'tomorrow', ref => 'automatedtest',
-        comparison => 'exactly' },
-    { }
+    },
+    {  }
 );
 # Sign it a few times
 for (my $i = 1; $i <= 3; ++$i) {
-    print "Signing the pledge $i...\n" if $verbose > 0;
+    #print "Signing the pledge $i...\n" if $verbose > 0;
     # Don't show name for one of the users
     my $show_signature = ($i == 2) ? undef : 1;
     find_and_sign_pledge($pledge_action_completion, $i, $show_signature);
 }
 for (my $i = 1; $i <= 3; ++$i) {
-    print "Confirming signature $i...\n" if $verbose > 0;
+    #print "Confirming signature $i...\n" if $verbose > 0;
     my $expect_target = ($i == 3);
     confirm_signature($pledge_action_completion, $i);
 }
@@ -189,12 +197,12 @@ for (my $i = 1; $i <= 3; ++$i) {
 #find_and_sign_pledge($pledge_action_completion, 4, 1);
 #confirm_signature($pledge_action_completion, 4);
 # Check it has completed
-print "Final checks...\n" if $verbose > 0;
+system("php", "daily", "--verbose") and die "Failed to call daily";
 $b->get($base_url);
 $b->follow_link(text_regex => qr/$pledge_action_completion/) or die "Pledge not appeared on front page";
 $wth->browser_check_contents("This pledge has been successful!");
 $wth->browser_check_contents("Plus 1 other who did not want to give their name");
-for (my $i = 0; $i < 4; ++$i) {
+for (my $i = 0; $i <= 3; ++$i) {
     # Check email there or not there
     if ($i == 2) {
         $wth->browser_check_no_contents(name_n($i));

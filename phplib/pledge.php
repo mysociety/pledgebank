@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.14 2005-03-11 17:00:41 matthew Exp $
+ * $Id: pledge.php,v 1.15 2005-03-11 18:33:20 francis Exp $
  * 
  */
 
@@ -23,6 +23,28 @@ function pledge_ab64_encode($i) {
     $t = str_replace("/", ",", &$t);
     $t = str_replace("=", "-", &$t);
     return $t;
+}
+
+/* pledge_random_token_store DATA
+ * Returns a randomly generated token, suitable for use in URLs. 
+ * Array DATA is serialised and stored in the database associated with that
+ * token, for later retrieval with pledge_random_token_retrieve. */
+function pledge_random_token_store($data) {
+    $token = pledge_ab64_encode(random_bytes(12));
+    db_query('insert into token_store (token, data) values (?, ?)', 
+        array($token, serialize($data)));
+    return $token;
+}
+
+/* pledge_random_token_retrieve TOKEN
+ * Given a token that was made by pledge_random_token_store, this returns the
+ * DATA associated with it, or causes an error if there isn't one. */
+function pledge_random_token_retrieve($token) {
+    $data = db_getOne('select data from token_store where token = ?', $token);
+    if (is_null($data)) {
+        err("Token not valid.");
+    }
+    return unserialize($data);
 }
 
 /* pledge_email_token ADDRESS PLEDGE [SALT]
@@ -42,13 +64,13 @@ function pledge_email_token($email, $pledge, $salt = null) {
     }
 
     $h = pack('H*', sha1($salt . $email . $pledge . db_secret()));
+
     /* Don't send the full SHA1 hash, because we don't want our URLs to be too
-     * long (at some marginal risk to security...). */
+     * long (at some marginal risk to security...).  Base64 uses the character
+     * set [A-za-z0-9+/=]. "+", "/" and "=" are poor characters for URLs,
+     * because they have special interpretations. So use others instead. */
     $b64 = pledge_ab64_encode(substr(&$h, 0, 12));
 
-    /* Base64 uses the character set [A-za-z0-9+/=]. "+", "/" and "=" are poor
-     * characters for URLs, because they have special interpretations. So use
-     * others instead. */
     return $salt . '_' . $b64;
 }
 

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.26 2005-03-11 12:46:44 chris Exp $
+-- $Id: schema.sql,v 1.27 2005-03-11 18:33:20 francis Exp $
 --
 
 -- secret
@@ -42,7 +42,7 @@ create table pledges (
     confirmed boolean not null default false,
 
     -- password for private pledges
-    password text not null default '',
+    password text default '',
 
     -- "at least" vs. "exactly"
     comparison text not null check (
@@ -234,3 +234,13 @@ create table pledges_outgoingsms (
 );
 
 create unique index pledges_outgoingsms_token_idx on pledges_outgoingsms(token);
+
+-- Stores randomly generated tokens and serialised hash arrays associated
+-- with them.
+create table token_store (
+    token text not null,
+    data text not null
+);
+create unique index token_store_token_idx on token_store(token);
+
+

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.70 2005-03-11 16:57:09 matthew Exp $
+// $Id: index.php,v 1.71 2005-03-11 18:33:20 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -171,6 +171,10 @@ function pledge_form_two($data, $errors = array()) {
     }
     $local = (isset($data['local'])) ? $data['local'] : 0;
     $isodate = $data['date']['iso'];
+    if (!isset($data['comparison']))
+        $comparison = "atleast";
+    else
+        $comparison = $data['comparison'];
 ?>
 <form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="2">
 <p style="float: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
@@ -182,8 +186,8 @@ function pledge_form_two($data, $errors = array()) {
 
 <p>Would you like the pledge to stop accepting new subscribers when it
 is fulfilled?
-<input type="radio" name="comparison" value="exactly"> Yes
-<input type="radio" name="comparison" value="atleast"> No
+<input type="radio" name="comparison" value="exactly"<?=($comparison == 'exactly') ? ' checked' : '' ?>> Yes
+<input type="radio" name="comparison" value="atleast"<?=($comparison == 'atleast') ? ' checked' : '' ?>> No
 </p>
 
 <p>Where does your pledge apply?
@@ -275,7 +279,7 @@ function step1_error_check($data) {
 function pledge_form_two_submitted() {
     $errors = array();
     $data = array();
-    $fields = array('detail', 'comparsion', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
+    $fields = array('detail', 'comparison', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
@@ -286,7 +290,6 @@ function pledge_form_two_submitted() {
     $data = array_merge($step1data, $data);
     if (!$data['local']) $data['postcode'] = '';
     if ($data['visibility'] != 'password') { $data['visibility'] = 'all'; $data['password'] = ''; }
-    
     if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
         $errors[] = 'Please select either "at least" or "exactly" number of people';
     }
@@ -329,7 +332,7 @@ doesn't work, or you have any other suggests or comments.
     $q = db_query("
                 SELECT *, date - CURRENT_DATE AS daysleft
                 FROM pledges
-                WHERE date >= CURRENT_DATE AND password = '' AND confirmed
+                WHERE date >= CURRENT_DATE AND password is NULL AND confirmed
                 ORDER BY id
                 DESC LIMIT 5");
     $new = '';
@@ -362,7 +365,7 @@ doesn't work, or you have any other suggests or comments.
             FROM pledges, signers
             WHERE pledges.id = signers.pledge_id
                 AND pledges.date >= CURRENT_DATE AND pledges.confirmed
-                AND pledges.password = ''
+                AND pledges.password is NULL
             GROUP BY pledges.id, pledges.name, pledges.title, pledges.date,
                 pledges.target, pledges.type, pledges.signup, pledges.ref,
                 pledges.comparison
@@ -396,11 +399,13 @@ function view_faq() {
 function add_signatory() {
     global $today;
 
-    global $q_email, $q_ref, $q_pw;
+    global $q_email, $q_name, $q_showname, $q_ref, $q_pw;
     if (!is_null(importparams(
-            array('email',      '//',           ''),
+            array('email',      '/^[^@]+@.+/',     'Please give your email'),
+            array('name',       '/[a-z]/i',        'Please give your name'),
             array('ref',        '/^[a-z0-9-]+$/i', ''),
-            array('pw',         '//',           '', null)
+            array('showname',   '//',              'Please enter showname', 0),
+            array('pw',         '//',              '', null)
             )))
         err("Bad parameters in add_signatory.");
 
@@ -430,9 +435,11 @@ EOF
             );
     } else {
         /* Generate a secure URL to send to the user. */
-        $token = pledge_email_token($q_email, $r['id']);
-        /* ";" is not used in base64 */
-        $url = OPTION_BASE_URL . "confirm.php?email=" . urlencode($q_email) . "&pledge=" . $r['id'] . '&token=' . urlencode($token);
+        $data = array('email' => $q_email, 'name' => $q_name, 
+                'showname' => $q_showname, 'pledge_id' => $r['id']);
+        $token = pledge_random_token_store($data);
+        db_commit();
+        $url = OPTION_BASE_URL . "/I/" . $token;
 
         $success = pb_send_email(
                 $q_email,
@@ -465,26 +472,6 @@ few minutes, making sure that you carefully check the email address you give.
 <?
         return false;
     }
-}
-
-function send_success_email($pledge_id) {
-    $q = db_query('SELECT * FROM pledges WHERE pledges.id=? AND pledges.confirmed', array($pledge_id));
-    $r = db_fetch_array($q);
-    $globalsuccess = 1;
-    $title = $r['title'];
-    $body = 'Congratulations! You said "' . pledge_sentence($pledge_id, true, false) . '", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL."/".$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
-    $success = pb_send_email($r['email'], 'PledgeBank pledge success!', $body);
-    if ($success==0) 
-        $globalsuccess = 0;
-    $q = db_query('SELECT * FROM signers WHERE pledge_id=?', array($pledge_id));
-    $s = db_fetch_array($q);
-    while ($s) {
-        $success = pb_send_email($s['email'], 'PledgeBank pledge success!', $body);
-        if ($success==0) 
-            $globalsuccess = 0;
-        $s = db_fetch_array($q);
-    }
-    return $globalsuccess;
 }
 
 # Individual pledge page
@@ -539,10 +526,12 @@ function view_pledge() {
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
 <p>
 <input type="hidden" name="add_signatory" value="1">
-<input type="hidden" name="ref" value="<?=$h_ref ?>">
-Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
-<input type="submit" name="submit" value="Submit">
+<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
+Name: <input type="text" name="name" value="<?=htmlspecialchars(get_http_var('name'))?>">
+<br /> Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
+<br /> <input type="checkbox" name="showname" value="1" <?=get_http_var('showname') ? 'checked' : '' ?>> Show my name on this pledge 
+<br /><input type="submit" name="submit" value="Submit">
 </p>
 </div>
 <? }
@@ -581,16 +570,18 @@ function create_new_pledge($data) {
     # 'title', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'date', 'signup', 'country', 'postcode', 'password'
 	$isodate = $data['date']['iso'];
     $token = pledge_email_token($data['email'], $data['ref']);
+    if ($data['visibility'] == 'all')
+        $data['password'] = null;
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)', 
-        array($data['title'], $data['people'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password']));
+        array($data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password']));
 ?>
 <h2>Now check your email...</h2>
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other
 people to sign up to your pledge after you have clicked the link in the email.</p>
 <?
-	$link = OPTION_BASE_URL . 'confirm.php?token=' . urlencode($token);
+    $link = OPTION_BASE_URL . '/C/' . urlencode($token);
 	$success = pb_send_email($data['email'], 'New pledge at PledgeBank.com : '.$data['title'], "Thank you for submitting your pledge to PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
 	if ($success) {
             db_commit();

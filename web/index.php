@@ -5,15 +5,15 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.51 2005-03-04 18:49:45 matthew Exp $
+// $Id: index.php,v 1.52 2005-03-04 18:53:40 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
 require_once '../phplib/fns.php';
+require_once '../../phplib/importparams.php';
+require_once '../../phplib/utility.php';
 
 require_once 'contact.php';
-
-db_connect();
 
 $today = date('Y-m-d');
 
@@ -92,15 +92,30 @@ function report_form() {
 }
 
 function send_report() {
-    $q = db_query('SELECT * FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed AND signers.id=?', array(get_http_var('report')));
-    if (!db_num_rows($q)) {
-        print '<p>Illegal PledgeBank id!</p>';
-	return false;
-    } else {
-        $r = db_fetch_array($q);
-        $reason = get_http_var('reason');
-        pb_send_email(OPTION_CONTACT_EMAIL, "Signature reporting", "Reporting of '$r[name]' in pledge '$r[title]'\n\nReason given: $reason\n\n");
-        db_query('UPDATE signers SET showname=false,reported=true WHERE id=?', array(get_http_var('report')));
+    if (!is_null(importparams(
+                array('report',     '/^\d+$/',  ''),
+                array('reason',     '//',       '')
+            )))
+        err("A required parameter was missing");
+    $r = db_getRow('
+                select name as name, title
+                from signers, pledges
+                where signers.id = ?
+                    and signers.pledge_id = pledges.id
+                for update
+            ', array($q_report));
+    if (is_null($r))
+        err("Bad signer ID in report parameter");
+    else {
+        pb_send_email(
+                OPTION_CONTACT_EMAIL,
+                "Signature reporting",
+                "Reporting '$r[name]' in pledge '$r[title]'\n\nReason given: $q_reason\n\n");
+        db_query('
+                update signers
+                set showname = false, reported = true
+                where id = ?', array($q_report));
+        db_commit();
         print '<p>Thank you for reporting that signature; it will be looked at asap.</p>';
     }
 }
@@ -345,57 +360,61 @@ function view_faq() {
     include 'faq.php';
 }
 
+function confirmation_token() {
+    return implode("-", array_map('bin2hex', array(random_bytes(4), random_bytes(4))));
+}
+
 # Someone wishes to sign a pledge
 function add_signatory() {
     global $today;
 
-    $email = get_http_var('email');
-    $showname = get_http_var('showname') ? 't' : 'f';
-    $ref = get_http_var('pledge_id');
+    global $q_email, $q_name, $q_showname, $q_pledge_id, $q_pw;
+    if (!is_null(importparams(
+            array('email',      '//',           ''),
+            array('name',       '//',           ''),
+            array('showname',   '/^1$/',        '', '0'),
+            array('pledge_id',  '/^[a-z-]+$/i', ''),    /* NB really a reference, not an ID */
+            array('pw',         '//',           '', null)
+            )))
+        err("Bad parameters in add_signatory.");
 
-    $q = db_query('SELECT id,target,title,email,confirmed,date,password,comparison FROM pledges WHERE ref=?', array($ref));
-    if (!$q) {
-        print '<p>Illegal PledgeBank reference!</p>';
-        return false;
-    }
+    $r = db_getRow('
+                select id, target, title, email, confirmed, date, password,
+                    comparison
+                from pledges
+                where ref = ?
+                for update', $q_pledge_id);
 
-    $r = db_fetch_array($q);
+    if (!$r || $r['confirmed'] != 't')
+        err("Bad PledgeBank reference");
+
+    if ($q_email == $r['email'])
+        err("You can't sign your own pledge");
+    
+    if ($r['date'] < $today)
+        err("You can't sign a closed pledge");
+
+    if (!is_null($r['password']) && (is_null($q_pw) || $q_pw != $r['password']))
+        err("Permission denied");
+                
     $action = $r['title'];
     $target = $r['target'];
     $id = $r['id'];
     $password = $r['password'];
     $comparison = comparison_nice($r['comparison']);
 
-    if ($r['confirmed'] != 't') {
-        print '<p>Illegal PledgeBank reference!</p>';
-        return false;
-    }
-
-    if ($email == $r['email']) {
-        print '<p>You can\'t sign your own pledge!</p>';
-        return false;
-    }
-
-    if ($r['date']<$today) {
-        print '<p>You can\'t sign up to a closed Pledge!</p>';
-        return false;
-    }
-
-    if ($password) {
-        if ($pw = get_http_var('pw')) {
-            if ($pw != $password) {
-                print '<p>Incorrect password!</p>';
-                return false;
-            }
-        } else {
-            print '<p>Something went wrong; please <a href="./'.$ref.'">try again</a>.</p>';
-            return false;
-        }
-    }
     if ($comparison=='exactly') {
-        $q = db_query('SELECT * FROM signers WHERE pledge_id=? AND confirmed', array($id));
+        /* Postgres doesn't allow you to do 'select count(...) for update' so
+         * actually select and lock all the rows. This will be slow; it's
+         * possible that using 'lock table' would be faster. */
+        db_query('lock table signers in row share mode');
+        $q = db_query('
+                    select id
+                    from signers
+                    where pledge_id = ? and confirme
+                    for update', $id);
         if ($q) {
-            $r = db_fetch_array($q);
+//            $r = db_fetch_array($q);
             $signedup = db_num_rows($q);
             if ($signedup >= $target) {
                 print '<p>That pledge has already reached its target, sorry.</p>';
@@ -404,66 +423,83 @@ function add_signatory() {
         }
     }
 	
-    $q = db_query('SELECT email FROM signers WHERE pledge_id = ? AND email= ?', array($id, $email));
+    $q = db_query('SELECT email FROM signers WHERE pledge_id = ? AND email= ?', array($id, $q_email));
     if (db_num_rows($q)) {
         print '<p>You have already signed this pledge!</p>';
         return false;
     }
 
-    $token = str_replace('.', 'X', substr(crypt($id.' '.$email.microtime()), 12, 16));
-    $add = db_query('INSERT INTO signers (pledge_id, name,
-        email, showname, signtime, token, confirmed) VALUES
-        (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, false)', 
-        array($id, get_http_var('name'), $email, $showname, $token));
+    $token = confirmation_token();
+    db_query('
+            insert into signers (
+                pledge_id, name, email, showname, signtime, token, confirmed
+            ) values (
+                ?, ?, ?, ?, current_timestamp, ?, false
+            )', array($id, $q_name, $q_email, $q_showname, $token));
+
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
-    $success = pb_send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
-    if ($success) { ?>
-<p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="<?=$ref ?>">Back to pledge page</a></p>
+    $success = pb_send_email($q_email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
+    
+    if ($success) {
+        db_commit();
+        global $q_h_pledge_id;
+    ?>
+<p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="<?=$q_h_pledge_id ?>">Back to pledge page</a></p>
 <?      return true;
-    } else { ?>
-<p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>
-<?      return false;
+    } else {
+        db_rollback();
+?>
+<p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>'
+<?
+        return false;
     }
 }
 
-# Pledgee has clicked on link in their email
+# Pledger has clicked on link in their email
 function confirm_signatory() {
-    $token = get_http_var('confirms');
-    $q = db_query('SELECT pledge_id,confirmed FROM signers WHERE token = ?', array($token));
-    $row = db_fetch_array($q);
-    if (!$row) {
-        print '<p>Confirmation token not recognised!</p>';
-        return false;
+    global $q_confirms, $q_unchecked_h_confirms;
+    if (!is_null(importparams(
+                array('confirms', '/^[0-9a-f]{8}-[0-9a-f]{8}$/', '')
+            )))
+        err("Bad confirmation token '$q_unchecked_h_confirms'");
+
+    $r = db_getRow('
+                select pledge_id, signers.confirmed as confirmed, ref, title, date
+                from signers, pledges
+                where signers.token = ? and pledges.id = signers.pledge_id
+                for update', $q_confirms);
+    if (!$r)
+        err("Bad confirmation token '$q_unchecked_h_confirms'");
+
+    $pledge_id = $r['pledge_id'];
+    $confirmed = ($r['confirmed'] == 't');
+    
+    $justreachedtarget = false;
+    if (!$confirmed) {
+	db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($q_confirms));
+        /* Find out if the pledge has just reached its target. */
+        if (db_getOne('
+                    select count(signers.id) - (select target from pledges where id = ?)
+                    from signers
+                    where pledge_id = ?',
+                array($pledge_id, $pledge_id)) >= 0)
+            $justreachedtarget = true;
     }
+        
+    db_commit();
 
-    $pledge_id = $row['pledge_id'];
-    $confirmed = ($row['confirmed'] == 't');
-    if ($confirmed) {
-        print '<p>You have already confirmed your signature for this pledge!</p>';
-#        return false;
-    }
+    print <<<EOF
+<p>Thank you for confirming your signature!</p>
+EOF;
 
-    db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($token));
-    $success = db_affected_rows();
-    if ($success) {
-        # 
-        $q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed AND signers.confirmed', array($pledge_id));
-        if ($q) {
-            $r = db_fetch_array($q);
-            $signedup = db_num_rows($q);
-            $target = $r['target'];
-            if ($signedup == $target) {
-                print '<p><strong>Your signature has made this Pledge reach its target! Woohoo!</strong></p>';
-                if (send_success_email($pledge_id)) {
-                    print '<p><em>An email has been sent to all concerned.</em></p>';
-                } else {
-                    print '<p><em>Something went wrong sending a success email.</em></p>';
-                }
-            }
-        } ?>
-<p>Thank you for confirming your signature. <a href="<?=$r['ref'] ?>">View pledge page</a>.</p>
-
-<p><a href="<?=$r['ref'] ?>/flyers">View and print Customised Flyers for this pledge</a></p>
+    if ($justreachedtarget) {
+        print <<<EOF
+<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>
+EOF;
+        send_success_email($pledge_id); /* XXX */
+    } else {
+?>
+<p><a href="<?=htmlspecialchars($r['ref']) ?>/flyers">View and print Customised Flyers for this pledge</a></p>
 
 <p align="center"><big>Why not <strong>
 <script type="text/javascript">
@@ -490,17 +526,15 @@ for ($rows = 0; $rows<4; $rows++) {
     print '<tr align="center">';
     for ($cols=0; $cols<2; $cols++) {
         print '<td>';
-        print '<strong>"I will ' . $r['title'] . '"</strong>';
+        print '<strong>"I will ' . htmlspecialchars($r['title']) . '"</strong>';
         print '<br>Deadline: ' . prettify($r['date']);
-        print '<br>www.pledgebank.com/' . $r['ref'];
+        print '<br>www.pledgebank.com/' . htmlspecialchars($r['ref']);
         print '</td>';
     }
     print '</tr>';
 }
 ?>
 </table>
-<?  } else { ?>
-<p>Something went wrong confirming your signature, hmm.</p>
 <?  }
 }
 
@@ -640,7 +674,7 @@ if ($detail) {
 function create_new_pledge($data) {
     # 'action', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'date', 'signup', 'country', 'postcode', 'password'
 	$isodate = $data['date']['iso'];
-	$token = str_replace('.', 'X', substr(crypt($data['ref'] . ' ' . $data['email'] . microtime()), 12, 16));
+        $token = confirmation_token();
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)', 
@@ -655,10 +689,14 @@ function create_new_pledge($data) {
 <?
 	$link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirmp=' . $token);
 	$success = pb_send_email($data['email'], 'New pledge at PledgeBank.com : '.$data['action'], "Thank you for submitting your pledge to PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
-	if ($success) { ?>
+	if ($success) {
+            db_commit();
+?>
 <p>An email has been sent to the address you gave to confirm the address is yours. <strong>Please check your email, and follow the link given there.</strong></p>
 <?		return true;
-	} else { ?>
+	} else {
+            db_rollback();
+?>
 <p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>
 <?		return false;
 	}
@@ -667,27 +705,19 @@ function create_new_pledge($data) {
 # Pledger has clicked on link in their email
 function confirm_pledge() {
 	$token = get_http_var('confirmp');
-	$q = db_query('SELECT confirmed FROM pledges WHERE token = ?', array($token));
+	$q = db_query('SELECT confirmed FROM pledges WHERE token = ? for update', array($token));
 	$row = db_fetch_array($q);
 	if (!$row) {
 		print '<p>Confirmation token not recognised!</p>';
 		return false;
 	}
 
-	$confirmed = ($row['confirmed'] == 't');
-	if ($confirmed) {
-		print '<p>You have already confirmed this pledge!</p>';
-		return false;
-	}
-
 	db_query('UPDATE pledges SET confirmed=true,creationtime=CURRENT_TIMESTAMP WHERE token = ?', array($token));
-	$success = db_affected_rows();
-	if ($success) { ?>
+        db_commit();
+        print <<<EOF
 <p>Thank you for confirming that pledge. It is now live, and people can sign up to it. OTHER STUFF.</p>
-<?	} else { ?>
-<p>Something went wrong confirming your pledge, hmm.</p>
-<?	}
-	return $success;
+EOF;
+	return 1;
 }
 
 function list_all_pledges() {

@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: db.php,v 1.10 2005-02-28 10:18:55 chris Exp $
+// $Id: db.php,v 1.11 2005-03-04 18:53:40 chris Exp $
 
 require_once "DB.php";
 
@@ -14,19 +14,18 @@ require_once "DB.php";
  * Connect a global handle to the database. */
 function db_connect() {
     global $pbdb;
-
-	$vars = array('hostspec'=>'HOST', 'port'=>'PORT', 'database'=>'NAME', 'username'=>'USER', 'password'=>'PASS');
-	$connstr = array('phptype'=>'pgsql');
-	foreach ($vars as $k => $v) {
-		if (defined('OPTION_PB_DB_' . $v)) {
-			$connstr[$k] = constant('OPTION_PB_DB_' . $v);
-		}
-	}
+    $vars = array('hostspec'=>'HOST', 'port'=>'PORT', 'database'=>'NAME', 'username'=>'USER', 'password'=>'PASS');
+    $connstr = array('phptype'=>'pgsql');
+    foreach ($vars as $k => $v) {
+        if (defined('OPTION_PB_DB_' . $v)) {
+            $connstr[$k] = constant('OPTION_PB_DB_' . $v);
+        }
+    }
     $pbdb = DB::connect($connstr);
-
     if (DB::isError($pbdb)) {
         die($pbdb->getMessage());
     }
+    $pbdb->autoCommit(false);
 }
 
 /* db_query QUERY PARAMETERS
@@ -48,6 +47,8 @@ function db_query($query, $params = array()) {
  * Execute QUERY and return a single value of a single column. */
 function db_getOne($query, $params = array()) {
     global $pbdb;
+    if (!is_array($params))
+        $params = array($params);
     if (!isset($pbdb))
         db_connect();
     $result = $pbdb->getOne($query, $params);
@@ -56,6 +57,23 @@ function db_getOne($query, $params = array()) {
     }
     return $result;
 }
+
+/* db_getRow QUERY PARAMETERS
+ * Execute QUERY and return an associative array of the columns of the first
+ * row returned. */
+function db_getRow($query, $params = array()) {
+    global $pbdb;
+    if (!is_array($params))
+        $params = array($params);
+    if (!isset($pbdb))
+        db_connect();
+    $result = $pbdb->getRow($query, $params, DB_FETCHMODE_ASSOC);
+    if (DB::isError($result)) {
+        die($result->getMessage().': "'.$result->getDebugInfo().'"');
+    }
+    return $result;
+}
+
 
 /* db_fetch_array QUERY
  * Fetch values of the next row from QUERY as an associative array from column
@@ -83,6 +101,20 @@ function db_affected_rows() {
     if (!isset($pbdb))
         die("db_affected_rows called before any query made");
     return $pbdb->affectedRows();
+}
+
+/* db_commit
+ * Commit current transaction. */
+function db_commit () {
+    global $pbdb;
+    $pbdb->commit();
+}
+
+/* db_rollback
+ * Roll back current transaction. */
+function db_rollback () {
+    global $pbdb;
+    $pbdb->commit();
 }
 
 ?>

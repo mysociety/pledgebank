@@ -6,12 +6,8 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: PB.pm,v 1.1 2005-03-02 20:08:35 chris Exp $
+# $Id: PB.pm,v 1.2 2005-03-11 17:11:49 chris Exp $
 #
-
-package PB;
-
-use strict;
 
 package PB::Error;
 
@@ -52,5 +48,15 @@ sub secret () {
     return scalar(dbh()->selectrow_array('select secret from secret'));
 }
 
+package PB;
+
+use secret;
+
+use PB::DB;
+
+sub pledge_is_valid_to_sign ($$$) {
+    my ($pledge, $email, $mobile) = @_;
+    return scalar(dbh()->selectrow_array('select pledge_is_valid_to_sign(?, ?, ?)', {}, $pledge, $email, $mobile);
+}
 
 1;

@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.7 2005-03-09 10:30:20 chris Exp $
+# $Id: SMS.pm,v 1.8 2005-03-11 17:11:49 chris Exp $
 #
 
 package PB::SMS;
@@ -112,31 +112,50 @@ sub receive_sms ($$$$$) {
 @PB::SMS::delivered_handlers = (
         ['sms-signup',
         sub ($$$$$) {
-            my ($id) = @_;
-            # Confirm signer who has signed up by SMS and been sent a 
+            my ($id, $text, $sender) = @_;
+            # Add signer who has signed up by SMS and received a 
             # conversion-to-email message.
-            my $signer_id = dbh()->selectrow_array('
-                                    select signer_id
-                                    from outgoingsms_signers
-                                    where outgoingsms_id = ?
-                                    for update
-                                ', {}, $id);
-            return 0 if (!defined($signer_id));
+            my ($pledge_id, $token) =
+                dbh()->selectrow_array('
+                        select pledge_id, token
+                        from pledge_outgoingsms
+                        where pledge_outgoingsms.outgoingsms_id = outgoingsms.id'
+                        {}, $id);
 
-            dbh()->do('
-                    update signers
-                    set confirmed = true
-                    where id = ?
-                ', {}, $signer_id);
+            return 0 if (!defined($pledge_id));
 
-            # Now delete any other records of SMSs sent to this mobile number
-            # for this signer.
-            dbh()->do('
-                    delete from outgoingsms_signers
-                    where signer_id = ?
-                ', {}, $signer_id);
-
-            return 1;
+            my $r = PB::pledge_is_valid_to_sign($pledge_id, undef, $mobile);
+            if ($r eq 'signed') {
+                # Already signed, but that's OK.
+                print_log('debug', "#$id delivered, but $sender already signed up to pledge id $pledge_id");
+                return 1;
+            } elsif ($r ne 'ok') {
+                my %errormsg = (
+                    finished => "Sorry, in between your texting us and our reply reaching you, that pledge finished. Better luck next time!",
+                    full => "Sorry, in between your texting us and our reply reaching you, the last place on that pledge was taken. Better luck next time!"
+                        # we've already tested for 'none' and 'signed'
+                    );
+                die "pledge_is_valid_to_sign returned unexpected result '$r' for $sender on pledge $pledge_id"
+                    unless (exists($errormsg{$r}));
+                print_log('debug', "#$id delivered, but $sender cannot sign up because pledge $pledge_id is $r");
+                send_sms(
+                        $sender,
+                        $errormsg{$r}
+                    );
+            } else {
+                # Add signer and delete record mapping the SMS to the pledge
+                # so that the SMS itself may be deleted.
+                dbh()->do('
+                        insert into signers (pledge_id, mobile, signtime,
+                            token)
+                        values (?, ?, current_timestamp, ?)',
+                        {}, $pledge_id, $sender, $token);
+                dbh()->do('
+                        delete from pledge_outgoingsms
+                        where outgoingsms_id = ?', {}, $id);
+                print_log('debug', "#$id delivered, and $sender signed up to pledge id $pledge_id");
+                return 1;
+            }
         }]
     );
 
@@ -151,18 +170,8 @@ sub receive_sms ($$$$$) {
             # and a signer. If that signer is not confirmed and has no other
             # outstanding SMSs, then drop the signer too.
             dbh()->do('
-                    delete from outgoingsms_signers
+                    delete from pledge_outgoingsms
                     where outgoingsms_id = ?
-                ');
-            dbh()->do('
-                    delete from signers
-                    where not confirmed
-                        and email is null
-                        and (
-                            select count(outgoingsms_id)
-                            from outgoingsms_signers
-                            where signer_id = signers.id
-                        ) = 0
                 ');
             return 1;
         }]
@@ -200,107 +209,89 @@ sub receive_sms ($$$$$) {
                 }
                 print_log('debug', "incoming message #$id is signup request for pledge $pledge_id ($ref)");
 
-                # Must check that they haven't signed up before. If they have,
-                # and the subscription is confirmed, send an error report; or
-                # if it's unconfirmed, send them a reminder of the token.
-                my ($signer_id, $c, $token)
-                            = dbh()->selectrow_array('
-                                    select id, confirmed, token from signers
+                # Three cases:
+                #   1. SMS from unknown person
+                #   2. SMS from person who has signed but not converted
+                #   3. SMS from person who has signed and converted
+                #
+                # In case 3 we send an error message. Cases 1 and 2 are
+                # handled the same way -- we send out a conversion URL. But
+                # don't do this in case 1 unless the pledge is still signable
+                # -- obviously we're not signing it yet, but we might as well
+                # catch the common case here as long as no race condition
+                # remains.
+                my ($signer_id, $email) = dbh()->selectrow_array('
+                                    select id, email from signers
                                     where pledge_id = ? and mobile = ?
                                     for update', {}, $pledge_id, $sender);
 
-                if (defined($signer_id) && $c) {
-                    print_log('debug', "user at $sender has already signed and confirmed on $pledge_id as signer $signer_id");
-                    send_sms(
-                            $sender,
-                            "You're already signed up to this pledge!"
-                        );
-                }
-                
-                # OK, we've got a signup request. Send them a conversion
-                # message and add them to the list.
-                # XXX birthday probability; this will be OK until we have ~64K
-                # or more outstanding conversion SMSs.
+                my $send_token = 0;
 
-                # Only create a new token if they haven't already been sent
-                # one.
+                if (defined($signer_id)) {
+                    if (defined($email)) {
+                        # Case 3. Just send an error message.
+                        print_log('debug', "user at $sender has already signed up and converted on $pledge_id as signer $signer_id; sending error message");
+                        send_sms(
+                                $sender,
+                                "You're already signed up to this pledge!"
+                            );
+                        return 1;
+                    } else {
+                        # Case 2.
+                        $send_token = 1;
+                    }
+                } else {
+                    # Case 1. But we should only send the token in the case
+                    # where the pledge is still signable.
+                    my $r = PB::pledge_is_valid_to_sign($pledge_id, undef, $sender);
+                    my %errormsg = (
+                            finished => "Sorry, it's too late to sign up to that pledge",
+                            full => "Sorry, that pledge is now full"
+                                # we've already tested for 'none' and 'signed'
+                        );
+                    if ($r ne 'ok') {
+                        die "pledge_is_valid_to_sign returned unexpected result '$r' for $sender on pledge $pledge_id"
+                            unless (exists($errormsg{$r}));
+                        send_sms(
+                                $sender,
+                                $errormsg{$r}
+                            );
+                        return 1;
+                    }
+                }
+
+                # If the have already sent us an SMS, then we should dig out
+                # the token we've already sent them.
+                my $token =
+                    dbh()->selectrow_array('
+                            select token
+                            from pledge_outgoingsms, outgoingsms
+                            where pledge_outgoingsms.outgoingsmsid = outgoingsms.id
+                                and pledge_id = ?
+                                and recipient = ?', {}, $pledge_id, $sender);
+
+                # XXX should also limit total number of SMSs sent to this phone
+                # on this pledge.
+
                 my $token ||= unpack('h*', mySociety::Util::random_bytes(2))
                                 . "-"
                                 . unpack('h*', mySociety::Util::random_bytes(2));
 
-                if (!defined($signer_id)) {
-                    # At this point we have to check that they can sign this
-                    # pledge, and, if they can, create a new signer record.
-                    my ($date, $comparison, $target) =
-                        dbh()->selectrow_array('
-                                select date, comparison, target
-                                from pledges
-                                where id = ?',
-                                {}, $pledge_id
-                            );
-
-                    if ($date lt strftime('%Y-%m-%d', localtime())) {
-                        # Pledge has closed.
-                        send_sms(
-                                $sender,
-                                sprintf('Sorry! The pledge %s has now closed.',
-                                    $ref)
-                            );
-                        print_log('debug', "pledge $pledge_id is closed");
-                        return 1;
-                    } elsif ($comparison eq 'exactly') {
-                        # Lock signers table, count sigers.
-                        dbh()->do('lock table signers in row share mode');
-                        my $num = dbh()->selectrow_array('
-                                        select count(id)
-                                        from signers
-                                        where pledge_id = ? and confirmed
-                                    ', {}, $pledge_id);
-                        if ($num >= $target) {
-                            # Pledge has reached target.
-                            send_sms(
-                                    $sender,
-                                    sprintf('Sorry! The pledge "%s" has now reached its target',
-                                        $ref)
-                                );
-                            print_log('debug', "pledge $pledge_id has already reached its target");
-                            return 1;
-                        }
-                    } else {
-                        # We're OK; create a new unconfirmed signer.
-                        $signer_id = dbh()->selectrow_array("select nextval('signers_id_seq')");
-                        dbh()->do('
-                                insert into signers
-                                    (id, pledge_id, mobile, signtime, token)
-                                values (?, ?, ?, current_timestamp, ?)
-                            ', {}, $signer_id, $pledge_id, $sender, $token, $new_id);
-                        print_log('debug', "signing up $sender to $pledge_id as signer $signer_id");
-                    }
-                } elsif (scalar(dbh()->selectrow_array('
-                                    select count(outgoingsms_id)
-                                    from outgoingsms_signers
-                                    where signer_id = ?
-                                ', {}, $signer_id)) > 2) {
-                    # We've already sent several replies to this; don't send
-                    # another.
-                    print_log('debug', "have already sent 3 SMSs to $sender for pledge $pledge_id as signer $signer_id");
-                    return 1;
-                }
-
-                # Send conversion message.
-                my ($new_id) = send_sms(
-                                    $sender,
-                                    sprintf('Thanks for pledging! Visit %sS/%s to sign up for email and more.',
-                                        mySociety::Config::get('BASE_URL'),
-                                        $token
-                                ));
+                my ($new_id) =
+                    send_sms(
+                            $sender,
+                            sprintf('Thanks for pledging! Visit %sS/%s to sign up for email and more.',
+                                    mySociety::Config::get('BASE_URL'),
+                                    $token
+                            ));
 
                 dbh()->do('
-                        insert into outgoingsms_signers
-                            (signer_id, outgoingsms_id)
-                        values (?, ?)', {}, $signer_id, $new_id);
+                        insert into pledge_outgoingsms
+                            (pledge_id, outgoingsms_id)
+                        values (?, ?)', {}, $pledge_id, $new_id);
 
-                print_log('debug', "sending conversion request #$new_id to $sender as signer $signer_id for $pledge_id");
+        
+                print_log('debug', "sending conversion request #$new_id to $sender for $pledge_id");
 
                 return 1;
             } else {

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.17 2005-03-04 14:52:32 francis Exp $
+-- $Id: schema.sql,v 1.18 2005-03-04 18:36:36 chris Exp $
 --
 
 -- secret
@@ -22,7 +22,7 @@ create table pledges (
     -- summary of pledge
     title text not null,
     -- number of type ("people" etc.) to reach
-    target text not null,
+    target integer not null check (target > 0),
     type text not null,
     -- display verb for joining the pledge
     signup text not null default 'sign up',

@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.15 2005-03-30 16:10:05 sandpit Exp $
+# $Id: SMS.pm,v 1.16 2005-04-05 18:02:55 chris Exp $
 #
 
 package PB::SMS;
@@ -93,15 +93,17 @@ sub encode_ia5 ($) {
     return $ret;
 }
 
-=item send_sms RECIPIENTS MESSAGE
+=item send_sms RECIPIENTS MESSAGE [ISPREMIUM]
 
 Send the MESSAGE to RECIPIENTS (an international-format phone number or
-reference to an array of same). Returns in list context the IDs of the outgoing
-messages created or dies on error. Does not commit.
+reference to an array of same). If ISPREMIUM is true, the message is sent as a
+25p "premium" (reverse-billed) message. Returns in list context the IDs of the
+outgoing messages created or dies on error. Does not commit.
 
 =cut
-sub send_sms ($$) {
-    my ($r, $msg) = @_;
+sub send_sms ($$;$) {
+    my ($r, $msg, $ispremium) = @_;
+    $ispremium ||= 0;
     if (ref($r) eq '') {
         $r = [$r];
     } elsif (ref($r) ne 'ARRAY') {
@@ -115,10 +117,10 @@ sub send_sms ($$) {
         push(@ids, $id);
         PB::DB::dbh()->do('
                 insert into outgoingsms
-                    (id, recipient, message, whensubmitted)
-                values (?, ?, ?, ?)',
+                    (id, recipient, message, whensubmitted, ispremium)
+                values (?, ?, ?, ?, ?)',
                 {},
-                $id, $recipient, $msg, time());
+                $id, $recipient, $msg, time(), $ispremium ? 't' : 'f');
     }
     return @ids;
 }
@@ -360,7 +362,9 @@ sub receive_sms ($$$$$$) {
                                     ordinal($numsigned),
                                     mySociety::Config::get('BASE_URL'),
                                     $token
-                            ));
+                            ),
+                            1       # this SMS costs them 25p
+                        );
 
                 dbh()->do('
                         insert into smssubscription

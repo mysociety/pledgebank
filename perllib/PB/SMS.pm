@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.12 2005-03-29 13:59:28 chris Exp $
+# $Id: SMS.pm,v 1.13 2005-03-29 15:24:03 sandpit Exp $
 #
 
 package PB::SMS;
@@ -123,22 +123,22 @@ sub send_sms ($$) {
     return @ids;
 }
 
-=item receive_sms SENDER RECIPIENT MESSAGE FOREIGNID WHENSENT
+=item receive_sms SENDER RECIPIENT NETWORK MESSAGE FOREIGNID WHENSENT
 
 Record a received SMS message in the database. Returns the ID of the received
 message. Does not commit.
 
 =cut
-sub receive_sms ($$$$$) {
-    my ($sender, $receiver, $msg, $foreignid, $whensent) = @_;
+sub receive_sms ($$$$$$) {
+    my ($sender, $receiver, $network, $msg, $foreignid, $whensent) = @_;
     my $id = dbh()->selectrow_array("select nextval('incomingsms_id_seq')");
     dbh()->do('
             insert into incomingsms
-                (id, sender, recipient, message, foreignid,
+                (id, sender, recipient, network, message, foreignid,
                     whenreceived, whensent)
-            values (?, ?, ?, ?, ?, ?, ?)',
+            values (?, ?, ?, ?, ?, ?, ?, ?)',
             {},
-            $id, $sender, $receiver, $msg, $foreignid, time(), $whensent);
+            $id, $sender, $receiver, $network, $msg, $foreignid, time(), $whensent);
     return $id;
 }
 
@@ -239,7 +239,7 @@ sub receive_sms ($$$$$) {
         sub ($$$$$) {
             my ($id, $message, $sender, $recipient) = @_;
             my $keyword = mySociety::Config::get('PB_SMS_PREFIX', '');
-            if ($message =~ m#^\s*\Q$keyword\E\s*([^\s]+)#) {
+            if ($message =~ m#^\s*\Q$keyword\E\s*([^\s]+)#i) {
                 # Could be a signup request.
                 my $ref = $1;
                 # Exact reference match.

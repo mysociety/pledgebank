@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.106 2005-03-29 14:23:15 francis Exp $
+// $Id: index.php,v 1.107 2005-03-29 15:32:51 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -163,8 +163,8 @@ the door of that neighbour whose name you've forgotten.</li>
 <div class="c">
 <p><strong>I will</strong> <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
-<p><strong>if</strong> <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'3') ?>">
-<input type="text" id="type" name="type" size="67" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):'other local people') ?>"></p>
+<p><strong>but only if</strong> <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'3') ?>">
+<input type="text" id="type" name="type" size="67" value="other local people"></p>
 
 <p><strong>will</strong> <input type="text" id="signup" name="signup"
 size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'do the same') ?>">.</p>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.10 2005-03-29 15:06:23 francis Exp $
+ * $Id: sms.php,v 1.11 2005-03-29 15:32:51 francis Exp $
  * 
  */
 
@@ -193,7 +193,7 @@ few minutes, making sure that you carefully check the email address you give.
             if ($errs) {
                 /* Form to supply info for the subscription */
                 page_header('SMS');
-                conversion_form($q_f ? $errs : null);
+                conversion_form($q_f ? $errs : null, $pledge_id);
                 page_footer();
             }
         }
@@ -245,7 +245,7 @@ EOF;
 /* conversion_form ERRORS
  * Display the form for a user to convert their SMS subscription to email.
  * ERRORS is an array of errors to display for each field. */
-function conversion_form($errs) {
+function conversion_form($errs, $pledge_id) {
     global $q_h_token, $q_unchecked_h_phone, $q_unchecked_h_email, $q_unchecked_h_name;
     print <<<EOF
 <h2>Thanks for signing up!</h2>
@@ -254,26 +254,39 @@ function conversion_form($errs) {
 get email from the pledge creator and, if you want, discuss the pledge with
 other signers. If you give us your email address we can also email you when the
 pledge succeeds, rather than sending an SMS.</p>
+EOF;
+    if ($errs) {
+        print '<div id="errors"><ul>';
+        if (array_key_exists('phone', $errs))
+            print "<li>" . htmlspecialchars($errs['phone']) . "</li";
+        if (array_key_exists('name', $errs))
+            print "<li>" . htmlspecialchars($errs['name']) . "</li>";
+        if (array_key_exists('email', $errs))
+            print "<li>" . htmlspecialchars($errs['email']) . "</li>";
+        print '</ul></div>';
+    } else {
+        $pledge_info = db_getRow('select * from pledges where id = ?', $pledge_id);
+        $sentence = pledge_sentence($pledge_info, array('firstperson'=>true, 'html'=>true));
+        $pretty_date = prettify($pledge_info['date']);
+        $pretty_name = htmlspecialchars($pledge_info['name']);
+    
+        print <<<EOF
+        <div class="tips" style="text-align: center">
+        <p style="margin-top: 0">&quot;$sentence&quot;</p>
+        <p>Deadline: <strong>$pretty_date</strong></p>
+        </div>
+EOF;
 
+    }
+
+    print <<<EOF
 <form class="pledge" method="post">
 <input type="hidden" name="f" value="1">
 <input type="hidden" name="token" value="$q_h_token">
 <p>
 Phone number: <input type="text" name="phone" value="$q_unchecked_h_phone"><br/>
-EOF;
-    if ($errs && array_key_exists('email', $errs))
-        print "<em>" . htmlspecialchars($errs['email']) . "</em><br/>";
-    print <<<EOF
 Name: <input type="text" name="name" value="$q_unchecked_h_name"><br/>
-EOF;
-    if ($errs && array_key_exists('phone', $errs))
-        print "<em>" . htmlspecialchars($errs['phone']) . "</em><br/>";
-    print <<<EOF
 Email: <input type="text" name="email" size="30" value="$q_unchecked_h_email"><br/>
-EOF;
-    if ($errs && array_key_exists('name', $errs))
-        print "<em>" . htmlspecialchars($errs['name']) . "</em><br/>";
-    print <<<EOF
 Show my name on this pledge: <input name="showname" value="1" checked="checked" type="checkbox"><br/>
 <input type="submit" name="submit" value="Submit">
 EOF;

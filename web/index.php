@@ -419,4 +419,14 @@ function confirm_pledge() {
 	return $success;
 }
 
+function list_all_pledges() {
+        print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
+        $q = db_query('SELECT id,title,target,date,name,ref FROM pledges WHERE confirmed=1');
+        print '<table><tr><th>ID</th><th>Title</th><th>Target</th><th>Date</th><th>Name</th><th>Ref</th></tr>';
+        while ($r = db_fetch_row($q)) {
+                $r[1] = '<a href="./?pledge='.$r[0].'">'.$r[1].'</a>';
+                print '<tr><td>'.join('</td><td>',array_map('prettify',$r)).'</td></tr>';        }
+        print '</table>';
+}
+
 ?>

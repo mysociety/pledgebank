@@ -463,7 +463,7 @@ function search() {
         Header("Location: $_GET[search]"); # TODO: should be absolute?
         exit;
     }
-    $q = db_query('SELECT date,ref,title FROM pledges WHERE title LIKE \'%\' || ? || \'%\' ORDER BY date', array($_GET['search']));
+    $q = db_query('SELECT date,ref,title FROM pledges WHERE title ILIKE \'%\' || ? || \'%\' ORDER BY date', array($_GET['search']));
     if (!db_num_rows($q)) {
         return '<p>Sorry, we could find nothing that matched "' . htmlspecialchars($_GET['search']) . '".</p>';
     } else {

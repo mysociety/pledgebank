@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.2 2005-03-03 16:35:09 francis Exp $
+# $Id: poster.cgi,v 1.3 2005-03-04 14:06:06 matthew Exp $
 #
 
 import sys
@@ -27,9 +27,6 @@ ref = form.getfirst("ref", "")
 type = form.getfirst("type", "cards")
 size = form.getfirst("size", "A4")
 
-title = "I will do something if other people do too"
-date = "1st February 2005"
-
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 
@@ -47,7 +44,7 @@ def draw_pledge(x, y):
     c.setFont("Helvetica", size)
     c.drawCentredString(x, (y-2)*cm, text)
 
-    text = "http://%s.pledgebank.com/" % ref
+    text = "http://pledgebank.com/%s" % ref
     size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
     c.setFont("Helvetica", size)
     c.drawCentredString(x, (y-3)*cm, text)
@@ -85,14 +82,14 @@ def cards():
 def tearoff():
     x = 10.5*cm
     y = 20
-    text = "\"I will test this site if 1 person will do the same\""
+    text = "\"%s\"" % title
     size = 32/(c.stringWidth(text, "Helvetica", 32)/cm)*19
     c.setFont("Helvetica", size)
     c.drawCentredString(x, (y-1)*cm, text)
     c.setFont("Helvetica", size*0.8)
-    text = "Deadline: 16th January 2005"
+    text = "Deadline: %s" % date
     c.drawCentredString(x, (y-3)*cm, text)
-    text = "http://%s.pledgebank.com/" % ref
+    text = "http://pledgebank.com/%s" % ref
     c.drawCentredString(x, (y-5)*cm, text)
     c.setDash(3,3)
     stripheight = 8*cm
@@ -103,12 +100,12 @@ def tearoff():
         c.setFont("ZapfDingbats", 24)
         c.drawString(1*cm, -x*cm-9, '"')
         c.setFont("Helvetica", 10)
-        text = "\"I will test this site if 1 person will do the same\""
+        text = "\"%s\"" % title
         c.drawCentredString(stripheight/2, (2.2-x)*cm, text)
         c.setFont("Helvetica", 9)
-        text = "Deadline: 16th January 2005"
+        text = "Deadline: %s" % date
         c.drawCentredString(stripheight/2, (1.2-x)*cm, text)
-        text = "http://%s.pledgebank.com/" % ref
+        text = "http://pledgebank.com/%s" % ref
         c.drawCentredString(stripheight/2, (0.7-x)*cm, text)
     c.showPage()
 

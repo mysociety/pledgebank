@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.43 2005-03-04 13:56:26 matthew Exp $
+// $Id: index.php,v 1.44 2005-03-04 14:06:06 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -637,15 +637,15 @@ function pdfs() {
     $ref = get_http_var('pdf');
 	$q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
 	$row = db_fetch_array($q);
-    $pdf_cards_url = new_url("/poster.cgi", false, 
+    $pdf_cards_url = new_url("poster.cgi", false, 
         'title', $row['title'], 'date', $row['date'], 'ref', $ref,
         'type', 'cards', 'size', 'A4');
-    $pdf_tearoff_url = new_url("/poster.cgi", false, 
+    $pdf_tearoff_url = new_url("poster.cgi", false, 
         'title', $row['title'], 'date', $row['date'], 'ref', $ref,
         'type', 'tearoff', 'size', 'A4');
     ?>
 <h2>Customised Flyers</h2>
-<p>Below you can generate PDFs containing your pledge data, to print out, display, hand out, or whatever.</p>
+<p>Below you can generate <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
 <li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
 <li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>

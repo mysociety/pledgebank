@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.17 2005-03-17 19:03:34 francis Exp $
+# $Id: poster.cgi,v 1.18 2005-03-17 19:16:21 francis Exp $
 #
 
 import os
@@ -286,7 +286,7 @@ while fcgi.isFCGI():
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         if pledge['signup'] == "do the same":
             pledge['signup'] = "too"
-        sms_number = mysociety.config.get('PB_SMS_NUMBER')
+        sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
         c = canvas.Canvas(outdir + '/' + outfile)
         try:

@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.10 2005-03-17 19:03:34 francis Exp $
+ * $Id: general-example,v 1.11 2005-03-17 19:16:20 francis Exp $
  * 
  */
 
@@ -54,13 +54,14 @@ define('OPTION_PB_SMS_MODE', 'none');
 // aggregator.  Access to this service is authenticated by this username and
 // password.
 define('OPTION_PB_SMS_MODE', 'mxtelecom');
-
-// The SMS number and (optional) message prefix that we need.
-define('OPTION_PB_SMS_NUMBER', '00000');
-//define('OPTION_PB_SMS_PREFIX', 'PLEDGE');
-
 define('OPTION_PB_SMS_MXTELECOM_USER', 'username');
 define('OPTION_PB_SMS_MXTELECOM_PASS', 'password');
+
+// The SMS number and (optional) message prefix that we need.
+define('OPTION_PB_SMS_NUMBER', 'XXXXX');
+define('OPTION_PB_SMS_PREFIX', 'PLEDGE');
+// For use on posters and on website
+define('OPTION_PB_SMS_DISPLAY_NUMBER', 'XXXXX');
 
 // Where PDF files are put
 define('OPTION_PB_PDF_CACHE', "/home/francis/tmp/pdfs");

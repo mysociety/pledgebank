@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.28 2005-03-17 19:03:34 francis Exp $
+ * $Id: pledge.php,v 1.29 2005-03-17 19:16:20 francis Exp $
  * 
  */
 
@@ -211,7 +211,7 @@ function get_flyer_text($r, $params = array()) {
     $html .= '<strong>www.pledgebank.com/' .  htmlspecialchars($r['ref']) . "</strong>";
     $html .= '<p>Or text <strong>';
     $html .= 'pledge ' . htmlspecialchars($r['ref']);
-    $html .= '</strong>  to <strong>' . OPTION_PB_SMS_NUMBER . '</strong> (cost 50p)';
+    $html .= '</strong>  to <strong>' . OPTION_PB_SMS_DISPLAY_NUMBER . '</strong> (cost 50p)';
     $html .= '<p>This pledge closes on ' . prettify($r['date']). '. ';
     $html .= 'Thanks!';
     return $html;

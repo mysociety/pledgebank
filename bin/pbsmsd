@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.20 2005-03-30 11:23:23 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.21 2005-04-04 09:44:09 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -258,8 +258,8 @@ sub run_gathering_process () {
     my $s_missed = dbh()->prepare("
                         select gap
                         from incomingsms_foreignid_gap
-                        where lastpolled is null
-                            or (lastpolled > ? and lastpolled < ?)
+                        where firstpolled is null
+                            or (firstpolled > ? and lastpolled < ?)
                         order by gap
                         for update
                         ");
@@ -457,15 +457,21 @@ sub run_gathering_process () {
                     dbh()->do('
                             update incomingsms_foreignid_gap
                             set lastpolled = ?
-                            where lastpolled is null
-                                or (lastpolled > ? and lastpolled < ?)',
+                            where firstpolled is null
+                                or (firstpolled > ? and lastpolled < ?)',
                             {}, time(),
                                 time() - max_polling_age,
                                 time() - min_polling_interval);
 
+                    dbh()->do('
+                            update incomingsms_foreignid_gap
+                            set firstpolled = ?
+                            where firstpolled is null',
+                            {}, time());
+
                     my $n = dbh()->do('
                             delete from incomingsms_foreignid_gap
-                            where lastpolled < ?',
+                            where firstpolled < ?',
                             {}, time() - max_polling_age);
                     print_log('warning', "get missed messages: dropped " . int($n) . " expired outstanding IDs");
                 }
@@ -672,5 +678,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.20 2005-03-30 11:23:23 sandpit Exp $
+$Id: pbsmsd,v 1.21 2005-04-04 09:44:09 sandpit Exp $
 

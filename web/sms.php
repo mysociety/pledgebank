@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.1 2005-03-04 12:45:11 chris Exp $
+ * $Id: sms.php,v 1.2 2005-03-08 17:18:33 chris Exp $
  * 
  */
 
@@ -27,26 +27,38 @@ $errs = importparams(
             
 page_header('SMS');
 
-
 if (is_null($q_token)) {
-    print " <p>
+    print <<<EOF
+            <p>
         Sorry, we can't make sense of the code '$q_unchecked_h_token'. Please
-        could you re-check the URL you typed in; the last part of it should
-        consist of two groups of four letters and numbers, joined by a hyphen
-        ('-')
-            </p>";
-} else {
-    if (is_null($errs)) {
-        /* Check that we can actually sign up. */
-        $p = preg_replace("/[^\d]/", '', $q_phone);
-        if ($ss = db_getRow('select id, mobile from signers where token = ?', $q_token)
-            /* Compare last few characters of the phone numbers, so that we
-             * avoid having to know anything about their format. */
-            && substr($p, -6) == substr($ss['mobile'], -6)) {
-            db_query('update signers set name = ?, email = ?, showname = ? where id = ?', $q_name, $q_email, $q_showname, $ss['id']);
-        }
-        
+        could you re-check the address you typed in; the last part of it should
+        be two groups of four letters and numbers, joined by a hyphen ("-"),
+        something like "1234-abcd"
+            </p>'
+EOF;
+} else if (is_null($errs)) {
+    /* Check that we can actually sign up. */
+    $p = preg_replace("/[^\d]/", '', $q_phone);
+    $ss = db_getRow('select id, mobile, pledge_id from signers where token = ?', $q_token);
+    
+    /* Compare last few characters of the phone numbers, so that we avoid
+     * having to know anything about their format. */
+    if ($ss && substr($p, -6) == substr($ss['mobile'], -6)) {
+        /* Token and phone number match. Now see whether that email address
+         * has been registered in the database before. That determines whether
+         * we send a confirmation or a confirmation reminder mail. */
+         
+        $existingid = db_getOne('
+                            select id
+                            from signers
+                            where email = ? and pledge_id = ? for update
+                        ', $q_email, $ss['pledge_id']);
+                        
+
+    } else {
+        $errs['phone'] = "That phone number doesn't match our records";
     }
+}
 
     /* Form to supply info for the subscription */
     print <<<EOF
@@ -63,18 +75,18 @@ pledge succeeds, rather than sending an SMS.</p>
 <p>
 Phone number: <input type="text" name="phone" value="$q_unchecked_h_phone"><br/>
 EOF;
-    if ($q_f && is_null($q_phone))
-        print "<em>Please enter a valid phone number!</em><br/>";
+    if ($q_f && array_key_exists('phone', $errs))
+        print "<em>" . htmlspecialchars($errs['phone']) . "</em><br/>";
     print <<<EOF
 Email: <input type="text" name="email" value="$q_unchecked_h_email"><br/>
 EOF;
-    if ($q_f && is_null($q_email))
-        print "<em>Please enter a valid email address!</em><br/>";
+    if ($q_f && array_key_exists('email', $errs))
+        print "<em>" . htmlspecialchars($errs['email']) . "</em><br/>";
     print <<<EOF
 Name: <input type="text" name="name" value="$q_unchecked_h_name"><br/>
 EOF;
-    if ($q_f && is_null($q_name))
-        print "<em>Please enter your name!</em><br/>";
+    if ($q_f && array_key_exists('name', $errs))
+        print "<em>" . htmlspecialchars($errs['name']) . "</em><br/>";
     print <<<EOF
 Show my name on this pledge: <input name="showname" value="1" checked="checked" type="checkbox"><br/>
 <input type="submit" name="submit" value="Submit">

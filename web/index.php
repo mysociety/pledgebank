@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.102 2005-03-25 20:41:45 matthew Exp $
+// $Id: index.php,v 1.103 2005-03-29 07:39:56 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -20,6 +20,7 @@ if (get_http_var('search')) {
 }
 
 $title = '';
+$header_params = array();
 ob_start();
 if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
     if (get_http_var('reason')) {
@@ -60,6 +61,7 @@ if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
     admin();
 } elseif (get_http_var('pdf')) {
     $title = 'Pledge Flyers';
+    $header_params['noprint'] = true;
     pdfs();
 } elseif (get_http_var('search')) {
     $title = 'Search Results';
@@ -71,7 +73,7 @@ if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
 $body = ob_get_contents();
 ob_end_clean();
 
-page_header($title);
+page_header($title, $header_params);
 print $body;
 page_footer();
 
@@ -675,16 +677,26 @@ function pdfs() {
     $pdf_flyers16_url = new_url("../flyers/{$ref}_A4_flyers16.pdf", false);
     $pdf_flyers4_url = new_url("../flyers/{$ref}_A4_flyers4.pdf", false);
     $pdf_flyers1_url = new_url("../flyers/{$ref}_A4_flyers1.pdf", false);
+    $png_flyers4_url = new_url("../flyers/{$ref}_A4_flyers4.png", false);
     ?>
+<div class="noprint">
 <h2>Customised Flyers</h2>
-<p>Below you can generate <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
+<p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
-<li><a href="<?=$pdf_flyers1_url?>">Big poster (A4)</a></li>
-<li><a href="<?=$pdf_flyers4_url?>">Flyers for getting out and giving to people, 4 per page (A4)</a></li>
-<li><a href="<?=$pdf_flyers16_url?>">Flyers for getting out and giving to people, 16 per page (A4)</a></li>
+<li><a href="<?=$pdf_flyers1_url?>">Big poster (A4, PDF)</a></li>
+<li><a href="<?=$pdf_flyers4_url?>">Flyers for handing out, 4 per page (A4, PDF, like picture below)</a></li>
+<li><a href="<?=$pdf_flyers16_url?>">Loads of little flyers, 16 per page (A4, PDF)</a></li>
 <!--<li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
 <li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>-->
 </ul>
+</div>
+
+<p class="noprint">Alternatively, simply 
+<?print_this_link("print this page out", "")?>
+to get these flyers.
+</p>
+
+<p><a href="<?=$png_flyers4_url?>"><img src="<?=$png_flyers4_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
 <?  return true;
 }
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.18 2005-03-25 18:40:05 matthew Exp $
+ * $Id: confirm.php,v 1.19 2005-03-29 07:39:56 francis Exp $
  * 
  */
 
@@ -37,13 +37,12 @@ if ($q_type == 'pledge') {
     /* Success. */
     $q = db_query('select * from pledges where id = ?', $pledge_id);
     $r = db_fetch_array($q);
-#    page_header("${r['title']} - Confirm", array('nonav' => true));
     page_header("PRINT THIS - CUT IT UP - DELIVER LOCALLY", array('nonav' => true));
 
     db_commit();
     $url = "/" . urlencode($r['ref']);
     ?>
-    <p class="noprint">Thank you for confirming your pledge. It is now live, and people can 
+    <p class="noprint" align="center">Thank you for confirming your pledge. It is now live, and people can 
     <a href="<?=$url?>">sign up to it</a>.</p>
     <?  advertise_flyers($pledge_id);
 } elseif ($q_type == 'signature') {
@@ -98,7 +97,7 @@ if ($q_type == 'pledge') {
     }
 
     if (!pledge_is_error($r)) {
-        print '<p class="noprint">Thanks for signing up to this pledge!</p>';
+        print '<p class="noprint" align="center">Thanks for signing up to this pledge!</p>';
 
         if ($f1 === false && pledge_is_successful($data['pledge_id']))
             /* Has this completed the pledge? */
@@ -128,18 +127,13 @@ function advertise_flyers($pledge_id) {
 <p class="noprint" align="center">
 <strong>Important Notice</strong> - You will massively increase the chance of this pledge being
 a success if you
-<script type="text/javascript">
-    document.write('<a href="javascript: window.print()">print this page out</a>,');
-</script>
-<noscript>
-print this page out,
-</noscript> 
+<?print_this_link("print this page out", ",")?>
 cut up the flyers and stick them through some
 of your neighbours letterboxes. We cannot emphasise this enough - print them
 now and post them next time you go out to the shops. We also have more
 <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers"> attractive PDF versions</a>.</p>
 
-<img src="<?=$png_flyers4_url?>" alt="Flyers">
+<p align="center"><a href="<?=$png_flyers4_url?>"><img src="<?=$png_flyers4_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
 <?
 }
 

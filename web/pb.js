@@ -5,11 +5,11 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.4 2005-03-04 09:35:13 matthew Exp $
+ * $Id: pb.js,v 1.5 2005-03-04 13:16:42 matthew Exp $
  * 
  */
 
-var greyed = [ ['action', '<Enter your pledge>'], ['date', '<Date>'], ['ref', ''] ]
+var greyed = [ ['action', '<Enter your pledge>'], ['date', '<Date>'] ]
 
 function addEvent(obj, evType, fn){ 
     if (obj.addEventListener){ 
@@ -61,15 +61,51 @@ function fadeout(thi) {
 addEvent(window, 'load', greyOutInputs);
 
 function greyOutInputs() {
-    for (var j = 0; j < greyed.length; j++) {
-        d = document.getElementById(greyed[j][0])
-        if (d && d.value == '') d.value = greyed[j][1]
-        if (d && d.value == greyed[j][1]) d.style.color = '#999999'
+    if (!document) return
+    if (document.getElementById) {
+        for (var j = 0; j < greyed.length; j++) {
+            d = document.getElementById(greyed[j][0])
+            if (d && d.value == '') d.value = greyed[j][1]
+            if (d && d.value == greyed[j][1]) d.style.color = '#999999'
+        }
+        d = document.getElementById('ref')
+        if (d && d.value.length<6) d.style.color = '#999999'
     }
+
+    if (document.pledge && document.pledge.local)
+        grey_postcode(document.pledge.local[1].checked)
+    if (document.pledge && document.pledge.visibility)
+        grey_password(document.pledge.visibility[0].checked)
+
 }
 
 function checklength(thi) {
     var l = thi.value.length
     if (l<6) thi.style.color = '#999999'
     else thi.style.color = '#000000'
+}
+
+function grey_postcode(t) {
+    if (t) {
+        document.getElementById('postcode_line').style.color = '#999999'
+    } else {
+        document.getElementById('postcode_line').style.color = '#000000'
+    }
+    grey_thing(t, 'postcode')
+}
+
+function grey_password(t) {
+    grey_thing(t, 'password')
+}
+
+function grey_thing(t, e) {
+    d = document.getElementById(e)
+    if (t) {
+        d.disabled = true
+        d.style.color = '#999999'
+    } else {
+        d.disabled = false
+        d.style.color = '#000000'
+        d.focus()
+    }
 }

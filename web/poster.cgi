@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.19 2005-03-22 11:07:59 francis Exp $
+# $Id: poster.cgi,v 1.20 2005-03-22 14:23:01 sandpit Exp $
 #
 
 import os
@@ -240,7 +240,7 @@ def flyers(number):
 while fcgi.isFCGI():
     req = fcgi.Accept()
     fs = req.getFieldStorage()
-    # req.err.write("got request, path: %s" % req.env.get('PATH_INFO'))
+    #req.err.write("got request in poster.cgi, path: %s\n" % req.env.get('PATH_INFO'))
 
     if req.env.get('PATH_INFO'):
         incgi = True
@@ -285,7 +285,7 @@ in conf/general.  This cache is not used on the command line.""")
         if len(args) <> 1:
             parser.print_help()
             print >>sys.stderr, "specify Pledgebank ref"
-            sys.exit(1)
+            continue
         ref = args[0] 
         size = options.size
         type = options.type 
@@ -334,8 +334,8 @@ in conf/general.  This cache is not used on the command line.""")
         sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
         # Generate PDF file
-        (tmpfile, tmpfilename) = tempfile.mkstemp()
-        c = canvas.Canvas(tmpfilename)
+        (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
+        c = canvas.Canvas(canvasfilename)
         try:
             if type == "cards":
                 cards()
@@ -355,7 +355,7 @@ in conf/general.  This cache is not used on the command line.""")
             c.setFont("Helvetica", 15)
             c.drawCentredString(10.5*cm, 25*cm, str(e))
         c.save()
-        os.rename(tmpfilename, outdir + '/' + outpdf)
+        os.rename(canvasfilename, outdir + '/' + outpdf)
             
         # Generate any other file type
         os.spawnlp(os.P_WAIT, "convert", "convert", outdir + '/' + outpdf, outdir + '/' + outfile)

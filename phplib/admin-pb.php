@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.10 2005-03-14 15:45:34 francis Exp $
+ * $Id: admin-pb.php,v 1.11 2005-03-14 15:50:36 francis Exp $
  * 
  */
 
@@ -159,6 +159,7 @@ class ADMIN_PAGE_PB {
     function remove_pledge($id) {
         db_query('DELETE FROM pledges WHERE id = ?', array($id));
         db_query('DELETE FROM signers WHERE pledge_id = ?', array($id));
+        db_commit();
         print '<p><em>That pledge has been successfully removed, along with all its signatories.</em></p>';
     }
 

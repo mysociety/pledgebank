@@ -1,6 +1,6 @@
 <?
 
-function send_email($to, $subject, $message, $headers = '') {
+function pb_send_email($to, $subject, $message, $headers = '') {
 	$headers = $headers . 
 	"From: PledgeBank.com <" . CONTACTEMAIL . ">\r\n" .
 	"Reply-To: PledgeBank.com <" . CONTACTEMAIL . ">\r\n" .

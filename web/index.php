@@ -2,7 +2,7 @@
 
 /* Insert standard copyright thing here */
 
-include_once 'config.php';
+require_once "../conf/general";
 include_once '../templates/page.php';
 include_once 'contact.php';
 include_once '../phplib/db.php';
@@ -221,7 +221,7 @@ function add_signatory() {
         (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, 0)', 
         array($id, $_POST['name'], $email, $showname, $token));
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
-    $success = send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
+    $success = pb_send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
     if ($success) { ?>
 <p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="./?pledge=<?=htmlentities($_POST['pledge_id']) ?>">Back to pledge page</a></p>
 <?			return true;
@@ -278,11 +278,11 @@ function send_success_email($id, $q) {
 		if (!$action) $action = $r['title'];
 		if (!$email) {
 			$email = $r['email'];
-			$success = send_email($email, 'PledgeBank pledge success! "'.$action.'"', "This pledge has just received its last needed signup,\nso congratulations to everyone.\nNow do whatever it said. :)\n\n(Yes, text will be changed!)");
+			$success = pb_send_email($email, 'PledgeBank pledge success! "'.$action.'"', "This pledge has just received its last needed signup,\nso congratulations to everyone.\nNow do whatever it said. :)\n\n(Yes, text will be changed!)");
 			if ($success==0) $globalsuccess = 0;
 		}
 		$signemail = $r['signemail'];
-		$success = send_email($signemail, 'PledgeBank pledge success! "'.$action.'"', "This pledge has just received its last needed signup,\nso congratulations to everyone.\nNow do whatever it said. :)\n\n(Yes, text will be changed!)");
+		$success = pb_send_email($signemail, 'PledgeBank pledge success! "'.$action.'"', "This pledge has just received its last needed signup,\nso congratulations to everyone.\nNow do whatever it said. :)\n\n(Yes, text will be changed!)");
 		if ($success==0) $globalsuccess = 0;
 	}
 	return $globalsuccess;
@@ -383,7 +383,7 @@ function create_new_pledge($action, $people, $type, $date, $name, $email,$ref) {
 </div>
 <?
 	$link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirmp=' . $token);
-	$success = send_email($email, 'New pledge at PledgeBank.com : '.$action, "Thank you for submitting your pledge to PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
+	$success = pb_send_email($email, 'New pledge at PledgeBank.com : '.$action, "Thank you for submitting your pledge to PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
 	if ($success) { ?>
 <p>An email has been sent to the address you gave to confirm the address is yours. <strong>Please check your email, and follow the link given there.</strong></p>
 <?		return true;
@@ -417,28 +417,6 @@ function confirm_pledge() {
 <p>Something went wrong confirming your pledge, hmm.</p>
 <?	}
 	return $success;
-}
-
-# Will be on some sort of admin page at some point
-function list_all_pledges() {
-	print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
-	$q = db_query('SELECT id,title,target,date,name,ref FROM pledges WHERE confirmed=1');
-	print '<table><tr><th>ID</th><th>Title</th><th>Target</th><th>Date</th><th>Name</th><th>Ref</th></tr>';
-	while ($r = db_fetch_row($q)) {
-		$r[1] = '<a href="./?pledge='.$r[0].'">'.$r[1].'</a>';
-		print '<tr><td>'.join('</td><td>',array_map('prettify',$r)).'</td></tr>';
-	}
-	print '</table>';
-}
-
-function admin() {
-	$q = db_query('SELECT id,title,target,date,name,ref,confirmed FROM pledges');
-	print '<table><tr><th>ID</th><th>Title</th><th>Target</th><th>Date</th><th>Name</th><th>Ref</th><th>Confirmed?</th></tr>';
-	while ($r = db_fetch_row($q)) {
-		$r[1] = '<a href="./?pledge='.$r[0].'">'.$r[1].'</a>';
-		print '<tr><td>'.join('</td><td>',$r).'</td></tr>';
-	}
-	print '</table>';	
 }
 
 ?>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.3 2005-03-07 16:24:14 chris Exp $
+ * $Id: pledge.php,v 1.4 2005-03-07 16:30:29 chris Exp $
  * 
  */
 
@@ -25,7 +25,9 @@ function pledge_confirmation_token() {
  * caller's responsibility to check that the signer is authorised to sign a
  * private pledge (by supplying a password, presumably). On success returns the
  * signer ID and confirmation token; on failure returns an error message. This
- * function does not commit its changes. */
+ * function does not commit its changes.
+ * XXX we should return a descriptive error code, because some of these error
+ * conditions must not be shown to the user. */
 function pledge_sign($pledge_id, $name, $showname, $email) {
     $r = db_getRow('
             select id, target, title, email, confirmed, date, comparison

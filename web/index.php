@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.58 2005-03-07 16:24:14 chris Exp $
+// $Id: index.php,v 1.59 2005-03-07 16:30:29 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -392,6 +392,12 @@ function add_signatory() {
     $R = pledge_sign($r['id'], $q_name, $q_showname, $q_email);
     if (is_string($R))
         err($R);
+        /* XXX really bad -- we leak information about who has signed
+        up to pledges here. In the case where the email address has already
+        signed up, we should just send out another confirmation email to the
+        same user, if they haven't confirmed; if they have, then send nothing;
+        and in any case just show the usual "success" note to the user. */
+
     list($signer_id, $token) = $R;
 
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);

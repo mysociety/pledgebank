@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.8 2005-03-10 18:48:11 chris Exp $
+ * $Id: pledge.php,v 1.9 2005-03-10 18:53:45 chris Exp $
  * 
  */
 
@@ -99,7 +99,7 @@ function pledge_strerror($e) {
 /* pledge_is_permanent_error CODE
  * Return true if CODE represents a permanent error (i.e. one which won't go
  * away by itself). */
-function pledge_permanent_error($e) {
+function pledge_is_permanent_error($e) {
     return ($e > PLEDGE_ERROR);
 }
 

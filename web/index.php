@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.112 2005-04-04 09:33:07 francis Exp $
+// $Id: index.php,v 1.113 2005-04-04 11:27:25 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -289,12 +289,13 @@ function step1_error_check($data) {
     if (!$data['target']) $errors[] = 'Please enter a target';
     elseif (!ctype_digit($data['target']) || $data['target'] < 1) $errors[] = 'The target must be a positive number';
     elseif ($data['target'] > 100) {
-        $errors[] = 'At the moment, we do not allow pledges with a target of
-        more than 100 people.  Instead, we recommend that you make a
-        simpler, smaller pledge.  Perhaps restrict it to a smaller geographic
-        area, or make the action an easier one.  If you have any questions or
-        comments about this then <a href="mailto:team@pledgebank.com">email
-        us</a>.';
+        $errors[] = 'We have imposed a cap of 100 people maximum on each
+        pledge. This is not a hard limit, just a way of encouraging people to
+        aim at smaller and more achievable targets. If you want a target higher
+        than 100 people, we\'d be glad to set it up for you. Just drop us a
+        quick email to <a href="mailto:team@pledgebank.com">team@pledgebank.com</a> 
+        letting us know who you are and what
+        you are aiming to do.';
     }
     if (!$data['ref']) $errors[] = 'Please enter a PledgeBank reference';
     elseif (strlen($data['ref'])<6) $errors[] = 'The reference must be at least six characters long';

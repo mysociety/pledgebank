@@ -5,11 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.54 2005-03-06 22:20:16 matthew Exp $
+// $Id: index.php,v 1.55 2005-03-07 14:46:44 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
 require_once '../phplib/fns.php';
+require_once '../phplib/pledge.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
@@ -360,10 +361,6 @@ function view_faq() {
     include 'faq.php';
 }
 
-function confirmation_token() {
-    return implode("-", array_map('bin2hex', array(random_bytes(4), random_bytes(4))));
-}
-
 # Someone wishes to sign a pledge
 function add_signatory() {
     global $today;
@@ -378,64 +375,12 @@ function add_signatory() {
             )))
         err("Bad parameters in add_signatory.");
 
-    $r = db_getRow('
-                select id, target, title, email, confirmed, date, password,
-                    comparison
-                from pledges
-                where ref = ?
-                for update', $q_pledge_id);
+    $r = db_getRow('select id, password from pledges where ref = ?', $q_pledge_id);
 
-    if (!$r || $r['confirmed'] != 't')
-        err("Bad PledgeBank reference");
-
-    if ($q_email == $r['email'])
-        err("You can't sign your own pledge");
-    
-    if ($r['date'] < $today)
-        err("You can't sign a closed pledge");
-
-    if (!is_null($r['password']) && (is_null($q_pw) || $q_pw != $r['password']))
+    if (!is_null($r['password']) && (is_null($q_password) || $q_password != $r['password']))
         err("Permission denied");
-                
-    $action = $r['title'];
-    $target = $r['target'];
-    $id = $r['id'];
-    $password = $r['password'];
-    $comparison = comparison_nice($r['comparison']);
 
-    if ($comparison=='exactly') {
-        /* Postgres doesn't allow you to do 'select count(...) for update' so
-         * actually select and lock all the rows. This will be slow; it's
-         * possible that using 'lock table' would be faster. */
-        db_query('lock table signers in row share mode');
-        $q = db_query('
-                    select id
-                    from signers
-                    where pledge_id = ? and confirme
-                    for update', $id);
-        if ($q) {
-//            $r = db_fetch_array($q);
-            $signedup = db_num_rows($q);
-            if ($signedup >= $target) {
-                print '<p>That pledge has already reached its target, sorry.</p>';
-                return false;
-            }
-        }
-    }
-	
-    $q = db_query('SELECT email FROM signers WHERE pledge_id = ? AND email= ?', array($id, $q_email));
-    if (db_num_rows($q)) {
-        print '<p>You have already signed this pledge!</p>';
-        return false;
-    }
-
-    $token = confirmation_token();
-    db_query('
-            insert into signers (
-                pledge_id, name, email, showname, signtime, token, confirmed
-            ) values (
-                ?, ?, ?, ?, current_timestamp, ?, false
-            )', array($id, $q_name, $q_email, $q_showname, $token));
+    list($signer_id, $token) = pledge_sign($id, $q_name, $q_showname, $q_email);
 
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
     $success = pb_send_email($q_email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");

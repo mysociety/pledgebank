@@ -5,11 +5,11 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.5 2005-03-04 13:16:42 matthew Exp $
+ * $Id: pb.js,v 1.6 2005-03-11 12:30:45 matthew Exp $
  * 
  */
 
-var greyed = [ ['action', '<Enter your pledge>'], ['date', '<Date>'] ]
+var greyed = [ ['title', '<Enter your pledge>'], ['date', '<Date>'] ]
 
 function addEvent(obj, evType, fn){ 
     if (obj.addEventListener){ 
@@ -30,11 +30,11 @@ function pluralize(t) {
 	v = d.value;
         w = s.value;
 	if (t==1) {
-            if (w=='sign up') s.value = 'signs up';
-	    if (v=='people') d.value = 'person';
+//            if (w=='sign up') s.value = 'signs up';
+	    if (v=='other local people') d.value = 'other local person';
 	} else {
-	    if (w=='signs up') s.value = 'sign up';
-	    if (v=='person') d.value = 'people';
+//	    if (w=='signs up') s.value = 'sign up';
+	    if (v=='other local person') d.value = 'other local people';
         }
     }
 }

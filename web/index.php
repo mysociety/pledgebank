@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.69 2005-03-11 12:30:45 matthew Exp $
+// $Id: index.php,v 1.70 2005-03-11 16:57:09 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -487,28 +487,6 @@ function send_success_email($pledge_id) {
     return $globalsuccess;
 }
 
-/* deal_with_password(HTML escaped pledge reference, password entered, actual password) */
-function deal_with_password($type, $ref, $actual) {
-    $h_ref = htmlspecialchars($ref);
-    $entered = get_http_var('pw');
-    if (!$actual) return true;
-    if ($entered) {
-        if ($entered != $actual) {
-            print '<p class="finished">Incorrect password!</p>';
-            print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="' . $type . '" value="' . $h_ref . '"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
-            print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
-            print '</form>';
-            return false;
-        }
-    } else {
-        print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="' . $type . '" value="' . $h_ref . '"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
-        print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
-        print '</form>';
-        return false;
-    }
-    return true;
-}
-    
 # Individual pledge page
 function view_pledge() {
     global $today, $title;
@@ -534,17 +512,14 @@ function view_pledge() {
 	$left = $r['target'] - $curr;
 
 	$finished = 0;
-        $print_signup_form = 1;
 	if ($r['date'] < $today) {
             $finished = 1;
-	    print '<p class="finished">This pledge is now closed, its deadline has passed.</p>';
-            $print_signup_form = 1;
+	    print '<p class="finished">This pledge is now closed, as its deadline has passed.</p>';
         }
 	if ($left <= 0) {
             if ($r['comparison'] == 'exactly') {
                 $finished = 1;
-                $print_signup_form = 0;
-                print '<p class="finished">This pledge is now closed, its target has been reached.</p>';
+                print '<p class="finished">This pledge is now closed, as its target has been reached.</p>';
             } else {
                 print '<p class="success">This pledge has been successful!</p>';
             }
@@ -553,15 +528,16 @@ function view_pledge() {
 <p>Here is the pledge:</p>
 <form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=$h_ref ?>">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
+<div class="c">
 <p style="margin-top: 0">&quot;<?=pledge_sentence(0, true, true, $r) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
 
-<p style="text-align: center; font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target :) )':', '.prettify($left).' more needed') ?></p>
-
-<? if ($print_signup_form) { ?>
-<div style="text-align: left; margin-left: 50%;">
+<p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target :) )':', '.prettify($left).' more needed') ?></p>
+</div>
+<? if (!$finished) { ?>
+<div style="margin-left: 50%;">
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
-<p style="text-align: left">
+<p>
 <input type="hidden" name="add_signatory" value="1">
 <input type="hidden" name="ref" value="<?=$h_ref ?>">
 Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
@@ -572,13 +548,13 @@ Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_
 <? }
 
 if ($r['detail']) {
-    print '<p style="text-align:left"><strong>More details</strong><br>' . htmlspecialchars($r['detail']) . '</p>';
+    print '<p><strong>More details</strong><br>' . htmlspecialchars($r['detail']) . '</p>';
 }
 
 ?>
 </form>
 
-<p style="text-align: center"><a href="./<?=$h_ref ?>/flyers" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="./<?=$h_ref ?>/email">Email this Pledge</a><? } ?></p>
+<p style="text-align: center"><a href="./<?=$h_ref ?>/flyers" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Comment on this Pledge</a><? if (!$finished) { ?> | <a href="./<?=$h_ref ?>/email">Email this Pledge</a><? } ?></p>
 <!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
 
 <h2>Current signatories</h2><?

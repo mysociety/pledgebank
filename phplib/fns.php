@@ -5,26 +5,33 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.9 2005-03-06 22:20:14 matthew Exp $
+// $Id: fns.php,v 1.10 2005-03-11 16:57:07 matthew Exp $
 
 function pb_send_email($to, $subject, $message, $headers = '') {
-	$headers = $headers . 
-	'From: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n" .
-	'Reply-To: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n" .
-	'X-Mailer: PHP/' . phpversion();
-	$success = mail ($to, $subject, $message, $headers);
-	return $success;
+    if (!strstr($headers, 'From:')) {
+        $headers .= 'From: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n" .
+                    'Reply-To: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n";
+    }
+    $headers .= 'X-Mailer: PHP/' . phpversion();
+    $success = mail ($to, $subject, $message, $headers);
+    return $success;
 }
 
-function prettify($s) {
-	if (preg_match('#^(\d{4})-(\d\d)-(\d\d)$#',$s,$m)) {
-		list(,$y,$m,$d) = $m;
-		return date('j<\sup>S</\sup> F Y', mktime(12,0,0,$m,$d,$y));
-	}
-        if (ctype_digit($s)) {
-            return number_format($s);
-        }
-	return $s;
+/* prettify THING [HTML]
+   Returns a nicer form of THING for things that it knows about, otherwise just returns the string.
+ */
+function prettify($s, $html = true) {
+    if (preg_match('#^(\d{4})-(\d\d)-(\d\d)$#',$s,$m)) {
+        list(,$y,$m,$d) = $m;
+        $e = mktime(12,0,0,$m,$d,$y);
+        if ($html)
+            return date('j<\sup>S</\sup> F Y', $e);
+        return date('jS F Y', $e);
+    }
+    if (ctype_digit($s)) {
+        return number_format($s);
+    }
+    return $s;
 }
 
 # Stolen from my railway script

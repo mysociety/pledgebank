@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.85 2005-03-16 15:22:52 chris Exp $
+// $Id: index.php,v 1.86 2005-03-16 15:26:02 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -467,7 +467,7 @@ EOF
         $data = array('email' => $q_email, 'name' => $q_name, 
                 'showname' => $q_showname, 'pledge_id' => $r['id']);
         $token = pledge_token_store('signup-web', $data);
-        db_commit();
+
         $url = OPTION_BASE_URL . "/I/" . $token;
 
         $success = pb_send_email(
@@ -492,6 +492,7 @@ EOF
 <p>We've sent you an email to confirm your address. Please follow the link
 we've sent to you to finish signing this pledge.</p>
 <?
+        db_commit();
         return true;
     } else {
 ?>

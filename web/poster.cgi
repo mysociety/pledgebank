@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.25 2005-04-01 18:02:14 matthew Exp $
+# $Id: poster.cgi,v 1.26 2005-04-05 16:51:20 francis Exp $
 #
 
 import os
@@ -45,20 +45,21 @@ def myRegisterFont(font):
                     font.face.descent,
                     font.widths)
 
+sys.path.append("../../pylib")
+import mysociety.config
+mysociety.config.set_file("../conf/general")
+
 from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.pdfbase.pdfmetrics import _fonts
 from reportlab.lib.fonts import addMapping
-myRegisterFont(ttfonts.TTFont('Rockwell', 'rock.ttf'))
-myRegisterFont(ttfonts.TTFont('Rockwell-Bold', 'rockb.ttf'))
-pdfmetrics.registerFont(ttfonts.TTFont('Transport', 'transport.ttf'))
+font_dir = mysociety.config.get('PB_FONTS')
+myRegisterFont(ttfonts.TTFont('Rockwell', font_dir + '/rock.ttf'))
+myRegisterFont(ttfonts.TTFont('Rockwell-Bold', font_dir + '/rockb.ttf'))
+pdfmetrics.registerFont(ttfonts.TTFont('Transport', font_dir + '/transport.ttf'))
 addMapping('rockwell', 0, 0, 'Rockwell')
 addMapping('rockwell', 1, 0, 'Rockwell-Bold')
 addMapping('rockwell', 0, 1, 'Rockwell')
 addMapping('rockwell', 1, 1, 'Rockwell')
-
-sys.path.append("../../pylib")
-import mysociety.config
-mysociety.config.set_file("../conf/general")
 
 db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
 

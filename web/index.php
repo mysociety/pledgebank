@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.99 2005-03-25 16:52:59 matthew Exp $
+// $Id: index.php,v 1.100 2005-03-25 18:40:05 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -165,10 +165,10 @@ the door of that neighbour whose name you've forgotten.</li>
 <p><strong>I will</strong> <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
 <p><strong>if</strong> <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'3') ?>">
-<input type="text" id="type" name="type" size="67" value="other local people"></p>
+<input type="text" id="type" name="type" size="67" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):'other local people') ?>"></p>
 
 <p><strong>will</strong> <input type="text" id="signup" name="signup"
-size="74" value="do the same">.</p>
+size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'do the same') ?>">.</p>
 
 <p>The other people must sign up before <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']['iso']) ?>"></p>
 
@@ -530,9 +530,9 @@ function view_pledge($errors = array()) {
 	}
 
     if (get_http_var('add_signatory'))
-        $showname = get_http_var('showname') ? 'checked' : '';
+        $showname = get_http_var('showname') ? ' checked' : '';
     else
-        $showname = 'checked';
+        $showname = ' checked';
 
 ?>
 <p></p>
@@ -555,7 +555,7 @@ function view_pledge($errors = array()) {
 Name: <input type="text" name="name" value="<?=htmlspecialchars(get_http_var('name'))?>">
 <br /> Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
-<br /> <input type="checkbox" name="showname" value="1" <?=$showname?>> Show my name on this pledge 
+<br /> <input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge 
 <br /><input type="submit" name="submit" value="Submit">
 </p>
 </div>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.17 2005-03-24 11:05:22 francis Exp $
+ * $Id: confirm.php,v 1.18 2005-03-25 18:40:05 matthew Exp $
  * 
  */
 
@@ -43,10 +43,8 @@ if ($q_type == 'pledge') {
     db_commit();
     $url = "/" . urlencode($r['ref']);
     ?>
-    <div class="noprint">
-    <p>Thank you for confirming your pledge. It is now live, and people can 
+    <p class="noprint">Thank you for confirming your pledge. It is now live, and people can 
     <a href="<?=$url?>">sign up to it</a>.</p>
-    </div>
     <?  advertise_flyers($pledge_id);
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
@@ -100,15 +98,13 @@ if ($q_type == 'pledge') {
     }
 
     if (!pledge_is_error($r)) {
-        print '<div class="noprint">';
-        print "<p>Thanks for signing up to this pledge!</p>";
+        print '<p class="noprint">Thanks for signing up to this pledge!</p>';
 
         if ($f1 === false && pledge_is_successful($data['pledge_id']))
             /* Has this completed the pledge? */
-            print "</div><p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
+            print "<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
         else {
             /* Otherwise advertise flyers. */
-            print "</div>";
             advertise_flyers($data['pledge_id']);
         }
         db_commit();
@@ -129,8 +125,7 @@ function advertise_flyers($pledge_id) {
     $r = db_getRow('select * from pledges where id = ?', $pledge_id);
     $png_flyers4_url = new_url("../flyers/{$r['ref']}_A4_flyers4.png", false);
 ?>
-<div class="noprint">
-<p align="center">
+<p class="noprint" align="center">
 <strong>Important Notice</strong> - You will massively increase the chance of this pledge being
 a success if you
 <script type="text/javascript">
@@ -143,7 +138,6 @@ cut up the flyers and stick them through some
 of your neighbours letterboxes. We cannot emphasise this enough - print them
 now and post them next time you go out to the shops. We also have more
 <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers"> attractive PDF versions</a>.</p>
-</div> <!-- noprint -->
 
 <img src="<?=$png_flyers4_url?>" alt="Flyers">
 <?

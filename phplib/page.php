@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.7 2005-03-16 09:13:10 sandpit Exp $
+// $Id: page.php,v 1.8 2005-03-25 18:40:04 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -31,9 +31,9 @@ function page_header($title, $params = array()) {
 <hr class="v"><div id="content"><?
     }
     if (OPTION_PB_STAGING) {
-?><div class="noprint"><p align="center" style="color: #cc0000; background-color: #ffffff">
+?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
 <i>This is a test site for developers only. You probably want
-<a href="http://www.pledgebank.com/">the real site</a>.</i></p></div><?
+<a href="http://www.pledgebank.com/">the real site</a>.</i></p><?
     }
 }
 

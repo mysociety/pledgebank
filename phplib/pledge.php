@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.17 2005-03-12 00:57:49 francis Exp $
+ * $Id: pledge.php,v 1.18 2005-03-14 13:06:12 francis Exp $
  * 
  */
 
@@ -31,7 +31,7 @@ function pledge_ab64_encode($i) {
  * token, for later retrieval with pledge_random_token_retrieve. */
 function pledge_random_token_store($data) {
     $token = pledge_ab64_encode(random_bytes(12));
-    db_query('insert into token_store (token, data) values (?, ?)', 
+    db_query('insert into token_store (token, data, when) values (?, ?, current_timestamp)', 
         array($token, serialize($data)));
     return $token;
 }

@@ -133,7 +133,7 @@ doesn't work, or you have any other suggests or comments.
     while ($k && $r = db_fetch_array($q)) {
         $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ? AND confirmed=1', array($r['id']));
         $days = $r['daysleft'];
-        $new .= '<li>' . htmlspecialchars($r['name']) . ' will <a href="./?pledge=' . $r['id'] . '">' . htmlspecialchars($r['title']) . '</a> if ' . htmlspecialchars($r['target']) . ' other ' . $r['type'] . ' ';
+        $new .= '<li>' . htmlspecialchars($r['name']) . ' will <a href="' . $r['ref'] . '">' . htmlspecialchars($r['title']) . '</a> if ' . htmlspecialchars($r['target']) . ' other ' . $r['type'] . ' ';
         $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
         $new .= ' (';
         $new .= $days . ' '.make_plural($days,'day').' left';
@@ -150,16 +150,16 @@ doesn't work, or you have any other suggests or comments.
 
 <h2>Five Highest Signup Pledges</h2>
 <?	$q = db_query('SELECT pledges.id, pledges.name, pledges.title,
-pledges.signup, pledges.date, pledges.target, pledges.type,
+pledges.signup, pledges.date, pledges.target, pledges.type, pledges.ref,
 COUNT(signers.id) AS count, max(date)-CURRENT_DATE
 AS daysleft FROM pledges, signers WHERE pledges.id=signers.pledge_id AND
 pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 GROUP
-BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type,pledges.signup ORDER BY count DESC');
+BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type,pledges.signup,pledges.ref ORDER BY count DESC');
     $new = '';
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {
         $days = $r['daysleft'];
-        $new .= '<li>'.$r['count'].' '.make_plural($r['count'],'pledge').' : '.htmlspecialchars($r['name']).' will <a href="./?pledge='.$r['id'].'">'.htmlspecialchars($r['title']).'</a> if '.htmlspecialchars($r['target']).' other ' . htmlspecialchars($r['type']) . ' ';
+        $new .= '<li>'.$r['count'].' '.make_plural($r['count'],'pledge').' : '.htmlspecialchars($r['name']).' will <a href="'.$r['ref'].'">'.htmlspecialchars($r['title']).'</a> if '.htmlspecialchars($r['target']).' other ' . htmlspecialchars($r['type']) . ' ';
         $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
         $new .= ' (';
         $new .= 'by '.prettify(htmlspecialchars($r['date']));
@@ -191,13 +191,14 @@ function add_signatory() {
 	$showname = $_POST['showname'] ? 1 : 0;
 	$id = $_POST['pledge_id'];
 
-	$q = db_query('SELECT title,email,confirmed,date FROM pledges WHERE id=?', array($id));
+	$q = db_query('SELECT title,email,confirmed,date,ref FROM pledges WHERE id=?', array($id));
 	if (!$q) {
 		print '<p>Illegal PledgeBank reference!</p>';
 		return false;
 	}
 
-	$r = db_fetch_array($q); $action = $r['title'];
+	$r = db_fetch_array($q);
+        $action = $r['title']; $ref = $r['ref'];
 
 	if (!$r['confirmed']) {
 		print '<p>Illegal PledgeBank reference!</p>';
@@ -228,7 +229,7 @@ function add_signatory() {
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
     $success = pb_send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
     if ($success) { ?>
-<p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="./?pledge=<?=htmlspecialchars($_POST['pledge_id']) ?>">Back to pledge page</a></p>
+<p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="<?=$ref ?>">Back to pledge page</a></p>
 <?			return true;
     } else { ?>
 <p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>
@@ -434,7 +435,7 @@ function list_all_pledges() {
         $q = db_query('SELECT id,title,target,date,name,ref FROM pledges WHERE confirmed=1');
         print '<table><tr><th>ID</th><th>Title</th><th>Target</th><th>Date</th><th>Name</th><th>Ref</th></tr>';
         while ($r = db_fetch_row($q)) {
-                $r[1] = '<a href="./?pledge='.$r[0].'">'.$r[1].'</a>';
+                $r[1] = '<a href="'.$r[5].'">'.$r[1].'</a>';
                 print '<tr><td>'.join('</td><td>',array_map('prettify',$r)).'</td></tr>';        }
         print '</table>';
 }

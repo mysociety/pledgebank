@@ -1,44 +1,48 @@
 <?
 
+require_once "DB.php";
+
 function db_connect() {
-	$vars = array('host'=>'HOST', 'port'=>'PORT', 'dbname'=>'NAME', 'user'=>'USER', 'password'=>'PASS');
-	$connstr = array();
+    global $pbdb;
+
+	$vars = array('hostspec'=>'HOST', 'port'=>'PORT', 'database'=>'NAME', 'username'=>'USER', 'password'=>'PASS');
+	$connstr = array('phptype'=>'pgsql');
 	foreach ($vars as $k => $v) {
 		if (defined('OPTION_PB_DB_' . $v)) {
-			$connstr[] = $k . '=' . constant('OPTION_PB_DB_' . $v);
+			$connstr[$k] = constant('OPTION_PB_DB_' . $v);
 		}
 	}
-	$connstr = join(' ',$connstr);
-	return pg_connect($connstr);
+    $pbdb = DB::connect($connstr);
+
+    if (DB::isError($pbdb)) {
+        die($pbdb->getMessage());
+    }
 }
 
-function db_query($query) {
-	$result = pg_query($query);
+function db_query($query, $params = array()) {
+    global $pbdb;
+	$result = $pbdb->query($query, $params);
+    if (DB::isError($result)) {
+        die($result->getMessage());
+    }
 	return $result;
 }
 
 function db_fetch_array($q) {
-	return pg_fetch_array($q);
+	return $q->fetchRow(DB_FETCHMODE_ASSOC);
 }
 
 function db_fetch_row($q) {
-	return pg_fetch_row($q);
+	return $q->fetchRow(DB_FETCHMODE_ORDERED);
 }
 
 function db_num_rows($q) {
-	return pg_num_rows($q);
+	return $q->numRows();
 }
 
 function db_affected_rows($q) {
-	return pg_affected_rows($q);
-}
-
-function db_error() {
-	return pg_last_error(); # TODO: Should do pg_result_error and so on instead
-}
-
-function db_close() {
-	return pg_close();
+    global $pbdb;
+    return $pbdb->affectedRows();
 }
 
 function db_data_seek($q, $n) {

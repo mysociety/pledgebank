@@ -21,7 +21,7 @@ if (get_magic_quotes_gpc()) {
 	$_COOKIE = array_map('stripslashes_deep', $_COOKIE);
 }
 
-$db = db_connect();
+db_connect();
 
 $today = date('Y-m-d');
 $nowA = array( 'day' => date('d'), 'month' => date('m'), 'year' => date('Y') );
@@ -42,8 +42,6 @@ elseif ($_GET['admin']=='pledgebank') admin();
 else front_page();
 
 page_footer();
-
-if ($db) db_close($db);
 
 # --------------------------------------------------------------------
 
@@ -115,7 +113,7 @@ function pledge_form_submitted() {
 	if (sizeof($errors)) {
 		pledge_form($errors);
 	} else {
-		create_new_pledge($db,$action,$people,$type,$date,$name,$email,$ref);
+		create_new_pledge($action,$people,$type,$date,$name,$email,$ref);
 	}
 }
 
@@ -132,25 +130,21 @@ function front_page() {
 </form>
 <h2>Five Newest Pledges</h2>
 <?	$q = db_query('SELECT *, date - CURRENT_DATE AS daysleft FROM pledges WHERE date >= CURRENT_DATE AND confirmed=1 ORDER BY id DESC LIMIT 10');
-	if ($q) {
-		$new = '';
-		$k = 5;
-		while ($k && $r = db_fetch_array($q)) {
-			$days = $r['daysleft'];
-			$new .= '<li>' . htmlentities($r['name']) . ' will <a href="./?pledge=' . $r['id'] . '">' . htmlentities($r['title']) . '</a> if ' . htmlentities($r['target']) . ' other ' . $r['type'] . ' will too (';
-			$new .= $days . ' '.pluralize($days,'day').' left';
+    $new = '';
+    $k = 5;
+    while ($k && $r = db_fetch_array($q)) {
+        $days = $r['daysleft'];
+        $new .= '<li>' . htmlentities($r['name']) . ' will <a href="./?pledge=' . $r['id'] . '">' . htmlentities($r['title']) . '</a> if ' . htmlentities($r['target']) . ' other ' . $r['type'] . ' will too (';
+        $new .= $days . ' '.pluralize($days,'day').' left';
 #			$new .= 'by '.htmlentities($r['date']);
-			$new .= ')</li>'."\n";
-			$k--;
-		}
-		if (!$new) {
-			print '<p>No pledges yet!</p>';
-		} else {
-			print '<ol>'.$new.'</ol>';
-		}
-	} else {
-		print '<p>Database problem: '.db_error().'</p>';
-	}
+        $new .= ')</li>'."\n";
+        $k--;
+    }
+    if (!$new) {
+        print '<p>No pledges yet!</p>';
+    } else {
+        print '<ol>'.$new.'</ol>';
+    }
 ?>
 
 <h2>Five Highest Signup Pledges</h2>
@@ -160,24 +154,20 @@ COUNT(signers.id) AS count,max(date)-CURRENT_DATE
 AS daysleft FROM pledges,signers WHERE pledges.id=signers.pledge_id AND
 pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 GROUP
 BY pledges.id ORDER BY count DESC');
-	if ($q) {
-		$new = '';
-		$k = 5;
-		while ($k && $r = db_fetch_array($q)) {
-			$days = $r['daysleft'];
-			$new .= '<li>'.$r['count'].' '.pluralize($r['count'],'pledge').' : '.htmlentities($r['name']).' will <a href="./?pledge='.$r['id'].'">'.htmlentities($r['title']).'</a> if '.htmlentities($r['target']).' other ' . htmlentities($r['type']) . ' will too (';
-			$new .= 'by '.prettify(htmlentities($r['date']));
-			$new .= ')</li>'."\n";
-			$k--;
-		}
-		if (!$new) {
-			print '<p>No pledges yet!</p>';
-		} else {
-			print '<ol>'.$new.'</ol>';
-		}
-	} else {
-		print '<p>Database problem: '.db_error().'</p>';
-	}
+    $new = '';
+    $k = 5;
+    while ($k && $r = db_fetch_array($q)) {
+        $days = $r['daysleft'];
+        $new .= '<li>'.$r['count'].' '.pluralize($r['count'],'pledge').' : '.htmlentities($r['name']).' will <a href="./?pledge='.$r['id'].'">'.htmlentities($r['title']).'</a> if '.htmlentities($r['target']).' other ' . htmlentities($r['type']) . ' will too (';
+        $new .= 'by '.prettify(htmlentities($r['date']));
+        $new .= ')</li>'."\n";
+        $k--;
+    }
+    if (!$new) {
+        print '<p>No pledges yet!</p>';
+    } else {
+        print '<ol>'.$new.'</ol>';
+    }
 }
 
 function view_faq() { ?>
@@ -196,7 +186,7 @@ function add_signatory() {
 	$showname = $_POST['showname'] ? 1 : 0;
 	$id = $_POST['pledge_id'];
 
-	$q = db_query('SELECT title,email,confirmed,date FROM pledges WHERE id='.addslashes($id));
+	$q = db_query('SELECT title,email,confirmed,date FROM pledges WHERE id=?', array($id));
 	if (!$q) {
 		print '<p>Illegal PledgeBank reference!</p>';
 		return false;
@@ -219,7 +209,7 @@ function add_signatory() {
 		return false;
 	}
 	
-	$q = db_query('SELECT signemail FROM signers WHERE pledge_id = '.addslashes($id).' AND signemail="'.addslashes($email).'"');
+	$q = db_query('SELECT signemail FROM signers WHERE pledge_id = ? AND signemail= ?', array($id, $email));
 	if (db_num_rows($q)) {
 		print '<p>You have already signed this pledge!</p>';
 		return false;
@@ -228,32 +218,23 @@ function add_signatory() {
 	$token = str_replace('.','X',substr(crypt($id.' '.$email),0,16));
 	$add = db_query('INSERT INTO signers (pledge_id, signname,
         signemail, showname, signtime, token, confirmed) VALUES
-        ('.addslashes($id).', "'.addslashes($_POST['name']).'",
-        "'.addslashes($email).'", '.$showname.', CURRENT_TIMESTAMP, "'.addslashes($token).'", 0)');
-	if ($add) {
-		$link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
-		$success = send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
-		if ($success) { ?>
+        (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, 0)', 
+        array($id, $_POST['name'], $email, $showname, $token));
+    $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
+    $success = send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
+    if ($success) { ?>
 <p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="./?pledge=<?=htmlentities($_POST['pledge_id']) ?>">Back to pledge page</a></p>
 <?			return true;
-		} else { ?>
+    } else { ?>
 <p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>
 <?			return false;
-		}
-	} else {
-		print '<p>Problem adding you, eek! '.db_error().'</p>';
-		return false;
-	}
+    }
 }
 
 # Pledgee has clicked on link in their email
 function confirm_signatory() {
 	$token = $_GET['confirms'];
-	$q = db_query('SELECT pledge_id,confirmed FROM signers WHERE token = "'.addslashes($token).'"');
-	if (!$q) {
-		print '<p>Database error: '.db_error().'</p>';
-		return false;
-	}
+	$q = db_query('SELECT pledge_id,confirmed FROM signers WHERE token = ?', array($token));
 	$row = db_fetch_array($q);
 	if (!$row) {
 		print '<p>Confirmation token not recognised!</p>';
@@ -267,10 +248,10 @@ function confirm_signatory() {
 		return false;
 	}
 
-	db_query('UPDATE signers SET confirmed=1 WHERE token = "'.addslashes($token).'"');
+	db_query('UPDATE signers SET confirmed=1 WHERE token = ?', array($token));
 	$success = db_affected_rows();
 	if ($success) {
-		$q = db_query('SELECT * FROM pledges,signers WHERE pledges.id='.$pledge_id.' AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed=1');
+		$q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed=1', array($pledge_id));
 		if ($q) {
 			$r = db_fetch_array($q);
 			$signedup = db_num_rows($q);
@@ -311,7 +292,7 @@ function send_success_email($id, $q) {
 function view_pledge() {
 	global $today;
 
-	$q = db_query('SELECT * FROM pledges WHERE id='.addslashes($_GET['pledge']));
+	$q = db_query('SELECT * FROM pledges WHERE id=?',array($_GET['pledge']));
 	if (!db_num_rows($q)) {
 		print '<p>Illegal PledgeBank reference!</p>';
 		return false;
@@ -329,7 +310,7 @@ function view_pledge() {
 		$name = $r['name'];
 		$email = $r['email'];
 
-		$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id='.$r['id']);
+		$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id=?', array($r['id']));
 		$curr = db_num_rows($q);
 		$left = $people - $curr;
 
@@ -385,20 +366,14 @@ function view_pledge() {
 }
 
 # Someone has submitted a new pledge
-function create_new_pledge($db, $action, $people, $type, $date, $name, $email,$ref) {
+function create_new_pledge($action, $people, $type, $date, $name, $email,$ref) {
 	$isodate = "$date[year]-$date[month]-$date[day]";
 	$token = str_replace('.','X',substr(crypt($id.' '.$email),0,16));
 	$add = db_query('INSERT INTO pledges (title, target, type, date,
         name, email, ref, token, confirmed, creationtime) VALUES
-        ("'.addslashes($action).'", "'.addslashes($people).'",
-        "'.addslashes($type).'", "'.addslashes($isodate).'",
-        "'.addslashes($name).'", "'.addslashes($email).'",
-        "'.addslashes($ref).'", "'.addslashes($token).'", 0,
-        CURRENT_TIMESTAMP)');
-	if (!$add) {
-		print '<p>Something went wrong adding that to the database: '. db_error().'</p>';
-		return false;
-	}
+        (?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP)', 
+        array($action, $people, $type, $isodate, 
+        $name, $email, $ref, $token));
 ?>
 <p>Thank you very much for submitting your pledge:</p>
 <div id="pledge">
@@ -421,11 +396,7 @@ function create_new_pledge($db, $action, $people, $type, $date, $name, $email,$r
 # Pledger has clicked on link in their email
 function confirm_pledge() {
 	$token = $_GET['confirmp'];
-	$q = db_query('SELECT confirmed FROM pledges WHERE token = "'.addslashes($token).'"');
-	if (!$q) {
-		print '<p>Database error: '.db_error().'</p>';
-		return false;
-	}
+	$q = db_query('SELECT confirmed FROM pledges WHERE token = ?', array($token));
 	$row = db_fetch_array($q);
 	if (!$row) {
 		print '<p>Confirmation token not recognised!</p>';
@@ -438,7 +409,7 @@ function confirm_pledge() {
 		return false;
 	}
 
-	db_query('UPDATE pledges SET confirmed=1 WHERE token = "'.addslashes($token).'"');
+	db_query('UPDATE pledges SET confirmed=1 WHERE token = ?', array($token));
 	$success = db_affected_rows();
 	if ($success) { ?>
 <p>Thank you for confirming that pledge. It is now live, and people can sign up to it. OTHER STUFF.</p>

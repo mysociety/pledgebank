@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.16 2005-03-30 11:03:11 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.17 2005-03-30 11:07:14 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -298,11 +298,14 @@ sub run_gathering_process () {
                 } else {
                     foreach (@$r) {
                         my %f = %$_;
+                        my $ok = 1;
                         foreach (qw(BatchID DeliveryStatus DeliveryTime)) {
                             if (!exists($f{$_})) {
-                                print_log('warning', "get receipts: bad line from remote side (missing field '$_')")
+                                print_log('warning', "get receipts: bad line from remote side (missing field '$_')");
+                                $ok = 0;
                             }
                         }
+                        next unless ($ok);
                         my $foreignid = $f{BatchID};
                         next unless (defined(dbh()->selectrow_array('
                                 select id from outgoingsms
@@ -407,7 +410,8 @@ sub run_gathering_process () {
         if (@qq) {
             my %p = (
                     strMethod => 'getInbound',
-                    strWhere => join(" or ", map { "($_)" } @qq)
+                        # XXX check for blank Reference to get rid of bad rows in table
+                    strWhere => "Reference <> '' and (" . join(" or ", map { "($_)" } @qq) . ")"
                 );
             print_log('debug', "get missed messages: query is '$p{strWhere}'");
             my $result = do_post_request("get missed messages", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
@@ -424,13 +428,17 @@ sub run_gathering_process () {
                 } else {
                     foreach (@$r) {
                         my %f = %$_;
+                        my $ok = 1;
                         foreach (qw(Sequence ReceivedTime Source Destination Network Message)) {
                             if (!exists($f{$_})) {
-                                print_log('warning', "get missed messages: bad line from remote side (missing field '$_')")
+                                print_log('warning', "get missed messages: bad line from remote side (missing field '$_')");
+                                $ok = 0;
+                                next;
                             }
                             $f{$_} =~ s/^\s+//;
                             $f{$_} =~ s/\s+$//;
                         }
+                        next unless ($ok);
 
                         my ($foreignid, $whensent, $sender, $recipient, $network, $message)
                             = map { $f{$_} } qw(Sequence ReceivedTime Source Destination Network Message);
@@ -456,14 +464,15 @@ sub run_gathering_process () {
                             set lastpolled = ?
                             where lastpolled is null
                                 or (lastpolled > ? and lastpolled < ?)',
-                            {}, time() - max_polling_age,
+                            {}, time(),
+                                time() - max_polling_age,
                                 time() - min_polling_interval);
 
                     my $n = dbh()->do('
                             delete from incomingsms_foreignid_gap
                             where lastpolled < ?',
                             {}, time() - max_polling_age);
-                    print_log('warning', "get missed messages: dropped $n expired outstanding IDs");
+                    print_log('warning', "get missed messages: dropped " . int($n) . " expired outstanding IDs");
                 }
             }
         } else {
@@ -668,5 +677,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.16 2005-03-30 11:03:11 sandpit Exp $
+$Id: pbsmsd,v 1.17 2005-03-30 11:07:14 sandpit Exp $
 

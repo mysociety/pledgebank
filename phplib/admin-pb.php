@@ -5,10 +5,12 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.9 2005-03-14 14:55:49 francis Exp $
+ * $Id: admin-pb.php,v 1.10 2005-03-14 15:45:34 francis Exp $
  * 
  */
 
+require_once "../phplib/pb.php";
+require_once "../phplib/pledge.php";
 require_once "fns.php";
 require_once "db.php";
 require_once "../../phplib/utility.php";
@@ -22,7 +24,7 @@ class ADMIN_PAGE_PB {
 
     function pledge_header($sort) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
-        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 'd'=>'Deadline', 'e'=>'Setter', 'c'=>'Creation Time');
+        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Setter', 'c'=>'Creation Time');
         foreach ($cols as $s => $col) {
             print '<th>';
             if ($sort != $s) print '<a href="'.$this->self_link.'&s='.$s.'">';
@@ -35,26 +37,29 @@ class ADMIN_PAGE_PB {
 
     function list_all_pledges() {
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdec]/', $sort)) $sort = 'd';
+        if (!$sort || preg_match('/[^ratdecs]/', $sort)) $sort = 'd';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
         elseif ($sort=='t') $order = 'target';
         elseif ($sort=='d') $order = 'date';
         elseif ($sort=='e') $order = 'email';
         elseif ($sort=='c') $order = 'creationtime';
+        elseif ($sort=='s') $order = 'signers';
 
-        $q = db_query('SELECT ref,title,type,target,date,name,email,confirmed,date_trunc(\'second\',creationtime) AS creationtime FROM pledges ORDER BY ' . $order);
+        $q = db_query('SELECT ref,title,type,target,signup,date,name,email,confirmed,date_trunc(\'second\',creationtime) AS creationtime, (SELECT count(*) from signers where pledge_id=pledges.id) as signers FROM pledges ORDER BY ' . $order);
         $open = array();
         $closed = array();
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
             $row = '<td>'.$r['ref'].'</td>';
-            $row .= '<td><a href="'.$this->self_link.'&pledge='.$r['ref'].'">'.$r['title'].'</a>';
+            $row .= '<td><a href="'.$this->self_link.'&pledge='.$r['ref'].'">'.
+            $r['title'].'</a>';
             if ($r['confirmed'] == 'f') {
                 $row .= "<br><b>not confirmed</b>";
             }
             $row .= '</td>';
             $row .= '<td>'.$r['target'].' '.$r['type'].'</td>';
+            $row .= '<td>'.$r['signers'].'</td>';
             $row .= '<td>'.prettify($r['date']).'</td>';
             $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
             $row .= '<td>'.$r['creationtime'].'</td>';

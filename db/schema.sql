@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.9 2005-03-02 20:07:59 chris Exp $
+-- $Id: schema.sql,v 1.10 2005-03-02 22:02:15 chris Exp $
 --
 
 -- secret
@@ -98,13 +98,15 @@ create table outgoingsms (
 );
 
 create unique index outgoingsms_foreignid_idx on outgoingsms(foreignid);
+-- This is for an extra, paranoid check on delivery report messages.
+create index outgoingsms_recipient_idx on outgoingsms(recipient);
 
 create table incomingsms (
     id serial not null primary key,
     -- Sender's phone number.
     sender text not null,
     -- Receiving number/short code/whatever.
-    receiver text not null,
+    recipient text not null,
     -- Text of the message, transcoded to UTF-8.
     message text not null,
     -- ID assigned by the deliverer.

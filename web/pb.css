@@ -1,0 +1,160 @@
+body {
+	text-align: center;
+	font-family: "Lucida Grande", "Lucida Sans", sans-serif;
+	margin: 0;
+	padding: 0;
+}
+h1 {
+	font-size: 200%;
+	padding: 0.4em 10px;
+	text-align: left;
+	margin: 0;
+	color: #ffffff;
+	background-color: #9C7BBD;
+	border-bottom: solid 2px #522994;
+}
+h1 span {
+	color: #21004A;
+}
+a:link { color: #9C7BBD; background-color: #ffffff; }
+a:visited { color: #9C7BBD; background-color: #ffffff; }
+a:hover, a:active { color: #000000; background-color: #ffffff; }
+#start a {
+	float: right;
+	border: solid 2px #522994;
+	padding: 3px;
+	text-align: center;
+	font-size: 150%;
+	color: #000000;
+	background-color: #C6B5DE;
+	width: 6em;
+	text-decoration: none;
+}
+#start a:hover {
+	border: solid 2px #990000;
+	color: #ff0000;
+	background-color: #ffcccc;
+}
+
+#content {
+	text-align: left;
+	padding: 10px;
+}
+
+#search {
+	clear: right;
+	float: right;
+	margin-top: 1em;
+	width: 9em;
+}
+#search h2 {
+	margin: 0;
+	font-size: 100%;
+}
+#search p {
+	margin: 0;
+	font-size: 83%;
+}
+
+div#pledge {
+	border: solid 2px #522994;
+}
+#pledge {
+	width: 75%;
+	margin: 0 auto;
+	padding: 10px;
+	background-color: #c6b5de;
+}
+form#pledge h2 {
+	margin-top: 0;
+}
+#pledge p {
+	text-align: center;
+	margin-bottom: 0;
+}
+
+dt {
+	font-weight: bold;
+}
+
+ul#nav {
+	list-style-type: none;
+	position: absolute;
+	top: 2.8em;
+	right: 0;
+	margin: 0 1em 0 0;
+	padding: 0;
+}
+ul#nav a {
+	text-decoration: none;
+}
+ul#nav li {
+	margin: 0;
+	padding: 1px 5px;
+	text-align: center;
+	position: relative;
+	top: 2px;
+	background-color: #ffffff;
+	color: #21004a;
+	margin-left: 0.5em;
+	display: inline;
+	border: solid 1px #522994;
+	border-width: 2px 2px 0 2px;
+}
+form {
+	margin: 0;
+	border: solid 2px #522994;
+	padding: 3px;
+}
+input, textarea {
+	background-color: #ffffff;
+	color: #000000;
+	border: solid 2px #9c7bbd;
+}
+textarea:hover, textarea:focus, input:hover, input:focus {
+	border: solid 2px #522994;
+}
+.v {
+	display: none;
+}
+
+#footer {
+	padding: 3px;
+	border-top: solid 1px #c6b5d3;
+	font-size: 90%;
+	width: 50%;
+	margin: 1em auto 0;
+}
+
+label {
+	cursor: pointer;
+}
+.fr {
+	margin-bottom: 2px;
+}
+
+#errors {
+	color: #ff0000;
+	background-color: #ffcccc;
+	border: solid 2px #990000;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+.success {
+	margin: 0 auto;
+	width: 50%;
+	padding: 10px;
+	text-align: center;
+	background-color: #ccffcc;
+	border: solid 2px #009900;
+}
+
+.finished {
+	margin: 0 auto;
+	width: 50%;
+	padding: 10px;
+	text-align: center;
+	background-color: #ffcccc;
+	border: solid 2px #990000;	
+}

@@ -1,0 +1,47 @@
+<?php
+/*
+ * general-example:
+ * Example values for the "general" config file.
+ *
+ * Configuration parameters, in PHP syntax. Configuration parameters are set
+ * using the PHP define('OPTION_...', '...') function. Both perl and PHP code
+ * parse this properly, so you can use comments and conditionals and whatnot,
+ * but unless essential it's better to keep it simple....
+ *
+ * Copy this file to one called "general" in the same directory.  Or
+ * have multiple config files and use a symlink to change between them.
+ * 
+ * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org; WWW: http://www.mysociety.org
+ *
+ * $Id: general-example,v 1.1 2005-01-06 19:22:58 matthew Exp $
+ * 
+ */
+
+// PostgreSQL database for PB
+/*
+// Host and port for database, if it is on a remote machine.
+define('OPTION_PB_DB_HOST', 'dbhost');
+define('OPTION_PB_DB_PORT', '5432');
+*/
+define('OPTION_PB_DB_NAME', 'pb');
+define('OPTION_PB_DB_USER', 'pb');
+define('OPTION_PB_DB_PASS', '');
+
+// Base domain of the website. This is used to distinguish internal from
+// external referrers, for instance.
+define('OPTION_WEB_DOMAIN', 'pledgebank.com');
+
+// Top-level URL of current website
+define('OPTION_BASE_URL', 'http://sometesthost.' . OPTION_WEB_DOMAIN . '/');
+
+// Domain name for emails to current website
+define('OPTION_EMAIL_DOMAIN', 'sometestdomain.pledgebank.com');
+// Prefix of return-path local part. All mail for EMAIL_PREFIX(.*)@EMAIL_DOMAIN
+// must be delivered to the bounce processing scripts.
+define('OPTION_EMAIL_PREFIX', 'pb-');
+
+// Debug log level for PHP website
+define('OPTION_PHP_DEBUG_LEVEL', 0);
+
+?>

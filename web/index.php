@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.28 2005-02-23 15:45:00 francis Exp $
+// $Id: index.php,v 1.29 2005-02-24 12:18:02 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -32,10 +32,10 @@ elseif (get_http_var('confirms')) confirm_signatory();
 elseif (get_http_var('add_signatory')) add_signatory();
 elseif (get_http_var('pledge')) view_pledge();
 elseif (get_http_var('new')) pledge_form();
-elseif (get_http_var('new')) pledge_form_submitted();
+elseif (get_http_var('newpost')) pledge_form_submitted();
 elseif (get_http_var('faq')) view_faq();
 elseif (get_http_var('contact')) contact_form();
-elseif (get_http_var('contact')) contact_form_submitted();
+elseif (get_http_var('contactpost')) contact_form_submitted();
 elseif (get_http_var('all')) list_all_pledges();
 elseif (get_http_var('admin')=='pledgebank') admin();
 elseif (get_http_var('pdf')) pdfs();
@@ -87,7 +87,7 @@ function pledge_form($errors = array()) {
 	}
 ?>
 <!-- <p>To create a new pledge, please fill in the form below.</p> -->
-<form id="pledge" method="post" action="./"><input type="hidden" name="new" value="1">
+<form id="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
 <h2>New Pledge</h2>
 <p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="action" id="action" value="<?=htmlspecialchars(get_http_var('action')) ?>" size="82"></p>
 <p>if <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" name="people" value="<?=htmlspecialchars(get_http_var('people')) ?>">
@@ -99,17 +99,18 @@ other <input type="text" id="type" name="type" size="30" value="people"> <input 
 <p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars(get_http_var('name')) ?>">
 Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 &nbsp;
-<input type="submit" value="Submit"></p>
+<input type="submit" name="submit" value="Submit"></p>
 <hr style="color: #522994; background-color: #522994; height: 1px; border: none;" >
 <h3>Optional Information</h3>
 <p id="moreinfo" style="text-align: left">More details about your pledge:
 <br><textarea name="moreinfo" rows="10" cols="60"><?=htmlspecialchars(get_http_var('moreinfo')) ?></textarea>
-<input type="submit" value="Submit">
+<input type="submit" name="submit" value="Submit">
 </form>
 <? }
 
 function pledge_form_submitted() {
 	global $today;
+    $errors = array();
 	$action = get_http_var('action'); if ($action=='<Enter your pledge>') $action = '';
 	$people = get_http_var('people');
 	$type = get_http_var('type'); if (!$type) $type = 'people';
@@ -224,7 +225,8 @@ function add_signatory() {
 	}
 
 	$r = db_fetch_array($q);
-        $action = $r['title']; $id = $r['id'];
+    $action = $r['title']; 
+    $id = $r['id'];
 
 	if (!$r['confirmed']) {
 		print '<p>Illegal PledgeBank reference!</p>';
@@ -409,7 +411,7 @@ if ($detail) {
 # Someone has submitted a new pledge
 function create_new_pledge($action, $people, $type, $date, $name, $email, $ref, $signup, $detail, $open) {
 	$isodate = $date['iso'];
-	$token = str_replace('.', 'X', substr(crypt($id.' '.$email.microtime()), 12, 16));
+	$token = str_replace('.', 'X', substr(crypt($ref.' '.$email.microtime()), 12, 16));
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, open) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?, ?)', 

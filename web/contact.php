@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.4 2005-02-23 16:07:31 francis Exp $
+// $Id: contact.php,v 1.5 2005-02-24 12:18:02 francis Exp $
 
 function contact_form($errors = array()) { ?>
 <h2>Contact Us</h2>
@@ -15,7 +15,7 @@ function contact_form($errors = array()) { ?>
 		print join ('</li><li>', $errors);
 		print '</li></ul>';
 	} ?>
-<form action="./" method="post"><input type="hidden" name="contact" value="1">
+<form action="./" method="post"><input type="hidden" name="contactpost" value="1">
 <div class="fr"><label for="name">Name</label>: <input type="text" id="name" name="name" value="<?=htmlentities(get_http_var('name')) ?>" size="32"></div>
 <div class="fr"><label for="email">Email</label>: <input type="text" id="email" name="email" value="<?=htmlentities(get_http_var('email')) ?>" size="32"></div>
 <div class="fr"><label for="subject">Subject</label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>

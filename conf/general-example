@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.3 2005-01-28 13:06:28 matthew Exp $
+ * $Id: general-example,v 1.4 2005-02-24 12:18:02 francis Exp $
  * 
  */
 
@@ -33,7 +33,7 @@ define('OPTION_PB_DB_PASS', '');
 define('OPTION_WEB_DOMAIN', 'pledgebank.com');
 
 // Top-level URL of current website
-define('OPTION_BASE_URL', 'http://sometesthost.' . OPTION_WEB_DOMAIN . '/');
+define('OPTION_BASE_URL', 'http://sometesthost.pledgebank.com');
 
 // Domain name for emails to current website
 define('OPTION_EMAIL_DOMAIN', 'sometestdomain.pledgebank.com');
@@ -44,5 +44,10 @@ define('OPTION_EMAIL_PREFIX', 'pb-');
 
 // Debug log level for PHP website
 define('OPTION_PHP_DEBUG_LEVEL', 0);
+// Is this a staging site?  Affects how errors are displayed.
+define('OPTION_PB_STAGING', 1);
+
+// Log file (used in test harness, and later in admin scripts)
+define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');
 
 ?>

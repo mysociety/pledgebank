@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.7 2005-02-22 09:20:56 francis Exp $
+// $Id: fns.php,v 1.8 2005-02-24 12:18:02 francis Exp $
 
 function pb_send_email($to, $subject, $message, $headers = '') {
 	$headers = $headers . 
@@ -32,7 +32,10 @@ function parse_date($date) {
 
 	$date = preg_replace('#((\b([a-z]|on|an|of|in|the|year of our lord))|(?<=\d)(st|nd|rd|th))\b#','',$date);
 
-        $epoch = 0;
+    $epoch = 0;
+    $day = null;
+    $year = null;
+    $month = null;
 	if (preg_match('#(\d+)/(\d+)/(\d+)#',$date,$m)) {
 		$day = $m[1]; $month = $m[2]; $year = $m[3];
 	} elseif (preg_match('#(\d+)/(\d+)#',$date,$m)) {

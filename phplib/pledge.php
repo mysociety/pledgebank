@@ -6,12 +6,24 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.7 2005-03-09 18:10:21 francis Exp $
+ * $Id: pledge.php,v 1.8 2005-03-10 18:48:11 chris Exp $
  * 
  */
 
 require_once 'db.php';
 require_once '../../phplib/utility.php';
+
+/* pledge_ab64_encode DATA
+ * Return a "almost base64" encoding of DATA (a six-bit encoding of
+ * URL-friendly characters; specifically the encoded data match
+ * /^[0-9A-Za-z.,-]+$/). */
+function pledge_ab64_encode($i) {
+    $t = base64_encode($i);
+    $t = str_replace("+", ".", &$t);
+    $t = str_replace("/", ",", &$t);
+    $t = str_replace("=", "-", &$t);
+    return $t;
+}
 
 /* pledge_email_token ADDRESS PLEDGE [SALT]
  * Return a token encoding ADDRESS and PLEDGE. SALT should be either null, in
@@ -19,11 +31,11 @@ require_once '../../phplib/utility.php';
  * to this function, in which case the same salt as was used then will be
  * re-used, so that a comparison can be made. The returned token is of the
  * form SALT_TOKEN, where _ is a literal underscore and SALT and TOKEN are
- * base64-encoded data (matching /^[0-9A-Za-z+/=]+$/). */
+ * almost-base64-encoded data. */
 function pledge_email_token($email, $pledge, $salt = null) {
-    if (is_null($salt))
-        $salt = base64_encode(random_bytes(3));
-    else {
+    if (is_null($salt)) {
+        $salt = pledge_ab64_encode(random_bytes(3));
+    } else {
         /* Salt is anything up to first "_" in token. */
         $a = split("_", $salt);
         $salt = $a[0];
@@ -32,26 +44,35 @@ function pledge_email_token($email, $pledge, $salt = null) {
     $h = pack('H*', sha1($salt . $email . $pledge . db_secret()));
     /* Don't send the full SHA1 hash, because we don't want our URLs to be too
      * long (at some marginal risk to security...). */
-    $b64 = base64_encode(substr(&$h, 0, 12));
-    // Use URL friendly codes
-    $b64 = str_replace("+", ".", $b64);
-    $b64 = str_replace("/", ",", $b64);
-    $b64 = str_replace("=", "-", $b64);
-    return $salt . "_" . $b64;
+    $b64 = pledge_ab64_encode(substr(&$h, 0, 12));
+
+    /* Base64 uses the character set [A-za-z0-9+/=]. "+", "/" and "=" are poor
+     * characters for URLs, because they have special interpretations. So use
+     * others instead. */
+    return $salt . '_' . $b64;
 }
 
 /* PLEDGE_...
- * Various codes for things which can happen to pledges. */
+ * Various codes for things which can happen to pledges. All such error codes
+ * must be nonpositive. */
 define('PLEDGE_OK',          0);
-define('PLEDGE_NONE',        1);    /* Can't find that pledge */
-define('PLEDGE_FINISHED',    2);    /* Pledge has expired */
-define('PLEDGE_FULL',        3);    /* All places taken */
-define('PLEDGE_SIGNED',      4);    /* Email address is already on pledge */
-define('PLEDGE_DENIED',      5);    /* Permission denied */
+define('PLEDGE_NONE',       -1);    /* Can't find that pledge */
+define('PLEDGE_FINISHED',   -2);    /* Pledge has expired */
+define('PLEDGE_FULL',       -3);    /* All places taken */
+define('PLEDGE_SIGNED',     -4);    /* Email address is already on pledge */
+define('PLEDGE_DENIED',     -5);    /* Permission denied */
 
-    /* codes >= 100 represent temporary errors */
-define('PLEDGE_ERROR',     100);    /* Some sort of nonspecific error. */
+    /* codes <= -100 represent temporary errors */
+define('PLEDGE_ERROR',    -100);    /* Some sort of nonspecific error. */
 
+/* pledge_is_error RESULT
+ * Does RESULT indicate an error? */
+function pledge_is_error($res) {
+    return (is_int($res) && $res < 0);
+}
+
+/* pledge_strerror CODE
+ * Return a description of the error CODE. */
 function pledge_strerror($e) {
     switch ($e) {
     case PLEDGE_OK:
@@ -75,8 +96,11 @@ function pledge_strerror($e) {
     }
 }
 
+/* pledge_is_permanent_error CODE
+ * Return true if CODE represents a permanent error (i.e. one which won't go
+ * away by itself). */
 function pledge_permanent_error($e) {
-    return ($e < 100);
+    return ($e > PLEDGE_ERROR);
 }
 
 /* pledge_sentence PLEDGE FIRSTPERSON [HTML]
@@ -131,7 +155,8 @@ function pledge_is_valid_to_sign($pledge_id, $email) {
     $r = db_getRow('
                 select comparison, target, date, email
                 from pledges
-                where id = ? and confirmed for update', $pledge_id);
+                where id = ? and confirmed
+                for update', $pledge_id);
     if (is_null($r))
         return PLEDGE_NONE;
     else if ($r['date'] < date('Y-m-d'))
@@ -156,6 +181,27 @@ function pledge_is_valid_to_sign($pledge_id, $email) {
     return PLEDGE_OK;
 }
 
+/* pledge_confirm TOKEN
+ * If TOKEN confirms any outstanding pledge, confirm that pledge and return
+ * its ID. */
+function pledge_confirm($token) {
+    $pledge_id = db_getOne('
+                        select id from pledges
+                        where token = ?', $token);
+                    /* NB do not need "for update" because this function is
+                     * idempotent. */
+    if (!isset($pledge_id))
+        return PLEDGE_NONE;
+    else {
+        db_query('
+                update pledges
+                set confirmed = true, creationtime = current_timestamp
+                where id = ? and not confirmed',
+                    $pledge_id);
+        return $pledge_id;
+    }
+}
+
 /* pledge_sign PLEDGE SIGNER SHOWNAME EMAIL [CONVERTS]
  * Add the named SIGNER to the PLEDGE. SHOWNAME indicates whether their name
  * should be displayed publically; EMAIL is their email address. It is the
@@ -163,14 +209,11 @@ function pledge_is_valid_to_sign($pledge_id, $email) {
  * private pledge (by supplying a password, presumably). If CONVERTS is not
  * null, it gives the ID of an existing signer whose signature will be
  * replaced by the new signature on confirmation. This is used to convert SMS
- * subscriptions into email subscriptions. On success returns the signer ID and
- * confirmation token; on failure returns an error message. This function does
- * not commit its changes.
- * XXX we should return a descriptive error code, because some of these error
- * conditions must not be shown to the user. */
+ * subscriptions into email subscriptions. On success returns the new signer
+ * ID; on failure, return an error code. */
 function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
     $e = pledge_is_valid_to_sign($pledge_id, $email);
-    if ($e != PLEDGE_OK)
+    if (pledge_is_error($e))
         return $e;
 
     $id = db_getOne("select nextval('signers_id_seq')");
@@ -196,7 +239,7 @@ function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
         return PLEDGE_ERROR;
 
     /* Done. */
-    return array($id, $token);
+    return $id;
 }
 
 /* pledge_sign_confirm TOKEN

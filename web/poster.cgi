@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.22 2005-03-24 14:28:50 francis Exp $
+# $Id: poster.cgi,v 1.23 2005-03-30 13:57:50 sandpit Exp $
 #
 
 import os
@@ -156,22 +156,38 @@ def flyer(c, x1, y1, x2, y2, size):
 
     # Draw all the text
     story = [
-        Paragraph(1*('''I, %s, will %s if %s %s will %s. ''' % (pledge['name'], pledge['title'],
-            pledge['target'], pledge['type'], pledge['signup'])), p_head),
+        Paragraph('''
+            I, %s, will %s <b>but only if</b> %s %s will %s.
+            ''' % (
+                pledge['name'], pledge['title'], pledge['target'],
+                pledge['type'], pledge['signup']
+            ), p_head),
 
         Paragraph('', p_normal),
-        Paragraph('''Please support me by signing up, and by
-            encouraging other people to do the same. I am using the charitable service
-            PledgeBank.com to gather support.''', p_normal),
+        Paragraph('''
+            Please tell me you'll do this! There's nothing to lose -- you only
+            have to go through with it if %s %s will %s.
+            ''' % (
+                pledge['target'], pledge['type'], pledge['signup']
+            ), p_normal),
 
-        Paragraph('''It will only take you a few seconds - ''', p_nospaceafter),
-        Paragraph('''<b>www.pledgebank.com/%s</b>''' % ref, p_nospaceafter),
-        Paragraph('''(web sign up is free)''', p_normal),
+        Paragraph('''
+            It's easy and incredibly quick -- either sign up for free at
+            ''', p_nospaceafter),
+        Paragraph('''
+            <b>www.pledgebank.com/%s</b>
+            ''' % ref, p_nospaceafter),
+        Paragraph('''
+            or text <b>pledge %s</b> to <b>%s</b>
+            ''' % (ref, sms_number), p_nospaceafter),
+        Paragraph('''
+            (for a one-off charge of 25p). PledgeBank will keep you updated
+            on the progress of the pledge.
+            ''', p_normal),
 
-        Paragraph('''or text <b>pledge %s</b> to <b>%s</b>''' % (ref, sms_number), p_nospaceafter),
-        Paragraph('''(cost 50p)''', p_normal),
-
-        Paragraph('''This pledge closes on %s. Thanks!''' % pledge['date'], p_normal)
+        Paragraph('''
+            This pledge closes on %s. Thanks!
+            ''' % pledge['date'], p_normal)
     ]
 
     dots_body_gap = 10

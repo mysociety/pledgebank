@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.16 2005-03-22 11:07:59 francis Exp $
+ * $Id: confirm.php,v 1.17 2005-03-24 11:05:22 francis Exp $
  * 
  */
 
@@ -101,7 +101,7 @@ if ($q_type == 'pledge') {
 
     if (!pledge_is_error($r)) {
         print '<div class="noprint">';
-        print "<p>Thanks for subscribing to this pledge!</p>";
+        print "<p>Thanks for signing up to this pledge!</p>";
 
         if ($f1 === false && pledge_is_successful($data['pledge_id']))
             /* Has this completed the pledge? */
@@ -129,11 +129,10 @@ function advertise_flyers($pledge_id) {
     $r = db_getRow('select * from pledges where id = ?', $pledge_id);
     $png_flyers4_url = new_url("../flyers/{$r['ref']}_A4_flyers4.png", false);
 ?>
-
 <div class="noprint">
 <p align="center">
 <strong>Important Notice</strong> - You will massively increase the chance of this pledge being
-a success if 
+a success if you
 <script type="text/javascript">
     document.write('<a href="javascript: window.print()">print this page out</a>,');
 </script>
@@ -144,39 +143,9 @@ cut up the flyers and stick them through some
 of your neighbours letterboxes. We cannot emphasise this enough - print them
 now and post them next time you go out to the shops. We also have more
 <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers"> attractive PDF versions</a>.</p>
-
 </div> <!-- noprint -->
 
 <img src="<?=$png_flyers4_url?>" alt="Flyers">
-
-<!--
-<style type="text/css">
-table {
-    margin: 10pt;
-    max-width: 90%;
-    border-collapse: collapse;
-    border: dashed 1px black;
-}
-td {
-    font-size: 83%;
-    border: dashed 1px black;
-    padding: 10pt;
-}
-</style>
-<table><?
-    
-    for ($rows = 0; $rows<3; $rows++) {
-        print '<tr align="center">';
-        for ($cols=0; $cols<2; $cols++) {
-            print '<td>';
-            print get_flyer_text($r, array());
-            print '</td>';
-        }
-        print '</tr>';
-    }
-?>
-    </table>
-    -->
 <?
 }
 

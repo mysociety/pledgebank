@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.95 2005-03-23 17:24:12 francis Exp $
+// $Id: index.php,v 1.96 2005-03-24 11:05:23 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -446,7 +446,7 @@ function add_signatory() {
     /* The exact mail we send depends on whether we're already signed up to
      * this pledge. */
     $id = db_getOne('select id from signers where pledge_id = ? and email = ?', array($r['id'], $q_email));
-    if (defined($id)) {
+    if (isset($id)) {
         $success = pb_send_email_template($q_email, 'signature-confirm-already', $r);
     } else {
         /* Generate a secure URL to send to the user. */

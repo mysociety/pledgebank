@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.44 2005-03-29 13:22:22 chris Exp $
+-- $Id: schema.sql,v 1.45 2005-03-29 13:59:28 chris Exp $
 --
 
 -- secret
@@ -146,6 +146,7 @@ create table outgoingsms (
             lastsendstatus is null
             or lastsendstatus = 'systemerror'
             or lastsendstatus = 'httperror'
+            or lastsendstatus = 'remoteerror'
             or lastsendstatus = 'success'
         ),
     -- any other information, e.g. errno value or HTTP status line
@@ -529,7 +530,3 @@ create function pb_current_timestamp()
         end if;
     end;
 ' language 'plpgsql';
-
-
-
-

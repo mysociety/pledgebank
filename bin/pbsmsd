@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.6 2005-03-26 16:33:59 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.7 2005-03-29 13:59:28 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -75,9 +75,10 @@ sub run_sending_process () {
         $s->execute(time(), send_retry_interval, send_max_attempts);
         while (my $id = $s->fetchrow_array()) {
             # Grab a lock on the message, assuming that it still needs to be sent.
-            my ($recipient, $message, $numattempts) =
+            my ($recipient, $message, $ispremium, $numattempts) =
                 dbh()->selectrow_array("
-                    select recipient, message, numsendattempts from outgoingsms
+                    select recipient, message, ispremium, numsendattempts
+                    from outgoingsms
                     where lastsendattempt is null
                         or (lastsendstatus <> 'success'
                             and lastsendattempt < ? - ? * (2 ^ (numsendattempts - 1)))
@@ -97,38 +98,30 @@ sub run_sending_process () {
                 dbh()->do('delete from outgoingsms where id = ?', {}, $id);
             } else {
                 # Assemble parameters for message.
-                # http://www.mxtelecom.com/uk/index.jsp?m=tech/sms/http/send#params
+                #
+                #   strMethod               sendSMS
+                #   strShortcode            sending short code
+                #   strMobile               recipient
+                #   strMessage              IA5 octets of message
+                #   intTransactionID        our reference
+                #   intPremium              cost of premium SMS
+                #
                 $recipient =~ s/^\+//;
                 my %p = (
-                        user => mySociety::Config::get('PB_SMS_MXTELECOM_USER'),
-                        pass => mySociety::Config::get('PB_SMS_MXTELECOM_PASS'),
-                        smsto => $recipient,
-                        note => "message #$id; send attempt "
-                                        . ($numattempts + 1),
-                        # bitfield:
-                        #   2 = receive success reports;
-                        #   4 = receive failure reports
-                        report => 6,
-
-                        # 2 means "split using user-data header"
-                        # XXX review this
-                        split => 2
+                        strMethod => 'sendSMS',
+                        strShortcode => '60022',        # XXX
+                        strMobile => $recipient,
+                        intTransactionID => $id,
+                        intPremium => ($ispremium ? 25 : 0)     # XXX
                     );
 
                 # Now we need to send the message. That means finding a
                 # character set in which it can be expressed.
                 eval {
-                    eval {
-                        $p{smsmsg} = encode('iso-8859-15', $message, Encode::FB_CROAK);
-                    };
-                    if ($@) {
-                        print_log('debug', "outgoing #$id cannot be expressed in ISO-8859-15; trying UCS-2");
-                        my $u = encode('ucs-2', $message, Encode::FB_CROAK);
-                        $p{smsucs2} = unpack('h*', $u);
-                    }
+                    $p{strMessage} = PB::SMS::encode_ia5($message);
                 };
                 if ($@) {
-                    print_log('err', "outgoing #$id, '$message', cannot be expressed in ISO-8859-15 or UCS-2; abandoning message");
+                    print_log('err', "outgoing #$id, '$message', cannot be expressed in IA5; abandoning message");
                     dbh()->do('delete from outgoingsms where id = ?', {}, $id);
                 } else {
                     # We're OK to attempt sending.
@@ -137,7 +130,7 @@ sub run_sending_process () {
                         local $SIG{ALRM} = sub { die "timed out in eval\n"; };
                         alarm(300);
                         print_log('debug', "outgoing #$id: attempting to send by HTTP POST");
-                        my $resp = $ua->post('http://sms.mxtelecom.com/SMSSend', \%p);
+                        my $resp = $ua->post('http://www.c360uk.com/api/complex/pledge-query.php', \%p);
                         alarm(0);
                         if (!defined($resp)) {
                             $! ||= '(no error)';
@@ -151,12 +144,20 @@ sub run_sending_process () {
                             ($status, $extra) = ('httperror', $resp->status_line());
                         } else {
                             print_log('info', "outgoing #$id: sent");
-                            # Now extract the ID from the result.
-                            my $foreignid = $resp->content();
-                            $foreignid =~ s#\s*$##gs;
-                            print_log('debug', "outgoing #$id: foreign ID is $foreignid");
-                            dbh()->do('update outgoingsms set foreignid = ? where id = ?', {}, $foreignid, $id);
-                            ($status, $extra) = ('success', undef);
+
+                            my $result = $resp->content();
+                            if ($result =~ /^ID=(\d+)/) {
+                                # Success; ID returned.
+                                print_log('debug', "outgoing #$id: foreign ID is $1");
+                                dbh()->do('update outgoingsms set foreignid = ? where id = ?', {}, $1, $id);
+                                ($status, $extra) = ('success', undef);
+                            } else {
+                                $result =~ s/\s*$//;
+                                $result = 'Miscellaneous error (blank ID)'
+                                    if ($result =~ /^ID=$/);
+                                print_log('warning', "outgoing #$id: remote error: $result");
+                                ($status, $extra) = ('remoteerror', $result);
+                            }
                         }
                     };
                     if ($@) {
@@ -195,7 +196,7 @@ sub run_processing_process () {
     # there so that in the presence of heavy traffic we maintain acceptable
     # latency in processing messages in both directions.
     my $s_sent = dbh()->prepare("
-                        select id, message, '00000', recipient, status
+                        select id, message, '60022', recipient, status
                             from outgoingsms
                         where status = 'delivered'
                             or status = 'failed'
@@ -379,5 +380,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.6 2005-03-26 16:33:59 chris Exp $
+$Id: pbsmsd,v 1.7 2005-03-29 13:59:28 chris Exp $
 

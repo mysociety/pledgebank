@@ -5,8 +5,14 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.8 2005-03-02 15:29:47 francis Exp $
+-- $Id: schema.sql,v 1.9 2005-03-02 20:07:59 chris Exp $
 --
+
+-- secret
+-- A random secret.
+create table secret (
+    secret text not null
+);
 
 create table pledges (
     id serial not null primary key,
@@ -49,6 +55,7 @@ create table outgoingsms (
     id serial not null primary key,
     -- Recipient, as an international-format number, and text of message.
     recipient text not null,
+    -- Message, as UTF-8.
     message text not null,
     
     -- When we tried to submit the message to the server last, how many times
@@ -89,6 +96,26 @@ create table outgoingsms (
     
     -- XXX extra fields for billing?
 );
+
+create unique index outgoingsms_foreignid_idx on outgoingsms(foreignid);
+
+create table incomingsms (
+    id serial not null primary key,
+    -- Sender's phone number.
+    sender text not null,
+    -- Receiving number/short code/whatever.
+    receiver text not null,
+    -- Text of the message, transcoded to UTF-8.
+    message text not null,
+    -- ID assigned by the deliverer.
+    foreignid text not null,
+    -- When we received the message.
+    whenreceived integer not null,
+    -- When the message says it was sent.
+    whensent integer not null
+);
+
+create unique index incomingsms_foreignid_idx on incomingsms(foreignid);
 
 create table signers (
   id serial not null primary key,

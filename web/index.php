@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.24 2005-02-22 09:20:57 francis Exp $
+// $Id: index.php,v 1.25 2005-02-22 23:01:29 matthew Exp $
 
 require_once "../conf/general";
 include_once '../templates/page.php';
@@ -81,6 +81,7 @@ function pledge_form_submitted() {
 	$name = $_POST['name'];
 	$email = $_POST['email'];
 	$ref = $_POST['ref'];
+        $detail = $_POST['detail'];
         $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($ref));
         if ($dupe) $errors[] = 'That reference is already taken!';
         $signup = $_POST['signup']; if (!$signup) $signup = 'sign up';
@@ -97,7 +98,7 @@ function pledge_form_submitted() {
 	if (sizeof($errors)) {
 		pledge_form($errors);
 	} else {
-		create_new_pledge($action,$people,$type,$date,$name,$email,$ref,$signup);
+		create_new_pledge($action,$people,$type,$date,$name,$email,$ref,$signup,$detail);
 	}
 }
 
@@ -310,6 +311,7 @@ function view_pledge() {
 	$name = $r['name'];
 	$email = $r['email'];
         $signup = $r['signup'];
+        $detail = $r['detail'];
 
 	$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id=?', array($r['id']));
 	$curr = db_num_rows($q);
@@ -333,7 +335,7 @@ function view_pledge() {
 <p style="text-align: center; font-style: italic;"><?=$curr ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.(-$left).' over target :) )':', '.$left.' more needed') ?></p>
 
 <? if (!$finished) { ?>
-<div style="text-align: left; margin-left: 50%">
+<div style="text-align: left; margin-left: 50%;">
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
 <p style="text-align: left">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars($_POST['name']) ?>">
 <br>Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($_POST['email']) ?>">
@@ -342,7 +344,13 @@ function view_pledge() {
 &nbsp;
 <input type="submit" value="Submit"></p>
 </div>
-<? } ?>
+<? }
+
+if ($detail) {
+    print '<p style="text-align:left"><strong>More details</strong><br>' . htmlspecialchars($detail) . '</p>';
+}
+
+?>
 </form>
 
 <p style="text-align: center"><a href="./?pdf=<?=$_GET['pledge'] ?>" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="" onclick="return false">Email this Pledge</a><? } ?></p>
@@ -368,14 +376,14 @@ function view_pledge() {
 }
 
 # Someone has submitted a new pledge
-function create_new_pledge($action, $people, $type, $date, $name, $email, $ref, $signup) {
+function create_new_pledge($action, $people, $type, $date, $name, $email, $ref, $signup, $detail) {
 	$isodate = $date['iso'];
 	$token = str_replace('.','X',substr(crypt($id.' '.$email),0,16));
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
-        name, email, ref, token, confirmed, creationtime) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP)', 
+        name, email, ref, token, confirmed, creationtime, detail) VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?)', 
         array($action, $people, $type, $signup, $isodate, 
-        $name, $email, $ref, $token));
+        $name, $email, $ref, $token, $detail));
 ?>
 <p>Thank you very much for submitting your pledge:</p>
 <div id="pledge">

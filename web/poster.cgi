@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.13 2005-03-17 16:19:11 francis Exp $
+# $Id: poster.cgi,v 1.14 2005-03-17 17:50:38 francis Exp $
 #
 
 import os
@@ -61,6 +61,9 @@ def draw_short_pledge(x, y):
     c.setFont("Helvetica", size)
     c.drawCentredString(x, (y-3)*cm, text)
 
+############################################################################
+# Tiled cards on a sheet.
+
 def cards():
     c.setStrokeColorRGB(0,0,0)
     c.setFillColorRGB(0,0,0)
@@ -76,6 +79,10 @@ def cards():
     c.setFont("ZapfDingbats",24)
     c.drawString(-29*cm, 10.5*cm-8, '"')
     c.showPage()
+
+############################################################################
+# Little tear off strips at the bottom, like phone numbers on adverts on 
+# student noticeboards.
 
 def tearoff():
     x = 10.5*cm
@@ -108,9 +115,11 @@ def tearoff():
     c.showPage()
 
 ############################################################################
-# Flyer using reportlab.platypus for word wrapping
+# Flyers using reportlab.platypus for word wrapping
 
-def flyer(x1, y1, x2, y2):
+# Prints one copy of the flier at given coordinates, and font sizes.
+# Returns False if it didn't all fit, or True if it did.
+def flyer(c, x1, y1, x2, y2, size):
     w = x2 - x1
     h = y2 - y1
 
@@ -123,41 +132,98 @@ def flyer(x1, y1, x2, y2):
     c.line(x1, y1, x2, y1)
     c.line(x1, y2, x2, y2)
 
-    # Set up styles
-    p_head = ParagraphStyle('normal', alignment = TA_CENTER, spaceBefore = 0, spaceAfter = 20, 
-        fontSize = 30, leading = 32, fontName = 'Helvetica')
-    p_normal = ParagraphStyle('normal', alignment = TA_CENTER, spaceBefore = 0, spaceAfter = 20, 
-        fontSize = 15, leading = 16, fontName = 'Helvetica')
-    p_nospaceafter = ParagraphStyle('normal', alignment = TA_CENTER, spaceBefore = 0, spaceAfter = 1, 
-        fontSize = 15, leading = 16, fontName = 'Helvetica')
+    # Scale font sizes - with minimum for extreme cases
+    large_writing = size * 35
+    small_writing = size * 20
+    if small_writing < 7:
+        small_writing = 7
+    if large_writing < 7:
+        large_writing = 7
 
-    # Draw
+    # Set up styles
+    p_head = ParagraphStyle('normal', alignment = TA_CENTER, spaceBefore = 0, spaceAfter = size*20, 
+        fontSize = large_writing, leading = size*37, fontName = 'Helvetica')
+    p_normal = ParagraphStyle('normal', alignment = TA_CENTER, spaceBefore = 0, spaceAfter = size*20, 
+        fontSize = small_writing, leading = size*22, fontName = 'Helvetica')
+    p_nospaceafter = ParagraphStyle('normal', alignment = TA_CENTER, spaceBefore = 0, spaceAfter = 1, 
+        fontSize = small_writing, leading = size*22, fontName = 'Helvetica')
+
+    # Draw all the text
     story = [
-        Paragraph('''I, %s, will %s if %s %s will %s.''' % (pledge['name'], pledge['title'],
-            pledge['target'], pledge['type'], pledge['signup']), p_head),
+        Paragraph(('''I, %s, will %s if %s %s will %s. ''' % (pledge['name'], pledge['title'],
+            pledge['target'], pledge['type'], pledge['signup'])), p_head),
+
+        Paragraph('', p_normal),
         Paragraph('''Please support me by signing up, and by
             encouraging other people to do the same. I am using the charitable service
             PledgeBank.com to gather support.''', p_normal),
-        Paragraph('''It will only take you a few seconds - sign up free at''', p_nospaceafter),
-        Paragraph('''<b>www.pledgebank.com/%s</b>''' % ref, p_normal),
-        Paragraph('''<p>Or text <b>pledge %s</b> to <b>12345</b>''' % ref, p_nospaceafter),
-        Paragraph('''(cost 25p)''', p_normal),
+
+        Paragraph('''It will only take you a few seconds - ''', p_nospaceafter),
+        Paragraph('''<b>www.pledgebank.com/%s</b>''' % ref, p_nospaceafter),
+        Paragraph('''(web sign up is free)''', p_normal),
+
+        Paragraph('''or text <b>pledge %s</b> to <b>12345</b>''' % ref, p_nospaceafter),
+        Paragraph('''(cost 50p)''', p_normal),
+
         Paragraph('''This pledge closes on %s. Thanks!''' % pledge['date'], p_normal)
     ]
 
-    dots_body_gap = 20
+    dots_body_gap = 10
     f = Frame(x1, y1, w, h, showBoundary = 0, 
         leftPadding = dots_body_gap, rightPadding = dots_body_gap, topPadding = dots_body_gap, bottomPadding = dots_body_gap
         )
     f.addFromList(story, c)
 
-def flyers():
+    # If it didn't fit, say so
+    if len(story) > 0:
+        return False
+    return True
+
+def flyers(number):
+    if number not in [1, 4, 16]:
+        raise Exception("Invalid number %d for flyers" % number)
+
+    if number == 1:
+        flyers_across = 1
+        flyers_down = 1
+    elif number == 4:
+        flyers_across = 2
+        flyers_down = 2
+    elif number == 16:
+        flyers_across = 4
+        flyers_down = 4
+
+    page_width = 21 * cm
+    page_height = 30 * cm
+    flyer_width = page_width / flyers_across
+    flyer_height = page_height / flyers_down
+
+    # Try different font sizes on a hidden canvas to get the largest
+    dummyc = canvas.Canvas(None)
+    size = 3.0
+    while True:
+        # print >>sys.stderr, "Trying flyer size %s" % size
+        ok = flyer(dummyc, 0, 0, flyer_width, flyer_height, size);
+        if ok:
+            break
+        size = size * 19 / 20
+        if size * 30 < 10:
+            raise Exception("Pledge text wouldn't fit on page")
+
+    # Draw fliers
     c.setStrokeColorRGB(0,0,0)
     c.setFillColorRGB(0,0,0)
-    flyer(0, 0*cm + 0, 10.5 * cm, 0*cm + 15 * cm)
-    flyer(0, 15*cm + 0, 10.5 * cm, 15*cm + 15 * cm)
-    flyer(10.5 * cm, 0*cm + 0, 21 * cm, 0*cm + 15 * cm)
-    flyer(10.5 * cm, 15*cm + 0, 21 * cm, 15*cm + 15 * cm)
+    for along in range(0, flyers_across):
+        for down in range(0, flyers_down):
+            flyer(c, 
+                along * flyer_width, down * flyer_height, 
+                (along + 1) * flyer_width, (down + 1) * flyer_height,
+                size)
+
+#    flyer(c, 0, 0*cm + 0, 10.5*cm, 0*cm + 15 * cm, size)
+#    flyer(c, 0, 15*cm + 0, 10.5 * cm, 15*cm + 15*cm, size)
+#    flyer(c, flyer_width, 0*cm + 0, 21*cm, 0*cm + 15*cm, size)
+#    flyer(c, flyer_width,10.5*cm, 15*cm + 0, 21*cm, 15*cm + 15*cm, size)
 
 ############################################################################
 
@@ -189,7 +255,7 @@ while fcgi.isFCGI():
         incgi = False
         ref = 'automatedtest'
         size = 'A4'
-        type = 'flyers'
+        type = 'flyers1'
         suffix = 'pdf'
 
     if incgi:
@@ -226,8 +292,12 @@ while fcgi.isFCGI():
             cards()
         elif type == "tearoff":
             tearoff()
-        elif type == "flyers":
-            flyers()
+        elif type == "flyers16":
+            flyers(16)
+        elif type == "flyers4":
+            flyers(4)
+        elif type == "flyers1":
+            flyers(1)
         else:
             raise Exception, "Unknown type '%s'" % type
         c.save()

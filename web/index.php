@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.88 2005-03-17 09:20:39 francis Exp $
+// $Id: index.php,v 1.89 2005-03-17 17:50:38 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -693,14 +693,16 @@ function pdfs() {
     }
     $pdf_cards_url = new_url("../flyers/{$ref}_A4_cards.pdf", false);
     $pdf_tearoff_url = new_url("../flyers/{$ref}_A4_tearoff.pdf", false);
-    $pdf_flyers_url = new_url("../flyers/{$ref}_A4_flyers.pdf", false);
+    $pdf_flyers4_url = new_url("../flyers/{$ref}_A4_flyers4.pdf", false);
+    $pdf_flyers1_url = new_url("../flyers/{$ref}_A4_flyers1.pdf", false);
     ?>
 <h2>Customised Flyers</h2>
 <p>Below you can generate <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
+<li><a href="<?=$pdf_flyers4_url?>">Flyers for getting out and giving to people (A4)</a></li>
+<li><a href="<?=$pdf_flyers1_url?>">Big poster (A4)</a></li>
 <li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
 <li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>
-<li><a href="<?=$pdf_flyers_url?>">Flyers for getting out and giving to people (A4)</a></li>
 </ul>
 <?  return true;
 }

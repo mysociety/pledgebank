@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.20 2005-03-14 15:28:57 francis Exp $
+ * $Id: pledge.php,v 1.21 2005-03-14 15:48:04 francis Exp $
  * 
  */
 
@@ -148,14 +148,14 @@ function pledge_sentence($r, $params = array()) {
         $r = array_map('htmlspecialchars', $r);
         
     $s = ($firstperson ? "I" : $r['name'])
-            . " will <strong>";
+            . " will ";
     if (array_key_exists('href', $params)) {
             $s .= "<a href=\"".urlencode($params['href'])."\">"
             . $r['title'] . "<a>";
     } else {
-            $s .= $r['title'];
+            $s .= "<strong>" . $r['title'] . "</strong>";
     }
-    $s .= "</strong> if "
+    $s .= " if "
             . '<strong>';
     //if (isset($r['comparison']))
     //    $s .= ($r['comparison'] == 'exactly' ? 'exactly' : 'at least');
@@ -164,7 +164,7 @@ function pledge_sentence($r, $params = array()) {
             . " ${r['type']} will "
             . ($r['signup'] == 'do the same' ? 'too' : $r['signup'])
             . ".";
-    if (!$html)
+    if (!$html or array_key_exists('href', $params))
         $s = preg_replace('#</?strong>#', '', $s);
 
     return $s;

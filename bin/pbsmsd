@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.12 2005-03-30 10:16:23 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.13 2005-03-30 10:23:08 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -354,6 +354,17 @@ sub run_gathering_process () {
                                 where foreignid = ?',
                                 {}, time(), $foreignid);
                     }
+
+                    # If we got a valid response at all, assume that we've
+                    # successfully checked the status of all messages more
+                    # recent than $min_id which we didn't get a status
+                    # indication for above, in case any status reports have
+                    # been lost.
+                    dbh()->do('
+                            update outgoingsms
+                            set laststatuscheck = ?
+                            where foreignid >= ? and laststatuscheck is null',
+                            {}, time(), $min_id);
                 }
             }
         }
@@ -638,5 +649,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.12 2005-03-30 10:16:23 sandpit Exp $
+$Id: pbsmsd,v 1.13 2005-03-30 10:23:08 sandpit Exp $
 

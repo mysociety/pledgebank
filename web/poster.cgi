@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.27 2005-04-05 16:56:11 matthew Exp $
+# $Id: poster.cgi,v 1.28 2005-04-05 17:48:22 francis Exp $
 #
 
 import os
@@ -445,7 +445,7 @@ Files are cached in the directory PB_PDF_CACHE specified in conf/general.""")
         # Generate any other file type
         if format != 'pdf':
             # Call out to "convert" from ImageMagick
-            cmd = "/home/chris/afpl-gs/bin/gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outdir + '/' + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outdir + '/' + outfile
+            cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outdir + '/' + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outdir + '/' + outfile
             child = popen2.Popen3(cmd, True) # capture stderr
             child.tochild.close()
             req.err.write(child.fromchild.read())

@@ -2,8 +2,8 @@
 
 function pb_send_email($to, $subject, $message, $headers = '') {
 	$headers = $headers . 
-	'From: "PledgeBank.com" <' . CONTACTEMAIL . ">\r\n" .
-	'Reply-To: "PledgeBank.com" <' . CONTACTEMAIL . ">\r\n" .
+	'From: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n" .
+	'Reply-To: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n" .
 	'X-Mailer: PHP/' . phpversion();
 	$success = mail ($to, $subject, $message, $headers);
 	return $success;

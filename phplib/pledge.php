@@ -6,12 +6,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.23 2005-03-15 18:58:10 sandpit Exp $
+ * $Id: pledge.php,v 1.24 2005-03-16 15:20:21 chris Exp $
  * 
  */
 
 require_once 'db.php';
 require_once '../../phplib/utility.php';
+require_once '../../phplib/rabx.php';
 
 /* pledge_ab64_encode DATA
  * Return a "almost base64" encoding of DATA (a six-bit encoding of
@@ -25,26 +26,46 @@ function pledge_ab64_encode($i) {
     return $t;
 }
 
-/* pledge_random_token_store DATA
- * Returns a randomly generated token, suitable for use in URLs. 
- * Array DATA is serialised and stored in the database associated with that
- * token, for later retrieval with pledge_random_token_retrieve. */
-function pledge_random_token_store($data) {
+/* pledge_token_store SCOPE DATA
+ * Returns a randomly generated token, suitable for use in URLs. SCOPE is the
+ * associated scope. DATA (of arbitrary, non-object type) are serialised and
+ * stored in the database associated with that scope and token, for later
+ * retrieval with pledge_random_token_retrieve. */
+function pledge_token_store($scope, $data) {
     $token = pledge_ab64_encode(random_bytes(12));
-    db_query('insert into token_store (token, data, created) values (?, ?, current_timestamp)', 
-        array($token, serialize($data)));
+    $ser = '';
+    rabx_wire_wr($data, $ser);
+    db_query('
+            insert into token (scope, token, data, created)
+            values (?, ?, ?, current_timestamp)', array($scope, $token, $ser));
     return $token;
 }
 
-/* pledge_random_token_retrieve TOKEN
- * Given a token that was made by pledge_random_token_store, this returns the
- * DATA associated with it, or causes an error if there isn't one. */
-function pledge_random_token_retrieve($token) {
-    $data = db_getOne('select data from token_store where token = ?', $token);
-    if (is_null($data)) {
-        err("Token not valid.");
+/* pledge_token_retrieve SCOPE TOKEN
+ * Given a TOKEN returned by pledge_random_token_store for the given SCOPE,
+ * return the DATA associated with it, raising an error if there isn't one. */
+function pledge_token_retrieve($scope, $token) {
+    $data = db_getOne('
+                    select data
+                    from token
+                    where scope = ? and token = ?', array($scope, $token));
+
+    $pos = 0;
+    $res = rabx_wire_rd(&$data, &$pos);
+    if (rabx_is_error($res)) {
+        $res = unserialize($data);
+        if (is_null($res))
+            err("Data for scope '$scope', token '$token' are not valid");
     }
-    return unserialize($data);
+
+    return $res;
+}
+
+/* pledge_token_destroy SCOPE TOKEN
+ * Delete any data associated with TOKEN in the given SCOPE. */
+function pledge_token_destroy($scope, $token) {
+    db_query('delete from token where scope = ? and token = ?',
+            array($scope, $token));
 }
 
 /* pledge_email_token ADDRESS PLEDGE [SALT]
@@ -193,10 +214,10 @@ function pledge_is_successful($pledge_id) {
     return $num >= $target;
 }
 
-/* pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
- * Return true if EMAIL/MOBILE may validly sign PLEDGE. This function locks
- * rows in pledges and signers with select ... for update / lock tables. */
-function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null) {
+/* pledge_dbresult_to_code RESULT
+ * Convert a string result from the database (e.g. 'ok', 'none', etc.) into a
+ * PLEDGE_... code. */
+function pledge_dbresult_to_code($r) {
     $resmap = array(
             'ok' => PLEDGE_OK,
             'none' => PLEDGE_NONE,
@@ -204,11 +225,20 @@ function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null) {
             'signed' => PLEDGE_SIGNED,
             'full' => PLEDGE_FULL,
         );
-    $r = db_getOne('select pledge_is_valid_to_sign(?, ?, ?)', array($pledge_id, $email, $mobile));
     if (array_key_exists($r, $resmap))
         return $resmap[$r];
     else
-        err("Bad result $r from pledge_is_valid_to_sign");
+        err("Bad result $r in pledge_dbresult_to_code");
+}
+
+/* pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
+ * Return true if EMAIL/MOBILE may validly sign PLEDGE. This function locks
+ * rows in pledges and signers with select ... for update / lock tables. */
+function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null) {
+    return pledge_dbresult_to_code(
+                db_getOne('select pledge_is_valid_to_sign(?, ?, ?)',
+                    array($pledge_id, $email, $mobile))
+            );
 }
 
 /* pledge_confirm TOKEN

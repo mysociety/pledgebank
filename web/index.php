@@ -290,39 +290,42 @@ function send_success_email($pledge_id) {
 
 # Individual pledge page
 function view_pledge() {
-	global $today;
+    global $today;
 
-	$q = db_query('SELECT * FROM pledges WHERE id=?',array($_GET['pledge']));
-	if (!db_num_rows($q)) {
-		print '<p>Illegal PledgeBank reference!</p>';
-		return false;
-	} else {
-		$r = db_fetch_array($q);
-		$confirmed = $r['confirmed'];
-		if (!$confirmed) {
-			print '<p>Illegal PledgeBank reference!</p>';
-			return false;
-		}
-		$action = $r['title'];
-		$people = $r['target'];
-		$type = $r['type'];
-		$date = $r['date'];
-		$name = $r['name'];
-		$email = $r['email'];
-                $signup = $r['signup'];
+    if (ctype_digit($_GET['pledge']))
+        $q = db_query('SELECT * FROM pledges WHERE id=?',array($_GET['pledge']));
+    else
+        $q = db_query('SELECT * FROM pledges WHERE ref=?', array($_GET['pledge']));
+    if (!db_num_rows($q)) {
+        print '<p>Illegal PledgeBank reference!</p>';
+	return false;
+    } else {
+        $r = db_fetch_array($q);
+	$confirmed = $r['confirmed'];
+	if (!$confirmed) {
+	    print '<p>Illegal PledgeBank reference!</p>';
+	    return false;
+	}
+	$action = $r['title'];
+	$people = $r['target'];
+	$type = $r['type'];
+	$date = $r['date'];
+	$name = $r['name'];
+	$email = $r['email'];
+        $signup = $r['signup'];
 
-		$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id=?', array($r['id']));
-		$curr = db_num_rows($q);
-		$left = $people - $curr;
+	$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id=?', array($r['id']));
+	$curr = db_num_rows($q);
+	$left = $people - $curr;
 
-		$finished = 0;
-		if ($r['date']<$today) {
-			$finished = 1;
-			print '<p class="finished">This pledge is now closed, its deadline has passed.</p>';
-		}
-		if ($left<=0) {
-			print '<p class="success">This pledge has been successful!</p>';
-		}
+	$finished = 0;
+	if ($r['date']<$today) {
+            $finished = 1;
+	    print '<p class="finished">This pledge is now closed, its deadline has passed.</p>';
+	}
+	if ($left<=0) {
+	    print '<p class="success">This pledge has been successful!</p>';
+	}
 ?>
 <p>Here is the pledge:</p>
 <form id="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($_GET['pledge']) ?>">

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.5 2005-01-28 19:25:29 matthew Exp $
+ * $Id: admin-pb.php,v 1.6 2005-01-29 15:42:47 matthew Exp $
  * 
  */
 
@@ -15,35 +15,82 @@ require_once "../../phplib/utility.php";
 
 class ADMIN_PAGE_PB {
     function ADMIN_PAGE_PB () {
+        $this->today = date('Y-m-d');
         $this->id = "pb";
         $this->name = "Pledges and Signers";
         $this->navname = "Pledges and Signers";
     }
 
+    function pledge_header($sort) {
+        print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
+        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 'd'=>'Deadline', 'e'=>'Setter', 'c'=>'Creation Time');
+        foreach ($cols as $s => $col) {
+            print '<th>';
+            if ($sort != $s) print '<a href="./?s='.$s.'">';
+            print $col;
+            if ($sort != $s) print '</a>';
+            print '</th>';
+        }
+        print '</tr>';
+    }
+
     function list_all_pledges() {
-        print "<h2>All Pledges</h2>";
-        $q = db_query('SELECT * FROM pledges');
-        print '<table border=1
-        width=100%><tr><th>Ref</th><th>Title</th><th>Target</th><th>Deadline</th><th>Setter</th></tr>';
+        $sort = get_http_var('s');
+        if (!$sort || preg_match('/[^ratdec]/', $sort)) $sort = 'd';
+        if ($sort=='r') $order = 'ref';
+        elseif ($sort=='a') $order = 'title';
+        elseif ($sort=='t') $order = 'target';
+        elseif ($sort=='d') $order = 'date';
+        elseif ($sort=='e') $order = 'email';
+        elseif ($sort=='c') $order = 'creationtime';
+
+        $q = db_query('SELECT ref,title,type,target,date,name,email,confirmed,date_trunc(\'second\',creationtime) AS creationtime FROM pledges ORDER BY ' . $order);
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
-            print '<tr>';
-            print '<td>'.$r['ref'].'</td>';
-            print '<td><a href="./?pledge='.$r['ref'].'">'.$r['title'].'</a>';
+            $row = '<td>'.$r['ref'].'</td>';
+            $row .= '<td><a href="./?pledge='.$r['ref'].'">'.$r['title'].'</a>';
             if ($r['confirmed'] == 0) {
-                print "<br/><b>not confirmed</b>";
+                $row .= "<br><b>not confirmed</b>";
             }
-            print '</td>';
-            print '<td>'.$r['target'].' '.$r['type'].'</td>';
-            print '<td>'.prettify($r['date']).'</td>';
-            print '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
-            print '</tr>';
+            $row .= '</td>';
+            $row .= '<td>'.$r['target'].' '.$r['type'].'</td>';
+            $row .= '<td>'.prettify($r['date']).'</td>';
+            $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
+            $row .= '<td>'.$r['creationtime'].'</td>';
+            if ($r['date']<$this->today)
+                $closed[] = $row;
+            else
+                $open[] = $row;
         }
-        print '</table>';
+        if (count($open)) {
+            print "<h2>All Open Pledges</h2>";
+            $this->pledge_header($sort);
+            $a = 0;
+            foreach ($open as $row) {
+                print '<tr'.($a++%2==0?' class="v"':'').'>';
+                print $row;
+                print '</tr>';
+            }
+            print '</table>';
+        }
+        if (count($closed)) {
+            print "<h2>All Closed Pledges</h2>";
+            $this->pledge_header($sort);
+            $a = 0;
+            foreach ($closed as $row) {
+                print '<tr'.($a++%2==0?' class="v"':'').'>';
+                print $row;
+                print '</tr>';
+            }
+            print '</table>';
+        }
     }
 
     function show_one_pledge($pledge) {
         print '<p><a href="./">List of all pledges</a></p>';
+
+        $sort = get_http_var('s');
+        if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 'e';
 
         $q = db_query('SELECT * FROM pledges where ref=?', $pledge);
         $pdata = db_fetch_array($q);
@@ -55,28 +102,57 @@ class ADMIN_PAGE_PB {
         }
         
         print "<p>Set by: <b>" . $pdata['name'] . " &lt;" .  $pdata['email'] . "&gt;</b>";
-        print "<br/>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
-        print "<br/>Deadline: <b>" . prettify($pdata['date']) . "</b>";
+        print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
+        print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print "</p>";
 
-        $q = db_query('SELECT COUNT(*) FROM signers where pledge_id=?  and confirmed=1', $pdata['id']);
-        $r = db_fetch_row($q);
-        $confirmed = $r[0];
-        $q = db_query('SELECT * FROM signers where pledge_id=?', $pdata['id']);
-        print "<p>There are <b>$confirmed</b> confirmed signers, and <b>".(db_num_rows($q)-$confirmed)."</b> unconfirmed so far:</p>";
-        print '<table border=1 width=100%><tr>
-        <th>Signee</th> <th>Time</th> <th>Show name?</th> <th>Confirmed</th> </tr>';
+        $query = 'SELECT signname,signemail,date_trunc(\'second\',signtime) AS signtime,showname,confirmed FROM signers WHERE pledge_id=?';
+        if ($sort=='t') $query .= ' ORDER BY signtime DESC';
+        elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
+        elseif ($sort=='c') $query .= ' ORDER BY confirmed DESC';
+        $q = db_query($query, $pdata['id']);
+        $confirmed = 0; $out = array();
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
-            print '<tr>';
-            print '<td>'.$r['signname'].'<br>'.$r['signemail'].'</td>';
-            print '<td>'.prettify($r['signtime']).'</td>';
-            print '<td>'.$r['showname'].'</td>';
-            print '<td>'.$r['confirmed'].'</td>';
-            print '</tr>';
+            $e = $r['signemail'];
+            $out[$e] = '<td>'.$r['signname'].'<br>'.$e.'</td>';
+            $out[$e] .= '<td>'.prettify($r['signtime']).'</td>';
+            $out[$e] .= '<td align="center">'.($r['showname']?'Yes':'No').'</td>';
+            $out[$e] .= '<td align="center">'.($r['confirmed']?'Yes':'No').'</td>';
+            if ($r['confirmed']) $confirmed++;
         }
-        print '</table>';
+        if ($sort == 'e') {
+            function sort_by_domain($a, $b) {
+                $aa = stristr($a, '@');
+                $bb = stristr($b, '@');
+                if ($aa==$bb) return 0;
+                return ($aa>$bb) ? 1 : -1;
+            }
+            uksort($out, 'sort_by_domain');
+        }
+        print "<p>There are <b>$confirmed</b> confirmed signers";
+        if ($unconfirmed = db_num_rows($q) - $confirmed > 0)
+            print ", and <b>".$unconfirmed."</b> unconfirmed so far:</p>";
+        if (count($out)) {
+            print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
+            $cols = array('e'=>'Signee', 't'=>'Time', 'n'=>'Show name?', 'c'=>'Confirmed');
+            foreach ($cols as $s => $col) {
+                print '<th>';
+                if ($sort != $s) print '<a href="./?pledge='.$pledge.'&amp;s='.$s.'">';
+                print $col;
+                if ($sort != $s) print '</a>';
+                print '</th>';
+            }
+            print '</tr>';
+            $a = 0;
+            foreach ($out as $row) {
+                print '<tr'.($a++%2==0?' class="v"':'').'>';
+                print $row;
+                print '</tr>';
+            }
+            print '</table>';
+        }
         print '<form method="post" action="./"><input type="hidden" name="id" value="' . $pdata['id'] . '"><input type="submit" name="remove" value="Remove pledge"></form>';
     }
 

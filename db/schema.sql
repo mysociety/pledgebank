@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.21 2005-03-07 18:19:14 chris Exp $
+-- $Id: schema.sql,v 1.22 2005-03-08 11:26:49 chris Exp $
 --
 
 -- secret
@@ -158,10 +158,22 @@ create table signers (
     -- converts_signer_id mechanism.
     token text not null,
     confirmed boolean not null default false,
-    outgoingsms_id integer references outgoingsms(id),
 
     -- Name has been reported
     reported boolean not null default false
 );
 
-create unique index signers_outgoingsms_id_idx on signers(outgoingsms_id);
+-- There may be only one signature on any given pledge from any given mobile
+-- phone number.
+create unique index signers_pledge_id_mobile_idx on signers(pledge_id, mobile);
+-- Ditto emails.
+create unique index signers_pledge_id_email_idx on signers(pledge_id, email);
+
+-- This is a table which records the number of SMSs sent to any individual
+-- phone number on any given pledge. The point here is that somebody may send
+-- a subscription request, not receive the reply message and then (perhaps
+-- impatiently) send a further signup request.
+create table outgoingsms_signers (
+    signer_id integer not null references signers(id),
+    outgoingsms_id integer not null references outgoingsms(id)
+);

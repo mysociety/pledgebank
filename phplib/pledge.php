@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.33 2005-03-25 20:41:43 matthew Exp $
+ * $Id: pledge.php,v 1.34 2005-03-29 08:58:01 francis Exp $
  * 
  */
 
@@ -325,7 +325,8 @@ function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
  */
 function deal_with_password($type, $ref, $actual) {
     $h_ref = htmlspecialchars($ref);
-    $entered = sha1(get_http_var('pw'));
+    $raw = get_http_var('pw');
+    $entered = $raw ? sha1($raw) : $raw;
     if (!$actual) return true;
     if ($entered) {
         if ($entered != $actual) {

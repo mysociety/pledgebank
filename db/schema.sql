@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.42 2005-03-25 20:26:06 francis Exp $
+-- $Id: schema.sql,v 1.43 2005-03-29 08:58:00 francis Exp $
 --
 
 -- secret
@@ -89,7 +89,7 @@ create function pledge_is_valid_to_sign(integer, text, text)
             return ''none'';
         end if;
 
-        if p.date < pb_current_date() or p.success then
+        if p.date < pb_current_date() then
             return ''finished'';
         end if;
         

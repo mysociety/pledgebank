@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.103 2005-03-29 07:39:56 francis Exp $
+// $Id: index.php,v 1.104 2005-03-29 08:58:01 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -363,7 +363,8 @@ doesn't work, or you have any other suggests or comments.
     $q = db_query("
                 SELECT *, date - pb_current_date() AS daysleft
                 FROM pledges
-                WHERE date >= pb_current_date() AND password is NULL AND confirmed
+                WHERE date >= pb_current_date() AND 
+                password is NULL AND confirmed
                 ORDER BY id
                 DESC LIMIT 5");
     $new = '';
@@ -382,13 +383,13 @@ doesn't work, or you have any other suggests or comments.
         $new .= '</li>';
     }
     if (!$new) {
-        print '<p>No pledges yet!</p>';
+        print '<p>There are no new pledges at the moment.</p>';
     } else {
         print '<ol>'.$new.'</ol>';
     }
 ?>
 
-<h2>Five Highest Signup Pledges</h2><?
+<h2>... or sign a pledge with lots of signatures</h2><?
 
     $q = db_query("
             SELECT pledges.id, pledges.name, pledges.title, pledges.signup,
@@ -420,7 +421,7 @@ doesn't work, or you have any other suggests or comments.
         $new .= '</li>';
     }
     if (!$new) {
-        print '<p>No pledges yet!</p>';
+        print '<p>There are no currently active pledges.</p>';
     } else {
         print '<ol>'.$new.'</ol>';
     }
@@ -625,7 +626,7 @@ function create_new_pledge($data) {
 	$add = db_query('INSERT INTO pledges (id, title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, pb_current_timestamp(), ?, ?, ?, ?, ?)', 
-        array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], sha1($data['password'])));
+        array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password'] ? sha1($data['password']) : $data['password']));
 ?>
 <h2>Now check your email...</h2>
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.72 2005-03-11 19:38:37 francis Exp $
+// $Id: index.php,v 1.73 2005-03-11 21:06:38 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -160,17 +160,19 @@ door of that neighbour who's name you've forgotten.
 <form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
 <h2>New Pledge &#8211; Step 1</h2>
 <div class="c">
-<p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="82"></p>
+<p><strong>I will</strong> <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
-<p>if <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'3') ?>">
-<input type="text" id="type" name="type" size="77" value="other local people"></p>
+<p><strong>if</strong> <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'3') ?>">
+<input type="text" id="type" name="type" size="67" value="other local people"></p>
 
-<p>will <input type="text" id="signup" name="signup" size="84" value="do the same">.</p>
+<p><strong>will</strong> <input type="text" id="signup" name="signup" size="74" value="do the same"></p>
 
-<p>The other people must sign up before <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']['iso']) ?>">.</p>
+<p>The other people must sign up before <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']['iso']) ?>"></p>
 
-<p>Choose a short name for your pledge (e.g. tidyupthepark) :
-<br>www.pledgebank.com/<input onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> <small>(letters, numbers, or '-', with a minimum of 6 characters)</small></p>
+<p>Choose a short name for your pledge (6 to 12 letters):
+<input onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
+<br><small>This gives your pledge an easy web address. e.g. www.pledgebank.com/tidyupthepark</small>
+</p>
 
 <p style="margin-bottom: 1em;">Your name: <input type="text" size="20" name="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 Email: <input type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">

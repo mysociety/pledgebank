@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.3 2005-03-08 17:17:46 chris Exp $
+// $Id: page.php,v 1.4 2005-03-11 21:06:38 francis Exp $
 
 /* page_header TITLE
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -37,7 +37,12 @@ function page_header($title) {
 function page_footer() { ?>
 </div>
 <hr class="v"><h2 class="v">Navigation</h2>
-<ul id="nav"><li><a href="/">Home</a><li><a href="/all">Pledges</a><li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a><li><a href="/contact">Contact</a></ul>
+<ul id="nav">
+<li><a href="/">Home</a>
+<li><a href="/new">New Pledge</a>
+<li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a>
+<li><a href="/contact">Contact</a>
+</ul>
 <hr class="v">
 <div id="footer"><a href="http://www.mysociety.org/">Built by mySociety</a>.</div>
 </body></html>

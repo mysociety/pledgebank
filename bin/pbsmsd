@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.14 2005-03-30 10:48:17 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.15 2005-03-30 10:52:07 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -109,9 +109,9 @@ sub run_sending_process () {
                     order by random()
                 ");
 
-    my $ua = 
     my $niter = 0;
     while (!$foad && $niter < 10000) {
+        my $nsent = 0;
         $s->execute(time(), send_retry_interval, send_max_attempts);
         while (my $id = $s->fetchrow_array()) {
             # Grab a lock on the message, assuming that it still needs to be sent.
@@ -192,18 +192,14 @@ sub run_sending_process () {
                                 lastsendextrastatus = ?,
                                 numsendattempts = numsendattempts + 1
                             where id = ?', {}, time(), $status, $extra, $id);
+                    ++$nsent;
                 }
             }
             dbh()->commit();
         }
 
-        # Pause for a bit.
-        # XXX could probably be a bit more intelligent than this! In particular
-        # (a) under heavy traffic we shouldn't wait at all; (b) under very
-        # light traffic we should probably wait for longer; (c) if we seem to
-        # be suffering some kind of connectivity or other failure (e.g. all
-        # message sending attempts fail) we should hold off for quite a while.
-        sleep(10);
+        # Pause for a bit if we ran out of messages to send.
+        sleep(10) if ($nsent == 0);
 
         ++$niter;
     }
@@ -672,5 +668,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.14 2005-03-30 10:48:17 sandpit Exp $
+$Id: pbsmsd,v 1.15 2005-03-30 10:52:07 sandpit Exp $
 

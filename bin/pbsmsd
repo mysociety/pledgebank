@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.11 2005-03-30 09:11:37 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.12 2005-03-30 10:16:23 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -254,7 +254,7 @@ sub run_gathering_process () {
                             and lastsendattempt > ?
                             and lastsendattempt < ?
                             and (laststatuscheck is null or
-                                    laststatuscheck > ?)
+                                    laststatuscheck < ?)
                         ");
     my $s_missed = dbh()->prepare("
                         select gap
@@ -638,5 +638,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.11 2005-03-30 09:11:37 sandpit Exp $
+$Id: pbsmsd,v 1.12 2005-03-30 10:16:23 sandpit Exp $
 

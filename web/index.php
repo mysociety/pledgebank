@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.29 2005-02-24 12:18:02 francis Exp $
+// $Id: index.php,v 1.30 2005-02-24 21:41:25 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -119,7 +119,8 @@ function pledge_form_submitted() {
 	$email = get_http_var('email');
 	$ref = get_http_var('ref');
         $detail = get_http_var('detail');
-        $open = get_http_var('open'); if ($open) $open=1; else $open = 0;
+#        $open = get_http_var('open'); if ($open) $open=1; else $open = 0;
+        $open = 1; # Not doing anything with open/closed pledges yet
         $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($ref));
         if ($dupe) $errors[] = 'That reference is already taken!';
         $signup = get_http_var('signup'); if (!$signup) $signup = 'sign up';

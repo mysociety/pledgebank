@@ -5,27 +5,36 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.5 2005-02-24 12:18:02 francis Exp $
+// $Id: contact.php,v 1.6 2005-03-22 18:29:02 francis Exp $
 
 function contact_form($errors = array()) { ?>
 <h2>Contact Us</h2>
-<p>Fill in this form to send us stuff.</p>
+<p>Was it useful?  How could it be better?  
+We make PledgeBank and thrive off feedback, good and bad.
+Use this form to contact us.  
+If you prefer, you can email <a href="mailto:<?=OPTION_CONTACT_EMAIL?>"><?=OPTION_CONTACT_EMAIL?></a> instead of using the form.
+<p><a href="/faq">Read the FAQ</a> first, it might be a quicker
+way to answer your question.  
+</p>
 <?	if (sizeof($errors)) {
 		print '<ul id="errors"><li>';
 		print join ('</li><li>', $errors);
 		print '</li></ul>';
 	} ?>
 <form action="./" method="post"><input type="hidden" name="contactpost" value="1">
-<div class="fr"><label for="name">Name</label>: <input type="text" id="name" name="name" value="<?=htmlentities(get_http_var('name')) ?>" size="32"></div>
-<div class="fr"><label for="email">Email</label>: <input type="text" id="email" name="email" value="<?=htmlentities(get_http_var('email')) ?>" size="32"></div>
+<div class="fr"><label for="name">Your name</label>: <input type="text" id="name" name="name" value="<?=htmlentities(get_http_var('name')) ?>" size="32"></div>
+<div class="fr"><label for="email">Your email</label>: <input type="text" id="email" name="email" value="<?=htmlentities(get_http_var('email')) ?>" size="32"></div>
 <div class="fr"><label for="subject">Subject</label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>
 <div><label for="message">Message</label>:<br><textarea rows="7" cols="60" name="message" id="message"><?=htmlentities(get_http_var('message')) ?></textarea></div>
-<p><input type="submit" value="Send"></p>
+<p>
+Did you <a href="/faq">read the FAQ</a> first?
+--&gt; <input type="submit" value="Send"></p>
 </form>
 <? }
 
 function contact_form_submitted() {
 	$name = get_http_var('name'); $email = get_http_var('email'); $subject = get_http_var('subject'); $message = get_http_var('message');
+    $errors = array();
 	if (!$name) $errors[] = 'Please enter your name';
 	if (!$email) $errors[] = 'Please enter your mail address';
 	if (!$subject) $errors[] = 'Please enter a subject';
@@ -38,8 +47,11 @@ function contact_form_submitted() {
 }
 
 function send_contact_form($name, $email, $subject, $message) {
-	$header = 'Sent from IP address ' . $_SERVER['REMOTE_ADDR'] . ($_SERVER['HTTP_X_FORWARDED_FOR'] ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . "\n\n";
-	$success = @mail('matthew-pb-contact-form@dracos.co.uk', $subject, $header . $message, "From: $name <$email>");
+	$header = 'Sent by contact.php from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . "\n\n";
+	$success = @mail(OPTION_CONTACT_EMAIL, $subject, $header . $message, "From: $name <$email>");
+?>
+    Thanks for your feedback.  We'll get back to you as soon as we can!
+<?
 }
 
 ?>

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.11 2005-03-11 19:14:54 francis Exp $
+// $Id: fns.php,v 1.12 2005-03-22 18:29:02 francis Exp $
 
 function pb_send_email($to, $subject, $message, $headers = '') {
     if (!strstr($headers, 'From:')) {
@@ -13,7 +13,7 @@ function pb_send_email($to, $subject, $message, $headers = '') {
                     'Reply-To: "PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">\r\n";
     }
     $headers .= 'X-Mailer: PHP/' . phpversion();
-    $success = mail ($to, $subject, $message, $headers);
+    $success = mail($to, $subject, $message, $headers);
     return $success;
 }
 

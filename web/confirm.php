@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.12 2005-03-16 15:22:52 chris Exp $
+ * $Id: confirm.php,v 1.13 2005-03-16 16:58:35 chris Exp $
  * 
  */
 
@@ -37,7 +37,7 @@ if ($q_type == 'pledge') {
     /* Success. */
     $q = db_query('select * from pledges where id = ?', $pledge_id);
     $r = db_fetch_array($q);
-    page_header(htmlspecialchars($r['title']) . ' - Confirm', array('nonav'=>true));
+    page_header("${r['title']} - Confirm", array('nonav' => true));
     db_commit();
     $url = "/" . urlencode($r['ref']);
     ?>
@@ -50,19 +50,58 @@ if ($q_type == 'pledge') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
      * pledge. */
     $data = pledge_token_retrieve('signup-web', $q_token);
+    if (!$data)
+        err("No such token");
     pledge_token_destroy('signup-web', $q_token);
 
-    $r = db_getRow('select * from pledges where id = ?', $data['pledge_id']);
-    page_header(htmlspecialchars($r['title']) . ' - Sign Up', array('nonav'=>true));
+    $title = db_getOne('select title from pledges where id = ?',
+                        $data['pledge_id']);
+                        
+    page_header("$title - Sign up", array('nonav' => true));
 
-    /* Sign them up. */
-    $f1 = pledge_is_successful($data['pledge_id']);
-    $r = pledge_sign($data['pledge_id'], $data['name'], $data['showname'], $data['email']);
+    $r = PLEDGE_ERROR;
+    $f1 = null;
+    if (array_key_exists('signer_id', $data)) {
+        /* If the data contain a signer ID, then we're converting an SMS
+         * subscription. */
+        $r = pledge_is_valid_to_sign($data['pledge_id'], $data['email']);
+        if (!pledge_is_error($r)) {
+            /* Fine. */
+            db_query('
+                    update signers
+                    set email = ?, name = ?, showname = ?
+                    where id = ?',
+                    array(
+                        $data['email'], $data['name'], $data['showname'],
+                        $data['signer_id']
+                    )
+                );
+        } else {
+            /* Two possibilities:
+             *  1. signer has given same email address as another signer
+             *  2. signer has given email address of pledge creator
+            $id = db_getOne('select id from signers where pledge_id = ? and email = ?', array($data['pledge_id'], $data['signer_id']));
+                /* There's already a signer with that email address; combine them. */
+                db_query('select signers_combine_2(?, ?)', array($id, $data['signer_id']));
+                /* In the other case (where we discover this before sending the
+                 * confirm email, we send a special "hey, you've signed up twice"
+                 * mail. But I don't think that's worth doing here, since we'll
+                 * only get into this condition when the user has already received
+                 * two confirmation mails in short order. Presumably they have
+                 * some idea what they're doing! */
+                $r = PLEDGE_OK;
+            }
+    } else {
+        /* Else this is a new subscription. */
+        $f1 = pledge_is_successful($data['pledge_id']);
+        $r = pledge_sign($data['pledge_id'], $data['name'], $data['showname'], $data['email']);
+    }
+
     if (!pledge_is_error($r)) {
         print '<div class="noprint">';
         print "<p>Thanks for subscribing to this pledge!</p>";
 
-        if (!$f1 && pledge_is_successful($data['pledge_id']))
+        if ($f1 === false && pledge_is_successful($data['pledge_id']))
             /* Has this completed the pledge? */
             print "</div><p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
         else {
@@ -124,7 +163,7 @@ td {
         print '<tr align="center">';
         for ($cols=0; $cols<2; $cols++) {
             print '<td>';
-            print pledge_sentence($r, array('firstperson'=>'includename', 'html'=>true));
+            print pledge_sentence($r, array('firstperson' => 'includename', 'html' => true));
             print '<p>Please support me by signing up, and by encouraging
                 other people to do the same. I am using the charitable service
                 PledgeBank.com to gather support.</p>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.24 2005-03-16 15:20:21 chris Exp $
+ * $Id: pledge.php,v 1.25 2005-03-16 16:58:35 chris Exp $
  * 
  */
 
@@ -300,43 +300,6 @@ function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
 
     /* Done. */
     return $id;
-}
-
-/* pledge_sign_confirm TOKEN
- * Confirm a signature on a pledge with the given TOKEN. If the signer is
- * converting from an earlier (e.g. SMS) subscription, then drop the old
- * subscription after updating the new subscription with any missing details.
- * Returns the ID of the pledge for which the TOKEN confirmed a signatory, or
- * null if the token was not valid. This function does not commit its
- * changes. */
-function pledge_sign_confirm($token) {
-    $r = db_getOne('
-                select id, converts_signer_id, pledge_id
-                from signers
-                where token = ?
-                for update
-            ', $token);
-    if (is_null($r))
-        return null;
-
-    $id = $r['id'];
-    $converts = $r['converts_signer_id'];
-    
-    db_query('update signers set confirmed = true where id = ?', $id);
-
-    /* Handle conversion. For the moment assume that the converted-from signer
-     * only specifies a mobile number. */
-    if (!is_null($converts)) {
-        db_query('
-                update signers
-                set mobile = (select mobile from signers where id = ?)
-                where id = ?
-            ', array($converts, $id));
-        db_query('delete from outgoingsms_signers where signer_id = ?', $converts);
-        db_query('delete from signers where id = ?', $converts);
-    }
-
-    return $r['pledge_id'];
 }
 
 /* deal_with_password(form input name of variable used to pass pledge reference (e.g. pdf for the pdf page),

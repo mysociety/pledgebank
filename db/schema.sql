@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.37 2005-03-16 15:04:43 chris Exp $
+-- $Id: schema.sql,v 1.38 2005-03-16 16:58:35 chris Exp $
 --
 
 -- secret
@@ -241,6 +241,7 @@ create function signers_combine_2(integer, integer)
         id2 integer;
         t_pledge_id integer;
         t_mobile text;
+        p record;
     begin
         -- Lock the signers table.
         lock table signers in share mode;
@@ -251,6 +252,12 @@ create function signers_combine_2(integer, integer)
         end if;
         
         t_pledge_id := (select pledge_id from signers where id = $1);
+
+        -- lock pledges table in case we need to update it later
+        select into p success
+            from pledges
+            where id = t_pledge_id
+            for update;
 
         if (select email from signers where id = $1) is not null
             and (select email from signers where id = $2) is null then
@@ -273,8 +280,12 @@ create function signers_combine_2(integer, integer)
             set mobile = t_mobile
             where id = id1;
 
-        update pledges set removedsigneraftersuccess = true
-            where id = t_pledge_id and success;
+        if success then
+            -- pledge was successful and now we're removing a signer, so record
+            -- this fact
+            update pledges set removedsigneraftersuccess = true
+                where id = t_pledge_id;
+        end if;
 
         return;
     end;

@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.16 2005-03-17 18:51:05 francis Exp $
+# $Id: poster.cgi,v 1.17 2005-03-17 19:03:34 francis Exp $
 #
 
 import os
@@ -162,7 +162,7 @@ def flyer(c, x1, y1, x2, y2, size):
         Paragraph('''<b>www.pledgebank.com/%s</b>''' % ref, p_nospaceafter),
         Paragraph('''(web sign up is free)''', p_normal),
 
-        Paragraph('''or text <b>pledge %s</b> to <b>12345</b>''' % ref, p_nospaceafter),
+        Paragraph('''or text <b>pledge %s</b> to <b>%s</b>''' % (ref, sms_number), p_nospaceafter),
         Paragraph('''(cost 50p)''', p_normal),
 
         Paragraph('''This pledge closes on %s. Thanks!''' % pledge['date'], p_normal)
@@ -286,6 +286,7 @@ while fcgi.isFCGI():
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         if pledge['signup'] == "do the same":
             pledge['signup'] = "too"
+        sms_number = mysociety.config.get('PB_SMS_NUMBER')
 
         c = canvas.Canvas(outdir + '/' + outfile)
         try:

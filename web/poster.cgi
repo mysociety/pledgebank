@@ -10,11 +10,12 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.21 2005-03-24 14:09:56 francis Exp $
+# $Id: poster.cgi,v 1.22 2005-03-24 14:28:50 francis Exp $
 #
 
 import os
 import sys
+import popen2
 from time import time
 from pyPgSQL import PgSQL
 import fcgi
@@ -216,7 +217,6 @@ def flyers(number):
     dummyc = canvas.Canvas(None)
     size = 3.0
     while True:
-        # print >>sys.stderr, "Trying flyer size %s" % size
         ok = flyer(dummyc, 0, 0, flyer_width, flyer_height, size);
         if ok:
             break
@@ -284,7 +284,7 @@ in conf/general.  This cache is not used on the command line.""")
         (options, args) = parser.parse_args()
         if len(args) <> 1:
             parser.print_help()
-            print >>sys.stderr, "specify Pledgebank ref"
+            req.err.write("specify Pledgebank ref")
             continue
         ref = args[0] 
         size = options.size
@@ -350,7 +350,7 @@ in conf/general.  This cache is not used on the command line.""")
             else:
                 raise Exception, "Unknown type '%s'" % type
         except Exception, e:
-            print >>sys.stderr, e
+            req.err.write(e)
             c.setStrokeColorRGB(0,0,0)
             c.setFont("Helvetica", 15)
             c.drawCentredString(10.5*cm, 25*cm, str(e))
@@ -359,8 +359,18 @@ in conf/general.  This cache is not used on the command line.""")
             
         # Generate any other file type
         if format != 'pdf':
-            os.spawnlp(os.P_WAIT, "convert", "convert", outdir + '/' + outpdf, outdir + '/' + outfile)
-
+            # Call out to "convert" from ImageMagick
+            cmd = ["convert", outdir + '/' + outpdf, outdir + '/' + outfile]
+            child = popen2.Popen3(cmd, True) # capture stderr
+            child.tochild.close()
+            req.err.write(child.fromchild.read())
+            req.err.write(child.childerr.read())
+            status = child.wait()
+            if os.WIFSIGNALED(status):
+                raise Exception, "%s: killed by signal %d" % (cmd, os.WTERMSIG(status))
+            elif os.WEXITSTATUS(status) != 0:
+                raise Exception, "%s: exited with failure status %d" % (cmd, os.WEXITSTATUS(status))
+     
         file_to_stdout(outdir + '/' + outfile)
 
     req.Finish()

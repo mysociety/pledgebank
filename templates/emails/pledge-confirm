@@ -14,7 +14,9 @@ we won't share anything with any other sites.
 
 <?=$values['url']?>
 
+
 Your pledge says:
+
 '<?=$values['sentence_first']?>'
 
 Thank you for submitting your pledge to PledgeBank. 

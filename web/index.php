@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.62 2005-03-07 18:12:14 francis Exp $
+// $Id: index.php,v 1.63 2005-03-08 15:42:32 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -553,14 +553,14 @@ function view_pledge() {
             if ($pw = get_http_var('pw')) {
                 if ($pw != $password) {
                     print '<p class="finished">Incorrect password!</p>';
-                    print '<form class="pledge" action="./" method="post"><input type="hidden" name="pledge" value="'.htmlspecialchars($ref).'"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
-                    print '<p><input type="password" name="pw" value=""><input type="submit" value="Submit"></p>';
+                    print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge" value="'.htmlspecialchars($ref).'"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
+                    print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
                     print '</form>';
                     return true;
                 }
             } else {
-                print '<form class="pledge" action="./" method="post"><input type="hidden" name="pledge" value="'.htmlspecialchars($ref).'"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
-                print '<p><input type="password" name="pw" value=""><input type="submit" value="Submit"></p>';
+                print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge" value="'.htmlspecialchars($ref).'"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
+                print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
                 print '</form>';
                 return true;
             }

@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.9 2005-03-07 16:46:44 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.10 2005-03-08 15:42:32 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -31,6 +31,9 @@ our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
 sub email_n { my $n = shift; return "pbharness+$n\@owl"; }
 sub name_n { my $n = shift; return $n == 0 ? "Peter Setter" : "Siegfried Signer $n"; }
 my $verbose = 1;
+
+#############################################################################
+# Setup
 
 # Configure test harness class
 print "Set up web test harness...\n" if $verbose > 0;
@@ -49,62 +52,127 @@ print "Confirm we can detect errors...\n" if $verbose > 0;
 $b->get($base_url . "/test.php?error=1" );
 die "Unable to detect errors from PHP" if !$wth->log_watcher_get_errors();
 
-# Create a new pledge, starting at the home page
-print "Create new pledge...\n" if $verbose > 0;
-$b->get($base_url);
-$b->follow_link(text_regex => qr/Start your own pledge/) or die "Start your own pledge link missing";
-$wth->browser_check_contents("New Pledge");
-$b->submit_form(form_name => 'pledge',
-    fields => { action => 'finish running this test harness', 
-        people => '3', type => 'automated lines of code', signup => 'sign up',
-        date => 'tomorrow', ref => 'automatedtest',
-        name => name_n(0), email => email_n(0) },
-    button => 'submit') or die "Failed to submit creating form stage 1";
-$wth->browser_check_contents("Step 2");
-$wth->log_watcher_check();
-$b->submit_form(form_name => 'pledge',
-    fields => { },
-    button => 'submit') or die "Failed to submit creating form stage 2";
-$wth->browser_check_contents("An email has been sent");
-$wth->log_watcher_check();
-print "Confirming new pledge...\n" if $verbose > 0;
-my $confirmation_email = $wth->email_get_containing(
-    '%To: '.email_n(0).'%To confirm your email address%');
-print "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
-$b->get($1);
-$wth->browser_check_contents("Thank you for confirming that pledge");
+#############################################################################
+# Functions to make and sign pledges, and so on
 
-# Sign it a few times
-for (my $i = 1; $i < 4; ++$i) {
-    print "Signing the pledge $i...\n" if $verbose > 0;
+# sign_pledge ACTION WHO SHOW_SIGNATURE
+# Adds a signer to a pledge whose action text is ACTION.  Adds person number
+# WHO.  SHOW_SIGNATURE is 1 for their signature to be public, undef for
+# private.
+sub sign_pledge {
+    my ($action, $who, $show_signature) = @_;
     $b->get($base_url);
-    $b->follow_link(text_regex => qr/finish running this test harness/) or die "Pledge not appeared on front page";
+    $b->follow_link(text_regex => qr/$action/) or die "Pledge not appeared on front page";
+
     $wth->browser_check_contents("Sign me up");
-    # Don't show name for one user
-    my $show_signature = ($i == 2) ? undef : 1;
     $b->submit_form(form_name => 'pledge',
-        fields => { name => name_n($i), email => email_n($i), showname => $show_signature },
+        fields => { name => name_n($who), email => email_n($who), showname => $show_signature },
         button => 'submit') or die "Failed to submit signing form";
     $wth->browser_check_contents("An email has been sent to the address you gave to confirm it is yours");
     $wth->log_watcher_check();
 }
-for (my $i = 1; $i < 4; ++$i) {
-    print "Confirming signature $i...\n" if $verbose > 0;
-    $confirmation_email = $wth->email_get_containing(
-        '%To: '.email_n($i).'%To confirm your email address%');
+
+# confirm_signature ACTION WHO TARGET_REACHED
+# Looks for confirmation email to WHO with pledge action ACTION.  Follows link to
+# confirm the signature.  TARGET_REACHED is true if this is expected to have
+# made pledge reach target, or false otherwise.
+sub confirm_signature {
+    my ($action, $who, $target_reached) = @_;
+    my $confirmation_email = $wth->email_get_containing(
+        '%To: '.email_n($who).
+        '%Subject: Signing up to "'.$action.'"'.
+        '%To confirm your email address%');
     print "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
     $b->get($1);
-    if ($i == 3) {
+    if ($target_reached) {
         $wth->browser_check_contents("Your signature has made this pledge reach its target!");
     } else {
         $wth->browser_check_contents("Thank you for confirming your signature");
     }
     $wth->log_watcher_check();
 }
+
+# create_pledge WHO PAGE1 PAGE2
+# Creates a new pledge, setter is person number WHO.  PAGE1
+# and PAGE2 contain parameters for each page of the sign-up form.
+sub create_pledge {
+    my ($who, $page1, $page2) = @_;
+    $page1->{name} = name_n($who); 
+    $page1->{email} = email_n($who);
+
+    $b->get($base_url);
+    $b->follow_link(text_regex => qr/Start your own pledge/) or die "Start your own pledge link missing";
+    $wth->browser_check_contents("New Pledge");
+    $b->submit_form(form_name => 'pledge', fields => $page1,
+        button => 'submit') or die "Failed to submit creating form stage 1";
+    $wth->browser_check_contents("Step 2");
+    $wth->log_watcher_check();
+    $b->submit_form(form_name => 'pledge',
+        fields => $page2,
+        button => 'submit') or die "Failed to submit creating form stage 2";
+    $wth->browser_check_contents("You must now click on the link within the email we've just sent you");
+    $wth->log_watcher_check();
+    my $confirmation_email = $wth->email_get_containing(
+        '%To: '.email_n($who).'%To confirm your email address%');
+    die "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
+    $b->get($1);
+    $wth->browser_check_contents("Thank you for confirming that pledge");
+}
+
+#############################################################################
+print "Checking private pledges are really private...\n" if $verbose > 0;
+
+my $pledge_action_private = 'check private pledges are private';
+my $private_password = 'zx3uuhai';
+create_pledge(0, 
+    { action => $pledge_action_private, 
+        people => '3', date => 'tomorrow', ref => 'privatepledge',
+        comparison => 'exactly' },
+    { visibility => 'password', password => $private_password}
+);
+$b->get($base_url);
+$wth->browser_check_no_contents($pledge_action_private);
+$b->get($base_url . "/privatepledge");
+$wth->browser_check_contents("Password Protected Pledge");
+$b->submit_form(form_name => 'pledge',
+        fields => { pw => 'thisisnotthepassword' },
+        button => 'submit') or die "Failed to submit password form";
+$wth->browser_check_contents("Incorrect password!");
+$b->submit_form(form_name => 'pledge',
+        fields => { pw => $private_password },
+        button => 'submit') or die "Failed to submit password form";
+$wth->browser_check_contents($pledge_action_private);
+
+#############################################################################
+print "Testing successful completion of a pledge...\n" if $verbose > 0;
+
+my $pledge_action_completion = 'make sure a pledge can be completed';
+create_pledge(0, 
+    { action => $pledge_action_completion, 
+        people => '3', type => 'automated lines of code', signup => 'sign up',
+        date => 'tomorrow', ref => 'automatedtest',
+        comparison => 'exactly' },
+    { }
+);
+# Sign it a few times
+for (my $i = 1; $i <= 3; ++$i) {
+    print "Signing the pledge $i...\n" if $verbose > 0;
+    # Don't show name for one of the users
+    my $show_signature = ($i == 2) ? undef : 1;
+    sign_pledge($pledge_action_completion, $i, $show_signature);
+}
+for (my $i = 1; $i <= 3; ++$i) {
+    print "Confirming signature $i...\n" if $verbose > 0;
+    my $expect_target = ($i == 3);
+    confirm_signature($pledge_action_completion, $i);
+}
+# To do, make extra signature and check doesn't work
+#sign_pledge($pledge_action_completion, 4, 1);
+#confirm_signature($pledge_action_completion, 4);
 # Check it has completed
 print "Final checks...\n" if $verbose > 0;
 $b->get($base_url);
-$b->follow_link(text_regex => qr/finish running this test harness/) or die "Pledge not appeared on front page";
+$b->follow_link(text_regex => qr/$pledge_action_completion/) or die "Pledge not appeared on front page";
 $wth->browser_check_contents("This pledge has been successful!");
 $wth->browser_check_contents("Plus 1 other who did not want to give their name");
 for (my $i = 0; $i < 4; ++$i) {
@@ -115,11 +183,13 @@ for (my $i = 0; $i < 4; ++$i) {
         $wth->browser_check_contents(name_n($i));
     }
     # Check got success emails
-    $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
+    my $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
 }
 $wth->log_watcher_check();
 
-# Or any unhandled emails or errors
+#############################################################################
+# Check for any unhandled mails or errors
+
 $wth->email_check_none_left();
 $wth->log_watcher_check();
 

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.35 2005-03-16 14:07:20 chris Exp $
+-- $Id: schema.sql,v 1.36 2005-03-16 14:57:00 chris Exp $
 --
 
 -- secret
@@ -424,11 +424,13 @@ create function smssubscription_sign(integer, text)
 
 -- Stores randomly generated tokens and serialised hash arrays associated
 -- with them.
-create table token_store (
+create table token (
+    scope text not null,        -- what bit of code is using this token
     token text not null,
     data text not null,
-    created timestamp not null
+    created timestamp not null,
+    primary key (scope, token)
 );
-create unique index token_store_token_idx on token_store(token);
 
-
+-- migrate old token_store table:
+-- insert into token (scope, token, data, created) select 'signup-web' as scope, token, data, created from token_store

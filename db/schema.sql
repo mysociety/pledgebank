@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.12 2005-03-03 01:21:46 chris Exp $
+-- $Id: schema.sql,v 1.13 2005-03-03 17:36:48 francis Exp $
 --
 
 -- secret
@@ -151,4 +151,4 @@ create table signers (
   reported boolean not null default false
 );
 
-create unique index signers_outgoingsms_id_idx on signers(outgoingsmsid_idx);
+create unique index signers_outgoingsms_id_idx on signers(outgoingsmsid);

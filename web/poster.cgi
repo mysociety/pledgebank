@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.10 2005-03-07 13:01:12 sandpit Exp $
+# $Id: poster.cgi,v 1.11 2005-03-07 14:24:51 sandpit Exp $
 #
 
 import os
@@ -27,6 +27,7 @@ db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.c
 while fcgi.isFCGI():
     req = fcgi.Accept()
     fs = req.getFieldStorage()
+    # req.err.write("got request, path: %s" % req.env.get('PATH_INFO'))
 
     path_info = req.env.get('PATH_INFO').split('_')
     if len(path_info)>0:

@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.6 2005-03-01 18:04:03 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.7 2005-03-02 16:52:33 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -29,6 +29,7 @@ use mySociety::WebTestHarness;
 our $base_url = mySociety::Config::get('BASE_URL');
 our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
 sub email_n { my $n = shift; return "pbharness+$n\@owl"; }
+sub name_n { my $n = shift; return $n == 0 ? "Peter Setter" : "Siegfried Signer $n"; }
 my $verbose = 1;
 
 # Configure test harness class
@@ -57,7 +58,7 @@ $b->submit_form(form_name => 'pledge',
     fields => { action => 'finish running this test harness', 
         people => '3', type => 'automated lines of code', signup => 'sign up',
         date => 'tomorrow', ref => 'automatedtest',
-        name => 'Peter Setter', email => email_n(0) },
+        name => name_n(0), email => email_n(0) },
     button => 'submit') or die "Failed to submit creating form";
 $wth->browser_check_contents("An email has been sent");
 $wth->log_watcher_check();
@@ -74,8 +75,10 @@ for (my $i = 1; $i < 4; ++$i) {
     $b->get($base_url);
     $b->follow_link(text_regex => qr/finish running this test harness/) or die "Pledge not appeared on front page";
     $wth->browser_check_contents("Sign me up");
+    # Don't show name for one user
+    my $show_signature = ($i == 2) ? undef : 1;
     $b->submit_form(form_name => 'pledge',
-        fields => { name => "Siegfried Signer $i", email => email_n($i) },
+        fields => { name => name_n($i), email => email_n($i), showname => $show_signature },
         button => 'submit') or die "Failed to submit signing form";
     $wth->browser_check_contents("An email has been sent to the address you gave to confirm it is yours");
     $wth->log_watcher_check();
@@ -98,11 +101,18 @@ print "Final checks...\n" if $verbose > 0;
 $b->get($base_url);
 $b->follow_link(text_regex => qr/finish running this test harness/) or die "Pledge not appeared on front page";
 $wth->browser_check_contents("This pledge has been successful!");
-$wth->log_watcher_check();
-# Check got success emails
+$wth->browser_check_contents("Plus 1 other who did not want to give their name");
 for (my $i = 0; $i < 4; ++$i) {
+    # Check email there or not there
+    if ($i == 2) {
+        $wth->browser_check_no_contents(name_n($i));
+    } else {
+        $wth->browser_check_contents(name_n($i));
+    }
+    # Check got success emails
     $confirmation_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
 }
+$wth->log_watcher_check();
 
 # Or any unhandled emails or errors
 $wth->email_check_none_left();

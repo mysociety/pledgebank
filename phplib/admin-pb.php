@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.4 2005-01-28 17:11:57 matthew Exp $
+ * $Id: admin-pb.php,v 1.5 2005-01-28 19:25:29 matthew Exp $
  * 
  */
 
@@ -77,14 +77,29 @@ class ADMIN_PAGE_PB {
             print '</tr>';
         }
         print '</table>';
+        print '<form method="post" action="./"><input type="hidden" name="id" value="' . $pdata['id'] . '"><input type="submit" name="remove" value="Remove pledge"></form>';
     }
 
+    function remove_pledge($id) {
+        db_query('DELETE FROM pledges WHERE id = ?', array($id));
+        db_query('DELETE FROM signers WHERE pledge_id = ?', array($id));
+        print '<p><em>That pledge has been successfully removed, along with all its signatories.</em></p>';
+    }
 
     function display($self_link) {
         db_connect();
 
         $pledge = get_http_var('pledge');
-        if ($pledge) {
+
+        if (get_http_var('remove')) {
+            $id = get_http_var('id');
+            if (ctype_digit($id)) {
+                $this->remove_pledge($id);
+            } else {
+                # Error potential hack?
+            }
+            $this->list_all_pledges();
+        } elseif ($pledge) {
             $this->show_one_pledge($pledge);
         } else {
             $this->list_all_pledges();

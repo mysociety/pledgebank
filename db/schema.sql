@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.39 2005-03-17 09:20:38 francis Exp $
+-- $Id: schema.sql,v 1.40 2005-03-18 11:20:00 sandpit Exp $
 --
 
 -- secret
@@ -318,7 +318,8 @@ create table smssubscription (
     )
 );
 
-create unique index smssubscription_token_idx on smssubscription(token);
+create index smssubscription_token_idx on smssubscription(token);
+create index smssubscription_outgoingsms_id_idx on smssubscription(outgoingsms_id);
 
 -- smssubscription_sign ID TOKEN
 -- Sign up from an SMS subscription. Supply either the ID of an outgoing SMS

@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.23 2005-03-30 13:57:50 sandpit Exp $
+# $Id: poster.cgi,v 1.24 2005-03-30 13:59:48 sandpit Exp $
 #
 
 import os
@@ -165,7 +165,7 @@ def flyer(c, x1, y1, x2, y2, size):
 
         Paragraph('', p_normal),
         Paragraph('''
-            Please tell me you'll do this! There's nothing to lose -- you only
+            Please tell me you'll do this. There's nothing to lose -- you only
             have to go through with it if %s %s will %s.
             ''' % (
                 pledge['target'], pledge['type'], pledge['signup']

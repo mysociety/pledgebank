@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.44 2005-03-04 14:06:06 matthew Exp $
+// $Id: index.php,v 1.45 2005-03-04 15:07:31 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -637,12 +637,16 @@ function pdfs() {
     $ref = get_http_var('pdf');
 	$q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
 	$row = db_fetch_array($q);
-    $pdf_cards_url = new_url("poster.cgi", false, 
-        'title', $row['title'], 'date', $row['date'], 'ref', $ref,
-        'type', 'cards', 'size', 'A4');
-    $pdf_tearoff_url = new_url("poster.cgi", false, 
-        'title', $row['title'], 'date', $row['date'], 'ref', $ref,
-        'type', 'tearoff', 'size', 'A4');
+        if (file_exists(OPTION_PB_PDF_CACHE . '/' . $ref . '_cards.pdf')) {
+            $pdf_cards_url = new_url(OPTION_PB_PDF_URL . '/' . $ref . '_cards.pdf', false);
+        } else {
+            $pdf_cards_url = new_url("poster.cgi", false, 'ref', $ref, 'type', 'cards', 'size', 'A4');
+        }
+        if (file_exists(OPTION_PB_PDF_CACHE . '/' . $ref . '_tearoff.pdf')) {
+            $pdf_tearoff_url = new_url(OPTION_PB_PDF_URL . '/' . $ref . '_tearoff.pdf', false);
+        } else {
+            $pdf_tearoff_url = new_url("poster.cgi", false, 'ref', $ref, 'type', 'tearoff', 'size', 'A4');
+        }
     ?>
 <h2>Customised Flyers</h2>
 <p>Below you can generate <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>

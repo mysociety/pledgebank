@@ -6,13 +6,14 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.3 2005-03-04 14:06:06 matthew Exp $
+# $Id: poster.cgi,v 1.4 2005-03-04 15:07:31 matthew Exp $
 #
 
 import sys
 import cgi
 import cgitb; cgitb.enable()
 from time import time
+from pyPgSQL import PgSQL
 
 #print "Content-Type: text/html\r\n\r\n"
 
@@ -20,18 +21,25 @@ sys.path.append("../../pylib")
 import mysociety.config
 mysociety.config.set_file("../conf/general")
 
+db = PgSQL.connect('::pb:matthew:')
+
 form = cgi.FieldStorage()
-title = form.getfirst("title", "")
-date = form.getfirst("date", "")
 ref = form.getfirst("ref", "")
 type = form.getfirst("type", "cards")
 size = form.getfirst("size", "A4")
+
+# print "Content-Type: text/html\r\n\r\n";
+q = db.cursor()
+q.execute('SELECT title, date FROM pledges WHERE ref = %s', ref)
+(title,date) = q.fetchone()
+q.close()
+db.close()
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 
 outdir = mysociety.config.get("PB_PDF_CACHE")
-outfile = "pledge%d.pdf" % int(time())
+outfile = "%s_%s.pdf" % (ref, type)
 
 def draw_pledge(x, y):
     text = "\"%s\"" % title

@@ -7,22 +7,49 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.1 2005-02-24 12:18:02 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.2 2005-02-28 13:52:30 francis Exp $';
 
 use strict;
 require 5.8.0;
 
 use WWW::Mechanize;
 use File::Find;
+use File::Slurp;
 use Data::Dumper;
+use DBI;
 
 use mySociety::Logfile;
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
+use mySociety::DBHandle qw(dbh);
 
 our $base_url = mySociety::Config::get('BASE_URL');
 our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
 our @emails = ( 'test+1@owl', 'test+2@owl', 'test+3@owl' );
+
+our $dbhost = mySociety::Config::get('PB_DB_HOST', undef);
+our $dbport = mySociety::Config::get('PB_DB_PORT', undef);
+our $dbname  = mySociety::Config::get('PB_DB_NAME');
+our $dbuser = mySociety::Config::get('PB_DB_USER');
+our $dbpass = mySociety::Config::get('PB_DB_PASS');
+
+# Drop and recreate database from schema
+die "Database will be dropped, so for safety must be called '_testharness'" if ($dbname !~ m/_testharness$/);
+# ... make connection with no database name and drop and remake databse
+my $connstr = 'dbi:Pg:';
+$connstr .= "host=$dbhost;" if ($dbhost);
+$connstr .= "port=$dbport;" if ($dbport);
+my $db_remake_db = DBI->connect($connstr, undef, $dbpass, {
+                        RaiseError => 1, AutoCommit => 1, PrintError => 0, PrintWarn => 1, });
+$db_remake_db->do("drop database $dbname");
+$db_remake_db->do("create database $dbname");
+$db_remake_db->disconnect();
+# ... load in schema
+mySociety::DBHandle::configure(Name => $dbname, User => $dbuser, Password => $dbpass, 
+        Host => $dbhost, Port => $dbport);
+my $schema = read_file("../db/schema.sql");
+dbh()->do($schema);
+dbh()->commit();
 
 # Syntax check all .php files
 find(\&check_php_syntax, "../../pb/"); # TODO reenable
@@ -33,14 +60,16 @@ sub check_php_syntax {
     }
 }
 
-# Clear postgresql database and reload the schema    
-#    dropdb -q -U $PSQL_SCHEMATEST_USER schematest || warn "schematest already dropped, continuing"
-#    createdb -q -U $PSQL_SCHEMATEST_USER schematest
-#    psql --file=$2 -U $PSQL_SCHEMATEST_USER -q schematest 2>&1 | grep -v "will create implicit" && echo -n 
-#    pg_dump -s -U $PSQL_SCHEMATEST_USER schematest | egrep -v "^--|SET SESSION AUTHORIZATION|\\connect - |GRANT ALL|REVOKE ALL" | grep -v "SET search_path = public, pg_catalog;" | sed "s/,$//;" > $CVS_SCHEMA_FILE
-
 # Create web browsing agent, check for errors automatically
 our $b = new WWW::Mechanize(autocheck => 1);
+sub check_content_contains {
+    my $check = shift;
+    if ($b->content !~ m/$check/) {
+        print $b->content;
+        print "\n\n";
+        die "URL " . $b->uri() . " does not contain '" . $check . "'";
+    }
+}
 
 # Set up HTTP log file watcher
 our $http_logobj = new mySociety::Logfile($httpd_error_log);
@@ -71,7 +100,7 @@ $b->submit_form(form_name => 'pledge',
         date => 'tomorrow', ref => 'automatedtest',
         name => 'Peter Setter', email => $emails[0] },
     button => 'submit') or die "failed to submit form";
-$b->content =~ m/An email has been sent/ or die "New pledge submitted page not recognised";
+check_content_contains("An email has been sent");
 
 # See if there were any errors
 my $errors = check_for_log_errors();

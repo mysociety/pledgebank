@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.19 2005-03-07 17:23:38 chris Exp $
+-- $Id: schema.sql,v 1.20 2005-03-07 17:25:34 chris Exp $
 --
 
 -- secret
@@ -134,6 +134,11 @@ create table signers (
     name text,
     email text,
     mobile text,
+
+    -- SMS signers may convert to an email subscription. To do this we create
+    -- a new, unconfirmed email signer and tie it to this signer through a
+    -- reference. When they confirm the email the old signer is removed.
+    converts_signer_id integer references signers(id),
   
     -- whether they want their name public
     showname boolean not null default false,
@@ -145,7 +150,8 @@ create table signers (
     -- regard them as signed up when they have supplied it back to us. SMS
     -- signers are regarded as confirmed as soon as the reply SMS has been
     -- received by their phone, but we send them a token allowing them to
-    -- convert their subscription to an email one later.
+    -- convert their subscription to an email one later via the
+    -- converts_signer_id mechanism.
     token text not null,
     confirmed boolean not null default false,
     outgoingsms_id integer references outgoingsms(id),

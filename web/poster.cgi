@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.9 2005-03-07 12:54:33 sandpit Exp $
+# $Id: poster.cgi,v 1.10 2005-03-07 13:01:12 sandpit Exp $
 #
 
 import os
@@ -45,9 +45,9 @@ while fcgi.isFCGI():
         suffix = 'pdf'
 
     if suffix == 'pdf':
-        print "Content-Type: application/pdf\r\n\r\n"
+        req.out.write("Content-Type: application/pdf\r\n\r\n")
     else:
-        print "Content-Type: text/plain\r\n\r\n"
+        req.out.write("Content-Type: text/plain\r\n\r\n")
 
     outdir = mysociety.config.get("PB_PDF_CACHE")
     outfile = "%s_%s_%s.pdf" % (ref, size, type)

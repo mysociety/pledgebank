@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.9 2005-03-10 18:53:45 chris Exp $
+ * $Id: pledge.php,v 1.10 2005-03-11 11:37:21 matthew Exp $
  * 
  */
 
@@ -109,8 +109,9 @@ function pledge_is_permanent_error($e) {
  * will...". If HTML is true, encode entities and add <strong> tags around
  * strategic bits.
  * XXX i18n -- this won't work at all in other languages */
-function pledge_sentence($pledge_id, $firstperson, $html = false) {
-    $r = db_getRow('select * from pledges where id = ?', $pledge_id);
+function pledge_sentence($pledge_id = false, $firstperson = false, $html = false, $r = array()) {
+    if (!$r)
+        $r = db_getRow('select * from pledges where id = ?', $pledge_id);
     if (!$r)
         err(pledge_strerror(PLEDGE_NONE));
 
@@ -121,9 +122,9 @@ function pledge_sentence($pledge_id, $firstperson, $html = false) {
             . " will <strong>${r['title']}</strong> if "
             . '<strong>'
                 . ($r['comparison'] == 'exactly' ? 'exactly' : 'at least')
-                . " ${r['target']}"
+                . ' ' . prettify($r['target'])
                 . '</strong>'
-            . " other ${r['type']} "
+            . " ${r['type']} "
             . ($r['signup'] == 'sign up' ? 'will too' : $r['signup'])
             . ".";
     if (!$html)

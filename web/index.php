@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.67 2005-03-11 10:58:09 chris Exp $
+// $Id: index.php,v 1.68 2005-03-11 11:37:23 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -466,7 +466,7 @@ function send_success_email($pledge_id) {
     $r = db_fetch_array($q);
     $globalsuccess = 1;
     $action = $r['title'];
-    $body = 'Congratulations! You said "I will '.$r['title'].' if '.comparison_nice($r['comparison']).' '.prettify($r['target']).' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL."/".$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
+    $body = 'Congratulations! You said "' . pledge_sentence($pledge_id, true, false) . '", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL."/".$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
     $success = pb_send_email($r['email'], 'PledgeBank pledge success!', $body);
     if ($success==0) 
         $globalsuccess = 0;
@@ -481,11 +481,33 @@ function send_success_email($pledge_id) {
     return $globalsuccess;
 }
 
+/* deal_with_password(HTML escaped pledge reference, password entered, actual password) */
+function deal_with_password($type, $ref, $actual) {
+    $h_ref = htmlspecialchars($ref);
+    $entered = get_http_var('pw');
+    if (!$actual) return true;
+    if ($entered) {
+        if ($entered != $actual) {
+            print '<p class="finished">Incorrect password!</p>';
+            print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="' . $type . '" value="' . $h_ref . '"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
+            print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
+            print '</form>';
+            return false;
+        }
+    } else {
+        print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="' . $type . '" value="' . $h_ref . '"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
+        print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
+        print '</form>';
+        return false;
+    }
+    return true;
+}
+    
 # Individual pledge page
 function view_pledge() {
     global $today, $title;
 
-    $ref = get_http_var('pledge');
+    $ref = get_http_var('pledge'); $h_ref = htmlspecialchars($ref);
     $q = db_query('SELECT * FROM pledges WHERE ref=?', array($ref));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank reference!</p>';
@@ -497,38 +519,13 @@ function view_pledge() {
 	    print '<p>Illegal PledgeBank reference!</p>';
 	    return false;
 	}
-        $password = $r['password'];
-        $pw = '';
-        if ($password) {
-            if ($pw = get_http_var('pw')) {
-                if ($pw != $password) {
-                    print '<p class="finished">Incorrect password!</p>';
-                    print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge" value="'.htmlspecialchars($ref).'"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
-                    print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
-                    print '</form>';
-                    return true;
-                }
-            } else {
-                print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge" value="'.htmlspecialchars($ref).'"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
-                print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
-                print '</form>';
-                return true;
-            }
-        }
+        if (!deal_with_password('pledge', $ref, $r['password']))
+            return false;
 
-	$action = $r['title'];
-    $title = "'I will " . $action . "'";
-	$people = $r['target'];
-	$type = $r['type'];
-	$date = $r['date'];
-	$name = $r['name'];
-	$email = $r['email'];
-    $signup = $r['signup'];
-    $detail = $r['detail'];
-    $comparison = comparison_nice($r['comparison']);
+        $title = "'I will " . $r['title'] . "'";
 	$q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($r['id']));
 	$curr = db_num_rows($q);
-	$left = $people - $curr;
+	$left = $r['target'] - $curr;
 
 	$finished = 0;
         $print_signup_form = 1;
@@ -538,7 +535,7 @@ function view_pledge() {
             $print_signup_form = 1;
         }
 	if ($left <= 0) {
-            if ($comparison == 'exactly') {
+            if ($r['comparison'] == 'exactly') {
                 $finished = 1;
                 $print_signup_form = 0;
                 print '<p class="finished">This pledge is now closed, its target has been reached.</p>';
@@ -548,10 +545,10 @@ function view_pledge() {
 	}
 ?>
 <p>Here is the pledge:</p>
-<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
-<input type="hidden" name="pw" value="<?=htmlspecialchars($pw) ?>">
-<p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($action) ?></strong> if <strong><?=htmlspecialchars($comparison) ?></strong> <strong><?=htmlspecialchars(prettify($people)) ?></strong> <?=htmlspecialchars($type) ?> <?=($signup=='sign up'?'will do the same':$signup) ?>&quot;</p>
-<p>Deadline: <strong><?=prettify($date) ?></strong></p>
+<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=$h_ref ?>">
+<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
+<p style="margin-top: 0">&quot;<?=pledge_sentence(0, true, true, $r) ?>&quot;</p>
+<p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
 
 <p style="text-align: center; font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target :) )':', '.prettify($left).' more needed') ?></p>
 
@@ -560,7 +557,7 @@ function view_pledge() {
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
 <p style="text-align: left">
 <input type="hidden" name="add_signatory" value="1">
-<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
+<input type="hidden" name="ref" value="<?=$h_ref ?>">
 Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
 <input type="submit" name="submit" value="Submit">
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
@@ -568,18 +565,18 @@ Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_
 </div>
 <? }
 
-if ($detail) {
-    print '<p style="text-align:left"><strong>More details</strong><br>' . htmlspecialchars($detail) . '</p>';
+if ($r['detail']) {
+    print '<p style="text-align:left"><strong>More details</strong><br>' . htmlspecialchars($r['detail']) . '</p>';
 }
 
 ?>
 </form>
 
-<p style="text-align: center"><a href="./<?=get_http_var('pledge') ?>/flyers" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="" onclick="return false">Email this Pledge</a><? } ?></p>
+<p style="text-align: center"><a href="./<?=$h_ref ?>/flyers" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="./<?=$h_ref ?>/email">Email this Pledge</a><? } ?></p>
 <!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
 
 <h2>Current signatories</h2><?
-		$out = '<li>'.htmlspecialchars($name).' (Pledge Author)</li>';
+		$out = '<li>'.htmlspecialchars($r['name']).' (Pledge Author)</li>';
 		$anon = 0;
 		while ($r = db_fetch_array($q)) {
 			$showname = ($r['showname'] == 't');
@@ -642,14 +639,17 @@ function list_all_pledges() {
 
 function pdfs() {
     $ref = get_http_var('pdf');
-	$q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
-	$row = db_fetch_array($q);
-        if (!$row) {
-            print '<p>Illegal PledgeBank reference!</p>';
-            return false;
-        }
-        $pdf_cards_url = new_url("../flyers/{$ref}_A4_cards.pdf", false);
-        $pdf_tearoff_url = new_url("../flyers/{$ref}_A4_tearoff.pdf", false);
+    $q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
+    $row = db_fetch_array($q);
+    if (!deal_with_password('pdf', $ref, $row['password']))
+        return false;
+
+    if (!$row) {
+        print '<p>Illegal PledgeBank reference!</p>';
+        return false;
+    }
+    $pdf_cards_url = new_url("../flyers/{$ref}_A4_cards.pdf", false);
+    $pdf_tearoff_url = new_url("../flyers/{$ref}_A4_tearoff.pdf", false);
     ?>
 <h2>Customised Flyers</h2>
 <p>Below you can generate <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
@@ -657,7 +657,6 @@ function pdfs() {
 <li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
 <li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>
 </ul>
-
 <?  return true;
 }
 
@@ -692,15 +691,6 @@ function search() {
         }
         return $out;
     }
-}
-
-function comparison_nice($comparison) {
-    if ($comparison == 'atleast') 
-        return 'at least';
-    else if ($comparison == 'exactly')
-        return 'exactly';
-    else
-        err("Unknown comparison type '$comparison'");
 }
 
 ?>

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.6 2005-01-29 15:42:47 matthew Exp $
+ * $Id: admin-pb.php,v 1.7 2005-02-21 11:37:30 francis Exp $
  * 
  */
 
@@ -17,7 +17,6 @@ class ADMIN_PAGE_PB {
     function ADMIN_PAGE_PB () {
         $this->today = date('Y-m-d');
         $this->id = "pb";
-        $this->name = "Pledges and Signers";
         $this->navname = "Pledges and Signers";
     }
 

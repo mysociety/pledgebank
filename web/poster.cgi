@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.15 2005-03-17 18:01:22 francis Exp $
+# $Id: poster.cgi,v 1.16 2005-03-17 18:51:05 francis Exp $
 #
 
 import os
@@ -135,10 +135,10 @@ def flyer(c, x1, y1, x2, y2, size):
     # Scale font sizes - with minimum for extreme cases
     large_writing = size * 35
     small_writing = size * 20
-    if small_writing < 6:
-        small_writing = 6
-    if large_writing < 6:
-        large_writing = 6
+    if small_writing < 4:
+        small_writing = 4
+    if large_writing < 4:
+        large_writing = 4
 
     # Set up styles
     p_head = ParagraphStyle('normal', alignment = TA_CENTER, spaceBefore = 0, spaceAfter = size*20, 

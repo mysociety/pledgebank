@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.101 2005-03-25 20:26:07 francis Exp $
+// $Id: index.php,v 1.102 2005-03-25 20:41:45 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -443,7 +443,7 @@ function add_signatory() {
 
     $r = db_getRow('select id, title, password from pledges where ref = ?', $q_ref);
 
-    if (!is_null($r['password']) && (is_null($q_pw) || $q_pw != $r['password']))
+    if (!is_null($r['password']) && (is_null($q_pw) || sha1($q_pw) != $r['password']))
         err("Permission denied");
 
     /* The exact mail we send depends on whether we're already signed up to
@@ -623,7 +623,7 @@ function create_new_pledge($data) {
 	$add = db_query('INSERT INTO pledges (id, title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, pb_current_timestamp(), ?, ?, ?, ?, ?)', 
-        array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password']));
+        array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], sha1($data['password'])));
 ?>
 <h2>Now check your email...</h2>
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other

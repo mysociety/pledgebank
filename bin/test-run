@@ -21,13 +21,14 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.10 2005-03-25 11:05:59 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.11 2005-03-25 20:26:06 francis Exp $';
 
 use strict;
 require 5.8.0;
 
 use Data::Dumper;
 use Carp qw(verbose);
+use mySociety::DBHandle qw(dbh);
 
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
@@ -151,6 +152,18 @@ sub create_pledge {
     $wth->browser_check_contents("Thank you for confirming your pledge");
 }
 
+# Change the date that all parts of PledgeBank think is today.  Call with no
+# parameters to reset it to the actual today.
+sub set_pb_date {
+    my $new_date = shift;
+    if (defined($new_date)) {
+        dbh()->do('delete from debugdate; insert into debugdate (override_today) values (?);', {}, $new_date);
+    } else {
+        dbh()->do('delete from debugdate;');
+    }
+    dbh()->commit();
+}
+
 #############################################################################
 sub do_private_failing_pledge {
     my $pledge_action_private = 'check private pledges are private';
@@ -178,9 +191,11 @@ sub do_private_failing_pledge {
     confirm_signature($pledge_action_private, 1);
 
     # Test what happens upon expiry
-    system("php", "daily", "--verbose", "--today=2010-06-02") and die "Failed to call daily";
+    set_pb_date('2010-06-02');
+    system("php", "daily", "--verbose") and die "Failed to call daily";
     $wth->email_get_containing('%To: '.email_n(0).  '%your pledge did not meet its target%');
     $wth->email_get_containing('%To: '.email_n(1).  '%sorry to have to inform you that%');
+    set_pb_date();
 }
 
 #############################################################################

@@ -8,35 +8,31 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.14 2005-03-25 18:40:03 matthew Exp $
+ * $Id: daily,v 1.15 2005-03-25 20:26:06 francis Exp $
  *
  */
 
 require_once "../phplib/pledge.php";
 
 $short_opts = '';
-$long_opts = array('verbose','testrun','today=','help');
+$long_opts = array('verbose','testrun','help');
 require_once 'phpcgi';
 
 $switches = $options[0];
 $args = $options[1];
 $verbose = 0; 
 $testrun = 0;
-$today = date('Y-m-d');
 foreach ($switches as $switch) {
     if ($switch[0]=='--verbose') $verbose = 1;
     if ($switch[0]=='--testrun') $testrun = 1;
-    if ($switch[0]=='--today') $today = $switch[1];
     if ($switch[0]=='--help') {
 ?>
 
 PledgeBank daily script, run just after midnight
-./daily [--testrun] [--verbose] [--today=YYYY-MM-DD]
+./daily [--testrun] [--verbose]
 
 --verbose    Display more information
 --testrun    Dry run, just show what would do
---today=DATE Pretend that the date today is as specified 
-(useful for testing things that only happen in the future)
 
 <?
         exit;
@@ -76,9 +72,9 @@ function check_for_completed_pledges() {
 }
 
 function check_for_expired_pledges() {
-    global $today, $verbose, $testrun;
+    global $verbose, $testrun;
 
-    $q = db_query("SELECT * FROM pledges WHERE confirmed AND date < '$today' AND NOT completionnotified FOR UPDATE");
+    $q = db_query("SELECT * FROM pledges WHERE confirmed AND date < pb_current_date() AND NOT completionnotified FOR UPDATE");
     while ($r = db_fetch_array($q)) {
         # Failure
         if ($testrun)

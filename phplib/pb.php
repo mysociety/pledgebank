@@ -7,16 +7,20 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.5 2005-03-14 16:43:18 francis Exp $
+ * $Id: pb.php,v 1.6 2005-03-25 20:26:07 francis Exp $
  * 
  */
 
 // Load configuration file
 require_once "../conf/general";
 
+require_once '../phplib/db.php';
 require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
 require_once 'page.php';
+
+/* Date which PledgeBank application believes it is */
+$pb_today = db_getOne('select pb_current_date()');
 
 /* Output buffering: PHP's output buffering is broken, because it does not
  * affect headers. However, it's worth using it anyway, because in the common

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.31 2005-03-25 11:05:59 francis Exp $
+ * $Id: pledge.php,v 1.32 2005-03-25 20:26:07 francis Exp $
  * 
  */
 
@@ -37,7 +37,7 @@ function pledge_token_store($scope, $data) {
     rabx_wire_wr($data, $ser);
     db_query('
             insert into token (scope, token, data, created)
-            values (?, ?, ?, current_timestamp)', array($scope, $token, $ser));
+            values (?, ?, ?, pb_current_timestamp())', array($scope, $token, $ser));
     return $token;
 }
 
@@ -272,7 +272,7 @@ function pledge_confirm($token) {
     else {
         db_query('
                 update pledges
-                set confirmed = true, creationtime = current_timestamp
+                set confirmed = true, creationtime = pb_current_timestamp()
                 where id = ? and not confirmed',
                     $pledge_id);
         return $pledge_id;
@@ -307,7 +307,7 @@ function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
                     ?,
                     ?,
                     ?, ?, ?,
-                    current_timestamp
+                    pb_current_timestamp()
                 )', array(
                     $id,
                     $pledge_id,

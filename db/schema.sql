@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.41 2005-03-25 11:05:59 francis Exp $
+-- $Id: schema.sql,v 1.42 2005-03-25 20:26:06 francis Exp $
 --
 
 -- secret
@@ -89,7 +89,7 @@ create function pledge_is_valid_to_sign(integer, text, text)
             return ''none'';
         end if;
 
-        if p.date < current_timestamp or p.success then
+        if p.date < pb_current_date() or p.success then
             return ''finished'';
         end if;
         
@@ -423,7 +423,7 @@ create function smssubscription_sign(integer, text)
         -- showname = true here so that they will appear as a "person whose
         -- name we do not know" rather than an anonymous person
         insert into signers (id, pledge_id, mobile, showname, signtime)
-            values (t_signer_id, t_pledge_id, t_mobile, true, current_timestamp);
+            values (t_signer_id, t_pledge_id, t_mobile, true, pb_current_timestamp());
 
        
         update smssubscription
@@ -445,5 +445,43 @@ create table token (
     primary key (scope, token)
 );
 
--- migrate old token_store table:
--- insert into token (scope, token, data, created) select 'signup-web' as scope, token, data, created from token_store
+-- If a row is present, that is date which is "today".  Used for debugging
+-- to advance time without having to wait.
+create table debugdate (
+    override_today date
+);
+
+-- Returns the date of "today", which can be overriden for testing.
+create function pb_current_date()
+    returns date as '
+    declare
+        today date;
+    begin
+        today = (select override_today from debugdate);
+        if today is not null then
+           return today;
+        else
+           return current_date;
+        end if;
+
+    end;
+' language 'plpgsql';
+
+-- Returns the timestamp of current time, but with possibly overriden "today".
+create function pb_current_timestamp()
+    returns timestamp as '
+    declare
+        today date;
+    begin
+        today = (select override_today from debugdate);
+        if today is not null then
+           return today + current_time;
+        else
+           return current_timestamp;
+        end if;
+    end;
+' language 'plpgsql';
+
+
+
+

@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.9 2005-03-25 18:41:50 matthew Exp $
+// $Id: page.php,v 1.10 2005-03-25 20:26:07 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -34,6 +34,11 @@ function page_header($title, $params = array()) {
 ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
 <i>This is a test site for developers only. You probably want
 <a href="http://www.pledgebank.com/">the real site</a>.</i></p><?
+    }
+    global $pb_today;
+    if ($pb_today != date('Y-m-d')) {
+?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
+<i>Note: On this test site, the date is faked to be <?=$pb_today?></p><?
     }
 }
 

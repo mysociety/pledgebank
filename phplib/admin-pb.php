@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.11 2005-03-14 15:50:36 francis Exp $
+ * $Id: admin-pb.php,v 1.12 2005-03-25 20:26:07 francis Exp $
  * 
  */
 
@@ -17,7 +17,6 @@ require_once "../../phplib/utility.php";
 
 class ADMIN_PAGE_PB {
     function ADMIN_PAGE_PB () {
-        $this->today = date('Y-m-d');
         $this->id = "pb";
         $this->navname = "Pledges and Signers";
     }
@@ -46,7 +45,11 @@ class ADMIN_PAGE_PB {
         elseif ($sort=='c') $order = 'creationtime';
         elseif ($sort=='s') $order = 'signers';
 
-        $q = db_query('SELECT ref,title,type,target,signup,date,name,email,confirmed,date_trunc(\'second\',creationtime) AS creationtime, (SELECT count(*) from signers where pledge_id=pledges.id) as signers FROM pledges ORDER BY ' . $order);
+        $q = db_query('SELECT ref,title,type,target,signup,date,name,email,confirmed,
+            date_trunc(\'second\',creationtime) AS creationtime, 
+            (SELECT count(*) from signers where pledge_id=pledges.id) as signers,
+            pb_current_date() <= date as open
+            FROM pledges ORDER BY ' . $order);
         $open = array();
         $closed = array();
         while ($r = db_fetch_array($q)) {
@@ -63,10 +66,10 @@ class ADMIN_PAGE_PB {
             $row .= '<td>'.prettify($r['date']).'</td>';
             $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
             $row .= '<td>'.$r['creationtime'].'</td>';
-            if ($r['date']<$this->today)
-                $closed[] = $row;
-            else
+            if ($r['open'] == 't')
                 $open[] = $row;
+            else
+                $closed[] = $row;
         }
         if (count($open)) {
             print "<h2>All Open Pledges</h2>";

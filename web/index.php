@@ -5,18 +5,15 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.100 2005-03-25 18:40:05 matthew Exp $
+// $Id: index.php,v 1.101 2005-03-25 20:26:07 francis Exp $
 
 require_once "../phplib/pb.php";
-require_once '../phplib/db.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
 require_once 'contact.php';
-
-$today = date('Y-m-d');
 
 if (get_http_var('search')) {
     $search_results = search();
@@ -284,7 +281,8 @@ function pledge_form_submitted() {
 }
 
 function step1_error_check($data) {
-    global $today;
+    global $pb_today;
+
     $errors = array();
     if (!$data['target']) $errors[] = 'Please enter a target';
     elseif (!ctype_digit($data['target']) || $data['target'] < 1) $errors[] = 'The target must be a positive number';
@@ -300,7 +298,7 @@ function step1_error_check($data) {
     if ($dupe) $errors[] = 'That reference is already taken!';
     if (!$data['title']) $errors[] = 'Please enter a pledge';
     if (!$data['date']) $errors[] = 'Please enter a deadline';
-    if ($data['date']['iso'] < $today) $errors[] = 'The deadline must be in the future';
+    if ($data['date']['iso'] < $pb_today) $errors[] = 'The deadline must be in the future';
     if ($data['date']['error']) $errors[] = 'Please enter a valid date';
     if (!$data['name']) $errors[] = 'Please enter your name';
     if (!$data['email']) $errors[] = 'Please enter your email address';
@@ -361,9 +359,9 @@ doesn't work, or you have any other suggests or comments.
 <h2>Sign up to one of our five newest pledges</h2><?
 
     $q = db_query("
-                SELECT *, date - CURRENT_DATE AS daysleft
+                SELECT *, date - pb_current_date() AS daysleft
                 FROM pledges
-                WHERE date >= CURRENT_DATE AND password is NULL AND confirmed
+                WHERE date >= pb_current_date() AND password is NULL AND confirmed
                 ORDER BY id
                 DESC LIMIT 5");
     $new = '';
@@ -394,10 +392,10 @@ doesn't work, or you have any other suggests or comments.
             SELECT pledges.id, pledges.name, pledges.title, pledges.signup,
                 pledges.date, pledges.target, pledges.type, pledges.ref,
                 pledges.comparison, COUNT(signers.id) AS count,
-                max(date) - CURRENT_DATE AS daysleft
+                max(date) - pb_current_date() AS daysleft
             FROM pledges, signers
             WHERE pledges.id = signers.pledge_id
-                AND pledges.date >= CURRENT_DATE AND pledges.confirmed
+                AND pledges.date >= pb_current_date() AND pledges.confirmed
                 AND pledges.password is NULL
             GROUP BY pledges.id, pledges.name, pledges.title, pledges.date,
                 pledges.target, pledges.type, pledges.signup, pledges.ref,
@@ -432,8 +430,6 @@ function view_faq() {
 
 # Someone wishes to sign a pledge
 function add_signatory() {
-    global $today;
-
     global $q_email, $q_name, $q_showname, $q_ref, $q_pw;
     $errors = importparams(
             array('email',      '/^[^@]+@.+/',     'Please give your email'),
@@ -486,7 +482,7 @@ few minutes, making sure that you carefully check the email address you give.
 
 # Individual pledge page
 function view_pledge($errors = array()) {
-    global $today, $title;
+    global $title;
 
 	if (sizeof($errors)) {
 		print '<div id="errors"><ul><li>';
@@ -496,7 +492,7 @@ function view_pledge($errors = array()) {
 
     $ref = get_http_var('pledge'); 
     $h_ref = htmlspecialchars($ref);
-    $q = db_query('SELECT * FROM pledges WHERE ref=?', array($ref));
+    $q = db_query('SELECT *, pb_current_date() <= date as open FROM pledges WHERE ref=?', array($ref));
     if (!db_num_rows($q)) {
         err('PledgeBank reference not known');
         return false;
@@ -516,7 +512,7 @@ function view_pledge($errors = array()) {
 	$left = $r['target'] - $curr;
 
 	$finished = 0;
-	if ($r['date'] < $today) {
+	if ($r['open'] == 'f') {
         $finished = 1;
 	    print '<p class="finished">This pledge is now closed, as its deadline has passed.</p>';
     }
@@ -626,7 +622,7 @@ function create_new_pledge($data) {
     $data['id'] = db_getOne("select nextval('pledges_id_seq')");
 	$add = db_query('INSERT INTO pledges (id, title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)', 
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, pb_current_timestamp(), ?, ?, ?, ?, ?)', 
         array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password']));
 ?>
 <h2>Now check your email...</h2>
@@ -693,20 +689,19 @@ function pdfs() {
 }
 
 function search() {
-    global $today;
     $id = db_getOne('SELECT id FROM pledges WHERE ref = ?', array(get_http_var('search')));
     if ($id) {
         Header("Location: " . get_http_var('search')); # TODO: should be absolute?
         exit;
     }
-    $q = db_query('SELECT date,ref,title FROM pledges WHERE title ILIKE \'%\' || ? || \'%\' ORDER BY date', array(get_http_var('search')));
+    $q = db_query('SELECT date,ref,title, pb_current_date() <= date as open FROM pledges WHERE title ILIKE \'%\' || ? || \'%\' ORDER BY date', array(get_http_var('search')));
     if (!db_num_rows($q)) {
         return '<p>Sorry, we could find nothing that matched "' . htmlspecialchars(get_http_var('search')) . '".</p>';
     } else {
         $closed = ''; $open = '';
         while ($r = db_fetch_array($q)) {
             $text = '<li><a href="' . $r['ref'] . '">' . $r['title'] . '</a></li>';
-            if ($r['date']>$today) {
+            if ($r['open']=='t') {
                 $open .= $text;
             } else {
                 $closed .= $text;

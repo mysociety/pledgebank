@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.107 2005-03-29 15:32:51 francis Exp $
+// $Id: index.php,v 1.108 2005-03-30 14:35:05 sandpit Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -394,7 +394,7 @@ doesn't work, or you have any other suggests or comments.
     }
 ?>
 
-<h2>... or sign a pledge with many signatures</h2><?
+<h2>&hellip; or sign a pledge with many signatures</h2><?
 
     $q = db_query("
             SELECT pledges.id, pledges.name, pledges.title, pledges.signup,

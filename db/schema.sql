@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.47 2005-03-29 15:17:19 chris Exp $
+-- $Id: schema.sql,v 1.48 2005-03-29 19:00:08 chris Exp $
 --
 
 -- secret
@@ -174,7 +174,6 @@ create table outgoingsms (
         ),
     
     -- When we last tried to discover the status of this message.
-    numstatuschecks integer not null default 0,
     laststatuscheck integer
     
     -- XXX add extra fields for billing
@@ -183,6 +182,7 @@ create table outgoingsms (
 create unique index outgoingsms_foreignid_idx on outgoingsms(foreignid);
 create index outgoingsms_lastsendstatus_idx on outgoingsms(lastsendstatus);
 create index outgoingsms_status_idx on outgoingsms(status);
+create index outgoingsms_laststatuscheck_idx on outgoingsms(laststatuscheck);
 
 create table incomingsms (
     id serial not null primary key,

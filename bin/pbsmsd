@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.8 2005-03-29 15:40:02 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.9 2005-03-29 19:00:08 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -23,6 +23,7 @@ use FindBin;
 use lib "$FindBin::Bin/../perllib";
 use lib "$FindBin::Bin/../../perllib";
 
+use DateTime::Format::Strptime;
 use Encode;
 use Error qw(:try);
 use Getopt::Long;
@@ -47,6 +48,48 @@ use PB::SMS;
 # Variable set in signal handler to indicate termination.
 my $foad = 0;
 
+# do_post_request WHAT URL PARAMS
+# WHAT is a description of what the request accomplishes (e.g. "get receipts");
+# URL is the URL to send the post to, and PARAMS is a reference to a hash of
+# key-value pairs. WHAT is used as a prefix to logged messages. On success
+# returns the content returned by the POST; otherwise returns a two-element
+# list reference in which the first element is 'systemerror' or 'httperror' and
+# the second element gives more detail about the actual error which occured.
+sub do_post_request ($$$) {
+    my ($what, $url, $params) = @_;
+    our $ua;
+    $ua ||= new LWP::UserAgent(
+                    agent => "PledgeBank pbsmsd $rcsid",
+                );
+
+    eval {
+        local $SIG{ALRM} = sub { die "timed out in eval\n"; };
+        alarm(300);
+        print_log('debug', "$what: doing POST to $url");
+        my $resp = $ua->post($url, $params);
+        alarm(0);
+        if (!defined($resp)) {
+            $! ||= '(no error)';
+            print_log('warning', "$what: no response from user-agent; system error: $!");
+            return ['systemerror', $!];
+        } elsif ($resp->code() != 200) {
+            print_log('warning', "$what: failure to send; HTTP status: " . $resp->status_line());
+            foreach (split(/\r?\n/, $resp->content())) {
+                print_log('warning', "$what: remote error: $_");
+            }
+            return ['httperror', $resp->status_line()];
+        } else {
+            print_log('debug', "$what: did POST; " . length($resp->content()) . " bytes returned");
+            return $resp->content();
+        }
+    };
+    if ($@) {
+        $@ =~ s#\n##gs;
+        print_log('warning', "$what: $@");
+        return ['systemerror', $@];
+    }
+}
+
 # run_sending_process
 # Process the SMS sending queue.
 sub run_sending_process () {
@@ -66,10 +109,7 @@ sub run_sending_process () {
                     order by random()
                 ");
 
-    my $ua = new LWP::UserAgent(
-                    agent => "PledgeBank pbsmsd $rcsid",
-                );
-
+    my $ua = 
     my $niter = 0;
     while (!$foad && $niter < 10000) {
         $s->execute(time(), send_retry_interval, send_max_attempts);
@@ -122,46 +162,28 @@ sub run_sending_process () {
                 };
                 if ($@) {
                     print_log('err', "outgoing #$id, '$message', cannot be expressed in IA5; abandoning message");
-                    dbh()->do('delete from outgoingsms where id = ?', {}, $id);
+                    # Mark failed so that the message is processed.
+                    dbh()->do("update outgoingsms set status = 'failed' where id = ?", {}, $id);
                 } else {
                     # We're OK to attempt sending.
                     my ($status, $extra);
-                    eval {
-                        local $SIG{ALRM} = sub { die "timed out in eval\n"; };
-                        alarm(300);
-                        print_log('debug', "outgoing #$id: attempting to send by HTTP POST");
-                        my $resp = $ua->post('http://www.c360uk.com/api/complex/pledge-query.php', \%p);
-                        alarm(0);
-                        if (!defined($resp)) {
-                            $! ||= '(no error)';
-                            print_log('warning', "outgoing #$id: no response from user-agent; system error: $!");
-                            ($status, $extra) = ('systemerror', $!);
-                        } elsif ($resp->code() != 200) {
-                            print_log('warning', "outgoing #$id: failure to send; HTTP status: " . $resp->status_line());
-                            foreach (split(/\r?\n/, $resp->content())) {
-                                print_log('warning', "outgoing #$id: remote error: $_");
-                            }
-                            ($status, $extra) = ('httperror', $resp->status_line());
-                        } else {
-                            print_log('info', "outgoing #$id: sent");
 
-                            my $result = $resp->content();
-                            if ($result =~ /^ID=(\d+)/) {
-                                # Success; ID returned.
-                                print_log('debug', "outgoing #$id: foreign ID is $1");
-                                dbh()->do('update outgoingsms set foreignid = ? where id = ?', {}, $1, $id);
-                                ($status, $extra) = ('success', undef);
-                            } else {
-                                $result =~ s/\s*$//;
-                                $result = 'Miscellaneous error (blank ID)'
-                                    if ($result =~ /^ID=$/);
-                                print_log('warning', "outgoing #$id: remote error: $result");
-                                ($status, $extra) = ('remoteerror', $result);
-                            }
+                    my $result = do_post_request("outgoing #$id", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
+                    if (ref($result) eq 'ARRAY') {
+                        ($status, $extra) = @$result;
+                    } else {
+                        if ($result =~ /^ID=(\d+)/) {
+                            # Success; ID returned.
+                            print_log('info', "outgoing #$id: sent; foreign ID is $1");
+                            dbh()->do('update outgoingsms set foreignid = ? where id = ?', {}, $1, $id);
+                            ($status, $extra) = ('success', undef);
+                        } else {
+                            $result =~ s/\s*$//;
+                            $result = 'Miscellaneous error (blank ID)'
+                                if ($result =~ /^ID=$/);
+                            print_log('warning', "outgoing #$id: not sent; remote error: $result");
+                            ($status, $extra) = ('remoteerror', $result);
                         }
-                    };
-                    if ($@) {
-                        ($status, $extra) = ('systemerror', $@);
                     }
                     dbh()->do('
                             update outgoingsms
@@ -187,6 +209,226 @@ sub run_sending_process () {
     }
 
     print_log('info', "sending process shutting down after $niter iterations");
+}
+
+# parse_csv_fields DATA
+# Parse DATA into CSV-type fields separated by "\r\n". Each line consists of
+# a number of comma-separated key="value" tuples; values may contain characters
+# escaped with backslashes. Returns a reference to a list on success or undef
+# on failure.
+sub parse_csv_fields ($) {
+    my @rows;
+    foreach my $line (split(/\r\n/, $_[0])) {
+        my %fields =
+            ($line =~ m#(?:([^=]+)="((?:[^"]|\\.)*)"(?:,|$))+#)
+        return undef if (!%fields);
+        foreach (values %fields) {
+            s/\\(.)/$1/g;
+        }
+        push(@rows, \%fields);
+    }
+    return \@rows;
+}
+
+# run_gathering_process
+# Gather delivery reports and any incoming messages we've missed.
+sub run_gathering_process () {
+    # We have two things to do: obtain the delivery status of sent messages,
+    # and pick up messages which were not delivered because of transient
+    # network outages.
+
+    # Polling status of messages. We need to supply a simple query for the
+    # messages to inspect (such as "BatchID > ..."), but must not query too
+    # often or too long.
+    use constant max_polling_age => 28 * 3600;  # 28 hours; apparently standard
+    use constant min_polling_interval => 1800;
+
+    my $s_status = dbh()->prepare("
+                        select min(foreignid) from outgoingsms
+                        where lastsendstatus = 'success'
+                            and status <> 'delivered and status <> 'failed'
+                            and lastsendattempt > ?
+                            and laststatuscheck > ?
+                        ");
+    my $s_missed = dbh()->prepare("
+                        select gap
+                        from incomingsms_foreignid_gap
+                        order by gap
+                        for update
+                        ");
+
+    my $D = new DateTime::Format::Strptime(
+                pattern => '%Y%m%d%H%M%S'
+                # XXX locale and timezone?
+            );
+
+
+    my $niter = 0;
+    while (!$foad && $niter < 10000) {
+        #
+        # Receipts
+        #
+        my $min_id = $s_status->execute(time() - max_polling_age, time() - min_polling_interval);
+        my %p = (
+                strMethod => 'getReceipts',
+                strWhere => "BatchID > $min_id"
+            );
+
+        my $result = do_post_request("get receipts", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
+        if (ref($result) eq 'ARRAY') {
+            if ($result->[0] eq 'system error') {
+                print_log('warning', "get receipts: system error: $result->[1]");
+            } else {
+                print_log('warning', "get receipts: HTTP error: $result->[1]");
+            }
+        } else {
+            my $r = parse_csv_fields($result);
+            if (!$r) {
+                print_log('warning', "get receipts: bad returned value: '" . substr($result, 0, 40) . "...'");
+            } else {
+                foreach (@$r) {
+                    my %f = %$_;
+                    foreach (qw(BatchID DeliveryStatus DeliveryTime)) {
+                        if (!exists($f{$_})) {
+                            print_log('warning', "get receipts: bad line from remote side (missing field '$_')")
+                        }
+                    }
+                    my $foreignid = $f{BatchID};
+                    my $old_status = dbh()->selectrow_array('
+                                        select status
+                                        from outgoingsms
+                                        where foreignid = ?
+                                        for update', {}, $foreignid);
+                    next unless defined($old_status);
+
+                    my $s = lc($f{DeliveryStatus});
+
+                    if ($s eq 'null') {
+                        # NULL is a rare condition which means that the
+                        # message couldn't be passed on to the partner; we
+                        # should respond to it with resubmission.
+                        print_log('warning', "get receipts: message with foreign ID $foreignid had NULL status; resubmitting for transmission");
+                        dbh()->do('
+                                update outgoingsms
+                                set numsendattempts = 0,
+                                    lastsendattempt = null,
+                                    lastsendstatus = null,
+                                    lastsendextrastatus = null,
+                                    foreignid = null,
+                                    status = null,
+                                    laststatuscheck = null
+                                where foreignid = ? ', {}, $foreignid);
+                    } else {
+                        my %statusmap = (
+                                acked => 'buffered',
+                                'buffered phone' => 'buffered',
+                                'buffered smsc' => 'buffered',
+                                'delivered' => 'buffered',
+                                'lost notification' => 'none',
+                                'non delivered' => 'failed'
+                            );
+                        if (!exists($statusmap{$s})) {
+                            print_log('warning', "get receipts: message with foreign ID $foreignid has unknown status '$f{DeliveryStatus}'");
+                        } else {
+                            print_log('debug', "get receipts: message with foreign ID $foreignid: $statusmap{$s}");
+                            dbh()->do('
+                                        update outgoingsms
+                                        set status = ?
+                                        where foreignid = ? and status = ?',
+                                        {}, $statusmap{$s}, $fields{BatchID},
+                                            $old_status);
+                        }
+                    }
+                }
+            }
+        }
+        dbh()->commit();
+
+        #
+        # Missed messages
+        #
+        $s_missed->execute();
+
+        # Try to produce an efficient query to pick up ranges.
+        my @qq;
+        my ($first, $prev);
+        while (my $n = $s_missed->fetchrow_array()) {
+            if (defined($first)) {
+                if ($n > $prev + 1) {
+                    if ($first == $prev) {
+                        push(@qq, "Sequence = $first");
+                    } else {
+                        push(@qq, "Sequence >= $first and Sequence <= $prev");
+                    }
+                    $first = $n;
+                }
+            } 
+            
+            $first ||= $n;
+            $prev = $n;
+        }
+
+        if (defined($first)) {
+            if ($first == $prev) {
+                push(@qq, "Sequence = $first");
+            } else {
+                push(@qq, "Sequence >= $first and Sequence <= $prev");
+            }
+        }
+
+        if (@qq) {
+            %p = (
+                    strMethod => 'getInbound',
+                    strWhere => join(" or ", map { "($_)" } @qq);
+                );
+            my $result = do_post_request("get missed messages", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
+            if (ref($result) eq 'ARRAY') {
+                if ($result->[0] eq 'system error') {
+                    print_log('warning', "get missed messages: system error: $result->[1]");
+                } else {
+                    print_log('warning', "get missed messages: HTTP error: $result->[1]");
+                }
+            } else {
+                my $r = parse_csv_fields($result);
+                if (!$r) {
+                    print_log('warning', "get missed messages: bad returned value: '" . substr($result, 0, 40) . "...'");
+                } else {
+                    foreach (@$r) {
+                        my %f = %$_;
+                        foreach (qw(Sequence ReceivedTime Source Destination Network Message)) {
+                            if (!exists($f{$_})) {
+                                print_log('warning', "get missed messages: bad line from remote side (missing field '$_')")
+                            }
+                            $f{$_} =~ s/^\s+//;
+                            $f{$_} =~ s/\s+$//;
+                        }
+
+                        my ($foreignid, $whensent, $sender, $recipient, $network, $message)
+                            = map { $f{$_} } qw(Sequence ReceivedTime Source Destination Network Message);
+                        next if (defined(dbh()->selectrow_array('select id from incomingsms where foreignid = ? for update', {}, $foreignid)));
+
+                        if (!defined($whensent = $D->parse_datetime($whensent))) {
+                            print_log('warning', "get missed messages: message with foreign ID $foreignid has bad date '$f{ReceivedTime}'; assuming now");
+                            $whensent = time();
+                        } else {
+                            $whensent = $whensent->epoch();
+                        }
+
+                        $sender =~ s#^([^+])#+$1#;
+                            # recipient is a short code
+
+                        PB::SMS::receive_sms($sender, $recipient, $network, PB::SMS::decode_ia5($message), $foreignid, $whensent);
+                    }
+                }
+            }
+        } else {
+            print_log('debug', "missed messages: no missed message ranges to grab");
+        }
+
+        dbh()->commit();
+
+        sleep(120);
+    }
 }
 
 # run_processing_process
@@ -380,5 +622,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.8 2005-03-29 15:40:02 chris Exp $
+$Id: pbsmsd,v 1.9 2005-03-29 19:00:08 chris Exp $
 

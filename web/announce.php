@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.7 2005-04-05 18:16:31 matthew Exp $
+ * $Id: announce.php,v 1.8 2005-04-05 19:11:58 francis Exp $
  * 
  */
 
@@ -74,7 +74,7 @@ if (!$q_message_body) {
 $errors = array();
 if ($q_submit) {
     if (merge_spaces($q_message_body) == merge_spaces($default_message)) {
-        array_push($errors, "Please edit the text of the message.");
+        array_push($errors, "Please edit the text of the email message.");
     }
     if ($need_sms) {
         if (merge_spaces($q_message_sms) == merge_spaces($default_sms))

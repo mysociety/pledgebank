@@ -7,17 +7,16 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.1 2005-02-23 15:44:59 francis Exp $
+ * $Id: pb.php,v 1.2 2005-03-07 15:13:39 francis Exp $
  * 
  */
 
 // Load configuration file
 require_once "../conf/general";
 
-require_once '../templates/page.php';
-
 require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
+require_once 'page.php';
 
 /* Output buffering: PHP's output buffering is broken, because it does not
  * affect headers. However, it's worth using it anyway, because in the common

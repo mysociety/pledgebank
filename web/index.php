@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.55 2005-03-07 14:46:44 chris Exp $
+// $Id: index.php,v 1.56 2005-03-07 15:13:39 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -25,10 +25,12 @@ if (get_http_var('search')) {
 $title = '';
 ob_start();
 if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
-    if (get_http_var('reason')) send_report();
-    else report_form();
-}
-elseif (get_http_var('confirmp')) {
+    if (get_http_var('reason')) {
+        send_report();
+    } else {
+        report_form();
+    }
+} elseif (get_http_var('confirmp')) {
     $title = 'Pledge Confirmation';
     confirm_pledge();
 } elseif (get_http_var('confirms')) {
@@ -49,10 +51,15 @@ elseif (get_http_var('confirmp')) {
 } elseif (get_http_var('pledge') == 'contact') {
     $title = 'Contact Us';
     contact_form();
-} elseif (get_http_var('pledge')) view_pledge();
-elseif (get_http_var('newpost')==1) pledge_form_submitted();
-elseif (get_http_var('newpost')==2) pledge_form_two_submitted();
-elseif (get_http_var('contactpost')) {
+} elseif (get_http_var('pledge')) {
+    view_pledge();
+} elseif (get_http_var('newpost')==1) {
+    $title = 'Create a New Pledge';
+    pledge_form_submitted();
+} elseif (get_http_var('newpost')==2) {
+    $title = 'Please Check Your Email';
+    pledge_form_two_submitted();
+} elseif (get_http_var('contactpost')) {
     $title = 'Contact Us';
     contact_form_submitted();
 } elseif (get_http_var('admin')=='pledgebank') {
@@ -64,8 +71,10 @@ elseif (get_http_var('contactpost')) {
 } elseif (get_http_var('search')) {
     $title = 'Search Results';
     print $search_results;
-} else
+} else {
+    $title = null;
     front_page();
+}
 $body = ob_get_contents();
 ob_end_clean();
 
@@ -539,7 +548,7 @@ function view_pledge() {
         }
 
 	$action = $r['title'];
-        $title = 'I will ' . $action;
+        $title = "'I will " . $action . "'";
 	$people = $r['target'];
 	$type = $r['type'];
 	$date = $r['date'];

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.108 2005-03-30 14:35:05 sandpit Exp $
+// $Id: index.php,v 1.109 2005-04-01 18:02:14 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -684,19 +684,20 @@ function pdfs() {
     $pdf_cards_url = new_url("../flyers/{$ref}_A4_cards.pdf", false);
     $pdf_tearoff_url = new_url("../flyers/{$ref}_A4_tearoff.pdf", false);
     $pdf_flyers16_url = new_url("../flyers/{$ref}_A4_flyers16.pdf", false);
+    $pdf_flyers8_url = new_url("../flyers/{$ref}_A4_flyers8.pdf", false);
     $pdf_flyers4_url = new_url("../flyers/{$ref}_A4_flyers4.pdf", false);
     $pdf_flyers1_url = new_url("../flyers/{$ref}_A4_flyers1.pdf", false);
-    $png_flyers4_url = new_url("../flyers/{$ref}_A4_flyers4.png", false);
+    $png_flyers8_url = new_url("../flyers/{$ref}_A4_flyers8.png", false);
     ?>
 <div class="noprint">
 <h2>Customised Flyers</h2>
 <p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
 <li><a href="<?=$pdf_flyers1_url?>">Big poster (A4, PDF)</a></li>
-<li><a href="<?=$pdf_flyers4_url?>">Flyers for handing out, 4 per page (A4, PDF, like picture below)</a></li>
+<li><a href="<?=$pdf_flyers4_url?>">Flyers for handing out, 4 per page (A4, PDF)</a></li>
+<li><a href="<?=$pdf_flyers8_url?>">Flyers for handing out, 8 per page (A4, PDF, like picture below)</a></li>
 <li><a href="<?=$pdf_flyers16_url?>">Loads of little flyers, 16 per page (A4, PDF)</a></li>
 <!--<li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li>
-<li><a href="<?=$pdf_cards_url?>">Sheet of little pledge cards (A4)</a></li>-->
 </ul>
 </div>
 
@@ -705,7 +706,7 @@ function pdfs() {
 to get these flyers.
 </p>
 
-<p><a href="<?=$png_flyers4_url?>"><img src="<?=$png_flyers4_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
+<p><a href="<?=$png_flyers8_url?>"><img src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
 <?  return true;
 }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.91 2005-03-17 18:49:39 francis Exp $
+// $Id: index.php,v 1.92 2005-03-17 19:37:29 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -83,8 +83,8 @@ page_footer();
 function report_form() {
     $q = db_query('SELECT title, signers.name AS name FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.id=?', array(get_http_var('report')));
     if (!db_num_rows($q)) {
-        print '<p>Illegal PledgeBank id!</p>';
-	return false;
+        err('<p>PledgeBank id not known');
+        return false;
     } else {
         $r = db_fetch_array($q);
         print '<form action="./" method="post"><input type="hidden" name="report" value="' . htmlspecialchars(get_http_var('report')) . '">';
@@ -518,13 +518,13 @@ function view_pledge($errors = array()) {
     $h_ref = htmlspecialchars($ref);
     $q = db_query('SELECT * FROM pledges WHERE ref=?', array($ref));
     if (!db_num_rows($q)) {
-        print '<p>Illegal PledgeBank reference!</p>';
-	return false;
+        err('PledgeBank reference not known');
+        return false;
     } else {
         $r = db_fetch_array($q);
 	$confirmed = ($r['confirmed'] == 't');
 	if (!$confirmed) {
-	    print '<p>Illegal PledgeBank reference!</p>';
+	    err('PledgeBank reference not known');
 	    return false;
 	}
         if (!deal_with_password('pledge', $ref, $r['password']))
@@ -688,7 +688,7 @@ function pdfs() {
         return false;
 
     if (!$row) {
-        print '<p>Illegal PledgeBank reference!</p>';
+        err('PledgeBank not known');
         return false;
     }
     $pdf_cards_url = new_url("../flyers/{$ref}_A4_cards.pdf", false);

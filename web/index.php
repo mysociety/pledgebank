@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.81 2005-03-14 15:28:58 francis Exp $
+// $Id: index.php,v 1.82 2005-03-14 16:43:18 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -346,7 +346,7 @@ it'll be ready soon.
 If you'd like to use PledgeBank when it is launched, or have any good
 ideas for organisations who might like to use it, email <a
 href="mailto:pb@mysociety.org">Tom Steinberg</a>.  You can also <a
-href="mailto:help@pledgebank.com">email us</a> if it just
+href="mailto:team@pledgebank.com">email us</a> if it just
 doesn't work, or you have any other suggests or comments. 
 </p>
 <p id="start"><a href="./new"><strong>Start your own pledge &raquo;</strong></a></p>

@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.4 2005-03-11 18:33:20 francis Exp $
+ * $Id: pb.php,v 1.5 2005-03-14 16:43:18 francis Exp $
  * 
  */
 
@@ -36,7 +36,7 @@ function pb_handle_error($num, $message, $file, $line, $context) {
         ob_clean();
         /* Message will be in log file, don't display it for cleanliness */
         pb_show_error("Please try again later, or <a
-            href=\"mailto:contact@pledgebank.com\">email us</a> to let us know.");
+            href=\"mailto:team@pledgebank.com\">email us</a> to let us know.");
     }
 }
 err_set_handler_display('pb_handle_error');

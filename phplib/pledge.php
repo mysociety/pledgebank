@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.2 2005-03-07 15:58:57 francis Exp $
+ * $Id: pledge.php,v 1.3 2005-03-07 16:24:14 chris Exp $
  * 
  */
 
@@ -56,11 +56,12 @@ function pledge_sign($pledge_id, $name, $showname, $email) {
         if ($num >= $r['target'])
             return "Pledge $pledge_id has already reached its target";
     }
-    $already_signed = db_getOne('select email from signers where pledge_id = ? and email = ?', 
-            $pledge_id, $email);
-    if (isset($already_signed)) {
+
+    if (!is_null(db_getOne('
+                select email from signers
+                where pledge_id = ? and email = ?
+            ', array($pledge_id, $email))))
         return "'$email' has already signed pledge $pledge_id";
-    }
 
     $token = pledge_confirmation_token();
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.57 2005-03-07 15:58:57 francis Exp $
+// $Id: index.php,v 1.58 2005-03-07 16:24:14 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -384,15 +384,18 @@ function add_signatory() {
             )))
         err("Bad parameters in add_signatory.");
 
-    $r = db_getRow('select id, password from pledges where ref = ?', $q_pledge_id);
+    $r = db_getRow('select id, title, password from pledges where ref = ?', $q_pledge_id);
 
-    if (!is_null($r['password']) && (is_null($q_password) || $q_password != $r['password']))
+    if (!is_null($r['password']) && (is_null($q_pw) || $q_pw != $r['password']))
         err("Permission denied");
 
-    list($signer_id, $token) = pledge_sign($id, $q_name, $q_showname, $q_email);
+    $R = pledge_sign($r['id'], $q_name, $q_showname, $q_email);
+    if (is_string($R))
+        err($R);
+    list($signer_id, $token) = $R;
 
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
-    $success = pb_send_email($q_email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
+    $success = pb_send_email($q_email, 'Signing up to "'. $r['title'] .'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
     
     if ($success) {
         db_commit();

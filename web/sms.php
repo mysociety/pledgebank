@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.5 2005-03-12 00:57:27 francis Exp $
+ * $Id: sms.php,v 1.6 2005-03-15 16:55:28 chris Exp $
  * 
  */
 
@@ -57,7 +57,6 @@ EOF;
         if (!pledge_is_permanent_error($r))
             print "<p><strong>Please try again a bit later.</strong></p>";
     }
-    exit();
 }
             
 page_header('SMS');
@@ -70,17 +69,17 @@ if (is_null($q_token)) {
      *  2. User has signed but not converted
      *  3. User has signed and converted
      *  4. Token is not valid */
-    $pledge_id = null;
     $signer_id = db_getOne('select id from signers where token = ? for update', $q_token);
+    $pledge_id = db_getOne('select pledge_id from pledge_outgoingsms where token = ? for update', $q_token);
     if (!isset($signer_id)) {
         /* Case 1. Add signature, if we can. */
-        $r = db_getRow('
-                    select pledge_id, recipient
+        $mobile = db_getOne('
+                    select recipient
                     from pledge_outgoingsms, outgoingsms
                     where token = ?
                         and pledge_outgoingsms.outgoingsms_id = outgoingsms.id
                     ', $q_token);
-        if (!isset($r))
+        if (!isset($mobile))
             bad_token($q_token);
         $pledge_id = $r['pledge_id'];
         $mobile = $r['recipient'];
@@ -98,9 +97,12 @@ if (is_null($q_token)) {
                 values (?, ?, ?, current_timestamp, ?)
             ', array($signer_id, $pledge_id, $r['recipient'], $q_token));
         db_commit();
-    } else {
+    } else if (isset($pledge_id)) {
         /* One of cases 2 or 3. If the user has converted, warn them;
          * otherwise proceed. */
+    } else {
+        /* Case 4. */
+        bad_token($q_token);
     }
 }
 

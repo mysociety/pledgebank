@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.8 2005-03-11 17:11:49 chris Exp $
+# $Id: SMS.pm,v 1.9 2005-03-15 16:55:28 chris Exp $
 #
 
 package PB::SMS;
@@ -118,13 +118,19 @@ sub receive_sms ($$$$$) {
             my ($pledge_id, $token) =
                 dbh()->selectrow_array('
                         select pledge_id, token
-                        from pledge_outgoingsms
-                        where pledge_outgoingsms.outgoingsms_id = outgoingsms.id'
+                        from smssubscription, outgoingsms
+                        where smssubscription.outgoingsms_id = outgoingsms.id
+                            and outgoingsms.id = ?
+                        for update',
                         {}, $id);
 
             return 0 if (!defined($pledge_id));
 
-            my $r = PB::pledge_is_valid_to_sign($pledge_id, undef, $mobile);
+            # Call into the database to do the actual work.
+            my $r = dbh()->selectrow_array('
+                        select smssubscription_sign(?, null)',
+                        {}, $id);
+
             if ($r eq 'signed') {
                 # Already signed, but that's OK.
                 print_log('debug', "#$id delivered, but $sender already signed up to pledge id $pledge_id");
@@ -135,24 +141,15 @@ sub receive_sms ($$$$$) {
                     full => "Sorry, in between your texting us and our reply reaching you, the last place on that pledge was taken. Better luck next time!"
                         # we've already tested for 'none' and 'signed'
                     );
-                die "pledge_is_valid_to_sign returned unexpected result '$r' for $sender on pledge $pledge_id"
+                die "smssubscription returned unexpected result '$r' for $sender on pledge $pledge_id"
                     unless (exists($errormsg{$r}));
                 print_log('debug', "#$id delivered, but $sender cannot sign up because pledge $pledge_id is $r");
                 send_sms(
                         $sender,
                         $errormsg{$r}
                     );
+                return 1;
             } else {
-                # Add signer and delete record mapping the SMS to the pledge
-                # so that the SMS itself may be deleted.
-                dbh()->do('
-                        insert into signers (pledge_id, mobile, signtime,
-                            token)
-                        values (?, ?, current_timestamp, ?)',
-                        {}, $pledge_id, $sender, $token);
-                dbh()->do('
-                        delete from pledge_outgoingsms
-                        where outgoingsms_id = ?', {}, $id);
                 print_log('debug', "#$id delivered, and $sender signed up to pledge id $pledge_id");
                 return 1;
             }
@@ -166,13 +163,12 @@ sub receive_sms ($$$$$) {
         ['sms-signup',
         sub ($$$$$) {
             my ($id) = @_;
-            # Delivery of this SMS has failed, so remove any link between it
-            # and a signer. If that signer is not confirmed and has no other
-            # outstanding SMSs, then drop the signer too.
+            # Delivery of this SMS has failed, so there's no possibility of it
+            # being confirmed. Remove the subscription record.
             dbh()->do('
-                    delete from pledge_outgoingsms
+                    delete from smssubscription
                     where outgoingsms_id = ?
-                ');
+                ', {}, $id);
             return 1;
         }]
     );
@@ -187,10 +183,13 @@ sub receive_sms ($$$$$) {
             if ($message =~ m#^\s*\Q$keyword\E\s*([^\s]+)#) {
                 # Could be a signup request.
                 my $ref = $1;
+                # Exact reference match.
                 my $pledge_id = dbh()->selectrow_array('
                                         select id from pledges
                                         where ref = ? and confirmed
                                     ', {}, $ref);
+
+                # Approximate reference match.
                 if (!defined($pledge_id)) {
                     my $ids = dbh()->selectall_arrayref("
                                             select id, ref
@@ -199,8 +198,13 @@ sub receive_sms ($$$$$) {
                                                 and confirmed
                                         ", {}, $ref);
                     if (@$ids != 1) {
-                        # XXX should we send a warning SMS here?
-                        print_log('warning', "incoming message #$id was request for unknown/ambiguous ref '$ref'");
+                        send_sms(
+                                $sender,
+                                "We can't find the pledge '$ref' - please check it carefully and try again"
+                            );
+                        print_log('warning', "incoming message #$id was request for "
+                                                . (@$ids > 1 ? 'ambiguous' : 'unknown')
+                                                . " ref '$ref'");
                         return 0;
                     } else {
                         # Replace ref with its actual value.
@@ -236,20 +240,19 @@ sub receive_sms ($$$$$) {
                                 "You're already signed up to this pledge!"
                             );
                         return 1;
-                    } else {
-                        # Case 2.
-                        $send_token = 1;
-                    }
+                    } # else case 2.
                 } else {
                     # Case 1. But we should only send the token in the case
                     # where the pledge is still signable.
                     my $r = PB::pledge_is_valid_to_sign($pledge_id, undef, $sender);
                     my %errormsg = (
-                            finished => "Sorry, it's too late to sign up to that pledge",
-                            full => "Sorry, that pledge is now full"
+                            finished => "Sorry, it's too late to sign up to the '$ref' pledge",
+                            full => "Sorry, the '$ref' pledge is now full"
                                 # we've already tested for 'none' and 'signed'
                         );
-                    if ($r ne 'ok') {
+                    if ($r eq 'ok') {
+                        $send_token = 1;
+                    } else {
                         die "pledge_is_valid_to_sign returned unexpected result '$r' for $sender on pledge $pledge_id"
                             unless (exists($errormsg{$r}));
                         send_sms(
@@ -262,18 +265,28 @@ sub receive_sms ($$$$$) {
 
                 # If the have already sent us an SMS, then we should dig out
                 # the token we've already sent them.
-                my $token =
+                my $token;
+                
+                # 1. Case where there's an outstanding SMS.
+                $token =
                     dbh()->selectrow_array('
                             select token
-                            from pledge_outgoingsms, outgoingsms
-                            where pledge_outgoingsms.outgoingsmsid = outgoingsms.id
+                            from smssubscription, outgoingsms
+                            where smssubscription.outgoingsms_id = outgoingsms.id
                                 and pledge_id = ?
                                 and recipient = ?', {}, $pledge_id, $sender);
 
-                # XXX should also limit total number of SMSs sent to this phone
-                # on this pledge.
+                # 2. Case where there isn't, but signer is signed up already.
+                $token ||=
+                    dbh()->selectrow_array('
+                            select token
+                            from smssubscription, signers
+                            where smssubscription.signer_id = signers.id
+                                and signers.pledge_id = ?
+                                and mobile = ?', {}, $pledge_id, $sender);
 
-                my $token ||= unpack('h*', mySociety::Util::random_bytes(2))
+                # 3. No previous token; generate a new one.
+                $token ||= unpack('h*', mySociety::Util::random_bytes(2))
                                 . "-"
                                 . unpack('h*', mySociety::Util::random_bytes(2));
 
@@ -286,11 +299,10 @@ sub receive_sms ($$$$$) {
                             ));
 
                 dbh()->do('
-                        insert into pledge_outgoingsms
-                            (pledge_id, outgoingsms_id)
-                        values (?, ?)', {}, $pledge_id, $new_id);
+                        insert into smssubscription
+                            (token, pledge_id, outgoingsms_id)
+                        values (?, ?, ?)', {}, $token, $pledge_id, $new_id);
 
-        
                 print_log('debug', "sending conversion request #$new_id to $sender for $pledge_id");
 
                 return 1;

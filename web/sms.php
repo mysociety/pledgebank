@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.7 2005-03-16 16:58:35 chris Exp $
+ * $Id: sms.php,v 1.8 2005-03-16 17:26:21 chris Exp $
  * 
  */
 
@@ -88,14 +88,16 @@ EOF;
                 if (!$phone)
                     err("No mobile number recorded for SMS signer $signer_id");
                 
-                /* Compare last few characters of the phone numbers, so that we avoid
-                 * having to know anything about their format. */
+                /* Compare last few characters of the phone numbers, so that we
+                 * avoid having to know anything about their format. */
                 if (substr($p, -6) == substr($phone, -6)) {
                     /* Token and phone number match. Now see whether that email
                      * address has been registered in the database before. That
                      * determines whether we send a confirmation or a
                      * confirmation reminder mail. */
                     $r = pledge_is_valid_to_sign($pledge_id, $q_email);
+                    $title = db_getOne('select title from pledges where id = ?',
+                                        $pledge_id);
                     if ($r == PLEDGE_OK) {
                         /* New email address */
                         $token = pledge_token_store(
@@ -165,6 +167,9 @@ EOF
                                             from pledges
                                             where id = ?
                                             for update', $pledge_id);
+
+                            db_query('delete from smssubscription where token = ?',
+                                        $q_token);
                             db_query('delete from signers where id = ?',
                                         $signer_id);
                             if ($f == 't') 
@@ -175,6 +180,7 @@ EOF
                                         $pledge_id
                                     );
                             $success = pb_send_email(
+                                    $q_email,
                                     "You cannot sign up to your own \"$title\" pledge at PledgeBank.com",
                                     <<<EOF
 
@@ -201,6 +207,9 @@ EOF
 <p>We've sent you an email to confirm your address. Please follow the link
 we've sent to you to finish signing this pledge.</p>
                         <?
+                        db_query('delete from smssubscription where token = ?',
+                                    $q_token);
+
                         db_commit();
                     } else {
                         ?>

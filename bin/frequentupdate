@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.2 2005-03-30 18:12:05 francis Exp $
+ * $Id: frequentupdate,v 1.3 2005-04-01 12:08:54 francis Exp $
  *
  */
 
@@ -115,6 +115,7 @@ function send_failure_email($pledge) {
 function send_success_email($pledge) {
     $q = db_query('SELECT * FROM signers WHERE pledge_id=?', array($pledge['id']));
     $pledge['actual'] = db_num_rows($q);
+    $pledge['exceeded_or_met'] = ($pledge['actual']>$pledge['target']?'exceeded':'met');
 
     $globalsuccess = 1;
     $title = $pledge['title'];

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.17 2005-04-01 10:40:06 francis Exp $
+// $Id: fns.php,v 1.18 2005-04-01 12:08:55 francis Exp $
 
 require_once "../../phplib/evel.php";
 
@@ -13,40 +13,37 @@ require_once "../../phplib/evel.php";
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
     $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
     $values['sentence_third'] = pledge_sentence($values['id'], array('firstperson' => false));
+    $values['signature'] = "-- the PledgeBank.com team\n";
 
-    if (file_exists("../templates/emails/$template_name")) {
-        ob_start();
-        require "../templates/emails/$template_name";
-        $template_content = ob_get_contents();
-        ob_end_clean();
-    }
-    else
-        err("email template file for \"$template_name\" does not exist");
-
-    $count = preg_match("/^Subject: ([^\n]*)\n\n(.*)$/s", $template_content, $matches);
-    if ($count != 1)
-        err("template \"$template_name\" doesn't have subject/body");
-    $subject = $matches[1];
-    $message = $matches[2];
-    return pb_send_email($to, $subject, $message, $headers);
+    $template = file_get_contents("../templates/emails/$template_name");
+    $spec = array(
+        '_template_' => $template,
+        '_parameters_' => $values
+    );
+    $spec = array_merge($spec, $headers);
+    return pb_send_email_internal($to, $spec);
 }
 
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email($to, $subject, $message, $headers = array()) {
-    // Construct parameters
     $spec = array(
         '_body_' => $message,
         'Subject' => $subject,
     );
     $spec = array_merge($spec, $headers);
+    return pb_send_email_internal($to, $spec);
+}
 
+function pb_send_email_internal($to, $spec) {
+    // Construct parameters
+    // Add standard PledgeBank from header
     if (!array_key_exists("From", $spec)) {
         $spec['From'] = '"PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">";
         $spec['Reply-To'] = '"PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">";
     }
 
+    // With one recipient, put in header.  Otherwise default to undisclosed recip.
     if (!is_array($to)) {
-        // With one recipient, put in header.  Otherwise default to undisclosed recip.
         $spec['To'] = $to;
         $to = array($to);
     }
@@ -57,6 +54,7 @@ function pb_send_email($to, $subject, $message, $headers = array()) {
     if ($error) 
         error_log("pb_send_email: " . $error);
     $success = $error ? FALSE : TRUE;
+
     return $success;
 }
 

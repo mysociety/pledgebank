@@ -1,5 +1,5 @@
-Email templates for PledgeBank.  These are interpreted using PHP, but you
-should probably only use the following syntax:
+Email templates for PledgeBank.  These are interpreted using a pseudo-PHP
+syntax:
 
     <?=$values['name_of_variable']?>
 

@@ -1,13 +1,11 @@
 Subject: Sorry, your pledge failed - '<?=$values['title']?>' at PledgeBank.com
 
 We are sorry to have to tell you that your pledge did not meet its target in
-the required time.  You required <?=$values['target']?> <?=$values['type']?>, but achieved 
-only <?=$values['actual']?>.
+the required time.  You required <?=$values['target']?> <?=$values['type']?>, 
+but achieved only <?=$values['actual']?>.
 
 Better luck next time - maybe you'd like to hit reply and tell us what you
 think didn't work out? It might help us give better guidance or build further
 useful features in the future.
 
--- 
-www.PledgeBank.com
-a mySociety.org project
+<?=$values['signature']?>

@@ -2,8 +2,8 @@ Subject: Pledge successful - '<?=$values['title']?>' at PledgeBank.com
 
 Congratulations! 
 
-We are pleased to tell you that the pledge you signed up to <?=($values['actual']>$values['target']?'exceeded':'met')?> its 
-target in the required time.
+We are pleased to tell you that the pledge you signed up to
+<?=$values['exceeded_or_met']?> its target in the required time.
 
 The pledge says:
 '<?=$values['sentence_third']?>'
@@ -14,6 +14,4 @@ email you soon to give you any further information you need.
 To see who else signed up, please follow this link:
 <?=$values['url']?>
 
--- 
-www.PledgeBank.com
-a mySociety project
+<?=$values['signature']?>

@@ -5,6 +5,4 @@ but according to our records you have already signed it.
 
 Good luck with your pledge!
 
--- 
-www.PledgeBank.com
-a mySociety project
+<?=$values['signature']?>

@@ -13,6 +13,4 @@ The pledge says:
 
 '<?=$values['sentence_third']?>'
 
--- 
-www.PledgeBank.com
-a mySociety project
+<?=$values['signature']?>

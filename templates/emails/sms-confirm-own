@@ -6,6 +6,4 @@ no need to add yourself again.
 
 Good luck with your pledge!
 
--- 
-www.PledgeBank.com
-a mySociety project
+<?=$values['signature']?>

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.25 2005-03-11 11:55:23 chris Exp $
+-- $Id: schema.sql,v 1.26 2005-03-11 12:46:44 chris Exp $
 --
 
 -- secret
@@ -66,6 +66,63 @@ create table pledges (
     -- This flag is set when we first notice that that has happened.
     completionnotified boolean not null default false
 );
+
+-- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
+-- Is the given PLEDGE valid for EMAIL or MOBILE to sign? One of EMAIL or
+-- MOBILE may be null. Returns one of:
+--      ok          pledge is OK to sign
+--      none        no such pledge exists
+--      finished    pledge has expired
+--      full        pledge is full
+--      signed      signer has already signed this pledge
+create function pledge_is_valid_to_sign(integer, text, text)
+    returns text as '
+    declare
+        p record;
+    begin
+        select into p *
+            from pledges
+            where id = $1 and confirmed
+            for update;
+
+        if not found then
+            return ''none'';
+        end if;
+
+        if p.date < current_timestamp or p.success then
+            return ''finished'';
+        end if;
+        
+        -- Lock the signers table, so that a later insert within this
+        -- transaction would succeed.
+        lock table signers in share mode;
+        if p.comparison = ''exactly'' then
+            if p.target <=
+                (select count(id) from signers where pledge_id = $1) then
+                return ''full'';
+            end if;
+        end if;
+
+        if $2 is not null then
+            if $2 = p.email then
+                return ''signed'';
+            end if;
+            perform id from signers where pledge_id = $1 and email = $2 for update;
+            if found then
+                return ''signed'';
+            end if;
+        end if;
+
+        if $3 is not null then
+            perform id from signers where pledge_id = $1 and mobile = $3 for update;
+            if found then
+                return ''signed'';
+            end if;
+        end if;
+
+        return ''ok'';
+    end;
+    ' language 'plpgsql';
 
 create table outgoingsms (
     id serial not null primary key,

@@ -5,10 +5,7 @@ use PB::PDF;
 use Data::Dumper;
 my $pdf;
 
-=comment
 #testing PDF::API2
-    my $loadpdf = PDF::API2->open("test.pdf") or die "failed";
-
     $pdf = PDF::API2->new(-file => "foo.pdf");
     $pdf->preferences(-fitb => 1); # viewer shows full page
     my ($page_width,$page_height,$page_margin) = (595.27,842.89,36);
@@ -23,18 +20,20 @@ my $pdf;
     $gfx->stroke;
     $gfx->endpath();
 
+=comment
+    my $loadpdf = PDF::API2->open("test.pdf") or die "failed";
     my $form = $pdf->importPageIntoForm($loadpdf,1);
     print Dumper($form);
     $form->{'rotate'} = 90;
 #    print Dumper($form->{'scale'});
 #    $form->scale(0.5);
     $gfx->formimage($form, 200, 200);
+=cut
 
     $pdf->finishobjects($page,$text,$gfx);
     $pdf->saveas;
     $pdf->end;
     exit;
-=cut
 
 
 #use PB::PDF;

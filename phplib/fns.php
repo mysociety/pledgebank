@@ -18,7 +18,6 @@ function prettify($s) {
 }
 
 # Stolen from my railway script
-# TODO: Return an epoch instead?
 function parse_date($date) {
 	$now = time();
 	$error = 0;
@@ -26,6 +25,7 @@ function parse_date($date) {
 
 	$date = preg_replace('#((\b([a-z]|on|an|of|in|the|year of our lord))|(?<=\d)(st|nd|rd|th))\b#','',$date);
 
+        $epoch = 0;
 	if (preg_match('#(\d+)/(\d+)/(\d+)#',$date,$m)) {
 		$day = $m[1]; $month = $m[2]; $year = $m[3];
 	} elseif (preg_match('#(\d+)/(\d+)#',$date,$m)) {
@@ -46,12 +46,15 @@ function parse_date($date) {
 		}
 		$t = strtotime($date,$now);
 		if ($t != -1) {
-			$day = date('d',$t); $month = date('m',$t); $year = date('Y',$t);
+			$day = date('d',$t); $month = date('m',$t); $year = date('Y',$t); $epoch = $t;
 		} else {
 			$error = 1;
 		}
 	}
-	return array('day'=>$day, 'month'=>$month, 'year'=>$year, 'error'=>$error);
+        if (!$epoch && $day && $month && $year)
+            $epoch = mktime(0,0,0,$month,$day,$year);
+
+        return array('iso'=>"$year-$month-$day", 'epoch'=>$epoch, 'day'=>$day, 'month'=>$month, 'year'=>$year, 'error'=>$error);
 }
 
 ?>

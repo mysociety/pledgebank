@@ -25,7 +25,6 @@ if (get_magic_quotes_gpc()) {
 db_connect();
 
 $today = date('Y-m-d');
-$nowA = array( 'day' => date('d'), 'month' => date('m'), 'year' => date('Y') );
 
 page_header();
 
@@ -40,6 +39,7 @@ elseif ($_GET['contact']) contact_form();
 elseif ($_POST['contact']) contact_form_submitted();
 elseif ($_GET['all']) list_all_pledges();
 elseif ($_GET['admin']=='pledgebank') admin();
+elseif ($_GET['pdf']) pdfs();
 else front_page();
 
 page_footer();
@@ -52,60 +52,44 @@ function pledge_form($errors = array()) {
 		print '<ul id="errors"><li>';
 		print join ('</li><li>', $errors);
 		print '</li></ul>';
-	} ?>
-<script type="text/javascript">
-function pluralize(t) {
-	if (document && document.getElementById) {
-		d = document.getElementById('type');
-		s = document.getElementById('signplural');
-		v = d.value;
-		if (t==1) {
-			s.innerHTML = 's';			
-			if (v=='people') {
-				d.value = 'person';
-			}
-		} else {
-			s.innerHTML = '';
-			if (v=='person') {
-				d.value = 'people';
-			}
-		}
 	}
-}
-</script>
+?>
 <!-- <p>To create a new pledge, please fill in the form below.</p> -->
 <form id="pledge" method="post" action="./"><input type="hidden" name="new" value="1">
 <h2>New Pledge</h2>
-<p>I will <input title="Pledge" type="text" name="action" value="<?=htmlentities($_POST['action']) ?>" size="82"></p>
-<p>if <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" name="people" value="<?=htmlentities($_POST['people']) ?>">
-other <input type="text" id="type" name="type" size="30" value="people"> sign<span id="signplural"></span> up before <input title="Deadline date" type="text" name="date" value="<?=htmlentities($_POST['date']) ?>">.</p>
+<p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="action" id="action" value="<?=htmlspecialchars($_POST['action']) ?>" size="82"></p>
+<p>if <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" name="people" value="<?=htmlspecialchars($_POST['people']) ?>">
+other <input type="text" id="type" name="type" size="30" value="people"> <input type="text" id="signup" name="signup" size="10" value="sign up"> before
+<input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<?=htmlspecialchars($_POST['date']) ?>">.</p>
 
-<p>Choose a unique reference for your pledge:<br>http://pledgebank.com/<input type="text" size="10" name="ref" value="<?=htmlentities($_POST['ref']) ?>"> <small>(letters, numbers, -)</small>
-<p>Name: <input type="text" size="20" name="name" value="<?=htmlentities($_POST['name']) ?>">
-Email: <input type="text" size="30" name="email" value="<?=htmlentities($_POST['email']) ?>">
+<p>Choose a short name for your pledge (e.g. mySocPledge) :<br>http://pledgebank.com/<input type="text" size="20" name="ref" value="<?=htmlspecialchars($_POST['ref']) ?>"> <small>(letters, numbers, -)</small>
+<p style="margin-bottom: 1em;">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars($_POST['name']) ?>">
+Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($_POST['email']) ?>">
 &nbsp;
 <input type="submit" value="Submit"></p>
-</p>
+<hr style="color: #522994; background-color: #522994; height: 1px; border: none;" >
+<h3>Optional Information</h3>
+<p id="moreinfo" style="text-align: left">More details about your pledge:
+<br><textarea name="moreinfo" rows="10" cols="60"><?=htmlspecialchars($_POST['moreinfo']) ?></textarea>
+<input type="submit" value="Submit">
 </form>
 <? }
 
 function pledge_form_submitted() {
-	global $nowA;
-	$action = $_POST['action'];
+	global $today;
+	$action = $_POST['action']; if ($action=='<Enter your pledge>') $action = '';
 	$people = $_POST['people'];
-	$type = $_POST['type'];
+	$type = $_POST['type']; if (!$type) $type = 'people';
 	$date = parse_date($_REQUEST['date']);
 	$name = $_POST['name'];
 	$email = $_POST['email'];
 	$ref = $_POST['ref'];
+        $signup = $_POST['signup']; if (!$signup) $signup = 'sign up';
 	if (!$action) $errors[] = 'Please enter a pledge';
 	if (!$people) $errors[] = 'Please enter a target';
 	elseif (!ctype_digit($people) || $people < 1) $errors[] = 'The target must be a positive number';
 	if (!$date) $errors[] = 'Please enter a deadline';
-	if (!$type) $errors[] = 'Please enter a type';
-	if ($date['year']<$nowA['year'] || ($date['year']==$nowA['year'] && $date['month']<$nowA['month']) || ($date['year']==$nowA['year'] && $date['month']==$nowA['month'] && $date['day']<=$nowA['day']) ) {
-		$errors[] = 'The deadline must be in the future';
-	}
+	if ($date['iso'] < $today) $errors[] = 'The deadline must be in the future';
 	if (!$ref) $errors[] = 'Please enter a PledgeBank reference';
 	if (preg_match('/[^a-z0-9-]/i',$ref)) $errors[] = 'The reference must only contain letters, numbers, -';
 	if ($date['error']) $errors[] = 'Please enter a valid date';
@@ -114,12 +98,11 @@ function pledge_form_submitted() {
 	if (sizeof($errors)) {
 		pledge_form($errors);
 	} else {
-		create_new_pledge($action,$people,$type,$date,$name,$email,$ref);
+		create_new_pledge($action,$people,$type,$date,$name,$email,$ref,$signup);
 	}
 }
 
 function front_page() {
-	global $today;
 ?>
 <p>Welcome to PledgeBank, the site that lets you say "I'll do something
 if other people will do it too." </p>
@@ -144,9 +127,11 @@ doesn't work, or you have any other suggests or comments.
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {
         $days = $r['daysleft'];
-        $new .= '<li>' . htmlentities($r['name']) . ' will <a href="./?pledge=' . $r['id'] . '">' . htmlentities($r['title']) . '</a> if ' . htmlentities($r['target']) . ' other ' . $r['type'] . ' will too (';
+        $new .= '<li>' . htmlspecialchars($r['name']) . ' will <a href="./?pledge=' . $r['id'] . '">' . htmlspecialchars($r['title']) . '</a> if ' . htmlspecialchars($r['target']) . ' other ' . $r['type'] . ' ';
+        $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
+        $new .= ' (';
         $new .= $days . ' '.make_plural($days,'day').' left';
-#			$new .= 'by '.htmlentities($r['date']);
+#			$new .= 'by '.htmlspecialchars($r['date']);
         $new .= ')</li>'."\n";
         $k--;
     }
@@ -159,7 +144,7 @@ doesn't work, or you have any other suggests or comments.
 
 <h2>Five Highest Signup Pledges</h2>
 <?	$q = db_query('SELECT pledges.id, pledges.name, pledges.title,
-pledges.date, pledges.target, pledges.type,
+pledges.signup, pledges.date, pledges.target, pledges.type,
 COUNT(signers.id) AS count, max(date)-CURRENT_DATE
 AS daysleft FROM pledges, signers WHERE pledges.id=signers.pledge_id AND
 pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 GROUP
@@ -168,8 +153,10 @@ BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.typ
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {
         $days = $r['daysleft'];
-        $new .= '<li>'.$r['count'].' '.make_plural($r['count'],'pledge').' : '.htmlentities($r['name']).' will <a href="./?pledge='.$r['id'].'">'.htmlentities($r['title']).'</a> if '.htmlentities($r['target']).' other ' . htmlentities($r['type']) . ' will too (';
-        $new .= 'by '.prettify(htmlentities($r['date']));
+        $new .= '<li>'.$r['count'].' '.make_plural($r['count'],'pledge').' : '.htmlspecialchars($r['name']).' will <a href="./?pledge='.$r['id'].'">'.htmlspecialchars($r['title']).'</a> if '.htmlspecialchars($r['target']).' other ' . htmlspecialchars($r['type']) . ' ';
+        $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
+        $new .= ' (';
+        $new .= 'by '.prettify(htmlspecialchars($r['date']));
         $new .= ')</li>'."\n";
         $k--;
     }
@@ -192,6 +179,8 @@ function view_faq() { ?>
 
 # Someone wishes to sign a pledge
 function add_signatory() {
+    global $today;
+
 	$email = $_POST['email'];
 	$showname = $_POST['showname'] ? 1 : 0;
 	$id = $_POST['pledge_id'];
@@ -233,7 +222,7 @@ function add_signatory() {
     $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
     $success = pb_send_email($email, 'Signing up to "'.$action.'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
     if ($success) { ?>
-<p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="./?pledge=<?=htmlentities($_POST['pledge_id']) ?>">Back to pledge page</a></p>
+<p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="./?pledge=<?=htmlspecialchars($_POST['pledge_id']) ?>">Back to pledge page</a></p>
 <?			return true;
     } else { ?>
 <p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>
@@ -319,6 +308,7 @@ function view_pledge() {
 		$date = $r['date'];
 		$name = $r['name'];
 		$email = $r['email'];
+                $signup = $r['signup'];
 
 		$q = db_query('SELECT * FROM signers WHERE confirmed=1 AND pledge_id=?', array($r['id']));
 		$curr = db_num_rows($q);
@@ -334,9 +324,9 @@ function view_pledge() {
 		}
 ?>
 <p>Here is the pledge:</p>
-<form id="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlentities($_GET['pledge']) ?>">
+<form id="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($_GET['pledge']) ?>">
 <input type="hidden" name="add_signatory" value="1">
-<p style="margin-top: 0">&quot;I will <strong><?=htmlentities($action) ?></strong> if <strong><?=htmlentities($people) ?></strong> <?=htmlentities($type) ?> will do the same&quot;</p>
+<p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($action) ?></strong> if <strong><?=htmlspecialchars($people) ?></strong> <?=htmlspecialchars($type) ?> <?=($signup=='sign up'?'will do the same':$signup) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($date) ?></strong></p>
 
 <p style="text-align: center; font-style: italic;"><?=$curr ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.(-$left).' over target :) )':', '.$left.' more needed') ?></p>
@@ -344,8 +334,9 @@ function view_pledge() {
 <? if (!$finished) { ?>
 <div style="text-align: left; margin-left: 50%">
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
-<p style="text-align: left">Name: <input type="text" size="20" name="name" value="<?=htmlentities($_POST['name']) ?>">
-<br>Email: <input type="text" size="30" name="email" value="<?=htmlentities($_POST['email']) ?>">
+<p style="text-align: left">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars($_POST['name']) ?>">
+<br>Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($_POST['email']) ?>">
+<br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
 <br>Show my name on this pledge: <input type="checkbox" name="showname" value="1" checked>
 &nbsp;
 <input type="submit" value="Submit"></p>
@@ -353,16 +344,16 @@ function view_pledge() {
 <? } ?>
 </form>
 
-<p style="text-align: center"><a href="" onclick="return false" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="" onclick="return false">Email this Pledge</a><? } ?></p>
+<p style="text-align: center"><a href="./?pdf=<?=$_GET['pledge'] ?>" title="Stick them places!">Print out customised flyers</a> | <a href="" onclick="return false">Chat about this Pledge</a><? if (!$finished) { ?> | <a href="" onclick="return false">SMS this Pledge</a> | <a href="" onclick="return false">Email this Pledge</a><? } ?></p>
 <!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
 
 <h2>Current signatories</h2><?
-		$out = '<li>'.htmlentities($name).' (Pledge Author)</li>';
+		$out = '<li>'.htmlspecialchars($name).' (Pledge Author)</li>';
 		$anon = 0;
 		while ($r = db_fetch_array($q)) {
 			$showname = $r['showname'];
 			if ($showname) {
-				$out .= '<li>'.htmlentities($r['signname']).'</li>';
+				$out .= '<li>'.htmlspecialchars($r['signname']).'</li>';
 			} else {
 				$anon++;
 			}
@@ -376,20 +367,20 @@ function view_pledge() {
 }
 
 # Someone has submitted a new pledge
-function create_new_pledge($action, $people, $type, $date, $name, $email,$ref) {
-	$isodate = "$date[year]-$date[month]-$date[day]";
+function create_new_pledge($action, $people, $type, $date, $name, $email, $ref, $signup) {
+	$isodate = $date['iso'];
 	$token = str_replace('.','X',substr(crypt($id.' '.$email),0,16));
-	$add = db_query('INSERT INTO pledges (title, target, type, date,
+	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP)', 
-        array($action, $people, $type, $isodate, 
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP)', 
+        array($action, $people, $type, $signup, $isodate, 
         $name, $email, $ref, $token));
 ?>
 <p>Thank you very much for submitting your pledge:</p>
 <div id="pledge">
-<p style="margin-top: 0">&quot;I will <strong><?=htmlentities($action) ?></strong> if <strong><?=htmlentities($people) ?></strong> <?=htmlentities($type) ?> will do the same&quot;</p>
+<p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($action) ?></strong> if <strong><?=htmlspecialchars($people) ?></strong> <?=htmlspecialchars($type) ?> <?=($signup=='sign up'?'will do the same':$signup) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($isodate) ?></strong></p>
-<p style="text-align: right">&mdash; <?=htmlentities($name) ?></p>
+<p style="text-align: right">&mdash; <?=htmlspecialchars($name) ?></p>
 </div>
 <?
 	$link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirmp=' . $token);
@@ -437,6 +428,33 @@ function list_all_pledges() {
                 $r[1] = '<a href="./?pledge='.$r[0].'">'.$r[1].'</a>';
                 print '<tr><td>'.join('</td><td>',array_map('prettify',$r)).'</td></tr>';        }
         print '</table>';
+}
+
+function pdfs() {
+        if (!$_GET['pdf']) {
+} ?>
+<h2>Customised Flyers</h2>
+<p>Below you can generate PDFs containing your pledge data, to print out, display, hand out, or whatever.</p>
+<ul>
+<li>Tear-off format (like accommodation rental ones)
+<ul><li>A4</ul>
+<li>Sheet of little pledge cards:
+<ul>
+<li>A3
+<li>A4
+<li>A5
+</ul>
+</li>
+<li>Poster format
+<ul>
+<li>Design 1
+<ul><li>A3<li>A4</ul>
+<li>Design 2
+<ul><li>A3<li>A4</ul>
+</ul>
+</ul>
+
+<?
 }
 
 ?>

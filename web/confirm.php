@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.14 2005-03-17 09:20:39 francis Exp $
+ * $Id: confirm.php,v 1.15 2005-03-17 09:33:52 sandpit Exp $
  * 
  */
 
@@ -37,7 +37,9 @@ if ($q_type == 'pledge') {
     /* Success. */
     $q = db_query('select * from pledges where id = ?', $pledge_id);
     $r = db_fetch_array($q);
-    page_header("${r['title']} - Confirm", array('nonav' => true));
+#    page_header("${r['title']} - Confirm", array('nonav' => true));
+    page_header("PRINT THIS - CUT IT UP - DELIVER LOCALLY", array('nonav' => true));
+
     db_commit();
     $url = "/" . urlencode($r['ref']);
     ?>
@@ -159,7 +161,7 @@ td {
 </style>
 <table><?
     
-    for ($rows = 0; $rows<10; $rows++) {
+    for ($rows = 0; $rows<3; $rows++) {
         print '<tr align="center">';
         for ($cols=0; $cols<2; $cols++) {
             print '<td>';

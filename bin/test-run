@@ -19,7 +19,7 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.15 2005-03-30 18:12:05 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.16 2005-04-01 07:24:25 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -47,10 +47,11 @@ my $verbose = 1;
 
 # Configure test harness class
 print "Set up web test harness...\n" if $verbose > 0;
-our $wth = new mySociety::WebTestHarness('PB_');
+our $wth = new mySociety::WebTestHarness({db_option_prefix => 'PB_'});
 $wth->log_watcher_setup($httpd_error_log);
 $wth->database_drop_reload('../db/schema.sql');
-$wth->email_setup("$FindBin::Bin/../../services/EvEl/bin/eveld");
+$wth->email_setup({ eveld_bin => "$FindBin::Bin/../../services/EvEl/bin/eveld",
+                    log_mailbox => "log_mailbox" });
 our $b = $wth->browser_get_agent();
 
 # Syntax check all .php files

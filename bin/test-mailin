@@ -1,7 +1,12 @@
 #!/usr/bin/perl -w
 #
 # test-mailin:
-# Incoming mail for test harness.
+# Receives incoming mail for the test harness, and stores it in the database
+# for the test harness to access.
+# 
+# Hook this up with something like this in /etc/aliases...
+#   pbharness: "| /home/francis/devel/mysociety/pb/bin/test-mailin"
+# ... or some other appropriate way.
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
@@ -19,7 +24,7 @@ use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
 use mySociety::WebTestHarness;
 
-our $wth = new mySociety::WebTestHarness('PB_');
+our $wth = new mySociety::WebTestHarness({'db_option_prefix' => 'PB_'});
 my $slurped = read_file(\*STDIN);
 $wth->email_incoming($slurped);
 

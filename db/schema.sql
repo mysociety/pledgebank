@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.6 2005-02-28 09:47:52 chris Exp $
+-- $Id: schema.sql,v 1.7 2005-03-02 13:11:04 chris Exp $
 --
 
 create table pledges (
@@ -48,15 +48,72 @@ create table signers (
   id serial not null primary key,
   pledge_id int not null,
 
-  -- who has signed the pledge
-  signname varchar(50) not null,
-  signemail varchar(100) not null,
+  -- Who has signed the pledge.
+  -- Name may be null because we allow users to sign up by SMS without giving
+  -- their name.
+  name text,
+  email text,
+  mobile text,
+  
   -- whether they want their name public
+  showname boolean not null default false,
   showname int not null,
+  
   -- when they signed
   signtime timestamp not null,
-  -- confirmation stuff
-  token varchar(50) not null,
-  confirmed int not null
+  
+  -- Confirmation stuff. For email signers we send them a token and only regard
+  -- them as signed up when they have supplied it back to us. SMS signers are
+  -- regarded as confirmed as soon as the reply SMS has been received by their
+  -- phone, but we send them a token allowing them to convert their
+  -- subscription to an email one later.
+  token text not null,
+  confirmed boolean not null default false,
+  outgoingsms_id integer references outgoingsms(id)
+);
+
+create table outgoingsms (
+    id serial not null primary key,
+    -- Recipient, as an international-format number, and text of message.
+    recipient text not null,
+    message text not null,
+    
+    -- When we tried to submit the message to the server last, how many times
+    -- we've attempted this, and what the result was on the most recent
+    -- occasion.
+    numsendattempts integer not null default 0,
+    lastsendattempt integer,    -- UNIX time not timestamp because of now()
+                                -- issues in transactions, etc.
+    lastsendstatus varchar(16) check (
+            lastsendstatus is null
+            or lastsendstatus = 'systemerror'
+            or lastsendstatus = 'httperror'
+            or lastsendstatus = 'success'
+        ),
+    -- any other information, e.g. errno value or HTTP status line
+    lastsendextrastatus text
+
+    -- ID assigned to the message by the sender. Null indicates that the
+    -- message has not been submitted to their server.
+    foreignid text,
+    
+    -- Status reports returned by the sender. Null indicates that no status
+    -- report has been received; 'delivered' indicates that the message has
+    -- been delivered, 'failed' that it has failed and will not be delivered
+    -- (including when the recipient is using PAYG and can't afford to receive
+    -- it); 'buffered' that it is still in flight; 'rejected' that the network
+    -- has rejected the message without attempting delivery; and 'none' that
+    -- the phone is out of coverage or credit, and delivery attempts will
+    -- continue.
+    status varchar(16) check (
+            status is null
+            or status = 'delivered'
+            or status = 'failed'
+            or status = 'buffered'
+            or status = 'rejected'
+            or status = 'none'
+        )
+    
+    -- XXX extra fields for billing?
 );
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.5 2005-04-04 14:34:17 chris Exp $
+ * $Id: announce.php,v 1.6 2005-04-05 15:57:56 sandpit Exp $
  * 
  */
 
@@ -33,6 +33,7 @@ if (!$data)
     err("No such token");
 # Note, we destroy the token later when the message is sent
 
+print_r($data);
 $pledge = db_getRow('
     select *,
         (select count(id) from signers
@@ -46,9 +47,14 @@ $pledge = db_getRow('
 
 page_header("Send announcement to '${pledge['title']}", array());
 
-$need_sms = ($data['signers_sms'] > 0);
-if ($need_sms)
-    $default_sms = "${data['name']} here. The ${data['ref']} pledge has been successful! <ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE>";
+$need_sms = ($pledge['signers_sms'] > 0);
+if ($need_sms) {
+    $default_sms = "${pledge['name']} here. The ${pledge['ref']} pledge has been successful! <ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE>";
+    if (!$q_message_sms) {
+        $q_message_sms = $default_sms;
+        $q_h_message_sms = htmlspecialchars($q_message_sms);
+    }
+}
 
 $default_message = 
         "Hello, and thank you for signing our successful pledge!\n\n" .
@@ -90,7 +96,7 @@ if ($q_submit) {
 
 if (!sizeof($errors) && $q_submit) {
     // Send message
-    $q = db_query('select email from signers where pledge_id = ?', $pledge['id']);
+    $q = db_query('select email from signers where pledge_id = ? and email is not null', $pledge['id']);
     $addrs = array();
     while ($r = db_fetch_array($q))
         array_push($addrs, $r['email']);
@@ -102,7 +108,7 @@ if (!sizeof($errors) && $q_submit) {
          * SMSs. */
         if ($need_sms)
             db_query('
-                insert into outgoingsms
+                insert into outgoingsms (recipient, message, whensubmitted)
                 select mobile as recipient, ? as message, ? as whensubmitted
                 from signers
                 where pledge_id = ? and email is null',
@@ -128,7 +134,7 @@ if (!sizeof($errors) && $q_submit) {
     }
 
     // Display form
-    print <<<EOF
+    ?>
 <p></p>
 
 <form class="pledge" name="pledge" id="pledge" method="post" action="/M/<?=$q_h_token?>">
@@ -138,10 +144,11 @@ if (!sizeof($errors) && $q_submit) {
 signed your pledge.  This is to tell them what to do next.  Remember
 to give your own email address, phone number or website so they can contact
 you again.</p>
-EOF
+<?
 
     if ($need_sms) {
         print <<<EOF
+<h3>SMS message</h3>
 <p><em>We only have the mobile phone numbers for some of the people who have
 signed your pledge &mdash; not their email addresses</em>. To reach them,
 please enter a short (160 or fewer characters) summary of your main message,
@@ -153,31 +160,42 @@ function count_sms_characters() {
     /* XXX should really use the DOM for that but that requires a little
      * appendChild/removeChild dance that might not even work in old
      * browsers. So do it lazily instead: */
-    document.getElementById("smslengthcounter").innerHTML = "Used " + n + " characters; " + (160 - n) + " remain.";
+    if (n <= 160)
+        text = "You have used " + n + " characters; " + (160 - n) + " remain.";
+    else
+        text = "<b>You have used " + n + " characters, which is " + (n - 160) + " more than will fit in an SMS. Please make your message shorter.</b>";
+    document.getElementById("smslengthcounter").innerHTML = text;
 }
 //-->
 </script>
-<p><input
-        type="text"
-        name="message_sms"
-        size="72"
-        maxlength="160"
-        value="$q_h_message_sms"
-        onKeyUp="count_sms_characters()"></p>
-<p><small><span id="smslengthcounter"></span>
+<p><textarea
+    name="message_sms"
+    id="message_sms"
+    cols="72"
+    rows="3"
+    onKeyUp="count_sms_characters()"
+    onChange="count_sms_characters()"
+    onClick="count_sms_characters()"
+    onMouseUp="count_sms_characters()"
+    onMouseMove="count_sms_characters()">$q_h_message_sms</textarea></p>
+<p><small><span id="smslengthcounter"></span></small></p>
 <script type="text/javascript">
 <!--
+// One call to show the initial count.
 count_sms_characters();
 //-->
 </script>
-EOF
+<h3>Email message</h3>
+EOF;
     }
 
     ?>
 
-<p><textarea name="message_body" id="message_body" cols="72" rows="20">
-<?=$q_h_message_body?>
-</textarea></p>
+<p><textarea
+    name="message_body"
+    id="message_body"
+    cols="72"
+    rows="20"><?=$q_h_message_body?></textarea></p>
 
 <p>(Did you remember to give your email address or phone number?) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
 </form>

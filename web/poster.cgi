@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.4 2005-03-04 15:07:31 matthew Exp $
+# $Id: poster.cgi,v 1.5 2005-03-04 15:30:19 matthew Exp $
 #
 
 import sys
@@ -34,6 +34,22 @@ q.execute('SELECT title, date FROM pledges WHERE ref = %s', ref)
 (title,date) = q.fetchone()
 q.close()
 db.close()
+
+def ordinal(day):
+    if day==11 or day==12:
+        return 'th'
+    day = day % 10
+    if day==1:
+        return 'st'
+    elif day==2:
+        return 'nd'
+    elif day==3:
+        return 'rd'
+    return 'th'
+
+title = "I will %s" % title
+day = date.day
+date = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm

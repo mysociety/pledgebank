@@ -6,12 +6,12 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.5 2005-03-04 15:30:19 matthew Exp $
+# $Id: poster.cgi,v 1.6 2005-03-04 16:12:24 matthew Exp $
 #
 
+import os
 import sys
-import cgi
-import cgitb; cgitb.enable()
+from posix import environ
 from time import time
 from pyPgSQL import PgSQL
 
@@ -21,14 +21,28 @@ sys.path.append("../../pylib")
 import mysociety.config
 mysociety.config.set_file("../conf/general")
 
+path_info = environ.get('PATH_INFO').split('/')[1:]
+if len(path_info)>0:
+    ref = path_info[0]
+if len(path_info)>1:
+    size = path_info[1]
+else:
+    size = 'A4'
+if len(path_info)>2:
+    type = path_info[2]
+else:
+    type = 'cards'
+
+outdir = mysociety.config.get("PB_PDF_CACHE")
+outfile = "%s_%s_%s.pdf" % (ref, size, type)
+
+if os.path.exists(outdir + '/' + outfile):
+    print "Location: %s/%s" % (mysociety.config.get('PB_PDF_URL'), outfile)
+    print
+    print "<h1>301 Found</h1>"
+    sys.exit()
+
 db = PgSQL.connect('::pb:matthew:')
-
-form = cgi.FieldStorage()
-ref = form.getfirst("ref", "")
-type = form.getfirst("type", "cards")
-size = form.getfirst("size", "A4")
-
-# print "Content-Type: text/html\r\n\r\n";
 q = db.cursor()
 q.execute('SELECT title, date FROM pledges WHERE ref = %s', ref)
 (title,date) = q.fetchone()
@@ -53,9 +67,6 @@ date = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
-
-outdir = mysociety.config.get("PB_PDF_CACHE")
-outfile = "%s_%s.pdf" % (ref, type)
 
 def draw_pledge(x, y):
     text = "\"%s\"" % title

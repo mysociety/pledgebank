@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.45 2005-03-04 15:07:31 matthew Exp $
+// $Id: index.php,v 1.46 2005-03-04 16:12:24 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -88,7 +88,7 @@ function pledge_form($data = array(), $errors = array()) {
 ?>
 <!-- <p>To create a new pledge, please fill in the form below.</p> -->
 <form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
-<h2>New Pledge &#8210; Step 1</h2>
+<h2>New Pledge &#8211; Step 1</h2>
 <p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="action" id="action" value="<? if (isset($data['action'])) print htmlspecialchars($data['action']) ?>" size="82"></p>
 <p>if <select name="comparison"><option value="atleast">at least</option><option value="exactly">exactly</option></select>
 <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="people" name="people" value="<?=(isset($data['people'])?htmlspecialchars($data['people']):'3') ?>">
@@ -133,7 +133,7 @@ function pledge_form_two($data, $errors = array()) {
 </div>
 
 <form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="2">
-<h2>New Pledge &#8210; Step 2 (optional)</h2>
+<h2>New Pledge &#8211; Step 2 (optional)</h2>
 
 <p>Where does your pledge apply?
 <select name="country"><option>Global<option>UK</select>
@@ -637,16 +637,8 @@ function pdfs() {
     $ref = get_http_var('pdf');
 	$q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
 	$row = db_fetch_array($q);
-        if (file_exists(OPTION_PB_PDF_CACHE . '/' . $ref . '_cards.pdf')) {
-            $pdf_cards_url = new_url(OPTION_PB_PDF_URL . '/' . $ref . '_cards.pdf', false);
-        } else {
-            $pdf_cards_url = new_url("poster.cgi", false, 'ref', $ref, 'type', 'cards', 'size', 'A4');
-        }
-        if (file_exists(OPTION_PB_PDF_CACHE . '/' . $ref . '_tearoff.pdf')) {
-            $pdf_tearoff_url = new_url(OPTION_PB_PDF_URL . '/' . $ref . '_tearoff.pdf', false);
-        } else {
-            $pdf_tearoff_url = new_url("poster.cgi", false, 'ref', $ref, 'type', 'tearoff', 'size', 'A4');
-        }
+        $pdf_cards_url = new_url("poster.cgi/$ref/A4/cards", false);
+        $pdf_tearoff_url = new_url("poster.cgi/$ref/A4/tearoff", false);
     ?>
 <h2>Customised Flyers</h2>
 <p>Below you can generate <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>

@@ -23,7 +23,7 @@ if (get_magic_quotes_gpc()) {
 
 $db = db_connect();
 
-$now = time() - 720;
+$now = time();
 $nowA = array( 'day' => date('d'), 'month' => date('m'), 'year' => date('Y') );
 
 page_header();
@@ -108,7 +108,7 @@ function pledge_form_submitted() {
 		$errors[] = 'The deadline must be in the future';
 	}
 	if (!$ref) $errors[] = 'Please enter a PledgeBank reference';
-	if (preg_match('/[^a-z0-9_-]/i',$ref)) $errors[] = 'The reference must only contain letters, numbers, _ and -';
+	if (preg_match('/[^a-z0-9-]/i',$ref)) $errors[] = 'The reference must only contain letters, numbers, -';
 	if ($date['error']) $errors[] = 'Please enter a valid date';
 	if (!$name) $errors[] = 'Please enter your name';
 	if (!$email) $errors[] = 'Please enter your email address';

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.9 2005-03-11 18:33:20 francis Exp $
+ * $Id: daily,v 1.10 2005-03-14 12:56:22 francis Exp $
  *
  */
 
@@ -67,6 +67,7 @@ function check_for_completed_pledges() {
                 print "Failure sending success messages, pledge $r[id] ($r[title])\n";
             else {
                 db_query('UPDATE pledges SET completionnotified = true WHERE id = ?', $r['id']);
+                db_query('UPDATE pledges SET success = true WHERE id = ?', $r['id']);
                 if ($verbose)
                     print "Success messages sent for pledge $r[id] ($r[title])\n";
             }

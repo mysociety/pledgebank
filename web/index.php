@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.63 2005-03-08 15:42:32 francis Exp $
+// $Id: index.php,v 1.64 2005-03-08 16:30:53 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -324,21 +324,26 @@ doesn't work, or you have any other suggests or comments.
 <input type="text" id="s" name="search" size="10" value=""></p>
 <p style="margin-top: 1em; text-align: right"><input type="submit" value="Go"></p>
 </form>
-<h2>Sign up to one of our five newest pledges</h2>
-<?	$q = db_query('SELECT *, date - CURRENT_DATE AS daysleft FROM pledges WHERE date >= CURRENT_DATE AND confirmed AND password=\'\' ORDER BY id DESC LIMIT 10');
+<h2>Sign up to one of our five newest pledges</h2><?
+
+    $q = db_query("
+                SELECT *, date - CURRENT_DATE AS daysleft
+                FROM pledges
+                WHERE date >= CURRENT_DATE AND password = ''
+                ORDER BY id
+                DESC LIMIT 5");
     $new = '';
-    $k = 5;
-    while ($k && $r = db_fetch_array($q)) {
-        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ? AND confirmed', array($r['id']));
-        $days = $r['daysleft'];
-        $new .= '<li>' . htmlspecialchars($r['name']) . ' will <a href="' . $r['ref'] . '">' . htmlspecialchars($r['title']) . '</a> if ';
-        $new .= comparison_nice($r['comparison']) . ' ' . htmlspecialchars(prettify($r['target'])) . ' other ' . $r['type'] . ' ';
-        $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
-        $new .= ' (';
-        $new .= $days . ' '.make_plural($days,'day').' left';
-#			$new .= 'by '.htmlspecialchars($r['date']);
-        $new .= ', '.prettify($r['target']-$signatures).' more needed)</li>'."\n";
-        $k--;
+    while ($r = db_fetch_array($q)) {
+        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
+        $new .= '<li><a href="'
+                        . htmlspecialchars($r['ref'])
+                        . '">'
+                    . pledge_sentence($r['id'], false, true)
+                    . " (${r['daysleft']} "
+                        . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
+                        . " left), "
+                    . prettify($r['target'] - $signatures)
+                    . " more needed</a></li>";
     }
     if (!$new) {
         print '<p>No pledges yet!</p>';
@@ -347,25 +352,34 @@ doesn't work, or you have any other suggests or comments.
     }
 ?>
 
-<h2>Five Highest Signup Pledges</h2>
-<?	$q = db_query('SELECT pledges.id, pledges.name, pledges.title,
-pledges.signup, pledges.date, pledges.target, pledges.type, pledges.ref, pledges.comparison,
-COUNT(signers.id) AS count, max(date)-CURRENT_DATE
-AS daysleft FROM pledges, signers WHERE pledges.id=signers.pledge_id AND
-pledges.date>=CURRENT_DATE AND pledges.confirmed AND signers.confirmed AND pledges.password=\'\' GROUP
-BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type,pledges.signup,pledges.ref,pledges.comparison ORDER BY count DESC');
+<h2>Five Highest Signup Pledges</h2><?
+
+    $q = db_query("
+            SELECT pledges.id, pledges.name, pledges.title, pledges.signup,
+                pledges.date, pledges.target, pledges.type, pledges.ref,
+                pledges.comparison, COUNT(signers.id) AS count,
+                max(date) - CURRENT_DATE AS daysleft
+            FROM pledges, signers
+            WHERE pledges.id = signers.pledge_id
+                AND pledges.date >= CURRENT_DATE AND pledges.confirmed
+                AND pledges.password = ''
+            GROUP BY pledges.id, pledges.name, pledges.title, pledges.date,
+                pledges.target, pledges.type, pledges.signup, pledges.ref,
+                pledges.comparison
+            ORDER BY count DESC
+            limit 5");
     $new = '';
-    $k = 5;
-    while ($k && $r = db_fetch_array($q)) {
-        $days = $r['daysleft'];
-        $new .= '<li>'.$r['count'].' '.make_plural($r['count'],'pledge').' : '.htmlspecialchars($r['name']).' will <a href="'.$r['ref'].'">';
-        $new .= htmlspecialchars($r['title']).'</a> if ';
-        $new .= comparison_nice($r['comparison']) . ' ' . htmlspecialchars(prettify($r['target'])).' other ' . htmlspecialchars($r['type']) . ' ';
-        $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
-        $new .= ' (';
-        $new .= 'by '.prettify(htmlspecialchars($r['date']));
-        $new .= ')</li>'."\n";
-        $k--;
+    while ($r = db_fetch_array($q)) {
+        $signatures = $r['count'];
+        $new .= '<li><a href="'
+                        . htmlspecialchars($r['ref'])
+                        . '">'
+                    . pledge_sentence($r['id'], false, true)
+                    . " (${r['daysleft']} "
+                        . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
+                        . " left), "
+                    . prettify($r['target'] - $signatures)
+                    . " more needed</a></li>";
     }
     if (!$new) {
         print '<p>No pledges yet!</p>';
@@ -382,133 +396,75 @@ function view_faq() {
 function add_signatory() {
     global $today;
 
-    global $q_email, $q_name, $q_showname, $q_pledge_id, $q_pw;
+    global $q_email, $q_ref, $q_pw;
     if (!is_null(importparams(
             array('email',      '//',           ''),
-            array('name',       '//',           ''),
-            array('showname',   '/^1$/',        '', '0'),
-            array('pledge_id',  '/^[a-z-]+$/i', ''),    /* NB really a reference, not an ID */
+            array('ref',        '/^[a-z-]+$/i', ''),    /* NB really a reference, not an ID */
             array('pw',         '//',           '', null)
             )))
         err("Bad parameters in add_signatory.");
 
-    $r = db_getRow('select id, title, password from pledges where ref = ?', $q_pledge_id);
+    $r = db_getRow('select id, title, password from pledges where ref = ?', $q_ref);
 
     if (!is_null($r['password']) && (is_null($q_pw) || $q_pw != $r['password']))
         err("Permission denied");
 
-    $R = pledge_sign($r['id'], $q_name, $q_showname, $q_email);
-    if (is_string($R))
-        err($R);
-        /* XXX really bad -- we leak information about who has signed
-        up to pledges here. In the case where the email address has already
-        signed up, we should just send out another confirmation email to the
-        same user, if they haven't confirmed; if they have, then send nothing;
-        and in any case just show the usual "success" note to the user. */
+    /* The exact mail we send depends on whether we're already signed up to
+     * this pledge. */
+    $id = db_getOne('select id from signers where pledge_id = ? and email = ?', array($r['id'], $q_email));
+    if (defined($id)) {
+        $success = pb_send_email(
+                $q_email,
+                "Already signed up to \"${r['title']}\" at PledgeBank.com",
+                <<<EOF
 
-    list($signer_id, $token) = $R;
+Thanks for signing up to this pledge at PledgeBank, but
+according to our records you have already signed it.
 
-    $link = str_replace('index.php', '', 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'] . '?confirms=' . $token);
-    $success = pb_send_email($q_email, 'Signing up to "'. $r['title'] .'" at PledgeBank.com', "Thank you for submitting your signature to a pledge at PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
-    
-    if ($success) {
-        db_commit();
-        global $q_h_pledge_id;
-    ?>
-<p>An email has been sent to the address you gave to confirm it is yours. <strong>Please check your email, and follow the link given there.</strong> <a href="<?=$q_h_pledge_id ?>">Back to pledge page</a></p>
-<?      return true;
+Good luck with your pledge!
+
+-- 
+PledgeBank.com
+a mySociety project
+EOF
+            );
     } else {
-        db_rollback();
+        /* Generate a secure URL to send to the user. */
+        $token = pledge_email_token($q_email, $r['id']);
+        /* ";" is not used in base64 */
+        $url = OPTION_BASE_URL . "C/" . urlencode($q_email) . ";" . $r['id'] . ";$token";
+
+        $success = pb_send_email(
+                $q_email,
+                "Signing up to \"${r['title']}\" at PledgeBank.com",
+                <<<EOF
+Thank you for signing a pledge at PledgeBank. To confirm your
+email address, please click on this link:
+
+ $url
+
+-- 
+PledgeBank.com
+a mySociety project
+EOF
+            );
+    }
+
+    if ($success) {
+    ?>
+<p><strong>Now check your email</strong></p>
+<p>We've sent you an email to confirm your address. Please follow the link
+we've sent to you to finish signing this pledge.</p>
+<?
+        return true;
+    } else {
 ?>
-<p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>'
+<p>We seem to be having some technical problems. Please could try again in a
+few minutes, making sure that you carefully check the email address you give.
+</p>
 <?
         return false;
     }
-}
-
-# Pledger has clicked on link in their email
-function confirm_signatory() {
-    global $q_confirms, $q_unchecked_h_confirms;
-    if (!is_null(importparams(
-                array('confirms', '/^[0-9a-f]{8}-[0-9a-f]{8}$/', '')
-            )))
-        err("Bad confirmation token '$q_unchecked_h_confirms'");
-
-    $r = db_getRow('
-                select pledge_id, signers.confirmed as confirmed, ref, title, date
-                from signers, pledges
-                where signers.token = ? and pledges.id = signers.pledge_id
-                for update', $q_confirms);
-    if (!$r)
-        err("Bad confirmation token '$q_unchecked_h_confirms'");
-
-    $pledge_id = $r['pledge_id'];
-    $confirmed = ($r['confirmed'] == 't');
-    
-    $justreachedtarget = false;
-    if (!$confirmed) {
-        db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($q_confirms));
-        /* Find out if the pledge has just reached its target. */
-        if (db_getOne('
-                    select count(signers.id) - (select target from pledges where id = ?)
-                    from signers
-                    where pledge_id = ? and confirmed',
-                array($pledge_id, $pledge_id)) >= 0) 
-        {
-            $justreachedtarget = true;
-        }
-    }
-        
-    db_commit();
-
-    print <<<EOF
-<p>Thank you for confirming your signature!</p>
-EOF;
-
-    if ($justreachedtarget) {
-        print <<<EOF
-<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>
-EOF;
-        send_success_email($pledge_id); /* XXX */
-    } else {
-?>
-<p><a href="<?=htmlspecialchars($r['ref']) ?>/flyers">View and print Customised Flyers for this pledge</a></p>
-
-<p align="center"><big>Why not <strong>
-<script type="text/javascript">
-    document.write('<a href="javascript: window.print()">HIT PRINT</a>');
-</script>
-<noscript>
-HIT PRINT
-</noscript>
-</strong> now and get these example cards below, for you to cut out and give to your friends and neighbours?</big></p>
-
-<style type="text/css">
-table {
-    border: none;
-    margin: 0 auto;
-    max-width: 90%;
-}
-td {
-    border: solid 2px black;
-}
-</style>
-<table border="1" cellpadding="10" cellspacing="20"><?
-
-for ($rows = 0; $rows<4; $rows++) {
-    print '<tr align="center">';
-    for ($cols=0; $cols<2; $cols++) {
-        print '<td>';
-        print '<strong>"I will ' . htmlspecialchars($r['title']) . '"</strong>';
-        print '<br>Deadline: ' . prettify($r['date']);
-        print '<br>www.pledgebank.com/' . htmlspecialchars($r['ref']);
-        print '</td>';
-    }
-    print '</tr>';
-}
-?>
-</table>
-<?  }
 }
 
 function send_success_email($pledge_id) {
@@ -581,36 +537,40 @@ function view_pledge() {
 	$left = $people - $curr;
 
 	$finished = 0;
-	if ($r['date']<$today) {
+        $print_signup_form = 1;
+	if ($r['date'] < $today) {
             $finished = 1;
 	    print '<p class="finished">This pledge is now closed, its deadline has passed.</p>';
+            $print_signup_form = 1;
         }
-	if ($left<=0) {
+	if ($left <= 0) {
             if ($comparison == 'exactly') {
                 $finished = 1;
+                $print_signup_form = 0;
                 print '<p class="finished">This pledge is now closed, its target has been reached.</p>';
+            } else {
+                print '<p class="success">This pledge has been successful!</p>';
             }
-	    print '<p class="success">This pledge has been successful!</p>';
 	}
 ?>
 <p>Here is the pledge:</p>
 <form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 <input type="hidden" name="pw" value="<?=htmlspecialchars($pw) ?>">
-<input type="hidden" name="add_signatory" value="1">
 <p style="margin-top: 0">&quot;I will <strong><?=htmlspecialchars($action) ?></strong> if <strong><?=htmlspecialchars($comparison) ?></strong> <strong><?=htmlspecialchars(prettify($people)) ?></strong> <?=htmlspecialchars($type) ?> <?=($signup=='sign up'?'will do the same':$signup) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($date) ?></strong></p>
 
 <p style="text-align: center; font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target :) )':', '.prettify($left).' more needed') ?></p>
 
-<? if (!$finished) { ?>
+<? if ($print_signup_form) { ?>
 <div style="text-align: left; margin-left: 50%;">
 <h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
-<p style="text-align: left">Name: <input type="text" size="20" name="name" value="<?=htmlspecialchars(get_http_var('name')) ?>">
-<br>Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
+<p style="text-align: left">
+<input type="hidden" name="add_signatory" value="1">
+<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>"
+Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
+<input type="submit" name="submit" value="Submit">
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
-<br>Show my name on this pledge: <input type="checkbox" name="showname" value="1" checked>
-&nbsp;
-<input type="submit" name="submit" value="Submit"></p>
+</p>
 </div>
 <? }
 

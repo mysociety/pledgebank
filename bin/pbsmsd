@@ -10,7 +10,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.17 2005-03-30 11:07:14 sandpit Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.18 2005-03-30 11:16:02 sandpit Exp $';
 
 use strict;
 require 5.8.0;
@@ -364,11 +364,12 @@ sub run_gathering_process () {
                     # recent than $min_id which we didn't get a status
                     # indication for above, in case any status reports have
                     # been lost.
-                    dbh()->do('
+                    my $num = dbh()->do('
                             update outgoingsms
                             set laststatuscheck = ?
-                            where foreignid >= ? and laststatuscheck is null',
+                            where foreignid >= ?', # and laststatuscheck is null',
                             {}, time(), $min_id);
+                    print_log('debug', "get receipts: marked " . int($num) . " unchecked messages as having had status checked") if ($num > 0);
                 }
             }
         } else {
@@ -677,5 +678,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.17 2005-03-30 11:07:14 sandpit Exp $
+$Id: pbsmsd,v 1.18 2005-03-30 11:16:02 sandpit Exp $
 

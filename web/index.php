@@ -126,13 +126,14 @@ doesn't work, or you have any other suggests or comments.
     $new = '';
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {
+        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ? AND confirmed=1', array($r['id']));
         $days = $r['daysleft'];
         $new .= '<li>' . htmlspecialchars($r['name']) . ' will <a href="./?pledge=' . $r['id'] . '">' . htmlspecialchars($r['title']) . '</a> if ' . htmlspecialchars($r['target']) . ' other ' . $r['type'] . ' ';
         $new .= ($r['signup']=='sign up' ? 'will too' : $r['signup']);
         $new .= ' (';
         $new .= $days . ' '.make_plural($days,'day').' left';
 #			$new .= 'by '.htmlspecialchars($r['date']);
-        $new .= ')</li>'."\n";
+        $new .= ', '.($r['target']-$signatures).' more needed)</li>'."\n";
         $k--;
     }
     if (!$new) {
@@ -148,7 +149,7 @@ pledges.signup, pledges.date, pledges.target, pledges.type,
 COUNT(signers.id) AS count, max(date)-CURRENT_DATE
 AS daysleft FROM pledges, signers WHERE pledges.id=signers.pledge_id AND
 pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed=1 GROUP
-BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type ORDER BY count DESC');
+BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type,pledges.signup ORDER BY count DESC');
     $new = '';
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {

@@ -21,11 +21,20 @@ function db_connect() {
 
 function db_query($query, $params = array()) {
     global $pbdb;
-	$result = $pbdb->query($query, $params);
+    $result = $pbdb->query($query, $params);
     if (DB::isError($result)) {
-	    die($result->getMessage().': "'.$result->getDebugInfo().'"');
+        die($result->getMessage().': "'.$result->getDebugInfo().'"');
     }
-	return $result;
+    return $result;
+}
+
+function db_getOne($query, $params = array()) {
+    global $pbdb;
+    $result = $pbdb->getOne($query, $params);
+    if (DB::isError($result)) {
+        die($result->getMessage().': "'.$result->getDebugInfo().'"');
+    }
+    return $result;
 }
 
 function db_fetch_array($q) {

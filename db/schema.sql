@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.31 2005-03-15 13:02:45 chris Exp $
+-- $Id: schema.sql,v 1.32 2005-03-15 17:02:55 chris Exp $
 --
 
 -- secret
@@ -254,7 +254,7 @@ create unique index smssubscription_token_idx on smssubscription(token);
 -- Sign up from an SMS subscription. Supply either the ID of an outgoing SMS
 -- subscription message; or a TOKEN sent in such a message. Returns a code as
 -- from pledge_is_valid_to_sign.
-create or replace function smssubscription_sign(integer, text)
+create function smssubscription_sign(integer, text)
     returns text as '
     declare
         p record;
@@ -324,8 +324,10 @@ create or replace function smssubscription_sign(integer, text)
             select nextval(''signers_id_seq'')
         );
 
-        insert into signers (id, pledge_id, mobile, signtime)
-            values (t_signer_id, t_pledge_id, t_mobile, current_timestamp);
+        -- showname = true here so that they will appear as a "person whose
+        -- name we do not know" rather than an anonymous person
+        insert into signers (id, pledge_id, mobile, showname, signtime)
+            values (t_signer_id, t_pledge_id, t_mobile, true, current_timestamp);
 
         if t_token is null then
             t_token = (

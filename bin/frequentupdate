@@ -1,14 +1,14 @@
 #!/usr/local/bin/php -q
 <?php
-
-/* daily:
- * To be run daily, just after midnight, to send out failure messages
- * (And probably things like "wow, look how many you over-subscribed" messages)
+/* 
+ * frequentupdate:
+ * Run from cron regularly to detect pledges which have succeeded/failed and
+ * so forth, and take appropriate action.
  *
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.4 2005-04-04 00:55:03 francis Exp $
+ * $Id: frequentupdate,v 1.5 2005-04-05 10:49:41 sandpit Exp $
  *
  */
 

@@ -4,8 +4,8 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab,v 1.1 2005-03-04 11:45:47 francis Exp $
+# $Id: crontab,v 1.2 2005-03-04 11:52:30 francis Exp $
 
-5 0 * * * /data/vhost/www.pledgebank.com/mysociety/pb/daily
+5 0 * * * /data/vhost/www.pledgebank.com/mysociety/pb/bin/daily
 
 

@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.20 2005-03-22 14:23:01 sandpit Exp $
+# $Id: poster.cgi,v 1.21 2005-03-24 14:09:56 francis Exp $
 #
 
 import os
@@ -358,7 +358,8 @@ in conf/general.  This cache is not used on the command line.""")
         os.rename(canvasfilename, outdir + '/' + outpdf)
             
         # Generate any other file type
-        os.spawnlp(os.P_WAIT, "convert", "convert", outdir + '/' + outpdf, outdir + '/' + outfile)
+        if format != 'pdf':
+            os.spawnlp(os.P_WAIT, "convert", "convert", outdir + '/' + outpdf, outdir + '/' + outfile)
 
         file_to_stdout(outdir + '/' + outfile)
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.2 2005-03-08 20:28:22 matthew Exp $
+ * $Id: confirm.php,v 1.3 2005-03-09 18:10:21 francis Exp $
  * 
  */
 
@@ -28,11 +28,14 @@ if (!is_null($err))
 
 # Pledge confirmation
 if (!$q_email && !$q_pledge) {
+print $q_token;
     $q = db_query('SELECT ref, title, date, confirmed FROM pledges WHERE token = ? for update', array($q_token));
+    print "moose";
+    print db_num_rows($q);
+print "chese";
     $r = db_fetch_array($q);
     if (!$r) {
-        print '<p>Confirmation token not recognised!</p>';
-        return false;
+        err('Confirmation token not recognised!');
     }
     page_header($r['title'] . ' - Sign Up');
 
@@ -47,6 +50,7 @@ if (!$q_email && !$q_pledge) {
     return true;
 }
 
+print "$q_email##$q_pledge##$q_token**". pledge_email_token($q_email, $q_pledge, $q_token);
 if (pledge_email_token($q_email, $q_pledge, $q_token) != $q_token) 
     err("Sorry -- something seems to have gone wrong");
 

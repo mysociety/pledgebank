@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.23 2005-03-09 10:30:20 chris Exp $
+-- $Id: schema.sql,v 1.24 2005-03-09 18:10:21 francis Exp $
 --
 
 -- secret
@@ -160,7 +160,7 @@ create unique index signers_pledge_id_email_idx on signers(pledge_id, email);
 -- a subscription request, not receive the reply message and then (perhaps
 -- impatiently) send a further signup request.
 create table pledges_outgoingsms (
-    pledge_id integer not null references pledge(id),
+    pledge_id integer not null references pledges(id),
     outgoingsms_id integer not null references outgoingsms(id),
     -- Since the URL in the SMS probably has to be typed in by the user, have
     -- a short unique token rather than using the Magic of Cryptography(TM).

@@ -8,22 +8,36 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: daily,v 1.6 2005-03-08 15:51:45 francis Exp $
+ * $Id: daily,v 1.7 2005-03-09 18:10:20 francis Exp $
  *
  */
 
-$short_opts = 'vn';
-$long_opts = array('verbose','nomail');
+$short_opts = '';
+$long_opts = array('verbose','testrun','today=','help');
 require_once 'phpcgi';
 $switches = $options[0];
 $args = $options[1];
-$verbose = 0; $nomail = 0;
-foreach ($switches as $switch) {
-    if ($switch[0]=='v' || substr($switch[0],0,3)=='--v') $verbose = 1;
-    if ($switch[0]=='n' || substr($switch[0],0,3)=='--n') $nomail = 1;
-}
-
+$verbose = 0; $testrun = 0;
 $today = date('Y-m-d');
+foreach ($switches as $switch) {
+    if ($switch[0]=='--verbose') $verbose = 1;
+    if ($switch[0]=='--testrun') $testrun = 1;
+    if ($switch[0]=='--today') $today = $switch[1];
+    if ($switch[0]=='--help') {
+?>
+
+PledgeBank daily script, run just after midnight
+./daily [--testrun] [--verbose] [--today=YYYY-MM-DD]
+
+--verbose    Display more information
+--testrun    Dry run, just show what would do
+--today=DATE Pretend that the date today is as specified 
+(useful for testing things that only happen in the future)
+
+<?
+        exit;
+    }
+}
 
 require_once "../conf/general";
 include_once '../phplib/db.php';
@@ -40,7 +54,7 @@ while ($r = db_fetch_array($q)) {
     if ($r['date'] == $today) {
         if ($signatures < $r['target']) {
             # Failure
-            if ($nomail)
+            if ($testrun)
                 print "Would send failure messages for pledge $r[id] ($r[title])\n";
             elseif (!send_failure_email($r))
                 print "Failure sending one or more failure messages to pledgees of pledge $r[id] ($r[title])\n";
@@ -50,7 +64,7 @@ while ($r = db_fetch_array($q)) {
             # Email pledge creator with success
             $subject = 'PledgeBank pledge completion - "' . $r['title'] . '"';
             $body = "Dear $r[name],\n\nWe are pleased to tell you that your pledge " . ($signatures>$r['target']?'exceeded':'met') . " its target in the required time.\n\nWoohoo!.";
-            if ($nomail)
+            if ($testrun)
                 print "Would send success message to pledge creator for pledge $r[id] ($r[title])\n";
             elseif (!pb_send_email($r['email'], $subject, $body))
                 print "Failure sending success message to pledge creator, pledge $r[id] ($r[title])\n";

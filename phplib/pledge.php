@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.6 2005-03-08 17:18:11 chris Exp $
+ * $Id: pledge.php,v 1.7 2005-03-09 18:10:21 francis Exp $
  * 
  */
 
@@ -32,7 +32,12 @@ function pledge_email_token($email, $pledge, $salt = null) {
     $h = pack('H*', sha1($salt . $email . $pledge . db_secret()));
     /* Don't send the full SHA1 hash, because we don't want our URLs to be too
      * long (at some marginal risk to security...). */
-    return $salt . "_" . base64_encode(substr(&$h, 0, 12));
+    $b64 = base64_encode(substr(&$h, 0, 12));
+    // Use URL friendly codes
+    $b64 = str_replace("+", ".", $b64);
+    $b64 = str_replace("/", ",", $b64);
+    $b64 = str_replace("=", "-", $b64);
+    return $salt . "_" . $b64;
 }
 
 /* PLEDGE_...

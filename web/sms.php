@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.2 2005-03-08 17:18:33 chris Exp $
+ * $Id: sms.php,v 1.3 2005-03-09 18:10:21 francis Exp $
  * 
  */
 
@@ -30,7 +30,7 @@ page_header('SMS');
 if (is_null($q_token)) {
     print <<<EOF
             <p>
-        Sorry, we can't make sense of the code '$q_unchecked_h_token'. Please
+        Sorry, we can't make sense of the code '$q_h_unchecked_token'. Please
         could you re-check the address you typed in; the last part of it should
         be two groups of four letters and numbers, joined by a hyphen ("-"),
         something like "1234-abcd"
@@ -91,6 +91,5 @@ EOF;
 Show my name on this pledge: <input name="showname" value="1" checked="checked" type="checkbox"><br/>
 <input type="submit" name="submit" value="Submit">
 EOF;
-}
 
 ?>

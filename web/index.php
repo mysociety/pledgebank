@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.65 2005-03-08 20:28:22 matthew Exp $
+// $Id: index.php,v 1.66 2005-03-09 18:10:21 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -79,7 +79,7 @@ page_footer();
 # --------------------------------------------------------------------
 
 function report_form() {
-    $q = db_query('SELECT title, signers.name AS name FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.confirmed AND signers.id=?', array(get_http_var('report')));
+    $q = db_query('SELECT title, signers.name AS name FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.id=?', array(get_http_var('report')));
     if (!db_num_rows($q)) {
         print '<p>Illegal PledgeBank id!</p>';
 	return false;
@@ -426,7 +426,7 @@ EOF
         /* Generate a secure URL to send to the user. */
         $token = pledge_email_token($q_email, $r['id']);
         /* ";" is not used in base64 */
-        $url = OPTION_BASE_URL . "C/" . urlencode($q_email) . ";" . $r['id'] . ';' . urlencode($token);
+        $url = OPTION_BASE_URL . "/C/" . urlencode($q_email) . ";" . $r['id'] . ';' . urlencode($token);
 
         $success = pb_send_email(
                 $q_email,
@@ -466,11 +466,11 @@ function send_success_email($pledge_id) {
     $r = db_fetch_array($q);
     $globalsuccess = 1;
     $action = $r['title'];
-    $body = 'Congratulations! You said "I will '.$r['title'].' if '.comparison_nice($r['comparison']).' '.prettify($r['target']).' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL.$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
+    $body = 'Congratulations! You said "I will '.$r['title'].' if '.comparison_nice($r['comparison']).' '.prettify($r['target']).' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL."/".$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
     $success = pb_send_email($r['email'], 'PledgeBank pledge success!', $body);
     if ($success==0) 
         $globalsuccess = 0;
-    $q = db_query('SELECT * FROM signers WHERE pledge_id=? AND signers.confirmed', array($pledge_id));
+    $q = db_query('SELECT * FROM signers WHERE pledge_id=?', array($pledge_id));
     $s = db_fetch_array($q);
     while ($s) {
         $success = pb_send_email($s['email'], 'PledgeBank pledge success!', $body);
@@ -526,7 +526,7 @@ function view_pledge() {
     $signup = $r['signup'];
     $detail = $r['detail'];
     $comparison = comparison_nice($r['comparison']);
-	$q = db_query('SELECT * FROM signers WHERE confirmed AND pledge_id=? ORDER BY id', array($r['id']));
+	$q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($r['id']));
 	$curr = db_num_rows($q);
 	$left = $people - $curr;
 
@@ -601,7 +601,7 @@ if ($detail) {
 function create_new_pledge($data) {
     # 'action', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'date', 'signup', 'country', 'postcode', 'password'
 	$isodate = $data['date']['iso'];
-        $token = pledge_email_token($data['email'], $data['ref']);
+    $token = pledge_email_token($data['email'], $data['ref']);
 	$add = db_query('INSERT INTO pledges (title, target, type, signup, date,
         name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, false, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)', 
@@ -611,7 +611,7 @@ function create_new_pledge($data) {
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other
 people to sign up to your pledge after you have clicked the link in the email.</p>
 <?
-	$link = OPTION_BASE_URL . 'C/' . urlencode($token);
+	$link = OPTION_BASE_URL . '/C/' . urlencode($token);
 	$success = pb_send_email($data['email'], 'New pledge at PledgeBank.com : '.$data['action'], "Thank you for submitting your pledge to PledgeBank. To confirm your email address, please click on this link:\n\n$link\n\n");
 	if ($success) {
             db_commit();

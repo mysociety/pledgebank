@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w -I../../perllib
 #
-# run.pl:
+# test-run:
 # Test harness for PledgeBank.  Makes sure we haven't broken the code.
 # 
 # Requires:
@@ -8,19 +8,20 @@
 # * apache configured to serve ../web on OPTION_BASE_URL
 # * a database with name ending "_testharness"; this script will drop and remake the
 #   database, so make sure it is never used for anything important
-# * email addresses (email_n below) configured to pipe to ./mailin.pl with fast
+# * email addresses (email_n below) configured to pipe to ./test-mailin with fast
 #   local delivery
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.1 2005-03-08 15:51:45 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.2 2005-03-09 18:10:20 francis Exp $';
 
 use strict;
 require 5.8.0;
 
 use Data::Dumper;
+use Carp;
 
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
@@ -55,21 +56,34 @@ die "Unable to detect errors from PHP" if !$wth->log_watcher_get_errors();
 #############################################################################
 # Functions to make and sign pledges, and so on
 
-# sign_pledge ACTION WHO SHOW_SIGNATURE
-# Adds a signer to a pledge whose action text is ACTION.  Adds person number
-# WHO.  SHOW_SIGNATURE is 1 for their signature to be public, undef for
-# private.
+# sign_pledge WHO SHOW_SIGNATURE
+# Adds a signer to a pledge, assumes browser is already pointing to pledge
+# signup page.  Adds person number WHO.  SHOW_SIGNATURE is 1 for their
+# signature to be public, undef for private.
 sub sign_pledge {
-    my ($action, $who, $show_signature) = @_;
-    $b->get($base_url);
-    $b->follow_link(text_regex => qr/$action/) or die "Pledge not appeared on front page";
+    my ($who, $show_signature) = @_;
 
     $wth->browser_check_contents("Sign me up");
     $b->submit_form(form_name => 'pledge',
-        fields => { name => name_n($who), email => email_n($who), showname => $show_signature },
+        fields => { 
+            # name => name_n($who), 
+            email => email_n($who), 
+            #showname => $show_signature 
+            },
         button => 'submit') or die "Failed to submit signing form";
-    $wth->browser_check_contents("An email has been sent to the address you gave to confirm it is yours");
+    $wth->browser_check_contents("We've sent you an email to confirm your address");
     $wth->log_watcher_check();
+}
+
+# find_and_sign_pledge ACTION WHO SHOW_SIGNATURE
+# Finds a public pledge from the front page use text ACTION, then calls
+# sign_pledge.
+sub find_and_sign_pledge {
+    my ($action, $who, $show_signature) = @_;
+
+    $b->get($base_url);
+    $b->follow_link(text_regex => qr/$action/) or die "Pledge not appeared on front page";
+    sign_pledge($who, $show_signature);
 }
 
 # confirm_signature ACTION WHO TARGET_REACHED
@@ -81,8 +95,8 @@ sub confirm_signature {
     my $confirmation_email = $wth->email_get_containing(
         '%To: '.email_n($who).
         '%Subject: Signing up to "'.$action.'"'.
-        '%To confirm your email address%');
-    print "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
+        '%To confirm%');
+    print "Confirmation link not found\n" if ($confirmation_email !~ m#^\s*($base_url.*$)#m);
     $b->get($1);
     if ($target_reached) {
         $wth->browser_check_contents("Your signature has made this pledge reach its target!");
@@ -126,7 +140,7 @@ my $pledge_action_private = 'check private pledges are private';
 my $private_password = 'zx3uuhai';
 create_pledge(0, 
     { action => $pledge_action_private, 
-        people => '3', date => 'tomorrow', ref => 'privatepledge',
+        people => '10', date => '2010-06-01', ref => 'privatepledge',
         comparison => 'exactly' },
     { visibility => 'password', password => $private_password}
 );
@@ -142,6 +156,11 @@ $b->submit_form(form_name => 'pledge',
         fields => { pw => $private_password },
         button => 'submit') or die "Failed to submit password form";
 $wth->browser_check_contents($pledge_action_private);
+
+sign_pledge(1, 1);
+confirm_signature($pledge_action_private, 1);
+
+`./daily --verbose --testrun --today=2010-06-02`;
 
 #############################################################################
 print "Testing successful completion of a pledge...\n" if $verbose > 0;
@@ -159,7 +178,7 @@ for (my $i = 1; $i <= 3; ++$i) {
     print "Signing the pledge $i...\n" if $verbose > 0;
     # Don't show name for one of the users
     my $show_signature = ($i == 2) ? undef : 1;
-    sign_pledge($pledge_action_completion, $i, $show_signature);
+    find_and_sign_pledge($pledge_action_completion, $i, $show_signature);
 }
 for (my $i = 1; $i <= 3; ++$i) {
     print "Confirming signature $i...\n" if $verbose > 0;
@@ -167,7 +186,7 @@ for (my $i = 1; $i <= 3; ++$i) {
     confirm_signature($pledge_action_completion, $i);
 }
 # To do, make extra signature and check doesn't work
-#sign_pledge($pledge_action_completion, 4, 1);
+#find_and_sign_pledge($pledge_action_completion, 4, 1);
 #confirm_signature($pledge_action_completion, 4);
 # Check it has completed
 print "Final checks...\n" if $verbose > 0;

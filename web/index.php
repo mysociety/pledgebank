@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.59 2005-03-07 16:30:29 chris Exp $
+// $Id: index.php,v 1.60 2005-03-07 16:46:44 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -439,14 +439,16 @@ function confirm_signatory() {
     
     $justreachedtarget = false;
     if (!$confirmed) {
-	db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($q_confirms));
+        db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($q_confirms));
         /* Find out if the pledge has just reached its target. */
         if (db_getOne('
                     select count(signers.id) - (select target from pledges where id = ?)
                     from signers
-                    where pledge_id = ?',
-                array($pledge_id, $pledge_id)) >= 0)
+                    where pledge_id = ? and confirmed',
+                array($pledge_id, $pledge_id)) >= 0) 
+        {
             $justreachedtarget = true;
+        }
     }
         
     db_commit();

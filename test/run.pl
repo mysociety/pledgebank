@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.8 2005-03-07 15:58:57 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: run.pl,v 1.9 2005-03-07 16:46:44 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -95,7 +95,7 @@ for (my $i = 1; $i < 4; ++$i) {
     print "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
     $b->get($1);
     if ($i == 3) {
-        $wth->browser_check_contents("Your signature has made this Pledge reach its target!");
+        $wth->browser_check_contents("Your signature has made this pledge reach its target!");
     } else {
         $wth->browser_check_contents("Thank you for confirming your signature");
     }

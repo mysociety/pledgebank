@@ -422,7 +422,7 @@ function confirm_pledge() {
 		return false;
 	}
 
-	db_query('UPDATE pledges SET confirmed=1 WHERE token = ?', array($token));
+	db_query('UPDATE pledges SET confirmed=1,creationtime=CURRENT_TIMESTAMP WHERE token = ?', array($token));
 	$success = db_affected_rows();
 	if ($success) { ?>
 <p>Thank you for confirming that pledge. It is now live, and people can sign up to it. OTHER STUFF.</p>

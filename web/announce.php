@@ -1,12 +1,12 @@
 <?php
 /*
- * confirm.php:
- * Confirm a user's subscription to a pledge, or creation of a pledge.
+ * announce.php:
+ * Send an announcement to the pledge signers.
  * 
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.2 2005-04-04 11:25:21 francis Exp $
+ * $Id: announce.php,v 1.3 2005-04-04 11:58:40 chris Exp $
  * 
  */
 

@@ -100,7 +100,7 @@ function pledge_form_submitted() {
 	$ref = $_POST['ref'];
 	if (!$action) $errors[] = 'Please enter a pledge';
 	if (!$people) $errors[] = 'Please enter a target';
-	if (!ctype_digit($people)) $errors[] = 'The target must be a number';
+	if ($people == "" || !ctype_digit($people) || $people < 1) $errors[] = 'The target must be a number';
 	if (!$date) $errors[] = 'Please enter a deadline';
 	if (!$type) $errors[] = 'Please enter a type';
 	if ($date['year']<$nowA['year'] || ($date['year']==$nowA['year'] && $date['month']<$nowA['month']) || ($date['year']==$nowA['year'] && $date['month']==$nowA['month'] && $date['day']<=$nowA['day']) ) {

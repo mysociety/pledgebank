@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.113 2005-04-04 11:27:25 francis Exp $
+// $Id: index.php,v 1.114 2005-04-05 17:09:49 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -700,10 +700,10 @@ function pdfs() {
 <h2>Customised Flyers</h2>
 <p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
-<li><a href="<?=$pdf_flyers1_url?>">Big poster (A4, PDF)</a></li>
-<li><a href="<?=$pdf_flyers4_url?>">Flyers for handing out, 4 per page (A4, PDF)</a></li>
+<!--<li><a href="<?=$pdf_flyers1_url?>">Big poster (A4, PDF)</a></li>
+<li><a href="<?=$pdf_flyers4_url?>">Flyers for handing out, 4 per page (A4, PDF)</a></li>-->
 <li><a href="<?=$pdf_flyers8_url?>">Flyers for handing out, 8 per page (A4, PDF, like picture below)</a></li>
-<li><a href="<?=$pdf_flyers16_url?>">Loads of little flyers, 16 per page (A4, PDF)</a></li>
+<!--<li><a href="<?=$pdf_flyers16_url?>">Loads of little flyers, 16 per page (A4, PDF)</a></li>-->
 <!-- <li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li> -->
 </ul>
 </div>

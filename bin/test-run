@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.20 2005-04-04 11:25:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.21 2005-04-05 17:09:47 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -118,7 +118,7 @@ sub confirm_signature {
         '%To: '.email_n($who).
         '%to confirm your signature%');
     die "Confirmation link not found" if ($confirmation_email !~ m#^\s*($base_url.*$)#m);
-#print "Confirm link is $1"; exit; # for testing confirmation links ;)
+print "Confirm link is $1"; exit; # for testing confirmation links ;)
     $b->get($1);
 
     # Check there were no errors

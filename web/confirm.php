@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.20 2005-03-30 18:12:05 francis Exp $
+ * $Id: confirm.php,v 1.21 2005-04-05 17:09:47 francis Exp $
  * 
  */
 
@@ -122,7 +122,7 @@ page_footer(array('nonav'=>true));
  * Print some stuff advertising flyers for PLEDGE. */
 function advertise_flyers($pledge_id) {
     $r = db_getRow('select * from pledges where id = ?', $pledge_id);
-    $png_flyers4_url = new_url("../flyers/{$r['ref']}_A4_flyers4.png", false);
+    $png_flyers8_url = new_url("/flyers/{$r['ref']}_A4_flyers8.png", false);
 ?>
 <p class="noprint" align="center">
 <strong>Important Notice</strong> - You will massively increase the chance of this pledge being
@@ -133,7 +133,7 @@ of your neighbours letterboxes. We cannot emphasise this enough - print them
 now and post them next time you go out to the shops. We also have more
 <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers"> attractive PDF versions</a>.</p>
 
-<p align="center"><a href="<?=$png_flyers4_url?>"><img src="<?=$png_flyers4_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
+<p align="center"><a href="<?=$png_flyers8_url?>"><img src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
 <?
 }
 

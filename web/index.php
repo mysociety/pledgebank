@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.79 2005-03-14 11:17:11 francis Exp $
+// $Id: index.php,v 1.80 2005-03-14 14:57:58 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -371,11 +371,13 @@ doesn't work, or you have any other suggests or comments.
                         . htmlspecialchars($r['ref'])
                         . '">'
                     . pledge_sentence($r['id'], false, true)
+                    . "</a>"
                     . " (${r['daysleft']} "
                         . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
                         . " left), "
                     . prettify($r['target'] - $signatures)
-                    . " more needed</a></li>";
+                    . " more needed"
+                    . "</li>";
     }
     if (!$new) {
         print '<p>No pledges yet!</p>';
@@ -407,11 +409,13 @@ doesn't work, or you have any other suggests or comments.
                         . htmlspecialchars($r['ref'])
                         . '">'
                     . pledge_sentence($r['id'], false, true)
+                    . "</a>"
                     . " (${r['daysleft']} "
                         . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
                         . " left), "
                     . prettify($r['target'] - $signatures)
-                    . " more needed</a></li>";
+                    . " more needed"
+                    . "</li>";
     }
     if (!$new) {
         print '<p>No pledges yet!</p>';

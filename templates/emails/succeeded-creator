@@ -1,0 +1,7 @@
+Subject: PledgeBank pledge completion - '<?=$values['title']?>'
+
+Congratulations!
+
+We are pleased to tell you that your pledge <?=($values['actual']>$values['target']?'exceeded':'met')?> . " its target in the required time.
+
+Woohoo!

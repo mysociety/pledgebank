@@ -21,7 +21,7 @@
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.5 2005-03-17 09:20:37 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.6 2005-03-23 12:49:19 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -55,6 +55,7 @@ our $b = $wth->browser_get_agent();
 # Syntax check all .php files
 print "Syntax check all PHP files...\n" if $verbose > 0;
 $wth->php_check_syntax("../../pb/");
+$wth->php_check_syntax("../../pb/templates/emails/", qr//);
 
 # Check that we can detect PHP errors
 print "Confirm we can detect errors...\n" if $verbose > 0;
@@ -100,7 +101,7 @@ sub confirm_signature {
     my ($action, $who, $target_reached) = @_;
     my $confirmation_email = $wth->email_get_containing(
         '%To: '.email_n($who).
-        '%Subject: Signing up to "'.$action.'"'.
+        '%Subject: Signing up to \''.$action.'\''.
         '%To confirm%');
     print "Confirmation link not found\n" if ($confirmation_email !~ m#^\s*($base_url.*$)#m);
     $b->get($1);
@@ -133,7 +134,7 @@ sub create_pledge {
     $wth->browser_check_contents("You must now click on the link within the email we've just sent you");
     $wth->log_watcher_check();
     my $confirmation_email = $wth->email_get_containing(
-        '%To: '.email_n($who).'%To confirm your email address%');
+        '%To: '.email_n($who).'%To confirm your email%');
     die "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
     $b->get($1);
     $wth->browser_check_contents("Thank you for confirming your pledge");
@@ -168,8 +169,8 @@ confirm_signature($pledge_action_private, 1);
 
 # Test what happens upon expiry
 system("php", "daily", "--verbose", "--today=2010-06-02") and die "Failed to call daily";
-$wth->email_get_containing('%To: '.email_n(0).  '%did not meet its target in the required time%');
-$wth->email_get_containing('%To: '.email_n(1).  '%did not meet its target in the required time%');
+$wth->email_get_containing('%To: '.email_n(0).  '%your pledge did not meet its target%');
+$wth->email_get_containing('%To: '.email_n(1).  '%sorry to have to inform you that%');
 
 #############################################################################
 print "Making public pledge and making it succeed...\n" if $verbose > 0;

@@ -1,0 +1,10 @@
+Subject: Signing up to <?=$values['title']?> at PledgeBank.com
+
+Thank you for signing a pledge at PledgeBank. To confirm your
+email address, please click on this link:
+
+<?=$values['url']?>
+
+--
+PledgeBank.com
+a mySociety project

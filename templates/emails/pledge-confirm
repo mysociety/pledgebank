@@ -1,0 +1,7 @@
+Subject: New pledge at PledgeBank.com '<?=$values['title']?>'
+
+Thank you for submitting your pledge to PledgeBank. To confirm your email
+address, please click on this link:
+
+<?=$values['url']?>
+

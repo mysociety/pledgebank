@@ -5,7 +5,25 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.12 2005-03-22 18:29:02 francis Exp $
+// $Id: fns.php,v 1.13 2005-03-23 12:49:28 francis Exp $
+
+function pb_send_email_template($to, $template_name, $values, $headers = '') {
+    if (file_exists("../templates/emails/$template_name")) {
+        ob_start();
+        require "../templates/emails/$template_name";
+        $template_content = ob_get_contents();
+        ob_end_clean();
+    }
+    else
+        err("email template file for \"$template_name\" does not exist");
+
+    $count = preg_match("/^Subject: ([^\n]*)\n\n(.*)$/s", $template_content, $matches);
+    if ($count != 1)
+        err("template \"$template_name\" doesn't have subject/body");
+    $subject = $matches[1];
+    $message = $matches[2];
+    return pb_send_email($to, $subject, $message, $headers);
+}
 
 function pb_send_email($to, $subject, $message, $headers = '') {
     if (!strstr($headers, 'From:')) {

@@ -1,0 +1,15 @@
+Subject: PledgeBank pledge completion - '<?=$values['title']?>'
+
+Congratulations! 
+
+You signed up to '<?=$values['sentence']?>'
+and it has happened!
+
+To see who else signed up, please follow this link:
+
+<?=$values['url']?>
+
+You should also visit this page to be reminded what the pledge was about.
+
+Many thanks,
+PledgeBank

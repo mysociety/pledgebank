@@ -1,0 +1,9 @@
+Subject: PledgeBank pledge failure - '<?=$values['title']?>'
+
+Dear <?=$values['name']?>,
+
+We are sorry to have to tell you that your pledge did not meet its target in
+the required time.  You required <?=$values['target']?> <?=$values['type']?>, but achieved 
+only <?=$values['actual']?>.
+
+Ah well, better luck next time.

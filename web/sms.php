@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.8 2005-03-16 17:26:21 chris Exp $
+ * $Id: sms.php,v 1.9 2005-03-23 12:49:35 francis Exp $
  * 
  */
 
@@ -96,8 +96,7 @@ EOF;
                      * determines whether we send a confirmation or a
                      * confirmation reminder mail. */
                     $r = pledge_is_valid_to_sign($pledge_id, $q_email);
-                    $title = db_getOne('select title from pledges where id = ?',
-                                        $pledge_id);
+                    $row = db_getRow('select * from pledges where id = ?', $pledge_id);
                     if ($r == PLEDGE_OK) {
                         /* New email address */
                         $token = pledge_token_store(
@@ -112,19 +111,9 @@ EOF;
                                     );
 
                         $url = OPTION_BASE_URL . "/I/" . $token;
-                        $success = pb_send_email(
-                                        $q_email,
-                                        "Signing up to \"$title\" at PledgeBank.com",
-                                        <<<EOF
-Thank you for signing a pledge at PledgeBank. To confirm your
-email address, please click on this link:
-
- $url
-
--- 
-PledgeBank.com
-a mySociety project
-EOF
+                        $success = pb_send_email_template(
+                                        $q_email, 'sms-confirm-ok',
+                                        array_merge($row, array('url'=>$url))
                                     );
                     } else if ($r == PLEDGE_SIGNED) {
                         /* Old email address. This is either another signer, in
@@ -143,20 +132,9 @@ EOF
                         if (!is_null($existingid)) {
                             db_query('select signers_combine_2(?, ?)',
                                         array($existingid, $signer_id));
-                            $success = pb_send_email(
-                                    $q_email,
-                                    "Already signed up to \"$title\" at PledgeBank.com",
-                                    <<<EOF
-
-Thanks for signing up by SMS to this pledge at PledgeBank,
-but according to our records you have already signed it.
-
-Good luck with your pledge!
-
--- 
-PledgeBank.com
-a mySociety project
-EOF
+                            $success = pb_send_email_template(
+                                    $q_email, 'sms-confirm-already',
+                                    $row
                                 );
                         } else {
                             /* Pledge creator. We need to remove this signer,
@@ -179,21 +157,9 @@ EOF
                                         where id = ?',
                                         $pledge_id
                                     );
-                            $success = pb_send_email(
-                                    $q_email,
-                                    "You cannot sign up to your own \"$title\" pledge at PledgeBank.com",
-                                    <<<EOF
-
-Thanks for signing up by SMS to this pledge at PledgeBank,
-but according to our records are the creator of this
-pledge!
-
-Good luck with your pledge!
-
--- 
-PledgeBank.com
-a mySociety project
-EOF
+                            $success = pb_send_email_template(
+                                    $q_email, 'sms-confirm-own',
+                                    $row
                                 );
                         }
                     } else {

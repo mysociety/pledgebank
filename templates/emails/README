@@ -1,0 +1,74 @@
+Email templates for PledgeBank.  These are interpreted using PHP, but you
+should probably only use the following syntax:
+
+    <?=$values['name_of_variable']?>
+
+Values which are available in all emails are:
+
+  - title, many body text of the pledge saying what pledge setter will do;
+
+  - target, how many people are needed for the pledge to succeed;
+    
+  - type, description of the people, e.g. "residents of Eglwysbach";
+
+  - signup, description of what pledge signers will do;
+    
+  - date, deadline for pledge failing;
+   
+  - detail, extra description of the pledge.
+
+The text of each message should be pre-formatted as an email.
+
+Emails and the available variables are:
+
+**************************************************************************
+
+* pledge-confirm
+Sent to pledge creator when they make a new pledge, to check their
+email address.
+  - url, the URL for confirmation.
+
+**************************************************************************
+
+* signature-confirm-ok
+Sent to signers to confirm their signature and email address.
+  - url, the URL for confirmation.
+
+* signature-confirm-already
+Sent to someone who has tried to sign up a second time.
+
+**************************************************************************
+
+* sms-confirm-ok
+Sent to converters from SMS to confirm their email.
+  - url, the URL for confirmation.
+
+* sms-confirm-already
+Sent to converters from SMS if they have already signed by email.
+ 
+* sms-confirm-own
+Sent if SMS subscription is converted to the creator's email address.
+
+**************************************************************************
+            
+* failed-creator
+Sent to creator when a pledge fails.
+  - actual, number of people who signed up.
+
+* failed-signer
+Sent to each signer when a pledge fails.
+  - actual, number of people who signed up.
+  - signer_name, name of the signer this email is going to.
+
+**************************************************************************
+
+* succeeded-creator
+Sent to creator when a pledge succeeds.
+  - actual, number of people who signed up.
+
+* succeeded-signer
+Sent to each signer when a pledge succeeds.
+  - url, of the pledge page.
+  - sentence, full pledge sentence in third person.
+
+**************************************************************************

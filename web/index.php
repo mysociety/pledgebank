@@ -5,16 +5,13 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.38 2005-03-02 13:20:38 chris Exp $
+// $Id: index.php,v 1.39 2005-03-02 15:29:47 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
 require_once '../phplib/fns.php';
 
 require_once 'contact.php';
-
-#$foo = array("foo");
-#$x = $foo['hello'];
 
 db_connect();
 
@@ -73,7 +70,7 @@ function send_report() {
         $r = db_fetch_array($q);
         $reason = get_http_var('reason');
         pb_send_email(OPTION_CONTACT_EMAIL, "Signature reporting", "Reporting of '$r[name]' in pledge '$r[title]'\n\nReason given: $reason\n\n");
-        db_query('UPDATE signers SET showname=0,reported=1 WHERE id=?', array(get_http_var('report')));
+        db_query('UPDATE signers SET showname=false,reported=true WHERE id=?', array(get_http_var('report')));
         print '<p>Thank you for reporting that signature; it will be looked at asap.</p>';
     }
 }
@@ -90,7 +87,7 @@ function pledge_form($errors = array()) {
 <form id="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
 <h2>New Pledge</h2>
 <p>I will <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="action" id="action" value="<?=htmlspecialchars(get_http_var('action')) ?>" size="82"></p>
-<p>if <select name="comparison"><option>at least</option><option>exactly</option></select>
+<p>if <select name="comparison"><option value="atleast">at least</option><option value="exactly">exactly</option></select>
 <input onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" name="people" value="<?=htmlspecialchars(get_http_var('people')) ?>">
 other <input type="text" id="type" name="type" size="30" value="people"> <input type="text" id="signup" name="signup" size="10" value="sign up"> before
 <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<?=htmlspecialchars(get_http_var('date')) ?>">.</p>
@@ -125,11 +122,7 @@ function pledge_form_submitted() {
         $detail = get_http_var('detail');
         $password = get_http_var('password');
         $comparison = get_http_var('comparison');
-        if ($comparison=='at least') {
-            $comparison = false;
-        } elseif ($comparison=='exactly') {
-            $comparison = true;
-        } else {
+        if ($comparison != 'atleast' and $comparison != 'exactly') {
             $errors[] = 'Please select either "at least" or "exactly" number of people';
         }
         $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($ref));
@@ -172,7 +165,7 @@ doesn't work, or you have any other suggests or comments.
 <p style="margin-top: 1em; text-align: right"><input type="submit" value="Go"></p>
 </form>
 <h2>Sign up to one of our five newest pledges</h2>
-<?	$q = db_query('SELECT *, date - CURRENT_DATE AS daysleft FROM pledges WHERE date >= CURRENT_DATE AND confirmed=1 AND password=\'\' ORDER BY id DESC LIMIT 10');
+<?	$q = db_query('SELECT *, date - CURRENT_DATE AS daysleft FROM pledges WHERE date >= CURRENT_DATE AND confirmed AND password=\'\' ORDER BY id DESC LIMIT 10');
     $new = '';
     $k = 5;
     while ($k && $r = db_fetch_array($q)) {
@@ -199,7 +192,7 @@ doesn't work, or you have any other suggests or comments.
 pledges.signup, pledges.date, pledges.target, pledges.type, pledges.ref, pledges.comparison,
 COUNT(signers.id) AS count, max(date)-CURRENT_DATE
 AS daysleft FROM pledges, signers WHERE pledges.id=signers.pledge_id AND
-pledges.date>=CURRENT_DATE AND pledges.confirmed=1 AND signers.confirmed AND pledges.password=\'\' GROUP
+pledges.date>=CURRENT_DATE AND pledges.confirmed AND signers.confirmed AND pledges.password=\'\' GROUP
 BY pledges.id,pledges.name,pledges.title,pledges.date,pledges.target,pledges.type,pledges.signup,pledges.ref,pledges.comparison ORDER BY count DESC');
     $new = '';
     $k = 5;
@@ -230,7 +223,7 @@ function add_signatory() {
     global $today;
 
     $email = get_http_var('email');
-    $showname = get_http_var('showname') ? 1 : 0;
+    $showname = get_http_var('showname') ? 't' : 'f';
     $ref = get_http_var('pledge_id');
 
     $q = db_query('SELECT id,target,title,email,confirmed,date,password,comparison FROM pledges WHERE ref=?', array($ref));
@@ -246,7 +239,7 @@ function add_signatory() {
     $password = $r['password'];
     $comparison = comparison_nice($r['comparison']);
 
-    if (!$r['confirmed']) {
+    if ($r['confirmed'] != 't') {
         print '<p>Illegal PledgeBank reference!</p>';
         return false;
     }
@@ -317,7 +310,7 @@ function confirm_signatory() {
 	}
 
 	$pledge_id = $row['pledge_id'];
-	$confirmed = $row['confirmed'];
+	$confirmed = ($row['confirmed'] == 't');
 	if ($confirmed) {
 		print '<p>You have already confirmed your signature for this pledge!</p>';
 		return false;
@@ -326,7 +319,7 @@ function confirm_signatory() {
 	db_query('UPDATE signers SET confirmed = true WHERE token = ?', array($token));
 	$success = db_affected_rows();
 	if ($success) {
-		$q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed', array($pledge_id));
+		$q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed AND signers.confirmed', array($pledge_id));
 		if ($q) {
 			$r = db_fetch_array($q);
 			$signedup = db_num_rows($q);
@@ -347,19 +340,21 @@ function confirm_signatory() {
 }
 
 function send_success_email($pledge_id) {
-    $q = db_query('SELECT * FROM pledges,signers WHERE pledges.id=? AND pledges.id=signers.pledge_id AND pledges.confirmed=1 AND signers.confirmed', array($pledge_id));
+    $q = db_query('SELECT * FROM pledges WHERE pledges.id=? AND pledges.confirmed', array($pledge_id));
     $r = db_fetch_array($q);
     $globalsuccess = 1;
     $action = $r['title'];
     $body = 'Congratulations! You said "I will '.$r['title'].' if '.comparison_nice($r['comparison']).' '.$r['target'].' '.$r['type'].' '.($r['signup']=='sign up'?'will do the same':$r['signup']).'", and they have!'."\n\nTo see who else signed up, please follow this link:\n\n".OPTION_BASE_URL.$r['ref']."\n\nYou should also visit this page to be reminded what the pledge was about.\n\nMany thanks,\n\nPledgeBank";
-    $email = $r['email'];
-    $success = pb_send_email($email, 'PledgeBank pledge success!', $body);
-    if ($success==0) $globalsuccess = 0;
-    while ($r) {
-	$email = $r['email'];
-	$success = pb_send_email($email, 'PledgeBank pledge success!', $body);
-	if ($success==0) $globalsuccess = 0;
-        $r = db_fetch_array($q);
+    $success = pb_send_email($r['email'], 'PledgeBank pledge success!', $body);
+    if ($success==0) 
+        $globalsuccess = 0;
+    $q = db_query('SELECT * FROM signers WHERE pledge_id=? AND signers.confirmed', array($pledge_id));
+    $s = db_fetch_array($q);
+    while ($s) {
+        $success = pb_send_email($s['email'], 'PledgeBank pledge success!', $body);
+        if ($success==0) 
+            $globalsuccess = 0;
+        $s = db_fetch_array($q);
     }
     return $globalsuccess;
 }
@@ -375,7 +370,7 @@ function view_pledge() {
 	return false;
     } else {
         $r = db_fetch_array($q);
-	$confirmed = $r['confirmed'];
+	$confirmed = ($r['confirmed'] == 't');
 	if (!$confirmed) {
 	    print '<p>Illegal PledgeBank reference!</p>';
 	    return false;
@@ -460,7 +455,7 @@ if ($detail) {
 		$out = '<li>'.htmlspecialchars($name).' (Pledge Author)</li>';
 		$anon = 0;
 		while ($r = db_fetch_array($q)) {
-			$showname = $r['showname'];
+			$showname = ($r['showname'] == 't');
 			if ($showname) {
                             $out .= '<li>'.htmlspecialchars($r['name']).' <small>(<a href="./?report='.$r['id'].'">Is this signature suspicious?</a>)</small></li>';
 			} else {
@@ -513,13 +508,13 @@ function confirm_pledge() {
 		return false;
 	}
 
-	$confirmed = $row['confirmed'];
+	$confirmed = ($row['confirmed'] == 't');
 	if ($confirmed) {
 		print '<p>You have already confirmed this pledge!</p>';
 		return false;
 	}
 
-	db_query('UPDATE pledges SET confirmed=1,creationtime=CURRENT_TIMESTAMP WHERE token = ?', array($token));
+	db_query('UPDATE pledges SET confirmed=true,creationtime=CURRENT_TIMESTAMP WHERE token = ?', array($token));
 	$success = db_affected_rows();
 	if ($success) { ?>
 <p>Thank you for confirming that pledge. It is now live, and people can sign up to it. OTHER STUFF.</p>
@@ -531,7 +526,7 @@ function confirm_pledge() {
 
 function list_all_pledges() {
         print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
-        $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed=1 AND password=\'\'');
+        $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed AND password=\'\'');
         print '<table><tr><th>Title</th><th>Target</th><th>Deadline</th><th>Creator</th><th>Short name</th></tr>';
         while ($r = db_fetch_row($q)) {
                 $r[0] = '<a href="'.$r[4].'">'.$r[0].'</a>';
@@ -600,7 +595,12 @@ function search() {
 }
 
 function comparison_nice($comparison) {
-    if ($comparison == 'f') return 'at least';
-    return 'exactly';
+    if ($comparison == 'atleast') 
+        return 'at least';
+    else if ($comparison == 'exactly')
+        return 'exactly';
+    else
+        err("Unknown comparison type '$comparison'");
 }
+
 ?>

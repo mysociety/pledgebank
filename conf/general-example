@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.13 2005-04-05 16:51:20 francis Exp $
+ * $Id: general-example,v 1.14 2005-04-05 18:46:42 francis Exp $
  * 
  */
 
@@ -62,6 +62,12 @@ define('OPTION_PB_SMS_NUMBER', 'XXXXX');
 define('OPTION_PB_SMS_PREFIX', 'PLEDGE');
 // For use on posters and on website
 define('OPTION_PB_SMS_DISPLAY_NUMBER', 'XXXXX');
+
+// Configuration of the SMS daemon:
+// Number of sender processes
+define('OPTION_SMS_DAEMON_SEND_PROCESSES', '2');
+// PID file location
+define('OPTION_SMS_DAEMON_PIDFILE', '/var/run/pbsmsd.pid');
 
 // Where PDF files are put
 define('OPTION_PB_PDF_CACHE', "/home/francis/tmp/pdfs");

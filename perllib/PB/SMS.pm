@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.6 2005-03-08 11:26:49 chris Exp $
+# $Id: SMS.pm,v 1.7 2005-03-09 10:30:20 chris Exp $
 #
 
 package PB::SMS;
@@ -290,7 +290,7 @@ sub receive_sms ($$$$$) {
                 # Send conversion message.
                 my ($new_id) = send_sms(
                                     $sender,
-                                    sprintf('Thanks for pledging! Visit %s%s to sign up for email and more.',
+                                    sprintf('Thanks for pledging! Visit %sS/%s to sign up for email and more.',
                                         mySociety::Config::get('BASE_URL'),
                                         $token
                                 ));

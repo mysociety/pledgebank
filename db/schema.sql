@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.22 2005-03-08 11:26:49 chris Exp $
+-- $Id: schema.sql,v 1.23 2005-03-09 10:30:20 chris Exp $
 --
 
 -- secret
@@ -139,26 +139,12 @@ create table signers (
     email text,
     mobile text,
 
-    -- SMS signers may convert to an email subscription. To do this we create
-    -- a new, unconfirmed email signer and tie it to this signer through a
-    -- reference. When they confirm the email the old signer is removed.
-    converts_signer_id integer references signers(id),
-  
     -- whether they want their name public
     showname boolean not null default false,
       
     -- when they signed
     signtime timestamp not null,
   
-    -- Confirmation stuff. For email signers we send them a token and only
-    -- regard them as signed up when they have supplied it back to us. SMS
-    -- signers are regarded as confirmed as soon as the reply SMS has been
-    -- received by their phone, but we send them a token allowing them to
-    -- convert their subscription to an email one later via the
-    -- converts_signer_id mechanism.
-    token text not null,
-    confirmed boolean not null default false,
-
     -- Name has been reported
     reported boolean not null default false
 );
@@ -173,7 +159,12 @@ create unique index signers_pledge_id_email_idx on signers(pledge_id, email);
 -- phone number on any given pledge. The point here is that somebody may send
 -- a subscription request, not receive the reply message and then (perhaps
 -- impatiently) send a further signup request.
-create table outgoingsms_signers (
-    signer_id integer not null references signers(id),
-    outgoingsms_id integer not null references outgoingsms(id)
+create table pledges_outgoingsms (
+    pledge_id integer not null references pledge(id),
+    outgoingsms_id integer not null references outgoingsms(id),
+    -- Since the URL in the SMS probably has to be typed in by the user, have
+    -- a short unique token rather than using the Magic of Cryptography(TM).
+    token text not null
 );
+
+create unique index pledges_outgoingsms_token_idx on pledges_outgoingsms(token);

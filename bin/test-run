@@ -18,11 +18,10 @@
 # Tests to do:
 # Frig dates into past, rather than running daily in the future
 # Try to sign up to an expired pledge
-# Try to sign up to a fulfilled exactly pledges
 # Check other private pages are private (e.g. flyers)
 # Send SMS messages somehow without costing us a fortune
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.9 2005-03-24 12:31:39 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.10 2005-03-25 11:05:59 francis Exp $';
 
 use strict;
 require 5.8.0;

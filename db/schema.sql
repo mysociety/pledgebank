@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.40 2005-03-18 11:20:00 sandpit Exp $
+-- $Id: schema.sql,v 1.41 2005-03-25 11:05:59 francis Exp $
 --
 
 -- secret
@@ -47,7 +47,7 @@ create table pledges (
     -- "at least" vs. "exactly"
     comparison text not null check (
             comparison = 'atleast' 
-            or comparison = 'exactly'
+            -- or comparison = 'exactly' -- exactly is disabled for now, as not clear we need it
         ),
 
     country text not null default '',
@@ -95,8 +95,9 @@ create function pledge_is_valid_to_sign(integer, text, text)
         
         -- Lock the signers table, so that a later insert within this
         -- transaction would succeed.
+        -- NOTE that "exactly" is disabled for now, so this code is not used
         lock table signers in share mode;
-        if p.comparison = ''exactly'' then
+        if p.comparison = ''exactly'' then 
             if p.target <=
                 (select count(id) from signers where pledge_id = $1) then
                 return ''full'';

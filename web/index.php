@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.96 2005-03-24 11:05:23 francis Exp $
+// $Id: index.php,v 1.97 2005-03-25 11:05:59 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -198,7 +198,7 @@ function pledge_form_two($data, $errors = array()) {
     if (isset($data['visibility'])) {
         $v = $data['visibility']; if ($v!='password') $v = 'all';
     }
-    $local = (isset($data['local'])) ? $data['local'] : 0;
+    $local = (isset($data['local'])) ? $data['local'] : '0';
     $isodate = $data['date']['iso'];
     if (!isset($data['comparison']))
         $comparison = "atleast";
@@ -221,17 +221,18 @@ function pledge_form_two($data, $errors = array()) {
 <p id="moreinfo">More details about your pledge:
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
-<p>Should the pledge stop accepting new subscribers when it
+<input type="hidden" name="comparison" value="atleast">
+<? /* <p>Should the pledge stop accepting new subscribers when it
 is fulfilled?
 <input type="radio" name="comparison" value="exactly"<?=($comparison == 'exactly') ? ' checked' : '' ?>> Yes
 <input type="radio" name="comparison" value="atleast"<?=($comparison == 'atleast') ? ' checked' : '' ?>> No
-</p>
+</p> */?>
 
 <p>Which country does your pledge apply to?
 <select name="country"><option>Global<option>UK</select>
 </p>
 
-<p>Is your pledge specific to a local area?
+<p>Within your country, is your pledge specific to a local area?
 <input onclick="grey_postcode(false)" type="radio" name="local" value="1"<?=($local?' checked':'') ?>> Yes
 <input onclick="grey_postcode(true)" type="radio" name="local" value="0"<?=(!$local?' checked':'') ?>> No
 <br>

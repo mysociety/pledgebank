@@ -18,7 +18,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.1 2005-03-29 13:22:22 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.2 2005-03-29 15:23:32 sandpit Exp $';
 
 use strict;
 
@@ -29,6 +29,7 @@ BEGIN {
     mySociety::Config::set_file('../conf/general');
 }
 
+use CGI;
 use CGI::Fast;
 use DateTime::Format::Strptime;
 use Encode;
@@ -54,35 +55,44 @@ while (my $q = new CGI::Fast()) {
         throw PB::Error('REMOTE_ADDR not defined; this program must be run in a CGI/FastCGI environment')
             unless (defined($ip));
 
+        throw PB::Error("Script must be called by POST, not " . $q->request_method())
+            unless ($q->request_method() eq 'POST');
+
+        my %P;
         foreach (qw(intSequence intTransactionID intTime intDestination intOriginatingNumber intDeliverer strData)) {
             throw PB::Error("Client did not supply required parameter '$_'")
                 unless (defined($q->param($_)));
 
+            # Sometimes we get whitespace in these; trim it.
+            $P{$_} = $q->param($_);
+            $P{$_} =~ s/^\s+//;
+            $P{$_} =~ s/\s+$//;
+
             throw PB::Error("Bad value '" . $q->param($_) . "' for required parameter '$_'")
-                if ($_ =~ /^int/ && $q->param($_) =~ /[^\d]/);
+                if ($_ =~ /^int/ && $P{$_} =~ /[^\d]/);
         }
 
         # Start by checking whether we've seen this message before.
         my $resp = 'bad';
-        my $smsid = $q->param('intSequence');
+        my $smsid = $P{intSequence};
         
         if (!defined(dbh()->selectrow_array('select id from incomingsms where foreignid = ? for update', {}, $smsid))) {
-            my $message;
+            my $message = $P{strData};
 
             # Parse the date.
-            my $smsdate = $q->param('smsdate');
+            my $smsdate = $P{intTime};
             my $whensent;
             if (!defined($whensent = $D->parse_datetime($smsdate))) {
                 throw PB::Error("Bad value '$smsdate' for smsdate parameter in request");
             }
             $whensent = $whensent->epoch();
 
-            my $sender = $q->param('intOriginatingNumber');
+            my $sender = $P{intOriginatingNumber};
             $sender =~ s#^([^+])#+$1#;
-            my $recipient = $q->param('intDestination');
+            my $recipient = $P{intDestination};
 #            $recipient =~ s#^([^+])#+$1#;      # destination is a short code
 
-            PB::SMS::receive_sms($sender, $recipient, PB::SMS::decode_ia5($message), $smsid, $whensent);
+            PB::SMS::receive_sms($sender, $recipient, $P{intDeliverer}, PB::SMS::decode_ia5($message), $smsid, $whensent);
 
             $resp = "OK\n";
         } else {
@@ -98,12 +108,13 @@ while (my $q = new CGI::Fast()) {
     } catch PB::Error with {
         my $E = shift;
         my $t = $E->text();
+        print STDERR "$t\n";
         print $q->header(
                     -status => "500 Internal Error: $t",
                     -type => 'text/plain; charset=utf-8',
                     -content_length => length($t) + 1
                 ), $t, "\n";
-        warn "Error: $t\n";
+#        warn "Error: $t\n";
     };  # any other kind of error will kill the script and return HTTP 500 
         # to the client, which is what we want.
 }

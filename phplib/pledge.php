@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.21 2005-03-14 15:48:04 francis Exp $
+ * $Id: pledge.php,v 1.22 2005-03-15 16:37:33 francis Exp $
  * 
  */
 
@@ -129,7 +129,8 @@ function pledge_is_permanent_error($e) {
  * Return a sentence describing what each signer agrees to do ("$pledgecreator
  * will ...  if ...").  PLEDGE is either a pledge id number, or an array of
  * pledge data from the database.  
- * If PARAMS['firstperson'] is true, then the sentence is "I will...".  
+ * If PARAMS['firstperson'] is true, then the sentence is "I will...", if
+ # it is 'includename', says "I, $pledgecreator, will..."
  * If PARAMS['html'] is true, encode entities and add <strong> tags around
  * strategic bits. 
  * If PARAMS['href'] contains a URL, then the main part of the returned
@@ -147,8 +148,11 @@ function pledge_sentence($r, $params = array()) {
     if ($html)
         $r = array_map('htmlspecialchars', $r);
         
-    $s = ($firstperson ? "I" : $r['name'])
-            . " will ";
+    $s = ($firstperson ? "I" : $r['name']);
+    if ($firstperson == "includename") {
+        $s .= ", " . $r['name'] . ",";
+    }
+    $s .= " will ";
     if (array_key_exists('href', $params)) {
             $s .= "<a href=\"".urlencode($params['href'])."\">"
             . $r['title'] . "<a>";

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.8 2005-03-14 14:32:04 francis Exp $
+ * $Id: confirm.php,v 1.9 2005-03-15 16:37:33 francis Exp $
  * 
  */
 
@@ -37,15 +37,13 @@ if ($q_type == 'pledge') {
     /* Success. */
     page_header(
             db_getOne('select title from pledges where id = ?', $pledge_id)
-            . ' - Confirm'
+            . ' - Confirm', array('nonav'=>true)
         );
     db_commit();
     ?>
     <p>Thank you for confirming your pledge. It is now live, and people can sign up
     to it. OTHER STUFF.</p>
     <?  advertise_flyers($pledge_id);
-    page_footer();
-    exit;
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
      * pledge. */
@@ -54,14 +52,14 @@ if ($q_type == 'pledge') {
 
     page_header(
             db_getOne('select title from pledges where id = ?', $data['pledge_id'])
-            . ' - Sign Up'
+            . ' - Sign Up', array('nonav'=>true)
         );
 
     /* Sign them up. */
     $f1 = pledge_is_successful($data['pledge_id']);
     $r = pledge_sign($data['pledge_id'], $data['name'], $data['showname'], $data['email']);
     if (!pledge_is_error($r)) {
-        print "<p>Thank you for confirming your signature!</p>";
+        print "<p>Thanks for subscribing to this pledge!</p>";
 
         if (!$f1 && pledge_is_successful($data['pledge_id']))
             /* Has this completed the pledge? */
@@ -74,24 +72,30 @@ if ($q_type == 'pledge') {
     } else {
         oops($r);
     }
-    page_footer();
 }
+page_footer(array('nonav'=>true));
 
 /* advertise_flyers PLEDGE
  * Print some stuff advertising flyers for PLEDGE. */
 function advertise_flyers($pledge_id) {
-    $r = db_getRow('select ref, title, date from pledges where id = ?', $pledge_id);
-?><p><a href="<?=htmlspecialchars($r['ref']) ?>/flyers">View and print Customised Flyers for this pledge</a></p>
+    $r = db_getRow('select * from pledges where id = ?', $pledge_id);
+?>
 
-<p align="center"><big>Why not <strong>
+<p align="center">
+Important Notice - You will massively increase the chance of this pledge being
+a success if 
 <script type="text/javascript">
-    document.write('<a href="javascript: window.print()">HIT PRINT</a>');
+    document.write('<a href="javascript: window.print()">print this page out</a>,');
 </script>
 <noscript>
-HIT PRINT
-</noscript>
-</strong> now and get these example cards below, for you to cut out and give
-to your friends and neighbours?</big></p>
+print this page out,
+</noscript> 
+cut up the flyers and stick them through some
+of your neighbours letterboxes. We cannot emphasise this enough - print them
+now and post them next time you go out to the shops. We also have more
+<a href="/<?=htmlspecialchars($r['ref']) ?>/flyers"> attractive PDF versions</a>.</p>
+
+
 
 <style type="text/css">
 table {
@@ -109,9 +113,18 @@ td {
         print '<tr align="center">';
         for ($cols=0; $cols<2; $cols++) {
             print '<td>';
-            print '<strong>"I will ' . htmlspecialchars($r['title']) . '"</strong>';
-            print '<br>Deadline: ' . prettify($r['date']);
-            print '<br>www.pledgebank.com/' . htmlspecialchars($r['ref']);
+            print pledge_sentence($r, array('firstperson'=>'includename', 'html'=>true));
+            print '<p>Please support me by signing up, and by encouraging
+                other people to do the same. I am using the charitable service
+                PledgeBank.com to gather support.</p>
+            
+                <p>It will only take you a few seconds - sign up free at:</b>';
+            print '<br><strong>www.pledgebank.com/' . htmlspecialchars($r['ref']) . "</strong";
+            print '<p>Or text <strong>';
+            print 'pledge ' . htmlspecialchars($r['ref']);
+            print '</strong>  to <strong>12345</strong> (cost 25p)';
+            print '<p>This pledge closes on ' . prettify($r['date']). '. ';
+            print 'Thanks!';
             print '</td>';
         }
         print '</tr>';

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.9 2005-04-07 11:24:44 chris Exp $
+ * $Id: announce.php,v 1.10 2005-04-07 14:18:03 chris Exp $
  * 
  */
 
@@ -46,13 +46,10 @@ $pledge = db_getRow('
 
 page_header("Send announcement to '${pledge['title']}", array());
 
-$need_sms = ($pledge['signers_sms'] > 0);
-if ($need_sms) {
-    $default_sms = "${pledge['name']} here. The ${pledge['ref']} pledge has been successful! <ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE>";
-    if (!$q_message_sms) {
-        $q_message_sms = $default_sms;
-        $q_h_message_sms = htmlspecialchars($q_message_sms);
-    }
+$default_sms = "${pledge['name']} here. The ${pledge['ref']} pledge has been successful! <ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE>";
+if (!$q_message_sms) {
+    $q_message_sms = $default_sms;
+    $q_h_message_sms = htmlspecialchars($q_message_sms);
 }
 
 $default_message = 
@@ -76,15 +73,15 @@ if ($q_submit) {
     if (merge_spaces($q_message_body) == merge_spaces($default_message)) {
         array_push($errors, "Please edit the text of the email message.");
     }
-    if ($need_sms) {
-        if (merge_spaces($q_message_sms) == merge_spaces($default_sms))
-            array_push($errors, "Please edit the text of the SMS message");
-        else if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
-            array_push($errors, "Please shorten the text of the SMS message to 160 characters or fewer");
-        /* XXX else we must check that the text is representable in IA5; if it
-         * isn't, we must get the user to fix it, since otherwise it cannot be
-         * transmitted. */
-    }
+    
+    if (merge_spaces($q_message_sms) == merge_spaces($default_sms))
+        array_push($errors, "Please edit the text of the SMS message");
+    else if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
+        array_push($errors, "Please shorten the text of the SMS message to 160 characters or fewer");
+    /* XXX else we must check that the text is representable in IA5; if it
+     * isn't, we must get the user to fix it, since otherwise it cannot be
+     * transmitted. */
+
     if (strlen($q_message_body) < 50) {
         array_push($errors, "Please enter a longer message.");
     }
@@ -94,31 +91,17 @@ if ($q_submit) {
 }
 
 if (!sizeof($errors) && $q_submit) {
-    // Send message
-    $q = db_query('select email from signers where pledge_id = ? and email is not null', $pledge['id']);
-    $addrs = array();
-    while ($r = db_fetch_array($q))
-        array_push($addrs, $r['email']);
+    /* Got all the data we need. Just drop the announcement into the database
+     * and let the frequentupdate script pass it to the signers. */
+    db_query('
+        insert into announcement (pledge_id, whensent, emailbody, sms)
+        values (?, current_timestamp, ?, ?)',
+        array($pledge['id'], $q_message_body, $q_message_sms));
+    pledge_token_destroy('signup-web', $q_token);
+    db_commit();
 
-    if (!pb_send_email($addrs, "Announcement from ${pledge['name']} about '${pledge['title']}' at PledgeBank.com", $q_message_body))
-        print "<p>Sorry, we failed to send your message properly.  Please try again!</p>";
-    else {
-        /* We have successfully sent the emails, so now send any outstanding
-         * SMSs. */
-        if ($need_sms)
-            db_query('
-                insert into outgoingsms (recipient, message, whensubmitted)
-                select mobile as recipient, ? as message, ? as whensubmitted
-                from signers
-                where pledge_id = ? and email is null',
-                array($q_message_sms, time(), $data['pledge_id']));
-        // Last of all, destroy the token
-        pledge_token_destroy('signup-web', $q_token);
-        db_commit();
-
-        print "<p>Your message has been sent to all the people who signed your pledge.  
-        Thanks, and enjoy carrying out you pledge!</p>";
-    }
+    print "<p>Your message has been sent to all the people who signed your pledge.  
+    Thanks, and enjoy carrying out you pledge!</p>";
 } else {
     
     // Display errors or success header
@@ -140,18 +123,14 @@ if (!sizeof($errors) && $q_submit) {
 <h2>Send Announcement</h2>
 <div class="c">
 <p>Write a message to the <?=$pledge['signers']?> <?=$pledge['type']?> who
-signed your pledge.  This is to tell them what to do next.  Remember
-to give your own email address, phone number or website so they can contact
-you again.</p>
+signed your pledge.  This is to tell them what to do next.  Remember to give
+your own email address, phone number or website so they can contact you
+again.</p>
 <?
-
-    if ($need_sms) {
-        print <<<EOF
+    print <<<EOF
 <h3>SMS message</h3>
-<p><em>We only have the mobile phone numbers for some of the people who have
-signed your pledge &mdash; not their email addresses</em>. To reach them,
-please enter a short (160 or fewer characters) summary of your main message,
-below:</p>
+<p>Please enter a short (160 or fewer characters) summary of your main message,
+which can be sent to anyone who has signed up to your pledge by SMS only:</p>
 <script type="text/javascript">
 <!--
 function count_sms_characters() {
@@ -185,8 +164,6 @@ count_sms_characters();
 //-->
 </script>
 <h3>Email message</h3>
-EOF;
-    }
 
     ?>
 
@@ -194,13 +171,13 @@ EOF;
     name="message_body"
     id="message_body"
     cols="72"
-    rows="20"><?=$q_h_message_body?></textarea></p>
+    rows="20">$q_h_message_body</textarea></p>
 
 <p>(Did you remember to give your email address or phone number?) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
 </form>
 </div>
+EOF;
 
-<?php
 }
 
 page_footer();

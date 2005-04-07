@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.8 2005-04-05 19:11:58 francis Exp $
+ * $Id: announce.php,v 1.9 2005-04-07 11:24:44 chris Exp $
  * 
  */
 
@@ -136,7 +136,7 @@ if (!sizeof($errors) && $q_submit) {
     ?>
 <p></p>
 
-<form class="pledge" name="pledge" id="pledge" method="post" action="/M/<?=$q_h_token?>">
+<form accept-charset="utf-8" class="pledge" name="pledge" id="pledge" method="post" action="/M/<?=$q_h_token?>">
 <h2>Send Announcement</h2>
 <div class="c">
 <p>Write a message to the <?=$pledge['signers']?> <?=$pledge['type']?> who

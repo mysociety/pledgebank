@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.114 2005-04-05 17:09:49 francis Exp $
+// $Id: index.php,v 1.115 2005-04-07 11:24:44 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -86,7 +86,7 @@ function report_form() {
         return false;
     } else {
         $r = db_fetch_array($q);
-        print '<form action="./" method="post"><input type="hidden" name="report" value="' . htmlspecialchars(get_http_var('report')) . '">';
+        print '<form accept-charset="utf-8" action="./" method="post"><input type="hidden" name="report" value="' . htmlspecialchars(get_http_var('report')) . '">';
         print '<h2>Signature reporting</h2>';
         print '<p>You are reporting the signature "' . htmlspecialchars($r['name']) . '" on the pledge "' . htmlspecialchars($r['title']) . '"</p>';
         print '<p>Please give a (short) reason for reporting this signature:</p>';
@@ -158,7 +158,7 @@ the door of that neighbour whose name you've forgotten.</li>
     }
 ?>
 
-<form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
+<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
 <h2>New Pledge &#8211; Step 1</h2>
 <div class="c">
 <p><strong>I will</strong> <input onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
@@ -212,7 +212,7 @@ function pledge_form_two($data, $errors = array()) {
 <p style="text-align: right">&mdash; <?=htmlspecialchars($data['name']) ?></p>
 </div>
 
-<form class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="2">
+<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="2">
 <p style="float: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
 
 <h2>New Pledge &#8211; Step 2 (optional details)</h2>
@@ -358,7 +358,7 @@ href="mailto:team@pledgebank.com">email us</a> if it just
 doesn't work, or you have any other suggests or comments. 
 </p>
 <p id="start"><a href="./new"><strong>Start your own pledge &raquo;</strong></a></p>
-<form id="search" action="./" method="get">
+<form accept-charset="utf-8" id="search" action="./" method="get">
 <h2>Search</h2>
 <p><label for="s">Enter a PledgeBank Reference, or a search string:</label>
 <input type="text" id="s" name="search" size="10" value=""></p>
@@ -544,7 +544,7 @@ function view_pledge($errors = array()) {
 
 ?>
 <p></p>
-<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=$h_ref ?>">
+<form accept-charset="utf-8" class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=$h_ref ?>">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <div class="c">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true,

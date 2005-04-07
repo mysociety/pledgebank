@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.10 2005-04-07 14:18:03 chris Exp $
+ * $Id: announce.php,v 1.11 2005-04-07 16:15:05 chris Exp $
  * 
  */
 
@@ -28,22 +28,17 @@ if (!is_null($err))
     err("Sorry -- something seems to have gone wrong. "
         . join(",", array_values($err)));
 
-$data = pledge_token_retrieve('announce-post', $q_token);
-if (!$data)
-    err("No such token");
-# Note, we destroy the token later when the message is sent
+/* Extract data for token and pledge, and lock the latter. */
+if (!($data = pledge_token_retrieve('announce-post', $q_token))
+    || !($pledge = db_getRow('select * from pledges where id = ? for update',
+                    $data['pledge_id'])))
+    err("No such token or pledge"); /* XXX make this a single, friendlier error message. */
 
-$pledge = db_getRow('
-    select *,
-        (select count(id) from signers
-        where signers.pledge_id = pledges.id
-            and signers.email is not null) as signers,
-        (select count(id) from signers
-        where signers.pledge_id = pledges.id
-            and signers.email is null) as signers_sms
-    from pledges
-    where id = ?', $data['pledge_id']);
+/* Verify that we haven't already sent the announcement. */
+if (!is_null(db_getOne('select id from announcement where pledge_id = ?', $data['pledge_id'])))
+    err("Announcement already sent for this pledge");
 
+/* All OK. */
 page_header("Send announcement to '${pledge['title']}", array());
 
 $default_sms = "${pledge['name']} here. The ${pledge['ref']} pledge has been successful! <ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE>";

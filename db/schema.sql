@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.53 2005-04-07 13:58:53 chris Exp $
+-- $Id: schema.sql,v 1.54 2005-04-07 16:57:16 chris Exp $
 --
 
 -- secret
@@ -63,10 +63,6 @@ create table pledges (
 
     -- When a pledge is successful, we mark it as successful here.
     success boolean not null default false,
-    -- We must only notify people that the pledge has been completed (either 
-    -- success or failure) once.  This flag is set when we first notice that 
-    -- that has happened.
-    completionnotified boolean not null default false
 );
 
 -- Announcements sent by pledge creators to signers. We require the pledge
@@ -268,7 +264,7 @@ create trigger incomingsms_insert_trigger after insert on incomingsms
 
 create table signers (
     id serial not null primary key,
-    pledge_id int not null,
+    pledge_id integer not null references pledges(id),
 
     -- Who has signed the pledge.
     -- Name may be null because we allow users to sign up by SMS without giving
@@ -285,9 +281,6 @@ create table signers (
   
     -- Name has been reported
     reported boolean not null default false,
-
-    -- Success/failure has been notified for this signer.
-    pledgecompletionnotified boolean not null default false,
 
     check (
         (name is not null and email is not null)
@@ -507,6 +500,14 @@ create function smssubscription_sign(integer, text)
         return ''ok'';
     end;
 ' language 'plpgsql';
+
+-- Table which maps announcements to the signers to which they have been sent.
+-- We use this to ensure that even signers who sign the pledge after completion
+-- are sent the appropriate announcements.
+create table announcement_signer (
+    announcement_id integer not null references announcement(id),
+    signer_id integer not null references signers(id)
+);
 
 -- Stores randomly generated tokens and serialised hash arrays associated
 -- with them.

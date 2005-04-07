@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.11 2005-04-07 16:15:05 chris Exp $
+ * $Id: announce.php,v 1.12 2005-04-07 16:46:32 chris Exp $
  * 
  */
 
@@ -19,11 +19,9 @@ require_once "../../phplib/importparams.php";
 require_once "../../phplib/evel.php";
 
 $err = importparams(
-            array('token', '/.+/', "Missing token"),
-            array('message_body', '//', "", null),
-            array('message_sms', '//', "", null),
-            array('submit', '//', "", null)
+            array('token', '/.+/', "Missing token")
         );
+
 if (!is_null($err))
     err("Sorry -- something seems to have gone wrong. "
         . join(",", array_values($err)));
@@ -41,48 +39,49 @@ if (!is_null(db_getOne('select id from announcement where pledge_id = ?', $data[
 /* All OK. */
 page_header("Send announcement to '${pledge['title']}", array());
 
+$sentence = pledge_sentence($pledge);
+$default_message = <<<EOF
+
+Hello, and thank you for signing our successful pledge!
+
+$sentence
+
+<ENTER INSTRUCTIONS FOR PLEDGE SIGNERS HERE>
+
+Yours sincerely,
+
+${pledge['name']}
+
+EOF;
+
 $default_sms = "${pledge['name']} here. The ${pledge['ref']} pledge has been successful! <ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE>";
-if (!$q_message_sms) {
-    $q_message_sms = $default_sms;
-    $q_h_message_sms = htmlspecialchars($q_message_sms);
-}
-
-$default_message = 
-        "Hello, and thank you for signing our successful pledge!\n\n" .
-        "'". pledge_sentence($pledge) . "'\n\n" . 
-        "Here's what we're going to do next...\n\n" .
-        "\n\n" .
-        "<ENTER INSTRUCTIONS FOR PLEDGE SIGNERS HERE>\n\n" . 
-        "\n\n" .
-        "Yours sincerely,\n\n" .
-        $pledge['name'];
-
-if (!$q_message_body) {
-    $q_message_body = $default_message;
-    $q_h_message_body = htmlspecialchars($q_message_body);
-}
+$err = importparams(
+            array('message_body', '//', "", $default_message),
+            array('message_sms', '//', "", $default_sms),
+            array('submit', '//', "", null)
+        );
 
 // Check parameters
 $errors = array();
 if ($q_submit) {
-    if (merge_spaces($q_message_body) == merge_spaces($default_message)) {
-        array_push($errors, "Please edit the text of the email message.");
-    }
     
     if (merge_spaces($q_message_sms) == merge_spaces($default_sms))
         array_push($errors, "Please edit the text of the SMS message");
-    else if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
+    if (stristr($q_message_sms, "ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE"))
+        array_push($errors, "Please add instructions for the pledge signers to the SMS message.");
+    if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
         array_push($errors, "Please shorten the text of the SMS message to 160 characters or fewer");
     /* XXX else we must check that the text is representable in IA5; if it
      * isn't, we must get the user to fix it, since otherwise it cannot be
      * transmitted. */
 
-    if (strlen($q_message_body) < 50) {
+    if (merge_spaces($q_message_body) == merge_spaces($default_message))
+        array_push($errors, "Please edit the text of the email message.");
+    if (strlen($q_message_body) < 50)
         array_push($errors, "Please enter a longer message.");
-    }
-    if (stristr($q_message_body, "ENTER INSTRUCTIONS FOR PLEDGE SIGNERS HERE")) {
-        array_push($errors, "Please enter instructions for the pledge signers.");
-    }
+    if (stristr($q_message_body, "ENTER INSTRUCTIONS FOR PLEDGE SIGNERS HERE"))
+        array_push($errors, "Please enter instructions for the pledge signers to the email message.");
+
 }
 
 if (!sizeof($errors) && $q_submit) {
@@ -95,34 +94,34 @@ if (!sizeof($errors) && $q_submit) {
     pledge_token_destroy('signup-web', $q_token);
     db_commit();
 
-    print "<p>Your message has been sent to all the people who signed your pledge.  
+    print "<p>Your message will now be sent to all the people who signed your pledge.  
     Thanks, and enjoy carrying out you pledge!</p>";
 } else {
-    
+ 
+    if ($data['circumstance'] == 'success')
+        print '<p class="success">Your pledge is successful!</p>';
+
+ 
     // Display errors or success header
-    if (sizeof($errors)) {
-        print '<div id="errors"><ul><li>';
-        print join ('</li><li>', $errors);
-        print '</li></ul></div>';
-    }  else {
-        if ($data['circumstance'] == 'success') {
-            print '<p class="success">Your pledge is successful!</p>';
-        }
-    }
+    if (sizeof($errors))
+        print '<div id="errors"><ul><li>'
+                . join('</li><li>', array_map('htmlspecialchars', $errors))
+                . '</li></ul></div>';
 
     // Display form
-    ?>
+    $howmany = db_getOne('select count(id) from signers where pledge_id = ?', $pledge['id']);
+
+    print <<<EOF
 <p></p>
 
-<form accept-charset="utf-8" class="pledge" name="pledge" id="pledge" method="post" action="/M/<?=$q_h_token?>">
+<form accept-charset="utf-8" class="pledge" name="pledge" id="pledge" method="post" action="/M/$q_h_token">
 <h2>Send Announcement</h2>
 <div class="c">
-<p>Write a message to the <?=$pledge['signers']?> <?=$pledge['type']?> who
-signed your pledge.  This is to tell them what to do next.  Remember to give
-your own email address, phone number or website so they can contact you
-again.</p>
-<?
-    print <<<EOF
+<p>Write a message to the $howmany ${pledge['type']} who
+signed your pledge.  This is to tell them what to do next. <strong>Remember to
+give your own email address, phone number or website so they can contact you
+again.</strong></p>
+
 <h3>SMS message</h3>
 <p>Please enter a short (160 or fewer characters) summary of your main message,
 which can be sent to anyone who has signed up to your pledge by SMS only:</p>
@@ -158,9 +157,8 @@ function count_sms_characters() {
 count_sms_characters();
 //-->
 </script>
-<h3>Email message</h3>
 
-    ?>
+<h3>Email message</h3>
 
 <p><textarea
     name="message_body"

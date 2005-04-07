@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.52 2005-04-06 14:47:31 chris Exp $
+-- $Id: schema.sql,v 1.53 2005-04-07 13:58:53 chris Exp $
 --
 
 -- secret
@@ -44,6 +44,8 @@ create table pledges (
     -- password for private pledges
     password text default '',
 
+        -- XXX optionally, add a flag which prohibits signup by SMS?
+
     -- "at least" vs. "exactly"
     comparison text not null check (
             comparison = 'atleast' 
@@ -66,6 +68,22 @@ create table pledges (
     -- that has happened.
     completionnotified boolean not null default false
 );
+
+-- Announcements sent by pledge creators to signers. We require the pledge
+-- creator to 
+create table announcement (
+    id serial not null primary key,
+    pledge_id integer not null references pledges(id),
+        -- XXX should add circumstance field if we're having multiple
+        -- announcements
+    whensent timestamp not null,
+    emailbody text not null,
+    sms text not null
+        -- XXX see note above about prohibiting SMS signup
+);
+
+-- For the moment, constrain to one announcement per pledge on success only.
+create unique index announcement_pledge_id_idx on announcement(pledge_id);
 
 -- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
 -- Whether the given PLEDGE is valid for EMAIL or MOBILE to sign. One of EMAIL

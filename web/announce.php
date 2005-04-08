@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.12 2005-04-07 16:46:32 chris Exp $
+ * $Id: announce.php,v 1.13 2005-04-08 17:27:23 chris Exp $
  * 
  */
 
@@ -33,7 +33,7 @@ if (!($data = pledge_token_retrieve('announce-post', $q_token))
     err("No such token or pledge"); /* XXX make this a single, friendlier error message. */
 
 /* Verify that we haven't already sent the announcement. */
-if (!is_null(db_getOne('select id from announcement where pledge_id = ?', $data['pledge_id'])))
+if (!is_null(db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $data['pledge_id'])))
     err("Announcement already sent for this pledge");
 
 /* All OK. */
@@ -87,10 +87,19 @@ if ($q_submit) {
 if (!sizeof($errors) && $q_submit) {
     /* Got all the data we need. Just drop the announcement into the database
      * and let the frequentupdate script pass it to the signers. */
-    db_query('
-        insert into announcement (pledge_id, whensent, emailbody, sms)
-        values (?, current_timestamp, ?, ?)',
-        array($pledge['id'], $q_message_body, $q_message_sms));
+    db_query("
+        insert into message
+            (pledge_id, circumstance,
+            sendtocreator, sendtosigners, sendassms, sendtolatesigners,
+            emailsubject, emailbody, sms)
+        values
+            (?, 'success-announce',
+            false, true, true, true,
+            ?, ?, ?)",
+        array(
+            $pledge['id'],
+            "Pledge success! ${pledge['title']}",
+                $q_message_body, $q_message_sms));
     pledge_token_destroy('signup-web', $q_token);
     db_commit();
 

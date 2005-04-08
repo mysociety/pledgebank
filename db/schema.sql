@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.55 2005-04-08 17:13:15 chris Exp $
+-- $Id: schema.sql,v 1.56 2005-04-08 17:27:22 chris Exp $
 --
 
 -- secret
@@ -523,7 +523,7 @@ create table message (
     pledge_id integer not null references pledges(id),
     circumstance text not null,
     whencreated timestamp not null default current_timestamp,
-    senttocreator boolean not null,
+    sendtocreator boolean not null,
     sendtosigners boolean not null,
     sendassms boolean not null,
     sendtolatesigners boolean not null,

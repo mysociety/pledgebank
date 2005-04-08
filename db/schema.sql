@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.54 2005-04-07 16:57:16 chris Exp $
+-- $Id: schema.sql,v 1.55 2005-04-08 17:13:15 chris Exp $
 --
 
 -- secret
@@ -61,25 +61,31 @@ create table pledges (
     -- have already been sent out and so forth). So we instead note this here.
     removedsigneraftersuccess boolean not null default false,
 
-    -- When a pledge is successful, we mark it as successful here.
-    success boolean not null default false,
-);
+    -- 
+    -- States that we can be in: ("succeeded" means that the number of signers
+    -- equals or exceeds the threshold)
+    -- 
+    --  whensucceeded       whensentnotification    condition
+    --  ------------------- ----------------------- -------------------------
+    --  is null             is null                 pledge open
+    --  
+    --  is not null         is null                 pledge is open, has
+    --                                              succeeded, but no
+    --                                              automatic mails sent
+    -- 
+    --  is not null         is not null             pledge has succeeded and
+    --                                              the automatic "pledge
+    --                                              succeeded" emails have
+    --                                              been sent
+    -- 
+    --  is null             is not null             pledge has failed and
+    --                                              automatic failure
+    --                                              messages have been sent
+    -- 
 
--- Announcements sent by pledge creators to signers. We require the pledge
--- creator to 
-create table announcement (
-    id serial not null primary key,
-    pledge_id integer not null references pledges(id),
-        -- XXX should add circumstance field if we're having multiple
-        -- announcements
-    whensent timestamp not null,
-    emailbody text not null,
-    sms text not null
-        -- XXX see note above about prohibiting SMS signup
+    -- Record when a pledge succeeded.
+    whensucceeded timestamp,
 );
-
--- For the moment, constrain to one announcement per pledge on success only.
-create unique index announcement_pledge_id_idx on announcement(pledge_id);
 
 -- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
 -- Whether the given PLEDGE is valid for EMAIL or MOBILE to sign. One of EMAIL
@@ -501,14 +507,6 @@ create function smssubscription_sign(integer, text)
     end;
 ' language 'plpgsql';
 
--- Table which maps announcements to the signers to which they have been sent.
--- We use this to ensure that even signers who sign the pledge after completion
--- are sent the appropriate announcements.
-create table announcement_signer (
-    announcement_id integer not null references announcement(id),
-    signer_id integer not null references signers(id)
-);
-
 -- Stores randomly generated tokens and serialised hash arrays associated
 -- with them.
 create table token (
@@ -518,6 +516,39 @@ create table token (
     created timestamp not null,
     primary key (scope, token)
 );
+
+-- Messages sent to pledge creators and/or signers.
+create table message (
+    id serial not null primary key,
+    pledge_id integer not null references pledges(id),
+    circumstance text not null,
+    whencreated timestamp not null default current_timestamp,
+    senttocreator boolean not null,
+    sendtosigners boolean not null,
+    sendassms boolean not null,
+    sendtolatesigners boolean not null,
+    emailsubject text not null,
+    emailbody text not null,
+    sms text,
+    -- We can only send to signers by sms
+    check (not sendassms or sendtosigners),
+    check (sms is null or sendassms)
+);
+
+create unique index message_pledge_id_circumstance_idx on message(pledge_id, circumstance);
+
+-- To whom have messages been sent?
+create table message_creator_recipient (
+    message_id integer not null references message(id),
+    pledge_id integer not null references pledge(id)
+);
+
+create table message_signer_recipient (
+    message_id integer not null references message(id),
+    signer_id integer not null references signers(id);
+);
+
+
 
 -- If a row is present, that is date which is "today".  Used for debugging
 -- to advance time without having to wait.

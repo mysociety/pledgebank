@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.28 2005-04-05 17:48:22 francis Exp $
+# $Id: poster.cgi,v 1.29 2005-04-08 14:22:00 matthew Exp $
 #
 
 import os
@@ -405,7 +405,7 @@ Files are cached in the directory PB_PDF_CACHE specified in conf/general.""")
     else:
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup FROM pledges WHERE ref = %s', ref)
+        q.execute('SELECT title, date, name, type, target, signup FROM pledges WHERE ref ILIKE %s', ref)
         (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup']) = q.fetchone()
         q.close()
 

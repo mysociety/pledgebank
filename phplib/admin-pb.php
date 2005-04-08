@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.14 2005-03-30 12:01:16 francis Exp $
+ * $Id: admin-pb.php,v 1.15 2005-04-08 14:21:59 matthew Exp $
  * 
  */
 
@@ -26,7 +26,7 @@ class ADMIN_PAGE_PB {
         $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time');
         foreach ($cols as $s => $col) {
             print '<th>';
-            if ($sort != $s) print '<a href="'.$this->self_link.'&s='.$s.'">';
+            if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.'">';
             print $col;
             if ($sort != $s) print '</a>';
             print '</th>';
@@ -55,7 +55,7 @@ class ADMIN_PAGE_PB {
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
             $row = '<td>'.$r['ref'].'</td>';
-            $row .= '<td><a href="'.$this->self_link.'&pledge='.$r['ref'].'">'.
+            $row .= '<td><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">'.
             $r['title'].'</a>';
             if ($r['confirmed'] == 'f') {
                 $row .= "<br><b>not confirmed</b>";
@@ -101,7 +101,7 @@ class ADMIN_PAGE_PB {
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 'e';
 
-        $q = db_query('SELECT * FROM pledges where ref=?', $pledge);
+        $q = db_query('SELECT * FROM pledges where ref ILIKE ?', $pledge);
         $pdata = db_fetch_array($q);
 
         print "<h2>Pledge '" . $pdata['ref'] . "' &mdash; " .  $pdata['title'] . "</h2>";
@@ -149,7 +149,7 @@ class ADMIN_PAGE_PB {
             $cols = array('e'=>'Signer', 't'=>'Time', 'n'=>'Show name?');
             foreach ($cols as $s => $col) {
                 print '<th>';
-                if ($sort != $s) print '<a href="'.$this->self_link.'&pledge='.$pledge.'&amp;s='.$s.'">';
+                if ($sort != $s) print '<a href="'.$this->self_link.'&amp;pledge='.$pledge.'&amp;s='.$s.'">';
                 print $col;
                 if ($sort != $s) print '</a>';
                 print '</th>';

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.115 2005-04-07 11:24:44 chris Exp $
+// $Id: index.php,v 1.116 2005-04-08 14:22:00 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -302,7 +302,7 @@ function step1_error_check($data) {
     if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors[] = 'The reference must only contain letters, numbers, or a hyphen';
     $disallowed_refs = array('contact');
     if (in_array($data['ref'], $disallowed_refs)) $errors[] = 'That reference is not allowed.';
-    $dupe = db_getOne('SELECT id FROM pledges WHERE ref=?', array($data['ref']));
+    $dupe = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', array($data['ref']));
     if ($dupe) $errors[] = 'That reference is already taken!';
     if (!$data['title']) $errors[] = 'Please enter a pledge';
     if (!$data['date']) $errors[] = 'Please enter a deadline';
@@ -450,7 +450,7 @@ function add_signatory() {
     if (!is_null($errors))
         return $errors;
 
-    $r = db_getRow('select * from pledges where ref = ?', $q_ref);
+    $r = db_getRow('select * from pledges where ref ILIKE ?', $q_ref);
 
     if (!is_null($r['password']) && (is_null($q_pw) || sha1($q_pw) != $r['password']))
         err("Permission denied");
@@ -501,7 +501,7 @@ function view_pledge($errors = array()) {
 
     $ref = get_http_var('pledge'); 
     $h_ref = htmlspecialchars($ref);
-    $q = db_query('SELECT *, pb_current_date() <= date as open FROM pledges WHERE ref=?', array($ref));
+    $q = db_query('SELECT *, pb_current_date() <= date as open FROM pledges WHERE ref ILIKE ?', array($ref));
     if (!db_num_rows($q)) {
         err('PledgeBank reference not known');
         return false;
@@ -544,7 +544,7 @@ function view_pledge($errors = array()) {
 
 ?>
 <p></p>
-<form accept-charset="utf-8" class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="pledge_id" value="<?=$h_ref ?>">
+<form accept-charset="utf-8" class="pledge" name="pledge" action="./" method="post">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <div class="c">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true,
@@ -679,7 +679,7 @@ function list_all_pledges() {
 
 function pdfs() {
     $ref = get_http_var('pdf');
-    $q = db_query('SELECT * FROM pledges WHERE ref = ?', array($ref));
+    $q = db_query('SELECT * FROM pledges WHERE ref ILIKE ?', array($ref));
     $row = db_fetch_array($q);
     if (!deal_with_password('pdf', $ref, $row['password']))
         return false;
@@ -718,7 +718,7 @@ to get these flyers.
 }
 
 function search() {
-    $id = db_getOne('SELECT id FROM pledges WHERE ref = ?', array(get_http_var('search')));
+    $id = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', array(get_http_var('search')));
     if ($id) {
         Header("Location: " . get_http_var('search')); # TODO: should be absolute?
         exit;

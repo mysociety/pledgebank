@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ical.php,v 1.1 2005-03-25 16:31:30 matthew Exp $
+// $Id: ical.php,v 1.2 2005-04-08 14:22:00 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -19,7 +19,7 @@ if (!is_null(importparams(
         )))
     err("A required parameter was missing");
 
-$q = db_query('SELECT * FROM pledges WHERE confirmed AND ref=?', array($q_ref));
+$q = db_query('SELECT * FROM pledges WHERE confirmed AND ref ILIKE ?', array($q_ref));
 if (!db_num_rows($q))
     err('Illegal PledgeBank reference!');
 

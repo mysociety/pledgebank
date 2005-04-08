@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.16 2005-04-05 18:02:55 chris Exp $
+# $Id: SMS.pm,v 1.17 2005-04-08 14:21:57 matthew Exp $
 #
 
 package PB::SMS;
@@ -247,7 +247,7 @@ sub receive_sms ($$$$$$) {
                 # Exact reference match.
                 my $pledge_id = dbh()->selectrow_array('
                                         select id from pledges
-                                        where ref = ? and confirmed
+                                        where ref ilike ? and confirmed
                                     ', {}, $ref);
 
                 # Approximate reference match.

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.56 2005-04-08 17:27:22 chris Exp $
+-- $Id: schema.sql,v 1.57 2005-04-08 17:42:42 chris Exp $
 --
 
 -- secret
@@ -60,28 +60,6 @@ create table pledges (
     -- been marked as successful we can't undo that (because success emails
     -- have already been sent out and so forth). So we instead note this here.
     removedsigneraftersuccess boolean not null default false,
-
-    -- 
-    -- States that we can be in: ("succeeded" means that the number of signers
-    -- equals or exceeds the threshold)
-    -- 
-    --  whensucceeded       whensentnotification    condition
-    --  ------------------- ----------------------- -------------------------
-    --  is null             is null                 pledge open
-    --  
-    --  is not null         is null                 pledge is open, has
-    --                                              succeeded, but no
-    --                                              automatic mails sent
-    -- 
-    --  is not null         is not null             pledge has succeeded and
-    --                                              the automatic "pledge
-    --                                              succeeded" emails have
-    --                                              been sent
-    -- 
-    --  is null             is not null             pledge has failed and
-    --                                              automatic failure
-    --                                              messages have been sent
-    -- 
 
     -- Record when a pledge succeeded.
     whensucceeded timestamp,
@@ -527,9 +505,16 @@ create table message (
     sendtosigners boolean not null,
     sendassms boolean not null,
     sendtolatesigners boolean not null,
-    emailsubject text not null,
-    emailbody text not null,
+    emailtemplatename text,
+    emailsubject text,
+    emailbody text,
     sms text,
+    check (
+            (emailtemplatename is not null
+                and (emailsubject is null and emailbody is null))
+            or (emailtemplatename is null
+                and (emailsubject is not null and emailbody is not null))
+        ),
     -- We can only send to signers by sms
     check (not sendassms or sendtosigners),
     check (sms is null or sendassms)

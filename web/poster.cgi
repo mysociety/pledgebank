@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.29 2005-04-08 14:22:00 matthew Exp $
+# $Id: poster.cgi,v 1.30 2005-04-08 14:47:14 matthew Exp $
 #
 
 import os
@@ -287,10 +287,10 @@ def flyers(number):
     # Just A4 for now
     (page_width, page_height) = A4
     # Tweaked to make sure dotted lines are displayed on all edges
-    margin_top = 0.1 * cm
-    margin_left = 0.1 * cm
-    margin_bottom = 0.1 * cm
-    margin_right = 0.1 * cm
+    margin_top = 1 * cm
+    margin_left = 1 * cm
+    margin_bottom = 1 * cm
+    margin_right = 1 * cm
 
     # Calculate size of fliers
     flyer_width = (page_width - margin_left - margin_right) / flyers_across 

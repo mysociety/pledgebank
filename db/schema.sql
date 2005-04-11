@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.58 2005-04-11 10:21:15 francis Exp $
+-- $Id: schema.sql,v 1.59 2005-04-11 13:10:04 chris Exp $
 --
 
 -- secret
@@ -528,12 +528,16 @@ create table message_creator_recipient (
     pledge_id integer not null references pledges(id)
 );
 
+create unique index message_creator_recipient_message_id_pledge_id_idx
+    on message_creator_recipient(message_id, pledge_id);
+
 create table message_signer_recipient (
     message_id integer not null references message(id),
     signer_id integer not null references signers(id)
 );
 
-
+create unique index message_signer_recipient_message_id_signer_id_idx
+    on message_signer_recipient(message_id, signer_id);
 
 -- If a row is present, that is date which is "today".  Used for debugging
 -- to advance time without having to wait.

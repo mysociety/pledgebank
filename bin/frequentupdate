@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.7 2005-04-05 19:06:45 francis Exp $
+ * $Id: frequentupdate,v 1.8 2005-04-11 13:10:04 chris Exp $
  *
  */
 
@@ -47,102 +47,228 @@ include_once '../../phplib/utility.php';
 db_connect();
 
 check_for_completed_pledges();
+send_pending_announcements();
 check_for_expired_pledges();
 
-function check_for_completed_pledges() {
-    global $verbose, $testrun;
+/* mark_pledges_successful
+ * Mark pledges which have exceeded their target as successful, and dispatch
+ * automatic success messages. */
+function mark_pledges_successful() {
+    $q = db_query('
+            select * from pledges
+            where whensucceeded is null
+                and current_timestamp < date
+                and (select count(id) from signers
+                    where pledge_id = pledges.id) >= target
+            for update');
 
-    $q = db_query("SELECT *, 
-        (SELECT COUNT(*) FROM signers WHERE pledge_id = pledges.id) as signatures
-        FROM pledges WHERE confirmed AND NOT completionnotified FOR UPDATE");
+    while ($pledge = db_fetch_row($q)) {
+        db_query('
+                update pledges
+                set whensucceeded = current_timestamp
+                where id = ?', $pledge['id']);
+        
+        /* Set up messages to go to creator and signers. */
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendassms, sendtolatesigners,
+                    emailtemplatename
+                ) values (
+                    ?, 'success-auto-creator',
+                    true, false, false, false,
+                    'succeeded-creator'
+                )", $pledge['id']);
+
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendassms, sendtolatesigners,
+                    emailtemplatename
+                ) values (
+                    ?, 'success-auto-signers',
+                    false, true, false, false,
+                    'succeeded-signer'
+                )", $pledge['id']);
+    }
+
+    db_commit();
+}
+
+/* send_automatic_failure_messages
+ * Send automatic pledge failure messages for pledges which have failed
+ * (passed their deadline without the number of signers reaching the
+ * threshold) and for which no such message has previously been sent. */
+function send_automatic_failure_messages() {
+    $q = db_query("
+                select * from pledges
+                where whensucceeded is null
+                    and current_timestamp > date
+                    and (select id
+                        from message
+                        where pledge_id = id
+                        and circumstance = 'failure-auto-creator') is null
+                for update");
+
     while ($r = db_fetch_array($q)) {
-        if ($r['signatures'] >= $r['target']) {
-            # Success
-            if ($testrun)
-                print "Would send success messages for pledge $r[id] ($r[title])\n";
-            elseif (!send_success_email($r))
-                print "Failure sending success messages, pledge $r[id] ($r[title])\n";
-            else {
-                db_query('UPDATE pledges SET completionnotified = true, success = true WHERE id = ?', $r['id']);
-                if ($verbose)
-                    print "Success messages sent for pledge $r[id] ($r[title])\n";
+         db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendassms, sendtolatesigners,
+                    emailtemplatename
+                ) values (
+                    ?, 'failure-auto-creator',
+                    true, false, false, false,
+                    'failed-creator'
+                )", $pledge['id']);
+
+
+        /* Unlike automatic success messages, automatic failure messages go
+         * by SMS too, because there's no other way for SMS signers to hear
+         * about them. */
+        $sms = "PledgeBank here. Sorry, the ${pledge['ref']} pledge has failed. Better luck next time!";
+
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendassms, sendtolatesigners,
+                    emailtemplatename, sms
+                ) values (
+                    ?, 'success-auto-signers',
+                    false, true, true, false,
+                    'failed-signer', ?
+                )", array($pledge['id'], $sms));
+    }
+    db_commit();
+}
+
+/* send_pending_messages
+ * Dispatch messages to pledge signers and creators which have not yet been
+ * sent. */
+function send_pending_messages() {
+    /* Messages to creators. */
+    $q = db_query('
+                select * from message
+                where sendtocreator
+                    and (select message_creator_recipient
+                        where message_id = id
+                            and message_creator_recipient.pledge_id
+                                = message.pledge_id) is null
+                order by random');
+
+    while ($msg = db_fetch_row($q)) {
+        /* Grab lock. As ever, this is bloody ugly, because we have to do
+         * something (send an email) which isn't transactional in the
+         * database, so we must do only one thing per transaction and commit
+         * once that transaction has succeeded. */
+        $f = db_getOne('
+                    select message_id
+                    from message_creator_recipient
+                    where message_id = ?
+                    for update', $msg['id']);
+
+        if (is_null($f))
+            continue;
+    
+        $pledge = db_getRow('select * from pledge where id = ?',
+                            $msg['pledge_id']);
+
+        $f = false;
+        if (isset($msg['emailtemplatename'])) {
+            /* Fill in some more information used in the email templates. */
+            $pledge['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $pledge['id']);
+            if ($pledge['actual'] >= $pledge['target'])
+                $pledge['exceeded_or_met'] = ($pledge['actual'] > $pledge['target'] ? 'exceeded' : 'met');
+            $pledge['sentence_first'] = pledge_sentence($pledge, array('firstperson' => true));
+            $pledge['sentence_third'] = pledge_sentence($pledge);
+            
+            /* XXX we also need a URL containing a token which is sent on success
+             * to the signer. For now just generate this here, but later on we'll
+             * need to move it into message, so that we can send reminders. */
+            if ($msg['circumstance'] == 'success-auto-creator') {
+                $token = pledge_token_store('announce-post', array(
+                                    'pledge_id' => $pledge['id'],
+                                    'circumstance' => 'success')
+                                );
+                $url = OPTION_BASE_URL . '/M/' . $token
+                $pledge['url'] = $url;
             }
-        }
-    }
-    db_commit();
-}
 
-function check_for_expired_pledges() {
-    global $verbose, $testrun;
-
-    $q = db_query("SELECT * FROM pledges WHERE confirmed AND date < pb_current_date() AND NOT completionnotified FOR UPDATE");
-    while ($r = db_fetch_array($q)) {
-        # Failure
-        if ($testrun)
-            print "Would send failure messages for pledge $r[id] ($r[title])\n";
-        elseif (!send_failure_email($r))
-            print "Failure sending failure messages of pledge $r[id] ($r[title])\n";
-        else {
-            db_query('UPDATE pledges SET completionnotified = true WHERE id = ?', $r['id']);
-            if ($verbose)
-                print "Failure messages sent for pledge $r[id] ($r[title])\n";
-        }
-    }
-    db_commit();
-}
-
-# ------------------------------------------
-
-function send_failure_email($pledge) {
-    $globalsuccess = 1;
-
-    $pledge_id = $pledge['id'];
-    $q = db_query('SELECT name, email FROM signers WHERE pledge_id=?', array($pledge_id));
-    $pledge['actual'] = db_num_rows($q);
-    $success = pb_send_email_template($pledge['email'], 'failed-creator', $pledge);
-    if ($success==0) 
-        $globalsuccess = 0;
-
-    while ($r = db_fetch_array($q)) {
-        if ($r['email']) {
-            $success = pb_send_email_template($r['email'], 'failed-signer', 
-                array_merge($pledge, array('signer_name'=>$r['name'])));
-            if ($success==0) 
-                $globalsuccess = 0;
+            $f = pb_send_email_template($pledge['email'], $msg['emailtemplatename'], $pledge);
         } else {
-            // TODO: Send SMS saying failure.
+            $f = pb_send_email($pledge['email'], $msg['emailsubject'], $msg['emailbody']);
         }
+
+        if ($f)
+            db_query('
+                    insert into message_creator_recipient
+                        (message_id, pledge_id)
+                    values (?, ?)', array($msg['id'], $pledge['id']));
+        else
+            print "failed to send message ${r['id']} to creator of pledge ${pledge['id']}\n";   /* XXX stderr */
+
+        db_commit();
     }
-    return $globalsuccess;
-}
 
-function send_success_email($pledge) {
-    $q = db_query('SELECT * FROM signers WHERE pledge_id=?', array($pledge['id']));
-    $pledge['actual'] = db_num_rows($q);
-    $pledge['exceeded_or_met'] = ($pledge['actual']>$pledge['target']?'exceeded':'met');
+    /* Messages to signers. Slightly nastier because of the
+     * signed-after-success and SMS options. We grab message and recipient
+     * info for each signer-message pair which is pending on delivery. */
+    $q = db_query('
+                select message.*,
+                    signers.id as signer_id,
+                    signers.name as signer_name,
+                    signers.email as signer_email,
+                    signers.mobile as signer_mobile
+                from message, signers
+                where sendtosigners
+                    message.pledge_id = signers.pledge_id
+                    and (sendassms or signers.email is not null)
+                    and (sendtolatesigners
+                            or signers.signtime < pledges.whensucceeded)
+                    and (select signer_id
+                        from message_signer_recipient
+                        where message_id = message.id
+                            and signer_id = signers.id) is null
+                order by random');
+    
+    while ($r = db_getRow($q)) {
+        /* Grab a lock. Actually it doesn't matter what we lock here, so just
+         * use the row in the recipients table. */
+        $f = db_getOne('
+                    select message_id
+                    from message_creator_recipient
+                    where message_id = ? and signer_id = ?
+                    for update', array($r['id'], $r['signer_id']);
 
-    $globalsuccess = 1;
-    $title = $pledge['title'];
+        if (is_null($f))
+            continue;
 
-    $data = array('pledge_id' => $pledge['id'], 'circumstance' => 'success');
-    $token = pledge_token_store('announce-post', $data);
-    $url = OPTION_BASE_URL . "/M/" . $token;
-    $success = pb_send_email_template($pledge['email'], 'succeeded-creator', 
-            array_merge($pledge, array('url'=>$url)));
-    if ($success==0) 
-        $globalsuccess = 0;
+        if (is_null($r['signer_email'])) {
+            /* Send by SMS. */
+            db_query('
+                    insert into outgoingsms (recipient, message, whensubmitted)
+                    values (?, ?, ?)',
+                    array($r['signer_mobile'], $r['sms'], time()));
+        } elseif (isset($r['emailtemplatename']))
+            /* Send email template. */
+            $pledge = db_getRow('select * from pledges where id = ?', $r['pledge_id']);
 
-    $s = db_fetch_array($q);
-    while ($s) {
-        if ($s['email']) {
-            $success = pb_send_email_template($s['email'], 'succeeded-signer',
-                array_merge($pledge, array('signer_name'=>$s['name'])));
-            if ($success==0) 
-                $globalsuccess = 0;
+            /* Fill in some more information used in the email templates.
+             * XXX repeated code -- need a function for this, probably. */
+            $pledge['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $pledge['id']);
+            if ($pledge['actual'] >= $pledge['target'])
+                $pledge['exceeded_or_met'] = ($pledge['actual'] > $pledge['target'] ? 'exceeded' : 'met');
+            $pledge['sentence_first'] = pledge_sentence($pledge, array('firstperson' => true));
+
+            $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $pledge);
+        } else {
+            /* Send raw mail. */
+            $f = pb_send_email($pledge['email'], $msg['emailsubject'], $msg['emailbody']);
         }
-        $s = db_fetch_array($q);
+
+        db_query('
+                insert into message_signer_recipient (message_id, signer_id)
+                values (?, ?)', array($r['id'], $r['signer_id']));
+        db_commit();
     }
-    return $globalsuccess;
 }
-
-

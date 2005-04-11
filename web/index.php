@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.121 2005-04-11 23:06:06 matthew Exp $
+// $Id: index.php,v 1.122 2005-04-11 23:19:43 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -184,6 +184,7 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 
 <p style="margin-bottom: 1em;">Your name: <input type="text" size="20" name="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 Email: <input type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
+<br><small>(we need your email so we can get in touch with you when your pledge completes, and so on)</small>
 </div>
 <p style="text-align: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
 <? if (sizeof($data)) {

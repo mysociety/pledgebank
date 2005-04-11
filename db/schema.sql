@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.57 2005-04-08 17:42:42 chris Exp $
+-- $Id: schema.sql,v 1.58 2005-04-11 10:21:15 francis Exp $
 --
 
 -- secret
@@ -62,7 +62,7 @@ create table pledges (
     removedsigneraftersuccess boolean not null default false,
 
     -- Record when a pledge succeeded.
-    whensucceeded timestamp,
+    whensucceeded timestamp
 );
 
 -- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
@@ -525,12 +525,12 @@ create unique index message_pledge_id_circumstance_idx on message(pledge_id, cir
 -- To whom have messages been sent?
 create table message_creator_recipient (
     message_id integer not null references message(id),
-    pledge_id integer not null references pledge(id)
+    pledge_id integer not null references pledges(id)
 );
 
 create table message_signer_recipient (
     message_id integer not null references message(id),
-    signer_id integer not null references signers(id);
+    signer_id integer not null references signers(id)
 );
 
 

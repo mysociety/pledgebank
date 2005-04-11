@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.117 2005-04-10 21:59:10 matthew Exp $
+// $Id: index.php,v 1.118 2005-04-11 11:47:38 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -451,8 +451,7 @@ function add_signatory() {
         return $errors;
 
     $r = db_getRow('select * from pledges where ref ILIKE ?', $q_ref);
-
-    if (!is_null($r['password']) && (is_null($q_pw) || sha1($q_pw) != $r['password']))
+    if (!check_password($q_ref, $r['password']))
         err("Permission denied");
 
     /* The exact mail we send depends on whether we're already signed up to
@@ -505,15 +504,16 @@ function view_pledge($errors = array()) {
     if (!db_num_rows($q)) {
         err('PledgeBank reference not known');
         return false;
-    } else {
-        $r = db_fetch_array($q);
+    } 
+    
+    $r = db_fetch_array($q);
 	$confirmed = ($r['confirmed'] == 't');
 	if (!$confirmed) {
 	    err('PledgeBank reference not known');
 	    return false;
 	}
-        if (!deal_with_password('pledge', $ref, $r['password']))
-            return false;
+    if (!deal_with_password('pledge', $ref, $r['password']))
+        return false;
 
     $title = "'I will " . $r['title'] . "'";
 	$q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($r['id']));
@@ -573,19 +573,20 @@ if ($r['detail']) {
     print '<p><strong>More details</strong><br>' . htmlspecialchars($r['detail']) . '</p>';
 }
 
-?>
-</form>
-
-<? if (!$finished) { ?>
+?> </form> <?
+    if (!$finished) { ?>
+<h2>Spread the Pledge</h2>
 <p style="text-align: center">
-    <a href="./<?=$h_ref ?>/flyers" title="Stick them places!">Print out customised flyers</a>
-   | <a href="./<?=$h_ref ?>/email">Email pledge to your friends</a>
-   | <a href="ical.php?ref=<?=$h_ref ?>">Add deadline to your calendar</a> 
+   <ul>
+   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?></li>
+   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
+   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
+   </ul>
 </p>
-<? } ?>
-<!-- <p><em>Need some way for originator to view email addresses of everyone, needs countdown, etc.</em></p> -->
+<?
+ }
 
-<h2>Current signatories</h2><?
+?><h2>Current signatories</h2><?
         $out = '<li>'
                 . htmlspecialchars($r['name'])
                 . ' (Pledge Author)</li>';
@@ -627,7 +628,7 @@ if ($r['detail']) {
             print "<li>$extra</li>";
         }
         print '</ul>';
-    }
+    
 }
 
 # Someone has submitted a new pledge
@@ -700,21 +701,32 @@ function pdfs() {
 <h2>Customised Flyers</h2>
 <p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
-<!--<li><a href="<?=$pdf_flyers1_url?>">Big poster (A4, PDF)</a></li>
-<li><a href="<?=$pdf_flyers4_url?>">Flyers for handing out, 4 per page (A4, PDF)</a></li>-->
-<li><a href="<?=$pdf_flyers8_url?>">Flyers for handing out, 8 per page (A4, PDF, like picture below)</a></li>
-<!--<li><a href="<?=$pdf_flyers16_url?>">Loads of little flyers, 16 per page (A4, PDF)</a></li>-->
-<!-- <li><a href="<?=$pdf_tearoff_url?>">Tear-off format (like accommodation rental ones) (A4)</a></li> -->
+<!--
+<li><? print_link_with_password($pdf_flyers1_url, "", "Big poster (A4, PDF)") ?> </li>
+<li><? print_link_with_password($pdf_flyers4_url, "", "Flyers for handing out, 4 per page (A4, PDF)") ?> </li>
+-->
+<li><? print_link_with_password($pdf_flyers8_url, "", "Flyers for handing out, 8 per page (A4, PDF, like picture below)") ?> </li>
+<!--
+<li><? print_link_with_password($pdf_flyers16_url, "", "Loads of little flyers, 16 per page (A4, PDF)") ?> </li>
+<li><? print_link_with_password($pdf_tearoff_url, "", "Tear-off format (like accommodation rental ones) (A4)") ?> </li>
+-->
 </ul>
 </div>
-
+<?
+    // Show inline graphics only for passwordless pledges (as PNG doesn't
+    // work for the password protected ones, you can't POST a password
+    // into an IMG SRC= link)
+    if (!get_http_var('pw')) {
+?>
 <p class="noprint">Alternatively, simply 
 <?print_this_link("print this page out", "")?>
 to get these flyers.
 </p>
 
 <p><a href="<?=$png_flyers8_url?>"><img src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
-<?  return true;
+<?  }
+
+    return true;
 }
 
 function search() {

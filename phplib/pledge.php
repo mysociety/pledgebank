@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.37 2005-04-06 13:55:47 chris Exp $
+ * $Id: pledge.php,v 1.38 2005-04-11 11:47:38 francis Exp $
  * 
  */
 
@@ -319,30 +319,67 @@ function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
     return $id;
 }
 
-/* deal_with_password(form input name of variable used to pass pledge reference (e.g. pdf for the pdf page),
-        pledge reference, actual password)
-  XXX: Doesn't work with non-index.php pages yet!
- */
-function deal_with_password($type, $ref, $actual) {
-    $h_ref = htmlspecialchars($ref);
+/* check_password REF ACTUAL_PASSWORD
+   Checks to see if password submitted is correct, returns true if it
+   is and false for wrong or no password.  */
+function check_password($ref, $actual) {
     $raw = get_http_var('pw');
     $entered = $raw ? sha1($raw) : $raw;
-    if (!$actual) return true;
+    if (!$actual) 
+        return true;
+
     if ($entered) {
-        if ($entered != $actual) {
-            print '<p class="finished">Incorrect password!</p>';
-            print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="' . $type . '" value="' . $h_ref . '"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
-            print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
-            print '</form>';
+        if ($entered == $actual) {
+            return true;
+        } else {
             return false;
         }
     } else {
-        print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="' . $type . '" value="' . $h_ref . '"><h2>Password Protected Pledge</h2><p>This pledge is password protected: please enter the password to proceed:</p>';
-        print '<p><input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
-        print '</form>';
         return false;
     }
-    return true;
 }
-    
-?>
+
+/* deal_with_password FORM_VAR_NAME REF ACTUAL_PASSWORD
+   Calls check_password and if necessary displays form for entering the password.
+   FORM_VAR_NAME form input name of variable used to pass pledge reference
+                 (e.g. pdf for the pdf page),
+   REF pledge reference
+   ACTUAL_PASSWORD actual password
+  XXX: Doesn't work with non-index.php pages yet!
+*/
+function deal_with_password($type, $ref, $actual) {
+    if (check_password($ref, $actual)) {
+        return true;
+    }
+
+    if (get_http_var('pw')) {
+        print '<p class="finished">Incorrect password!</p>';
+    }
+
+    print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="' . $type . '" value="' . htmlspecialchars($ref) . '"><h2>Password Protected Pledge</h2><p>This pledge is password protected.  Please enter the password to proceed.</p>';
+    print '<p><strong>Password:</strong> <input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
+    print '</form>';
+    return false;
+}
+
+
+/* print_link_with_password
+   Prints out a link, normally just using <a href=...>.  Title is for
+   the title= attribute, and text is the actual text body of the link.
+   If this page has a password, then instead of a link prints a button which
+   also transmits the passowrd to the link page.  Text to this function
+   should be already escaped, or not need escaping, for display in URLs or
+   HTML.*/
+function print_link_with_password($link, $title, $text) {
+    if (get_http_var('pw')) {
+?> 
+    <form class="buttonform" name="buttonform" action="<?=$link?>" method="post" title="<?=$title?>">
+    <input type="hidden" name="pw" value="<?=htmlspecialchars(get_http_var('pw'))?>">
+    <input type="submit" name="submit" value="<?=$text?>">
+    </form>
+<?
+    } else {
+?><a href="<?=$link?>" title="<?=$title?>"><?=$text?></a><?
+    }
+}
+

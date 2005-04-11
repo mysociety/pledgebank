@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.30 2005-04-08 14:47:14 matthew Exp $
+# $Id: poster.cgi,v 1.31 2005-04-11 11:47:38 francis Exp $
 #
 
 import os
@@ -19,6 +19,7 @@ from pyPgSQL import PgSQL
 import fcgi
 import tempfile
 import string
+import sha
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
@@ -323,140 +324,161 @@ def flyers(number):
 while fcgi.isFCGI():
     req = fcgi.Accept()
     fs = req.getFieldStorage()
-    #req.err.write("got request in poster.cgi, path: %s\n" % req.env.get('PATH_INFO'))
+    # req.err.write("got request in poster.cgi, path: %s\n" % req.env.get('PATH_INFO'))
 
-    if req.env.get('PATH_INFO'):
-        incgi = True
+    try:
+        if req.env.get('PATH_INFO'):
+            incgi = True
 
-        path_info = req.env.get('PATH_INFO').split('_')
-        if len(path_info)>0:
-            ref = path_info[0][1:]
+            path_info = req.env.get('PATH_INFO').split('_')
+            if len(path_info)>0:
+                ref = path_info[0][1:]
 
-        if len(path_info)>1 and path_info[1]:
-            size = path_info[1]
+            if len(path_info)>1 and path_info[1]:
+                size = path_info[1]
+            else:
+                size = 'A4'
+                
+            if len(path_info)>2 and path_info[2]:
+                type = path_info[2]
+                (type, format) = type.split('.')
+            else:
+                type = 'cards'
+                format = 'pdf'
         else:
-            size = 'A4'
-            
-        if len(path_info)>2 and path_info[2]:
-            type = path_info[2]
-            (type, format) = type.split('.')
-        else:
-            type = 'cards'
-            format = 'pdf'
-    else:
-        incgi = False
+            incgi = False
 
-        from optparse import OptionParser
-        parser = OptionParser()
-        parser.set_usage("""
-    ./poster.cgi REF [OPTIONS]
+            from optparse import OptionParser
+            parser = OptionParser()
+            parser.set_usage("""
+        ./poster.cgi REF [OPTIONS]
 
-Generates a poster or flyer for PledgeBank in PDF and other formats.  Designed
-to be run as a FastCGI script, but can be run on the command line for testing.
-REF is the PledgeBank reference of the poster to be printed.  The output
-is sent to standard output if run as a CGI.
+    Generates a poster or flyer for PledgeBank in PDF and other formats.  Designed
+    to be run as a FastCGI script, but can be run on the command line for testing.
+    REF is the PledgeBank reference of the poster to be printed.  The output
+    is sent to standard output if run as a CGI.
 
-Files are cached in the directory PB_PDF_CACHE specified in conf/general.""")
-        parser.add_option("--size", dest="size", default="A4",
-            help=", ".join(sizes));
-        parser.add_option("--type", dest="type", default="flyers4",
-            help=", ".join(types));
-        parser.add_option("--format", dest="format", default="pdf",
-            help=", ".join(formats));
-        (options, args) = parser.parse_args()
-        if len(args) <> 1:
-            parser.print_help()
-            req.err.write("specify Pledgebank ref")
-            continue
-        ref = args[0] 
-        size = options.size
-        type = options.type 
-        format = options.format
+    Files are cached in the directory PB_PDF_CACHE specified in conf/general.""")
+            parser.add_option("--size", dest="size", default="A4",
+                help=", ".join(sizes));
+            parser.add_option("--type", dest="type", default="flyers4",
+                help=", ".join(types));
+            parser.add_option("--format", dest="format", default="pdf",
+                help=", ".join(formats));
+            (options, args) = parser.parse_args()
+            if len(args) <> 1:
+                parser.print_help()
+                req.err.write("specify Pledgebank ref")
+                continue
+            ref = args[0] 
+            size = options.size
+            type = options.type 
+            format = options.format
 
-    if incgi:
-        if format == 'pdf':
-            req.out.write("Content-Type: application/pdf\r\n\r\n")
-        elif format == 'png':
-            req.out.write("Content-Type: image/png\r\n\r\n")
-        elif format == 'gif':
-            req.out.write("Content-Type: image/gif\r\n\r\n")
-        else:
-            req.out.write("Content-Type: text/plain\r\n\r\n")
+        if not size in sizes:
+            raise Exception, "Unknown size '%s'" % size
+        if not type in types:
+            raise Exception, "Unknown type '%s'" % type
+        if not format in formats:
+            raise Exception, "Unknown format '%s'" % format
 
-    if not size in sizes:
-        raise Exception, "Unknown size '%s'" % size
-    if not type in types:
-        raise Exception, "Unknown type '%s'" % type
-    if not format in formats:
-        raise Exception, "Unknown format '%s'" % format
-
-    outdir = mysociety.config.get("PB_PDF_CACHE")
-    outpdf = "%s_%s_%s.pdf" % (ref, size, type)
-    outfile = "%s_%s_%s.%s" % (ref, size, type, format)
-
-    def file_to_stdout(filename):
-        f = file(filename, 'rb')
-        content = f.read()
-        f.close()
-        req.out.write(content)
-
-    if os.path.exists(outdir + '/' + outfile) and incgi:
-        file_to_stdout(outdir + '/' + outfile)
-    else:
+        # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup FROM pledges WHERE ref ILIKE %s', ref)
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup']) = q.fetchone()
+        q.execute('SELECT title, date, name, type, target, signup, password FROM pledges WHERE ref ILIKE %s', ref)
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['password']) = q.fetchone()
         q.close()
-
         day = date.day
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         if pledge['signup'] == "do the same":
             pledge['signup'] = "too"
         sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
-        # Generate PDF file
-        (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
-        c = canvas.Canvas(canvasfilename)
-        try:
-            if type == "cards":
-                cards()
-            elif type == "tearoff":
-                tearoff()
-            elif type == "flyers16":
-                flyers(16)
-            elif type == "flyers8":
-                flyers(8)
-            elif type == "flyers4":
-                flyers(4)
-            elif type == "flyers1":
-                flyers(1)
+        # Check password
+        #req.err.write("password %s\n" % pledge['password'])
+        if pledge['password']:
+            userpassword = fs['pw'].value
+            sha_calc = sha.new()
+            sha_calc.update(userpassword)
+            crypt_userpassword = sha_calc.hexdigest()
+            #req.err.write("userpassword %s\n" % crypt_userpassword)
+            if crypt_userpassword != pledge['password']:
+                raise Exception, "Correct password needed for '%s' pledge" % ref
+
+        # Header
+        if incgi:
+            if format == 'pdf':
+                req.out.write("Content-Type: application/pdf\r\n\r\n")
+            elif format == 'png':
+                req.out.write("Content-Type: image/png\r\n\r\n")
+            elif format == 'gif':
+                req.out.write("Content-Type: image/gif\r\n\r\n")
             else:
-                raise Exception, "Unknown type '%s'" % type
-        except Exception, e:
-            req.err.write(string.join(e.args,' '))
-            c.setStrokeColorRGB(0,0,0)
-            c.setFont("Helvetica", 15)
-            c.drawCentredString(10.5*cm, 25*cm, str(e))
-        c.save()
-        os.rename(canvasfilename, outdir + '/' + outpdf)
-        os.chmod(outdir + '/' + outpdf, 0644)
-            
-        # Generate any other file type
-        if format != 'pdf':
-            # Call out to "convert" from ImageMagick
-            cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outdir + '/' + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outdir + '/' + outfile
-            child = popen2.Popen3(cmd, True) # capture stderr
-            child.tochild.close()
-            req.err.write(child.fromchild.read())
-            req.err.write(child.childerr.read())
-            status = child.wait()
-            if os.WIFSIGNALED(status):
-                raise Exception, "%s: killed by signal %d" % (cmd, os.WTERMSIG(status))
-            elif os.WEXITSTATUS(status) != 0:
-                raise Exception, "%s: exited with failure status %d" % (cmd, os.WEXITSTATUS(status))
-        if (incgi):
+                req.out.write("Content-Type: text/plain\r\n\r\n")
+
+        # Cache file checking
+
+        def file_to_stdout(filename):
+            f = file(filename, 'rb')
+            content = f.read()
+            f.close()
+            req.out.write(content)
+
+        outdir = mysociety.config.get("PB_PDF_CACHE")
+        outpdf = "%s_%s_%s.pdf" % (ref, size, type)
+        outfile = "%s_%s_%s.%s" % (ref, size, type, format)
+
+        if os.path.exists(outdir + '/' + outfile) and incgi:
+            # Use cache file
             file_to_stdout(outdir + '/' + outfile)
+        else:
+            # Generate PDF file
+            (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
+            c = canvas.Canvas(canvasfilename)
+            try:
+                if type == "cards":
+                    cards()
+                elif type == "tearoff":
+                    tearoff()
+                elif type == "flyers16":
+                    flyers(16)
+                elif type == "flyers8":
+                    flyers(8)
+                elif type == "flyers4":
+                    flyers(4)
+                elif type == "flyers1":
+                    flyers(1)
+                else:
+                    raise Exception, "Unknown type '%s'" % type
+            except Exception, e:
+                req.err.write(string.join(e.args,' '))
+                c.setStrokeColorRGB(0,0,0)
+                c.setFont("Helvetica", 15)
+                c.drawCentredString(10.5*cm, 25*cm, str(e))
+            c.save()
+            os.rename(canvasfilename, outdir + '/' + outpdf)
+            os.chmod(outdir + '/' + outpdf, 0644)
+                
+            # Generate any other file type
+            if format != 'pdf':
+                # Call out to "convert" from ImageMagick
+                cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outdir + '/' + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outdir + '/' + outfile
+                child = popen2.Popen3(cmd, True) # capture stderr
+                child.tochild.close()
+                req.err.write(child.fromchild.read())
+                req.err.write(child.childerr.read())
+                status = child.wait()
+                if os.WIFSIGNALED(status):
+                    raise Exception, "%s: killed by signal %d" % (cmd, os.WTERMSIG(status))
+                elif os.WEXITSTATUS(status) != 0:
+                    raise Exception, "%s: exited with failure status %d" % (cmd, os.WEXITSTATUS(status))
+            if (incgi):
+                file_to_stdout(outdir + '/' + outfile)
+
+    except Exception, e:
+        req.out.write("Content-Type: text/plain\r\n\r\n")
+        req.out.write("Sorry, we weren't able to make your PDF.\n\n")
+        req.out.write(string.join(e.args,' '))
 
     req.Finish()
 

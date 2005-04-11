@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.22 2005-04-05 17:48:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.23 2005-04-11 17:39:57 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -160,6 +160,7 @@ sub create_pledge {
     my $confirmation_email = $wth->email_get_containing(
         '%To: '.email_n($who).'%to confirm that you%');
     die "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
+print "Pledge confirm $1\n";
     $b->get($1);
     $wth->browser_check_contents("Thank you for confirming your pledge");
 }
@@ -201,11 +202,11 @@ sub do_private_failing_pledge {
         $wth->browser_check_no_contents("Incorrect password!");
         $b->submit_form(form_name => 'pledge',
                 fields => { pw => 'thisisnotthepassword' },
-                button => 'submit') or die "Failed to submit password form";
+                button => 'submitpassword') or die "Failed to submit password form";
         $wth->browser_check_contents("Incorrect password!");
         $b->submit_form(form_name => 'pledge',
                 fields => { pw => $private_password },
-                button => 'submit') or die "Failed to submit password form";
+                button => 'submitpassword') or die "Failed to submit password form";
         $wth->browser_check_contents($pledge_action_private);
     };
 

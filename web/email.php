@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: email.php,v 1.5 2005-04-08 14:22:00 matthew Exp $
+// $Id: email.php,v 1.6 2005-04-11 13:32:15 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -14,25 +14,21 @@ require_once '../phplib/pledge.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
-$title = '';
+$title = "Emailing friends";
+page_header($title);
 
 if (!is_null(importparams(
             array('ref',     '/^[a-z0-9-]+$/i',  '')
-        )))
+        ))) {
     err("A required parameter was missing");
+}
 
 $q = db_query('SELECT * FROM pledges WHERE confirmed AND ref ILIKE ?', array($q_ref));
 if (!db_num_rows($q))
     err('Illegal PledgeBank reference!');
 
 $r = db_fetch_array($q);
-if (!deal_with_password('email', $q_ref, $r['password']))
-    err('Hmm, can\'t really err() as deal_with_password() prints stuff. Oh, and deal_with_password doesn\'t
-    currently work with non index.php links. XXX');
-
-$title = "Emailing 'I will $r[title]'";
-
-page_header($title);
+if (deal_with_password("/$q_h_ref/email", $q_ref, $r['password'])) {
 
 # fromname, fromemail, frommessage
 # email as an array
@@ -41,9 +37,14 @@ $fromemail = get_http_var('fromemail');
 $frommessage = get_http_var('frommessage');
 $emails = array();
 for ($i = 1; $i <= 5; $i++) {
-    $emails[] = get_http_var("email$i");
+    if (get_http_var("email$i")) 
+        $emails[] = get_http_var("email$i");
 }
-if ($fromname && $fromemail && $emails) {
+$errors = array();
+if (!$fromname) $errors[] = "Please enter your name";
+if (!$fromemail) $errors[] = "Please enter your email";
+if (count($emails) < 1) $errors[] = "Please enter the email addresses of the people you want to tell about the pledge";
+if (!$errors) {
     if (sizeof($emails)>5)
         err("Trying to use us for SPAMMING!?!?!");
     $success = 1;
@@ -64,18 +65,26 @@ if ($fromname && $fromemail && $emails) {
         print '<p>Unfortunately, something went wrong when trying to send the emails.</p>';
     }
 } else {
-    view_pledge($q_ref, $r);
+    view_pledge($q_ref, $r, $errors);
 }
+
+} // password
+
 page_footer();
 
 # Individual pledge page
-function view_pledge($ref, $r) {
-    global $today;
+function view_pledge($ref, $r, $errors) {
     $h_ref = htmlspecialchars($ref);
     $q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($r['id']));
     $curr = db_num_rows($q);
     $left = $r['target'] - $curr;
-?>
+
+	if (sizeof($errors) and get_http_var('submit')) {
+		print '<div id="errors"><ul><li>';
+		print join ('</li><li>', $errors);
+		print '</li></ul></div>';
+	} else {
+    ?>
 <p align="center">Here's a reminder of the pledge you're telling people about:</p>
 <div class="pledge">
 <div class="c">
@@ -91,6 +100,7 @@ function view_pledge($ref, $r) {
 ?>
 </div>
 </div>
+<? } // errors ?>
 <p></p>
 <form class="tips" name="pledge" action="email" method="post"><input type="hidden" name="ref" value="<?=$h_ref ?>">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>

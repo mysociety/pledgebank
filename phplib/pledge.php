@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.38 2005-04-11 11:47:38 francis Exp $
+ * $Id: pledge.php,v 1.39 2005-04-11 13:32:15 francis Exp $
  * 
  */
 
@@ -339,15 +339,14 @@ function check_password($ref, $actual) {
     }
 }
 
-/* deal_with_password FORM_VAR_NAME REF ACTUAL_PASSWORD
+/* deal_with_password LINK REF ACTUAL_PASSWORD
    Calls check_password and if necessary displays form for entering the password.
-   FORM_VAR_NAME form input name of variable used to pass pledge reference
-                 (e.g. pdf for the pdf page),
+   LINK url for password form to post back to
    REF pledge reference
    ACTUAL_PASSWORD actual password
   XXX: Doesn't work with non-index.php pages yet!
 */
-function deal_with_password($type, $ref, $actual) {
+function deal_with_password($link, $ref, $actual) {
     if (check_password($ref, $actual)) {
         return true;
     }
@@ -356,8 +355,8 @@ function deal_with_password($type, $ref, $actual) {
         print '<p class="finished">Incorrect password!</p>';
     }
 
-    print '<form class="pledge" name="pledge" action="./" method="post"><input type="hidden" name="' . $type . '" value="' . htmlspecialchars($ref) . '"><h2>Password Protected Pledge</h2><p>This pledge is password protected.  Please enter the password to proceed.</p>';
-    print '<p><strong>Password:</strong> <input type="password" name="pw" value=""><input type="submit" name="submit" value="Submit"></p>';
+    print '<form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>Password Protected Pledge</h2><p>This pledge is password protected.  Please enter the password to proceed.</p>';
+    print '<p><strong>Password:</strong> <input type="password" name="pw" value=""><input type="submit" name="submitpassword" value="Submit"></p>';
     print '</form>';
     return false;
 }

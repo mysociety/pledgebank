@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.118 2005-04-11 11:47:38 francis Exp $
+// $Id: index.php,v 1.119 2005-04-11 13:32:15 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -512,7 +512,7 @@ function view_pledge($errors = array()) {
 	    err('PledgeBank reference not known');
 	    return false;
 	}
-    if (!deal_with_password('pledge', $ref, $r['password']))
+    if (!deal_with_password("/$h_ref", $ref, $r['password']))
         return false;
 
     $title = "'I will " . $r['title'] . "'";
@@ -680,9 +680,10 @@ function list_all_pledges() {
 
 function pdfs() {
     $ref = get_http_var('pdf');
+    $h_ref = htmlspecialchars($ref);
     $q = db_query('SELECT * FROM pledges WHERE ref ILIKE ?', array($ref));
     $row = db_fetch_array($q);
-    if (!deal_with_password('pdf', $ref, $row['password']))
+    if (!deal_with_password("/$h_ref/flyers", $ref, $row['password']))
         return false;
 
     if (!$row) {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ical.php,v 1.2 2005-04-08 14:22:00 matthew Exp $
+// $Id: ical.php,v 1.3 2005-04-11 13:32:15 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -24,9 +24,9 @@ if (!db_num_rows($q))
     err('Illegal PledgeBank reference!');
 
 $r = db_fetch_array($q);
-# if (!deal_with_password('email', $q_ref, $r['password']))
-#     err('Hmm, can\'t really err() as deal_with_password() prints stuff. Oh, and deal_with_password doesn\'t
-#     currently work with non index.php links. XXX');
+
+if (!check_password($q_ref, $r['password']))
+    err('Correct password required');
 
 header('Content-Type: text/calendar');
 output_ical($r);

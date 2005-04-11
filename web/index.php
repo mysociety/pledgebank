@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.119 2005-04-11 13:32:15 francis Exp $
+// $Id: index.php,v 1.120 2005-04-11 14:01:18 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -80,6 +80,9 @@ page_footer();
 # --------------------------------------------------------------------
 
 function report_form() {
+    err("Report form not working");
+    // TODO: Add password checking here
+    return;
     $q = db_query('SELECT title, signers.name AS name FROM signers,pledges WHERE signers.pledge_id=pledges.id AND signers.id=?', array(get_http_var('report')));
     if (!db_num_rows($q)) {
         err('<p>PledgeBank id not known');
@@ -97,6 +100,9 @@ function report_form() {
 }
 
 function send_report() {
+    err("Report form not working");
+    // TODO: Add password checking here
+    return;
     if (!is_null(importparams(
                 array('report',     '/^\d+$/',  ''),
                 array('reason',     '//',       '')
@@ -666,10 +672,10 @@ people to sign up to your pledge after you have clicked the link in the email.</
 	}
 }
 
-# Pledger has clicked on link in their email
+# TODO make this into useful browsing / searching interface
 function list_all_pledges() {
     print '<p>There wil have to be some sort of way into all the pledges, but I guess the below looks far more like the admin interface will, at present:</p>';
-    $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed AND password=\'\'');
+    $q = db_query('SELECT title,target,date,name,ref FROM pledges WHERE confirmed AND password IS NULL');
     print '<table><tr><th>Title</th><th>Target</th><th>Deadline</th><th>Creator</th><th>Short name</th></tr>';
     while ($r = db_fetch_row($q)) {
             $r[0] = '<a href="'.$r[4].'">'.$r[0].'</a>';
@@ -736,7 +742,7 @@ function search() {
         Header("Location: " . get_http_var('search')); # TODO: should be absolute?
         exit;
     }
-    $q = db_query('SELECT date,ref,title, pb_current_date() <= date as open FROM pledges WHERE title ILIKE \'%\' || ? || \'%\' ORDER BY date', array(get_http_var('search')));
+    $q = db_query('SELECT date,ref,title, pb_current_date() <= date as open FROM pledges WHERE password IS NULL AND title ILIKE \'%\' || ? || \'%\' ORDER BY date', array(get_http_var('search')));
     if (!db_num_rows($q)) {
         return '<p>Sorry, we could find nothing that matched "' . htmlspecialchars(get_http_var('search')) . '".</p>';
     } else {

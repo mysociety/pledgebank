@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.120 2005-04-11 14:01:18 francis Exp $
+// $Id: index.php,v 1.121 2005-04-11 23:06:06 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -175,7 +175,7 @@ the door of that neighbour whose name you've forgotten.</li>
 <p><strong>will</strong> <input type="text" id="signup" name="signup"
 size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'do the same') ?>">.</p>
 
-<p>The other people must sign up before <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']['iso']) ?>"></p>
+<p>The other people must sign up before <input title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']['iso']) ?>"> <small>(e.g. "5th May")</small></p>
 
 <p>Choose a short name for your pledge (6 to 12 letters):
 <input onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
@@ -225,6 +225,10 @@ function pledge_form_two($data, $errors = array()) {
 
 <p id="moreinfo">More details about your pledge:
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
+
+<p>On flyers and elsewhere, how would you like to be described?
+<small>(e.g. "resident of Tamilda Road")</small>
+<input type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
 
 <input type="hidden" name="comparison" value="atleast">
 <? /* <p>Should the pledge stop accepting new subscribers when it
@@ -322,7 +326,7 @@ function step1_error_check($data) {
 function pledge_form_two_submitted() {
     $errors = array();
     $data = array();
-    $fields = array('detail', 'comparison', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
+    $fields = array('detail', 'identity', 'comparison', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
@@ -576,7 +580,9 @@ Name: <input type="text" name="name" value="<?=htmlspecialchars(get_http_var('na
 <? }
 
 if ($r['detail']) {
-    print '<p><strong>More details</strong><br>' . htmlspecialchars($r['detail']) . '</p>';
+    $det = $r['detail'];
+    $det = preg_replace('#\n#', '<br>', $det);
+    print '<p><strong>More details</strong><br>' . htmlspecialchars($det) . '</p>';
 }
 
 ?> </form> <?
@@ -646,9 +652,10 @@ function create_new_pledge($data) {
         $data['password'] = null;
     $data['id'] = db_getOne("select nextval('pledges_id_seq')");
 	$add = db_query('INSERT INTO pledges (id, title, target, type, signup, date,
-        name, email, ref, token, confirmed, creationtime, detail, comparison, country, postcode, password) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, pb_current_timestamp(), ?, ?, ?, ?, ?)', 
-        array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password'] ? sha1($data['password']) : $data['password']));
+        name, email, ref, token, confirmed, creationtime, detail,
+        comparison, country, postcode, password, identity) VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, pb_current_timestamp(), ?, ?, ?, ?, ?, ?)', 
+        array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password'] ? sha1($data['password']) : '', $data['identity']));
 ?>
 <h2>Now check your email...</h2>
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other

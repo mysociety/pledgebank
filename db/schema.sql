@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.59 2005-04-11 13:10:04 chris Exp $
+-- $Id: schema.sql,v 1.60 2005-04-11 23:06:04 matthew Exp $
 --
 
 -- secret
@@ -34,6 +34,7 @@ create table pledges (
     -- pledge setter
     name text not null,
     email text not null,
+    identity text not null,
     -- metadata
     creationtime timestamp not null,
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.126 2005-04-12 22:39:17 matthew Exp $
+// $Id: index.php,v 1.127 2005-04-12 22:40:54 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -224,7 +224,7 @@ function pledge_form_two($data, $errors = array()) {
 
 <h2>New Pledge &#8211; Step 2 (optional details)</h2>
 
-<p id="moreinfo">More details about your pledge:
+<p id="moreinfo">More details about your pledge: <small>(no HTML; links and email addresses will be automatically spotted)</small>
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
 <p>On flyers and elsewhere, how would you like to be described?

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.14 2005-04-12 10:32:47 sandpit Exp $
+ * $Id: frequentupdate,v 1.15 2005-04-12 10:42:31 francis Exp $
  *
  */
 
@@ -16,7 +16,8 @@ require_once "../phplib/pledge.php";
 
 function verbose($str) {
     global $verbose;
-    if ($verbose) fwrite(STDERR, "frequentupdate: $str\n");
+    if ($verbose) 
+        fwrite(STDERR, "frequentupdate: $str\n");
 }
 
 $short_opts = '';

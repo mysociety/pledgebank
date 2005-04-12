@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.62 2005-04-12 10:29:08 francis Exp $
+-- $Id: schema.sql,v 1.63 2005-04-12 13:27:12 sandpit Exp $
 --
 
 -- secret
@@ -345,7 +345,7 @@ create function signers_combine_2(integer, integer)
         t_pledge_id := (select pledge_id from signers where id = $1);
 
         -- lock pledges table in case we need to update it later
-        select into p success
+        select into p whensucceeded
             from pledges
             where id = t_pledge_id
             for update;
@@ -371,7 +371,7 @@ create function signers_combine_2(integer, integer)
             set mobile = t_mobile
             where id = id1;
 
-        if success then
+        if p.whensucceeded is not null then
             -- pledge was successful and now we''re removing a signer, so record
             -- this fact
             update pledges set removedsigneraftersuccess = true

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.123 2005-04-12 10:29:09 francis Exp $
+// $Id: index.php,v 1.124 2005-04-12 17:14:27 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -582,8 +582,8 @@ Name: <input type="text" name="name" value="<?=htmlspecialchars(get_http_var('na
 
 if ($r['detail']) {
     $det = $r['detail'];
-    $det = preg_replace('#\n#', '<br>', $det);
-    print '<p><strong>More details</strong><br>' . htmlspecialchars($det) . '</p>';
+    $det = preg_replace('#\n#', '<br>', htmlspecialchars($det));
+    print '<p><strong>More details</strong><br>' . $det . '</p>';
 }
 
 ?> </form> <?

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.61 2005-04-11 23:19:42 matthew Exp $
+-- $Id: schema.sql,v 1.62 2005-04-12 10:29:08 francis Exp $
 --
 
 -- secret
@@ -14,6 +14,44 @@ create table secret (
     secret text not null
 );
 
+-- If a row is present, that is date which is "today".  Used for debugging
+-- to advance time without having to wait.
+create table debugdate (
+    override_today date
+);
+
+-- Returns the date of "today", which can be overriden for testing.
+create function pb_current_date()
+    returns date as '
+    declare
+        today date;
+    begin
+        today = (select override_today from debugdate);
+        if today is not null then
+           return today;
+        else
+           return current_date;
+        end if;
+
+    end;
+' language 'plpgsql';
+
+-- Returns the timestamp of current time, but with possibly overriden "today".
+create function pb_current_timestamp()
+    returns timestamp as '
+    declare
+        today date;
+    begin
+        today = (select override_today from debugdate);
+        if today is not null then
+           return today + current_time;
+        else
+           return current_timestamp;
+        end if;
+    end;
+' language 'plpgsql';
+
+-- information about each pledge
 create table pledges (
     id serial not null primary key,
     -- short name of pledge for URLs
@@ -496,12 +534,15 @@ create table token (
     primary key (scope, token)
 );
 
--- Messages sent to pledge creators and/or signers.
+-- Messages (Email or SMS) sent to pledge creators and/or signers.  This is
+-- used with message_creator_recipient and message_signer_recipient to make
+-- sure that messages are sent exactly once.  It is also used to keep 
+-- announcement messages to be sent to late signers.
 create table message (
     id serial not null primary key,
     pledge_id integer not null references pledges(id),
     circumstance text not null,
-    whencreated timestamp not null default current_timestamp,
+    whencreated timestamp not null default pb_current_timestamp(),
     sendtocreator boolean not null,
     sendtosigners boolean not null,
     sendassms boolean not null,
@@ -540,39 +581,4 @@ create table message_signer_recipient (
 create unique index message_signer_recipient_message_id_signer_id_idx
     on message_signer_recipient(message_id, signer_id);
 
--- If a row is present, that is date which is "today".  Used for debugging
--- to advance time without having to wait.
-create table debugdate (
-    override_today date
-);
 
--- Returns the date of "today", which can be overriden for testing.
-create function pb_current_date()
-    returns date as '
-    declare
-        today date;
-    begin
-        today = (select override_today from debugdate);
-        if today is not null then
-           return today;
-        else
-           return current_date;
-        end if;
-
-    end;
-' language 'plpgsql';
-
--- Returns the timestamp of current time, but with possibly overriden "today".
-create function pb_current_timestamp()
-    returns timestamp as '
-    declare
-        today date;
-    begin
-        today = (select override_today from debugdate);
-        if today is not null then
-           return today + current_time;
-        else
-           return current_timestamp;
-        end if;
-    end;
-' language 'plpgsql';

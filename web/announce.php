@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.13 2005-04-08 17:27:23 chris Exp $
+ * $Id: announce.php,v 1.14 2005-04-12 10:29:09 francis Exp $
  * 
  */
 
@@ -65,7 +65,7 @@ $err = importparams(
 $errors = array();
 if ($q_submit) {
     
-    if (merge_spaces($q_message_sms) == merge_spaces($default_sms))
+    if (trim(merge_spaces($q_message_sms)) == trim(merge_spaces($default_sms)))
         array_push($errors, "Please edit the text of the SMS message");
     if (stristr($q_message_sms, "ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE"))
         array_push($errors, "Please add instructions for the pledge signers to the SMS message.");
@@ -75,7 +75,7 @@ if ($q_submit) {
      * isn't, we must get the user to fix it, since otherwise it cannot be
      * transmitted. */
 
-    if (merge_spaces($q_message_body) == merge_spaces($default_message))
+    if (trim(merge_spaces($q_message_body)) == trim(merge_spaces($default_message)))
         array_push($errors, "Please edit the text of the email message.");
     if (strlen($q_message_body) < 50)
         array_push($errors, "Please enter a longer message.");

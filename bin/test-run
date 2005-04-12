@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.23 2005-04-11 17:39:57 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.24 2005-04-12 10:29:08 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -325,23 +325,30 @@ sub do_public_succeeding_pledge {
     $b->get($announce_link);
     $wth->browser_check_contents("Send Announcement");
     $b->submit_form(form_name => 'pledge',
-                fields => { message_body => "By merely partaking you have fulfilled your part in the pledge.  You rule!\n\nYours sincerely, \n\n" . name_n(0)},
+                fields => { message_body => "By merely partaking you have fulfilled your part in the pledge.  You rule!\n\nYours sincerely, \n\n" . name_n(0),
+                            message_sms => "U rul. " . (split(m/ /,name_n(0)))[0]. " x"},
         button => 'submit') or die "Failed to submit email success form";
-    $wth->browser_check_contents("Your message has been sent to all the people who signed your pledge");
+    $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
     $wth->log_watcher_check();
+    call_frequentupdate();
     # Check they all arrived
     for (my $i = 1; $i <= 3; ++$i) {
         my $success_email = $wth->email_get_containing( '%To: '.email_n($i).'%By merely partaking%');
     }
-    # TODO: Add code so the late signer (number 4) also recieves the announcement message,
-    # and test for that case here.  https://secure.mysociety.org/cvstrac/tktview?tn=242,9
+    # Make sure no extra emails - in particular that late partial-signer hasn't got message
+    call_frequentupdate();
+    # TODO: Make this next line check that we only have the (unconfirmed) signup
+    # message in the mail queue, and no other messages.
+    # $wth->email_check_none_left();
 
-    # ... complete partial signature
+    # ... now complete partial signature
     confirm_signature($pledge_action_completion, 4);
+    # Check the late signer (number 4) also recieves the announcement message.
+    call_frequentupdate();
+    $wth->email_get_containing( '%To: '.email_n(4).'%By merely partaking%');
 
     # Check what happens when the pledge expires
     set_pb_date('1982-02-03');
-    call_frequentupdate();
     # Front page should no longer have pledge on it
     $b->get($base_url);
     $wth->browser_check_no_contents($pledge_action_completion);

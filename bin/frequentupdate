@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.13 2005-04-12 10:29:08 francis Exp $
+ * $Id: frequentupdate,v 1.14 2005-04-12 10:32:47 sandpit Exp $
  *
  */
 
@@ -26,18 +26,19 @@ require_once 'phpcgi';
 $switches = $options[0];
 $args = $options[1];
 $verbose = 0; 
-$testrun = 0;
 foreach ($switches as $switch) {
     if ($switch[0]=='--verbose') $verbose = 1;
-    if ($switch[0]=='--testrun') $testrun = 1;
     if ($switch[0]=='--help') {
 ?>
 
-PledgeBank daily script, run just after midnight
-./daily [--testrun] [--verbose]
+PledgeBank frequent update script. This is responsible for completing
+pledges, generating automatic messages, and so forth. It should be run
+periodically from cron.
 
---verbose    Display more information
---testrun    Dry run, just show what would do
+Usage: frequentupdate [--verbose]
+
+--help      Display this help message
+--verbose   Display more information
 
 <?
         exit;

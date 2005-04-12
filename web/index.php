@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.124 2005-04-12 17:14:27 matthew Exp $
+// $Id: index.php,v 1.125 2005-04-12 22:22:48 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -412,14 +412,15 @@ doesn't work, or you have any other suggests or comments.
             SELECT pledges.id, pledges.name, pledges.title, pledges.signup,
                 pledges.date, pledges.target, pledges.type, pledges.ref,
                 pledges.comparison, COUNT(signers.id) AS count,
-                max(date) - pb_current_date() AS daysleft
+                max(date) - pb_current_date() AS daysleft,
+                pledges.identity
             FROM pledges, signers
             WHERE pledges.id = signers.pledge_id
                 AND pledges.date >= pb_current_date() AND pledges.confirmed
                 AND pledges.password is NULL
             GROUP BY pledges.id, pledges.name, pledges.title, pledges.date,
                 pledges.target, pledges.type, pledges.signup, pledges.ref,
-                pledges.comparison
+                pledges.comparison, pledges.identity
             ORDER BY count DESC
             limit 5");
     $new = '';
@@ -553,13 +554,22 @@ function view_pledge($errors = array()) {
     else
         $showname = ' checked';
 
-?>
-<p></p>
+    if (!$finished) { ?>
+<h2>Spread the Pledge</h2>
+<p style="text-align: center">
+   <ul>
+   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?></li>
+   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
+   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
+   </ul>
+</p>
+<?
+ } ?>
 <form accept-charset="utf-8" class="pledge" name="pledge" action="./" method="post">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <div class="c">
-<p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true,
-'html'=>true)) ?>&quot;</p>
+<p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
+<p align="right">&mdash; <?=$r['name'].($r['identity']?', '.$r['identity']:'') ?></p>
 <p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
 
 <p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></p>
@@ -586,20 +596,9 @@ if ($r['detail']) {
     print '<p><strong>More details</strong><br>' . $det . '</p>';
 }
 
-?> </form> <?
-    if (!$finished) { ?>
-<h2>Spread the Pledge</h2>
-<p style="text-align: center">
-   <ul>
-   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?></li>
-   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
-   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
-   </ul>
-</p>
-<?
- }
+?> </form>
 
-?><h2>Current signatories</h2><?
+<h2>Current signatories</h2><?
         $out = '<li>'
                 . htmlspecialchars($r['name'])
                 . ' (Pledge Author)</li>';

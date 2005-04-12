@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.32 2005-04-12 14:32:57 sandpit Exp $
+# $Id: poster.cgi,v 1.33 2005-04-12 22:22:48 matthew Exp $
 #
 
 import os
@@ -220,6 +220,9 @@ def flyer(c, x1, y1, x2, y2, size):
 
     dots_body_gap = w/30
     # Draw all the text
+    identity = ''
+    if pledge['identity']:
+        identity = ', ' + pledge['identity']
     story = [
 #        Paragraph('''
 #            I, <font color="#522994">%s</font>, will %s <b>but only if</b> <font color="#522994">%s</font> %s will %s.
@@ -232,7 +235,7 @@ def flyer(c, x1, y1, x2, y2, size):
                 pledge['target'], pledge['type'], pledge['signup'],
                 pledge['title']
             ), p_head),
-        Paragraph(u'<para align="right">\u2014 <font color="#522994">%s</font></para>'.encode('utf-8') % pledge['name'], p_head),
+        Paragraph(u'<para align="right">\u2014 <font color="#522994">%s%s</font></para>'.encode('utf-8') % (pledge['name'], identity), p_head),
 
         Paragraph('', p_normal),
         Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994"><b>pledge %s</b></font>
@@ -393,8 +396,8 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup, password FROM pledges WHERE ref ILIKE %s', ref)
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['password']) = q.fetchone()
+        q.execute('SELECT title, date, name, type, target, signup, password, identity FROM pledges WHERE ref ILIKE %s', ref)
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['password'], pledge['identity']) = q.fetchone()
         q.close()
         day = date.day
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))

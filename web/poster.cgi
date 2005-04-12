@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.31 2005-04-11 11:47:38 francis Exp $
+# $Id: poster.cgi,v 1.32 2005-04-12 14:32:57 sandpit Exp $
 #
 
 import os
@@ -194,6 +194,8 @@ def flyer(c, x1, y1, x2, y2, size):
         fontSize = small_writing, leading = small_writing*1.2, fontName = 'Rockwell')
     p_footer = ParagraphStyle('normal', alignment = TA_RIGHT, spaceBefore = 0, spaceAfter = 0,
         fontSize = h_purple*4/5, leading = 0, fontName = 'Transport')
+    p_smallprint = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 1, spaceAfter = 0,
+        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = 'Rockwell')
     if (w<h):
         ticksize = w*1.2
     else:
@@ -234,7 +236,7 @@ def flyer(c, x1, y1, x2, y2, size):
 
         Paragraph('', p_normal),
         Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994"><b>pledge %s</b></font>
-        to <font color="#522994"><b>%s</b></font> <font size="-2">(cost 25p)</font> or 
+        to <font color="#522994"><b>%s</b></font> <font size="-2">(cost 25p + normal SMS rate)</font> or 
         pledge for free at <font size="+3" color="#522994"><b>%s/%s</b></font>'''
         % (ref, sms_number, mysociety.config.get('WEB_DOMAIN'), ref), p_normal),
 #        Paragraph(u"<b>Please help me out.</b> There\u2019s nothing to lose \u2013 you only have to go through with it if %s %s will %s.".encode('utf-8') % (
@@ -255,7 +257,13 @@ def flyer(c, x1, y1, x2, y2, size):
 
         Paragraph('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
-            ''' % pledge['date'], p_normal)
+            ''' % pledge['date'], p_normal),
+
+        Paragraph('''
+            <b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
+            costs 25p + your normal text rate. Further messages are free.
+            Questions? 08453 330 160 or team@pledgebank.com.
+            ''', p_smallprint)
     ]
 
     f = Frame(x1, y1, w, h, showBoundary = 0, 

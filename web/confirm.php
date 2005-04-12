@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.23 2005-04-11 17:39:57 francis Exp $
+ * $Id: confirm.php,v 1.24 2005-04-12 14:32:57 sandpit Exp $
  * 
  */
 
@@ -150,6 +150,21 @@ We also have <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">more attractive
 versions</a>.</p>
 
 <p align="center"><a href="<?=$png_flyers8_url?>"><img src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
+<?
+    /* Similarly for SMS note, since private pledges can't be signed by SMS. */
+    if (!$r['password'])
+        ?>
+<p align="center">You can also invite people to sign up the the pledge by
+<b>SMS</b>. Simply ask them to text
+<b>pledge&nbsp;<?=htmlspecialchars($r['ref'])?></b> to <b>60022</b>. The SMS
+costs 25p (plus your normal text fee). We will send signers an SMS when the
+pledge completes.</p>
+
+<p style="text-size: 80%; text-align: center;">The small print: operated by
+mySociety, a project of UK Citizens Online Democracy. Sign-up message costs
+25p + your normal text rate. Further messages are free. Questions about this
+SMS service? Call us on 08453&nbsp;330&nbsp;160 or email
+<a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</p>
 <?
     }
 }

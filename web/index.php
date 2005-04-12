@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.125 2005-04-12 22:22:48 matthew Exp $
+// $Id: index.php,v 1.126 2005-04-12 22:39:17 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -592,7 +592,16 @@ Name: <input type="text" name="name" value="<?=htmlspecialchars(get_http_var('na
 
 if ($r['detail']) {
     $det = $r['detail'];
-    $det = preg_replace('#\n#', '<br>', htmlspecialchars($det));
+    $det = htmlspecialchars($det);
+    # regexs here borrowed from TWFY
+    preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);
+    foreach ($matches[0] as $match) {
+        $newmatch = $match;
+        if (substr($match,0,3)=='www') $newmatch = "http://$match";
+        $det = str_replace($match, '<a href="'.$newmatch.'">'.$match.'</a>', $det);
+    }
+    $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
+    $det = nl2br($det);
     print '<p><strong>More details</strong><br>' . $det . '</p>';
 }
 

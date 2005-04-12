@@ -8,11 +8,16 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.11 2005-04-11 17:29:07 sandpit Exp $
+ * $Id: frequentupdate,v 1.12 2005-04-12 09:32:32 sandpit Exp $
  *
  */
 
 require_once "../phplib/pledge.php";
+
+function verbose($str) {
+    global $verbose;
+    if ($verbose) fwrite(STDERR, "frequentupdate: $str\n");
+}
 
 $short_opts = '';
 $long_opts = array('verbose','testrun','help');
@@ -54,6 +59,7 @@ send_pending_messages();
  * Mark pledges which have exceeded their target as successful, and dispatch
  * automatic success messages. */
 function mark_pledges_successful() {
+    verbose("finding newly successful pledges");
     $q = db_query('
             select * from pledges
             where whensucceeded is null
@@ -63,6 +69,8 @@ function mark_pledges_successful() {
             for update');
 
     while ($pledge = db_fetch_array($q)) {
+        verbose("pledge #${pledge['id']} (${pledge['ref']}) has succeeded");
+    
         db_query('
                 update pledges
                 set whensucceeded = current_timestamp
@@ -93,6 +101,7 @@ function mark_pledges_successful() {
     }
 
     db_commit();
+    verbose("finished newly successful pledges");
 }
 
 /* send_automatic_failure_messages
@@ -100,6 +109,7 @@ function mark_pledges_successful() {
  * (passed their deadline without the number of signers reaching the
  * threshold) and for which no such message has previously been sent. */
 function send_automatic_failure_messages() {
+    verbose("finding newly failed pledges");
     $q = db_query("
                 select * from pledges
                 where whensucceeded is null
@@ -111,7 +121,9 @@ function send_automatic_failure_messages() {
                 for update");
 
     while ($pledge = db_fetch_array($q)) {
-         db_query("
+        verbose("pledge #${pledge['id']} (${pledge['ref']}) has failed");
+
+        db_query("
                 insert into message (
                     pledge_id, circumstance,
                     sendtocreator, sendtosigners, sendassms, sendtolatesigners,
@@ -134,12 +146,15 @@ function send_automatic_failure_messages() {
                     sendtocreator, sendtosigners, sendassms, sendtolatesigners,
                     emailtemplatename, sms
                 ) values (
-                    ?, 'success-auto-signers',
+                    ?, 'failure-auto-signers',
                     false, true, true, false,
                     'failed-signer', ?
                 )", array($pledge['id'], $sms));
     }
+    
     db_commit();
+
+    verbose("finished newly failed pledges");
 }
 
 /* send_pending_messages
@@ -147,6 +162,8 @@ function send_automatic_failure_messages() {
  * sent. */
 function send_pending_messages() {
     /* Messages to creators. */
+    verbose("sending pending creator messages");
+    
     $q = db_query('
                 select * from message
                 where sendtocreator
@@ -158,9 +175,6 @@ function send_pending_messages() {
                 order by random()');
 
     while ($msg = db_fetch_array($q)) {
-print_r($msg);
-print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n";
-    
         /* Grab lock. As ever, this is bloody ugly, because we have to do
          * something (send an email) which isn't transactional in the
          * database, so we must do only one thing per transaction and commit
@@ -171,13 +185,18 @@ print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n"
                     where message_id = ?
                     for update', $msg['id']);
 
-        if (!is_null($f))
+        if (!is_null($f)) {
+            verbose("message #${msg['id']} sent while waiting for lock; skipping");
             continue;
+        }
     
         $pledge = db_getRow('select * from pledges where id = ?', $msg['pledge_id']);
+        verbose("message #${msg['id']} is for pledge #${pledge['id']} (${pledge['ref']}); circumstance '${msg['circumstance']}'");
 
         $f = false;
         if (isset($msg['emailtemplatename'])) {
+            verbose("sending message #${msg['id']} using email template '${msg['emailtemplatename']}'");
+        
             /* Fill in some more information used in the email templates. */
             $pledge['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $pledge['id']);
             if ($pledge['actual'] >= $pledge['target'])
@@ -200,6 +219,7 @@ print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n"
 
             $f = pb_send_email_template($pledge['email'], $msg['emailtemplatename'], $pledge);
         } else {
+            verbose("sending message #${msg['id']} as raw email, subject '${msg['emailsubject']}'");
             $f = pb_send_email($pledge['email'], $msg['emailsubject'], $msg['emailbody']);
         }
 
@@ -209,7 +229,7 @@ print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n"
                         (message_id, pledge_id)
                     values (?, ?)', array($msg['id'], $pledge['id']));
         else
-            print "failed to send message ${msg['id']} to creator of pledge ${pledge['id']}\n";   /* XXX stderr */
+            verbose("failed to send message #${msg['id']} to creator of pledge #${pledge['id']} (${pledge['ref']})");   /* XXX stderr */
 
         db_commit();
     }
@@ -217,6 +237,8 @@ print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n"
     /* Messages to signers. Slightly nastier because of the
      * signed-after-success and SMS options. We grab message and recipient
      * info for each signer-message pair which is pending on delivery. */
+    verbose("sending pending signer messages");
+     
     $q = db_query('
                 select message.*,
                     signers.id as signer_id,
@@ -228,7 +250,7 @@ print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n"
                     and message.pledge_id = signers.pledge_id
                     and message.pledge_id = pledges.id
                     and (sendassms or signers.email is not null)
-                    and (sendtolatesigners
+                    and (pledges.whensucceeded is null or sendtolatesigners
                             or signers.signtime < pledges.whensucceeded)
                     and (select signer_id
                         from message_signer_recipient
@@ -237,28 +259,37 @@ print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n"
                 order by random()');
         /* XXX ugly. For a raw email we will transmit the (possibly large)
          * body of the mail over the wire once for each row. Should do a
-         * subquery for it. */
+         * subquery for it and cache the result. */
     
     while ($r = db_fetch_array($q)) {
         /* Grab a lock. Actually it doesn't matter what we lock here, so just
-         * use the row in the recipients table. */
+         * use the row in the signers table. */
+        db_getOne('select id from signers where id = ? for update', $r['id']);
+
+        /* Check that the message hasn't already been sent. */
         $f = db_getOne('
                     select message_id
                     from message_signer_recipient
-                    where message_id = ? and signer_id = ?
-                    for update', array($r['id'], $r['signer_id']));
+                    where message_id = ? and signer_id = ?',
+                    array($r['id'], $r['signer_id']));
 
-        if (!is_null($f))
+        if (!is_null($f)) {
+            verbose("message #${r['id']} sent to signer #${r['signer_id']} while waiting for lock; skipping");
             continue;
+        }
+
+        verbose("message #${r['id']} to be sent to signer #${r['signer_id']}");
 
         if (is_null($r['signer_email'])) {
             /* Send by SMS. */
+            verbose("delivering message #${r['id']} by SMS to signer #${r['signer_id']} on ${r['signer_mobile']}");
             db_query('
                     insert into outgoingsms (recipient, message, whensubmitted)
                     values (?, ?, ?)',
                     array($r['signer_mobile'], $r['sms'], time()));
         } elseif (isset($r['emailtemplatename'])) {
             /* Send email template. */
+            verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
             $pledge = db_getRow('select * from pledges where id = ?', $r['pledge_id']);
 
             /* Fill in some more information used in the email templates.
@@ -271,6 +302,7 @@ print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n"
             $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $pledge);
         } else {
             /* Send raw mail. */
+            verbose("sending message #${r['id']} as raw email, subject '${r['emailsubject']}'");
             $f = pb_send_email($r['signer_email'], $r['emailsubject'], $r['emailbody']);
         }
 
@@ -279,7 +311,7 @@ print "message.id = " . $msg['id'] . "; pledge.id = " . $msg['pledge_id'] . "\n"
                 insert into message_signer_recipient (message_id, signer_id)
                 values (?, ?)', array($r['id'], $r['signer_id']));
         else
-            print "failed to send message ${r['id']} to signer ${r['signer_id']} of pledge ${r['pledge_id']}\n";   /* XXX stderr */
+            debug("failed to send message #${r['id']} to signer #${r['signer_id']} of pledge #${r['pledge_id']}");   /* XXX stderr */
 
 
         db_commit();

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.64 2005-04-13 14:52:27 francis Exp $
+-- $Id: schema.sql,v 1.65 2005-04-13 15:34:49 chris Exp $
 --
 
 -- secret
@@ -580,6 +580,40 @@ create table message_signer_recipient (
 
 create unique index message_signer_recipient_message_id_signer_id_idx
     on message_signer_recipient(message_id, signer_id);
+
+-- Comments/q&a on pledges.
+create table author (
+    id serial not null primary key,
+    name text not null,
+    email text not null,
+    website text,
+    -- other fields -- isadmin, isbanned?
+);
+
+-- When the author of a comment is also the creator of a pledge, we stick a
+-- record in here, so that we can later show their comments highlighted.
+create table author_pledge_creator (
+    author_id integer not null references author(id),
+    pledge_id integer not null references pledges(id)
+);
+
+create index author_pledge_creator_author_id_idx
+    on author_pledge_creator(author_id);
+
+create table comment (
+    id serial not null primary key,
+    pledge_id integer not null references pledges(id),
+    author_id integer not null references author(id),
+    -- add a reply_comment_id here if we ever want threading
+    whenposted timestamp not null default pb_current_timestamp(),
+    text text not null,                     -- as entered by author
+    ishidden boolean not null default false -- hidden from view
+    -- other fields? one to indicate whether this was written by the pledge
+    -- author and should be highlighted in the display?
+);
+
+create index comment_pledge_id_idx on comment(pledge_id);
+create index comment_pledge_id_whenposted_idx on comment(pledge_id, whenposted);
 
 -- pledges which appear on front page are present in this table
 create table frontpage_pledges (

@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.26 2005-04-13 11:22:49 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.27 2005-04-13 14:52:27 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -163,6 +163,11 @@ sub create_pledge {
     print "Pledge confirm URL $1\n" if $verbose > 1;
     $b->get($1);
     $wth->browser_check_contents("Thank you for confirming your pledge");
+
+    # Add all to front page
+    dbh()->do("delete from frontpage_pledges");
+    dbh()->do("insert into frontpage_pledges (select id from pledges)");
+    dbh()->commit();
 }
 
 # Change the date that all parts of PledgeBank think is today.  Call with no

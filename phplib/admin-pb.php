@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.15 2005-04-08 14:21:59 matthew Exp $
+ * $Id: admin-pb.php,v 1.16 2005-04-13 14:52:27 francis Exp $
  * 
  */
 
@@ -23,7 +23,7 @@ class ADMIN_PAGE_PB {
 
     function pledge_header($sort) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
-        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time');
+        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time', 'f'=>'Front Page');
         foreach ($cols as $s => $col) {
             print '<th>';
             if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.'">';
@@ -32,24 +32,28 @@ class ADMIN_PAGE_PB {
             print '</th>';
         }
         print '</tr>';
+        print "\n";
     }
 
     function list_all_pledges() {
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdecs]/', $sort)) $sort = 'd';
+        if (!$sort || preg_match('/[^ratdecsf]/', $sort)) $sort = 'd';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
         elseif ($sort=='t') $order = 'target';
         elseif ($sort=='d') $order = 'date';
         elseif ($sort=='e') $order = 'email';
         elseif ($sort=='c') $order = 'creationtime';
+        elseif ($sort=='f') $order = 'frontpage desc';
         elseif ($sort=='s') $order = 'signers';
 
-        $q = db_query('SELECT ref,title,type,target,signup,date,name,email,confirmed,
-            date_trunc(\'second\',creationtime) AS creationtime, 
-            (SELECT count(*) from signers where pledge_id=pledges.id) as signers,
-            pb_current_date() <= date as open
-            FROM pledges ORDER BY ' . $order);
+        $q = db_query("
+            SELECT id,ref,title,type,target,signup,date,name,email,confirmed,
+                date_trunc('second',creationtime) AS creationtime, 
+                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
+                pb_current_date() <= date AS open,
+                (SELECT count(*) FROM frontpage_pledges WHERE pledge_id=pledges.id) AS frontpage
+            FROM pledges ORDER BY " . $order);
         $open = array();
         $closed = array();
         while ($r = db_fetch_array($q)) {
@@ -66,33 +70,41 @@ class ADMIN_PAGE_PB {
             $row .= '<td>'.prettify($r['date']).'</td>';
             $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
             $row .= '<td>'.$r['creationtime'].'</td>';
+            $row .= '<td><input type="checkbox" name="frontpage_'.$r['id'].'" '
+                    . ($r['frontpage'] ? 'checked' : ''). '></td>';
             if ($r['open'] == 't')
                 $open[] = $row;
             else
                 $closed[] = $row;
         }
+         
+        print '<form method="post" action="'.$this->self_link.'">'."\n";
+        print '<input type="hidden" name="s" value="' . get_http_var('s') . '">';
         if (count($open)) {
-            print "<h2>All Open Pledges</h2>";
+            print "<h2>All Open Pledges</h2>\n";
             $this->pledge_header($sort);
             $a = 0;
             foreach ($open as $row) {
                 print '<tr'.($a++%2==0?' class="v"':'').'>';
                 print $row;
-                print '</tr>';
+                print '</tr>'."\n";
             }
             print '</table>';
         }
         if (count($closed)) {
-            print "<h2>All Closed Pledges</h2>";
+            print "<h2>All Closed Pledges</h2>\n";
             $this->pledge_header($sort);
             $a = 0;
             foreach ($closed as $row) {
                 print '<tr'.($a++%2==0?' class="v"':'').'>';
                 print $row;
-                print '</tr>';
+                print '</tr>'."\n";
             }
             print '</table>';
         }
+        print '<p>';
+        print '<input type="submit" name="update" value="Save changes">';
+        print '</form>';
     }
 
     function show_one_pledge($pledge) {
@@ -173,6 +185,19 @@ class ADMIN_PAGE_PB {
         print '<p><em>That pledge has been successfully removed, along with all its signatories.</em></p>';
     }
 
+    function update_changes() {
+        db_query('DELETE FROM frontpage_pledges');
+        foreach ($_POST as $k=>$v) {
+            if (substr($k, 0, 10) == "frontpage_") {
+                $ref = substr($k, 10);
+                db_query('INSERT INTO frontpage_pledges (pledge_id) values (?)', 
+                        array($ref));
+            }
+        }
+        db_commit();
+        print "<p><i>Changes to front page pledges saved</i></p>";
+    }
+
     function display($self_link) {
         db_connect();
 
@@ -189,6 +214,9 @@ class ADMIN_PAGE_PB {
         } elseif ($pledge) {
             $this->show_one_pledge($pledge);
         } else {
+            if (get_http_var('update')) {
+                $this->update_changes();
+            }
             $this->list_all_pledges();
         }
     }

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.63 2005-04-12 13:27:12 sandpit Exp $
+-- $Id: schema.sql,v 1.64 2005-04-13 14:52:27 francis Exp $
 --
 
 -- secret
@@ -581,4 +581,9 @@ create table message_signer_recipient (
 create unique index message_signer_recipient_message_id_signer_id_idx
     on message_signer_recipient(message_id, signer_id);
 
+-- pledges which appear on front page are present in this table
+create table frontpage_pledges (
+    pledge_id integer not null references pledges(id)
+);
+create unique index frontpage_pledges_pledge_id_idx on frontpage_pledges(pledge_id);
 

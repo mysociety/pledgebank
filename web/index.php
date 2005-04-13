@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.131 2005-04-13 12:33:23 chris Exp $
+// $Id: index.php,v 1.132 2005-04-13 14:52:27 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -375,74 +375,10 @@ accepting certain kinds at the moment.</p>
 <input type="text" id="s" name="search" size="10" value=""></p>
 <p style="margin-top: 1em; text-align: right"><input type="submit" value="Go"></p>
 </form>
-<h2>Sign up to one of our five newest pledges</h2><?
-
-    $q = db_query("
-                SELECT *, date - pb_current_date() AS daysleft
-                FROM pledges
-                WHERE date >= pb_current_date() AND 
-                password is NULL AND confirmed
-                ORDER BY id
-                DESC LIMIT 5");
-    $new = '';
-    while ($r = db_fetch_array($q)) {
-        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
-        $new .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
-        if ($r['target'] - $signatures <= 0) {
-            $new .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
-        } else {
-            $new .= "(${r['daysleft']} "
-                        . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
-                        . " left), "
-                    . prettify($r['target'] - $signatures)
-                    . " more needed";
-        }
-        $new .= '</li>';
-    }
-    if (!$new) {
-        print '<p>There are no new pledges at the moment.</p>';
-    } else {
-        print '<ol>'.$new.'</ol>';
-    }
-?>
-
-<h2>&hellip; or sign a pledge with many signatures</h2><?
-
-    $q = db_query("
-            SELECT pledges.id, pledges.name, pledges.title, pledges.signup,
-                pledges.date, pledges.target, pledges.type, pledges.ref,
-                pledges.comparison, COUNT(signers.id) AS count,
-                max(date) - pb_current_date() AS daysleft,
-                pledges.identity
-            FROM pledges, signers
-            WHERE pledges.id = signers.pledge_id
-                AND pledges.date >= pb_current_date() AND pledges.confirmed
-                AND pledges.password is NULL
-            GROUP BY pledges.id, pledges.name, pledges.title, pledges.date,
-                pledges.target, pledges.type, pledges.signup, pledges.ref,
-                pledges.comparison, pledges.identity
-            ORDER BY count DESC
-            limit 5");
-    $new = '';
-    while ($r = db_fetch_array($q)) {
-        $signatures = $r['count'];
-        $new .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
-        if ($r['target'] - $signatures <= 0) {
-            $new .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
-        } else {
-            $new .= "(${r['daysleft']} "
-                        . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
-                        . " left), "
-                    . prettify($r['target'] - $signatures)
-                    . " more needed";
-        }
-        $new .= '</li>';
-    }
-    if (!$new) {
-        print '<p>There are currently no active pledges.</p>';
-    } else {
-        print '<ol>'.$new.'</ol>';
-    }
+<?
+    //list_newest_pledges();
+    //list_highest_signup_pledges();
+    list_frontpage_pledges();
 }
 
 function view_faq() {
@@ -700,7 +636,6 @@ people to sign up to your pledge after you have clicked the link in the email.</
 	}
 }
 
-# TODO make this into useful browsing / searching interface
 function list_all_pledges() {
     $type = $_SERVER['REQUEST_URI'];
     $type = substr($type, strpos($type, '?')+1);
@@ -726,6 +661,117 @@ function list_all_pledges() {
     print '<h2>Open Pledges 1-'.db_num_rows($q).':</h2>';
     print $out;
 }
+
+function list_newest_pledges() {
+?>
+<h2>Sign up to one of our five newest pledges</h2><?
+
+    $q = db_query("
+                SELECT *, date - pb_current_date() AS daysleft
+                FROM pledges
+                WHERE date >= pb_current_date() AND 
+                password is NULL AND confirmed
+                ORDER BY id
+                DESC LIMIT 5");
+    $new = '';
+    while ($r = db_fetch_array($q)) {
+        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
+        $new .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
+        if ($r['target'] - $signatures <= 0) {
+            $new .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
+        } else {
+            $new .= "(${r['daysleft']} "
+                        . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
+                        . " left), "
+                    . prettify($r['target'] - $signatures)
+                    . " more needed";
+        }
+        $new .= '</li>';
+    }
+    if (!$new) {
+        print '<p>There are no new pledges at the moment.</p>';
+    } else {
+        print '<ol>'.$new.'</ol>';
+    }
+}
+
+function list_highest_signup_pledges() {
+?>
+<h2>&hellip; or sign a pledge with many signatures</h2><?
+
+    $q = db_query("
+            SELECT pledges.id, pledges.name, pledges.title, pledges.signup,
+                pledges.date, pledges.target, pledges.type, pledges.ref,
+                pledges.comparison, COUNT(signers.id) AS count,
+                max(date) - pb_current_date() AS daysleft,
+                pledges.identity
+            FROM pledges, signers
+            WHERE pledges.id = signers.pledge_id
+                AND pledges.date >= pb_current_date() AND pledges.confirmed
+                AND pledges.password is NULL
+            GROUP BY pledges.id, pledges.name, pledges.title, pledges.date,
+                pledges.target, pledges.type, pledges.signup, pledges.ref,
+                pledges.comparison, pledges.identity
+            ORDER BY count DESC
+            limit 5");
+    $new = '';
+    while ($r = db_fetch_array($q)) {
+        $signatures = $r['count'];
+        $new .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
+        if ($r['target'] - $signatures <= 0) {
+            $new .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
+        } else {
+            $new .= "(${r['daysleft']} "
+                        . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
+                        . " left), "
+                    . prettify($r['target'] - $signatures)
+                    . " more needed";
+        }
+        $new .= '</li>';
+    }
+    if (!$new) {
+        print '<p>There are currently no active pledges.</p>';
+    } else {
+        print '<ol>'.$new.'</ol>';
+    }
+
+}
+
+function list_frontpage_pledges() {
+?>
+<h2>Some current pledges</h2><?
+
+    $q = db_query("
+                SELECT *, date - pb_current_date() AS daysleft
+                FROM pledges, frontpage_pledges
+                WHERE 
+                pledges.id = frontpage_pledges.pledge_id AND
+                -- date >= pb_current_date() AND 
+                password is NULL AND confirmed
+                ORDER BY id
+                DESC LIMIT 5");
+    $pledges = '';
+    while ($r = db_fetch_array($q)) {
+        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
+        $pledges .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
+        if ($r['target'] - $signatures <= 0) {
+            $pledges .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
+        } else {
+            $pledges .= "(${r['daysleft']} "
+                        . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
+                        . " left), "
+                    . prettify($r['target'] - $signatures)
+                    . " more needed";
+        }
+        $pledges .= '</li>';
+    }
+    if (!$pledges) {
+        print '<p>There are no featured pledges at the moment.</p>';
+    } else {
+        print '<ol>'.$pledges.'</ol>';
+    }
+}
+
 
 function pdfs() {
     $ref = get_http_var('pdf');

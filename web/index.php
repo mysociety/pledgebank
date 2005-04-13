@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.130 2005-04-13 11:22:49 francis Exp $
+// $Id: index.php,v 1.131 2005-04-13 12:33:23 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -358,16 +358,16 @@ function pledge_form_two_submitted() {
 
 function front_page() {
 ?>
-<p>Welcome to PledgeBank, the site that lets you say "I'll do something
-if other people will do it too." </p>
-<p>The site is still in development, it isn't finished yet.   Hopefully
-it'll be ready soon.
-If you'd like to use PledgeBank when it is launched, or have any good
-ideas for organisations who might like to use it, email <a
-href="mailto:pb@mysociety.org">Tom Steinberg</a>.  You can also <a
-href="mailto:team@pledgebank.com">email us</a> if it just
-doesn't work, or you have any other suggests or comments. 
-</p>
+<p>Welcome to PledgeBank, the site that helps you get things done that
+you couldn't do on your own.</p>
+
+<p>PledgeBank works by letting people set up pledges like "I'll organise
+a residents' association, but only if 5 people on my street pledge to
+come to my house to talk about it". We've only just entered our
+testing phase, and if you want to set up a pledge please
+<a href="mailto:team@pledgebank.com">contact us</a> first - we're only
+accepting certain kinds at the moment.</p>
+
 <p id="start"><a href="./new"><strong>Start your own pledge &raquo;</strong></a></p>
 <form accept-charset="utf-8" id="search" action="./" method="get">
 <h2>Search</h2>

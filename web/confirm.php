@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.24 2005-04-12 14:32:57 sandpit Exp $
+ * $Id: confirm.php,v 1.25 2005-04-13 11:24:37 sandpit Exp $
  * 
  */
 
@@ -162,9 +162,9 @@ pledge completes.</p>
 
 <p style="text-size: 80%; text-align: center;">The small print: operated by
 mySociety, a project of UK Citizens Online Democracy. Sign-up message costs
-25p + your normal text rate. Further messages are free. Questions about this
-SMS service? Call us on 08453&nbsp;330&nbsp;160 or email
-<a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</p>
+25p + your normal text rate. Further messages from us are free.
+Questions about this SMS service? Call us on 08453&nbsp;330&nbsp;160 or
+email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</p>
 <?
     }
 }

@@ -5,9 +5,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pbprint.css,v 1.1 2005-03-16 09:13:26 sandpit Exp $
+ * $Id: pbprint.css,v 1.2 2005-04-13 08:27:42 francis Exp $
  * 
  */
+
+#nav {
+    display: none;
+}
 
 .noprint {
 	display: none;

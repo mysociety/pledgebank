@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.26 2005-04-13 14:10:12 sandpit Exp $
+ * $Id: confirm.php,v 1.27 2005-04-13 19:12:35 matthew Exp $
  * 
  */
 
@@ -42,7 +42,7 @@ if ($q_type == 'pledge') {
     db_commit();
     $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($r['ref']));
     ?>
-    <p class="noprint" align="center">Thank you for confirming your pledge. It is now live at <a href="<?=$url?>"<?=$url?>></a> and people can sign up to it ther.
+    <p class="noprint" align="center">Thank you for confirming your pledge. It is now live at <a href="<?=$url?>"<?=$url?>></a> and people can sign up to it there.
     <?  advertise_flyers($pledge_id);
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
@@ -124,14 +124,13 @@ function advertise_flyers($pledge_id) {
     $png_flyers8_url = new_url("/flyers/{$r['ref']}_A4_flyers8.png", false);
 
     ?>
-<p class="noprint" align="center">
-<span style="font-size: 120%; font-weight: bold;">
+<p class="noprint" align="center"><big><strong>
 You will massively increase the chance of this pledge succeeding if you
 <?
     if (!$r['password']) {
         print_this_link("print this page out", ",");
         ?>
-(or use <a href="">these more attractive PDF versions</a>),
+    (or use <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">these more attractive PDF versions</a>),
 <?
    } else {
         // TODO - we don't have the password raw here, but really want it on
@@ -143,7 +142,7 @@ You will massively increase the chance of this pledge succeeding if you
 ?>
 cut up the flyers and stick them through your neighbours' letterboxes. We
 cannot emphasise this enough &mdash; print them NOW and post them next time you
-go out to the shops or your pledge is unlikely to succeed.</span>
+go out to the shops or your pledge is unlikely to succeed.</strong></big>
 </p>
 <? 
     // Show inline graphics only for passwordless pledges (as PNG doesn't

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.16 2005-04-13 14:52:27 francis Exp $
+ * $Id: admin-pb.php,v 1.17 2005-04-13 19:12:34 matthew Exp $
  * 
  */
 
@@ -70,8 +70,8 @@ class ADMIN_PAGE_PB {
             $row .= '<td>'.prettify($r['date']).'</td>';
             $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
             $row .= '<td>'.$r['creationtime'].'</td>';
-            $row .= '<td><input type="checkbox" name="frontpage_'.$r['id'].'" '
-                    . ($r['frontpage'] ? 'checked' : ''). '></td>';
+            $row .= '<td><input type="checkbox" name="frontpage['.$r['id'].']" '
+                    . ($r['frontpage'] ? 'checked' : ''). ' value="1"></td>';
             if ($r['open'] == 't')
                 $open[] = $row;
             else
@@ -187,9 +187,7 @@ class ADMIN_PAGE_PB {
 
     function update_changes() {
         db_query('DELETE FROM frontpage_pledges');
-        foreach ($_POST as $k=>$v) {
-            if (substr($k, 0, 10) == "frontpage_") {
-                $ref = substr($k, 10);
+        foreach (array_keys($_POST['frontpage']) as $ref) {
                 db_query('INSERT INTO frontpage_pledges (pledge_id) values (?)', 
                         array($ref));
             }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.129 2005-04-13 08:39:46 francis Exp $
+// $Id: index.php,v 1.130 2005-04-13 11:22:49 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -454,11 +454,12 @@ function add_signatory() {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pw;
     $errors = importparams(
             array('email',      '/^[^@]+@.+/',     'Please give your email'),
-            array('name',       '/[a-z]/i',        'Please give your name'),
+            array('name',       '/^[a-z]/i',        'Please give your name'),
             array('ref',        '/^[a-z0-9-]+$/i', ''),
             array('showname',   '//',              'Please enter showname', 0),
             array('pw',         '//',              '', null)
             );
+    if ($q_email=='<Enter your name>') $q_email='';
     if (!is_null($errors))
         return $errors;
 
@@ -553,43 +554,13 @@ function view_pledge($errors = array()) {
         $showname = get_http_var('showname') ? ' checked' : '';
     else
         $showname = ' checked';
-
-    if (!$finished) { ?>
-<h2>Spread the Pledge</h2>
-<p style="text-align: center">
-   <ul>
-   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?></li>
-   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
-   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
-   </ul>
-</p>
-<?
- } ?>
-<form accept-charset="utf-8" class="pledge" name="pledge" action="./" method="post">
-<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
-<div class="c">
+?>
+<div class="tips" style="text-align: center">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p align="right">&mdash; <?=$r['name'].($r['identity']?', '.$r['identity']:'') ?></p>
 <p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
-
 <p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></p>
-</div>
-<? if (!$finished) { ?>
-<div style="margin-left: 50%;">
-<h2 style="margin-top: 1em; font-size: 120%">Sign me up</h2>
-<p>
-<input type="hidden" name="add_signatory" value="1">
-<input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
-<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
-Name: <input type="text" name="name" value="<?=htmlspecialchars(get_http_var('name'))?>">
-<br /> Email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
-<br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
-<br /> <input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge 
-<br /><input type="submit" name="submit" value="Submit">
-</p>
-</div>
-<? }
-
+<?
 if ($r['detail']) {
     $det = $r['detail'];
     $det = htmlspecialchars($det);
@@ -602,10 +573,51 @@ if ($r['detail']) {
     }
     $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
     $det = nl2br($det);
-    print '<p><strong>More details</strong><br>' . $det . '</p>';
+    print '<p align = left><strong>More details</strong><br>' . $det . '</p>';
 }
+?>
+</div>
+<?
 
-?> </form>
+    if (!$finished) { ?>
+<h2>Spread the word</h2>
+<p style="text-align: center">
+   <ul>
+   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?></li>
+   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
+   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
+   </ul>
+</p>
+<?
+ } ?>
+<? if (!$finished) { ?>
+<h2>Sign up now</h2>
+<form accept-charset="utf-8" class="pledge" name="pledge" action="./" method="post">
+<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
+<p>
+<strong>I</strong>, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars(get_http_var('name'))?>">,
+<strong>sign up to the pledge</strong>
+<input type="hidden" name="add_signatory" value="1">
+<input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
+<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
+</p>
+<p><strong>Your email:</strong> <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
+<br><small>(we need this so we can tell you when the pledge is 
+<br>completed and let the pledge creator get in touch)</small>
+</p>
+<p> <input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge </p>
+<p><input type="submit" name="submit" value="Sign Pledge"> </p>
+</form>
+        Or you can text <strong>pledge <?=htmlspecialchars(get_http_var('pledge'))?></strong> to 
+        <strong><?=OPTION_PB_SMS_DISPLAY_NUMBER?></strong> (cost 25p + normal SMS rate)
+            <small>
+            <br><b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
+            costs 25p + your normal text rate. Further messages from us are free.
+            </small>
+
+<? }
+
+?>
 
 <h2>Current signatories</h2><?
         $out = '<li>'

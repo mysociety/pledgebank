@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.25 2005-04-12 10:42:31 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.26 2005-04-13 11:22:49 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -81,7 +81,7 @@ print "Everything completed successfully\n";
 sub sign_pledge {
     my ($who, $show_signature) = @_;
 
-    $wth->browser_check_contents("Sign me up");
+    $wth->browser_check_contents("Sign up now");
     $b->submit_form(form_name => 'pledge',
         fields => { 
             name => name_n($who), email => email_n($who), showname => $show_signature 
@@ -232,7 +232,7 @@ sub do_private_failing_pledge {
     # Make sure pledge says it is expired, and has no sign up box
     &$goto_pledge_page();
     $wth->browser_check_contents("This pledge is now closed");
-    $wth->browser_check_no_contents("Sign me up");
+    $wth->browser_check_no_contents("Sign up now");
 }
 
 #############################################################################
@@ -356,7 +356,7 @@ sub do_public_succeeding_pledge {
     # Pledge should say the right things
     $b->get($base_url . "/$pledge_ref");
     $wth->browser_check_contents("This pledge is now closed");
-    $wth->browser_check_no_contents("Sign me up");
+    $wth->browser_check_no_contents("Sign up now");
     $wth->browser_check_contents("This pledge has been successful!");
     $wth->browser_check_contents(name_n(4));
     $wth->browser_check_no_contents(name_n(5));

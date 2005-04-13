@@ -5,11 +5,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.6 2005-03-11 12:30:45 matthew Exp $
+ * $Id: pb.js,v 1.7 2005-04-13 11:22:49 francis Exp $
  * 
  */
 
-var greyed = [ ['title', '<Enter your pledge>'], ['date', '<Date>'] ]
+var greyed = [ 
+    ['title', '<Enter your pledge>'], 
+    ['date', '<Date>'],
+    ['name', '<Enter your name>'],
+    ]
 
 function addEvent(obj, evType, fn){ 
     if (obj.addEventListener){ 

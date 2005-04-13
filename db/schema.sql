@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.65 2005-04-13 15:34:49 chris Exp $
+-- $Id: schema.sql,v 1.66 2005-04-13 17:23:10 francis Exp $
 --
 
 -- secret
@@ -586,7 +586,7 @@ create table author (
     id serial not null primary key,
     name text not null,
     email text not null,
-    website text,
+    website text
     -- other fields -- isadmin, isbanned?
 );
 

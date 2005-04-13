@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.25 2005-04-13 11:24:37 sandpit Exp $
+ * $Id: confirm.php,v 1.26 2005-04-13 14:10:12 sandpit Exp $
  * 
  */
 
@@ -40,10 +40,9 @@ if ($q_type == 'pledge') {
     page_header("PRINT THIS - CUT IT UP - DELIVER LOCALLY", array('nonav' => true));
 
     db_commit();
-    $url = "/" . urlencode($r['ref']);
+    $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($r['ref']));
     ?>
-    <p class="noprint" align="center">Thank you for confirming your pledge. It is now live, and people can 
-    <a href="<?=$url?>">sign up to it</a>.</p>
+    <p class="noprint" align="center">Thank you for confirming your pledge. It is now live at <a href="<?=$url?>"<?=$url?>></a> and people can sign up to it ther.
     <?  advertise_flyers($pledge_id);
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
@@ -124,23 +123,28 @@ function advertise_flyers($pledge_id) {
     $r = db_getRow('select * from pledges where id = ?', $pledge_id);
     $png_flyers8_url = new_url("/flyers/{$r['ref']}_A4_flyers8.png", false);
 
-?>
+    ?>
 <p class="noprint" align="center">
-<strong>Important Notice</strong> &mdash; You will massively increase the
-chance of this pledge succeeding if you
-<? if (!$r['password']) {
+<span style="font-size: 120%; font-weight: bold;">
+You will massively increase the chance of this pledge succeeding if you
+<?
+    if (!$r['password']) {
         print_this_link("print this page out", ",");
+        ?>
+(or use <a href="">these more attractive PDF versions</a>),
+<?
    } else {
         // TODO - we don't have the password raw here, but really want it on
         // form to pass on for link to flyers page.  Not sure how best to fix
         // this up.
         print_link_with_password("/".htmlspecialchars($r['ref'])."/flyers", "", "print these pages out");
+        print ",";
    }
 ?>
- cut up the flyers and stick them through some of your neighbours' letterboxes.
-We cannot emphasise this enough &mdash; print them now and post them next time
-you go out to the shops. 
-
+cut up the flyers and stick them through your neighbours' letterboxes. We
+cannot emphasise this enough &mdash; print them NOW and post them next time you
+go out to the shops or your pledge is unlikely to succeed.</span>
+</p>
 <? 
     // Show inline graphics only for passwordless pledges (as PNG doesn't
     // work for the password protected ones, you can't POST a password

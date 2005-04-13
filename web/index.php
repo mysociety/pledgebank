@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.134 2005-04-13 14:55:55 francis Exp $
+// $Id: index.php,v 1.135 2005-04-13 16:23:18 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -464,6 +464,8 @@ function view_pledge($errors = array()) {
     if (!deal_with_password("/$h_ref", $ref, $r['password']))
         return false;
 
+    $pledge_id = $r['id'];
+
     $title = "'I will " . $r['title'] . "'";
 	$q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($r['id']));
 	$curr = db_num_rows($q);
@@ -598,6 +600,9 @@ if ($r['detail']) {
         }
         print '</ul>';
     
+
+    print "<h2>Comments on this pledge</h2>";
+    comments_show($pledge_id);
 }
 
 # Someone has submitted a new pledge

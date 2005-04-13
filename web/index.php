@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.135 2005-04-13 16:23:18 chris Exp $
+// $Id: index.php,v 1.136 2005-04-13 17:13:57 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -224,11 +224,11 @@ function pledge_form_two($data, $errors = array()) {
 
 <h2>New Pledge &#8211; Step 2 (optional details)</h2>
 
-<p id="moreinfo">More details about your pledge: <small>(no HTML; links and email addresses will be automatically spotted)</small>
+<p id="moreinfo">More details about your pledge:<br> <small>(links and email addresses will be automatically spotted, no markup needed)</small>
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
 <p>On flyers and elsewhere, how would you like to be described?
-<small>(e.g. "resident of Tamilda Road")</small>
+<br><small>(e.g. "resident of Tamilda Road")</small>
 <input type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
 
 <input type="hidden" name="comparison" value="atleast">
@@ -802,10 +802,11 @@ function pdfs() {
 <p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
 <!--
-<li><? print_link_with_password($pdf_flyers1_url, "", "Big poster (A4, PDF)") ?> </li>
 <li><? print_link_with_password($pdf_flyers4_url, "", "Flyers for handing out, 4 per page (A4, PDF)") ?> </li>
 -->
 <li><? print_link_with_password($pdf_flyers8_url, "", "Flyers for handing out, 8 per page (A4, PDF, like picture below)") ?> </li>
+<li><? print_link_with_password($pdf_flyers1_url, "", "Big poster" . 
+    ($row['detail'] ? ', including more details' : ''). " (A4, PDF)") ?> </li>
 <!--
 <li><? print_link_with_password($pdf_flyers16_url, "", "Loads of little flyers, 16 per page (A4, PDF)") ?> </li>
 <li><? print_link_with_password($pdf_tearoff_url, "", "Tear-off format (like accommodation rental ones) (A4)") ?> </li>

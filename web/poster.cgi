@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.33 2005-04-12 22:22:48 matthew Exp $
+# $Id: poster.cgi,v 1.34 2005-04-13 17:13:57 francis Exp $
 #
 
 import os
@@ -154,7 +154,7 @@ def tearoff():
 
 # Prints one copy of the flier at given coordinates, and font sizes.
 # Returns False if it didn't all fit, or True if it did.
-def flyer(c, x1, y1, x2, y2, size):
+def flyer(c, x1, y1, x2, y2, size, **keywords):
 #    size = 0.283
     w = x2 - x1
     h = y2 - y1
@@ -190,6 +190,8 @@ def flyer(c, x1, y1, x2, y2, size):
         fontSize = small_writing, leading = small_writing*1.2, fontName = 'Transport')
     p_normal = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*20, 
         fontSize = small_writing, leading = small_writing*1.2, fontName = 'Rockwell')
+    p_detail = ParagraphStyle('detail', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*10, 
+        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = 'Rockwell')
     p_nospaceafter = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 1, 
         fontSize = small_writing, leading = small_writing*1.2, fontName = 'Rockwell')
     p_footer = ParagraphStyle('normal', alignment = TA_RIGHT, spaceBefore = 0, spaceAfter = 0,
@@ -202,13 +204,15 @@ def flyer(c, x1, y1, x2, y2, size):
         ticksize = h
     p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize)
 
+    # Big tick
     story = [ Paragraph('<font color="#f4f1f8">3</font>', p_tick) ]
     if (w<h):
         f = Frame(x1, y1, w, h, showBoundary = 0)
     else:
         f = Frame(x1, y1+h/6, w, h, showBoundary = 0)
     f.addFromList(story, c)
-
+    
+    # PledgeBank logo
     story = [
         Paragraph('<font color="#ffffff">Pledge</font>Bank.com', p_footer)
     ]
@@ -218,59 +222,61 @@ def flyer(c, x1, y1, x2, y2, size):
         )
     f.addFromList(story, c)
 
+    # Main body text
     dots_body_gap = w/30
-    # Draw all the text
+
+    # Check web domain fits, as that is long word that doesn't fit on
+    # (and platypus/reportlab doesn't raise an error in that case)
+    webdomain_text = '''<font size="+3" color="#522994"><b>%s/%s</b></font>''' % (mysociety.config.get('WEB_DOMAIN'), ref)
+    webdomain_para = Paragraph(webdomain_text, p_normal)
+    webdomain_allowed_width = w - dots_body_gap * 2
+    webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]
+    if webdomain_width > webdomain_allowed_width:
+        return False
+    # print >>sys.stderr, "webdomain_width ", webdomain_width, w
+
+    # Draw text
     identity = ''
     if pledge['identity']:
         identity = ', ' + pledge['identity']
     story = [
-#        Paragraph('''
-#            I, <font color="#522994">%s</font>, will %s <b>but only if</b> <font color="#522994">%s</font> %s will %s.
-#            ''' % (
-#                pledge['name'], pledge['title'], pledge['target'],
-#                pledge['type'], pledge['signup']
         Paragraph('''
-            <b>If</b> <font color="#522994">%s</font> %s will %s, then <font color="#522994">I</font> will %s.
+            <b>If</b> <font color="#522994">%s</font> %s will %s, 
+            then <font color="#522994">I</font> will %s.
             ''' % (
                 pledge['target'], pledge['type'], pledge['signup'],
                 pledge['title']
             ), p_head),
-        Paragraph(u'<para align="right">\u2014 <font color="#522994">%s%s</font></para>'.encode('utf-8') % (pledge['name'], identity), p_head),
+        Paragraph(u'''<para align="right">\u2014 
+            <font color="#522994">%s%s</font></para>'''.encode('utf-8') 
+            % (pledge['name'], identity), p_head),
+        Paragraph('', p_detail),
+    ]
+    
+    if 'detail' in keywords and keywords['detail'] and pledge['detail']:
+        story.extend(
+            map(lambda text: Paragraph(text, p_detail), 
+                ('<b>More details:</b> %s' % pledge['detail']).split("\n\n"))
+            )
 
-        Paragraph('', p_normal),
-        Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994"><b>pledge %s</b></font>
-        to <font color="#522994"><b>%s</b></font> <font size="-2">(cost 25p + normal SMS rate)</font> or 
-        pledge for free at <font size="+3" color="#522994"><b>%s/%s</b></font>'''
-        % (ref, sms_number, mysociety.config.get('WEB_DOMAIN'), ref), p_normal),
-#        Paragraph(u"<b>Please help me out.</b> There\u2019s nothing to lose \u2013 you only have to go through with it if %s %s will %s.".encode('utf-8') % (
-#            p_normal),
-
-#        Paragraph(u"It\u2019s easy and incredibly quick \u2013".encode('utf-8'), p_nospaceafter),
-#        Paragraph('''
-#            <para leftindent="%f">visit <font color="#522994"><b>%s/%s</b></font> (free)</para>
-#            ''' % (dots_body_gap, mysociety.config.get('WEB_DOMAIN'), ref), p_nospaceafter),
-#        Paragraph('''
-#            <para leftindent="%f">or text <font color="#522994"><b>pledge %s</b></font> to
-#            <font color="#522994"><b>%s</b></font> (cost 25p).</para>
-#            ''' % (dots_body_gap, ref, sms_number), p_normal),
-#        Paragraph('''
-#           PledgeBank will keep you updated, for free,
-#            on the progress of the pledge.
-#            ''', p_normal),
-
+    story.extend([
+        Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994">
+            <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
+            <font size="-2">(cost 25p + normal SMS rate)</font> 
+            or pledge for free at %s''' % (ref, sms_number, webdomain_text), p_normal),
         Paragraph('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
             ''' % pledge['date'], p_normal),
-
         Paragraph('''
             <b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
             costs 25p + your normal text rate. Further messages are free.
             Questions? 08453 330 160 or team@pledgebank.com.
             ''', p_smallprint)
-    ]
+    ])
 
     f = Frame(x1, y1, w, h, showBoundary = 0, 
-        leftPadding = dots_body_gap, rightPadding = dots_body_gap, topPadding = dots_body_gap/2, bottomPadding = h_purple + dots_body_gap/2
+        leftPadding = dots_body_gap, rightPadding = dots_body_gap, 
+        topPadding = dots_body_gap/2, bottomPadding = h_purple + dots_body_gap/2
         )
     f.addFromList(story, c)
 
@@ -279,7 +285,7 @@ def flyer(c, x1, y1, x2, y2, size):
         return False
     return True
 
-def flyers(number):
+def flyers(number, **keywords):
     # Number of flyers to fit on the page
     if number == 1:
         flyers_across = 1
@@ -312,7 +318,7 @@ def flyers(number):
     dummyc = canvas.Canvas(None)
     size = 3.0
     while True:
-        ok = flyer(dummyc, 0, 0, flyer_width, flyer_height, size);
+        ok = flyer(dummyc, 0, 0, flyer_width, flyer_height, size, **keywords);
         if ok:
             break
         size = size * 19 / 20
@@ -327,7 +333,7 @@ def flyers(number):
             flyer(c, 
                 along * flyer_width + margin_left, down * flyer_height + margin_bottom, 
                 (along + 1) * flyer_width + margin_left, (down + 1) * flyer_height + margin_bottom,
-                size)
+                size, **keywords)
 
 ############################################################################
 
@@ -396,8 +402,8 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup, password, identity FROM pledges WHERE ref ILIKE %s', ref)
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['password'], pledge['identity']) = q.fetchone()
+        q.execute('SELECT title, date, name, type, target, signup, password, identity, detail FROM pledges WHERE ref ILIKE %s', ref)
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['password'], pledge['identity'], pledge['detail']) = q.fetchone()
         q.close()
         day = date.day
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
@@ -458,7 +464,7 @@ while fcgi.isFCGI():
                 elif type == "flyers4":
                     flyers(4)
                 elif type == "flyers1":
-                    flyers(1)
+                    flyers(1, detail = True)
                 else:
                     raise Exception, "Unknown type '%s'" % type
             except Exception, e:

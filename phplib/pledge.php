@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.42 2005-04-13 10:17:55 francis Exp $
+ * $Id: pledge.php,v 1.43 2005-04-13 15:04:42 francis Exp $
  * 
  */
 
@@ -172,10 +172,6 @@ function pledge_sentence($r, $params = array()) {
     $s = ($firstperson ? "I" : $r['name']);
     if ($firstperson === "includename") {
         $s .= ", " . $r['name'] . ",";
-    } elseif (array_key_exists('identity', $r) && $r['identity']) {
-        // ('identity' might not be in $r when displaying pledge at top
-        // of new pledge stage 2 form, as it hasn't been asked for yet)
-        $s .= ', ' . $r['identity'] . ',';
     }
     $s .= " will ";
     if (array_key_exists('href', $params)) {

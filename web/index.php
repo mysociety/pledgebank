@@ -5,11 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.137 2005-04-13 19:12:35 matthew Exp $
+// $Id: index.php,v 1.138 2005-04-13 23:46:38 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
+require_once '../phplib/comments.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
@@ -492,7 +493,17 @@ function view_pledge($errors = array()) {
         $showname = get_http_var('showname') ? ' checked' : '';
     else
         $showname = ' checked';
-?>
+
+    if (!$finished) { ?>
+<h2 class="v">Spread the word</h2>
+<ul id="spread">
+   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?></li>
+   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
+   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
+</ul>
+<br clear="both">
+<?
+ } ?>
 <div class="tips" style="text-align: center">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p align="right">&mdash; <?=$r['name'].($r['identity']?', '.$r['identity']:'') ?></p>
@@ -515,43 +526,28 @@ if ($r['detail']) {
 }
 ?>
 </div>
-<?
-
-    if (!$finished) { ?>
-<h2>Spread the word</h2>
-<p style="text-align: center">
-   <ul>
-   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?></li>
-   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
-   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
-   </ul>
-</p>
-<?
- } ?>
 <? if (!$finished) { ?>
-<h2>Sign up now</h2>
 <form accept-charset="utf-8" class="pledge" name="pledge" action="./" method="post">
-<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
-<p>
-<strong>I</strong>, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars(get_http_var('name'))?>">,
-<strong>sign up to the pledge</strong>
 <input type="hidden" name="add_signatory" value="1">
 <input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
-</p>
-<p><strong>Your email:</strong> <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>">
-<br><small>(we need this so we can tell you when the pledge is 
-<br>completed and let the pledge creator get in touch)</small>
+<h2>Sign up now</h2>
+<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
+<p><span style="font-weight: bold">
+I, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars(get_http_var('name'))?>">,
+sign up to the pledge. Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>"></span>
+<br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
 </p>
 <p> <input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge </p>
 <p><input type="submit" name="submit" value="Sign Pledge"> </p>
-</form>
-        Or you can text <strong>pledge <?=htmlspecialchars(get_http_var('pledge'))?></strong> to 
-        <strong><?=OPTION_PB_SMS_DISPLAY_NUMBER?></strong> (cost 25p + normal SMS rate)
+<p>Or you can text <strong>pledge <?=htmlspecialchars(get_http_var('pledge'))?></strong> to
+<strong><?=OPTION_PB_SMS_DISPLAY_NUMBER?></strong> (cost 25p + normal SMS rate)
             <small>
             <br><b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
             costs 25p + your normal text rate. Further messages from us are free.
             </small>
+</p>
+</form>
 
 <? }
 

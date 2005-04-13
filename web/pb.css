@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.18 2005-04-13 10:15:05 francis Exp $
+ * $Id: pb.css,v 1.19 2005-04-13 23:46:38 matthew Exp $
  * 
  */
 
@@ -14,6 +14,8 @@ body {
 	font-family: "Lucida Grande", "Lucida Sans", sans-serif;
 	margin: 0;
 	padding: 0;
+        color: #000000;
+        background-color: #ffffff;
 }
 h1 {
 	font-size: 200%;
@@ -32,9 +34,9 @@ h1 span.logo_bank {
 	background-color: #9C7BBD;
 	color: #21004A;
 }
-a:link { color: #9C7BBD; background-color: #ffffff; }
-a:visited { color: #9C7BBD; background-color: #ffffff; }
-a:hover, a:active { color: #000000; background-color: #ffffff; }
+a:link { color: #9C7BBD; }
+a:visited { color: #9C7BBD; }
+a:hover, a:active { color: #000000; }
 #start a {
 	float: right;
 	border: solid 2px #522994;
@@ -193,9 +195,10 @@ label {
 .tips {
 	border: solid 2px #522994;
 	width: 75%;
-	margin: 0 auto 1em;
+	margin: 1em auto;
 	padding: 10px;
-	background-color: #ffcccc;
+/*	background-color: #ffcccc; */
+        background-color: #f6e5ff;
 }
 
 .tips h2 {
@@ -205,5 +208,21 @@ label {
 .tips li {
     padding: 0;
     margin: 0 0 1em 0;
+}
+
+#spread {
+    width: 90%;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    list-style-type: none; 
+}
+#spread li {
+    margin: 0 1em 0 0;
+    padding: 3px;
+    float: left;
+    width: 30%;
+    background-color: #f6e5ff;
+    border: solid 1px #522994;
 }
 

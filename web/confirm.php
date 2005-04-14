@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.28 2005-04-14 10:17:23 francis Exp $
+ * $Id: confirm.php,v 1.29 2005-04-14 17:38:54 matthew Exp $
  * 
  */
 
@@ -162,11 +162,11 @@ go out to the shops or your pledge is unlikely to succeed.</strong></big>
 costs 25p (plus your normal text fee). We will send signers an SMS when the
 pledge completes.</p>
 
-<p class="noprint" style="text-size: 80%; text-align: center;">The small print: operated by
+<p class="noprint" style="text-align: center;"><small>The small print: operated by
 mySociety, a project of UK Citizens Online Democracy. Sign-up message costs
 25p + your normal text rate. Further messages from us are free.
 Questions about this SMS service? Call us on 08453&nbsp;330&nbsp;160 or
-email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</p>
+email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</small></p>
 <?
     }
 }

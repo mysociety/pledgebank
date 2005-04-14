@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.138 2005-04-13 23:46:38 matthew Exp $
+// $Id: index.php,v 1.139 2005-04-14 00:01:51 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -482,10 +482,11 @@ function view_pledge($errors = array()) {
                 $finished = 1;
                 print '<p class="finished">This pledge is now closed, as its target has been reached.</p>';
             } else {
-                print '<p class="success">This pledge has been successful!</p>';
+                print '<p class="success">This pledge has been successful!';
                 if (!$finished) {
-                    print '<p align="center">You can still add your name to it, because the deadline hasn\'t been reached yet.</p>';
+                    print '<br><strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.';
                 }
+                print '</p>';
             }
 	}
 
@@ -596,9 +597,9 @@ sign up to the pledge. Your email: <input type="text" size="30" name="email" val
         }
         print '</ul>';
     
-
-    print "<h2>Comments on this pledge</h2>";
-    comments_show($pledge_id);
+    # Commented out for now
+    #    print "<h2>Comments on this pledge</h2>";
+    #    comments_show($pledge_id);
 }
 
 # Someone has submitted a new pledge

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.17 2005-04-13 19:12:34 matthew Exp $
+ * $Id: admin-pb.php,v 1.18 2005-04-14 09:59:16 francis Exp $
  * 
  */
 
@@ -187,9 +187,9 @@ class ADMIN_PAGE_PB {
 
     function update_changes() {
         db_query('DELETE FROM frontpage_pledges');
-        foreach (array_keys($_POST['frontpage']) as $ref) {
-                db_query('INSERT INTO frontpage_pledges (pledge_id) values (?)', 
-                        array($ref));
+        if (array_key_exists('frontpage', $_POST)) {
+            foreach (array_keys($_POST['frontpage']) as $ref) {
+                db_query('INSERT INTO frontpage_pledges (pledge_id) values (?)', array($ref));
             }
         }
         db_commit();

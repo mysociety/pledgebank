@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.14 2005-04-05 18:46:42 francis Exp $
+ * $Id: general-example,v 1.15 2005-04-14 09:59:15 francis Exp $
  * 
  */
 
@@ -34,6 +34,7 @@ define('OPTION_WEB_DOMAIN', 'pledgebank.com');
 
 // Top-level URL of current website
 define('OPTION_BASE_URL', 'http://sometesthost.pledgebank.com/');
+define('OPTION_ADMIN_URL', 'https://secure.../admin');
 
 // Domain name for emails to current website
 define('OPTION_EMAIL_DOMAIN', 'sometestdomain.pledgebank.com');

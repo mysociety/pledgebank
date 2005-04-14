@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.27 2005-04-13 19:12:35 matthew Exp $
+ * $Id: confirm.php,v 1.28 2005-04-14 10:17:23 francis Exp $
  * 
  */
 
@@ -42,7 +42,8 @@ if ($q_type == 'pledge') {
     db_commit();
     $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($r['ref']));
     ?>
-    <p class="noprint" align="center">Thank you for confirming your pledge. It is now live at <a href="<?=$url?>"<?=$url?>></a> and people can sign up to it there.
+    <p class="noprint" align="center">Thank you for confirming your pledge.</p>
+    <p class="noprint" align="center">It is now live at <strong><a href="<?=$url?>"><?=$url?></a></strong> and people can sign up to it there.<p>
     <?  advertise_flyers($pledge_id);
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
@@ -128,7 +129,7 @@ function advertise_flyers($pledge_id) {
 You will massively increase the chance of this pledge succeeding if you
 <?
     if (!$r['password']) {
-        print_this_link("print this page out", ",");
+        print_this_link("print this page out", "");
         ?>
     (or use <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">these more attractive PDF versions</a>),
 <?
@@ -140,7 +141,7 @@ You will massively increase the chance of this pledge succeeding if you
         print ",";
    }
 ?>
-cut up the flyers and stick them through your neighbours' letterboxes. We
+ cut up the flyers and stick them through your neighbours' letterboxes. We
 cannot emphasise this enough &mdash; print them NOW and post them next time you
 go out to the shops or your pledge is unlikely to succeed.</strong></big>
 </p>
@@ -149,21 +150,19 @@ go out to the shops or your pledge is unlikely to succeed.</strong></big>
     // work for the password protected ones, you can't POST a password
     // into an IMG SRC= link)
     if (!$r['password']) { ?>
-We also have <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">more attractive PDF
-versions</a>.</p>
 
 <p align="center"><a href="<?=$png_flyers8_url?>"><img src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
 <?
     /* Similarly for SMS note, since private pledges can't be signed by SMS. */
     if (!$r['password'])
         ?>
-<p align="center">You can also invite people to sign up the the pledge by
+<p class="noprint" align="center">You can also invite people to sign up the the pledge by
 <b>SMS</b>. Simply ask them to text
 <b>pledge&nbsp;<?=htmlspecialchars($r['ref'])?></b> to <b>60022</b>. The SMS
 costs 25p (plus your normal text fee). We will send signers an SMS when the
 pledge completes.</p>
 
-<p style="text-size: 80%; text-align: center;">The small print: operated by
+<p class="noprint" style="text-size: 80%; text-align: center;">The small print: operated by
 mySociety, a project of UK Citizens Online Democracy. Sign-up message costs
 25p + your normal text rate. Further messages from us are free.
 Questions about this SMS service? Call us on 08453&nbsp;330&nbsp;160 or

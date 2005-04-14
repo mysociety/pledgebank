@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.34 2005-04-13 17:13:57 francis Exp $
+# $Id: poster.cgi,v 1.35 2005-04-14 10:17:23 francis Exp $
 #
 
 import os
@@ -259,11 +259,16 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 ('<b>More details:</b> %s' % pledge['detail']).split("\n\n"))
             )
 
+    password_text = ""
+    if pledge['password']:
+        password_text = ''' password <font color="#522994" size="+2">%s</font>''' % userpassword
+
     story.extend([
         Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
             <font size="-2">(cost 25p + normal SMS rate)</font> 
-            or pledge for free at %s''' % (ref, sms_number, webdomain_text), p_normal),
+            or pledge for free at %s%s''' % 
+            (ref, sms_number, webdomain_text, password_text), p_normal),
         Paragraph('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
             ''' % pledge['date'], p_normal),

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.139 2005-04-14 00:01:51 matthew Exp $
+// $Id: index.php,v 1.140 2005-04-14 10:17:23 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -801,7 +801,7 @@ function pdfs() {
 <!--
 <li><? print_link_with_password($pdf_flyers4_url, "", "Flyers for handing out, 4 per page (A4, PDF)") ?> </li>
 -->
-<li><? print_link_with_password($pdf_flyers8_url, "", "Flyers for handing out, 8 per page (A4, PDF, like picture below)") ?> </li>
+<li><? print_link_with_password($pdf_flyers8_url, "", "Flyers for handing out, 8 per page (A4, PDF" . (get_http_var("pw") ? "" : ", like picture below") . ")") ?> </li>
 <li><? print_link_with_password($pdf_flyers1_url, "", "Big poster" . 
     ($row['detail'] ? ', including more details' : ''). " (A4, PDF)") ?> </li>
 <!--

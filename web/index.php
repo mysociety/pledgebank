@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.140 2005-04-14 10:17:23 francis Exp $
+// $Id: index.php,v 1.141 2005-04-14 17:48:25 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -508,8 +508,7 @@ function view_pledge($errors = array()) {
 <div class="tips" style="text-align: center">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p align="right">&mdash; <?=$r['name'].($r['identity']?', '.$r['identity']:'') ?></p>
-<p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
-<p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></p>
+<p>Deadline: <strong><?=prettify($r['date']) ?></strong>. <i><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></i></p>
 <?
 if ($r['detail']) {
     $det = $r['detail'];

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.18 2005-04-14 09:59:16 francis Exp $
+ * $Id: admin-pb.php,v 1.19 2005-04-14 11:27:59 francis Exp $
  * 
  */
 
@@ -58,7 +58,7 @@ class ADMIN_PAGE_PB {
         $closed = array();
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
-            $row = '<td>'.$r['ref'].'</td>';
+            $row = '<td><a href="'.OPTION_BASE_URL . "/" . $r['ref'] .'">'.$r['ref'].'</a></td>';
             $row .= '<td><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">'.
             $r['title'].'</a>';
             if ($r['confirmed'] == 'f') {

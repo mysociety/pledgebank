@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.23 2005-04-15 09:59:02 sandpit Exp $
+ * $Id: admin-pb.php,v 1.24 2005-04-15 14:05:04 matthew Exp $
  * 
  */
 
@@ -243,39 +243,39 @@ class ADMIN_PAGE_PB_LATEST {
         while ($r = db_fetch_array($q)) {
             $time[$r['epoch']][] = $r;
         }
-        if (!get_http_var('onlysigners')) {
-        $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
-                         FROM pledges
-                     ORDER BY id DESC');
-        while ($r = db_fetch_array($q)) {
-            $time[$r['epoch']][] = $r;
-            $this->pledgeref[$r['id']] = $r['ref'];
-        }
-        $q = db_query('SELECT *
-                         FROM incomingsms
-                     ORDER BY whenreceived DESC');
-        while ($r = db_fetch_array($q)) {
-            $time[$r['whenreceived']][] = $r;
-        }
-        $q = db_query('SELECT *
-                         FROM outgoingsms
-                     ORDER BY lastsendattempt DESC LIMIT 10');
-        while ($r = db_fetch_array($q)) {
-            $time[$r['lastsendattempt']][] = $r;
-        }
         $q = db_query('SELECT *,extract(epoch from created) as epoch
                          FROM token
                      ORDER BY created DESC');
         while ($r = db_fetch_array($q)) {
             $time[$r['epoch']][] = $r;
         }
-        $q = db_query('SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch
-                         FROM message, pledges
-                        WHERE message.pledge_id = pledges.id
-                     ORDER BY whencreated DESC');
-        while ($r = db_fetch_array($q)) {
-            $time[$r['epoch']][] = $r;
-        }
+        if (!get_http_var('onlysigners')) {
+            $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
+                             FROM pledges
+                         ORDER BY id DESC');
+            while ($r = db_fetch_array($q)) {
+                $time[$r['epoch']][] = $r;
+                $this->pledgeref[$r['id']] = $r['ref'];
+            }
+            $q = db_query('SELECT *
+                             FROM incomingsms
+                         ORDER BY whenreceived DESC');
+            while ($r = db_fetch_array($q)) {
+                $time[$r['whenreceived']][] = $r;
+            }
+            $q = db_query('SELECT *
+                             FROM outgoingsms
+                         ORDER BY lastsendattempt DESC LIMIT 10');
+            while ($r = db_fetch_array($q)) {
+                $time[$r['lastsendattempt']][] = $r;
+            }
+            $q = db_query('SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch
+                             FROM message, pledges
+                            WHERE message.pledge_id = pledges.id
+                         ORDER BY whencreated DESC');
+            while ($r = db_fetch_array($q)) {
+                $time[$r['epoch']][] = $r;
+            }
         }
         krsort($time);
         print '<a href="'.$this->self_link.'">Full log</a> | <a
@@ -310,7 +310,9 @@ dd {
                 $this->pledge_link($data['ref']);
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, " .
-                $this->pledge_link($data['ref'], $data['title']) . ' created';
+                $this->pledge_link($data['ref'], $data['title']) . ' created (';
+                if ($r['confirmed']=='f') print 'un';
+                print 'confirmed)';
             } elseif (array_key_exists('whenreceived', $data)) {
                 print "Incoming SMS from $data[sender] received, sent
                 $data[whensent], message $data[message]

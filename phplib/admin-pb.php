@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.19 2005-04-14 11:27:59 francis Exp $
+ * $Id: admin-pb.php,v 1.20 2005-04-15 08:54:50 sandpit Exp $
  * 
  */
 
@@ -15,8 +15,8 @@ require_once "fns.php";
 require_once "db.php";
 require_once "../../phplib/utility.php";
 
-class ADMIN_PAGE_PB {
-    function ADMIN_PAGE_PB () {
+class ADMIN_PAGE_PB_MAIN {
+    function ADMIN_PAGE_PB_MAIN () {
         $this->id = "pb";
         $this->navname = "Pledges and Signers";
     }
@@ -220,4 +220,102 @@ class ADMIN_PAGE_PB {
     }
 }
 
+class ADMIN_PAGE_PB_LATEST {
+    function ADMIN_PAGE_PB_LATEST() {
+        $this->id = 'pblatest';
+        $this->navname = 'Latest Changes';
+    }
+
+    # pledges use creationtime
+    # signers use signtime
+    function show_latest_changes() {
+        /*
+        $q = db_query('SELECT * FROM comment ORDER BY whenposted DESC LIMIT 10');
+        while ($r = db_fetch_array($q)) {
+        }*/
+        $q = db_query('SELECT signers.name, signers.email,
+                              signers.mobile, signtime, pledges.title,
+                              pledges.ref,
+                              extract(epoch from signtime) as epoch
+                         FROM signers, pledges
+                        WHERE signers.pledge_id = pledges.id
+                     ORDER BY signtime DESC');
+        while ($r = db_fetch_array($q)) {
+            $time[$r['epoch']] = $r;
+        }
+        if (!get_http_var('onlysigners')) {
+        $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
+                         FROM pledges
+                     ORDER BY id DESC');
+        while ($r = db_fetch_array($q)) {
+            $time[$r['epoch']] = $r;
+        }
+        $q = db_query('SELECT *
+                         FROM incomingsms
+                     ORDER BY whenreceived DESC');
+        while ($r = db_fetch_array($q)) {
+            $time[$r['whenreceived']] = $r;
+        }
+        $q = db_query('SELECT *
+                         FROM outgoingsms
+                     ORDER BY lastsendattempt DESC LIMIT 10');
+        while ($r = db_fetch_array($q)) {
+            $time[$r['lastsendattempt']] = $r;
+        }
+        $q = db_query('SELECT *,extract(epoch from created) as epoch
+                         FROM token
+                     ORDER BY created DESC');
+        while ($r = db_fetch_array($q)) {
+            $time[$r['epoch']] = $r;
+        }
+        $q = db_query('SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch
+                         FROM message, pledges
+                        WHERE message.pledge_id = pledges.id
+                     ORDER BY whencreated DESC');
+        while ($r = db_fetch_array($q)) {
+            $time[$r['epoch']] = $r;
+        }
+        }
+        krsort($time);
+        print '<a href="'.$this->self_link.'">Full log</a> | <a
+        href="'.$this->self_link.'&amp;onlysigners=1">Only signatures</a>';
+        print '<dl>';
+        foreach ($time as $epoch => $data) {
+            print '<dt><b>' . date('Y-m-d H:i:s', $epoch) . '</b></dt> <dd>';
+            if (array_key_exists('signtime', $data)) {
+                print $data['name'];
+                if ($data['email']) print ' &lt;'.$data['email'].'&gt;';
+                if ($data['mobile']) print ' (' . $data['mobile'] . ')';
+                print ' signed up to <a href="' .
+                OPTION_BASE_URL . '/' . $data['ref'] . '">' . $data['ref'] . '</a>';
+            } elseif (array_key_exists('creationtime', $data)) {
+                print "Pledge $data[id], ref <em>$data[ref]</em>, <a
+                href=\"" . OPTION_BASE_URL . "/$data[ref]\">$data[title]</a> created";
+            } elseif (array_key_exists('whenreceived', $data)) {
+                print "Incoming SMS from $data[sender] received, sent
+                $data[whensent], message $data[message]
+                ($data[foreignid] $data[network])";
+            } elseif (array_key_exists('whencreated', $data)) {
+                print "Message $data[circumstance] sent to pledge <a
+                href=\"". OPTION_BASE_URL .
+                "/$data[ref]\">$data[ref]</a>";
+            } elseif (array_key_exists('created', $data)) {
+                print "$data[scope] token $data[token] created";
+            } elseif (array_key_exists('lastsendattempt', $data)) {
+                if ($data['ispremium'] == 't') print 'Premium ';
+                print "SMS sent to $data[recipient], message
+                '$data[message]' status $data[lastsendstatus]";
+            } else {
+                print_r($data);
+            }
+            print "</dd>\n";
+        }
+        print '</dl>';
+    }
+
+    function display($self_link) {
+        db_connect();
+        $this->show_latest_changes();
+    }
+}
 ?>

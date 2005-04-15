@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.21 2005-04-15 09:11:38 sandpit Exp $
+ * $Id: admin-pb.php,v 1.22 2005-04-15 09:25:01 sandpit Exp $
  * 
  */
 
@@ -241,53 +241,66 @@ class ADMIN_PAGE_PB_LATEST {
                         WHERE signers.pledge_id = pledges.id
                      ORDER BY signtime DESC');
         while ($r = db_fetch_array($q)) {
-            $time[$r['epoch']] = $r;
+            $time[$r['epoch']][] = $r;
         }
         if (!get_http_var('onlysigners')) {
         $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
                          FROM pledges
                      ORDER BY id DESC');
         while ($r = db_fetch_array($q)) {
-            $time[$r['epoch']] = $r;
+            $time[$r['epoch']][] = $r;
         }
         $q = db_query('SELECT *
                          FROM incomingsms
                      ORDER BY whenreceived DESC');
         while ($r = db_fetch_array($q)) {
-            $time[$r['whenreceived']] = $r;
+            $time[$r['whenreceived']][] = $r;
         }
         $q = db_query('SELECT *
                          FROM outgoingsms
                      ORDER BY lastsendattempt DESC LIMIT 10');
         while ($r = db_fetch_array($q)) {
-            $time[$r['lastsendattempt']] = $r;
+            $time[$r['lastsendattempt']][] = $r;
         }
         $q = db_query('SELECT *,extract(epoch from created) as epoch
                          FROM token
                      ORDER BY created DESC');
         while ($r = db_fetch_array($q)) {
-            $time[$r['epoch']] = $r;
+            $time[$r['epoch']][] = $r;
         }
         $q = db_query('SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch
                          FROM message, pledges
                         WHERE message.pledge_id = pledges.id
                      ORDER BY whencreated DESC');
         while ($r = db_fetch_array($q)) {
-            $time[$r['epoch']] = $r;
+            $time[$r['epoch']][] = $r;
         }
         }
         krsort($time);
         print '<a href="'.$this->self_link.'">Full log</a> | <a
-        href="'.$this->self_link.'&amp;onlysigners=1">Only signatures</a>';
+        href="'.$this->self_link.'&amp;onlysigners=1">Only
+        signatures</a>'; ?>
+<style type="text/css">
+dt {   
+    clear: left;
+    float: left;
+    font-weight: bold;
+}
+dd {
+    margin-left: 6em;
+}
+</style>
+<?
         print '<dl>';
         $date = '';
-        foreach ($time as $epoch => $data) {
+        foreach ($time as $epoch => $datas) {
             $curdate = date('dS F Y', $epoch);
             if ($date != $curdate) {
                 print '</dl> <h2>'. $curdate . '</h2> <dl>';
                 $date = $curdate;
             }
-            print '<dt><b>' . date('H:i:s', $epoch) . '</b></dt> <dd>';
+            print '<dt><b>' . date('H:i:s', $epoch) . ':</b></dt> <dd>';
+            foreach ($datas as $data) {
             if (array_key_exists('signtime', $data)) {
                 print $data['name'];
                 if ($data['email']) print ' &lt;'.$data['email'].'&gt;';
@@ -302,7 +315,7 @@ class ADMIN_PAGE_PB_LATEST {
                 $data[whensent], message $data[message]
                 ($data[foreignid] $data[network])";
             } elseif (array_key_exists('whencreated', $data)) {
-                print "Message $data[circumstance] sent to pledge <a
+                print "Message $data[circumstance] queued for pledge <a
                 href=\"". OPTION_BASE_URL .
                 "/$data[ref]\">$data[ref]</a>";
             } elseif (array_key_exists('created', $data)) {
@@ -314,9 +327,11 @@ class ADMIN_PAGE_PB_LATEST {
             } else {
                 print_r($data);
             }
+            print '<br>';
+            }
             print "</dd>\n";
         }
-        print '</dl>';
+        print '</ul>';
     }
 
     function display($self_link) {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.145 2005-04-15 11:49:43 matthew Exp $
+// $Id: index.php,v 1.146 2005-04-15 16:30:46 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -387,7 +387,7 @@ accepting certain kinds at the moment.</p>
 <h2>Search</h2>
 <p><label for="s">Enter a PledgeBank Reference, or a search string:</label>
 <input type="text" id="s" name="search" size="10" value=""></p>
-<p style="margin-top: 1em; text-align: right"><input type="submit" value="Go"></p>
+<p style="margin-top: 0.5em; text-align: right"><input type="submit" value="Go"></p>
 </form>
 <?
     //list_newest_pledges();
@@ -508,16 +508,7 @@ function view_pledge($errors = array()) {
     else
         $showname = ' checked';
 
-    if (!$finished) { ?>
-<h2 class="v">Spread the word</h2>
-<ul id="spread">
-   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?></li>
-   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
-   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
-</ul>
-<br clear="both">
-<?
- } ?>
+    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false); ?>
 <div class="tips" style="text-align: center">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p align="right">&mdash; <?=$r['name'].($r['identity']?', '.$r['identity']:'') ?></p>
@@ -540,15 +531,15 @@ if ($r['detail']) {
 ?>
 </div>
 <? if (!$finished) { ?>
-<form accept-charset="utf-8" class="pledge" name="pledge" action="./" method="post">
+<form accept-charset="utf-8" class="pledgesign" name="pledge" action="./" method="post">
 <input type="hidden" name="add_signatory" value="1">
 <input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">
 <h2>Sign up now</h2>
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
-<p><span style="font-weight: bold">
+<p><b>
 I, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars(get_http_var('name'))?>">,
-sign up to the pledge. Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>"></span>
+sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>"></b>
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
 </p>
 <p> <input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge </p>
@@ -565,7 +556,22 @@ sign up to the pledge. Your email: <input type="text" size="30" name="email" val
 <? }
 
 ?>
+<div id="flyeremail">
+<?    if (!$finished) { ?>
+<h2>Spread the word</h2>
+<ul id="spread">
+   <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
+   <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
+   <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?>
+<img vspace="5" align="right" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="">
+</li>
+</ul>
+<br clear="both">
+<?
+ } ?>
+</div>
 
+<div id="signatories">
 <h2>Current signatories</h2><?
         $out = '<li>'
                 . htmlspecialchars($r['name'])
@@ -608,7 +614,7 @@ sign up to the pledge. Your email: <input type="text" size="30" name="email" val
             print "<li>$extra</li>";
         }
         print '</ul>';
-    
+    print '</div>';
     # Commented out for now
     #    print "<h2>Comments on this pledge</h2>";
     #    comments_show($pledge_id);
@@ -840,35 +846,66 @@ to get these flyers.
 }
 
 function search() {
-    $id = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', array(get_http_var('search')));
+    $out = ''; $success = 0;
+    $search = get_http_var('search');
+    $id = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', $search);
     if ($id) {
-        Header("Location: " . get_http_var('search')); # TODO: should be absolute?
+        Header("Location: " . OPTION_BASE_URL . '/' . $search);
         exit;
     }
-    $q = db_query('SELECT date,ref,title, pb_current_date() <= date as open FROM pledges WHERE password IS NULL AND title ILIKE \'%\' || ? || \'%\' ORDER BY date', array(get_http_var('search')));
+
+    $q = db_query('SELECT date,ref,title, pb_current_date() <= date as open FROM pledges WHERE password IS NULL AND (title ILIKE \'%\' || ? || \'%\' OR detail ILIKE \'%\' || ? || \'%\') ORDER BY date', array($search, $search));
     if (!db_num_rows($q)) {
-        return '<p>Sorry, we could find nothing that matched "' . htmlspecialchars(get_http_var('search')) . '".</p>';
     } else {
+        $success = 1;
         $closed = ''; $open = '';
         while ($r = db_fetch_array($q)) {
-            $text = '<li><a href="' . $r['ref'] . '">' . $r['title'] . '</a></li>';
+            $text = '<li><a href="' . $r['ref'] . '">' . htmlspecialchars($r['title']) . '</a></li>';
             if ($r['open']=='t') {
                 $open .= $text;
             } else {
                 $closed .= $text;
             }
         }
-        $out = '';
         if ($open) {
-            $out = '<p>The following currently open pledges matched your search term "' . htmlspecialchars(get_http_var('search')) . '":</p>';
+            $out .= '<p>The following currently open pledges matched your search term "' . htmlspecialchars($search) . '" in either their title or More Details:</p>';
             $out .= '<ul>' . $open . '</ul>';
         }
         if ($closed) {
             $out .= '<p>The following are closed pledges that match your search term:</p>';
             $out .= '<ul>' . $closed . '</ul>';
         }
-        return $out;
     }
+
+    $people = array();
+    $q = db_query('SELECT ref, title, name FROM pledges WHERE confirmed AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    while ($r = db_fetch_array($q)) {
+        $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
+    }
+    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges WHERE showname AND NOT reported AND signers.pledge_id = pledges.id AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    while ($r = db_fetch_array($q)) {
+        $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
+    }
+    if (sizeof($people)) {
+        $success = 1;
+        $out .= '<p>The following creators or signatures matched your search term "'.htmlspecialchars($search).'":</p> <dl>';
+        ksort($people);
+        foreach ($people as $name => $array) {
+            $out .= '<dt><b>'.htmlspecialchars($name). '</b></dt> <dd>';
+            foreach ($array as $item) {
+                $out .= '<dd>';
+                $out .= '<a href="' . $item[0] . '">' . $item[1] . '</a>';
+                if ($item[2] == 'creator') $out .= " (creator)";
+                $out .= '</dd>';
+            }
+        }
+        $out .= '</dl>';
+    }
+
+    if (!$success) {
+        $out .= '<p>Sorry, we could find nothing that matched "' . htmlspecialchars($search) . '".</p>';
+    }
+    return $out;
 }
 
 ?>

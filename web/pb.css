@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.21 2005-04-15 11:49:43 matthew Exp $
+ * $Id: pb.css,v 1.22 2005-04-15 16:30:46 matthew Exp $
  * 
  */
 
@@ -37,6 +37,7 @@ h1 span.logo_bank {
 a:link { color: #9C7BBD; }
 a:visited { color: #9C7BBD; }
 a:hover, a:active { color: #000000; }
+
 #start a {
 	float: right;
 	border: solid 2px #522994;
@@ -56,7 +57,8 @@ a:hover, a:active { color: #000000; }
 
 #content {
 	text-align: left;
-	padding: 10px;
+	padding: 10px 10%;
+        margin: 0 auto;
 }
 
 #search {
@@ -77,14 +79,13 @@ a:hover, a:active { color: #000000; }
 .pledge .c {
     text-align: center;
 }
-.pledge {
+.pledge, .pledgesign {
 	border: solid 2px #522994;
-	width: 75%;
 	margin: 0 auto 1em;
 	padding: 10px;
 	background-color: #c6b5de;
 }
-.pledge h2 {
+.pledge h2, .pledgesign h2, .flyeremail h2 {
 	margin-top: 0;
 }
 .pledge p {
@@ -94,9 +95,20 @@ a:hover, a:active { color: #000000; }
 	color: #000000;
 	background-color: #c6b5de;
 }
+.pledgesign {
+    float: left;
+    width: 45%;
+    margin: 0 0 1em 0;
+}
+
+#flyeremail {
+    float: right;
+    width: 45%;
+    min-width: 298px;
+}
 
 dt {
-	font-weight: bold;
+    font-weight: bold;
     margin-top: 0.5em;
 }
 
@@ -134,12 +146,12 @@ form.buttonform {
 	border: solid 0px #522994;
 	padding: 0px;
 }
-input[type=text], input[type=submit], textarea {
+input[type=text], input[type=password], input[type=submit], textarea {
 	background-color: #ffffff;
 	color: #000000;
 	border: solid 2px #9c7bbd;
 }
-textarea:hover, textarea:focus, input[type=text]:hover, input[type=submit]:hover, input[type=text]:focus, input[type=submit]:focus {
+textarea:hover, textarea:focus, input[type=text]:hover, input[type=submit]:hover, input[type=password]:hover, input[type=text]:focus, input[type=submit]:focus, input[type=password]:focus {
 	border: solid 2px #522994;
 }
 .v {
@@ -198,35 +210,20 @@ input.error, input[type=text].error {
 
 .tips {
 	border: solid 2px #522994;
-	width: 75%;
 	margin: 1em auto;
 	padding: 10px;
-/*	background-color: #ffcccc; */
         background-color: #f6e5ff;
 }
-
 .tips h2 {
     margin-top: 0;
 }
-
 .tips li {
     padding: 0;
     margin: 0 0 1em 0;
 }
 
 #spread {
-    width: 90%;
-    margin: 0 auto;
-    padding: 0;
-    text-align: center;
-    list-style-type: none; 
-}
-#spread li {
-    margin: 0 0.25em;
-    padding: 5px;
-    float: left;
-    width: 30%;
-    background-color: #f6e5ff;
-    dborder: solid 1px #522994;
+    margin: 0;
+    padding: 0 0 0 1.5em;
 }
 

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.36 2005-04-15 10:22:50 francis Exp $
+# $Id: poster.cgi,v 1.37 2005-04-15 16:30:46 matthew Exp $
 #
 
 import os
@@ -23,7 +23,11 @@ import sha
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4 # only goes down to A6
+papersizes = {}
+papersizes['A4'] = A4
+papersizes['A7'] = (A4[0] * 0.5, A4[1] * 0.25)
+
 from reportlab.lib.styles import ParagraphStyle
 
 from reportlab.lib.styles import getSampleStyleSheet
@@ -65,7 +69,7 @@ addMapping('rockwell', 1, 1, 'Rockwell')
 db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
 
 types = ["cards", "tearoff", "flyers16", "flyers4", "flyers1", "flyers8"]
-sizes = ["A4"]
+sizes = ["A4","A7"]
 formats = ["pdf", "png", "gif"]
 
 def ordinal(day):
@@ -290,7 +294,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         return False
     return True
 
-def flyers(number, **keywords):
+def flyers(number, papersize='A4', **keywords):
     # Number of flyers to fit on the page
     if number == 1:
         flyers_across = 1
@@ -308,12 +312,18 @@ def flyers(number, **keywords):
         raise Exception("Invalid number %d for flyers" % number)
 
     # Just A4 for now
-    (page_width, page_height) = A4
-    # Tweaked to make sure dotted lines are displayed on all edges
-    margin_top = 1 * cm
-    margin_left = 1 * cm
-    margin_bottom = 1 * cm
-    margin_right = 1 * cm
+    (page_width, page_height) = papersizes[papersize]
+    if papersize == 'A4':
+        # Tweaked to make sure dotted lines are displayed on all edges
+        margin_top = 1 * cm
+        margin_left = 1 * cm
+        margin_bottom = 1 * cm
+        margin_right = 1 * cm
+    elif papersize == 'A7':
+        margin_top = 0
+        margin_left = 0
+        margin_bottom = 0
+        margin_right = 0
 
     # Calculate size of fliers
     flyer_width = (page_width - margin_left - margin_right) / flyers_across 
@@ -456,7 +466,7 @@ while fcgi.isFCGI():
         else:
             # Generate PDF file
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
-            c = canvas.Canvas(canvasfilename)
+            c = canvas.Canvas(canvasfilename, pagesize=papersizes[size])
             try:
                 if type == "cards":
                     cards()
@@ -468,8 +478,10 @@ while fcgi.isFCGI():
                     flyers(8)
                 elif type == "flyers4":
                     flyers(4)
+                elif type == "flyers1" and size=='A4':
+                    flyers(1, size, detail = True)
                 elif type == "flyers1":
-                    flyers(1, detail = True)
+                    flyers(1, size)
                 else:
                     raise Exception, "Unknown type '%s'" % type
             except Exception, e:

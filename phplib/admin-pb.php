@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.24 2005-04-15 14:05:04 matthew Exp $
+ * $Id: admin-pb.php,v 1.25 2005-04-15 16:30:41 matthew Exp $
  * 
  */
 
@@ -307,10 +307,10 @@ dd {
                 if ($data['email']) print ' &lt;'.$data['email'].'&gt;';
                 if ($data['mobile']) print ' (' . $data['mobile'] . ')';
                 print ' signed up to ' .
-                $this->pledge_link($data['ref']);
+                $this->pledge_link('ref', $data['ref']);
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, " .
-                $this->pledge_link($data['ref'], $data['title']) . ' created (';
+                $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (';
                 if ($r['confirmed']=='f') print 'un';
                 print 'confirmed)';
             } elseif (array_key_exists('whenreceived', $data)) {
@@ -319,7 +319,7 @@ dd {
                 ($data[foreignid] $data[network])";
             } elseif (array_key_exists('whencreated', $data)) {
                 print "Message $data[circumstance] queued for pledge " .
-                $this->pledge_link($data['ref']);
+                $this->pledge_link('ref', $data['ref']);
             } elseif (array_key_exists('created', $data)) {
                 $stuff = $data['data'];
                 $pos = 0;
@@ -328,9 +328,9 @@ dd {
                 print "$data[scope] token $data[token] created ";
                 if (array_key_exists('email', $res)) {
                     print "for $res[name] $res[email], pledge " .
-                    $this->pledge_link($res['pledge_id']);
+                    $this->pledge_link('id', $res['pledge_id']);
                 } elseif (array_key_exists('circumstance', $res)) {
-                    print "for pledge " . $this->pledge_link($res['pledge_id']);
+                    print "for pledge " . $this->pledge_link('id', $res['pledge_id']);
                 }
             } elseif (array_key_exists('lastsendattempt', $data)) {
                 if ($data['ispremium'] == 't') print 'Premium ';
@@ -346,8 +346,8 @@ dd {
         print '</ul>';
     }
 
-    function pledge_link($data, $title='') {
-        if (ctype_digit($data)) $ref = $this->pledgeref[$data];
+    function pledge_link($type, $data, $title='') {
+        if ($type == 'id') $ref = $this->pledgeref[$data];
         else $ref = $data;
         if (!$title) $title = $ref;
         return '<a href="' . OPTION_BASE_URL . '/' . $ref . '">' .

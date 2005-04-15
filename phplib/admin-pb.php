@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.20 2005-04-15 08:54:50 sandpit Exp $
+ * $Id: admin-pb.php,v 1.21 2005-04-15 09:11:38 sandpit Exp $
  * 
  */
 
@@ -280,8 +280,14 @@ class ADMIN_PAGE_PB_LATEST {
         print '<a href="'.$this->self_link.'">Full log</a> | <a
         href="'.$this->self_link.'&amp;onlysigners=1">Only signatures</a>';
         print '<dl>';
+        $date = '';
         foreach ($time as $epoch => $data) {
-            print '<dt><b>' . date('Y-m-d H:i:s', $epoch) . '</b></dt> <dd>';
+            $curdate = date('dS F Y', $epoch);
+            if ($date != $curdate) {
+                print '</dl> <h2>'. $curdate . '</h2> <dl>';
+                $date = $curdate;
+            }
+            print '<dt><b>' . date('H:i:s', $epoch) . '</b></dt> <dd>';
             if (array_key_exists('signtime', $data)) {
                 print $data['name'];
                 if ($data['email']) print ' &lt;'.$data['email'].'&gt;';

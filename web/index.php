@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.146 2005-04-15 16:30:46 matthew Exp $
+// $Id: index.php,v 1.147 2005-04-15 17:04:31 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -563,7 +563,7 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
    <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
    <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
    <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?>
-<img vspace="5" align="right" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="">
+<a href="/<?=$h_ref ?>/flyers"><img border="0" vspace="5" align="right" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="PDF flyers to download"></a>
 </li>
 </ul>
 <br clear="both">

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.25 2005-04-15 16:30:41 matthew Exp $
+ * $Id: admin-pb.php,v 1.26 2005-04-15 17:04:30 matthew Exp $
  * 
  */
 
@@ -309,10 +309,12 @@ dd {
                 print ' signed up to ' .
                 $this->pledge_link('ref', $data['ref']);
             } elseif (array_key_exists('creationtime', $data)) {
-                print "Pledge $data[id], ref <em>$data[ref]</em>, " .
-                $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (';
-                if ($r['confirmed']=='f') print 'un';
-                print 'confirmed)';
+                print "Pledge $data[id], ref <em>$data[ref]</em>, ";
+                if ($data['confirmed']=='f') {
+                    print '<em>' . htmlspecialchars($data['title']) . '</em> created (unconfirmed)';
+                } else {
+                    print $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (confirmed)';
+                }
             } elseif (array_key_exists('whenreceived', $data)) {
                 print "Incoming SMS from $data[sender] received, sent
                 $data[whensent], message $data[message]
@@ -351,7 +353,7 @@ dd {
         else $ref = $data;
         if (!$title) $title = $ref;
         return '<a href="' . OPTION_BASE_URL . '/' . $ref . '">' .
-        $title . '</a>';
+        htmlspecialchars($title) . '</a>';
     }
 
     function display($self_link) {

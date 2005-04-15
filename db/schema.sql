@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.66 2005-04-13 17:23:10 francis Exp $
+-- $Id: schema.sql,v 1.67 2005-04-15 11:49:41 matthew Exp $
 --
 
 -- secret
@@ -66,6 +66,8 @@ create table pledges (
     signup text not null default 'sign up',
     -- target deadline, midnight at end of this day
     date date not null,
+    -- actual text entered, just in case parse_date() goes wrong
+    datetext text not null,
     -- extra detail by pledge setter
     detail text not null default '',
 

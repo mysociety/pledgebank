@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.35 2005-04-14 10:17:23 francis Exp $
+# $Id: poster.cgi,v 1.36 2005-04-15 10:22:50 francis Exp $
 #
 
 import os
@@ -487,7 +487,7 @@ while fcgi.isFCGI():
                 cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outdir + '/' + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outdir + '/' + outfile
                 child = popen2.Popen3(cmd, True) # capture stderr
                 child.tochild.close()
-                req.err.write(child.fromchild.read())
+                # req.err.write(child.fromchild.read()) # no need for stdout in log file, just stderr
                 req.err.write(child.childerr.read())
                 status = child.wait()
                 if os.WIFSIGNALED(status):

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.29 2005-04-14 17:38:54 matthew Exp $
+ * $Id: confirm.php,v 1.30 2005-04-15 10:21:38 matthew Exp $
  * 
  */
 
@@ -151,7 +151,7 @@ go out to the shops or your pledge is unlikely to succeed.</strong></big>
     // into an IMG SRC= link)
     if (!$r['password']) { ?>
 
-<p align="center"><a href="<?=$png_flyers8_url?>"><img src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
+<p align="center"><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
 <?
     /* Similarly for SMS note, since private pledges can't be signed by SMS. */
     if (!$r['password'])

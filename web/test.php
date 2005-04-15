@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francsi@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: test.php,v 1.6 2005-04-11 11:47:38 francis Exp $
+// $Id: test.php,v 1.7 2005-04-15 18:26:45 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -18,5 +18,12 @@ if (get_http_var('error')) {
     $some_variable = $some_array['deliberate_error_to_test_error_handling'];
 }
 
-phpinfo();
+if (get_http_var('phpinfo')) {
+    phpinfo();
+}
+
+if (get_http_var('smstest')) {
+    print_r($_GET);
+    print_r($_POST);
+}
 

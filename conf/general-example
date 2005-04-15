@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.15 2005-04-14 09:59:15 francis Exp $
+ * $Id: general-example,v 1.16 2005-04-15 18:26:45 francis Exp $
  * 
  */
 
@@ -50,6 +50,10 @@ define('OPTION_PB_STAGING', 1);
 
 // By default, no SMS service.
 define('OPTION_PB_SMS_MODE', 'none');
+
+// C360 aggregator specific values.
+define('OPTION_PB_SMS_C360_INCOMING_URL', 'http://pledgebank.owl/c360smsin.cgi');
+define('OPTION_PB_SMS_C360_OUTGOING_URL', 'http://www.c360uk.com/...blah...');
 
 // SMS sending and receiving may be done over HTTP via the MX Telecom
 // aggregator.  Access to this service is authenticated by this username and

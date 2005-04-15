@@ -3,17 +3,21 @@
 # pbsmsd:
 # Pledgebank SMS daemon.
 #
-# This does two things: managing the sending of SMS messages from the outgoing
-# message queue, and calling code to process messages which have been received.
+# This does three things: 
+# 'processing' - calling code to process messages which have been received.
+# 'sending' - managing the sending of SMS messages from the outgoing message queue.
+# 'gathering' - polling for delivery reports and missed messages.
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.23 2005-04-05 18:56:40 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.24 2005-04-15 18:26:44 francis Exp $';
+$| = 1; # flush STDOUT afer each write
 
 use strict;
 require 5.8.0;
+our $sms_outgoing_url;
 
 # Horrible boilerplate to set up appropriate library paths.
 use FindBin;
@@ -168,7 +172,7 @@ sub run_sending_process () {
                     # We're OK to attempt sending.
                     my ($status, $extra);
 
-                    my $result = do_post_request("outgoing #$id", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
+                    my $result = do_post_request("outgoing #$id", $sms_outgoing_url, \%p);
                     if (ref($result) eq 'ARRAY') {
                         ($status, $extra) = @$result;
                     } else {
@@ -199,6 +203,7 @@ sub run_sending_process () {
         }
 
         # Pause for a bit if we ran out of messages to send.
+        last if $::once;
         sleep(10) if ($nsent == 0);
 
         ++$niter;
@@ -284,7 +289,7 @@ sub run_gathering_process () {
                 );
 
             print_log('debug', "get receipts: query is '$p{strWhere}'");
-            my $result = do_post_request("get receipts", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
+            my $result = do_post_request("get receipts", $sms_outgoing_url, \%p);
             if (ref($result) eq 'ARRAY') {
                 if ($result->[0] eq 'system error') {
                     print_log('warning', "get receipts: system error: $result->[1]");
@@ -409,7 +414,7 @@ sub run_gathering_process () {
                     strWhere => "Reference <> '' and (" . join(" or ", map { "($_)" } @qq) . ")"
                 );
             print_log('debug', "get missed messages: query is '$p{strWhere}'");
-            my $result = do_post_request("get missed messages", 'http://www.c360uk.com/api/complex/pledge-query.php', \%p);
+            my $result = do_post_request("get missed messages", $sms_outgoing_url, \%p);
             if (ref($result) eq 'ARRAY') {
                 if ($result->[0] eq 'system error') {
                     print_log('warning', "get missed messages: system error: $result->[1]");
@@ -482,6 +487,7 @@ sub run_gathering_process () {
 
         dbh()->commit();
 
+        last if $::once;
         sleep(120);
     }
 }
@@ -567,6 +573,7 @@ sub run_processing_process () {
             $delay = 0 if ($n == 20);
         }
 
+        last if $::once;
         sleep($delay) if ($delay);
         ++$niter;
     }
@@ -577,12 +584,15 @@ sub run_processing_process () {
 # Entry point.
 my $numprocesses = mySociety::Config::get('SMS_DAEMON_SEND_PROCESSES', 5);
 my $pidfilepath = mySociety::Config::get('SMS_DAEMON_PIDFILE', '/var/run/pbsmsd.pid');
-my $nodetach = 0;
+$sms_outgoing_url = mySociety::Config::get('PB_SMS_C360_OUTGOING_URL', undef);
+my $debug = 0;
 my $help = 0;
+our $once = 0;
 if (!GetOptions(
         'senderprocesses=i' =>  \$numprocesses,
         'pidfile=s' =>          \$pidfilepath,
-        'debug' =>              \$nodetach,
+        'debug' =>              \$debug,
+        'once' =>               \$once,
         'help' =>               \$help
     )) {
     print_log('err', "bad options; try --help for help");
@@ -594,9 +604,20 @@ if ($help) {
     exit(0);
 }
 
+if ($once) {
+    if (!$debug) {
+        mySociety::Util::log_to_stderr(0);
+    }
+    run_processing_process();
+    run_gathering_process();
+    run_sending_process();
+    exit(0);
+}
+
+
 $numprocesses = 2 if ($numprocesses < 1 or $numprocesses > 100);
 
-mySociety::Util::daemon() unless ($nodetach);
+mySociety::Util::daemon() unless ($debug);
 
 my $pidfile;
 try {
@@ -659,6 +680,11 @@ Display information about using the program.
 Don't detach from controlling terminal; log diagnostics to standard error as
 well as the system log.
 
+=item --once
+
+Rather than setting up as a daemon, run once.  If --debug is set, logs
+verbose output as well, otherwise is quite quite.
+
 =item --pidfile PATH
 
 Use PATH as the location of the PID file. By default, uses the value defined in
@@ -678,5 +704,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.23 2005-04-05 18:56:40 chris Exp $
+$Id: pbsmsd,v 1.24 2005-04-15 18:26:44 francis Exp $
 

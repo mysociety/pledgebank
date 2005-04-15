@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.31 2005-04-15 11:07:44 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.32 2005-04-15 18:26:44 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -35,9 +35,11 @@ my $verbose = 2; # currently 3 levels: 0, 1 and 2
 
 our $base_url = mySociety::Config::get('BASE_URL');
 our $admin_url = mySociety::Config::get('ADMIN_URL');
+our $sms_in_url = mySociety::Config::get('PB_SMS_C360_INCOMING_URL');
 our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
 sub email_n { my $n = shift; return "pbharness+$n\@owl"; }
-sub name_n { my $n = shift; return $n == 0 ? "Peter Setter" : "Siegfried Signer $n"; }
+sub name_n { my $n = shift; return ($n == 0 || $n == 100) ? "Peter Setter $n" : "Siegfried Signer $n"; }
+sub mobile_n { my $n = shift; return "9876543$n"; }
 
 #############################################################################
 # Main code
@@ -62,6 +64,8 @@ $b->get($base_url . "/test.php?error=1" );
 die "Unable to detect errors from PHP" if !$wth->log_watcher_get_errors();
 
 # Run some pledges through life cycle
+print "Testing SMS with pledge...\n" if $verbose > 0;
+do_sms_pledge();
 print "Making unconfirmed pledge...\n" if $verbose > 0;
 do_unconfirmed_pledge();
 print "Making private pledge and letting it expire...\n" if $verbose > 0;
@@ -214,6 +218,12 @@ sub set_pb_date {
 sub call_frequentupdate {
     system("php", "frequentupdate", $verbose > 1 ? qw("--verbose") : ()) 
         and die "Failed to call frequentupdate";
+}
+
+# Run pbsmsd once
+sub call_smsd {
+    system("./pbsmsd", "--once", $verbose > 1 ? qw("--debug") : ()) 
+        and die "Failed to call pbsmsd";
 }
 
 #############################################################################
@@ -416,6 +426,40 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents(name_n(4));
     $wth->browser_check_no_contents(name_n(5));
 }
+
+#############################################################################
+sub do_sms_pledge {
+    # Make the pledge
+    set_pb_date('1982-03-01');
+    my $pledge_action_sms = 'pretend to be an SMS aggregating service';
+    my $pledge_ref = "smsspoof";
+    create_pledge(100, 
+        { title => $pledge_action_sms, 
+            target => '2', type => 'spoofed texting facilities', signup => 'do the same',
+            date => '5th March', ref => $pledge_ref,
+        },
+        { }
+    );
+    confirm_pledge(100, $pledge_action_sms);
+
+    # A basic SMS signup
+    $b->post($sms_in_url, { 
+            intSequence => 1000, # go up by one each time
+            intTransactionID => 1, # ?
+            intTime => '19820301070000', # date/time
+            intDestination => '60022', # pledgebank number
+            intOriginatingNumber => mobile_n(0), # mobile from #
+            intDeliverer => 1, # ?
+            strData => "pledge smsspoof" 
+    });
+    die "Didn't get OK for incoming SMS" if $b->content() ne "OK";
+    call_smsd();
+
+    # TODO check that outgoing message was sent OK
+    # check the person has been signed up
+
+    # An SMS signup which gets converted to a real one
+ }
 
 #############################################################################
 sub do_admin_pages {

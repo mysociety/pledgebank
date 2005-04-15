@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.22 2005-04-15 09:25:01 sandpit Exp $
+ * $Id: admin-pb.php,v 1.23 2005-04-15 09:59:02 sandpit Exp $
  * 
  */
 
@@ -249,6 +249,7 @@ class ADMIN_PAGE_PB_LATEST {
                      ORDER BY id DESC');
         while ($r = db_fetch_array($q)) {
             $time[$r['epoch']][] = $r;
+            $this->pledgeref[$r['id']] = $r['ref'];
         }
         $q = db_query('SELECT *
                          FROM incomingsms
@@ -305,21 +306,30 @@ dd {
                 print $data['name'];
                 if ($data['email']) print ' &lt;'.$data['email'].'&gt;';
                 if ($data['mobile']) print ' (' . $data['mobile'] . ')';
-                print ' signed up to <a href="' .
-                OPTION_BASE_URL . '/' . $data['ref'] . '">' . $data['ref'] . '</a>';
+                print ' signed up to ' .
+                $this->pledge_link($data['ref']);
             } elseif (array_key_exists('creationtime', $data)) {
-                print "Pledge $data[id], ref <em>$data[ref]</em>, <a
-                href=\"" . OPTION_BASE_URL . "/$data[ref]\">$data[title]</a> created";
+                print "Pledge $data[id], ref <em>$data[ref]</em>, " .
+                $this->pledge_link($data['ref'], $data['title']) . ' created';
             } elseif (array_key_exists('whenreceived', $data)) {
                 print "Incoming SMS from $data[sender] received, sent
                 $data[whensent], message $data[message]
                 ($data[foreignid] $data[network])";
             } elseif (array_key_exists('whencreated', $data)) {
-                print "Message $data[circumstance] queued for pledge <a
-                href=\"". OPTION_BASE_URL .
-                "/$data[ref]\">$data[ref]</a>";
+                print "Message $data[circumstance] queued for pledge " .
+                $this->pledge_link($data['ref']);
             } elseif (array_key_exists('created', $data)) {
-                print "$data[scope] token $data[token] created";
+                $stuff = $data['data'];
+                $pos = 0;
+                $res = rabx_wire_rd(&$stuff, &$pos);
+                if (rabx_is_error($res)) $res = unserialize($stuff);
+                print "$data[scope] token $data[token] created ";
+                if (array_key_exists('email', $res)) {
+                    print "for $res[name] $res[email], pledge " .
+                    $this->pledge_link($res['pledge_id']);
+                } elseif (array_key_exists('circumstance', $res)) {
+                    print "for pledge " . $this->pledge_link($res['pledge_id']);
+                }
             } elseif (array_key_exists('lastsendattempt', $data)) {
                 if ($data['ispremium'] == 't') print 'Premium ';
                 print "SMS sent to $data[recipient], message
@@ -332,6 +342,14 @@ dd {
             print "</dd>\n";
         }
         print '</ul>';
+    }
+
+    function pledge_link($data, $title='') {
+        if (ctype_digit($data)) $ref = $this->pledgeref[$data];
+        else $ref = $data;
+        if (!$title) $title = $ref;
+        return '<a href="' . OPTION_BASE_URL . '/' . $ref . '">' .
+        $title . '</a>';
     }
 
     function display($self_link) {

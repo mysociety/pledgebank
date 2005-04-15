@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.30 2005-04-15 10:46:05 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.31 2005-04-15 11:07:44 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -125,7 +125,8 @@ sub confirm_signature {
         '%To: '.email_n($who).
         '%to confirm your signature%');
     die "Confirmation link not found" if ($confirmation_email !~ m#^\s*($base_url.*$)#m);
-#print "Confirm link is $1"; exit; # for testing confirmation links ;)
+    #print "Confirm link is $1"; exit; # for testing confirmation links ;)
+    $wth->email_check_url($1);
     $b->get($1);
 
     # Check there were no errors
@@ -181,6 +182,7 @@ sub confirm_pledge {
     die "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
 
     print "Pledge confirm URL $1\n" if $verbose > 1;
+    $wth->email_check_url($1);
     $b->get($1);
     $wth->browser_check_contents("Thank you for confirming your pledge");
 }
@@ -193,6 +195,7 @@ sub do_not_confirm_pledge {
     my $confirmation_email = $wth->email_get_containing(
         '%To: '.email_n($who).'%to confirm that you%');
     die "Confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
+    $wth->email_check_url($1);
 }
 
 # Change the date that all parts of PledgeBank think is today.  Call with no

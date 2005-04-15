@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.44 2005-04-15 10:32:17 chris Exp $
+ * $Id: pledge.php,v 1.45 2005-04-15 11:07:44 francis Exp $
  * 
  */
 
@@ -15,15 +15,23 @@ require_once '../../phplib/utility.php';
 require_once '../../phplib/rabx.php';
 
 /* pledge_ab64_encode DATA
- * Return a "almost base64" encoding of DATA (a six-bit encoding of
- * URL-friendly characters; specifically the encoded data match
- * /^[0-9A-Za-z$_-]+$/). */
+ * Return a "almost base64" encoding of DATA (a nearly six-bit encoding using
+ * email-client-friendly characters; specifically the encoded data match
+ * /^[0-9A-Za-z]+$/). 
+ * TODO: Change this to proper base62_encode :) */
 function pledge_ab64_encode($i) {
     $t = base64_encode($i);
-    $t = str_replace("+", "$", &$t);
-    $t = str_replace("/", "_", &$t);
-    $t = str_replace("=", "-", &$t);
+    $t = str_replace("+", "a", &$t);
+    $t = str_replace("/", "b", &$t);
+    $t = str_replace("=", "c", &$t);
     return $t;
+}
+
+/* pledge_random_token
+ * Returns a random token. */
+function pledge_random_token() {
+    $token = pledge_ab64_encode(random_bytes(12));
+    return $token;
 }
 
 /* pledge_token_store SCOPE DATA
@@ -32,7 +40,7 @@ function pledge_ab64_encode($i) {
  * stored in the database associated with that scope and token, for later
  * retrieval with pledge_random_token_retrieve. */
 function pledge_token_store($scope, $data) {
-    $token = pledge_ab64_encode(random_bytes(12));
+    $token = pledge_random_token();
     $ser = '';
     rabx_wire_wr($data, $ser);
     db_query('
@@ -66,33 +74,6 @@ function pledge_token_retrieve($scope, $token) {
 function pledge_token_destroy($scope, $token) {
     db_query('delete from token where scope = ? and token = ?',
             array($scope, $token));
-}
-
-/* pledge_email_token ADDRESS PLEDGE [SALT]
- * Return a token encoding ADDRESS and PLEDGE. SALT should be either null, in
- * which case a random salt will be generated; or the result of a previous call
- * to this function, in which case the same salt as was used then will be
- * re-used, so that a comparison can be made. The returned token is of the
- * form SALT_TOKEN, where _ is a literal underscore and SALT and TOKEN are
- * almost-base64-encoded data. */
-function pledge_email_token($email, $pledge, $salt = null) {
-    if (is_null($salt)) {
-        $salt = pledge_ab64_encode(random_bytes(3));
-    } else {
-        /* Salt is anything up to first "_" in token. */
-        $a = split("_", $salt);
-        $salt = $a[0];
-    }
-
-    $h = pack('H*', sha1($salt . $email . $pledge . db_secret()));
-
-    /* Don't send the full SHA1 hash, because we don't want our URLs to be too
-     * long (at some marginal risk to security...).  Base64 uses the character
-     * set [A-za-z0-9+/=]. "+", "/" and "=" are poor characters for URLs,
-     * because they have special interpretations. So use others instead. */
-    $b64 = pledge_ab64_encode(substr(&$h, 0, 12));
-
-    return $salt . '_' . $b64;
 }
 
 /* PLEDGE_...

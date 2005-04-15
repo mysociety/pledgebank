@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.142 2005-04-15 10:21:38 matthew Exp $
+// $Id: index.php,v 1.143 2005-04-15 11:07:44 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -605,7 +605,7 @@ sign up to the pledge. Your email: <input type="text" size="30" name="email" val
 function create_new_pledge($data) {
     # 'title', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'date', 'signup', 'country', 'postcode', 'password'
 	$isodate = $data['date']['iso'];
-    $token = pledge_email_token($data['email'], $data['ref']);
+    $token = pledge_random_token();
     if ($data['visibility'] == 'all')
         $data['password'] = null;
     $data['id'] = db_getOne("select nextval('pledges_id_seq')");

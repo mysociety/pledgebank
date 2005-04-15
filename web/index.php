@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.143 2005-04-15 11:07:44 francis Exp $
+// $Id: index.php,v 1.144 2005-04-15 11:13:33 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -317,9 +317,20 @@ function step1_error_check($data) {
     $dupe = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', array($data['ref']));
     if ($dupe) $errors[] = 'That reference is already taken!';
     if (!$data['title']) $errors[] = 'Please enter a pledge';
+
+    $pb_today_arr = explode('-', $pb_today);
+    $deadline_limit = 2; # in months
+    $deadline_limit = date('Y-m-d', mktime(12, 0, 0, $pb_today_arr[1] + $deadline_limit, $pb_today_arr[2], $pb_today_arr[0]));
     if (!$data['date']) $errors[] = 'Please enter a deadline';
     if ($data['date']['iso'] < $pb_today) $errors[] = 'The deadline must be in the future';
     if ($data['date']['error']) $errors[] = 'Please enter a valid date';
+    if ($deadline_limit < $data['date']['iso'])
+        $errors[] = 'We have imposed a limit of two months for pledges. This is
+        not a hard limit, just a way of encouraging people to aim at smaller, more
+        achievable targets. If you want a longer pledge, we\'d be glad to set it
+        up for you. Just drop us a quick email to <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>
+        letting us know who you are and what you are aiming to do.';
+
     if (!$data['name']) $errors[] = 'Please enter your name';
     if (!$data['email']) $errors[] = 'Please enter your email address';
     return $errors;

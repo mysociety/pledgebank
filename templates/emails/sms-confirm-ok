@@ -9,7 +9,7 @@ help, and announcing success or failure of your pledge.
 
 <?=$values['url']?>
 
-The pledge says:
+The pledge reads:
 
 '<?=$values['sentence_third']?>'
 

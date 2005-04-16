@@ -5,7 +5,7 @@ Congratulations!
 We are pleased to tell you that the pledge you signed up to
 <?=$values['exceeded_or_met']?> its target in the required time.
 
-The pledge says:
+The pledge reads:
 '<?=$values['sentence_third']?>'
 
 Now it is your turn to do what you pledged.  <?=$values['name']?> will

@@ -14,7 +14,7 @@ we won't share anything with any other sites.
 
 <?=$values['url']?>
 
-Your pledge says:
+Your pledge reads:
 
 '<?=$values['sentence_first']?>'
 

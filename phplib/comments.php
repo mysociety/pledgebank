@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.1 2005-04-13 16:15:55 chris Exp $
+ * $Id: comments.php,v 1.2 2005-04-18 16:21:48 chris Exp $
  * 
  */
 
@@ -14,7 +14,7 @@ require_once('pb.php');
 require_once('fns.php');
 require_once('db.php');
 
-/* comment_text_to_html TEXT
+/* comments_text_to_html TEXT
  * Convert TEXT to HTML. To start with we just turn line-feeds into <br>s and
  * URLs and hostnames beginning "www." into HREFs. */
 function comments_text_to_html($text) {
@@ -31,7 +31,7 @@ function comments_text_to_html($text) {
         );
 }
 
-/* comment_format_timestamp TIME
+/* comments_format_timestamp TIME
  * Format TIME as a friendly version of the timestamp. */
 function comments_format_timestamp($time) {
     return $time;
@@ -43,22 +43,22 @@ function comments_format_timestamp($time) {
  * timestamp of the posting time) print HTML for the comment described. */
 function comments_show_one($comment) {
     print '<div class="commentheader">Comment posted by ';  /* XXX or h1 or something? */
-    if (!is_null($r['website']))
-        print '<a href="' . htmlspecialchars($r['website']) . '">'
-                . $r['name']
+    if (isset($comment['website']))
+        print '<a href="' . htmlspecialchars($comment['website']) . '">'
+                . htmlspecialchars($comment['name'])
                 . '</a>';
     else
-        print htmlspecialchars($r['website']);
+        print htmlspecialchars($comment['name']);
 
     /* Format the time sanely. */
-    if (!is_null($comment['whenposted']))
-        print "at " . comment_format_timestamp($comment['whenposted']);
+    if (isset($comment['whenposted']))
+        print " at " . comments_format_timestamp($comment['whenposted']);
 
-    if (!is_null($comment['id']))
-        print '<a class="abusivecommentlink" href="/abusivecomment?id=' . $r['id'] . '">Abusive? Report it!</a>';
+    if (isset($comment['id']))
+        print ' <a class="abusivecommentlink" href="/abusivecomment?id=' . $comment['id'] . '">Abusive? Report it!</a>';
 
     print '</div><div class="commentcontent">'
-            . comment_text_to_html($comment['text'])
+            . comments_text_to_html($comment['text'])
             . '</div>';
 }
 
@@ -81,7 +81,7 @@ function comments_show($pledge) {
         print '<ul class="commentslist">';
 
         $q = db_query('
-                    select id, whenposted, text, name, website
+                    select comment.id as id, whenposted, text, name, website
                     from comment, author
                     where comment.pledge_id = ?
                         and comment.author_id = author.id
@@ -91,7 +91,7 @@ function comments_show($pledge) {
         while ($r = db_fetch_array($q)) {
             print '<li class="comment" id="comment_' . $r['id'] . '">';
 
-            comment_show_one($r);
+            comments_show_one($r);
 
             print '</li>';
         }

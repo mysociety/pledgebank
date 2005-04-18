@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.147 2005-04-15 17:04:31 matthew Exp $
+// $Id: index.php,v 1.148 2005-04-18 16:21:47 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -526,7 +526,7 @@ if ($r['detail']) {
     }
     $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
     $det = nl2br($det);
-    print '<p align = left><strong>More details</strong><br>' . $det . '</p>';
+    print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';
 }
 ?>
 </div>
@@ -615,9 +615,15 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
         }
         print '</ul>';
     print '</div>';
-    # Commented out for now
-    #    print "<h2>Comments on this pledge</h2>";
-    #    comments_show($pledge_id);
+
+    print '<div id="comments"><h2>Comments on this pledge</h2>';
+    comments_show($pledge_id);
+    print <<<EOF
+<form method="GET" action="comment.php">
+<input type="hidden" name="pledge_id" value="$pledge_id">
+<input type="submit" name="comment" value="Write a comment &gt;&gt;&gt;">
+</form>
+EOF;
 }
 
 # Someone has submitted a new pledge

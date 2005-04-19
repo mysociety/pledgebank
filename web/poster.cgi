@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.37 2005-04-15 16:30:46 matthew Exp $
+# $Id: poster.cgi,v 1.38 2005-04-19 14:54:27 chris Exp $
 #
 
 import os
@@ -270,16 +270,15 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     story.extend([
         Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
-            <font size="-2">(cost 25p + normal SMS rate)</font> 
-            or pledge for free at %s%s''' % 
+            or pledge at %s%s''' % 
             (ref, sms_number, webdomain_text, password_text), p_normal),
         Paragraph('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
             ''' % pledge['date'], p_normal),
         Paragraph('''
             <b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
-            costs 25p + your normal text rate. Further messages are free.
-            Questions? 08453 330 160 or team@pledgebank.com.
+            costs your normal text rate. Further messages are free. Questions?
+            08453 330 160 or team@pledgebank.com.
             ''', p_smallprint)
     ])
 

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.38 2005-04-19 14:54:27 chris Exp $
+# $Id: poster.cgi,v 1.39 2005-04-19 14:55:54 sandpit Exp $
 #
 
 import os
@@ -399,7 +399,7 @@ while fcgi.isFCGI():
             (options, args) = parser.parse_args()
             if len(args) <> 1:
                 parser.print_help()
-                req.err.write("specify Pledgebank ref")
+                req.err.write("specify Pledgebank ref\n")
                 continue
             ref = args[0] 
             size = options.size

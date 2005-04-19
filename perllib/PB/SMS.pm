@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.18 2005-04-13 10:13:39 chris Exp $
+# $Id: SMS.pm,v 1.19 2005-04-19 14:52:52 chris Exp $
 #
 
 package PB::SMS;
@@ -104,6 +104,9 @@ outgoing messages created or dies on error. Does not commit.
 sub send_sms ($$;$) {
     my ($r, $msg, $ispremium) = @_;
     $ispremium ||= 0;
+    $ispremium = 0;         # XXX chris 20050419 -- we may turn premium back on
+                            # later, but for the moment make all SMSs free.
+                            
     if (ref($r) eq '') {
         $r = [$r];
     } elsif (ref($r) ne 'ARRAY') {

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.3 2005-04-20 16:23:07 chris Exp $
+ * $Id: comments.php,v 1.4 2005-04-20 16:24:04 chris Exp $
  * 
  */
 
@@ -60,8 +60,10 @@ function comments_show_one($comment) {
             $tt = "$tt today";
         else if (strftime('%U', $w) == strftime('%U', $t))
             $tt = "$tt, " . strftime('%A', $w);
-        else
+        else if (strftime('%Y', $w) == strftime('%Y', $t))
             $tt = "$tt, " . strftime('%A %e %B', $w);
+        else
+            $tt = "$tt, " . strftime('%A %e %B %Y', $w);
 
         print " at $tt";
     }

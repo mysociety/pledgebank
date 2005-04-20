@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: PB.pm,v 1.3 2005-03-15 16:55:28 chris Exp $
+# $Id: PB.pm,v 1.4 2005-04-20 12:28:05 chris Exp $
 #
 
 package PB::Error;
@@ -55,6 +55,17 @@ use strict;
 sub pledge_is_valid_to_sign ($$$) {
     my ($pledge, $email, $mobile) = @_;
     return scalar(PB::DB::dbh()->selectrow_array('select pledge_is_valid_to_sign(?, ?, ?)', {}, $pledge, $email, $mobile));
+}
+
+my $time_offset;
+sub Time () {
+    if (!defined($time_offset)) {
+        $time_offset =
+            dbh()->selectrow_array('
+                        select extract(epoch from
+                                pb_current_timestamp() - current_timestamp)');
+    }
+    return time() + int($offset);
 }
 
 1;

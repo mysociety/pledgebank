@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.13 2005-04-13 10:09:06 chris Exp $
+ * $Id: sms.php,v 1.14 2005-04-20 17:09:32 francis Exp $
  * 
  */
 
@@ -280,7 +280,7 @@ EOF;
     }
 
     print <<<EOF
-<form accept-charset="utf-8" class="pledge" method="post">
+<form accept-charset="utf-8" class="pledge" method="post" name="pledge">
 <input type="hidden" name="f" value="1">
 <input type="hidden" name="token" value="$q_h_token">
 <p>

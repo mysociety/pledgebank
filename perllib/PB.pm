@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: PB.pm,v 1.5 2005-04-20 13:06:16 francis Exp $
+# $Id: PB.pm,v 1.6 2005-04-20 13:51:31 chris Exp $
 #
 
 package PB::Error;
@@ -61,7 +61,7 @@ my $time_offset;
 sub Time () {
     if (!defined($time_offset)) {
         $time_offset =
-            dbh()->selectrow_array('
+            PB::DB::dbh()->selectrow_array('
                         select extract(epoch from
                                 pb_current_timestamp() - current_timestamp)');
     }

@@ -12,7 +12,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.24 2005-04-15 18:26:44 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.25 2005-04-20 13:51:31 chris Exp $';
 $| = 1; # flush STDOUT afer each write
 
 use strict;
@@ -116,7 +116,7 @@ sub run_sending_process () {
     my $niter = 0;
     while (!$foad && $niter < 10000) {
         my $nsent = 0;
-        $s->execute(time(), send_retry_interval, send_max_attempts);
+        $s->execute(PB::Time(), send_retry_interval, send_max_attempts);
         while (my $id = $s->fetchrow_array()) {
             # Grab a lock on the message, assuming that it still needs to be sent.
             my ($recipient, $message, $ispremium, $numattempts) =
@@ -126,11 +126,11 @@ sub run_sending_process () {
                     where lastsendattempt is null
                         or (lastsendstatus <> 'success'
                             and lastsendattempt < ? - ? * (2 ^ (numsendattempts - 1)))
-                    for update", {}, time(), send_retry_interval);
+                    for update", {}, PB::Time(), send_retry_interval);
             next if (!defined($recipient));
             if ($numattempts >= send_max_attempts) {
                 # Give up.
-                my $howlong = time() - dbh()->selectrow_array('select whensubmitted from outgoingsms where id = ?', {}, $id);
+                my $howlong = PB::Time() - dbh()->selectrow_array('select whensubmitted from outgoingsms where id = ?', {}, $id);
                 my @t = ();
                 foreach ([86400, 'd'], [3600, 'h'], [60, 'm'], [1, 's']) {
                     if ($howlong > $_->[0]) {
@@ -195,7 +195,7 @@ sub run_sending_process () {
                                 lastsendstatus = ?,
                                 lastsendextrastatus = ?,
                                 numsendattempts = numsendattempts + 1
-                            where id = ?', {}, time(), $status, $extra, $id);
+                            where id = ?', {}, PB::Time(), $status, $extra, $id);
                     ++$nsent;
                 }
             }
@@ -280,7 +280,7 @@ sub run_gathering_process () {
         #
         # Receipts
         #
-        $s_status->execute(time() - max_polling_age, time() - min_polling_age, time() - min_polling_interval);
+        $s_status->execute(PB::Time() - max_polling_age, PB::Time() - min_polling_age, PB::Time() - min_polling_interval);
         my $min_id = $s_status->fetchrow_array();
         if (defined($min_id)) {
             my %p = (
@@ -352,7 +352,7 @@ sub run_gathering_process () {
                                             update outgoingsms
                                             set status = ?, laststatuscheck = ?
                                             where foreignid = ?',
-                                            {}, $statusmap{$s}, time(),
+                                            {}, $statusmap{$s}, PB::Time(),
                                                 $foreignid);
                             }
                         }
@@ -367,7 +367,7 @@ sub run_gathering_process () {
                             update outgoingsms
                             set laststatuscheck = ?
                             where foreignid >= ?', # and laststatuscheck is null',
-                            {}, time(), $min_id);
+                            {}, PB::Time(), $min_id);
                     print_log('debug', "get receipts: marked status checked for " . int($num) . " messages") if ($num > 0);
                 }
             }
@@ -379,7 +379,7 @@ sub run_gathering_process () {
         #
         # Missed messages
         #
-        $s_missed->execute(time() - min_polling_interval);
+        $s_missed->execute(PB::Time() - min_polling_interval);
 
         # Try to produce an efficient query to pick up ranges.
         my @qq;
@@ -446,7 +446,7 @@ sub run_gathering_process () {
 
                         if (!defined($whensent = $D->parse_datetime($whensent))) {
                             print_log('warning', "get missed messages: message with foreign ID $foreignid has bad date '$f{ReceivedTime}'; assuming now");
-                            $whensent = time();
+                            $whensent = PB::Time();
                         } else {
                             $whensent = $whensent->epoch();
                         }
@@ -464,20 +464,20 @@ sub run_gathering_process () {
                             set lastpolled = ?
                             where firstpolled is null
                                 or (firstpolled > ? and lastpolled < ?)',
-                            {}, time(),
-                                time() - max_polling_age,
-                                time() - min_polling_interval);
+                            {}, PB::Time(),
+                                PB::Time() - max_polling_age,
+                                PB::Time() - min_polling_interval);
 
                     dbh()->do('
                             update incomingsms_foreignid_gap
                             set firstpolled = ?
                             where firstpolled is null',
-                            {}, time());
+                            {}, PB::Time());
 
                     my $n = dbh()->do('
                             delete from incomingsms_foreignid_gap
                             where firstpolled < ?',
-                            {}, time() - max_polling_age);
+                            {}, PB::Time() - max_polling_age);
                     print_log('warning', "get missed messages: dropped " . int($n) . " expired outstanding IDs");
                 }
             }
@@ -704,5 +704,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.24 2005-04-15 18:26:44 francis Exp $
+$Id: pbsmsd,v 1.25 2005-04-20 13:51:31 chris Exp $
 

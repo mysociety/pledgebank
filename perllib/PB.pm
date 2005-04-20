@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: PB.pm,v 1.4 2005-04-20 12:28:05 chris Exp $
+# $Id: PB.pm,v 1.5 2005-04-20 13:06:16 francis Exp $
 #
 
 package PB::Error;
@@ -65,7 +65,7 @@ sub Time () {
                         select extract(epoch from
                                 pb_current_timestamp() - current_timestamp)');
     }
-    return time() + int($offset);
+    return time() + int($time_offset);
 }
 
 1;

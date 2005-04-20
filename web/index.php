@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.148 2005-04-18 16:21:47 chris Exp $
+// $Id: index.php,v 1.149 2005-04-20 18:44:43 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -223,12 +223,12 @@ function pledge_form_two($data, $errors = array()) {
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="2">
 <p style="float: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
 
-<h2>New Pledge &#8211; Step 2 (optional details)</h2>
+<h2>New Pledge &#8211; Step 2</h2>
 
-<p id="moreinfo">More details about your pledge:<br> <small>(links and email addresses will be automatically spotted, no markup needed)</small>
+<p id="moreinfo">More details about your pledge: (optional)<br> <small>(links and email addresses will be automatically spotted, no markup needed)</small>
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
-<p>On flyers and elsewhere, how would you like to be described?
+<p>On flyers and elsewhere, after your name, how would you like to be described? (optional)
 <br><small>(e.g. "resident of Tamilda Road")</small>
 <input type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
 

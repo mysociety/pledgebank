@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.1 2005-04-18 16:21:47 chris Exp $
+ * $Id: comment.php,v 1.2 2005-04-20 16:23:07 chris Exp $
  * 
  */
 
@@ -37,34 +37,13 @@ if (is_null($pledge))
     err("Bad pledge ID");
 /* test for commenting on expired pledges etc. */
 
-/* Determine author ID, if any. */
-$author_id = null;
-$author_name = '';
-$author_email = '';
-$author_website = null;
-if (isset($HTTP_COOKIE_VARS['pledgebank_author_id'])) {
-    /* Cookie gives author ID and signature. */
-    list($author_id, $s) = explode(".", $HTTP_COOKIE_VARS['pledgebank_author_id']);
-    $r = db_getRow('select * from author where id = ?', $author_id);
-    if ($s == sha1(db_secret() . $author_id) && !is_null($r)) {
-        /* Valid cookie; save its values for default. */
-        $author_name = $r['name'];
-        $author_email = $r['email'];
-        $author_website = $r['website'];
-    } else {
-        /* Invalid cookie; nuke it. */
-        $author_id = null;
-        setcookie('pledgebank_author_id', false, time() + 365 * 86400, '/', OPTION_WEB_DOMAIN);
-    }
-}
-
 page_header("Commenting on '${pledge['title']}'");
 
 /* Grab comment variables themselves. */
 $err = importparams(
-            array('author_name',        '//',                   "",     $author_name),
-            array('author_email',       '//',                   "",     $author_email),
-            array('author_website',     '//',                   "",     $author_website),
+            array('author_name',        '//',                   "",     null),
+            array('author_email',       '//',                   "",     null),
+            array('author_website',     '//',                   "",     null),
             array('text',               '//',                   "",     ""),
             array('n',                  '/^[0-9]+$/',           "",     0),
             array('submit',             '//',                   "",     false)
@@ -80,13 +59,6 @@ $q_author_email = trim($q_author_email);
 if (!is_null($q_author_website))
     $author_website = trim($q_author_website);
 $q_text = trim($q_text);
-
-/* If author has edited their name at all, then we need to create a new author
- * record. */
-if (!is_null($author_id) && ($q_author_name != $author_name || $q_author_email != $author_email || $q_author_website != $author_website)) {
-    $author_id = null;
-    setcookie('pledgebank_author_id', false, time() + 365 * 86400, '/', OPTION_WEB_DOMAIN);
-}
 
 if (!$q_author_email)
     array_push($err, "Please give your email address");
@@ -105,16 +77,20 @@ if (!is_null($q_author_website) && !preg_match('#^https?://.+#', $q_author_websi
     array_push($err, "Your website address should begin 'http://'");
 
 if (sizeof($err) == 0 && isset($_POST['submit'])) {
-    /* Actually post the comment. */
-    if (is_null($author_id)) {
-        $author_id = db_getOne("select nextval('author_id_seq')");
-        db_query('insert into author (id, name, email, website) values (?, ?, ?, ?)', array($author_id, $q_author_name, $q_author_email, $q_author_website));
-        setcookie('pledgebank_author_id', $author_id . '.' . sha1(db_secret() . $author_id), time() + 365 * 86400, '/', OPTION_WEB_DOMAIN);
-    }
-    /* Guard against double-insertion. */
+    /* Actually post the comment. Guard against double-insertion. */
     $id = db_getOne('select id from comment where id = ? for update', $comment_id);
     if (is_null($id))
-        db_query('insert into comment (id, pledge_id, author_id, text) values (?, ?, ?, ?)', array($comment_id, $pledge_id, $author_id, $q_text));
+        db_query('
+                insert into comment (id, pledge_id, name, email, website, text)
+                values (
+                    ?, ?,
+                    ?, ?, ?,
+                    ?)',
+                array(
+                    $comment_id, $pledge_id,
+                    $q_author_name, $q_author_email, $q_author_website,
+                    $q_text
+                ));
     db_commit();
     print <<<EOF
 <p>Thank you! Your comment has now been posted.</p>

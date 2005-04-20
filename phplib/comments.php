@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.2 2005-04-18 16:21:48 chris Exp $
+ * $Id: comments.php,v 1.3 2005-04-20 16:23:07 chris Exp $
  * 
  */
 
@@ -39,8 +39,9 @@ function comments_format_timestamp($time) {
 
 /* comments_show_one COMMENT
  * Given COMMENT, an associative array containing fields 'text', 'name' and
- * 'website' (and optional fields 'id', the comment ID, and 'whenposted', a
- * timestamp of the posting time) print HTML for the comment described. */
+ * 'website' (and optional fields 'id', the comment ID, and 'whenposted', the
+ * posting time in seconds since the epoch), print HTML for the comment
+ * described. */
 function comments_show_one($comment) {
     print '<div class="commentheader">Comment posted by ';  /* XXX or h1 or something? */
     if (isset($comment['website']))
@@ -51,8 +52,19 @@ function comments_show_one($comment) {
         print htmlspecialchars($comment['name']);
 
     /* Format the time sanely. */
-    if (isset($comment['whenposted']))
-        print " at " . comments_format_timestamp($comment['whenposted']);
+    if (isset($comment['whenposted'])) {
+        $w = $comment['whenposted'];
+        $tt = strftime('%H:%M', $w);
+        $t = time();
+        if (strftime('%Y%m%d', $w) == strftime('%Y%m%d', $t))
+            $tt = "$tt today";
+        else if (strftime('%U', $w) == strftime('%U', $t))
+            $tt = "$tt, " . strftime('%A', $w);
+        else
+            $tt = "$tt, " . strftime('%A %e %B', $w);
+
+        print " at $tt";
+    }
 
     if (isset($comment['id']))
         print ' <a class="abusivecommentlink" href="/abusivecomment?id=' . $comment['id'] . '">Abusive? Report it!</a>';
@@ -81,10 +93,10 @@ function comments_show($pledge) {
         print '<ul class="commentslist">';
 
         $q = db_query('
-                    select comment.id as id, whenposted, text, name, website
-                    from comment, author
+                    select id, extract(epoch from whenposted) as whenposted,
+                        text, name, website
+                    from comment
                     where comment.pledge_id = ?
-                        and comment.author_id = author.id
                         and not ishidden
                     order by whenposted', $id);
 

@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.34 2005-04-20 17:09:32 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.35 2005-04-20 18:08:15 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -567,6 +567,14 @@ sub do_sms_pledge {
     # Check signup still appears
     $b->get($base_url . "/$pledge_ref");
     $wth->browser_check_contents(name_n(102));
+
+    # Let pledge succeed
+    set_pb_date('1982-03-09');
+    call_frequentupdate();
+    my $success_email = $wth->email_get_containing( '%To: '.email_n(100).'%Congratulations%');
+    my $success_email = $wth->email_get_containing( '%To: '.email_n(102).'%Congratulations%');
+
+    # TODO creator to send completion message to SMS signers
 
     # Check nothing left
     sms_check_none_left();

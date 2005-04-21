@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.26 2005-04-15 17:04:30 matthew Exp $
+ * $Id: admin-pb.php,v 1.27 2005-04-21 18:01:22 francis Exp $
  * 
  */
 
@@ -179,8 +179,17 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function remove_pledge($id) {
-        db_query('DELETE FROM pledges WHERE id = ?', array($id));
+        db_query('DELETE FROM message_signer_recipient WHERE signer_id IN
+            (SELECT id FROM signers WHERE pledge_id = ?)', array($id));
+        db_query('DELETE FROM message_creator_recipient WHERE pledge_id = ?', array($id));
+        db_query('DELETE FROM message WHERE pledge_id = ?', array($id));
+        db_query('DELETE FROM smssubscription WHERE pledge_id = ?', array($id));
+        db_query('DELETE FROM smssubscription WHERE signer_id IN
+            (SELECT id FROM signers WHERE pledge_id = ?)', array($id));
         db_query('DELETE FROM signers WHERE pledge_id = ?', array($id));
+        db_query('DELETE FROM comment WHERE pledge_id = ?', array($id));
+        db_query('DELETE FROM frontpage_pledges WHERE pledge_id = ?', array($id));
+        db_query('DELETE FROM pledges WHERE id = ?', array($id));
         db_commit();
         print '<p><em>That pledge has been successfully removed, along with all its signatories.</em></p>';
     }
@@ -223,7 +232,7 @@ class ADMIN_PAGE_PB_MAIN {
 class ADMIN_PAGE_PB_LATEST {
     function ADMIN_PAGE_PB_LATEST() {
         $this->id = 'pblatest';
-        $this->navname = 'Latest Changes';
+        $this->navname = 'Timeline';
     }
 
     # pledges use creationtime
@@ -253,6 +262,7 @@ class ADMIN_PAGE_PB_LATEST {
             $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
                              FROM pledges
                          ORDER BY id DESC');
+            $this->pledgeref = array();
             while ($r = db_fetch_array($q)) {
                 $time[$r['epoch']][] = $r;
                 $this->pledgeref[$r['id']] = $r['ref'];
@@ -295,7 +305,7 @@ dd {
         print '<dl>';
         $date = '';
         foreach ($time as $epoch => $datas) {
-            $curdate = date('dS F Y', $epoch);
+            $curdate = date('jS F Y', $epoch);
             if ($date != $curdate) {
                 print '</dl> <h2>'. $curdate . '</h2> <dl>';
                 $date = $curdate;
@@ -349,9 +359,16 @@ dd {
     }
 
     function pledge_link($type, $data, $title='') {
-        if ($type == 'id') $ref = $this->pledgeref[$data];
-        else $ref = $data;
-        if (!$title) $title = $ref;
+        if ($type == 'id') {
+            if (!array_key_exists($data, $this->pledgeref)) {
+                return "DELETED";
+            }
+            $ref = $this->pledgeref[$data];
+        }
+        else 
+            $ref = $data;
+        if (!$title) 
+            $title = $ref;
         return '<a href="' . OPTION_BASE_URL . '/' . $ref . '">' .
         htmlspecialchars($title) . '</a>';
     }

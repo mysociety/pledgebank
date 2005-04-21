@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.149 2005-04-20 18:44:43 matthew Exp $
+// $Id: index.php,v 1.150 2005-04-21 12:11:11 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -619,9 +619,17 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
     print '<div id="comments"><h2>Comments on this pledge</h2>';
     comments_show($pledge_id);
     print <<<EOF
-<form method="GET" action="comment.php">
+<form method="POST" action="comment.php">
 <input type="hidden" name="pledge_id" value="$pledge_id">
 <input type="submit" name="comment" value="Write a comment &gt;&gt;&gt;">
+EOF;
+
+    if ($p = get_http_var('pw'))
+        print <<<EOF
+<input type="hidden" name="pw" value="$p">
+EOF;
+
+    print <<<EOF
 </form>
 EOF;
 }

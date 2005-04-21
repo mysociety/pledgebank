@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.2 2005-04-20 16:23:07 chris Exp $
+ * $Id: comment.php,v 1.3 2005-04-21 12:11:11 chris Exp $
  * 
  */
 
@@ -13,11 +13,13 @@ require_once('../../phplib/importparams.php');
 require_once('../../phplib/emailaddress.php');
 
 require_once('../phplib/pb.php');
+require_once('../phplib/pledge.php');
 require_once('../phplib/comments.php');
 
 $err = importparams(
-            array('pledge_id',          '/^[1-9][0-9]*$/',          ""),
-            array('comment_id',         '/^[1-9][0-9]*$/',          "",     null)
+            array('pledge_id',          '/^[1-9][0-9]*$/',      ""),
+            array('pw',                 '//',                   "",     null),
+            array('comment_id',         '/^[1-9][0-9]*$/',      "",     null)
         );
 
 if (!is_null($err))
@@ -36,6 +38,9 @@ $pledge = db_getRow('select * from pledges where id = ?', $pledge_id);
 if (is_null($pledge))
     err("Bad pledge ID");
 /* test for commenting on expired pledges etc. */
+
+if (!check_password($pledge['ref'], $pledge['password']))
+    err("Permission denied");
 
 page_header("Commenting on '${pledge['title']}'");
 
@@ -94,7 +99,19 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     db_commit();
     print <<<EOF
 <p>Thank you! Your comment has now been posted.</p>
+EOF;
+    if (is_null($pledge['password']))
+        print <<<EOF
 <p><a href="/${pledge['ref']}">Go back to the pledge</a></p>
+EOF;
+    else
+        print <<<EOF
+<form method="post" action="/${pledge['ref']}">
+<p>
+<input type="hidden" name="pw" value="$q_h_pw">
+<input type="submit" value="Go back to the pledge">
+</p>
+</form>
 EOF;
 } else {
     $nextn = $q_n + 1;
@@ -109,6 +126,7 @@ EOF;
     }
     print <<<EOF
 <form id="postcomment" method="POST">
+<input type="hidden" name="pw" value="$q_h_pw">
 <input type="hidden" name="pledge_id" value="$q_h_pledge_id">
 <input type="hidden" name="comment_id" value="$q_h_comment_id">
 <input type="hidden" name="n" value="$nextn">

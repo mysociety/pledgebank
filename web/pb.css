@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.23 2005-04-15 16:37:21 matthew Exp $
+ * $Id: pb.css,v 1.24 2005-04-21 16:30:11 matthew Exp $
  * 
  */
 
@@ -62,6 +62,7 @@ a:hover, a:active { color: #000000; }
 }
 
 #search {
+	border: solid 2px #522994;
 	clear: right;
 	float: right;
 	margin-top: 1em;
@@ -85,7 +86,7 @@ a:hover, a:active { color: #000000; }
 	padding: 10px;
 	background-color: #c6b5de;
 }
-.pledge h2, .pledgesign h2, #flyeremail h2 {
+.pledge h2, .pledgesign h2, #flyeremail h2, .tips h2 {
 	margin-top: 0;
 }
 .pledge p {
@@ -141,13 +142,10 @@ ul#nav li {
 }
 form {
 	margin: 0;
-	border: solid 2px #522994;
 	padding: 3px;
 }
 form.buttonform {
-	margin: 0;
-	border: solid 0px #522994;
-	padding: 0px;
+	padding: 0;
 }
 input[type=text], input[type=password], input[type=submit], textarea {
 	background-color: #ffffff;
@@ -216,9 +214,6 @@ input.error, input[type=text].error {
 	margin: 1em auto;
 	padding: 10px;
         background-color: #f6e5ff;
-}
-.tips h2 {
-    margin-top: 0;
 }
 .tips li {
     padding: 0;

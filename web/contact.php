@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.7 2005-04-07 11:24:44 chris Exp $
+// $Id: contact.php,v 1.8 2005-04-21 16:30:12 matthew Exp $
 
 function contact_form($errors = array()) { ?>
 <h2>Contact Us</h2>
@@ -21,7 +21,7 @@ way to answer your question.
 		print join ('</li><li>', $errors);
 		print '</li></ul>';
 	} ?>
-<form accept-charset="utf-8" action="./" method="post"><input type="hidden" name="contactpost" value="1">
+<form class="pledge" accept-charset="utf-8" action="./" method="post"><input type="hidden" name="contactpost" value="1">
 <div class="fr"><label for="name">Your name</label>: <input type="text" id="name" name="name" value="<?=htmlentities(get_http_var('name')) ?>" size="32"></div>
 <div class="fr"><label for="email">Your email</label>: <input type="text" id="email" name="email" value="<?=htmlentities(get_http_var('email')) ?>" size="32"></div>
 <div class="fr"><label for="subject">Subject</label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>

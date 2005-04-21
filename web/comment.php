@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.4 2005-04-21 16:36:39 francis Exp $
+ * $Id: comment.php,v 1.5 2005-04-21 17:49:26 matthew Exp $
  * 
  */
 
@@ -69,7 +69,7 @@ $q_text = trim($q_text);
 if (!$q_author_email)
     array_push($err, "Please give your email address");
 else if (!emailaddress_is_valid($q_author_email))
-    array_push($err, htmlspecialchars("'$author_email'") . " is not a valid email address; please check it carefully");
+    array_push($err, htmlspecialchars("'$q_author_email'") . " is not a valid email address; please check it carefully");
 
 if (strlen($q_author_name) == 0)
     array_push($err, "Please give your name $q_author_name");
@@ -120,10 +120,11 @@ EOF;
         if (sizeof($err) > 0)
             print '<div id="errors"><ul><li>'
                     . implode('</li><li>', array_map('htmlspecialchars', $err))
-                    . '</li></div>'
-                    . "<h2>Here's how your comment will appear</h2>";
+                    . '</li></div>';
 
+        print "<h2>Here's how your comment will appear</h2><blockquote>";
         comments_show_one(array('name' => $q_author_name, 'email' => $q_author_email, 'website' => $q_author_website, 'text' => $q_text));
+        print '</blockquote>';
     }
     print <<<EOF
 <form id="postcomment" method="POST">

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.19 2005-04-20 13:06:16 francis Exp $
+ * $Id: frequentupdate,v 1.20 2005-04-21 16:05:12 francis Exp $
  *
  */
 
@@ -316,9 +316,9 @@ function send_pending_messages() {
              * on that. */
             if (!is_null($emailbody) && $r['howlongago'] > 3600) {
                 if ($r['howlongago'] > 2 * 86400)
-                    $h = sprintf('%d days ago', int($r['howlongago'] / 86400));
+                    $h = sprintf('%d days ago', intval($r['howlongago'] / 86400));
                 elseif ($r['howlongago'] > 7200)
-                    $h = sprintf('%d hours ago', int($r['howlongago'] / 3600));
+                    $h = sprintf('%d hours ago', intval($r['howlongago'] / 3600));
                 else
                     $h = 'one hour ago';
 

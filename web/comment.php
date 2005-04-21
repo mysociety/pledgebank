@@ -5,14 +5,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.3 2005-04-21 12:11:11 chris Exp $
+ * $Id: comment.php,v 1.4 2005-04-21 16:36:39 francis Exp $
  * 
  */
+
+require_once('../phplib/pb.php');
 
 require_once('../../phplib/importparams.php');
 require_once('../../phplib/emailaddress.php');
 
-require_once('../phplib/pb.php');
 require_once('../phplib/pledge.php');
 require_once('../phplib/comments.php');
 

@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.36 2005-04-21 16:05:12 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.37 2005-04-21 16:11:19 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -439,7 +439,7 @@ sub do_public_succeeding_pledge {
     confirm_signature($pledge_action_completion, 4);
     # Check the late signer (number 4) also recieves the announcement message.
     call_frequentupdate();
-    $wth->email_get_containing( '%To: '.email_n(4).'%By merely partaking%');
+    $wth->email_get_containing( '%To: '.email_n(4).'%You signed this pledge after this message was sent to the other signers%By merely partaking%');
 
     # Check what happens when the pledge expires
     set_pb_date('1982-02-11');

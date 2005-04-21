@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.14 2005-04-12 10:29:09 francis Exp $
+ * $Id: announce.php,v 1.15 2005-04-21 11:49:07 chris Exp $
  * 
  */
 
@@ -85,6 +85,9 @@ if ($q_submit) {
 }
 
 if (!sizeof($errors) && $q_submit) {
+    /* User mail must be submitted with \n line endings. */
+    $q_message_body = str_replace("\r\n", "\n", $q_message_body);
+    
     /* Got all the data we need. Just drop the announcement into the database
      * and let the frequentupdate script pass it to the signers. */
     db_query("

@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.8 2005-04-22 08:25:12 matthew Exp $
+ * $Id: pb.php,v 1.9 2005-04-22 08:39:41 matthew Exp $
  * 
  */
 
@@ -43,8 +43,11 @@ function pb_handle_error($num, $message, $file, $line, $context) {
         /* Nuke any existing page output to display the error message. */
         ob_clean();
         /* Message will be in log file, don't display it for cleanliness */
-        pb_show_error("Please try again later, or <a
-            href=\"mailto:team@pledgebank.com\">email us</a> to let us know.");
+        $err = '<p>If this error was unexpected, please try again later, or <a href="mailto:team@pledgebank.com">email us</a> to let us know.</p>';
+        if ($num & E_USER_ERROR) {
+            $err = "<p><em>$message</em></p> $err";
+        }
+        pb_show_error($err);
     }
 }
 err_set_handler_display('pb_handle_error');

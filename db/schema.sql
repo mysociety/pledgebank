@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.68 2005-04-20 16:23:07 chris Exp $
+-- $Id: schema.sql,v 1.69 2005-04-22 16:08:57 francis Exp $
 --
 
 -- secret
@@ -128,21 +128,8 @@ create function pledge_is_valid_to_sign(integer, text, text)
             return ''none'';
         end if;
 
-        if p.date < pb_current_date() then
-            return ''finished'';
-        end if;
-        
-        -- Lock the signers table, so that a later insert within this
-        -- transaction would succeed.
-        -- NOTE that "exactly" is disabled for now, so this code is not used
-        lock table signers in share mode;
-        if p.comparison = ''exactly'' then 
-            if p.target <=
-                (select count(id) from signers where pledge_id = $1) then
-                return ''full'';
-            end if;
-        end if;
-
+        -- check for signed by email (before finished, so repeat sign-ups
+        -- by same person give the best message)
         if $2 is not null then
             if $2 = p.email then
                 return ''signed'';
@@ -153,12 +140,28 @@ create function pledge_is_valid_to_sign(integer, text, text)
             end if;
         end if;
 
+        -- check for signed by mobile
         if $3 is not null then
             perform id from signers where pledge_id = $1 and mobile = $3 for update;
             if found then
                 return ''signed'';
             end if;
         end if;
+
+        if p.date < pb_current_date() then
+            return ''finished'';
+        end if;
+        
+        -- Lock the signers table, so that a later insert within this
+        -- transaction would succeed.
+        -- NOTE that "exactly" is disabled for now, so this code is not used
+        -- lock table signers in share mode;
+        -- if p.comparison = ''exactly'' then 
+        --     if p.target <=
+        --         (select count(id) from signers where pledge_id = $1) then
+        --         return ''full'';
+        --     end if;
+        -- end if;
 
         return ''ok'';
     end;

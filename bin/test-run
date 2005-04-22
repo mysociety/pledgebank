@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.37 2005-04-21 16:11:19 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.38 2005-04-22 16:08:57 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -86,8 +86,10 @@ $wth->php_check_syntax("../../pb/templates/emails/", qr//);
 
 # Check that we can detect PHP errors
 print "Confirm we can detect errors...\n" if $verbose > 0;
+$wth->log_watcher_check();
 $b->get($base_url . "/test.php?error=1" );
-die "Unable to detect errors from PHP" if !$wth->log_watcher_get_errors();
+my $errors = $wth->log_watcher_get_errors();
+die "Unable to detect errors from PHP" if ($errors !~ m/deliberate_error_to_test_error_handling/);
 
 # Run some pledges through life cycle
 print "Making unconfirmed pledge...\n" if $verbose > 0;
@@ -156,7 +158,7 @@ sub confirm_signature {
         '%To: '.email_n($who).
         '%to confirm your signature%');
     die "Confirmation link not found" if ($confirmation_email !~ m#^\s*($base_url.*$)#m);
-    #print "Confirm link is $1"; exit; # for testing confirmation links ;)
+    print "Signature confirm URL is $1\n" if $verbose > 1;
     $wth->email_check_url($1);
     $b->get($1);
 
@@ -414,6 +416,7 @@ sub do_public_succeeding_pledge {
 
     # Send message using announcements page, from creator to signers.
     die "Failed to find announcements link" if !$announce_link;
+    print "Announce URL is $announce_link\n" if $verbose > 1;
     $b->get($announce_link);
     $wth->browser_check_contents("Send Announcement");
     $b->submit_form(form_name => 'pledge',

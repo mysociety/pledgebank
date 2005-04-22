@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.15 2005-04-21 11:49:07 chris Exp $
+ * $Id: announce.php,v 1.16 2005-04-22 16:08:57 francis Exp $
  * 
  */
 
@@ -103,7 +103,7 @@ if (!sizeof($errors) && $q_submit) {
             $pledge['id'],
             "Pledge success! ${pledge['title']}",
                 $q_message_body, $q_message_sms));
-    pledge_token_destroy('signup-web', $q_token);
+    pledge_token_destroy('announce-post', $q_token);
     db_commit();
 
     print "<p>Your message will now be sent to all the people who signed your pledge.  

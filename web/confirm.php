@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.30 2005-04-15 10:21:38 matthew Exp $
+ * $Id: confirm.php,v 1.31 2005-04-22 16:08:57 francis Exp $
  * 
  */
 
@@ -49,9 +49,12 @@ if ($q_type == 'pledge') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
      * pledge. */
     $data = pledge_token_retrieve('signup-web', $q_token);
-    if (!$data)
+    if (!$data) {
         err("No such token");
-    pledge_token_destroy('signup-web', $q_token);
+    }
+    # Note that we do NOT delete the token, so it doesn't give an error if they
+    # double confirm.
+    # pledge_token_destroy('signup-web', $q_token);
 
     $title = db_getOne('select title from pledges where id = ?',
                         $data['pledge_id']);
@@ -110,10 +113,18 @@ if ($q_type == 'pledge') {
     } else {
         if (pledge_is_permanent_error($r)) {
             db_rollback();  /* just in case -- shouldn't matter though */
-            pledge_token_destroy('signup-web', $q_token);
+            # Note that we do NOT delete the token, so they can get the error
+            # again.
+            # pledge_token_destroy('signup-web', $q_token);
             db_commit();
         }
-        oops($r);
+        if ($r == PLEDGE_SIGNED) {
+            print "<p align=\"center\">You've already signed up to this pledge, there's no need
+                    to sign it again.</p>";
+            advertise_flyers($data['pledge_id']);
+        } else {
+            oops($r);
+        }
     }
 }
 page_footer(array('nonav'=>true));
@@ -175,9 +186,9 @@ email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</small></p>
  * Print a message explaining CODE. */
 function oops($r) {
     global $q_f;
-    print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
     if ($r == PLEDGE_FULL || $r == PLEDGE_FINISHED) {
         /* Print a fuller explanation in this (common) case */
+        print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
         $what = $q_f ? 'filling in the form' : 'waiting for our email to arrive'; /* XXX l18n */
         $how = ($r == PLEDGE_FULL ?
                     "somebody else beat you to the last place on that pledge"
@@ -187,6 +198,7 @@ function oops($r) {
 We're very sorry &mdash; better luck next time!</p>
 EOF;
     } else {
+        print "<p><strong>Sorry, we couldn't sign you up.</strong></p>";
         print "<p>" . htmlspecialchars(pledge_strerror($r)) . "</p>";
         if (!pledge_is_permanent_error($r))
             print "<p><strong>Please try again a bit later.</strong></p>";

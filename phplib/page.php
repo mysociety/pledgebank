@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.17 2005-04-22 11:26:52 sandpit Exp $
+// $Id: page.php,v 1.18 2005-04-22 11:28:17 sandpit Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -23,8 +23,10 @@ function page_header($title, $params = array()) {
 <title><?
     if ($title) 
         print htmlspecialchars($title) . " - ";
+        /* XXX @import url('...') uses single-quotes to hide the style-sheet
+         * from Mac IE. Ugly, but it works. */
 ?> PledgeBank - Not Finished Yet</title>
-<style type="text/css" media="all">@import url("/pb.css");</style>
+<style type="text/css" media="all">@import url('/pb.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <script type="text/javascript" src="/pb.js"></script>
 </head>

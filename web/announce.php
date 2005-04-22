@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.17 2005-04-22 17:01:41 chris Exp $
+ * $Id: announce.php,v 1.18 2005-04-22 17:34:25 francis Exp $
  * 
  */
 
@@ -30,11 +30,11 @@ if (!is_null($err))
 if (!($data = pledge_token_retrieve('announce-post', $q_token))
     || !($pledge = db_getRow('select * from pledges where id = ? for update',
                     $data['pledge_id'])))
-    err("No such token or pledge"); /* XXX make this a single, friendlier error message. */
+    err("The link hasn't been recognised.  Please check the URL is copied correctly from your email."); /* XXX make this a single, friendlier error message. */
 
 /* Verify that we haven't already sent the announcement. */
 if (!is_null(db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $data['pledge_id'])))
-    err("Announcement already sent for this pledge");
+    err("You've already sent an announcement message for this pledge.");
 
 /* All OK. */
 page_header("Send announcement to '${pledge['title']}", array());
@@ -103,7 +103,8 @@ if (!sizeof($errors) && $q_submit) {
             $pledge['id'],
             "Pledge success! ${pledge['title']}",
                 $q_message_body, $q_message_sms));
-    pledge_token_destroy('announce-post', $q_token);
+    # Don't destroy token, so we can give proper error.
+    # pledge_token_destroy('announce-post', $q_token);
     db_commit();
 
     print "<p>Your message will now be sent to all the people who signed your pledge.  

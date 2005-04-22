@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.31 2005-04-22 16:08:57 francis Exp $
+ * $Id: confirm.php,v 1.32 2005-04-22 17:34:25 francis Exp $
  * 
  */
 
@@ -50,7 +50,7 @@ if ($q_type == 'pledge') {
      * pledge. */
     $data = pledge_token_retrieve('signup-web', $q_token);
     if (!$data) {
-        err("No such token");
+        err("Your signature hasn't been recognised.  Please check the URL is copied correctly from your email.");
     }
     # Note that we do NOT delete the token, so it doesn't give an error if they
     # double confirm.

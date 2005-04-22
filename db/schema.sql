@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.69 2005-04-22 16:08:57 francis Exp $
+-- $Id: schema.sql,v 1.70 2005-04-22 17:01:41 chris Exp $
 --
 
 -- secret
@@ -539,9 +539,9 @@ create table token (
     primary key (scope, token)
 );
 
--- Messages (Email or SMS) sent to pledge creators and/or signers.  This is
+-- Messages (email or SMS) sent to pledge creators and/or signers.  This is
 -- used with message_creator_recipient and message_signer_recipient to make
--- sure that messages are sent exactly once.  It is also used to keep 
+-- sure that messages are sent exactly once. It is also used to keep 
 -- announcement messages to be sent to late signers.
 create table message (
     id serial not null primary key,
@@ -550,21 +550,25 @@ create table message (
     whencreated timestamp not null default pb_current_timestamp(),
     sendtocreator boolean not null,
     sendtosigners boolean not null,
-    sendassms boolean not null,
     sendtolatesigners boolean not null,
     emailtemplatename text,
     emailsubject text,
     emailbody text,
     sms text,
     check (
-            (emailtemplatename is not null
-                and (emailsubject is null and emailbody is null))
-            or (emailtemplatename is null
-                and (emailsubject is not null and emailbody is not null))
-        ),
+        -- SMS-only message
+        (emailtemplatename is null
+            and emailsubject is null and emailbody is null
+            and sms is not null)
+        -- Raw email message
+        or (emailbody is not null and emailsubject is not null
+            and emailtemplatename is null)
+        -- Templated email message
+        or (emailtemplatename is not null
+            and emailsubject is null and emailbody is null)
+    ),
     -- We can only send to signers by sms
-    check (not sendassms or sendtosigners),
-    check (sms is null or sendassms)
+    check (sms is null or sendtosigners)
 );
 
 create unique index message_pledge_id_circumstance_idx on message(pledge_id, circumstance);

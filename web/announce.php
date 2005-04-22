@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.16 2005-04-22 16:08:57 francis Exp $
+ * $Id: announce.php,v 1.17 2005-04-22 17:01:41 chris Exp $
  * 
  */
 
@@ -93,11 +93,11 @@ if (!sizeof($errors) && $q_submit) {
     db_query("
         insert into message
             (pledge_id, circumstance,
-            sendtocreator, sendtosigners, sendassms, sendtolatesigners,
+            sendtocreator, sendtosigners, sendtolatesigners,
             emailsubject, emailbody, sms)
         values
             (?, 'success-announce',
-            false, true, true, true,
+            false, true, true,
             ?, ?, ?)",
         array(
             $pledge['id'],

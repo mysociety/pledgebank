@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.21 2005-04-22 17:01:41 chris Exp $
+ * $Id: frequentupdate,v 1.22 2005-04-22 18:46:38 chris Exp $
  *
  */
 
@@ -83,22 +83,22 @@ function mark_pledges_successful() {
         db_query("
                 insert into message (
                     pledge_id, circumstance,
-                    sendtocreator, sendtosigners, sendassms, sendtolatesigners,
+                    sendtocreator, sendtosigners, sendtolatesigners,
                     emailtemplatename
                 ) values (
                     ?, 'success-auto-creator',
-                    true, false, false, false,
+                    true, false, false,
                     'succeeded-creator'
                 )", $pledge['id']);
 
         db_query("
                 insert into message (
                     pledge_id, circumstance,
-                    sendtocreator, sendtosigners, sendassms, sendtolatesigners,
+                    sendtocreator, sendtosigners, sendtolatesigners,
                     emailtemplatename
                 ) values (
                     ?, 'success-auto-signers',
-                    false, true, false, false,
+                    false, true, false,
                     'succeeded-signer'
                 )", $pledge['id']);
     }

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.32 2005-04-22 17:34:25 francis Exp $
+ * $Id: confirm.php,v 1.33 2005-04-22 19:58:24 matthew Exp $
  * 
  */
 
@@ -186,6 +186,7 @@ email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</small></p>
  * Print a message explaining CODE. */
 function oops($r) {
     global $q_f;
+    page_header("Sorry, we couldn't sign you up to that pledge");
     if ($r == PLEDGE_FULL || $r == PLEDGE_FINISHED) {
         /* Print a fuller explanation in this (common) case */
         print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
@@ -203,6 +204,7 @@ EOF;
         if (!pledge_is_permanent_error($r))
             print "<p><strong>Please try again a bit later.</strong></p>";
     }
+    page_footer();
 }
 
 ?>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.4 2005-04-20 16:24:04 chris Exp $
+ * $Id: comments.php,v 1.5 2005-04-22 19:58:22 matthew Exp $
  * 
  */
 
@@ -43,7 +43,10 @@ function comments_format_timestamp($time) {
  * posting time in seconds since the epoch), print HTML for the comment
  * described. */
 function comments_show_one($comment) {
-    print '<div class="commentheader">Comment posted by ';  /* XXX or h1 or something? */
+    print '<div class="commentcontent">'
+            . comments_text_to_html($comment['text'])
+            . '</div>';
+    print '<div class="commentheader"><small>';  /* XXX or h1 or something? */
     if (isset($comment['website']))
         print '<a href="' . htmlspecialchars($comment['website']) . '">'
                 . htmlspecialchars($comment['name'])
@@ -65,15 +68,13 @@ function comments_show_one($comment) {
         else
             $tt = "$tt, " . strftime('%A %e %B %Y', $w);
 
-        print " at $tt";
+        print " at $tt.";
     }
 
     if (isset($comment['id']))
         print ' <a class="abusivecommentlink" href="/abusivecomment?id=' . $comment['id'] . '">Abusive? Report it!</a>';
 
-    print '</div><div class="commentcontent">'
-            . comments_text_to_html($comment['text'])
-            . '</div>';
+    print '</small></div>';
 }
 
 /* comments_show PLEDGE

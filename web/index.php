@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.150 2005-04-21 12:11:11 chris Exp $
+// $Id: index.php,v 1.151 2005-04-22 19:58:24 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -54,6 +54,9 @@ if (get_http_var('report') && ctype_digit(get_http_var('report'))) {
 } elseif (get_http_var('newpost')==2) {
     $title = 'Create a New Pledge';
     pledge_form_two_submitted();
+} elseif (get_http_var('newpost')==3) {
+    $title = 'Create a New Pledge';
+    pledge_form_three_submitted();
 } elseif (get_http_var('contactpost')) {
     $title = 'Contact Us';
     contact_form_submitted();
@@ -166,7 +169,7 @@ the door of that neighbour whose name you've forgotten.</li>
 ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="1">
-<h2>New Pledge &#8211; Step 1</h2>
+<h2>New Pledge &#8211; Step 1 of 3</h2>
 <div class="c">
 <p><strong>I will</strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
@@ -211,19 +214,26 @@ function pledge_form_two($data, $errors = array()) {
         $comparison = "atleast";
     else
         $comparison = $data['comparison'];
+
+    $country = '';
+    if (isset($data['country'])) $country = $data['country'];
 ?>
 
-<p style="text-align: center">Your pledge looks like this so far:</p>
+<p>Your pledge looks like this so far:</p>
 <div class="tips" style="text-align: center">
 <p style="margin-top: 0">&quot;<? $row = $data; unset($row['parseddate']); print pledge_sentence($row, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p>Deadline: <strong><?=prettify($isodate) ?></strong></p>
 <p style="text-align: right">&mdash; <?=htmlspecialchars($data['name']) ?></p>
 </div>
 
-<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="2">
-<p style="float: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
+<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./">
+<input type="hidden" name="newpost" value="2">
+<p style="float: right">
+<input type="submit" name="newback" value="&lt;&lt; Back to step 1">
+<input type="submit" name="submit" value="Preview &gt;&gt;">
+</p>
 
-<h2>New Pledge &#8211; Step 2</h2>
+<h2>New Pledge &#8211; Step 2 of 3</h2>
 
 <p id="moreinfo">More details about your pledge: (optional)<br> <small>(links and email addresses will be automatically spotted, no markup needed)</small>
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
@@ -240,7 +250,10 @@ is fulfilled?
 </p> */?>
 
 <p>Which country does your pledge apply to?
-<select name="country"><option>Global<option>UK</select>
+<select name="country">
+  <option<? if ($country=='Global') print ' selected'; ?>>Global</option>
+  <option<? if ($country=='UK') print ' selected'; ?>>UK</option>
+</select>
 </p>
 
 <p>Within your country, is your pledge specific to a local area?
@@ -261,7 +274,8 @@ If yes, enter your postcode so that local people can find your pledge:
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input type="submit" name="submit" value="Next &gt;&gt;">
+<input type="submit" name="newback" value="&lt;&lt; Back to step 1">
+<input type="submit" name="submit" value="Preview &gt;&gt;">
 </p>
 
 </form>
@@ -338,6 +352,16 @@ function step1_error_check($data) {
     return $errors;
 }
 
+function step2_error_check($data) {
+    $errors = array();
+    if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
+        $errors[] = 'Please select either "at least" or "exactly" number of people';
+    }
+    if ($data['local'] && !$data['postcode']) $errors[] = 'Please enter a postcode';
+    if ($data['visibility'] == 'password' && !$data['password']) $errors[] = 'Please enter a password';
+    return $errors;
+}
+
 function pledge_form_two_submitted() {
     $errors = array();
     $data = array();
@@ -352,22 +376,112 @@ function pledge_form_two_submitted() {
     $data = array_merge($step1data, $data);
     if (!$data['local']) $data['postcode'] = '';
     if ($data['visibility'] != 'password') { $data['visibility'] = 'all'; $data['password'] = ''; }
-    if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
-        $errors[] = 'Please select either "at least" or "exactly" number of people';
-    }
-    if ($data['local'] && !$data['postcode']) $errors[] = 'Please enter a postcode';
-    if ($data['visibility'] == 'password' && !$data['password']) $errors[] = 'Please enter a password';
+
+    $errors = step2_error_check($data);
     if (sizeof($errors)) {
         pledge_form_two($data, $errors);
         return;
     }
 
     $errors = step1_error_check($data);
-    if (sizeof($errors)) {
+    if (sizeof($errors) || get_http_var('newback')) {
         pledge_form_one($data, $errors);
         return;
     }
+    preview_pledge($data);
+}
+
+function pledge_form_three_submitted() {
+    $errors = array();
+    $data = array();
+    $fields = array('data');
+    foreach ($fields as $field) {
+        $data[$field] = get_http_var($field);
+    }
+
+    $alldata = unserialize(base64_decode($data['data']));
+    if (!$alldata) $errors[] = 'Transferring the data from Preview page failed :(';
+    unset($data['data']);
+    $data = $alldata;
+    if (get_http_var('newback1')) {
+        pledge_form_one($data, $errors);
+        return;
+    }
+    if (get_http_var('newback2')) {
+        pledge_form_two($data, $errors);
+    }
     create_new_pledge($data);
+}
+
+function preview_pledge($data) {
+    $v = 'all';
+    if (isset($data['visibility'])) {
+        $v = $data['visibility']; if ($v!='password') $v = 'all';
+    }
+    $local = (isset($data['local'])) ? $data['local'] : '0';
+    $isodate = $data['parseddate']['iso'];
+    if (!isset($data['comparison']))
+        $comparison = "atleast";
+    else
+        $comparison = $data['comparison'];
+
+#    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
+?>
+<p>Your pledge, with reference <em><?=$data['ref'] ?></em>, will look like this:</p>
+<div class="tips" style="text-align: center">
+<p style="margin-top: 0">&quot;<? $row = $data; unset($row['parseddate']); print pledge_sentence($row, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
+<p align="right">&mdash; <?=$data['name'].($data['identity']?', '.$data['identity']:'') ?></p>
+<p>Deadline: <strong><?=prettify($isodate) ?></strong>.</p>
+<?
+if ($data['detail']) {
+    $det = $data['detail'];
+    $det = htmlspecialchars($det);
+    # regexs here borrowed from TWFY
+    preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);
+    foreach ($matches[0] as $match) {
+        $newmatch = $match;
+        if (substr($match,0,3)=='www') $newmatch = "http://$match";
+        $det = str_replace($match, '<a href="'.$newmatch.'">'.$match.'</a>', $det);
+    }
+    $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
+    $det = nl2br($det);
+    print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';
+}
+?>
+</div>
+
+<? /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ ?>
+
+<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="3">
+<h2>New Pledge &#8211; Step 3 of 3</h2>
+
+<p>Please check the details you have entered, both the pledge above and other details below, and then either click "Create" to create your pledge, or one of the two "Back" buttons to go back and edit your data.</p>
+
+<ul>
+<li>Which country does your pledge apply to?
+<em><?=htmlspecialchars($data['country']) ?></em>
+</li>
+
+<li>Within your country, is your pledge specific to a local area? <em><?=
+$local ? 'Yes (' . htmlspecialchars($data['postcode']) . ')' : 'No' ?></em>
+</li>
+
+<li>Who do you want to be able to see your pledge? <em><?
+if ($v=='all') print 'Anyone';
+if ($v=='password') print ' Only people to whom I give a password I have specified';
+?></em></li>
+</ul>
+
+<p style="text-align: right;">
+<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
+<input type="submit" name="newback1" value="&lt;&lt; Back to step 1">
+<input type="submit" name="newback2" value="&lt;&lt; Back to step 2">
+<input type="submit" name="submit" value="Create &gt;&gt;">
+</p>
+
+</form>
+<?
+    
 }
 
 function front_page() {
@@ -542,15 +656,8 @@ I, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" 
 sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>"></b>
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
 </p>
-<p> <input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge </p>
+<p><input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge </p>
 <p><input type="submit" name="submit" value="Sign Pledge"> </p>
-<p>Or you can text <strong>pledge <?=htmlspecialchars(get_http_var('pledge'))?></strong> to
-<strong><?=OPTION_PB_SMS_DISPLAY_NUMBER?></strong> (cost 25p + normal SMS rate)
-            <small>
-            <br><b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
-            costs 25p + your normal text rate. Further messages from us are free.
-            </small>
-</p>
 </form>
 
 <? }
@@ -563,10 +670,10 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
    <li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
    <li> <? print_link_with_password("ical.php?ref=$h_ref", "", "Add deadline to your calendar") ?> </li>
    <li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?>
-<a href="/<?=$h_ref ?>/flyers"><img border="0" vspace="5" align="right" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="PDF flyers to download"></a>
+<!-- <a href="/<?=$h_ref ?>/flyers"><img border="0" vspace="5" align="right" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="PDF flyers to download"></a> -->
 </li>
 </ul>
-<br clear="both">
+<br clear="all">
 <?
  } ?>
 </div>
@@ -617,32 +724,53 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
     print '</div>';
 
     print '<div id="comments"><h2>Comments on this pledge</h2>';
-    comments_show($pledge_id);
-    print <<<EOF
-<form method="POST" action="comment.php">
-<input type="hidden" name="pledge_id" value="$pledge_id">
-<input type="submit" name="comment" value="Write a comment &gt;&gt;&gt;">
-EOF;
+    comments_show($pledge_id); ?>
+<form method="POST" action="comment.php" id="commentform" class="pledge">
+<input type="hidden" name="pledge_id" value="<?=$pledge_id ?>">
+<h2>Add Comment</h2>
 
+<div class="form_row">
+ <label for="author_name">Your name</label>
+ <input type="text" id="author_name" name="author_name" value="" size="30">
+</div>
+
+<div class="form_row">
+<label for="author_email">Your email address</label>
+  <input type="text" id="author_email" name="author_email" value="" size="30">
+</div>
+
+<div class="form_row">
+<label for="author_website">Your web site</label> <small><i>(Optional)</i></small>
+  <input type="text" id="author_website" name="author_website" value="" size="30">
+</div>
+
+<div class="form_row">
+<label for="text">Your comment</label>
+  <textarea style="max-width: 100%" name="text" id="text" cols="30" rows="10"></textarea>
+
+<input type="hidden" name="n" value="1">
+</div>
+
+<input type="submit" name="preview" value="Preview">
+
+<?
     if ($p = get_http_var('pw'))
         print <<<EOF
 <input type="hidden" name="pw" value="$p">
 EOF;
 
-    print <<<EOF
-</form>
-EOF;
+    print '</form></div>';
 }
 
 # Someone has submitted a new pledge
 function create_new_pledge($data) {
     # 'title', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'parseddate', 'date', 'signup', 'country', 'postcode', 'password'
-	$isodate = $data['parseddate']['iso'];
+    $isodate = $data['parseddate']['iso'];
     $token = pledge_random_token();
     if ($data['visibility'] == 'all')
         $data['password'] = null;
     $data['id'] = db_getOne("select nextval('pledges_id_seq')");
-	$add = db_query('INSERT INTO pledges (id, title, target, type, signup, date, datetext,
+    $add = db_query('INSERT INTO pledges (id, title, target, type, signup, date, datetext,
         name, email, ref, token, confirmed, creationtime, detail,
         comparison, country, postcode, password, identity) VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, pb_current_timestamp(), ?, ?, ?, ?, ?, ?)', 
@@ -653,21 +781,19 @@ function create_new_pledge($data) {
 people to sign up to your pledge after you have clicked the link in the email.</p>
 <?
     $url = OPTION_BASE_URL . '/C/' . urlencode($token);
-	$success = pb_send_email_template($data['email'], 'pledge-confirm',
-        array_merge($data, array('url'=>$url, 'date'=>$isodate)));
-	if ($success) {
-            db_commit();
-?>
-<?		
+    $success = pb_send_email_template($data['email'], 'pledge-confirm',
+    array_merge($data, array('url'=>$url, 'date'=>$isodate)));
+    if ($success) {
+        db_commit();
         global $title;
         $title = 'Now Check Your Email';
         return true;
-	} else {
-            db_rollback();
+    } else {
+        db_rollback();
 ?>
 <p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>
-<?		return false;
-	}
+<?      return false;
+    }
 }
 
 function list_all_pledges() {

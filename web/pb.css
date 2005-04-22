@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.24 2005-04-21 16:30:11 matthew Exp $
+ * $Id: pb.css,v 1.25 2005-04-22 19:58:24 matthew Exp $
  * 
  */
 
@@ -89,7 +89,7 @@ a:hover, a:active { color: #000000; }
 .pledge h2, .pledgesign h2, #flyeremail h2, .tips h2 {
 	margin-top: 0;
 }
-.pledge p {
+.pledge p, .pledgesign p {
 	margin-bottom: 0;
 }
 .pledge a:link, .pledge a:visited {
@@ -99,7 +99,7 @@ a:hover, a:active { color: #000000; }
 .pledgesign {
     float: left;
     width: 45%;
-    margin: 0 0 1em 0;
+    margin: 0 0 0.5em 0;
 }
 
 #flyeremail {
@@ -109,6 +109,34 @@ a:hover, a:active { color: #000000; }
 }
 #signatories {
     clear: both;
+    float: left;
+    width: 45%;
+}
+#comments {
+    float: right;
+    width: 45%;
+}
+#comments ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+#comments li {
+    padding-bottom: 0.5em;
+    border-bottom: dotted 1px #999999;
+    margin-bottom: 0.5em;
+}
+#comments li div.commentheader {
+    margin-top: 0.25em;
+    text-align: right;
+}
+#commentform label {
+    font-weight: bold;
+    float: left;
+    width: 10em;
+}
+#commentform .form_row {
+    margin-bottom: 2px;
 }
 
 dt {
@@ -160,6 +188,7 @@ textarea:hover, textarea:focus, input[type=text]:hover, input[type=submit]:hover
 }
 
 #footer {
+    clear: both;
 	padding: 3px;
 	border-top: solid 1px #c6b5d3;
 	font-size: 90%;

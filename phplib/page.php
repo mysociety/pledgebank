@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.15 2005-04-20 18:04:44 matthew Exp $
+// $Id: page.php,v 1.16 2005-04-22 08:25:12 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -13,6 +13,9 @@
  * title and navigation are not displayed, or if PARAMS['noprint'] is true
  * then they are not there if the page is printed.  */
 function page_header($title, $params = array()) {
+    static $header_outputted = 0;
+    if (!$header_outputted) {
+        $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
@@ -52,15 +55,17 @@ function page_header($title, $params = array()) {
 ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
 <em>Note: On this test site, the date is faked to be <?=$pb_today?></em></p><?
     }
-
+    }
 }
 
 /* page_footer PARAMS
  * Print bottom of HTML page. This closes the "content" <div>. 
  * If PARAMS['nonav'] is true then the footer navigation is not displayed.
  */
-function page_footer($params = array()) { 
-    if (!array_key_exists('nonav', $params) or !$params['nonav']) {
+function page_footer($params = array()) {
+    static $footer_outputted = 0; 
+    if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
+        $footer_outputted = 1;
 ?>
 </div>
 <hr class="v"><h2 class="v">Navigation</h2>
@@ -77,7 +82,7 @@ function page_footer($params = array()) {
     }
 ?>
 </body></html>
-<? }
+<?  }
 
 function print_this_link($link_text, $after_text) {
 ?>

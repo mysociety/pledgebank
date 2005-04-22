@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.7 2005-03-29 07:08:49 francis Exp $
+ * $Id: pb.php,v 1.8 2005-04-22 08:25:12 matthew Exp $
  * 
  */
 
@@ -36,7 +36,9 @@ ob_start();
  * Display a PHP error message to the user. */
 function pb_handle_error($num, $message, $file, $line, $context) {
     if (OPTION_PB_STAGING) {
+        page_header("Sorry! Something's gone wrong.");
         print("<strong>$message</strong> in $file:$line");
+        page_footer();
     } else {
         /* Nuke any existing page output to display the error message. */
         ob_clean();

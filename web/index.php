@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.151 2005-04-22 19:58:24 matthew Exp $
+// $Id: index.php,v 1.152 2005-04-23 09:26:24 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -143,7 +143,7 @@ function pledge_form_one($data = array(), $errors = array()) {
 		print '</li></ul></div>';
 	} else {
 ?>
-<div class="tips">
+<div class="tips" style="text-align: left">
 <h2>Top Tips for Successful Pledges</h2>
 <ol>
 
@@ -220,11 +220,9 @@ function pledge_form_two($data, $errors = array()) {
 ?>
 
 <p>Your pledge looks like this so far:</p>
-<div class="tips" style="text-align: center">
-<p style="margin-top: 0">&quot;<? $row = $data; unset($row['parseddate']); print pledge_sentence($row, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
-<p>Deadline: <strong><?=prettify($isodate) ?></strong></p>
-<p style="text-align: right">&mdash; <?=htmlspecialchars($data['name']) ?></p>
-</div>
+<?  $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
+    pledge_box($row);
+?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./">
 <input type="hidden" name="newpost" value="2">
@@ -428,29 +426,9 @@ function preview_pledge($data) {
 #    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
 ?>
 <p>Your pledge, with reference <em><?=$data['ref'] ?></em>, will look like this:</p>
-<div class="tips" style="text-align: center">
-<p style="margin-top: 0">&quot;<? $row = $data; unset($row['parseddate']); print pledge_sentence($row, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
-<p align="right">&mdash; <?=$data['name'].($data['identity']?', '.$data['identity']:'') ?></p>
-<p>Deadline: <strong><?=prettify($isodate) ?></strong>.</p>
-<?
-if ($data['detail']) {
-    $det = $data['detail'];
-    $det = htmlspecialchars($det);
-    # regexs here borrowed from TWFY
-    preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);
-    foreach ($matches[0] as $match) {
-        $newmatch = $match;
-        if (substr($match,0,3)=='www') $newmatch = "http://$match";
-        $det = str_replace($match, '<a href="'.$newmatch.'">'.$match.'</a>', $det);
-    }
-    $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
-    $det = nl2br($det);
-    print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';
-}
-?>
-</div>
-
-<? /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ ?>
+<?  $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
+    pledge_box($row);
+    /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="./"><input type="hidden" name="newpost" value="3">
 <h2>New Pledge &#8211; Step 3 of 3</h2>
@@ -584,67 +562,48 @@ function view_pledge($errors = array()) {
     } 
     
     $r = db_fetch_array($q);
-	$confirmed = ($r['confirmed'] == 't');
-	if (!$confirmed) {
-	    err('PledgeBank reference not known');
-	    return false;
-	}
+    $confirmed = ($r['confirmed'] == 't');
+    if (!$confirmed) {
+        err('PledgeBank reference not known');
+	return false;
+    }
     if (!deal_with_password("/$h_ref", $ref, $r['password']))
         return false;
 
     $pledge_id = $r['id'];
 
     $title = "'I will " . $r['title'] . "'";
-	$q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($pledge_id));
-	$curr = db_num_rows($q);
-	$left = $r['target'] - $curr;
+    $q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($pledge_id));
+    $curr = db_num_rows($q);
+    $left = $r['target'] - $curr;
 
-	$finished = 0;
-	if ($r['open'] == 'f') {
+    $finished = 0;
+    if ($r['open'] == 'f') {
         $finished = 1;
-	    print '<p class="finished">This pledge is now closed, as its deadline has passed.</p>';
+        print '<p class="finished">This pledge is now closed, as its deadline has passed.</p>';
     }
-	if ($left <= 0) {
-            if ($r['comparison'] == 'exactly') {
-                $finished = 1;
-                print '<p class="finished">This pledge is now closed, as its target has been reached.</p>';
-            } else {
-                print '<p class="success">This pledge has been successful!';
-                if (!$finished) {
-                    print '<br><strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.';
-                }
-                print '</p>';
+    if ($left <= 0) {
+        if ($r['comparison'] == 'exactly') {
+            $finished = 1;
+            print '<p class="finished">This pledge is now closed, as its target has been reached.</p>';
+        } else {
+            print '<p class="success">This pledge has been successful!';
+            if (!$finished) {
+                print '<br><strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.';
             }
-	}
+            print '</p>';
+        }
+    }
 
     if (get_http_var('add_signatory'))
         $showname = get_http_var('showname') ? ' checked' : '';
     else
         $showname = ' checked';
 
-    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false); ?>
-<div class="tips" style="text-align: center">
-<p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
-<p align="right">&mdash; <?=$r['name'].($r['identity']?', '.$r['identity']:'') ?></p>
-<p>Deadline: <strong><?=prettify($r['date']) ?></strong>. <i><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></i></p>
-<?
-if ($r['detail']) {
-    $det = $r['detail'];
-    $det = htmlspecialchars($det);
-    # regexs here borrowed from TWFY
-    preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);
-    foreach ($matches[0] as $match) {
-        $newmatch = $match;
-        if (substr($match,0,3)=='www') $newmatch = "http://$match";
-        $det = str_replace($match, '<a href="'.$newmatch.'">'.$match.'</a>', $det);
-    }
-    $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
-    $det = nl2br($det);
-    print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';
-}
-?>
-</div>
-<? if (!$finished) { ?>
+    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
+    pledge_box($r, $curr, $left);
+
+    if (!$finished) { ?>
 <form accept-charset="utf-8" class="pledgesign" name="pledge" action="./" method="post">
 <input type="hidden" name="add_signatory" value="1">
 <input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('pledge')) ?>">

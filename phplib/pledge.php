@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.45 2005-04-15 11:07:44 francis Exp $
+ * $Id: pledge.php,v 1.46 2005-04-23 09:26:23 matthew Exp $
  * 
  */
 
@@ -175,6 +175,32 @@ function pledge_sentence($r, $params = array()) {
     $s = preg_replace('#\.\.#', '.', $s);
 
     return $s;
+}
+
+function pledge_box($r, $curr='', $left='') { ?>
+<div class="tips">
+<p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
+<p align="right">&mdash; <?=$r['name'].((isset($r['identity']) && $r['identity'])?', '.$r['identity']:'') ?></p>
+<p>Deadline: <strong><?=prettify($r['date']) ?></strong>.
+<? if ($curr !== '') { ?>
+<i><?=prettify($curr) ?> <?=make_plural($curr, 'person has', 'people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></i>
+<? } ?>
+</p>
+<?
+    if (isset($r['detail']) && $r['detail']) {
+        $det = htmlspecialchars($r['detail']);
+        # regexs here borrowed from TWFY
+        preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);
+        foreach ($matches[0] as $match) {
+            $newmatch = $match;
+            if (substr($match,0,3)=='www') $newmatch = "http://$match";
+            $det = str_replace($match, '<a href="'.$newmatch.'">'.$match.'</a>', $det);
+        }
+        $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
+        $det = nl2br($det);
+        print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';
+    }
+    print '</div>';
 }
 
 /* pledge_is_successful PLEDGE

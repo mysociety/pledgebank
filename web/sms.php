@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.14 2005-04-20 17:09:32 francis Exp $
+ * $Id: sms.php,v 1.15 2005-04-23 09:26:24 matthew Exp $
  * 
  */
 
@@ -271,7 +271,7 @@ EOF;
         $pretty_name = htmlspecialchars($pledge_info['name']);
     
         print <<<EOF
-        <div class="tips" style="text-align: center">
+        <div class="tips">
         <p style="margin-top: 0">&quot;$sentence&quot;</p>
         <p>Deadline: <strong>$pretty_date</strong></p>
         </div>

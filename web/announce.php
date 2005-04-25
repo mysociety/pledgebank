@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.19 2005-04-25 12:44:16 francis Exp $
+ * $Id: announce.php,v 1.20 2005-04-25 23:12:55 francis Exp $
  * 
  */
 
@@ -90,13 +90,16 @@ if (!sizeof($errors) && $q_submit) {
     
     /* Got all the data we need. Just drop the announcement into the database
      * and let the frequentupdate script pass it to the signers. */
+    // TODO: 'success-announce' won't be right name when there are other
+    // announce messages.  Probably want to look at $date['circumstance']
+    // to work out what value to use.
     db_query("
         insert into message
-            (pledge_id, circumstance,
+            (pledge_id, circumstance, fromaddress,
             sendtocreator, sendtosigners, sendtolatesigners,
             emailsubject, emailbody, sms)
         values
-            (?, 'success-announce',
+            (?, 'success-announce', 'creator',
             false, true, true,
             ?, ?, ?)",
         array(
@@ -131,9 +134,9 @@ if (!sizeof($errors) && $q_submit) {
 <h2>Send Announcement</h2>
 <div class="c">
 <p>Write a message to the $howmany ${pledge['type']} who
-signed your pledge.  This is to tell them what to do next. <strong>Remember to
-give your own email address, phone number or website so they can contact you
-again.</strong></p>
+signed your pledge.  This is to tell them what to do next. <strong>Your email
+address will be used, so the signers can reply directly to you.</strong> You may want
+to also give your phone number or website so they can contact you again.</p>
 
 <h3>SMS message</h3>
 <p>Please enter a short (160 or fewer characters) summary of your main message,
@@ -179,7 +182,7 @@ count_sms_characters();
     cols="72"
     rows="20">$q_h_message_body</textarea></p>
 
-<p>(Did you remember to give your email address or phone number?) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
+<p>(<strong>Remember</strong>, when you send this message your email address will be given to all signers) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
 </form>
 </div>
 EOF;

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.20 2005-04-25 12:44:15 francis Exp $
+// $Id: fns.php,v 1.21 2005-04-25 23:12:55 francis Exp $
 
 require_once "../../phplib/evel.php";
 
@@ -16,6 +16,10 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
     $values['signature'] = "-- the PledgeBank.com team\n";
     $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];
     $values['pretty_date'] = prettify($values['date'], false);
+
+    $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
+    if ($values['actual'] >= $values['target'])
+        $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? 'exceeded' : 'met');
 
     $template = file_get_contents("../templates/emails/$template_name");
     $spec = array(
@@ -38,10 +42,10 @@ function pb_send_email($to, $subject, $message, $headers = array()) {
 
 function pb_send_email_internal($to, $spec) {
     // Construct parameters
+
     // Add standard PledgeBank from header
     if (!array_key_exists("From", $spec)) {
-        $spec['From'] = '"PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">";
-        $spec['Reply-To'] = '"PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">";
+        $spec['From'] = 'PledgeBank.com <' . OPTION_CONTACT_EMAIL . ">";
     }
 
     // With one recipient, put in header.  Otherwise default to undisclosed recip.

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.22 2005-04-22 18:46:38 chris Exp $
+ * $Id: frequentupdate,v 1.23 2005-04-25 23:12:55 francis Exp $
  *
  */
 
@@ -18,6 +18,9 @@ function verbose($str) {
     global $verbose;
     if ($verbose) 
         fwrite(STDERR, "frequentupdate: $str\n");
+}
+function error($str) {
+    fwrite(STDERR, "frequentupdate: ERROR: $str\n");
 }
 
 $short_opts = '';
@@ -215,43 +218,40 @@ function send_pending_messages() {
         $pledge = db_getRow('select * from pledges where id = ?', $msg['pledge_id']);
         verbose("message #${msg['id']} is for pledge #${pledge['id']} (${pledge['ref']}); circumstance '${msg['circumstance']}'");
 
+        /* XXX we also need a URL containing a token which is sent on
+         * success to the signer. For now just generate this here, but
+         * later on we'll need to move it into message, so that we can send
+         * reminders. */
+        if ($msg['circumstance'] == 'success-auto-creator') {
+            $token = pledge_token_store('announce-post', array(
+                                'pledge_id' => $pledge['id'],
+                                'circumstance' => 'success')
+                            );
+            $url = OPTION_BASE_URL . '/M/' . $token;
+            $pledge['url'] = $url;
+        }
+
+        // Make any extra headers
+        $headers = array();
+
+        // Send with template or raw appropriately
         $f = false;
         if (isset($msg['emailtemplatename'])) {
             verbose("sending message #${msg['id']} using email template '${msg['emailtemplatename']}'");
-        
-            /* Fill in some more information used in the email templates. */
-            $pledge['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $pledge['id']);
-            if ($pledge['actual'] >= $pledge['target'])
-                $pledge['exceeded_or_met'] = ($pledge['actual'] > $pledge['target'] ? 'exceeded' : 'met');
-            $pledge['sentence_first'] = pledge_sentence($pledge, array('firstperson' => true));
-            $pledge['sentence_third'] = pledge_sentence($pledge);
-            
-            /* XXX we also need a URL containing a token which is sent on
-             * success to the signer. For now just generate this here, but
-             * later on we'll need to move it into message, so that we can send
-             * reminders. */
-            if ($msg['circumstance'] == 'success-auto-creator') {
-                $token = pledge_token_store('announce-post', array(
-                                    'pledge_id' => $pledge['id'],
-                                    'circumstance' => 'success')
-                                );
-                $url = OPTION_BASE_URL . '/M/' . $token;
-                $pledge['url'] = $url;
-            }
-
-            $f = pb_send_email_template($pledge['email'], $msg['emailtemplatename'], $pledge);
+            $f = pb_send_email_template($pledge['email'], $msg['emailtemplatename'], $pledge, $headers);
         } else {
             verbose("sending message #${msg['id']} as raw email, subject '${msg['emailsubject']}'");
-            $f = pb_send_email($pledge['email'], $msg['emailsubject'], $msg['emailbody']);
+            $f = pb_send_email($pledge['email'], $msg['emailsubject'], $msg['emailbody'], $headers);
         }
 
+        // Store success
         if ($f)
             db_query('
                     insert into message_creator_recipient
                         (message_id, pledge_id)
                     values (?, ?)', array($msg['id'], $pledge['id']));
         else
-            verbose("failed to send message #${msg['id']} to creator of pledge #${pledge['id']} (${pledge['ref']})");   /* XXX stderr */
+            error("failed to send message #${msg['id']} to creator of pledge #${pledge['id']} (${pledge['ref']})");
 
         db_commit();
     }
@@ -304,6 +304,17 @@ function send_pending_messages() {
 
         verbose("message #${r['id']} to be sent to signer #${r['signer_id']}");
 
+        // Make any extra headers
+        $pledge = db_getRow('select * from pledges where id = ?', $r['pledge_id']);
+        $headers = array();
+        if ($r['fromaddress'] == 'pledgebank') {
+            // the default in pb_send_email_internal is from PledgeBank
+        } elseif ($r['fromaddress'] == 'creator') {
+            $headers['From'] = $pledge['name'] . "<" . $pledge['email'] .">";
+        } else {
+            error("Unknown 'from' in message " . $r['id'] . ": " . $msg['fromaddress']);
+        }
+
         if (is_null($r['signer_email'])) {
             /* Send by SMS. */
             verbose("delivering message #${r['id']} by SMS to signer #${r['signer_id']} on ${r['signer_mobile']}");
@@ -315,16 +326,7 @@ function send_pending_messages() {
         } elseif (isset($r['emailtemplatename'])) {
             /* Send email template. */
             verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
-            $pledge = db_getRow('select * from pledges where id = ?', $r['pledge_id']);
-
-            /* Fill in some more information used in the email templates.
-             * XXX repeated code -- need a function for this, probably. */
-            $pledge['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $pledge['id']);
-            if ($pledge['actual'] >= $pledge['target'])
-                $pledge['exceeded_or_met'] = ($pledge['actual'] > $pledge['target'] ? 'exceeded' : 'met');
-            $pledge['sentence_first'] = pledge_sentence($pledge, array('firstperson' => true));
-
-            $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $pledge);
+            $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $pledge, $headers);
         } else {
             /* Send raw mail. */
             verbose("sending message #${r['id']} as raw email, subject '${r['emailsubject']}'");
@@ -343,7 +345,7 @@ function send_pending_messages() {
                 $emailbody = "[ You signed this pledge after this message was sent to the other signers. They will have received copies $h. ]\n\n" . $emailbody;
             }
             
-            $f = pb_send_email($r['signer_email'], $r['emailsubject'], $emailbody);
+            $f = pb_send_email($r['signer_email'], $r['emailsubject'], $emailbody, $headers);
         }
 
         if ($f)
@@ -351,7 +353,7 @@ function send_pending_messages() {
                 insert into message_signer_recipient (message_id, signer_id)
                 values (?, ?)', array($r['id'], $r['signer_id']));
         else
-            debug("failed to send message #${r['id']} to signer #${r['signer_id']} of pledge #${r['pledge_id']}");   /* XXX stderr */
+            error("failed to send message #${r['id']} to signer #${r['signer_id']} of pledge #${r['pledge_id']}");
 
 
         db_commit();

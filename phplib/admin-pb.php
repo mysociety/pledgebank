@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.28 2005-04-25 12:06:39 francis Exp $
+ * $Id: admin-pb.php,v 1.29 2005-04-25 17:56:36 matthew Exp $
  * 
  */
 
@@ -353,7 +353,9 @@ dd {
                 $stuff = $data['data'];
                 $pos = 0;
                 $res = rabx_wire_rd(&$stuff, &$pos);
-                if (rabx_is_error($res)) $res = unserialize($stuff);
+                if (rabx_is_error($res)) {
+                    print '<em>RABX Error: ' . $res->text . '</em><br>';
+                }
                 print "$data[scope] token $data[token] created ";
                 if (array_key_exists('email', $res)) {
                     print "for $res[name] $res[email], pledge " .

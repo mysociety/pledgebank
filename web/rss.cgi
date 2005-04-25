@@ -6,29 +6,26 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.1 2005-04-13 16:18:24 chris Exp $';
-
-use strict;
-
-#!/usr/bin/perl
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.2 2005-04-25 18:43:54 matthew Exp $';
 
 use strict;
 use warnings;
 
-# Might need to look somewhere for modules.
-# use lib ('');
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
 
-# Might need to set the config file.
-# use mySociety::Config;
-# mySociety::Config::set_file('../conf/general');
-
-# Get dbh sub for connecting to db (use one of following lines).
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
 use PB;
-# use DBI; sub dbh { DBI->connect( 'dbi:Pg:dbname=pb' ) }; # EvdB's machine
 
 # Hardcoded variables - should be in central conf file.
 my %CONF = ( number_of_pledges => 20,
-	     base_url => 'http://www.pledgebank.com/'
+	     base_url => mySociety::Config::get('BASE_URL') . '/'
 	     );
 
 # Other modules we need.
@@ -58,9 +55,18 @@ sub run {
 
         # Put together the title and description.
         my $signed_up = $$signers{ $$pledge{id} } || 0;
-        my $title     = "$$pledge{title} - $signed_up of $$pledge{target}";
+        my $title     = "$$pledge{title} - ";
+        if ($signed_up > $$pledge{target}) {
+            my $over = $signed_up - $$pledge{target};
+            $title .= "$over over target";
+        } elsif ($signed_up == $$pledge{target}) {
+            $title .= "exact target reached";
+        } else {
+            my $more = $$pledge{target} - $signed_up;
+            $title .= "$signed_up signed up, $more more needed";
+        }
 
-        my $description = "Pledge by '$$pledge{name}'";
+        my $description = "Pledge by $$pledge{name}";
         $description .= "\n\n$$pledge{detail}" if $$pledge{detail};
 
         # Add then to the rss.
@@ -89,6 +95,7 @@ sub get_pledges {
       ->prepare( 
 "select id, ref, title, target, date, name, detail
    from pledges
+   where confirmed
    order by id desc 
    limit $CONF{number_of_pledges}"
 );
@@ -112,7 +119,7 @@ sub get_signers {
 "select pledge_id, count(id) as count
   from signers
   where pledge_id in
-    ( select id from pledges order by id desc limit $CONF{number_of_pledges})
+    ( select id from pledges where confirmed order by id desc limit $CONF{number_of_pledges})
   group by pledge_id " );
 
     $query->execute;

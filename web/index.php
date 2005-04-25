@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.152 2005-04-23 09:26:24 matthew Exp $
+// $Id: index.php,v 1.153 2005-04-25 18:43:54 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -181,7 +181,7 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 
 <p>The other people must sign up before <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(e.g. "5th May")</small></p>
 
-<p>Choose a short name for your pledge (6 to 12 letters):
+<p>Choose a short name for your pledge (6 to 13 letters):
 <input<? if (array_key_exists('ref', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
 <br><small>This gives your pledge an easy web address. e.g. www.pledgebank.com/tidyupthepark</small>
 </p>
@@ -325,6 +325,7 @@ function step1_error_check($data) {
     $disallowed_refs = array('contact');
     if (!$data['ref']) $errors['ref'] = 'Please enter a PledgeBank reference';
     elseif (strlen($data['ref'])<6) $errors['ref'] = 'The reference must be at least six characters long';
+    elseif (strlen($data['ref'])>13) $errors['ref'] = 'The reference must be at most 13 characters long';
     elseif (in_array($data['ref'], $disallowed_refs)) $errors['ref'] = 'That reference is not allowed.';
     if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = 'The reference must only contain letters, numbers, or a hyphen';
 

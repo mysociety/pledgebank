@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.18 2005-04-22 17:34:25 francis Exp $
+ * $Id: announce.php,v 1.19 2005-04-25 12:44:16 francis Exp $
  * 
  */
 
@@ -44,7 +44,7 @@ $default_message = <<<EOF
 
 Hello, and thank you for signing our successful pledge!
 
-$sentence
+'$sentence'
 
 <ENTER INSTRUCTIONS FOR PLEDGE SIGNERS HERE>
 

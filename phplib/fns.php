@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.19 2005-04-04 00:55:03 francis Exp $
+// $Id: fns.php,v 1.20 2005-04-25 12:44:15 francis Exp $
 
 require_once "../../phplib/evel.php";
 
@@ -29,7 +29,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email($to, $subject, $message, $headers = array()) {
     $spec = array(
-        '_body_' => $message,
+        '_unwrapped_body_' => $message,
         'Subject' => $subject,
     );
     $spec = array_merge($spec, $headers);

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.27 2005-04-21 18:01:22 francis Exp $
+ * $Id: admin-pb.php,v 1.28 2005-04-25 12:06:39 francis Exp $
  * 
  */
 
@@ -128,7 +128,9 @@ class ADMIN_PAGE_PB_MAIN {
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print "</p>";
 
-        $query = 'SELECT name as signname,email as signemail,mobile as signmobile,date_trunc(\'second\',signtime) AS signtime,showname FROM signers WHERE pledge_id=?';
+        $query = 'SELECT name as signname,email as signemail,mobile as signmobile,
+        date_trunc(\'second\',signtime) AS signtime,showname, signers.id AS signid FROM signers 
+        WHERE pledge_id=?';
         if ($sort=='t') $query .= ' ORDER BY signtime DESC';
         elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
         $q = db_query($query, $pdata['id']);
@@ -146,6 +148,7 @@ class ADMIN_PAGE_PB_MAIN {
             $out[$e] = '<td>'.$e.'</td>';
             $out[$e] .= '<td>'.prettify($r['signtime']).'</td>';
             $out[$e] .= '<td align="center">'.($r['showname']?'Yes':'No').'</td>';
+            $out[$e] .= '<td><form method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_signer_id" value="' . $r['signid'] . '"><input type="submit" name="remove_signer" value="Remove signer permanently"></form></td>';
         }
         if ($sort == 'e') {
             function sort_by_domain($a, $b) {
@@ -166,6 +169,7 @@ class ADMIN_PAGE_PB_MAIN {
                 if ($sort != $s) print '</a>';
                 print '</th>';
             }
+            print '<th>Action</th>';
             print '</tr>';
             $a = 0;
             foreach ($out as $row) {
@@ -175,7 +179,7 @@ class ADMIN_PAGE_PB_MAIN {
             }
             print '</table>';
         }
-        print '<p><form method="post" action="'.$this->self_link.'"><input type="hidden" name="id" value="' . $pdata['id'] . '"><input type="submit" name="remove" value="Remove pledge permanently"></form>';
+        print '<p><form method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
     }
 
     function remove_pledge($id) {
@@ -194,6 +198,14 @@ class ADMIN_PAGE_PB_MAIN {
         print '<p><em>That pledge has been successfully removed, along with all its signatories.</em></p>';
     }
 
+    function remove_signer($id) {
+        db_query('DELETE FROM message_signer_recipient WHERE signer_id = ?', array($id));
+        db_query('DELETE FROM smssubscription WHERE signer_id = ?', array($id));
+        db_query('DELETE FROM signers WHERE id = ?', array($id));
+        db_commit();
+        print '<p><em>That signer has been successfully removed.</em></p>';
+    }
+
     function update_changes() {
         db_query('DELETE FROM frontpage_pledges');
         if (array_key_exists('frontpage', $_POST)) {
@@ -210,14 +222,19 @@ class ADMIN_PAGE_PB_MAIN {
 
         $pledge = get_http_var('pledge');
 
-        if (get_http_var('remove')) {
-            $id = get_http_var('id');
-            if (ctype_digit($id)) {
+        if (get_http_var('remove_pledge_id')) {
+            $id = get_http_var('remove_pledge_id');
+            if (ctype_digit($id))
                 $this->remove_pledge($id);
-            } else {
-                # Error potential hack?
-            }
             $this->list_all_pledges();
+        } elseif (get_http_var('remove_signer_id')) {
+            $id = get_http_var('remove_signer_id');
+            if (ctype_digit($id)) {
+                $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $id");
+                $this->remove_signer($id);
+                $pledge = db_getOne("SELECT ref FROM pledges WHERE id = $pledge_id");
+            }
+            $this->show_one_pledge($pledge);
         } elseif ($pledge) {
             $this->show_one_pledge($pledge);
         } else {

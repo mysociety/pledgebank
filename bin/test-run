@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.39 2005-04-22 16:33:59 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.40 2005-04-25 12:06:39 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -197,6 +197,9 @@ sub create_pledge {
     $b->submit_form(form_name => 'pledge',
         fields => $page2,
         button => 'submit') or die "Failed to submit creating form stage 2";
+    $wth->browser_check_contents("will look like this");
+    $b->submit_form(form_name => 'pledge',
+        button => 'submit') or die "Failed to submit creating form stage 3";
     $wth->browser_check_contents("You must now click on the link within the email we've just sent you");
 
     # Add all to front page

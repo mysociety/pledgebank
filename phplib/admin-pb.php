@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.29 2005-04-25 17:56:36 matthew Exp $
+ * $Id: admin-pb.php,v 1.30 2005-04-26 11:01:19 francis Exp $
  * 
  */
 
@@ -255,10 +255,6 @@ class ADMIN_PAGE_PB_LATEST {
     # pledges use creationtime
     # signers use signtime
     function show_latest_changes() {
-        /*
-        $q = db_query('SELECT * FROM comment ORDER BY whenposted DESC LIMIT 10');
-        while ($r = db_fetch_array($q)) {
-        }*/
         $q = db_query('SELECT signers.name, signers.email,
                               signers.mobile, signtime, pledges.title,
                               pledges.ref,
@@ -302,6 +298,12 @@ class ADMIN_PAGE_PB_LATEST {
                          ORDER BY whencreated DESC');
             while ($r = db_fetch_array($q)) {
                 $time[$r['epoch']][] = $r;
+            }
+            $q = db_query('SELECT *, extract(epoch from whenposted) as commentposted
+                             FROM comment
+                         ORDER BY whenposted DESC');
+            while ($r = db_fetch_array($q)) {
+                $time[$r['commentposted']][] = $r;
             }
         }
         krsort($time);
@@ -367,6 +369,10 @@ dd {
                 if ($data['ispremium'] == 't') print 'Premium ';
                 print "SMS sent to $data[recipient], message
                 '$data[message]' status $data[lastsendstatus]";
+            } elseif (array_key_exists('commentposted', $data)) {
+                print "$data[name] <$data[email]> commented on " .
+                    $this->pledge_link('id', $res['pledge_id']) . " saying
+                '$data[text]'";
             } else {
                 print_r($data);
             }

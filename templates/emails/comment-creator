@@ -1,0 +1,8 @@
+Subject: <?=$values['comment_author_name']?> has commented on your pledge at PledgeBank.com
+
+Please click on the link below to read the new comment or question about
+your pledge.  You can also respond to the comment there.
+
+<?=$values['comment_url']?>
+
+<?=$values['signature']?>

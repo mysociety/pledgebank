@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.153 2005-04-25 18:43:54 matthew Exp $
+// $Id: index.php,v 1.154 2005-04-26 11:01:20 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -639,7 +639,7 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
 </div>
 
 <div id="signatories">
-<h2>Current signatories</h2><?
+<h2><a name="signers">Current signatories</a></h2><?
         $out = '<li>'
                 . htmlspecialchars($r['name'])
                 . ' (Pledge Author)</li>';
@@ -683,43 +683,10 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
         print '</ul>';
     print '</div>';
 
-    print '<div id="comments"><h2>Comments on this pledge</h2>';
-    comments_show($pledge_id); ?>
-<form method="POST" action="comment.php" id="commentform" class="pledge">
-<input type="hidden" name="pledge_id" value="<?=$pledge_id ?>">
-<h2>Add Comment</h2>
-
-<div class="form_row">
- <label for="author_name">Your name</label>
- <input type="text" id="author_name" name="author_name" value="" size="30">
-</div>
-
-<div class="form_row">
-<label for="author_email">Your email address</label>
-  <input type="text" id="author_email" name="author_email" value="" size="30">
-</div>
-
-<div class="form_row">
-<label for="author_website">Your web site</label> <small><i>(Optional)</i></small>
-  <input type="text" id="author_website" name="author_website" value="" size="30">
-</div>
-
-<div class="form_row">
-<label for="text">Your comment</label>
-  <textarea style="max-width: 100%" name="text" id="text" cols="30" rows="10"></textarea>
-
-<input type="hidden" name="n" value="1">
-</div>
-
-<input type="submit" name="preview" value="Preview">
-
-<?
-    if ($p = get_http_var('pw'))
-        print <<<EOF
-<input type="hidden" name="pw" value="$p">
-EOF;
-
-    print '</form></div>';
+    print '<div id="comments"><h2><a name="comments">Comments on this pledge</a></h2>';
+    comments_show($pledge_id); 
+    comments_form($pledge_id, 1);
+    print '</div>';
 }
 
 # Someone has submitted a new pledge

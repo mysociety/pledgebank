@@ -23,6 +23,36 @@ Emails and the available variables are:
 
 **************************************************************************
 
+* comment-creator
+Sent to creator when a comment is added to a pledge.
+  - comment_url, link to the comment
+  - comment_text, body text of the comment
+  - comment_author_name, name of commenter
+  - comment_author_email, email address of commenter
+  - comment_author_website, website of commenter
+
+**************************************************************************
+
+* email-friends
+Sent by someone to tell their friends about a pledge.
+  - from_name, who sent message
+  - from_email, email address of sender
+  - from_message, if present a paragraph with the message from sender to their
+    friend, including intro and quotes, otherwise empty string
+
+**************************************************************************
+            
+* failed-creator
+Sent to creator when a pledge fails.
+  - actual, number of people who signed up.
+
+* failed-signer
+Sent to each signer when a pledge fails.
+  - actual, number of people who signed up.
+  - signer_name, name of the signer this email is going to.
+
+**************************************************************************
+
 * pledge-confirm
 Sent to pledge creator when they make a new pledge, to check their
 email address.
@@ -50,17 +80,6 @@ Sent to converters from SMS if they have already signed by email.
 Sent if SMS subscription is converted to the creator's email address.
 
 **************************************************************************
-            
-* failed-creator
-Sent to creator when a pledge fails.
-  - actual, number of people who signed up.
-
-* failed-signer
-Sent to each signer when a pledge fails.
-  - actual, number of people who signed up.
-  - signer_name, name of the signer this email is going to.
-
-**************************************************************************
 
 * succeeded-creator
 Sent to creator when a pledge succeeds.
@@ -73,14 +92,5 @@ Sent to each signer when a pledge succeeds.
   - execeeded_or_met, either the word "met" or "exceeded" according to whether
     pledge went over target or not.
   - signer_name, name of the signer this email is going to.
-
-**************************************************************************
-
-* email-friends
-Sent by someone to tell their friends about a pledge.
-  - from_name, who sent message
-  - from_email, email address of sender
-  - from_message, if present a pargraph with the message from sender to their
-    friend, including intro and quotes, otherwise empty string
 
 **************************************************************************

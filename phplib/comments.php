@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.5 2005-04-22 19:58:22 matthew Exp $
+ * $Id: comments.php,v 1.6 2005-04-26 11:01:20 francis Exp $
  * 
  */
 
@@ -66,7 +66,7 @@ function comments_show_one($comment) {
         else if (strftime('%Y', $w) == strftime('%Y', $t))
             $tt = "$tt, " . strftime('%A %e %B', $w);
         else
-            $tt = "$tt, " . strftime('%A %e %B %Y', $w);
+            $tt = "$tt, " . strftime('%a %e %B %Y', $w);
 
         print " at $tt.";
     }
@@ -91,7 +91,7 @@ function comments_show($pledge) {
     print '<div class="commentsbox">';
     
     if (db_getOne('select count(id) from comment where pledge_id = ?', $id) == 0)
-        print '<em>No comments yet! Why not add one?</em>';
+        print '<p><em>No comments yet! Why not add one?</em></p>';
     else {
         print '<ul class="commentslist">';
 
@@ -114,6 +114,50 @@ function comments_show($pledge) {
         print "</ul>";
     }
     print "</div>";
+}
+
+function comments_form($pledge_id, $nextn, $allow_post = false) {
+    global $q_h_comment_id;
+    global $q_h_author_name, $q_h_author_email, $q_h_author_website;
+    global $q_h_text;
+?>
+<form method="POST" action="comment.php" id="commentform" name="commentform" class="pledge">
+<input type="hidden" name="pledge_id" value="<?=$pledge_id ?>">
+<h2>Add Comment</h2>
+
+<div class="form_row">
+ <label for="author_name">Your name</label>
+ <input type="text" id="author_name" name="author_name" value="<?=$q_h_author_name?>" size="30">
+</div>
+
+<div class="form_row">
+<label for="author_email">Your email</label>
+  <input type="text" id="author_email" name="author_email" value="<?=$q_h_author_email?>" size="30">
+</div>
+
+<div class="form_row">
+<label for="author_website">Your web site</label> <small><i>(Optional)</i></small>
+  <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="30">
+</div>
+
+<div class="form_row">
+<label for="text">Your comment</label>
+  <textarea style="max-width: 100%" name="text" id="text" cols="40" rows="10"><?=$q_h_text?></textarea>
+
+<? if ($q_h_comment_id) { ?>
+<input type="hidden" name="comment_id" value="<?=$q_h_comment_id?>">
+<? } ?>
+<input type="hidden" name="n" value="<?=$nextn?>">
+</div>
+
+<input type="submit" name="preview" value="Preview">
+<? if ($allow_post) { ?>
+<input type="submit" name="submit" value="Post comment">
+<? } ?>
+
+<?  if ($p = get_http_var('pw')) print '<input type="hidden" name="pw" value="$p">'; ?>
+</form>
+<?
 }
 
 ?>

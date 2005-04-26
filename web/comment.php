@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.5 2005-04-21 17:49:26 matthew Exp $
+ * $Id: comment.php,v 1.6 2005-04-26 11:01:20 francis Exp $
  * 
  */
 
@@ -18,9 +18,9 @@ require_once('../phplib/pledge.php');
 require_once('../phplib/comments.php');
 
 $err = importparams(
-            array('pledge_id',          '/^[1-9][0-9]*$/',      ""),
-            array('pw',                 '//',                   "",     null),
-            array('comment_id',         '/^[1-9][0-9]*$/',      "",     null)
+            array('pledge_id',          '/^[1-9][0-9]*$/',      "Missing pledge id"),
+            array('pw',                 '//',                   "Missing password",     null),
+            array('comment_id',         '/^[1-9][0-9]*$/',      "Missing comment id",     null)
         );
 
 if (!is_null($err))
@@ -98,12 +98,22 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
                     $q_text
                 ));
     db_commit();
+    $values = $pledge;
+    $values['comment_text'] = $q_text;
+    $values['comment_url'] = OPTION_BASE_URL . "/" . $values['ref'] . "#comments";
+    $values['comment_author_name'] = $q_author_name;
+    $values['comment_author_email'] = $q_author_email;
+    $values['comment_author_website'] = $q_author_website;
+    $success = pb_send_email_template($pledge['email'], 'comment-creator', $values);
+    if (!$success) {
+        err("Problems sending message to pledge creator.");
+    }
     print <<<EOF
 <p>Thank you! Your comment has now been posted.</p>
 EOF;
     if (is_null($pledge['password']))
         print <<<EOF
-<p><a href="/${pledge['ref']}">Go back to the pledge</a></p>
+<p><a href="/${pledge['ref']}#comments">Go back to the pledge comments</a></p>
 EOF;
     else
         print <<<EOF
@@ -126,39 +136,8 @@ EOF;
         comments_show_one(array('name' => $q_author_name, 'email' => $q_author_email, 'website' => $q_author_website, 'text' => $q_text));
         print '</blockquote>';
     }
-    print <<<EOF
-<form id="postcomment" method="POST">
-<input type="hidden" name="pw" value="$q_h_pw">
-<input type="hidden" name="pledge_id" value="$q_h_pledge_id">
-<input type="hidden" name="comment_id" value="$q_h_comment_id">
-<input type="hidden" name="n" value="$nextn">
-<table>
-<tr>
-    <th><label for="author_name">Your name</label></th>
-    <td><input type="text" id="author_name" name="author_name" value="$q_h_author_name"></td>
-</tr>
-<tr>
-    <th><label for="author_email">Your email address</label></th>
-    <td><input type="text" id="author_email" name="author_email" value="$q_h_author_email"></td>
-</tr>
-<tr>
-    <th><label for="author_website">Your web site</label><br>
-        <span style="font-size: 80%; font-style: italic">Optional</span></th>
-    <td><input type="text" id="author_website" name="author_website" value="$q_h_author_website"></td>
-</tr>
-<tr>
-    <th colspan="2"><label for="text">Your comment</label></th>
-</tr>
-<tr>
-    <td colspan="2"><textarea name="text" cols="50" rows="15">$q_h_text</textarea></td>
-</tr>
-<tr>
-    <td colspan="2">
-        <input type="submit" name="preview" value="Preview">
-EOF;
 
-    if (sizeof($err) == 0)
-        print ' <input type="submit" name="submit" value="Post comment">';
+    comments_form($pledge_id, $nextn, sizeof($err) == 0);
 
     print <<<EOF
     </td>
@@ -166,6 +145,7 @@ EOF;
 </table>
 
 </form>
+</div>
 EOF;
 }
 

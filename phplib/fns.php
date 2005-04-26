@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.21 2005-04-25 23:12:55 francis Exp $
+// $Id: fns.php,v 1.22 2005-04-26 11:01:20 francis Exp $
 
 require_once "../../phplib/evel.php";
 
@@ -58,7 +58,7 @@ function pb_send_email_internal($to, $spec) {
     $result = evel_send($spec, $to);
     $error = evel_get_error($result);
     if ($error) 
-        error_log("pb_send_email: " . $error);
+        error_log("pb_send_email_internal: " . $error);
     $success = $error ? FALSE : TRUE;
 
     return $success;

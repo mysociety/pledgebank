@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.30 2005-04-26 11:01:19 francis Exp $
+ * $Id: admin-pb.php,v 1.31 2005-04-26 19:54:54 matthew Exp $
  * 
  */
 
@@ -370,7 +370,7 @@ dd {
                 print "SMS sent to $data[recipient], message
                 '$data[message]' status $data[lastsendstatus]";
             } elseif (array_key_exists('commentposted', $data)) {
-                print "$data[name] <$data[email]> commented on " .
+                print "$data[name] &lt;$data[email]&gt; commented on " .
                     $this->pledge_link('id', $res['pledge_id']) . " saying
                 '$data[text]'";
             } else {

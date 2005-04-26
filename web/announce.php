@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.20 2005-04-25 23:12:55 francis Exp $
+ * $Id: announce.php,v 1.21 2005-04-26 15:24:01 francis Exp $
  * 
  */
 
@@ -17,6 +17,8 @@ require_once "../phplib/pledge.php";
 
 require_once "../../phplib/importparams.php";
 require_once "../../phplib/evel.php";
+
+$fill_in = "ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE, INCLUDING YOUR CONTACT INFO";
 
 $err = importparams(
             array('token', '/.+/', "Missing token")
@@ -46,7 +48,7 @@ Hello, and thank you for signing our successful pledge!
 
 '$sentence'
 
-<ENTER INSTRUCTIONS FOR PLEDGE SIGNERS HERE>
+<$fill_in>
 
 Yours sincerely,
 
@@ -54,7 +56,7 @@ ${pledge['name']}
 
 EOF;
 
-$default_sms = "${pledge['name']} here. The ${pledge['ref']} pledge has been successful! <ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE>";
+$default_sms = "${pledge['name']} here. The ${pledge['ref']} pledge has been successful! <$fill_in>.";
 $err = importparams(
             array('message_body', '//', "", $default_message),
             array('message_sms', '//', "", $default_sms),
@@ -67,7 +69,7 @@ if ($q_submit) {
     
     if (trim(merge_spaces($q_message_sms)) == trim(merge_spaces($default_sms)))
         array_push($errors, "Please edit the text of the SMS message");
-    if (stristr($q_message_sms, "ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE"))
+    if (stristr($q_message_sms, "$fill_in"))
         array_push($errors, "Please add instructions for the pledge signers to the SMS message.");
     if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
         array_push($errors, "Please shorten the text of the SMS message to 160 characters or fewer");
@@ -79,8 +81,8 @@ if ($q_submit) {
         array_push($errors, "Please edit the text of the email message.");
     if (strlen($q_message_body) < 50)
         array_push($errors, "Please enter a longer message.");
-    if (stristr($q_message_body, "ENTER INSTRUCTIONS FOR PLEDGE SIGNERS HERE"))
-        array_push($errors, "Please enter instructions for the pledge signers to the email message.");
+    if (stristr($q_message_body, "$fill_in"))
+        array_push($errors, "Please add instructions for the pledge signers to the email message.");
 
 }
 
@@ -133,14 +135,30 @@ if (!sizeof($errors) && $q_submit) {
 <form accept-charset="utf-8" class="pledge" name="pledge" id="pledge" method="post" action="/M/$q_h_token">
 <h2>Send Announcement</h2>
 <div class="c">
-<p>Write a message to the $howmany ${pledge['type']} who
-signed your pledge.  This is to tell them what to do next. <strong>Your email
-address will be used, so the signers can reply directly to you.</strong> You may want
-to also give your phone number or website so they can contact you again.</p>
+<p>Write a message to the $howmany ${pledge['type']} who signed your pledge.  
+This is to tell them what to do next.</p>
+
+<h3>Email message</h3>
+
+<p>The message will be sent from your email address, so the people
+who signed your pledge can reply directly to you. <strong>You may want to also give your
+phone number or website</strong>, so they can contact you in other ways.</p>
+
+<p><textarea
+    name="message_body"
+    id="message_body"
+    cols="72"
+    rows="20">$q_h_message_body</textarea></p>
 
 <h3>SMS message</h3>
-<p>Please enter a short (160 or fewer characters) summary of your main message,
-which can be sent to anyone who has signed up to your pledge by SMS only:</p>
+
+<p>Enter a short (160 or fewer characters) summary of your main message,
+which can be sent to anyone who has signed up to your pledge by SMS only.
+<strong>Include contact details, such as your phone number or email address.</strong>
+Otherwise people who signed up by text won't be able to contact you again.
+</p>
+
+
 <script type="text/javascript">
 <!--
 function count_sms_characters() {
@@ -174,15 +192,10 @@ count_sms_characters();
 //-->
 </script>
 
-<h3>Email message</h3>
+<h3>Send announcement</h3>
 
-<p><textarea
-    name="message_body"
-    id="message_body"
-    cols="72"
-    rows="20">$q_h_message_body</textarea></p>
+<p>(Remember, when you send this message <strong>your email address will be given to everyone who signed up</strong> by email) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
 
-<p>(<strong>Remember</strong>, when you send this message your email address will be given to all signers) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
 </form>
 </div>
 EOF;

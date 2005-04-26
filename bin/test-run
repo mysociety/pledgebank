@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.43 2005-04-26 11:01:19 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.44 2005-04-26 15:24:01 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -429,7 +429,6 @@ sub do_public_succeeding_pledge {
         if ($i == 0) {
             die "Success email link not found\n" if ($success_email !~ m#^\s*($base_url.*$)#m);
             $announce_link = $1;
-            #print "Email success message link is $announce_link\n"; exit; # for testing success message links ;)
         }
     }
     $wth->log_watcher_check();

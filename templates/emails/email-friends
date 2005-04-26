@@ -1,7 +1,7 @@
 Subject: I saw this pledge and thought of you
 
-<?=$values['from_name']?> <<?=$values['from_email']?>> thought you would be
-interested in the following pledge from PledgeBank.com.
+<?=$values['from_name']?> <<?=$values['from_email']?>> thought you might be
+interested in joining them to make the following pledge.
 
 '<?=$values['sentence_third']?>'
 

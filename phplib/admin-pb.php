@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.31 2005-04-26 19:54:54 matthew Exp $
+ * $Id: admin-pb.php,v 1.32 2005-04-27 10:53:23 francis Exp $
  * 
  */
 
@@ -256,7 +256,7 @@ class ADMIN_PAGE_PB_LATEST {
     # signers use signtime
     function show_latest_changes() {
         $q = db_query('SELECT signers.name, signers.email,
-                              signers.mobile, signtime, pledges.title,
+                              signers.mobile, signtime, showname, pledges.title,
                               pledges.ref,
                               extract(epoch from signtime) as epoch
                          FROM signers, pledges
@@ -337,6 +337,9 @@ dd {
                 if ($data['mobile']) print ' (' . $data['mobile'] . ')';
                 print ' signed up to ' .
                 $this->pledge_link('ref', $data['ref']);
+                if ($data['showname'] == 'f') {
+                    print ' (anonymously)';
+                }
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, ";
                 if ($data['confirmed']=='f') {
@@ -371,7 +374,7 @@ dd {
                 '$data[message]' status $data[lastsendstatus]";
             } elseif (array_key_exists('commentposted', $data)) {
                 print "$data[name] &lt;$data[email]&gt; commented on " .
-                    $this->pledge_link('id', $res['pledge_id']) . " saying
+                    $this->pledge_link('id', $data['pledge_id']) . " saying
                 '$data[text]'";
             } else {
                 print_r($data);

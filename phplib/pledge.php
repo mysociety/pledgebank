@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.46 2005-04-23 09:26:23 matthew Exp $
+ * $Id: pledge.php,v 1.47 2005-04-28 10:54:56 sandpit Exp $
  * 
  */
 
@@ -57,6 +57,10 @@ function pledge_token_retrieve($scope, $token) {
                     select data
                     from token
                     where scope = ? and token = ?', array($scope, $token));
+
+    /* Madness. We have to unescape this, because the PEAR DB library isn't
+     * smart enough to spot BYTEA columns and do it for us. */
+    $data = pg_unescape_bytea($data);
 
     $pos = 0;
     $res = rabx_wire_rd(&$data, &$pos);

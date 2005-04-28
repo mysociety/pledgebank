@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.71 2005-04-25 23:12:55 francis Exp $
+-- $Id: schema.sql,v 1.72 2005-04-28 15:40:03 chris Exp $
 --
 
 -- secret
@@ -620,3 +620,36 @@ create table frontpage_pledges (
 );
 create unique index frontpage_pledges_pledge_id_idx on frontpage_pledges(pledge_id);
 
+-- table of abuse reports on comments, pledges and signers.
+create table abusereport (
+    id serial not null primary key,
+    what_id integer not null,
+    what text not null check (
+        what = 'comment' or what = 'pledge' or what = 'signer'
+    ),
+    reason text
+);
+
+create function abusereport_id_check()
+    returns trigger as '
+    begin
+        -- cannot use execute for a select in this version so go through each
+        -- case manually
+        if new.what = ''comment'' then
+            perform id from comment where id = new.what_id;
+        elsif new.what = ''pledge'' then
+            perform id from pledges where id = new.what_id;
+        elsif new.what = ''signer'' then
+            perform id from signers where id = new.what_id;
+        else
+            raise exception ''attempt to insert with unknown value of "%" for what'', new.what;
+        end if;
+        if not found then
+            raise exception ''attempt to insert with invalid what_id % for "%"'', new.what_id, new.what;
+        end if;
+        return null;
+    end;
+' language 'plpgsql';
+
+create trigger abusereport_insert_trigger before insert on abusereport
+    for each row execute procedure abusereport_id_check();

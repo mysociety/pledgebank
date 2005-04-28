@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.74 2005-04-28 16:43:19 chris Exp $
+-- $Id: schema.sql,v 1.75 2005-04-28 17:57:55 francis Exp $
 --
 
 -- secret
@@ -547,6 +547,7 @@ create table message (
     id serial not null primary key,
     pledge_id integer not null references pledges(id),
     circumstance text not null,
+    circumstance_count int not null default 0,
     whencreated timestamp not null default pb_current_timestamp(),
     fromaddress text not null default 'pledgebank' check (fromaddress in('pledgebank','creator')),
 
@@ -577,7 +578,7 @@ create table message (
     check (sms is null or sendtosigners)
 );
 
-create unique index message_pledge_id_circumstance_idx on message(pledge_id, circumstance);
+create unique index message_pledge_id_circumstance_idx on message(pledge_id, circumstance, circumstance_count);
 
 -- To whom have messages been sent?
 create table message_creator_recipient (

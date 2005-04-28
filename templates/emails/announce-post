@@ -1,0 +1,9 @@
+Subject: Send a message to your signers - '<?=$values['title']?>' at PledgeBank.com
+
+To send a message to everyone who has signed your pledge so far, follow this
+link.  You might want to encourage them to spread the pledge, by printing out
+flyers or emailing it to their friends.
+
+<?=$values['url']?>
+
+<?=$values['signature']?>

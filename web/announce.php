@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.21 2005-04-26 15:24:01 francis Exp $
+ * $Id: announce.php,v 1.22 2005-04-28 17:57:56 francis Exp $
  * 
  */
 
@@ -34,9 +34,27 @@ if (!($data = pledge_token_retrieve('announce-post', $q_token))
                     $data['pledge_id'])))
     err("The link hasn't been recognised.  Please check the URL is copied correctly from your email."); /* XXX make this a single, friendlier error message. */
 
+/* Set flags according to type of announce message which was followed by this token.
+ * ('success' is just for backwards compatibility, now the circumstance field in 
+ * the token has the same content as the circumstance in the message table.) */
+if ($data['circumstance'] == 'success-auto-creator' or $data['circumstance'] == 'success') {
+    $message_circumstance = 'success-announce';
+    $do_sms = true;
+    $success = true;
+} elseif ($data['circumstance'] == 'announce-post') {
+    $message_circumstance = 'general-announce';
+    $do_sms = false;
+    $success = false;
+} else {
+    err("Internal error, unknown announce circumstance '" . $data['circumstance']) . "'";
+}
+$circumstance_count = $data['circumstance_count'];
+
 /* Verify that we haven't already sent the announcement. */
-if (!is_null(db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $data['pledge_id'])))
-    err("You've already sent an announcement message for this pledge.");
+if (!is_null(db_getOne("select id from message where pledge_id = ? and circumstance = ?
+and circumstance_count = ?", array($data['pledge_id'], $message_circumstance, $circumstance_count)))) {
+        err("You've already sent an announcement message for this pledge.");
+}
 
 /* All OK. */
 page_header("Send announcement to '${pledge['title']}", array());
@@ -67,15 +85,17 @@ $err = importparams(
 $errors = array();
 if ($q_submit) {
     
-    if (trim(merge_spaces($q_message_sms)) == trim(merge_spaces($default_sms)))
-        array_push($errors, "Please edit the text of the SMS message");
-    if (stristr($q_message_sms, "$fill_in"))
-        array_push($errors, "Please add instructions for the pledge signers to the SMS message.");
-    if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
-        array_push($errors, "Please shorten the text of the SMS message to 160 characters or fewer");
-    /* XXX else we must check that the text is representable in IA5; if it
-     * isn't, we must get the user to fix it, since otherwise it cannot be
-     * transmitted. */
+    if ($do_sms) {
+        if (trim(merge_spaces($q_message_sms)) == trim(merge_spaces($default_sms)))
+            array_push($errors, "Please edit the text of the SMS message");
+        if (stristr($q_message_sms, "$fill_in"))
+            array_push($errors, "Please add instructions for the pledge signers to the SMS message.");
+        if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
+            array_push($errors, "Please shorten the text of the SMS message to 160 characters or fewer");
+        /* XXX else we must check that the text is representable in IA5; if it
+         * isn't, we must get the user to fix it, since otherwise it cannot be
+         * transmitted. */
+    }
 
     if (trim(merge_spaces($q_message_body)) == trim(merge_spaces($default_message)))
         array_push($errors, "Please edit the text of the email message.");
@@ -92,31 +112,31 @@ if (!sizeof($errors) && $q_submit) {
     
     /* Got all the data we need. Just drop the announcement into the database
      * and let the frequentupdate script pass it to the signers. */
-    // TODO: 'success-announce' won't be right name when there are other
-    // announce messages.  Probably want to look at $date['circumstance']
-    // to work out what value to use.
     db_query("
         insert into message
-            (pledge_id, circumstance, fromaddress,
+            (pledge_id, circumstance, circumstance_count, fromaddress,
             sendtocreator, sendtosigners, sendtolatesigners,
             emailsubject, emailbody, sms)
         values
-            (?, 'success-announce', 'creator',
+            (?, ?, ?, 'creator',
             false, true, true,
             ?, ?, ?)",
         array(
-            $pledge['id'],
+            $pledge['id'], $message_circumstance, $circumstance_count,
             "Pledge success! ${pledge['title']}",
-                $q_message_body, $q_message_sms));
-    # Don't destroy token, so we can give proper error.
+                $q_message_body, $do_sms ? $q_message_sms : null));
+    # Don't destroy token, so we can give proper errors when trying to resend.
     # pledge_token_destroy('announce-post', $q_token);
     db_commit();
 
-    print "<p>Your message will now be sent to all the people who signed your pledge.  
-    Thanks, and enjoy carrying out you pledge!</p>";
+    print "<p>Your message will now be sent to all the people who signed your pledge.";
+    if ($success)
+        print "Thanks, and enjoy carrying out you pledge!</p>";
+    else 
+        print "Thanks, and good luck with your pledge!</p>";
 } else {
  
-    if ($data['circumstance'] == 'success')
+    if ($success)
         print '<p class="success">Your pledge is successful!</p>';
 
  
@@ -129,14 +149,17 @@ if (!sizeof($errors) && $q_submit) {
     // Display form
     $howmany = db_getOne('select count(id) from signers where pledge_id = ?', $pledge['id']);
 
-    print <<<EOF
+?>
 <p></p>
 
-<form accept-charset="utf-8" class="pledge" name="pledge" id="pledge" method="post" action="/M/$q_h_token">
+<form accept-charset="utf-8" class="pledge" name="pledge" id="pledge" method="post" action="/M/<?=$q_h_token?>">
 <h2>Send Announcement</h2>
 <div class="c">
-<p>Write a message to the $howmany ${pledge['type']} who signed your pledge.  
-This is to tell them what to do next.</p>
+<p>Write a message to the <?=$howmany?> <?=$pledge['type']?> who have signed your pledge.
+<? if ($success) { ?>
+This is to tell them what to do next.
+<? } ?>
+</p>
 
 <h3>Email message</h3>
 
@@ -148,7 +171,9 @@ phone number or website</strong>, so they can contact you in other ways.</p>
     name="message_body"
     id="message_body"
     cols="72"
-    rows="20">$q_h_message_body</textarea></p>
+    rows="20"><?=$q_h_message_body?></textarea></p>
+
+<? if ($do_sms) { ?>
 
 <h3>SMS message</h3>
 
@@ -183,7 +208,7 @@ function count_sms_characters() {
     onChange="count_sms_characters()"
     onClick="count_sms_characters()"
     onMouseUp="count_sms_characters()"
-    onMouseMove="count_sms_characters()">$q_h_message_sms</textarea></p>
+    onMouseMove="count_sms_characters()"><?=$q_h_message_sms?></textarea></p>
 <p><small><span id="smslengthcounter"></span></small></p>
 <script type="text/javascript">
 <!--
@@ -191,6 +216,7 @@ function count_sms_characters() {
 count_sms_characters();
 //-->
 </script>
+<? } ?>
 
 <h3>Send announcement</h3>
 
@@ -198,7 +224,7 @@ count_sms_characters();
 
 </form>
 </div>
-EOF;
+<?
 
 }
 

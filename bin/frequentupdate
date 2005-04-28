@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.23 2005-04-25 23:12:55 francis Exp $
+ * $Id: frequentupdate,v 1.24 2005-04-28 17:57:53 francis Exp $
  *
  */
 
@@ -222,10 +222,12 @@ function send_pending_messages() {
          * success to the signer. For now just generate this here, but
          * later on we'll need to move it into message, so that we can send
          * reminders. */
-        if ($msg['circumstance'] == 'success-auto-creator') {
+        if ($msg['circumstance'] == 'success-auto-creator' or
+            $msg['circumstance'] == 'announce-post') {
             $token = pledge_token_store('announce-post', array(
                                 'pledge_id' => $pledge['id'],
-                                'circumstance' => 'success')
+                                'circumstance' => $msg['circumstance'],
+                                'circumstance_count' => $msg['circumstance_count'])
                             );
             $url = OPTION_BASE_URL . '/M/' . $token;
             $pledge['url'] = $url;
@@ -310,7 +312,7 @@ function send_pending_messages() {
         if ($r['fromaddress'] == 'pledgebank') {
             // the default in pb_send_email_internal is from PledgeBank
         } elseif ($r['fromaddress'] == 'creator') {
-            $headers['From'] = $pledge['name'] . "<" . $pledge['email'] .">";
+            $headers['From'] = $pledge['name'] . " <" . $pledge['email'] .">";
         } else {
             error("Unknown 'from' in message " . $r['id'] . ": " . $msg['fromaddress']);
         }

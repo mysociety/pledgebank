@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.32 2005-04-27 10:53:23 francis Exp $
+ * $Id: admin-pb.php,v 1.33 2005-04-28 17:57:56 francis Exp $
  * 
  */
 
@@ -179,7 +179,9 @@ class ADMIN_PAGE_PB_MAIN {
             }
             print '</table>';
         }
-        print '<p><form method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
+        print '<p>';
+        print '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="send_announce_token_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="send_announce_token" value="Send announce URL to creator"></form>';
+        print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
     }
 
     function remove_pledge($id) {
@@ -221,26 +223,36 @@ class ADMIN_PAGE_PB_MAIN {
         db_connect();
 
         $pledge = get_http_var('pledge');
+        $pledge_id = null;
 
-        if (get_http_var('remove_pledge_id')) {
-            $id = get_http_var('remove_pledge_id');
-            if (ctype_digit($id))
-                $this->remove_pledge($id);
-            $this->list_all_pledges();
+        // Perform actions
+        if (get_http_var('update')) {
+            $this->update_changes();
+        } elseif (get_http_var('remove_pledge_id')) {
+            $remove_id = get_http_var('remove_pledge_id');
+            if (ctype_digit($remove_id))
+                $this->remove_pledge($remove_id);
         } elseif (get_http_var('remove_signer_id')) {
-            $id = get_http_var('remove_signer_id');
-            if (ctype_digit($id)) {
-                $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $id");
-                $this->remove_signer($id);
-                $pledge = db_getOne("SELECT ref FROM pledges WHERE id = $pledge_id");
+            $signer_id = get_http_var('remove_signer_id');
+            if (ctype_digit($signer_id)) {
+                $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $signer_id");
+                $this->remove_signer($signer_id);
             }
-            $this->show_one_pledge($pledge);
-        } elseif ($pledge) {
+        } elseif (get_http_var('send_announce_token')) {
+            $pledge_id = get_http_var('send_announce_token_pledge_id');
+            if (ctype_digit($pledge_id)) {
+                send_announce_token($pledge_id);
+                print '<p><em>Announcement permission mail sent</em></p>';
+            }
+        }
+        
+        // Display page
+        if ($pledge_id) {
+            $pledge = db_getOne("SELECT ref FROM pledges WHERE id = $pledge_id");
+        }
+        if ($pledge) {
             $this->show_one_pledge($pledge);
         } else {
-            if (get_http_var('update')) {
-                $this->update_changes();
-            }
             $this->list_all_pledges();
         }
     }

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.47 2005-04-28 10:54:56 sandpit Exp $
+ * $Id: pledge.php,v 1.48 2005-04-28 17:57:56 francis Exp $
  * 
  */
 
@@ -372,5 +372,23 @@ function print_link_with_password($link, $title, $text) {
     } else {
 ?><a href="<?=$link?>" title="<?=$title?>"><?=$text?></a><?
     }
+}
+
+/* Sends a message to pledge creator with URL containing link
+ * to let them make an announcement to all signers. */
+function send_announce_token($pledge_id) {
+    $max_circumstance = db_getOne("select max(circumstance_count) from message
+        where pledge_id = ? and circumstance = ?", array($pledge_id, 'announce-post'));
+    db_query("
+            insert into message (
+                pledge_id, circumstance, circumstance_count,
+                sendtocreator, sendtosigners, sendtolatesigners,
+                emailtemplatename
+            ) values (
+                ?, 'announce-post', ?,
+                true, false, false,
+                'announce-post'
+            )", array($pledge_id, $max_circumstance + 1));
+    db_commit();
 }
 

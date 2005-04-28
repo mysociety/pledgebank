@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.6 2005-04-26 11:01:20 francis Exp $
+ * $Id: comments.php,v 1.7 2005-04-28 16:19:55 chris Exp $
  * 
  */
 
@@ -72,7 +72,7 @@ function comments_show_one($comment) {
     }
 
     if (isset($comment['id']))
-        print ' <a class="abusivecommentlink" href="/abusivecomment?id=' . $comment['id'] . '">Abusive? Report it!</a>';
+        print ' <a class="abusivecommentlink" href="/?abusive=1&what=comment&id=' . $comment['id'] . '">Abusive? Report it!</a>';
 
     print '</small></div>';
 }

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.72 2005-04-28 15:40:03 chris Exp $
+-- $Id: schema.sql,v 1.73 2005-04-28 16:14:23 chris Exp $
 --
 
 -- secret
@@ -647,7 +647,7 @@ create function abusereport_id_check()
         if not found then
             raise exception ''attempt to insert with invalid what_id % for "%"'', new.what_id, new.what;
         end if;
-        return null;
+        return new;
     end;
 ' language 'plpgsql';
 

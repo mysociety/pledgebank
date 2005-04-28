@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.73 2005-04-28 16:14:23 chris Exp $
+-- $Id: schema.sql,v 1.74 2005-04-28 16:43:19 chris Exp $
 --
 
 -- secret
@@ -629,6 +629,9 @@ create table abusereport (
     ),
     reason text
 );
+
+create index abusereport_what_id_idx on abusereport(what_id);
+create index abusereport_what_idx on abusereport(what);
 
 create function abusereport_id_check()
     returns trigger as '

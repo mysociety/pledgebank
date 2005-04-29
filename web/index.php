@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.157 2005-04-29 10:06:03 francis Exp $
+// $Id: index.php,v 1.158 2005-04-29 11:40:58 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -101,7 +101,7 @@ function report_abusive_thing() {
         err("Bad ID value");
 
     if (!is_null($q_reason)) {
-        db_query('insert into abusereport (what, what_id, reason) values (?, ?, ?)', array($q_what, $q_id, $q_reason));
+        db_query('insert into abusereport (what, what_id, reason, ipaddr) values (?, ?, ?, ?)', array($q_what, $q_id, $q_reason, $_SERVER["REMOTE_ADDR"]));
         db_commit();
         print <<<EOF
 <p><strong>Thank you!</strong> One of our team will investigate that $w as soon
@@ -143,8 +143,8 @@ EOF;
 <input type="hidden" name="abusive" value="1">
 <input type="hidden" name="what" value="$q_h_what">
 <input type="hidden" name="id" value="$q_h_id">
-<p>Please give a short reason for reporting this $w</p>
-<textarea name="reason" rows="5" cols="50"></textarea>
+<p>Please give a short reason for reporting this $w<br>
+<input type="text" name="reason" size="60"></p>
 <p><input name="submit" type="submit" value="Submit"></p>
 </form>
 EOF;

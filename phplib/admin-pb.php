@@ -1,19 +1,22 @@
 <?php
 /*
- * PledgeBank admin page.
+ * admin-pb.php:
+ * PledgeBank admin pages.
  * 
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.33 2005-04-28 17:57:56 francis Exp $
+ * $Id: admin-pb.php,v 1.34 2005-04-29 16:28:14 chris Exp $
  * 
  */
 
 require_once "../phplib/pb.php";
 require_once "../phplib/pledge.php";
+require_once "../phplib/comments.php";
 require_once "fns.php";
 require_once "db.php";
 require_once "../../phplib/utility.php";
+require_once "../../phplib/importparams.php";
 
 class ADMIN_PAGE_PB_MAIN {
     function ADMIN_PAGE_PB_MAIN () {
@@ -179,9 +182,7 @@ class ADMIN_PAGE_PB_MAIN {
             }
             print '</table>';
         }
-        print '<p>';
-        print '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="send_announce_token_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="send_announce_token" value="Send announce URL to creator"></form>';
-        print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
+        print '<p><form method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
     }
 
     function remove_pledge($id) {
@@ -223,36 +224,26 @@ class ADMIN_PAGE_PB_MAIN {
         db_connect();
 
         $pledge = get_http_var('pledge');
-        $pledge_id = null;
 
-        // Perform actions
-        if (get_http_var('update')) {
-            $this->update_changes();
-        } elseif (get_http_var('remove_pledge_id')) {
-            $remove_id = get_http_var('remove_pledge_id');
-            if (ctype_digit($remove_id))
-                $this->remove_pledge($remove_id);
+        if (get_http_var('remove_pledge_id')) {
+            $id = get_http_var('remove_pledge_id');
+            if (ctype_digit($id))
+                $this->remove_pledge($id);
+            $this->list_all_pledges();
         } elseif (get_http_var('remove_signer_id')) {
-            $signer_id = get_http_var('remove_signer_id');
-            if (ctype_digit($signer_id)) {
-                $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $signer_id");
-                $this->remove_signer($signer_id);
+            $id = get_http_var('remove_signer_id');
+            if (ctype_digit($id)) {
+                $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $id");
+                $this->remove_signer($id);
+                $pledge = db_getOne("SELECT ref FROM pledges WHERE id = $pledge_id");
             }
-        } elseif (get_http_var('send_announce_token')) {
-            $pledge_id = get_http_var('send_announce_token_pledge_id');
-            if (ctype_digit($pledge_id)) {
-                send_announce_token($pledge_id);
-                print '<p><em>Announcement permission mail sent</em></p>';
-            }
-        }
-        
-        // Display page
-        if ($pledge_id) {
-            $pledge = db_getOne("SELECT ref FROM pledges WHERE id = $pledge_id");
-        }
-        if ($pledge) {
+            $this->show_one_pledge($pledge);
+        } elseif ($pledge) {
             $this->show_one_pledge($pledge);
         } else {
+            if (get_http_var('update')) {
+                $this->update_changes();
+            }
             $this->list_all_pledges();
         }
     }
@@ -418,4 +409,187 @@ dd {
         $this->show_latest_changes();
     }
 }
+
+class ADMIN_PAGE_PB_ABUSEREPORTS {
+    function ADMIN_PAGE_PB_ABUSEREPORTS() {
+        $this->id = 'pbabusereports';
+        $this->navname = 'Abuse reports';
+    }
+
+    function display($self_link) {
+        db_connect();
+
+        
+        if (array_key_exists('prev_url', $_POST)) {
+            $do_discard = false;
+            if (get_http_var('discardReports'))
+                $do_discard = true;
+            foreach ($_POST as $k => $v) {
+                $m = array();
+                if ($do_discard && preg_match('/^ar_([1-9]\d*)$/', $k, $a))
+                    db_query('delete from abusereport where id = ?', $a[1]);
+                if (preg_match('/^delete_(comment|pledge|signer)_([1-9]\d*)$/', $k, $a)) {
+                    /* XXX delete thing. */
+                }
+            }
+
+            db_commit();
+
+            print '<a href="' . htmlspecialchars(get_http_var('prev_url')) . '">Return to report list</a>';
+            return;
+        }
+
+        
+        ?>
+<style type="text/css">
+table.abusereporttable th { background-color: black; color: white; font-weight: bold; }
+//table.abusereporttable { padding-left: 1.5em; }
+table.abusereporttable tr.thing { background-color: #eee; padding-left: 0em; }
+table.abusereporttable tr.thing table { width: 100%; }
+table.abusereporttable tr.thing th { background-color: #00b; text-align: right; vertical-align: top; }
+table.abusereporttable tr.break { border-top: 1px solid white; }
+</style>
+<?
+        
+        $this->showlist($self_link);
+    }
+
+    function showlist($self_link) {
+        global $q_what;
+        importparams(
+                array('what',       '/^(comment|pledge|signer)$/',      '',     'pledge')
+            );
+
+        print "<p><strong>See reports on:</strong> ";
+
+        $ww = array('pledge', 'signer', 'comment');
+        $i = 0;
+        foreach ($ww as $w) {
+            if ($w != $q_what)
+                print "<a href=\"$self_link&what=$w\">";
+            print "${w}s ("
+                    . db_getOne('select count(id) from abusereport where what = ?', $w)
+                    . ")";
+            if ($w != $q_what)
+                print "</a>";
+            if ($i < sizeof($ww) - 1)
+                print " | ";
+            ++$i;
+        }
+
+        $this->do_one_list($self_link, $q_what);
+    }
+
+    function do_one_list($self_link, $what) {
+
+        print <<<EOF
+<table class="abusereporttable">
+    <tr>
+        <th style="width: 2em;"></th>
+        <th width="15%">Time</th>
+        <th width="15%">Reporting IP address</th>
+        <th>Reason</th>
+    </tr>
+EOF;
+
+        $old_id = null;
+        $q = db_query('select id, what_id, reason, ipaddr, extract(epoch from whenreported) as epoch from abusereport where what = ? order by what_id, whenreported desc', $what);
+
+        while (list($id, $what_id, $reason, $ipaddr, $t) = db_fetch_row($q)) {
+            if ($what_id !== $old_id) {
+                print '<form method="POST"><input type="hidden" name="prev_url" value="' . htmlspecialchars($self_link) . '">';
+            
+                /* XXX should group by pledge and then by signer/comment, but
+                 * can't be arsed... */
+                print '<tr class="thing"><td colspan="4">';
+
+                if ($what == 'pledge')
+                    $pledge_id = $what_id;
+                else if ($what == 'signer')
+                    $pledge_id = db_getRow('select pledge_id from signers where id = ?', $what_id);
+                else if ($what == 'comment')
+                    $pledge_id = db_getOne('select pledge_id from comment where id = ?', $what_id);
+                
+                $pledge = db_getRow('
+                                select *,
+                                    extract(epoch from creationtime) as createdepoch,
+                                    extract(epoch from date) as deadlineepoch
+                                from pledges
+                                where id = ?', $pledge_id);
+                    
+                /* Info on the pledge. Print for all categories. */
+                print '<table><tr><th colspan="2" style="text-align: center;">Pledge '
+                            . htmlspecialchars($pledge['title'])
+                        . '</th></tr><tr><th width="15%">Creator</th><td>'
+                            . htmlspecialchars($pledge['name'])
+                        . '</td></tr><tr><th>Created</th><td>'
+                            . date('Y-m-d H:i', $pledge['createdepoch'])
+                        . '</td></tr><tr><th>Deadline</th><td>'
+                            . date('Y-m-d', $pledge['deadlineepoch'])
+                        . '</td></tr>';
+                        
+                /* Print signer/comment details under pledge. */
+                if ($what == 'signer') {
+                    $signer = db_getRow('
+                                    select *,
+                                        extract(epoch from signtime) as epoch
+                                    from signers
+                                    where id = ?', $what_id);
+
+                    print '<tr class="break"><th>Signer name</th><td>'
+                            . (is_null($signer['name'])
+                                    ? "<em>not known</em>"
+                                    : htmlspecialchars($signer['name']))
+                            . '</td></tr><tr><th>Contact details</th><td>';
+
+                    if (!is_null($signer['email']))
+                        print '<a href="mailto:'
+                                . htmlspecialchars($signer['email'])
+                                . '">'
+                                . htmlspecialchars($signer['email'])
+                                . '</a> ';
+
+                    if (!is_null($signer['mobile']))
+                        print htmlspecialchars($signer['mobile']);
+
+                    print '</td></tr>'
+                            . '<tr><th>Signed at</th><td>'
+                            . date('Y-m-d H:M', $signer['epoch'])
+                            . '</td></tr>';
+                } else if ($what == 'comment') {
+                    $comment = db_getRow('
+                                    select id,
+                                        extract(epoch from whenposted)
+                                            as whenposted,
+                                        text, name, website
+                                    from comment
+                                    where id = ?', $what_id);
+
+                    print '<tr class="break"><th>Comment</th><td>';
+                    comments_show_one($comment, true);
+                    print '</td></tr>';
+                }
+
+                print '</td></tr><tr><td></td><td>'
+                        . "<input type=\"submit\" name=\"delete_${what}_${what_id}\" value=\"Delete this $what\">"
+                        . '</td></tr></table>';
+                $old_id = $what_id;
+            }
+
+            print '<tr><td>'
+                        . '<input type="checkbox" name="ar_' . $id . '" value="1">'
+                    . '</td><td>'
+                        . date('Y-m-d H:i', $t)
+                    . '</td><td>'
+                        . $ipaddr
+                    . '</td><td>'
+                        . $reason
+                    . '</td></tr>';
+        }
+
+        print '</table>'
+                . '<input type="submit" name="discardReports" value="Discard selected abuse reports"></form>';
+    }
+}
+
 ?>

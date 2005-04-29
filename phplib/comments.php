@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.7 2005-04-28 16:19:55 chris Exp $
+ * $Id: comments.php,v 1.8 2005-04-29 16:28:14 chris Exp $
  * 
  */
 
@@ -37,12 +37,13 @@ function comments_format_timestamp($time) {
     return $time;
 }
 
-/* comments_show_one COMMENT
+/* comments_show_one COMMENT [NOABUSE]
  * Given COMMENT, an associative array containing fields 'text', 'name' and
  * 'website' (and optional fields 'id', the comment ID, and 'whenposted', the
  * posting time in seconds since the epoch), print HTML for the comment
- * described. */
-function comments_show_one($comment) {
+ * described. If NOABUSE is true, don't show the link for reporting an abusive
+ * comment. */
+function comments_show_one($comment, $noabuse = false) {
     print '<div class="commentcontent">'
             . comments_text_to_html($comment['text'])
             . '</div>';
@@ -71,15 +72,16 @@ function comments_show_one($comment) {
         print " at $tt.";
     }
 
-    if (isset($comment['id']))
+    if (isset($comment['id']) && !$noabuse)
         print ' <a class="abusivecommentlink" href="/?abusive=1&what=comment&id=' . $comment['id'] . '">Abusive? Report it!</a>';
 
     print '</small></div>';
 }
 
-/* comments_show PLEDGE
- * Show the comments for the given PLEDGE (id or reference). */
-function comments_show($pledge) {
+/* comments_show PLEDGE [NOABUSE]
+ * Show the comments for the given PLEDGE (id or reference). If NOABUSE is
+ * true, don't show the link for reporting an abusive comment. */
+function comments_show($pledge, $noabuse = false) {
     $id = $pledge;
 
     if (is_null($id))
@@ -106,7 +108,7 @@ function comments_show($pledge) {
         while ($r = db_fetch_array($q)) {
             print '<li class="comment" id="comment_' . $r['id'] . '">';
 
-            comments_show_one($r);
+            comments_show_one($r, $noabuse);
 
             print '</li>';
         }

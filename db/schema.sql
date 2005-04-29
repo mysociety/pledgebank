@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.76 2005-04-29 11:38:23 chris Exp $
+-- $Id: schema.sql,v 1.77 2005-04-29 11:43:20 chris Exp $
 --
 
 -- secret
@@ -629,6 +629,7 @@ create table abusereport (
         what = 'comment' or what = 'pledge' or what = 'signer'
     ),
     reason text,
+    whenreported timestamp not null default pb_current_timestamp(),
     ipaddr text
 );
 

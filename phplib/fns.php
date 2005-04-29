@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.22 2005-04-26 11:01:20 francis Exp $
+// $Id: fns.php,v 1.23 2005-04-29 14:44:41 chris Exp $
 
 require_once "../../phplib/evel.php";
 
@@ -45,7 +45,7 @@ function pb_send_email_internal($to, $spec) {
 
     // Add standard PledgeBank from header
     if (!array_key_exists("From", $spec)) {
-        $spec['From'] = 'PledgeBank.com <' . OPTION_CONTACT_EMAIL . ">";
+        $spec['From'] = '"PledgeBank.com" <' . OPTION_CONTACT_EMAIL . ">";
     }
 
     // With one recipient, put in header.  Otherwise default to undisclosed recip.

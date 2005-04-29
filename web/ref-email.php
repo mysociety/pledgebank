@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: email.php,v 1.6 2005-04-11 13:32:15 francis Exp $
+// $Id: ref-email.php,v 1.1 2005-04-29 15:14:12 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -14,21 +14,23 @@ require_once '../phplib/pledge.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
-$title = "Emailing friends";
-page_header($title);
+$ref = get_http_var('ref'); 
+$h_ref = htmlspecialchars($ref);
+$q = db_query('SELECT * FROM pledges WHERE confirmed AND ref ILIKE ?', array($ref));
+if (!db_num_rows($q))
+    err('PledgeBank reference not known');
+$r = db_fetch_array($q);
 
-if (!is_null(importparams(
-            array('ref',     '/^[a-z0-9-]+$/i',  '')
-        ))) {
-    err("A required parameter was missing");
+$password_box = deal_with_password("/$h_ref/email", $ref, $r['password']);
+if ($password_box) {
+    page_header("Enter Password"); 
+    print $password_box;
+    page_footer();
+    exit;
 }
 
-$q = db_query('SELECT * FROM pledges WHERE confirmed AND ref ILIKE ?', array($q_ref));
-if (!db_num_rows($q))
-    err('Illegal PledgeBank reference!');
-
-$r = db_fetch_array($q);
-if (deal_with_password("/$q_h_ref/email", $q_ref, $r['password'])) {
+$title = "Emailing friends";
+page_header($title);
 
 # fromname, fromemail, frommessage
 # email as an array
@@ -65,15 +67,12 @@ if (!$errors) {
         print '<p>Unfortunately, something went wrong when trying to send the emails.</p>';
     }
 } else {
-    view_pledge($q_ref, $r, $errors);
+    view_friends_form($ref, $r, $errors);
 }
-
-} // password
 
 page_footer();
 
-# Individual pledge page
-function view_pledge($ref, $r, $errors) {
+function view_friends_form($ref, $r, $errors) {
     $h_ref = htmlspecialchars($ref);
     $q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($r['id']));
     $curr = db_num_rows($q);
@@ -109,18 +108,23 @@ function view_pledge($ref, $r, $errors) {
 Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.
 </p>
-<div class="formrow">Your name: <input type="text" name="fromname" value="" size="18">
-Email: <input type="text" name="fromemail" value="" size="26"></div>
-<p>Add a message, if you want:</p>
-<div class="formrow"><textarea name="frommessage" rows="5" cols="60"></textarea></div>
+
 <p>Other people's email addresses:</p>
-<style type="text/css">.formrow { margin-bottom: 3px; margin-left: 5em; }</style>
 <div class="formrow"><input type="text" name="email1" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email2" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email3" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email4" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email5" value="" size="40"></div>
+
+<p>Add a message, if you want:</p>
+<div class="formrow"><textarea name="frommessage" rows="5" cols="60"></textarea></div>
+
+<p>
+<div class="formrow">Your name: <input type="text" name="fromname" value="" size="18">
+Email: <input type="text" name="fromemail" value="" size="26"></div>
+
 <p><input name="submit" type="submit" value="Send"></p>
+
 </form>
 
 <?

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.48 2005-04-28 17:57:56 francis Exp $
+ * $Id: pledge.php,v 1.49 2005-04-29 15:14:12 francis Exp $
  * 
  */
 
@@ -332,25 +332,25 @@ function check_password($ref, $actual) {
 }
 
 /* deal_with_password LINK REF ACTUAL_PASSWORD
-   Calls check_password and if necessary displays form for entering the password.
-   LINK url for password form to post back to
-   REF pledge reference
-   ACTUAL_PASSWORD actual password
-  XXX: Doesn't work with non-index.php pages yet!
+   Calls check_password and if necessary returns HTML form for asking for password.
+   Otherwise returns false.
+       LINK url for password form to post back to
+       REF pledge reference
+       ACTUAL_PASSWORD actual password
 */
 function deal_with_password($link, $ref, $actual) {
     if (check_password($ref, $actual)) {
-        return true;
+        return false;
     }
 
+    $html = "";
     if (get_http_var('pw')) {
-        print '<p class="finished">Incorrect password!</p>';
+        $html .= '<p class="finished">Incorrect password!</p>';
     }
-
-    print '<form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>Password Protected Pledge</h2><p>This pledge is password protected.  Please enter the password to proceed.</p>';
-    print '<p><strong>Password:</strong> <input type="password" name="pw" value=""><input type="submit" name="submitpassword" value="Submit"></p>';
-    print '</form>';
-    return false;
+    $html .= '<form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>Password Protected Pledge</h2><p>This pledge is password protected.  Please enter the password to proceed.</p>';
+    $html .= '<p><strong>Password:</strong> <input type="password" name="pw" value=""><input type="submit" name="submitpassword" value="Submit"></p>';
+    $html .= '</form>';
+    return $html;
 }
 
 
@@ -366,7 +366,7 @@ function print_link_with_password($link, $title, $text) {
 ?> 
     <form class="buttonform" name="buttonform" action="<?=$link?>" method="post" title="<?=$title?>">
     <input type="hidden" name="pw" value="<?=htmlspecialchars(get_http_var('pw'))?>">
-    <input type="submit" name="submit" value="<?=$text?>">
+    <input type="submit" name="submitbuttonform" value="<?=$text?>">
     </form>
 <?
     } else {
@@ -392,3 +392,28 @@ function send_announce_token($pledge_id) {
     db_commit();
 }
 
+/* Display form for pledge signing. */
+function pledge_sign_box() {
+    if (get_http_var('add_signatory'))
+        $showname = get_http_var('showname') ? ' checked' : '';
+    else
+        $showname = ' checked';
+?>
+<form accept-charset="utf-8" class="pledgesign" name="pledge" action="/<?=htmlspecialchars(get_http_var('ref')) ?>/sign" method="post">
+<input type="hidden" name="add_signatory" value="1">
+<input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
+<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
+<h2>Sign up now</h2>
+<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
+<p><b>
+I, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars(get_http_var('name'))?>">,
+sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>"></b>
+<br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
+</p>
+<p><input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge </p>
+<p><input type="submit" name="submit" value="Sign Pledge"> </p>
+</form>
+
+<? 
+
+}

@@ -1,3 +1,18 @@
+<?
+// faq.php:
+// FAQ page for PledgeBank.
+//
+// Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+// Email: matthew@mysociety.org. WWW: http://www.mysociety.org
+//
+// $Id: faq.php,v 1.3 2005-04-29 15:14:12 francis Exp $
+
+require_once "../phplib/pb.php";
+require_once '../phplib/fns.php';
+
+page_header("Frequently Asked Questions");
+
+?>
 <h2>Frequently Asked Questions</h2>
 
 <dl>
@@ -143,3 +158,6 @@ they want to move across. As a pledge creator this means just sending
 a mail to your subscribers using the link that you were sent by email.
 
 </dl>
+<?
+
+page_footer();

@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.19 2005-04-19 14:52:52 chris Exp $
+# $Id: SMS.pm,v 1.20 2005-04-29 09:56:15 chris Exp $
 #
 
 package PB::SMS;
@@ -358,12 +358,15 @@ sub receive_sms ($$$$$$) {
                 # reliable but is Good Enough for these purposes.
                 my $numsigned = dbh()->selectrow_array('select count(id) from signers where pledge_id = ?', {}, $pledge_id) + 1;
 
+                # Don't need to waste seven characters on URL scheme....
+                my $shorturl = mySociety::Config::get('BASE_URL');
+                $shorturl =~ s#^http://##;
                 my ($new_id) =
                     send_sms(
                             $sender,
                             sprintf('Thanks - you are the %s person to pledge! Go to %s/S/%s to get email instead of texts.',
                                     ordinal($numsigned),
-                                    mySociety::Config::get('BASE_URL'),
+                                    $shorturl,
                                     $token
                             ),
                             1       # this SMS costs them 25p

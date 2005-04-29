@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.156 2005-04-29 09:10:13 chris Exp $
+// $Id: index.php,v 1.157 2005-04-29 10:06:03 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,10 +15,6 @@ require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
 require_once 'contact.php';
-
-if (get_http_var('search')) {
-    $search_results = search();
-}
 
 $title = '';
 $header_params = array();
@@ -56,14 +52,12 @@ if (get_http_var('abusive')) {
 } elseif (get_http_var('contactpost')) {
     $title = 'Contact Us';
     contact_form_submitted();
-} elseif (get_http_var('admin')=='pledgebank') {
-    $title = 'Admin';
-    admin();
 } elseif (get_http_var('pdf')) {
     $title = 'Pledge Flyers';
     $header_params['noprint'] = true;
     pdfs();
 } elseif (get_http_var('search')) {
+    $search_results = search();
     $title = 'Search Results';
     print $search_results;
 } else {

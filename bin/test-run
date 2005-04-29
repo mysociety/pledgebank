@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.45 2005-04-26 16:36:06 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.46 2005-04-29 10:06:03 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -591,7 +591,8 @@ sub do_sms_pledge {
     $wth->log_watcher_check();
     call_smsd();
     $conversion_sms = sms_get_containing(mobile_n(102), "%you are the 2nd person to pledge%", 0);
-    die "Conversion link not found in SMS '$conversion_sms'\n" if ($conversion_sms !~ m#\b($base_url[^\s]*)\b#m);
+    my $base_url_without_http = $base_url; $base_url_without_http =~ s#http://##;
+    die "Conversion link not found in SMS '$conversion_sms'\n" if ($conversion_sms !~ m#\b($base_url_without_http[^\s]*)\b#m);
     print "SMS conversion URL $1\n" if $verbose > 1;
     # Go to conversion link and fill in conversion form
     $b->get($1);

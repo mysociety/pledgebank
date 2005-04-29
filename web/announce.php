@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.23 2005-04-29 10:06:03 francis Exp $
+ * $Id: announce.php,v 1.24 2005-04-29 10:53:34 francis Exp $
  * 
  */
 
@@ -144,7 +144,7 @@ if (!sizeof($errors) && $q_submit) {
         array(
             $pledge['id'], $message_circumstance, $circumstance_count,
             $success ? "Pledge success! - '${pledge['title']}' at PledgeBank.com" : 
-                       "Pledge announcement! - '${pledge['title']}' at PledgeBank.com",
+                       "Update on the pledge you've signed - '${pledge['title']}' at PledgeBank.com",
                 $q_message_body, $do_sms ? $q_message_sms : null));
     # Don't destroy token, so we can give proper errors when trying to resend.
     # pledge_token_destroy('announce-post', $q_token);

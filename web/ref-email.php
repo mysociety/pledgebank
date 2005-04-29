@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.1 2005-04-29 15:14:12 francis Exp $
+// $Id: ref-email.php,v 1.2 2005-04-29 18:49:45 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -14,14 +14,9 @@ require_once '../phplib/pledge.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
-$ref = get_http_var('ref'); 
-$h_ref = htmlspecialchars($ref);
-$q = db_query('SELECT * FROM pledges WHERE confirmed AND ref ILIKE ?', array($ref));
-if (!db_num_rows($q))
-    err('PledgeBank reference not known');
-$r = db_fetch_array($q);
+$p  = new Pledge(get_http_var('ref'));
 
-$password_box = deal_with_password("/$h_ref/email", $ref, $r['password']);
+$password_box = deal_with_password($p->url_email(), $p->ref(), $p->password());
 if ($password_box) {
     page_header("Enter Password"); 
     print $password_box;
@@ -54,7 +49,7 @@ if (!$errors) {
         if (!$email)
             continue;
         $success &= pb_send_email_template($email, 'email-friends',
-            array_merge($r, array(
+            array_merge($p->data, array(
                 'from_name'=>$fromname, 
                 'from_email' => $fromemail, 
                 'from_message' => $frommessage ? "They added this message: \"$frommessage\"\n\n" : "",
@@ -62,46 +57,27 @@ if (!$errors) {
         );
     }
     if ($success) {
-        print '<p>Thanks very much for spreading the word of this pledge.</p>';
+        print '<p>Your message has been sent.  Thanks very much for spreading the word of this pledge.</p>';
     } else {
         print '<p>Unfortunately, something went wrong when trying to send the emails.</p>';
     }
 } else {
-    view_friends_form($ref, $r, $errors);
+    view_friends_form($p, $errors);
 }
 
 page_footer();
 
-function view_friends_form($ref, $r, $errors) {
-    $h_ref = htmlspecialchars($ref);
-    $q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($r['id']));
-    $curr = db_num_rows($q);
-    $left = $r['target'] - $curr;
-
+function view_friends_form($p, $errors) {
 	if (sizeof($errors) and get_http_var('submit')) {
 		print '<div id="errors"><ul><li>';
 		print join ('</li><li>', $errors);
 		print '</li></ul></div>';
 	} else {
-    ?>
-<p align="center">Here's a reminder of the pledge you're telling people about:</p>
-<div class="pledge">
-<div class="c">
-<p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 
-'html'=>true)) ?>&quot;</p>
-<p>Deadline: <strong><?=prettify($r['date']) ?></strong></p>
-
-<p style="font-style: italic;"><?=prettify($curr) ?> <?=make_plural($curr,'person has','people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target :) )':', '.prettify($left).' more needed') ?></p>
-
-<?  if ($r['detail']) {
-        print '<p><strong>More details</strong><br>' . htmlspecialchars($r['detail']) . '</p>';
-    }
-?>
-</div>
-</div>
-<? } // errors ?>
+        ?> <p align="center">Here's a reminder of the pledge you're telling people about:</p> <? 
+        $p->render_box(array());
+    } // errors ?>
 <p></p>
-<form class="tips" name="pledge" action="email" method="post"><input type="hidden" name="ref" value="<?=$h_ref ?>">
+<form class="generalform" name="pledge" action="email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <h2>Email this pledge</h2>
 <p>
@@ -109,21 +85,21 @@ Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.
 </p>
 
-<p>Other people's email addresses:</p>
+<p><strong>Other people's email addresses:</strong></p>
 <div class="formrow"><input type="text" name="email1" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email2" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email3" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email4" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email5" value="" size="40"></div>
 
-<p>Add a message, if you want:</p>
+<p><strong>Add a message, if you want:</strong></p>
 <div class="formrow"><textarea name="frommessage" rows="5" cols="60"></textarea></div>
 
 <p>
-<div class="formrow">Your name: <input type="text" name="fromname" value="" size="18">
-Email: <input type="text" name="fromemail" value="" size="26"></div>
+<div class="formrow"><strong>Your name:</strong> <input type="text" name="fromname" value="" size="18">
+<br><strong>Email:</strong> <input type="text" name="fromemail" value="" size="26"></div>
 
-<p><input name="submit" type="submit" value="Send"></p>
+<p><input name="submit" type="submit" value="Send message"></p>
 
 </form>
 

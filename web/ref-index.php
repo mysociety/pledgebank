@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.1 2005-04-29 15:14:12 francis Exp $
+// $Id: ref-index.php,v 1.2 2005-04-29 18:49:45 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -13,18 +13,8 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../../phplib/utility.php';
 
-$ref = get_http_var('ref'); 
-$h_ref = htmlspecialchars($ref);
-$q = db_query('SELECT *, pb_current_date() <= date as open FROM pledges WHERE ref ILIKE ?', array($ref));
-if (!db_num_rows($q))
-    err('PledgeBank reference not known');
-
-$r = db_fetch_array($q);
-$confirmed = ($r['confirmed'] == 't');
-if (!$confirmed)
-    err('PledgeBank reference not known');
-
-$password_box = deal_with_password("/$h_ref", $ref, $r['password']);
+$p  = new Pledge(get_http_var('ref'));
+$password_box = deal_with_password($p->url_main(), $p->ref(), $p->password());
 if ($password_box) {
     page_header("Enter Password"); 
     print $password_box;
@@ -32,49 +22,37 @@ if ($password_box) {
     exit;
 }
 
-$pledge_id = $r['id'];
+page_header("'I will " . $p->h_title() . "'");
 
-$title = "'I will " . $r['title'] . "'";
-page_header($title);
-
-$q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($pledge_id));
-$curr = db_num_rows($q);
-$left = $r['target'] - $curr;
-
-$finished = 0;
-if ($r['open'] == 'f') {
-    $finished = 1;
+if (!$p->open()) {
     print '<p class="finished">This pledge is now closed, as its deadline has passed.</p>';
 }
-if ($left <= 0) {
-    if ($r['comparison'] == 'exactly') {
-        $finished = 1;
+if ($p->left() <= 0) {
+    if ($p->exactly()) {
         print '<p class="finished">This pledge is now closed, as its target has been reached.</p>';
     } else {
         print '<p class="success">This pledge has been successful!';
-        if (!$finished) {
+        if (!$p->finished()) {
             print '<br><strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.';
         }
         print '</p>';
     }
 }
 
-$png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
-pledge_box($r, $curr, $left);
+$p->render_box(array('showdetails' => true));
 
-if (!$finished) { 
+if (!$p->finished()) { 
     pledge_sign_box(); 
 }
 
 ?>
 <div id="flyeremail">
-<?    if (!$finished) { ?>
+<?    if (!$p->finished()) { ?>
 <h2>Spread the word</h2>
 <ul id="spread">
-<li> <? print_link_with_password("./$h_ref/email", "", "Email pledge to your friends") ?></li>
-<li> <? print_link_with_password("$h_ref/ical", "", "Add deadline to your calendar") ?> </li>
-<li> <? print_link_with_password("./$h_ref/flyers", "Stick them places!", "Print out customised flyers") ?>
-<!-- <a href="/<?=$h_ref ?>/flyers"><img border="0" vspace="5" align="right" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="PDF flyers to download"></a> -->
+<li> <? print_link_with_password($p->url_email(), "", "Email pledge to your friends") ?></li>
+<li> <? print_link_with_password($p->url_ical(), "", "Add deadline to your calendar") ?> </li>
+<li> <? print_link_with_password($p->url_flyers(), "Stick them places!", "Print out customised flyers") ?>
 </li>
 </ul>
 <br clear="all">
@@ -85,11 +63,10 @@ if (!$finished) {
 <div id="signatories">
 <h2><a name="signers">Current signatories</a></h2><?
 
-$out = '<li>'
-        . htmlspecialchars($r['name'])
-        . ' (Pledge Author)</li>';
+$out = '<li>' . $p->h_name() . ' (Pledge Author)</li>';
 $anon = 0;
 $unknownname = 0;
+$q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($p->id()));
 while ($r = db_fetch_array($q)) {
     $showname = ($r['showname'] == 't');
     if ($showname) {
@@ -129,8 +106,8 @@ print '</ul>';
 print '</div>';
 
 print '<div id="comments"><h2><a name="comments">Comments on this pledge</a></h2>';
-comments_show($pledge_id); 
-comments_form($pledge_id, 1);
+comments_show($p->id()); 
+comments_form($p->id(), 1);
 print '</div>';
 
 page_footer();

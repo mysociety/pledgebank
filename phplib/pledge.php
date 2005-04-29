@@ -6,13 +6,91 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.49 2005-04-29 15:14:12 francis Exp $
+ * $Id: pledge.php,v 1.50 2005-04-29 18:49:45 francis Exp $
  * 
  */
 
 require_once 'db.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/rabx.php';
+
+class Pledge {
+    // Associative array of parameters about the pledge, taken from database
+    var $data;
+    // Escaped ref used for URLs
+    var $h_ref;
+    
+    // Construct from ref (TODO: probably can overload this for id constructor)
+    function Pledge($ref) {
+        $q = db_query('SELECT *, 
+                           pb_current_date() <= pledges.date AS open,
+                           (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
+                       FROM pledges
+                       WHERE ref ILIKE ?', array($ref));
+        if (!db_num_rows($q))
+            err('PledgeBank reference not known');
+        $this->data = db_fetch_array($q);
+
+        $this->_calc();
+    }
+
+    // Internal function to calculate some values from data
+    function _calc() {
+        $this->data['left'] = $this->data['target'] - $this->data['signers'];
+        $this->data['confirmed'] = ($this->data['confirmed'] == 't');
+        $this->data['open'] = ($this->data['open'] == 't');
+        $this->h_ref = htmlspecialchars($this->data['ref']);
+
+        // "Finished" means closed to new signers
+        $finished = false;
+        if (!$this->open())
+            $finished = true;
+        if ($this->left() <= 0)
+            if ($this->exactly())
+                $finished = true;
+        $this->data['finished'] = $finished;
+
+        // Check is confirmed
+        if (!$this->data['confirmed'])
+            err('PledgeBank reference not known');
+    }
+
+    // Basic data access
+    function ref() { return $this->data['ref']; }
+    function id() { return $this->data['id']; }
+    function open() { return $this->data['open']; } // not gone past the deadline date
+    function finished() { return $this->data['finished']; } // can take no more signers, for whatever reason
+    function exactly() { return ($this->data['comparison'] == 'exactly'); }
+    function has_details() { return $this->data['detail'] ? true : false; }
+
+    function target() { return $this->data['target']; }
+    function signers() { return $this->data['signers']; }
+    function left() { return $this->data['left']; }
+
+    function password() { return $this->data['password']; }
+
+    // Basic data access for HTML display
+    function h_title() { return htmlspecialchars($this->data['title']); }
+    function h_name() { return htmlspecialchars($this->data['name']); }
+
+    // Links.  The semantics here is that the URLs are all escaped, but didn't
+    // need escaping.  They can safely be used in HTML or plain text.
+    function url_main() { return "/" . $this->h_ref; }
+    function url_email() { return "/" . $this->h_ref . "/email"; }
+    function url_ical() { return "/" . $this->h_ref . "/ical"; }
+    function url_flyers() { return "/" . $this->h_ref . "/flyers"; }
+    function url_flyer($type) { return "/flyers/" . $this->h_ref . "_$type"; }
+    function url_comments() { return "/" . $this->h_ref . "#comments"; }
+
+    // Rendering the pledge in various ways
+
+    // Draws a plaque containing the pledge.  $params is an array, which
+    // can contain the following:
+    //     showdetails - if present, show "details" field
+    function render_box($params) {
+        pledge_box($this->data, $this->signers(), $this->left(), $params);
+    }
+}
 
 /* pledge_ab64_encode DATA
  * Return a "almost base64" encoding of DATA (a nearly six-bit encoding using
@@ -181,7 +259,7 @@ function pledge_sentence($r, $params = array()) {
     return $s;
 }
 
-function pledge_box($r, $curr='', $left='') { ?>
+function pledge_box($r, $curr='', $left='', $params = array()) { ?>
 <div class="tips">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p align="right">&mdash; <?=$r['name'].((isset($r['identity']) && $r['identity'])?', '.$r['identity']:'') ?></p>
@@ -191,7 +269,7 @@ function pledge_box($r, $curr='', $left='') { ?>
 <? } ?>
 </p>
 <?
-    if (isset($r['detail']) && $r['detail']) {
+    if (array_key_exists('showdetails', $params) && isset($r['detail']) && $r['detail']) {
         $det = htmlspecialchars($r['detail']);
         # regexs here borrowed from TWFY
         preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);

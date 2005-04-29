@@ -5,19 +5,16 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.1 2005-04-29 15:14:12 francis Exp $
+// $Id: ref-flyers.php,v 1.2 2005-04-29 18:49:45 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../../phplib/utility.php';
 
-$ref = get_http_var('ref');
-$h_ref = htmlspecialchars($ref);
-$q = db_query('SELECT * FROM pledges WHERE ref ILIKE ?', array($ref));
-$row = db_fetch_array($q);
+$p  = new Pledge(get_http_var('ref'));
 
-$password_box = deal_with_password("/$h_ref/flyers", $ref, $row['password']);
+$password_box = deal_with_password($p->url_flyers(), $p->ref(), $p->password());
 if ($password_box) {
     page_header("Enter Password"); 
     print $password_box;
@@ -28,32 +25,18 @@ if ($password_box) {
 $title = "Flyers";
 page_header($title);
 
+$pdf_flyers8_url = $p->url_flyer("A4_flyers8.pdf");
+$pdf_flyers1_url = $p->url_flyer("A4_flyers1.pdf");
+$png_flyers8_url = $p->url_flyer("A4_flyers8.png");
 
-if (!$row)
-    err("Pledge '$h_ref' not known");
-
-$pdf_cards_url = new_url("../flyers/{$ref}_A4_cards.pdf", false);
-$pdf_tearoff_url = new_url("../flyers/{$ref}_A4_tearoff.pdf", false);
-$pdf_flyers16_url = new_url("../flyers/{$ref}_A4_flyers16.pdf", false);
-$pdf_flyers8_url = new_url("../flyers/{$ref}_A4_flyers8.pdf", false);
-$pdf_flyers4_url = new_url("../flyers/{$ref}_A4_flyers4.pdf", false);
-$pdf_flyers1_url = new_url("../flyers/{$ref}_A4_flyers1.pdf", false);
-$png_flyers8_url = new_url("../flyers/{$ref}_A4_flyers8.png", false);
 ?>
 <div class="noprint">
 <h2>Customised Flyers</h2>
 <p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
-<!--
-<li><? print_link_with_password($pdf_flyers4_url, "", "Flyers for handing out, 4 per page (A4, PDF)") ?> </li>
--->
 <li><? print_link_with_password($pdf_flyers8_url, "", "Flyers for handing out, 8 per page (A4, PDF" . (get_http_var("pw") ? "" : ", like picture below") . ")") ?> </li>
 <li><? print_link_with_password($pdf_flyers1_url, "", "Big poster" . 
-($row['detail'] ? ', including more details' : ''). " (A4, PDF)") ?> </li>
-<!--
-<li><? print_link_with_password($pdf_flyers16_url, "", "Loads of little flyers, 16 per page (A4, PDF)") ?> </li>
-<li><? print_link_with_password($pdf_tearoff_url, "", "Tear-off format (like accommodation rental ones) (A4)") ?> </li>
--->
+($p->has_details() ? ', including more details' : ''). " (A4, PDF)") ?> </li>
 </ul>
 </div>
 <?

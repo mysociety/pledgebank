@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.75 2005-04-28 17:57:55 francis Exp $
+-- $Id: schema.sql,v 1.76 2005-04-29 11:38:23 chris Exp $
 --
 
 -- secret
@@ -628,7 +628,8 @@ create table abusereport (
     what text not null check (
         what = 'comment' or what = 'pledge' or what = 'signer'
     ),
-    reason text
+    reason text,
+    ipaddr text
 );
 
 create index abusereport_what_id_idx on abusereport(what_id);

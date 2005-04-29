@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.155 2005-04-28 16:19:55 chris Exp $
+// $Id: index.php,v 1.156 2005-04-29 09:10:13 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -334,11 +334,11 @@ function step1_error_check($data) {
     $errors = array();
     if (!$data['target']) $errors['target'] = 'Please enter a target';
     elseif (!ctype_digit($data['target']) || $data['target'] < 1) $errors['target'] = 'The target must be a positive number';
-    elseif ($data['target'] > 100) {
-        $errors['target'] = 'We have imposed a cap of 100 people maximum on each
+    elseif ($data['target'] > 400) {
+        $errors['target'] = 'We have imposed a cap of 400 people maximum on each
         pledge. This is not a hard limit, just a way of encouraging people to
         aim at smaller and more achievable targets. If you want a target higher
-        than 100 people, we\'d be glad to set it up for you. Just drop us a
+        than 400 people, we\'d be glad to set it up for you. Just drop us a
         quick email to <a href="mailto:team@pledgebank.com">team@pledgebank.com</a> 
         letting us know who you are and what
         you are aiming to do.';

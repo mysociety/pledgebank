@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.24 2005-04-28 17:57:53 francis Exp $
+ * $Id: frequentupdate,v 1.25 2005-04-30 13:44:53 matthew Exp $
  *
  */
 
@@ -138,7 +138,7 @@ function send_automatic_failure_messages() {
                 select * from pledges
                 where confirmed
                     and whensucceeded is null
-                    and pb_current_timestamp() > date
+                    and pb_current_date() > date
                     and (select id
                         from message
                         where pledge_id = pledges.id

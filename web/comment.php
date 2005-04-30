@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.6 2005-04-26 11:01:20 francis Exp $
+ * $Id: comment.php,v 1.7 2005-04-30 14:35:50 matthew Exp $
  * 
  */
 
@@ -68,7 +68,7 @@ $q_text = trim($q_text);
 
 if (!$q_author_email)
     array_push($err, "Please give your email address");
-else if (!emailaddress_is_valid($q_author_email))
+elseif (!emailaddress_is_valid($q_author_email))
     array_push($err, htmlspecialchars("'$q_author_email'") . " is not a valid email address; please check it carefully");
 
 if (strlen($q_author_name) == 0)

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.34 2005-04-29 16:28:14 chris Exp $
+ * $Id: admin-pb.php,v 1.35 2005-04-30 14:35:48 matthew Exp $
  * 
  */
 
@@ -505,9 +505,9 @@ EOF;
 
                 if ($what == 'pledge')
                     $pledge_id = $what_id;
-                else if ($what == 'signer')
+                elseif ($what == 'signer')
                     $pledge_id = db_getRow('select pledge_id from signers where id = ?', $what_id);
-                else if ($what == 'comment')
+                elseif ($what == 'comment')
                     $pledge_id = db_getOne('select pledge_id from comment where id = ?', $what_id);
                 
                 $pledge = db_getRow('
@@ -556,7 +556,7 @@ EOF;
                             . '<tr><th>Signed at</th><td>'
                             . date('Y-m-d H:M', $signer['epoch'])
                             . '</td></tr>';
-                } else if ($what == 'comment') {
+                } elseif ($what == 'comment') {
                     $comment = db_getRow('
                                     select id,
                                         extract(epoch from whenposted)

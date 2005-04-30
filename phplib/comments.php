@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.8 2005-04-29 16:28:14 chris Exp $
+ * $Id: comments.php,v 1.9 2005-04-30 14:35:48 matthew Exp $
  * 
  */
 
@@ -62,9 +62,9 @@ function comments_show_one($comment, $noabuse = false) {
         $t = time();
         if (strftime('%Y%m%d', $w) == strftime('%Y%m%d', $t))
             $tt = "$tt today";
-        else if (strftime('%U', $w) == strftime('%U', $t))
+        elseif (strftime('%U', $w) == strftime('%U', $t))
             $tt = "$tt, " . strftime('%A', $w);
-        else if (strftime('%Y', $w) == strftime('%Y', $t))
+        elseif (strftime('%Y', $w) == strftime('%Y', $t))
             $tt = "$tt, " . strftime('%A %e %B', $w);
         else
             $tt = "$tt, " . strftime('%a %e %B %Y', $w);
@@ -73,7 +73,7 @@ function comments_show_one($comment, $noabuse = false) {
     }
 
     if (isset($comment['id']) && !$noabuse)
-        print ' <a class="abusivecommentlink" href="/?abusive=1&what=comment&id=' . $comment['id'] . '">Abusive? Report it!</a>';
+        print ' <a class="abusivecommentlink" href="/abuse?what=comment&amp;id=' . $comment['id'] . '">Abusive? Report it!</a>';
 
     print '</small></div>';
 }

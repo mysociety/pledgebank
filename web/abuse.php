@@ -5,12 +5,13 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.1 2005-04-29 15:14:12 francis Exp $
+// $Id: abuse.php,v 1.2 2005-04-30 14:35:50 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
+require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
 page_header('Report Abuse');
@@ -34,9 +35,9 @@ function report_abusive_thing() {
     $w = $q_what;
     if ($q_what == 'pledge')
         $pledge_id = $q_id;
-    else if ($q_what == 'comment')
+    elseif ($q_what == 'comment')
         $pledge_id = db_getOne('select pledge_id from comment where id = ?', $q_id);
-    else if ($q_what == 'signer') {
+    elseif ($q_what == 'signer') {
         $w = 'signature';
         $pledge_id = db_getOne('select pledge_id from signers where id = ?', $q_id);
     }
@@ -54,33 +55,26 @@ EOF;
         return;
     }
 
-    $title = htmlspecialchars(db_getOne('select title from pledges where id = ?', $q_id));
+    $title = htmlspecialchars(db_getOne('select title from pledges where id = ?', $pledge_id));
 
     print <<<EOF
 <form accept-charset="utf-8" action="./" method="post">
 <h2>Report abusive $w</h2>
+<p>You are reporting the $w:</p> 
+<blockquote>
 EOF;
 
     if ($q_what == 'pledge') {
-        print <<<EOF
-<p>You are reporting the pledge</p>
-<blockquote>$title</blockquote>
-EOF;
-    } else if ($q_what == 'signer') {
+        print $title;
+    } elseif ($q_what == 'signer') {
         $name = htmlspecialchars(db_getOne('select name from signers where id = ?', $q_id));
-        print <<<EOF
-<p>You are reporting the signer</p>
-<blockquote>$name</blockquote>
-<p>on the pledge <strong>$title</strong>.</p>
-EOF;
-    } else if ($q_what == 'comment') {
-        print <<<EOF
-<p>You are reporting the comment</p>
-EOF;
+        print $name;
+    } elseif ($q_what == 'comment') {
         comments_show_one(db_getRow('select * from comment where id = ?', $q_id));
-        print <<<EOF
-<p>on the pledge <strong>$title</strong>.</p>
-EOF;
+    }
+    print '</blockquote>';
+    if ($q_what != 'pledge') {
+        print "<p>on the pledge <strong>$title</strong>.</p>";
     }
 
     print <<<EOF

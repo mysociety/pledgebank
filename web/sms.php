@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.15 2005-04-23 09:26:24 matthew Exp $
+ * $Id: sms.php,v 1.16 2005-04-30 14:35:50 matthew Exp $
  * 
  */
 
@@ -34,7 +34,7 @@ if (is_null($q_token)) {
                 for update', $q_token);
     if (is_null($r)) {
         bad_token($q_unchecked_token);
-    } else if (!isset($r['signer_id'])) {
+    } elseif (!isset($r['signer_id'])) {
         /* We're not signed up (because we haven't had confirmation that the
          * conversion SMS was delivered, presumably). Try a signup now. */
         $res = pledge_dbresult_to_code(

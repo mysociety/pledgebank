@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.27 2005-04-29 18:49:45 francis Exp $
+ * $Id: pb.css,v 1.28 2005-04-30 14:35:50 matthew Exp $
  * 
  */
 
@@ -37,6 +37,9 @@ h1 span.logo_bank {
 a:link { color: #9C7BBD; }
 a:visited { color: #9C7BBD; }
 a:hover, a:active { color: #000000; }
+blockquote {
+    font-style: italic;
+}
 
 #start a {
 	float: right;

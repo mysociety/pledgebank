@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.25 2005-04-30 15:54:30 francis Exp $
+ * $Id: announce.php,v 1.26 2005-04-30 20:59:58 matthew Exp $
  * 
  */
 
@@ -49,7 +49,11 @@ if ($data['circumstance'] == 'success-auto-creator' or $data['circumstance'] == 
 } else {
     err("Internal error, unknown announce circumstance '" . $data['circumstance']) . "'";
 }
-$circumstance_count = $data['circumstance_count'];
+if (array_key_exists('circumstance_count', $data)) {
+    $circumstance_count = $data['circumstance_count'];
+} else {
+    $circumstance_count = 0;
+}
 
 /* Verify that we haven't already sent the announcement. */
 if (!is_null(db_getOne("select id from message where pledge_id = ? and circumstance = ?

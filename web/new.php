@@ -5,11 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.1 2005-04-29 15:14:12 francis Exp $
+// $Id: new.php,v 1.2 2005-04-30 15:54:30 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
+require_once '../phplib/auth.php';
 require_once '../phplib/comments.php';
 require_once '../../phplib/utility.php';
 
@@ -359,7 +360,7 @@ if ($v=='password') print ' Only people to whom I give a password I have specifi
 function create_new_pledge($data) {
     # 'title', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'parseddate', 'date', 'signup', 'country', 'postcode', 'password'
     $isodate = $data['parseddate']['iso'];
-    $token = pledge_random_token();
+    $token = auth_random_token();
     if ($data['visibility'] == 'all')
         $data['password'] = null;
     $data['id'] = db_getOne("select nextval('pledges_id_seq')");

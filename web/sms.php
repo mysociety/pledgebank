@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.16 2005-04-30 14:35:50 matthew Exp $
+ * $Id: sms.php,v 1.17 2005-04-30 15:54:30 francis Exp $
  * 
  */
 
@@ -14,6 +14,7 @@ require_once "../phplib/db.php";
 require_once "../phplib/pb.php";
 require_once "../phplib/fns.php";
 require_once "../phplib/pledge.php";
+require_once "../phplib/auth.php";
 
 require_once "../../phplib/importparams.php";
 require_once "../../phplib/utility.php";
@@ -99,7 +100,7 @@ EOF;
                     $row = db_getRow('select * from pledges where id = ?', $pledge_id);
                     if ($r == PLEDGE_OK) {
                         /* New email address */
-                        $token = pledge_token_store(
+                        $token = auth_token_store(
                                         'signup-web',
                                         array(
                                             'email' => $q_email,

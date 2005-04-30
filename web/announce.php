@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.24 2005-04-29 10:53:34 francis Exp $
+ * $Id: announce.php,v 1.25 2005-04-30 15:54:30 francis Exp $
  * 
  */
 
@@ -14,6 +14,7 @@ require_once "../phplib/db.php";
 require_once "../phplib/pb.php";
 require_once "../phplib/fns.php";
 require_once "../phplib/pledge.php";
+require_once "../phplib/auth.php";
 
 require_once "../../phplib/importparams.php";
 require_once "../../phplib/evel.php";
@@ -29,7 +30,7 @@ if (!is_null($err))
         . join(",", array_values($err)));
 
 /* Extract data for token and pledge, and lock the latter. */
-if (!($data = pledge_token_retrieve('announce-post', $q_token))
+if (!($data = auth_token_retrieve('announce-post', $q_token))
     || !($pledge = db_getRow('select * from pledges where id = ? for update',
                     $data['pledge_id'])))
     err("The link hasn't been recognised.  Please check the URL is copied correctly from your email."); /* XXX make this a single, friendlier error message. */
@@ -147,7 +148,7 @@ if (!sizeof($errors) && $q_submit) {
                        "Update on the pledge you've signed - '${pledge['title']}' at PledgeBank.com",
                 $q_message_body, $do_sms ? $q_message_sms : null));
     # Don't destroy token, so we can give proper errors when trying to resend.
-    # pledge_token_destroy('announce-post', $q_token);
+    # auth_token_destroy('announce-post', $q_token);
     db_commit();
 
     print "<p>Your message will now be sent to all the people who signed your pledge. ";

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.33 2005-04-22 19:58:24 matthew Exp $
+ * $Id: confirm.php,v 1.34 2005-04-30 15:54:30 francis Exp $
  * 
  */
 
@@ -14,6 +14,7 @@ require_once "../phplib/db.php";
 require_once "../phplib/pb.php";
 require_once "../phplib/fns.php";
 require_once "../phplib/pledge.php";
+require_once "../phplib/auth.php";
 
 require_once "../../phplib/importparams.php";
 
@@ -48,13 +49,13 @@ if ($q_type == 'pledge') {
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
      * pledge. */
-    $data = pledge_token_retrieve('signup-web', $q_token);
+    $data = auth_token_retrieve('signup-web', $q_token);
     if (!$data) {
         err("Your signature hasn't been recognised.  Please check the URL is copied correctly from your email.");
     }
     # Note that we do NOT delete the token, so it doesn't give an error if they
     # double confirm.
-    # pledge_token_destroy('signup-web', $q_token);
+    # auth_token_destroy('signup-web', $q_token);
 
     $title = db_getOne('select title from pledges where id = ?',
                         $data['pledge_id']);
@@ -115,7 +116,7 @@ if ($q_type == 'pledge') {
             db_rollback();  /* just in case -- shouldn't matter though */
             # Note that we do NOT delete the token, so they can get the error
             # again.
-            # pledge_token_destroy('signup-web', $q_token);
+            # auth_token_destroy('signup-web', $q_token);
             db_commit();
         }
         if ($r == PLEDGE_SIGNED) {

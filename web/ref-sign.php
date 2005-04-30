@@ -5,11 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.1 2005-04-29 15:14:12 francis Exp $
+// $Id: ref-sign.php,v 1.2 2005-04-30 15:54:30 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
+require_once '../phplib/auth.php';
 require_once '../phplib/comments.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/importparams.php';
@@ -59,7 +60,7 @@ function do_sign() {
         /* Generate a secure URL to send to the user. */
         $data = array('email' => $q_email, 'name' => $q_name, 
                 'showname' => $q_showname, 'pledge_id' => $r['id']);
-        $token = pledge_token_store('signup-web', $data);
+        $token = auth_token_store('signup-web', $data);
 
         $url = OPTION_BASE_URL . "/I/" . $token;
         $success = pb_send_email_template($q_email, 'signature-confirm-ok',

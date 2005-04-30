@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.159 2005-04-29 15:14:12 francis Exp $
+// $Id: index.php,v 1.160 2005-04-30 18:31:29 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -14,7 +14,7 @@ require_once '../phplib/comments.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
-page_header(null);
+page_header(null, array('rss'=>1));
 front_page();
 page_footer();
 

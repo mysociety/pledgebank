@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: announce.php,v 1.26 2005-04-30 20:59:58 matthew Exp $
+ * $Id: announce.php,v 1.27 2005-05-02 22:27:44 matthew Exp $
  * 
  */
 
@@ -157,7 +157,7 @@ if (!sizeof($errors) && $q_submit) {
 
     print "<p>Your message will now be sent to all the people who signed your pledge. ";
     if ($success)
-        print "Thanks, and enjoy carrying out you pledge!</p>";
+        print "Thanks, and enjoy carrying out your pledge!</p>";
     else 
         print "Thanks, and good luck with your pledge!</p>";
 } else {

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.35 2005-04-30 14:35:48 matthew Exp $
+ * $Id: admin-pb.php,v 1.36 2005-05-02 22:27:43 matthew Exp $
  * 
  */
 
@@ -260,7 +260,7 @@ class ADMIN_PAGE_PB_LATEST {
     function show_latest_changes() {
         $q = db_query('SELECT signers.name, signers.email,
                               signers.mobile, signtime, showname, pledges.title,
-                              pledges.ref,
+                              pledges.ref, pledges.id
                               extract(epoch from signtime) as epoch
                          FROM signers, pledges
                         WHERE signers.pledge_id = pledges.id
@@ -325,7 +325,7 @@ dd {
 </style>
 <?
         print '<dl>';
-        $date = '';
+        $date = ''; # $signed = array();
         foreach ($time as $epoch => $datas) {
             $curdate = date('jS F Y', $epoch);
             if ($date != $curdate) {
@@ -343,6 +343,9 @@ dd {
                 if ($data['showname'] == 'f') {
                     print ' (anonymously)';
                 }
+#                if ($data['email']) {
+#                    $signed[$data['id']][$data['email']] = 1;
+#                }
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, ";
                 if ($data['confirmed']=='f') {
@@ -350,6 +353,7 @@ dd {
                 } else {
                     print $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (confirmed)';
                 }
+                print " by $data[name] &lt;$data[email]&gt;";
             } elseif (array_key_exists('whenreceived', $data)) {
                 print "Incoming SMS from $data[sender] received, sent
                 $data[whensent], message $data[message]
@@ -368,6 +372,9 @@ dd {
                 if (array_key_exists('email', $res)) {
                     print "for $res[name] $res[email], pledge " .
                     $this->pledge_link('id', $res['pledge_id']);
+#                    if ($signed[$res['pledge_id']][$res['email']]) {
+#                        print ' - confirmed';
+#                    }
                 } elseif (array_key_exists('circumstance', $res)) {
                     print "for pledge " . $this->pledge_link('id', $res['pledge_id']);
                 }

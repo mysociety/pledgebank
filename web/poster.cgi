@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.39 2005-04-19 14:55:54 sandpit Exp $
+# $Id: poster.cgi,v 1.40 2005-05-03 11:40:04 matthew Exp $
 #
 
 import os
@@ -54,6 +54,8 @@ sys.path.append("../../pylib")
 import mysociety.config
 mysociety.config.set_file("../conf/general")
 
+import PyRTF
+
 from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.pdfbase.pdfmetrics import _fonts
 from reportlab.lib.fonts import addMapping
@@ -69,8 +71,8 @@ addMapping('rockwell', 1, 1, 'Rockwell')
 db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
 
 types = ["cards", "tearoff", "flyers16", "flyers4", "flyers1", "flyers8"]
-sizes = ["A4","A7"]
-formats = ["pdf", "png", "gif"]
+sizes = ["A4", "A7"]
+formats = ["pdf", "png", "gif", "rtf"]
 
 def ordinal(day):
     if day==11 or day==12:
@@ -152,6 +154,71 @@ def tearoff():
         text = "www.pledgebank.com/%s" % ref
         c.drawCentredString(stripheight/2, (0.7-x)*cm, text)
     c.showPage()
+
+############################################################################
+# Flyers using PyRTF for RTF generation
+
+def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
+    w = x2 - x1
+    h = y2 - y1
+
+    # Main body text
+    dots_body_gap = w/30
+
+    # Check web domain fits, as that is long word that doesn't fit on
+    # (and platypus/reportlab doesn't raise an error in that case)
+    webdomain_text = '''<font size="+3" color="#522994"><b>%s/%s</b></font>''' % (mysociety.config.get('WEB_DOMAIN'), ref)
+#    webdomain_para = Paragraph(webdomain_text)
+#    webdomain_allowed_width = w - dots_body_gap * 2
+#    webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]
+#    if webdomain_width > webdomain_allowed_width:
+#        return False
+    # print >>sys.stderr, "webdomain_width ", webdomain_width, w
+
+    # Draw text
+    identity = ''
+    if pledge['identity']:
+        identity = ', ' + pledge['identity']
+    story = PyRTF.Section()
+    story.extend([
+        PyRTF.Paragraph(PyRTF.TEXT('If', bold=True), ' ', PyRTF.TEXT('%s' % pledge['target'], colour=ss.Colours.pb),
+        ''' %s will %s, then ''' % (pledge['type'], pledge['signup']), PyRTF.TEXT('I',colour=ss.Colours.pb),
+        ' will %s.' % pledge['title']),
+        PyRTF.Paragraph(PyRTF.ParagraphPS(alignment=2), u'\u2014 '.encode('utf-8'), PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
+        PyRTF.Paragraph(''),
+    ])
+
+    if 'detail' in keywords and keywords['detail'] and pledge['detail']:
+        story.append( PyRTF.Paragraph(PyRTF.TEXT('More details:',bold=True), ' ', pledge['detail']))
+
+    password_text = ""
+    if pledge['password']:
+        password_text = ''' password <font color="#522994" size="+2">%s</font>''' % userpassword
+
+    story.extend([
+        PyRTF.Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994">
+            <b>pledge %s</b></font> to ''' % ref, PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True), ''' or pledge at %s%s''' % 
+            (webdomain_text, password_text)),
+        PyRTF.Paragraph(' This pledge closes on ', PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), '. Thanks!'),
+        PyRTF.Paragraph('''
+            <b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
+            costs your normal text rate. Further messages are free. Questions?
+            08453 330 160 or team@pledgebank.com.
+            ''')
+    ])
+
+    c.Sections.append(story)
+#    f = Frame(x1, y1, w, h, showBoundary = 0, 
+#        leftPadding = dots_body_gap, rightPadding = dots_body_gap, 
+#        topPadding = dots_body_gap/2, bottomPadding = h_purple + dots_body_gap/2
+#        )
+#    f.addFromList(story, c)
+
+    # If it didn't fit, say so
+#    if len(story) > 0:
+#        return False
+    return True
+
 
 ############################################################################
 # Flyers using reportlab.platypus for word wrapping
@@ -444,10 +511,10 @@ while fcgi.isFCGI():
                 req.out.write("Content-Type: image/png\r\n\r\n")
             elif format == 'gif':
                 req.out.write("Content-Type: image/gif\r\n\r\n")
+            elif format == 'rtf':
+                req.out.write("Content-Type: text/rtf\r\n\r\n")
             else:
                 req.out.write("Content-Type: text/plain\r\n\r\n")
-
-        # Cache file checking
 
         def file_to_stdout(filename):
             f = file(filename, 'rb')
@@ -459,9 +526,48 @@ while fcgi.isFCGI():
         outpdf = "%s_%s_%s.pdf" % (ref, size, type)
         outfile = "%s_%s_%s.%s" % (ref, size, type, format)
 
+        # Cache file checking
+
         if os.path.exists(outdir + '/' + outfile) and incgi:
             # Use cache file
             file_to_stdout(outdir + '/' + outfile)
+        elif format == 'rtf':
+            (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir, prefix='tmp')
+            DR = PyRTF.Renderer()
+            doc = PyRTF.Document()
+            ss = doc.StyleSheet
+            ss.Colours.append( PyRTF.Colour('pb', 82, 41, 9*16+4)) # 522994
+
+            (page_width, page_height) = papersizes[size]
+            if size == 'A4':
+                margin_top = 1 * cm
+                margin_left = 1 * cm
+                margin_bottom = 1 * cm
+                margin_right = 1 * cm
+
+            flyer_width = (page_width - margin_left - margin_right)
+            flyer_height = (page_height - margin_top - margin_bottom)
+
+            # Try different font sizes on a hidden canvas to get the largest
+            dummyc = PyRTF.Document()
+            size = 3.0
+            while True:
+                ok = flyerRTF(dummyc, 0, 0, flyer_width, flyer_height, size, detail=True);
+                if ok:
+                    break
+                size = size * 19 / 20
+                if size * 50 < 10:
+                    raise Exception("Pledge text wouldn't fit on page")
+
+            flyerRTF(doc, margin_left, margin_bottom, 
+                flyer_width + margin_left, flyer_height + margin_bottom,
+                size, detail=True)
+
+            DR.Write(doc, file(canvasfilename, 'w'))
+            os.rename(canvasfilename, outdir + '/' + outfile)
+            os.chmod(outdir + '/' + outfile, 0644)
+            if (incgi):
+                file_to_stdout(outdir + '/' + outfile)
         else:
             # Generate PDF file
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
@@ -510,7 +616,7 @@ while fcgi.isFCGI():
 
     except Exception, e:
         req.out.write("Content-Type: text/plain\r\n\r\n")
-        req.out.write("Sorry, we weren't able to make your PDF.\n\n")
+        req.out.write("Sorry, we weren't able to make your poster.\n\n")
         req.out.write(string.join(e.args,' '))
 
     req.Finish()

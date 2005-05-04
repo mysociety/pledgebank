@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.2 2005-04-30 15:54:30 francis Exp $
+// $Id: new.php,v 1.3 2005-05-04 11:22:09 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -113,8 +113,10 @@ function pledge_form_two($data, $errors = array()) {
 ?>
 
 <p>Your pledge looks like this so far:</p>
-<?  $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
-    pledge_box($row);
+<?  
+    $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
+    $partial_pledge = new Pledge($row);
+    $partial_pledge->render_box(array());
 ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
@@ -218,7 +220,7 @@ function step1_error_check($data) {
     $disallowed_refs = array('contact');
     if (!$data['ref']) $errors['ref'] = 'Please enter a PledgeBank reference';
     elseif (strlen($data['ref'])<6) $errors['ref'] = 'The reference must be at least six characters long';
-    elseif (strlen($data['ref'])>13) $errors['ref'] = 'The reference must be at most 13 characters long';
+    elseif (strlen($data['ref'])>13) $errors['ref'] = 'The reference can be at most 13 characters long';
     elseif (in_array($data['ref'], $disallowed_refs)) $errors['ref'] = 'That reference is not allowed.';
     if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = 'The reference must only contain letters, numbers, or a hyphen';
 
@@ -320,9 +322,12 @@ function preview_pledge($data) {
 #    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
 ?>
 <p>Your pledge, with reference <em><?=$data['ref'] ?></em>, will look like this:</p>
-<?  $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
-    pledge_box($row);
-    /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ ?>
+<?  
+    $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
+    $partial_pledge = new Pledge($row);
+    $partial_pledge->render_box(array());
+    /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ 
+?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
 <h2>New Pledge &#8211; Step 3 of 3</h2>

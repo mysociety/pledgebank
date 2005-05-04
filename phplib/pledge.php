@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.51 2005-04-30 15:54:29 francis Exp $
+ * $Id: pledge.php,v 1.52 2005-05-04 11:22:08 francis Exp $
  * 
  */
 
@@ -19,23 +19,35 @@ class Pledge {
     var $data;
     // Escaped ref used for URLs
     var $h_ref;
-    
+
     // Construct from ref (TODO: probably can overload this for id constructor)
     function Pledge($ref) {
-        $q = db_query('SELECT *, 
-                           pb_current_date() <= pledges.date AS open,
-                           (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
-                       FROM pledges
-                       WHERE ref ILIKE ?', array($ref));
-        if (!db_num_rows($q))
-            err('PledgeBank reference not known');
-        $this->data = db_fetch_array($q);
+        if (gettype($ref) == "string") {
+            $q = db_query('SELECT *, 
+                               pb_current_date() <= pledges.date AS open,
+                               (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
+                           FROM pledges
+                           WHERE ref ILIKE ? AND confirmed', array($ref));
+            if (!db_num_rows($q))
+                err('PledgeBank reference not known');
+            $this->data = db_fetch_array($q);
+        } elseif (gettype($ref) == "array") {
+            $this->data = $ref;
+        } else {
+            err("Unknown type '" . gettype($ref) . "' to Pledge constructor");
+        }
 
         $this->_calc();
     }
 
     // Internal function to calculate some values from data
     function _calc() {
+        // Fill in partial pledges (ones being made still)
+        if (!array_key_exists('signers', $this->data)) $this->data['signers'] = 0;
+        if (!array_key_exists('confirmed', $this->data)) $this->data['confirmed'] = 'f';
+        if (!array_key_exists('open', $this->data)) $this->data['open'] = 't';
+
+        // Some calculations 
         $this->data['left'] = $this->data['target'] - $this->data['signers'];
         $this->data['confirmed'] = ($this->data['confirmed'] == 't');
         $this->data['open'] = ($this->data['open'] == 't');
@@ -49,10 +61,6 @@ class Pledge {
             if ($this->exactly())
                 $finished = true;
         $this->data['finished'] = $finished;
-
-        // Check is confirmed
-        if (!$this->data['confirmed'])
-            err('PledgeBank reference not known');
     }
 
     // Basic data access
@@ -72,6 +80,13 @@ class Pledge {
     // Basic data access for HTML display
     function h_title() { return htmlspecialchars($this->data['title']); }
     function h_name() { return htmlspecialchars($this->data['name']); }
+    function h_name_and_identity() {
+        return $this->h_name().
+                ((isset($this->data['identity']) && $this->data['identity']) ? 
+                    ', '. htmlspecialchars($this->data['identity'])
+                    : '');
+    }
+    function h_pretty_date() { return prettify(htmlspecialchars($this->data['date'])); }
 
     // Links.  The semantics here is that the URLs are all escaped, but didn't
     // need escaping.  They can safely be used in HTML or plain text.
@@ -88,8 +103,32 @@ class Pledge {
     // can contain the following:
     //     showdetails - if present, show "details" field
     function render_box($params) {
-        pledge_box($this->data, $this->signers(), $this->left(), $params);
+?>
+<div class="tips">
+<p style="margin-top: 0">&quot;<?=pledge_sentence($this->data, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
+<p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
+<p>Deadline: <strong><?=$this->h_pretty_date()?></strong>.
+<i><?=prettify($this->signers()) ?> <?=make_plural($this->signers(), 'person has', 'people have') ?> signed up<?=($this->left()<0?' ('.prettify(-$this->left()).' over target)':', '.prettify($this->left()).' more needed') ?></i>
+</p>
+<?
+        if (array_key_exists('showdetails', $params) && isset($this->data['detail']) && $this->data['detail']) {
+            $det = htmlspecialchars($this->data['detail']);
+            # regexs here borrowed from TWFY
+            preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);
+            foreach ($matches[0] as $match) {
+                $newmatch = $match;
+                if (substr($match,0,3)=='www') $newmatch = "http://$match";
+                $det = str_replace($match, '<a href="'.$newmatch.'">'.$match.'</a>', $det);
+            }
+            $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
+            $det = nl2br($det);
+            print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';
+        }
+?>
+</div>
+<?
     }
+
 }
 
 /* PLEDGE_...
@@ -191,32 +230,6 @@ function pledge_sentence($r, $params = array()) {
     $s = preg_replace('#\.\.#', '.', $s);
 
     return $s;
-}
-
-function pledge_box($r, $curr='', $left='', $params = array()) { ?>
-<div class="tips">
-<p style="margin-top: 0">&quot;<?=pledge_sentence($r, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
-<p align="right">&mdash; <?=$r['name'].((isset($r['identity']) && $r['identity'])?', '.$r['identity']:'') ?></p>
-<p>Deadline: <strong><?=prettify($r['date']) ?></strong>.
-<? if ($curr !== '') { ?>
-<i><?=prettify($curr) ?> <?=make_plural($curr, 'person has', 'people have') ?> signed up<?=($left<0?' ('.prettify(-$left).' over target)':', '.prettify($left).' more needed') ?></i>
-<? } ?>
-</p>
-<?
-    if (array_key_exists('showdetails', $params) && isset($r['detail']) && $r['detail']) {
-        $det = htmlspecialchars($r['detail']);
-        # regexs here borrowed from TWFY
-        preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);
-        foreach ($matches[0] as $match) {
-            $newmatch = $match;
-            if (substr($match,0,3)=='www') $newmatch = "http://$match";
-            $det = str_replace($match, '<a href="'.$newmatch.'">'.$match.'</a>', $det);
-        }
-        $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
-        $det = nl2br($det);
-        print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';
-    }
-    print '</div>';
 }
 
 /* pledge_is_successful PLEDGE

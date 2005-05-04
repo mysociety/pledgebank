@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.52 2005-05-04 11:22:08 francis Exp $
+ * $Id: pledge.php,v 1.53 2005-05-04 13:47:02 francis Exp $
  * 
  */
 
@@ -129,6 +129,9 @@ class Pledge {
 <?
     }
 
+    function sentence($params = array()) {
+        return pledge_sentence($this->data, $params);
+    }
 }
 
 /* PLEDGE_...

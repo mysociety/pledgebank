@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.36 2005-05-02 22:27:43 matthew Exp $
+ * $Id: admin-pb.php,v 1.37 2005-05-09 15:50:12 francis Exp $
  * 
  */
 
@@ -26,7 +26,7 @@ class ADMIN_PAGE_PB_MAIN {
 
     function pledge_header($sort) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
-        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time', 'f'=>'Front Page');
+        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time', 'p'=>'Prominance');
         foreach ($cols as $s => $col) {
             print '<th>';
             if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.'">';
@@ -40,22 +40,21 @@ class ADMIN_PAGE_PB_MAIN {
 
     function list_all_pledges() {
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdecsf]/', $sort)) $sort = 'd';
+        if (!$sort || preg_match('/[^ratdecsp]/', $sort)) $sort = 'd';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
         elseif ($sort=='t') $order = 'target';
         elseif ($sort=='d') $order = 'date';
         elseif ($sort=='e') $order = 'email';
         elseif ($sort=='c') $order = 'creationtime';
-        elseif ($sort=='f') $order = 'frontpage desc';
+        elseif ($sort=='p') $order = 'prominance desc';
         elseif ($sort=='s') $order = 'signers';
 
         $q = db_query("
-            SELECT id,ref,title,type,target,signup,date,name,email,confirmed,
+            SELECT id,ref,title,type,target,signup,date,name,email,confirmed,prominance,
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                pb_current_date() <= date AS open,
-                (SELECT count(*) FROM frontpage_pledges WHERE pledge_id=pledges.id) AS frontpage
+                pb_current_date() <= date AS open
             FROM pledges ORDER BY " . $order);
         $open = array();
         $closed = array();
@@ -73,8 +72,13 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '<td>'.prettify($r['date']).'</td>';
             $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
             $row .= '<td>'.$r['creationtime'].'</td>';
-            $row .= '<td><input type="checkbox" name="frontpage['.$r['id'].']" '
-                    . ($r['frontpage'] ? 'checked' : ''). ' value="1"></td>';
+
+            $row .= '<td><select name="prominance['.$r['id'].']">';
+            $row .= '<option value="normal" ' . ($r['prominance']=='normal'?'selected':'') . ' >normal</option';
+            $row .= '<option value="frontpage" ' . ($r['prominance']=='frontpage'?'selected':'') . ' >frontpage</option';
+            $row .= '<option value="backpage" ' . ($r['prominance']=='backpage'?'selected':'') . ' >backpage</option';
+            $row .= '</select></td>';
+
             if ($r['open'] == 't')
                 $open[] = $row;
             else
@@ -195,7 +199,6 @@ class ADMIN_PAGE_PB_MAIN {
             (SELECT id FROM signers WHERE pledge_id = ?)', array($id));
         db_query('DELETE FROM signers WHERE pledge_id = ?', array($id));
         db_query('DELETE FROM comment WHERE pledge_id = ?', array($id));
-        db_query('DELETE FROM frontpage_pledges WHERE pledge_id = ?', array($id));
         db_query('DELETE FROM pledges WHERE id = ?', array($id));
         db_commit();
         print '<p><em>That pledge has been successfully removed, along with all its signatories.</em></p>';
@@ -210,14 +213,13 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function update_changes() {
-        db_query('DELETE FROM frontpage_pledges');
-        if (array_key_exists('frontpage', $_POST)) {
-            foreach (array_keys($_POST['frontpage']) as $ref) {
-                db_query('INSERT INTO frontpage_pledges (pledge_id) values (?)', array($ref));
+        if (array_key_exists('prominance', $_POST)) {
+            foreach ($_POST['prominance'] as $id=>$value) {
+                db_query('UPDATE pledges set prominance = ? where id = ?', array($value, $id));
             }
         }
         db_commit();
-        print "<p><i>Changes to front page pledges saved</i></p>";
+        print "<p><i>Changes to pledge prominance saved</i></p>";
     }
 
     function display($self_link) {

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.77 2005-04-29 11:43:20 chris Exp $
+-- $Id: schema.sql,v 1.78 2005-05-09 15:50:12 francis Exp $
 --
 
 -- secret
@@ -103,7 +103,14 @@ create table pledges (
     removedsigneraftersuccess boolean not null default false,
 
     -- Record when a pledge succeeded.
-    whensucceeded timestamp
+    whensucceeded timestamp,
+
+    -- categorisation
+    prominance text not null default 'normal' check (
+        prominance = 'normal' or -- default
+        prominance = 'frontpage' or -- pledge appears on front page
+        prominance = 'backpage' ) -- pledge isn't in "all pledges" list
+    -- type ican
 );
 
 -- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
@@ -614,12 +621,6 @@ create table comment (
 
 create index comment_pledge_id_idx on comment(pledge_id);
 create index comment_pledge_id_whenposted_idx on comment(pledge_id, whenposted);
-
--- pledges which appear on front page are present in this table
-create table frontpage_pledges (
-    pledge_id integer not null references pledges(id)
-);
-create unique index frontpage_pledges_pledge_id_idx on frontpage_pledges(pledge_id);
 
 -- table of abuse reports on comments, pledges and signers.
 create table abusereport (

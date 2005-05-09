@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.47 2005-04-29 10:20:24 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.48 2005-05-09 15:50:12 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -203,8 +203,7 @@ sub create_pledge {
     $wth->browser_check_contents("You must now click on the link within the email we've just sent you");
 
     # Add all to front page
-    dbh()->do("delete from frontpage_pledges");
-    dbh()->do("insert into frontpage_pledges (select id from pledges)");
+    dbh()->do("update pledges set prominance = 'frontpage'");
     dbh()->commit();
 }
 
@@ -563,7 +562,7 @@ sub do_sms_pledge {
             target => '2', type => 'spoofed texting facilities', signup => 'do the same',
             date => '10th March', ref => $pledge_ref,
         },
-        { }
+        { detail => "Not sure what SMS is?  Find out here! www.wikipedia.org/wiki/Short_message_service Fab." }
     );
     confirm_pledge(100, $pledge_action_sms);
 

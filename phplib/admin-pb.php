@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.37 2005-05-09 15:50:12 francis Exp $
+ * $Id: admin-pb.php,v 1.38 2005-05-09 18:48:15 francis Exp $
  * 
  */
 
@@ -26,7 +26,7 @@ class ADMIN_PAGE_PB_MAIN {
 
     function pledge_header($sort) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
-        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time', 'p'=>'Prominance');
+        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time', 'p'=>'Prominence');
         foreach ($cols as $s => $col) {
             print '<th>';
             if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.'">';
@@ -47,11 +47,11 @@ class ADMIN_PAGE_PB_MAIN {
         elseif ($sort=='d') $order = 'date';
         elseif ($sort=='e') $order = 'email';
         elseif ($sort=='c') $order = 'creationtime';
-        elseif ($sort=='p') $order = 'prominance desc';
+        elseif ($sort=='p') $order = 'prominence desc';
         elseif ($sort=='s') $order = 'signers';
 
         $q = db_query("
-            SELECT id,ref,title,type,target,signup,date,name,email,confirmed,prominance,
+            SELECT id,ref,title,type,target,signup,date,name,email,confirmed,prominence,
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 pb_current_date() <= date AS open
@@ -73,10 +73,10 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
             $row .= '<td>'.$r['creationtime'].'</td>';
 
-            $row .= '<td><select name="prominance['.$r['id'].']">';
-            $row .= '<option value="normal" ' . ($r['prominance']=='normal'?'selected':'') . ' >normal</option';
-            $row .= '<option value="frontpage" ' . ($r['prominance']=='frontpage'?'selected':'') . ' >frontpage</option';
-            $row .= '<option value="backpage" ' . ($r['prominance']=='backpage'?'selected':'') . ' >backpage</option';
+            $row .= '<td><select name="prominence['.$r['id'].']">';
+            $row .= '<option value="normal" ' . ($r['prominence']=='normal'?'selected':'') . ' >normal</option';
+            $row .= '<option value="frontpage" ' . ($r['prominence']=='frontpage'?'selected':'') . ' >frontpage</option';
+            $row .= '<option value="backpage" ' . ($r['prominence']=='backpage'?'selected':'') . ' >backpage</option';
             $row .= '</select></td>';
 
             if ($r['open'] == 't')
@@ -213,13 +213,13 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function update_changes() {
-        if (array_key_exists('prominance', $_POST)) {
-            foreach ($_POST['prominance'] as $id=>$value) {
-                db_query('UPDATE pledges set prominance = ? where id = ?', array($value, $id));
+        if (array_key_exists('prominence', $_POST)) {
+            foreach ($_POST['prominence'] as $id=>$value) {
+                db_query('UPDATE pledges set prominence = ? where id = ?', array($value, $id));
             }
         }
         db_commit();
-        print "<p><i>Changes to pledge prominance saved</i></p>";
+        print "<p><i>Changes to pledge prominence saved</i></p>";
     }
 
     function display($self_link) {

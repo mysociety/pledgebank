@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.161 2005-05-09 15:50:12 francis Exp $
+// $Id: index.php,v 1.162 2005-05-09 18:48:15 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -126,7 +126,7 @@ function list_frontpage_pledges() {
                 SELECT *, date - pb_current_date() AS daysleft
                 FROM pledges
                 WHERE 
-                prominance = 'frontpage' AND
+                prominence = 'frontpage' AND
                 date >= pb_current_date() AND 
                 password is NULL AND confirmed
                 ORDER BY id");

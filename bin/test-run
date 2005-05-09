@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.49 2005-05-09 17:33:33 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.50 2005-05-09 18:48:15 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -203,7 +203,7 @@ sub create_pledge {
     $wth->browser_check_contents("You must now click on the link within the email we've just sent you");
 
     # Add all to front page
-    dbh()->do("update pledges set prominance = 'frontpage'");
+    dbh()->do("update pledges set prominence = 'frontpage'");
     dbh()->commit();
 }
 

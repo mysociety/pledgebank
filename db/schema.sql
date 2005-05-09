@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.78 2005-05-09 15:50:12 francis Exp $
+-- $Id: schema.sql,v 1.79 2005-05-09 18:48:15 francis Exp $
 --
 
 -- secret
@@ -106,10 +106,10 @@ create table pledges (
     whensucceeded timestamp,
 
     -- categorisation
-    prominance text not null default 'normal' check (
-        prominance = 'normal' or -- default
-        prominance = 'frontpage' or -- pledge appears on front page
-        prominance = 'backpage' ) -- pledge isn't in "all pledges" list
+    prominence text not null default 'normal' check (
+        prominence = 'normal' or -- default
+        prominence = 'frontpage' or -- pledge appears on front page
+        prominence = 'backpage' ) -- pledge isn't in "all pledges" list
     -- type ican
 );
 

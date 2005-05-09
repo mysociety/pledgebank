@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.53 2005-05-04 13:47:02 francis Exp $
+ * $Id: pledge.php,v 1.54 2005-05-09 15:07:51 francis Exp $
  * 
  */
 
@@ -115,11 +115,15 @@ class Pledge {
             $det = htmlspecialchars($this->data['detail']);
             # regexs here borrowed from TWFY
             preg_match_all("/((http(s?):\/\/)|(www\.))([a-zA-Z\d\_\.\+\,\;\?\%\~\-\/\#\='\*\$\!\(\)\&]+)([a-zA-Z\d\_\?\%\~\-\/\#\='\*\$\!\(\)\&])/", $det, $matches);
+            $search_arr = array();
+            $replace_arr = array();
             foreach ($matches[0] as $match) {
                 $newmatch = $match;
                 if (substr($match,0,3)=='www') $newmatch = "http://$match";
-                $det = str_replace($match, '<a href="'.$newmatch.'">'.$match.'</a>', $det);
+                $search_arr[] = $match;
+                $replace_arr[] = '<a href="'.$newmatch.'">'.$match.'</a>';
             }
+            $det = str_replace($search_arr, $replace_arr, $det);
             $det = preg_replace("/([\w\.]+)(@)([\w\.\-]+)/i", "<a href=\"mailto:$0\">$0</a>", $det);
             $det = nl2br($det);
             print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';

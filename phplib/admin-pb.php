@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.38 2005-05-09 18:48:15 francis Exp $
+ * $Id: admin-pb.php,v 1.39 2005-05-10 10:09:08 francis Exp $
  * 
  */
 
@@ -262,7 +262,7 @@ class ADMIN_PAGE_PB_LATEST {
     function show_latest_changes() {
         $q = db_query('SELECT signers.name, signers.email,
                               signers.mobile, signtime, showname, pledges.title,
-                              pledges.ref, pledges.id
+                              pledges.ref, pledges.id,
                               extract(epoch from signtime) as epoch
                          FROM signers, pledges
                         WHERE signers.pledge_id = pledges.id

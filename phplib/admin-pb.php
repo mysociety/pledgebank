@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.40 2005-05-13 11:41:10 francis Exp $
+ * $Id: admin-pb.php,v 1.41 2005-05-13 12:00:34 francis Exp $
  * 
  */
 
@@ -60,9 +60,10 @@ class ADMIN_PAGE_PB_MAIN {
         $closed = array();
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
-            $row = '<td><a href="'.OPTION_BASE_URL . "/" . $r['ref'] .'">'.$r['ref'].'</a></td>';
-            $row .= '<td><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">'.
-            $r['title'].'</a>';
+            $row = '<td><a href="'.OPTION_BASE_URL . "/" . $r['ref'] .'">'.$r['ref'].'</a>'.
+                '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">(admin)</a>'.
+                '</td>';
+            $row .= '<td>'.  $r['title'];
             if ($r['confirmed'] == 'f') {
                 $row .= "<br><b>not confirmed</b>";
             }
@@ -423,7 +424,9 @@ dd {
         if (!$title) 
             $title = $ref;
         return '<a href="' . OPTION_BASE_URL . '/' . $ref . '">' .
-        htmlspecialchars($title) . '</a>';
+            htmlspecialchars($title) . '</a>'.
+            ' <a href="?page=pb&amp;pledge='.$ref.'">(admin)</a>'
+        ;
     }
 
     function display($self_link) {

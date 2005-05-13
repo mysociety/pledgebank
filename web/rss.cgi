@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 #
 # rss.cgi:
+# RSS feed of new pledges.
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.2 2005-04-25 18:43:54 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.3 2005-05-13 16:06:02 francis Exp $';
 
 use strict;
 use warnings;
@@ -96,8 +97,10 @@ sub get_pledges {
 "select id, ref, title, target, date, name, detail
    from pledges
    where confirmed
+   AND password IS NULL 
+   AND prominence <> \'backpage\'
    order by id desc 
-   limit $CONF{number_of_pledges}"
+limit $CONF{number_of_pledges}"
 );
 
     $query->execute;

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.20 2005-04-30 18:31:28 matthew Exp $
+// $Id: page.php,v 1.21 2005-05-13 16:06:02 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -29,7 +29,7 @@ function page_header($title, $params = array()) {
 <style type="text/css" media="all">@import url('/pb.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <?  if (array_key_exists('rss', $params))
-        print '<link rel="alternate" type="application/rss+xml" title="New Pledges at PledgeBank.com" href="/rss.cgi">';
+        print '<link rel="alternate" type="application/rss+xml" title="New Pledges at PledgeBank.com" href="/rss">';
 ?>
 <script type="text/javascript" src="/pb.js"></script>
 </head>

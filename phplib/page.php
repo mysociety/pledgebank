@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.21 2005-05-13 16:06:02 francis Exp $
+// $Id: page.php,v 1.22 2005-05-13 18:36:38 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -92,7 +92,7 @@ function page_footer($params = array()) {
 function print_this_link($link_text, $after_text) {
 ?>
 <script type="text/javascript">
-    document.write('<a href="javascript: window.print()"><?=$link_text?></a><?=$after_text?>');
+    document.write('<a href="javascript:window.print();"><?=$link_text?><\/a><?=$after_text?>');
 </script>
 <noscript>
 <?=$link_text?><?=$after_text?>

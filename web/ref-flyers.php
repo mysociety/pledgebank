@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.2 2005-04-29 18:49:45 francis Exp $
+// $Id: ref-flyers.php,v 1.3 2005-05-13 18:31:20 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -27,16 +27,19 @@ page_header($title);
 
 $pdf_flyers8_url = $p->url_flyer("A4_flyers8.pdf");
 $pdf_flyers1_url = $p->url_flyer("A4_flyers1.pdf");
+$rtf_flyers1_url = $p->url_flyer("A4_flyers1.rtf");
 $png_flyers8_url = $p->url_flyer("A4_flyers8.png");
 
 ?>
 <div class="noprint">
 <h2>Customised Flyers</h2>
-<p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s containing your pledge data, to print out, display, hand out, or whatever.</p>
+<p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s or editable <acronym title="Rich Text File">RTF</acronym>s (Word compatible) containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
 <li><? print_link_with_password($pdf_flyers8_url, "", "Flyers for handing out, 8 per page (A4, PDF" . (get_http_var("pw") ? "" : ", like picture below") . ")") ?> </li>
-<li><? print_link_with_password($pdf_flyers1_url, "", "Big poster" . 
-($p->has_details() ? ', including more details' : ''). " (A4, PDF)") ?> </li>
+<li><? print_link_with_password($pdf_flyers1_url, "", "A4 PDF poster" . 
+($p->has_details() ? ', including more details' : '') ) ?> </li>
+<li><? print_link_with_password($rtf_flyers1_url, "", "A4 editable poster (RTF)" . 
+($p->has_details() ? ', including more details' : '') ) ?> </li>
 </ul>
 </div>
 <?

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.40 2005-05-03 11:40:04 matthew Exp $
+# $Id: poster.cgi,v 1.41 2005-05-13 18:31:20 matthew Exp $
 #
 
 import os
@@ -162,62 +162,71 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
     w = x2 - x1
     h = y2 - y1
 
-    # Main body text
-    dots_body_gap = w/30
+    h_purple = 0.15*h
 
-    # Check web domain fits, as that is long word that doesn't fit on
-    # (and platypus/reportlab doesn't raise an error in that case)
-    webdomain_text = '''<font size="+3" color="#522994"><b>%s/%s</b></font>''' % (mysociety.config.get('WEB_DOMAIN'), ref)
-#    webdomain_para = Paragraph(webdomain_text)
-#    webdomain_allowed_width = w - dots_body_gap * 2
-#    webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]
-#    if webdomain_width > webdomain_allowed_width:
-#        return False
-    # print >>sys.stderr, "webdomain_width ", webdomain_width, w
+    # Scale font sizes - with minimum for extreme cases
+    small_writing = size * 12
+    if small_writing < 4:
+        small_writing = 4
+
+    # Set up styles
+    # leading generally small * 1.2, 0.9 on detail and smallprint, though, and 0 on footer
+    text_style = PyRTF.TextStyle( PyRTF.TextPS(font=ss.Fonts.Transport, size=int(small_writing) ) )
+    p_head = PyRTF.ParagraphStyle('header', text_style.Copy(), PyRTF.ParagraphPS(alignment=1, space_before = 0, space_after = 0) )
+    ss.ParagraphStyles.append(p_head)
+    text_style.TextPropertySet.SetSize(int(h_purple*4/5))
+    p_footer = PyRTF.ParagraphStyle('footer', text_style.Copy(), PyRTF.ParagraphPS(alignment=PyRTF.ParagraphPS.RIGHT, space_before = 0, space_after = 0) )
+    ss.ParagraphStyles.append(p_footer)
+    text_style.TextPropertySet.SetFont(ss.Fonts.Rockwell)
+    text_style.TextPropertySet.SetSize(int(small_writing))
+    p_normal = PyRTF.ParagraphStyle('normal', text_style.Copy(), PyRTF.ParagraphPS(alignment = 1, space_before = 0, space_after = int(size*200)) )
+    ss.ParagraphStyles.append(p_normal)
+    p_nospaceafter = PyRTF.ParagraphStyle('nospaceafter', text_style.Copy(), PyRTF.ParagraphPS(alignment = 1, space_before = 0, space_after = 10) )
+    ss.ParagraphStyles.append(p_nospaceafter)
+    text_style.TextPropertySet.SetSize(int(small_writing*0.75))
+    p_detail = PyRTF.ParagraphStyle('detail', text_style.Copy(), PyRTF.ParagraphPS(alignment = 1, space_before=0, space_after=int(size*100)) )
+    ss.ParagraphStyles.append(p_detail)
+    p_smallprint = PyRTF.ParagraphStyle('smallprint', text_style.Copy(), PyRTF.ParagraphPS(alignment=1, space_before=10, space_after=0) )
+    ss.ParagraphStyles.append(p_smallprint)
+
+    webdomain_text = PyRTF.TEXT('%s/%s' % (mysociety.config.get('WEB_DOMAIN'), ref), size=int(small_writing+6), bold=True, colour=ss.Colours.pb)
 
     # Draw text
     identity = ''
     if pledge['identity']:
         identity = ', ' + pledge['identity']
     story = PyRTF.Section()
+    story.Footer.append(PyRTF.Paragraph(ss.ParagraphStyles.footer, "PledgeBank.com"))
     story.extend([
-        PyRTF.Paragraph(PyRTF.TEXT('If', bold=True), ' ', PyRTF.TEXT('%s' % pledge['target'], colour=ss.Colours.pb),
+        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.B('If'), ' ', PyRTF.TEXT('%s' % pledge['target'], colour=ss.Colours.pb),
         ''' %s will %s, then ''' % (pledge['type'], pledge['signup']), PyRTF.TEXT('I',colour=ss.Colours.pb),
         ' will %s.' % pledge['title']),
-        PyRTF.Paragraph(PyRTF.ParagraphPS(alignment=2), u'\u2014 '.encode('utf-8'), PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
-        PyRTF.Paragraph(''),
+        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\x97 ', PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
+        PyRTF.Paragraph(ss.ParagraphStyles.detail, ''),
     ])
 
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
-        story.append( PyRTF.Paragraph(PyRTF.TEXT('More details:',bold=True), ' ', pledge['detail']))
+        d = pledge['detail'].split("\n\n")
+        story.append(PyRTF.Paragraph(ss.ParagraphStyles.detail, PyRTF.B('More details:'), ' ', d[0]))
+        if len(d)>0:
+            story.extend(
+                map(lambda text: PyRTF.Paragraph(ss.ParagraphStyles.detail, text), d[1:])
+            )
 
-    password_text = ""
+    text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, PyRTF.TEXT('Text', size=int(small_writing+4)),
+            ' ', PyRTF.TEXT('pledge %s' % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
+            ' to ', PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
+            ' or pledge at ', webdomain_text)
     if pledge['password']:
-        password_text = ''' password <font color="#522994" size="+2">%s</font>''' % userpassword
+        text_para.append(' password ', PyRTF.TEXT('%s' % userpassword, colour=ss.Colours.pb, size=int(small_writing+4)))
 
-    story.extend([
-        PyRTF.Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994">
-            <b>pledge %s</b></font> to ''' % ref, PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True), ''' or pledge at %s%s''' % 
-            (webdomain_text, password_text)),
-        PyRTF.Paragraph(' This pledge closes on ', PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), '. Thanks!'),
-        PyRTF.Paragraph('''
-            <b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
-            costs your normal text rate. Further messages are free. Questions?
-            08453 330 160 or team@pledgebank.com.
-            ''')
+    story.extend([ text_para, 
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, 'This pledge closes on ', PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), '. Thanks!'),
+        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
+            ' SMS operated by charity UKCOD. Sign-up message costs your normal text rate. Further messages are free. Questions? 08453 330 160 or team@pledgebank.com.')
     ])
 
     c.Sections.append(story)
-#    f = Frame(x1, y1, w, h, showBoundary = 0, 
-#        leftPadding = dots_body_gap, rightPadding = dots_body_gap, 
-#        topPadding = dots_body_gap/2, bottomPadding = h_purple + dots_body_gap/2
-#        )
-#    f.addFromList(story, c)
-
-    # If it didn't fit, say so
-#    if len(story) > 0:
-#        return False
-    return True
 
 
 ############################################################################
@@ -415,6 +424,7 @@ def flyers(number, papersize='A4', **keywords):
                 along * flyer_width + margin_left, down * flyer_height + margin_bottom, 
                 (along + 1) * flyer_width + margin_left, (down + 1) * flyer_height + margin_bottom,
                 size, **keywords)
+    return size
 
 ############################################################################
 
@@ -527,16 +537,25 @@ while fcgi.isFCGI():
         outfile = "%s_%s_%s.%s" % (ref, size, type, format)
 
         # Cache file checking
-
         if os.path.exists(outdir + '/' + outfile) and incgi:
             # Use cache file
             file_to_stdout(outdir + '/' + outfile)
         elif format == 'rtf':
+            # Generate PDF file to get correct font size
+            (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
+            c = canvas.Canvas(canvasfilename, pagesize=papersizes[size])
+            neededsize = flyers(1, size, detail = True)
+            neededsize = neededsize * 1.9 # The MAGIC CONSTANT
+
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir, prefix='tmp')
-            DR = PyRTF.Renderer()
-            doc = PyRTF.Document()
-            ss = doc.StyleSheet
-            ss.Colours.append( PyRTF.Colour('pb', 82, 41, 9*16+4)) # 522994
+            ss = PyRTF.StyleSheet()
+            ss.Colours.append(PyRTF.Colour('pb', 82, 41, 9*16+4)) # 522994
+            ss.Fonts.append(PyRTF.Font('Rockwell', 'roman', 0))
+            ss.Fonts.append(PyRTF.Font('Transport', 'swiss', 0))
+            ps = PyRTF.ParagraphStyle('Body', PyRTF.TextStyle(PyRTF.TextPS(ss.Fonts.Arial, 22)), PyRTF.ParagraphPS(space_before=60, space_after=60))
+            ss.ParagraphStyles.append(ps)
+
+            doc = PyRTF.Document(style_sheet=ss, default_language=2057, view_kind=1, view_zoom_kind=0, view_scale=100)  
 
             (page_width, page_height) = papersizes[size]
             if size == 'A4':
@@ -548,21 +567,11 @@ while fcgi.isFCGI():
             flyer_width = (page_width - margin_left - margin_right)
             flyer_height = (page_height - margin_top - margin_bottom)
 
-            # Try different font sizes on a hidden canvas to get the largest
-            dummyc = PyRTF.Document()
-            size = 3.0
-            while True:
-                ok = flyerRTF(dummyc, 0, 0, flyer_width, flyer_height, size, detail=True);
-                if ok:
-                    break
-                size = size * 19 / 20
-                if size * 50 < 10:
-                    raise Exception("Pledge text wouldn't fit on page")
-
             flyerRTF(doc, margin_left, margin_bottom, 
                 flyer_width + margin_left, flyer_height + margin_bottom,
-                size, detail=True)
+                neededsize, detail=True)
 
+            DR = PyRTF.Renderer()
             DR.Write(doc, file(canvasfilename, 'w'))
             os.rename(canvasfilename, outdir + '/' + outfile)
             os.chmod(outdir + '/' + outfile, 0644)
@@ -614,10 +623,11 @@ while fcgi.isFCGI():
             if (incgi):
                 file_to_stdout(outdir + '/' + outfile)
 
+
     except Exception, e:
         req.out.write("Content-Type: text/plain\r\n\r\n")
         req.out.write("Sorry, we weren't able to make your poster.\n\n")
-        req.out.write(string.join(e.args,' '))
+        req.out.write(str(e) + "\n")
 
     req.Finish()
 

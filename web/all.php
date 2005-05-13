@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.3 2005-05-09 18:48:15 francis Exp $
+// $Id: all.php,v 1.4 2005-05-13 18:31:20 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -39,7 +39,13 @@ while ($r = db_fetch_row($q)) {
         $out .= '<tr><td>'.join('</td><td align="center">',array_map('prettify',$r)).'</td></tr>';
 }
 $out .= '</table>';
-print '<h2>Open Pledges 1-'.db_num_rows($q).':</h2>';
-print $out;
+if (db_num_rows($q)) {
+    print '<h2>Open Pledges 1-'.db_num_rows($q).':</h2>';
+    print $out;
+} else {
+    print '<h2>Open Pledges</h2><p>There are currently no open pledges.</p>';
+}
 
 page_footer();
+
+?>

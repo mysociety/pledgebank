@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.9 2005-04-29 15:14:12 francis Exp $
+// $Id: contact.php,v 1.10 2005-05-13 16:18:47 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -37,7 +37,7 @@ way to answer your question.
 		print '</li></ul>';
 	} ?>
 <form class="pledge" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1">
-<div class="fr"><label for="name">Your name</label>: <input type="text" id="name" name="name" value="<?=htmlentities(get_http_var('name')) ?>" size="32"></div>
+<div class="fr"><label for="name">Your name</label>: <input type="text" id="name" name="name" value="<?=htmlentities(get_http_var('name')) ?>" size="32" onblur="fadeout(this)" onfocus="fadein(this)" ></div>
 <div class="fr"><label for="email">Your email</label>: <input type="text" id="email" name="email" value="<?=htmlentities(get_http_var('email')) ?>" size="32"></div>
 <div class="fr"><label for="subject">Subject</label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>
 <div><label for="message">Message</label>:<br><textarea rows="7" cols="60" name="message" id="message"><?=htmlentities(get_http_var('message')) ?></textarea></div>

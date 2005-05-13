@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.3 2005-04-29 15:14:12 francis Exp $
+// $Id: faq.php,v 1.4 2005-05-13 15:55:18 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -110,6 +110,14 @@ puts their pledge up and forgets about it.
 set this relatively low cap of maximum subscribers. We can raise the
 cap for individuals and organisations who ask - just contact us if you
 want to launch a bigger pledge.
+
+<dt>How many people should I ask for?
+
+<dd>We recommend that you pick the lowest target you can possibly bare to.
+Choose the number of people for which you could only just be bothered to carry
+out your part of the pledge.  One less it wouldn't be worth it.  Don't put the
+value any higher than that.  This makes it most likely your pledge will succeed,
+and more people than you expected can always sign up.
 
 <dt>Who gets to see my email address?
 

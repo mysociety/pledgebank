@@ -1,11 +1,11 @@
 <?
 // test.php:
-// Part of test harness.  See ../test/run.pl for where this is called.
+// Part of test harness.  See ../bin/test-run.pl for where this is called.
 //
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francsi@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: test.php,v 1.7 2005-04-15 18:26:45 francis Exp $
+// $Id: test.php,v 1.8 2005-05-13 13:52:45 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';

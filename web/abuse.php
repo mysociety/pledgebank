@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.2 2005-04-30 14:35:50 matthew Exp $
+// $Id: abuse.php,v 1.3 2005-05-14 11:11:36 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -58,7 +58,7 @@ EOF;
     $title = htmlspecialchars(db_getOne('select title from pledges where id = ?', $pledge_id));
 
     print <<<EOF
-<form accept-charset="utf-8" action="./" method="post">
+<form accept-charset="utf-8" action="abuse" method="post">
 <h2>Report abusive $w</h2>
 <p>You are reporting the $w:</p> 
 <blockquote>

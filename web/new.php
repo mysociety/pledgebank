@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.3 2005-05-04 11:22:09 francis Exp $
+// $Id: new.php,v 1.4 2005-05-16 14:34:48 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -142,6 +142,24 @@ is fulfilled?
 <input type="radio" name="comparison" value="atleast"<?=($comparison == 'atleast') ? ' checked' : '' ?>> No
 </p> */?>
 
+<p>Does your pledge fit into a specific topic or category?</p>
+
+<select name="category">
+<option value="-1">no category</option>
+<?
+    /* XXX should do multiple categories, but ignore that for now. */
+    $s = db_query('select id, parent_category_id, name from category order by id');
+    while ($a = db_fetch_row($s)) {
+        list($id, $parent_id, $name) = $a;
+        printf("<option value=\"%s\">%s%s</option>",
+                    $id,
+                    (is_null($parent_id) ? '' : '&nbsp;-&nbsp;'),
+                    htmlspecialchars($name));
+    }
+
+?>
+</select>
+
 <p>Which country does your pledge apply to?
 <select name="country">
   <option<? if ($country=='Global') print ' selected'; ?>>Global</option>
@@ -259,7 +277,7 @@ function step2_error_check($data) {
 function pledge_form_two_submitted() {
     $errors = array();
     $data = array();
-    $fields = array('detail', 'identity', 'comparison', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
+    $fields = array('detail', 'identity', 'comparison', 'category', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
@@ -335,6 +353,16 @@ function preview_pledge($data) {
 <p>Please check the details you have entered, both the pledge above and other details below, and then either click "Create" to create your pledge, or one of the two "Back" buttons to go back and edit your data.</p>
 
 <ul>
+
+<li>Does your pledge fit into a specific topic or category?
+<em><?=
+    $data['category'] == -1
+        ? 'No'
+        : 'Yes: "'
+            . htmlspecialchars(db_getOne('select name from category where id = ?', $data['category'])) // XXX show enclosing cat?
+            . '"'
+?></em></li>
+
 <li>Which country does your pledge apply to?
 <em><?=htmlspecialchars($data['country']) ?></em>
 </li>
@@ -363,17 +391,49 @@ if ($v=='password') print ' Only people to whom I give a password I have specifi
 
 # Someone has submitted a new pledge
 function create_new_pledge($data) {
-    # 'title', 'people', 'name', 'email', 'ref', 'detail', 'comparison', 'type', 'parseddate', 'date', 'signup', 'country', 'postcode', 'password'
     $isodate = $data['parseddate']['iso'];
     $token = auth_random_token();
     if ($data['visibility'] == 'all')
         $data['password'] = null;
     $data['id'] = db_getOne("select nextval('pledges_id_seq')");
-    $add = db_query('INSERT INTO pledges (id, title, target, type, signup, date, datetext,
-        name, email, ref, token, confirmed, creationtime, detail,
-        comparison, country, postcode, password, identity) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, pb_current_timestamp(), ?, ?, ?, ?, ?, ?)', 
-        array($data['id'], $data['title'], $data['target'], $data['type'], $data['signup'], $isodate, $data['date'], $data['name'], $data['email'], $data['ref'], $token, $data['detail'], $data['comparison'], $data['country'], $data['postcode'], $data['password'] ? sha1($data['password']) : null, $data['identity']));
+    
+    $add = db_query('
+                insert into pledges (
+                    id, title, target,
+                    type, signup, date, datetext,
+                    name, email, ref, token,
+                    confirmed,
+                    creationtime,
+                    detail,
+                    comparison,
+                    country, postcode,
+                    password, identity
+                ) values (
+                    ?, ?, ?,
+                    ?, ?, ?, ?,
+                    ?, ?, ?, ?,
+                    false,
+                    pb_current_timestamp(),
+                    ?,
+                    ?,
+                    ?, ?,
+                    ?, ?
+                )', array(
+                    $data['id'], $data['title'], $data['target'],
+                    $data['type'], $data['signup'], $isodate, $data['date'],
+                    $data['name'], $data['email'], $data['ref'], $token,
+                    $data['detail'],
+                    $data['comparison'],
+                    $data['country'], $data['postcode'],
+                    $data['password'] ? sha1($data['password']) : null, $data['identity']
+                ));
+
+    if ($data['category'] != -1)
+        db_query('
+            insert into pledge_category (pledge_id, category_id)
+            values (?, ?)',
+            array($data['id'], $data['category']));
+
 ?>
 <h2>Now check your email...</h2>
 <p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other

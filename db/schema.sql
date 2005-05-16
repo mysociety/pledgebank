@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.79 2005-05-09 18:48:15 francis Exp $
+-- $Id: schema.sql,v 1.80 2005-05-16 13:33:02 chris Exp $
 --
 
 -- secret
@@ -50,6 +50,16 @@ create function pb_current_timestamp()
         end if;
     end;
 ' language 'plpgsql';
+
+-- categories in which pledges can lie
+create table category (
+    id serial not null primary key,
+    parent_category_id integer references category(id),
+    name text not null,
+    ican_id integer             -- integer ID shared with iCan
+);
+
+create unique index category_ican_id_idx on category(ican_id);
 
 -- information about each pledge
 create table pledges (
@@ -110,7 +120,12 @@ create table pledges (
         prominence = 'normal' or -- default
         prominence = 'frontpage' or -- pledge appears on front page
         prominence = 'backpage' ) -- pledge isn't in "all pledges" list
-    -- type ican
+);
+
+-- categories of which a pledge is member
+create table pledge_category (
+    pledge_id integer not null references pledges(id),
+    category_id integer not null references category(id)
 );
 
 -- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE

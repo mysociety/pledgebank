@@ -1,0 +1,79 @@
+#!/usr/bin/perl -w
+#
+# import-ican-categories:
+# Import top- and second-level categories from iCan for use in classifying
+# pledges.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: import-ican-categories,v 1.1 2005-05-16 13:33:02 chris Exp $';
+
+use strict;
+require 5.8.0;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use HTML::Entities;
+use LWP::Simple qw(get);
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+
+use PB;
+
+# C2655 appears to be "all issues".
+my $url = 'http://www.bbc.co.uk/dna/ican/C2655';
+my $t = get($url) or die "unable to retrieve $url";
+
+my (@xx) = ($t =~ m#<a (class="[^"]*"|) ?href="/dna/ican/[Cc](\d+)">([^<]+)#g);
+
+my %ican_id_to_id;
+
+my $p_ican_id = undef;
+while (@xx) {
+    my ($c, $ican_id, $name) = (shift(@xx), shift(@xx), shift(@xx));
+    my $parent_id;
+    my $id;
+
+    # Skip repeated categories in bottom-of-page navigation stuff.
+    next if (exists($ican_id_to_id{$ican_id}));
+
+    # Ignore special "top" category.
+    next if ($ican_id == 1290);
+
+    die "iCan ID #$ican_id already exists in the category table; has script already been run?"
+        if (scalar(dbh()->selectrow_array('select id from category where ican_id = ?', {}, $ican_id)));
+
+    $id = dbh()->selectrow_array("select nextval('category_id_seq')");
+    
+    $name =~ s/&nbsp;/ /g;
+    decode_entities($name);
+    $name =~ s/&/and/;
+    $name =~ s/\s+/ /;
+    $name =~ s/^\s+//;
+    $name =~ s/\s+$//;
+
+    $ican_id_to_id{$ican_id} = $id;
+    
+    if ($c) {
+        $parent_id = $ican_id_to_id{$p_ican_id};
+    } else {
+        $p_ican_id = $ican_id;
+        $parent_id = undef;
+    }
+
+    dbh()->do('insert into category (id, parent_category_id, ican_id, name) values (?, ?, ?, ?)', {}, $id, $parent_id, $ican_id, $name);
+}
+
+dbh()->commit();
+
+dbh()->disconnect();
+

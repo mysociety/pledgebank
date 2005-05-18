@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.80 2005-05-16 13:33:02 chris Exp $
+-- $Id: schema.sql,v 1.81 2005-05-18 12:56:56 chris Exp $
 --
 
 -- secret
@@ -60,6 +60,17 @@ create table category (
 );
 
 create unique index category_ican_id_idx on category(ican_id);
+
+-- users, but call the table person rather than user so we don't have to quote
+-- its name in every statement....
+create table person (
+    id serial not null primary key,
+    name text not null,
+    email text not null,
+    password text
+);
+
+create unique index person_email_idx on person(email);
 
 -- information about each pledge
 create table pledges (
@@ -675,3 +686,18 @@ create function abusereport_id_check()
 
 create trigger abusereport_insert_trigger before insert on abusereport
     for each row execute procedure abusereport_id_check();
+
+create table requeststash (
+    key char(8) not null primary key,
+    whensaved timestamp not null default pb_current_timestamp(),
+    method text not null default 'GET' check (
+            method = 'GET' or method = 'POST'
+        ),
+    url text not null,
+    -- contents of POSTed form
+    post_data bytea check (
+            (post_data is null and method = 'GET') or
+            (post_data is not null and method = 'POST')
+        ),
+    extra text
+);

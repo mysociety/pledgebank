@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: db.php,v 1.15 2005-04-05 14:07:41 sandpit Exp $
+// $Id: db.php,v 1.16 2005-05-18 12:56:56 chris Exp $
 
 require_once "DB.php";
 require_once "../../phplib/utility.php";
@@ -87,6 +87,20 @@ function db_getRow($query, $params = array()) {
     if (DB::isError($result)) {
         die($result->getMessage().': "'.$result->getDebugInfo().'"; query was: ' . $query);
     }
+    return $result;
+}
+
+/* db_getRow_list QUERY PARAMETERS
+ * Like db_getRow, but return an array not an associative array. */
+function db_getRow_list($query, $params = array()) {
+    global $pbdb;
+    if (!is_array($params))
+        $params = array($params);
+    if (!isset($pbdb))
+        db_connect();
+    $result = $pbdb->getRow($query, $params, DB_FETCHMODE_ORDERED);
+    if (DB::isError($result))
+        die($result->getMessage().': "'.$result->getDebugInfo().'"; query was: ' . $query);
     return $result;
 }
 

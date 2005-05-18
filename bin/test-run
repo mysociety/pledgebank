@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.54 2005-05-18 12:25:59 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.55 2005-05-18 16:03:27 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -682,6 +682,7 @@ sub do_admin_tests {
                 reason => "I hate signer 3, he sucks" },
             button => 'submit') or die "Failed to submit signature abuse form";
     $wth->browser_check_contents("One of our team will investigate");
+    $wth->email_get_containing('%To: '.$contact_email.  '%New abuse report for%');
 
     # Check pledges and signers page
     $b->get($admin_url);

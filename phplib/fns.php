@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.23 2005-04-29 14:44:41 chris Exp $
+// $Id: fns.php,v 1.24 2005-05-18 12:49:01 francis Exp $
 
 require_once "../../phplib/evel.php";
 
@@ -75,7 +75,14 @@ function prettify($s, $html = true) {
             return date('j<\sup>S</\sup> F Y', $e);
         return date('jS F Y', $e);
     }
-    if (ctype_digit($s)) {
+    if (preg_match('#^(\d{4})-(\d\d)-(\d\d) (\d\d:\d\d:\d\d)$#',$s,$m)) {
+        list(,$y,$m,$d,$tim) = $m;
+        $e = mktime(12,0,0,$m,$d,$y);
+        if ($html)
+            return date('j<\sup>S</\sup> F Y', $e)." $tim";
+        return date('jS F Y', $e)." $tim";
+    }
+     if (ctype_digit($s)) {
         return number_format($s);
     }
     return $s;

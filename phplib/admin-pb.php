@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.43 2005-05-16 18:18:46 chris Exp $
+ * $Id: admin-pb.php,v 1.44 2005-05-18 12:49:01 francis Exp $
  * 
  */
 
@@ -26,7 +26,7 @@ class ADMIN_PAGE_PB_MAIN {
 
     function pledge_header($sort) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
-        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time', 'p'=>'Prominence');
+        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time', 'u'=>'Success Time', 'p'=>'Prominence');
         foreach ($cols as $s => $col) {
             print '<th>';
             if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.'">';
@@ -40,18 +40,20 @@ class ADMIN_PAGE_PB_MAIN {
 
     function list_all_pledges() {
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdecsp]/', $sort)) $sort = 'd';
+        if (!$sort || preg_match('/[^ratdecspu]/', $sort)) $sort = 'd';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
         elseif ($sort=='t') $order = 'target';
         elseif ($sort=='d') $order = 'date';
         elseif ($sort=='e') $order = 'email';
         elseif ($sort=='c') $order = 'creationtime';
+        elseif ($sort=='u') $order = 'whensucceeded';
         elseif ($sort=='p') $order = 'prominence desc';
         elseif ($sort=='s') $order = 'signers';
 
         $q = db_query("
             SELECT id,ref,title,type,target,signup,date,name,email,confirmed,prominence,
+                date_trunc('second',whensucceeded) as whensucceeded, 
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 pb_current_date() <= date AS open
@@ -72,7 +74,11 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '<td>'.$r['signers'].'</td>';
             $row .= '<td>'.prettify($r['date']).'</td>';
             $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
-            $row .= '<td>'.$r['creationtime'].'</td>';
+            $row .= '<td>'.prettify($r['creationtime']).'</td>';
+            if ($r['whensucceeded']) 
+                $row .= '<td>'.prettify($r['whensucceeded']).'</td>';
+            else
+                $row .= '<td>None</td>';
 
             $row .= '<td><select name="prominence['.$r['id'].']">';
             $row .= '<option value="normal" ' . ($r['prominence']=='normal'?'selected':'') . ' >normal</option';

@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.52 2005-05-18 11:30:59 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.53 2005-05-18 12:16:21 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -96,18 +96,14 @@ die "Unable to detect errors from PHP" if ($errors !~ m/deliberate_error_to_test
 # Run some pledges through life cycle
 print "Making unconfirmed pledge...\n" if $verbose > 0;
 do_unconfirmed_pledge();
-print "Making private pledge and letting it expire...\n" if $verbose > 0;
-do_private_failing_pledge();
 print "Making public pledge and making it succeed...\n" if $verbose > 0;
 do_public_succeeding_pledge();
+print "Making private pledge and letting it expire...\n" if $verbose > 0;
+do_private_failing_pledge();
 print "Testing SMS with pledge...\n" if $verbose > 0;
 do_sms_pledge();
-print "Sending message via contact form...\n" if $verbose > 0;
-do_send_contact_message();
-
-# Check admin pages
-print "Checking administration pages...\n" if $verbose > 0;
-do_admin_pages();
+print "Checking administration functions...\n" if $verbose > 0;
+do_admin_tests();
 
 # Check for any unhandled mails or errors
 $wth->email_check_none_left();
@@ -262,22 +258,6 @@ sub call_smsd {
 }
 
 #############################################################################
-sub do_send_contact_message {
-    $b->get($base_url);
-    $b->follow_link(text_regex => qr/Contact/) or die "Contact link missing";
-    $wth->browser_check_contents("Was it useful?");
-    $b->submit_form(form_name => 'contact',
-            fields => { 
-                name => name_n(1000), 
-                email => email_n(1000), 
-                subject => "Lovely site", 
-                message => "Hey, your PledgeBank site rules!" },
-            button => 'submit') or die "Failed to submit password form";
-    $wth->browser_check_contents("Thanks for your feedback");
-    $wth->email_get_containing('%To: '.$contact_email.  '%Subject: Lovely site' . 
-            '%From: '. name_n(1000) . '%rules!%');
-}
-
 sub do_unconfirmed_pledge {
     # Make the pledge
     set_pb_date('1980-12-01');
@@ -675,10 +655,48 @@ sub do_sms_pledge {
 }
 
 #############################################################################
-sub do_admin_pages {
+sub do_admin_tests {
+    # Send contact message
+    $b->get($base_url);
+    $b->follow_link(text_regex => qr/Contact/) or die "Contact link missing";
+    $wth->browser_check_contents("Was it useful?");
+    $b->submit_form(form_name => 'contact',
+            fields => { 
+                name => name_n(1000), 
+                email => email_n(1000), 
+                subject => "Lovely site", 
+                message => "Hey, your PledgeBank site rules!" },
+            button => 'submit') or die "Failed to submit contact form";
+    $wth->browser_check_contents("Thanks for your feedback");
+    $wth->email_get_containing('%To: '.$contact_email.  '%Subject: Lovely site' . 
+            '%From: '. name_n(1000) . '%rules!%');
+
+    # Submit abusive signature report
+    $b->get($base_url . "/automatedtest");
+    $b->follow_link(text_regex => qr/suspicious signer/, n => 2) or die "Signature abuse link missing";
+    $wth->browser_check_contents("Report abusive signature");
+    $b->submit_form(form_name => 'abuse',
+            fields => { 
+                reason => "I hate signer 3, he sucks" },
+            button => 'submit') or die "Failed to submit signature abuse form";
+    $wth->browser_check_contents("One of our team will investigate");
+
+    # Check pledges and signers page
     $b->get($admin_url);
     $b->follow_link(text_regex => qr/Pledges and Signers/) or die "Pledges and Signers link missing";
     $wth->browser_check_contents("automatedtest");
     $wth->browser_check_contents("privatepledge");
+
+    # Check timeline page
+    $b->get($admin_url);
+    $b->follow_link(text_regex => qr/Timeline/) or die "Timeline link missing";
+    $wth->browser_check_contents("1st December 1980");
+
+    # check abuse reports page
+    $b->get($admin_url);
+    $b->follow_link(text_regex => qr/Abuse reports/) or die "Abuse reports link missing";
+    $wth->browser_check_contents(qr/pledges \(0\)/);
+    $wth->browser_check_contents(qr/signers \(1\)/);
+    $wth->browser_check_contents(qr/comments \(0\)/);
 }
 

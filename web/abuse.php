@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.3 2005-05-14 11:11:36 matthew Exp $
+// $Id: abuse.php,v 1.4 2005-05-18 12:16:21 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -50,7 +50,9 @@ function report_abusive_thing() {
         db_commit();
         print <<<EOF
 <p><strong>Thank you!</strong> One of our team will investigate that $w as soon
-as possible. <a href="./">Return to the home page</a>.</p>
+as possible. </p>
+
+<p><a href="./">Return to the home page</a>.</p>
 EOF;
         return;
     }
@@ -58,7 +60,7 @@ EOF;
     $title = htmlspecialchars(db_getOne('select title from pledges where id = ?', $pledge_id));
 
     print <<<EOF
-<form accept-charset="utf-8" action="abuse" method="post">
+<form accept-charset="utf-8" action="abuse" method="post" name="abuse" class="generalform">
 <h2>Report abusive $w</h2>
 <p>You are reporting the $w:</p> 
 <blockquote>

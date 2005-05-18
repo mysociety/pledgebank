@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.53 2005-05-18 12:16:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.54 2005-05-18 12:25:59 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -104,6 +104,8 @@ print "Testing SMS with pledge...\n" if $verbose > 0;
 do_sms_pledge();
 print "Checking administration functions...\n" if $verbose > 0;
 do_admin_tests();
+print "Final checks (RSS etc.)...\n" if $verbose > 0;
+do_final_checks();
 
 # Check for any unhandled mails or errors
 $wth->email_check_none_left();
@@ -692,11 +694,25 @@ sub do_admin_tests {
     $b->follow_link(text_regex => qr/Timeline/) or die "Timeline link missing";
     $wth->browser_check_contents("1st December 1980");
 
-    # check abuse reports page
+    # Check abuse reports page
     $b->get($admin_url);
     $b->follow_link(text_regex => qr/Abuse reports/) or die "Abuse reports link missing";
     $wth->browser_check_contents(qr/pledges \(0\)/);
     $wth->browser_check_contents(qr/signers \(1\)/);
     $wth->browser_check_contents(qr/comments \(0\)/);
+
+    # Check there were no errors
+    $wth->log_watcher_check();
 }
 
+#############################################################################
+sub do_final_checks {
+    # Check RSS works and has correct entries
+    $b->get($base_url . "/rss");
+    $wth->browser_check_contents("pretend to be an SMS aggregating service - exact target reached");
+    $wth->browser_check_contents("make sure a pledge can be completed - 1 over target");
+    $wth->browser_check_no_contents("privatepledge");
+
+    # Check there were no errors
+    $wth->log_watcher_check();
+}

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.3 2005-04-30 14:35:50 matthew Exp $
+// $Id: ref-index.php,v 1.4 2005-05-18 11:17:27 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -75,7 +75,7 @@ while ($r = db_fetch_array($q)) {
                     . htmlspecialchars($r['name'])
                     .' <small>(<a href="/abuse?what=signer&amp;id='
                         . htmlspecialchars($r['id'])
-                    . '">Is this signature suspicious?</a>)</small>'
+                    . '">suspicious signer?</a>)</small>'
                     . '</li>';
         } else {
             ++$unknownname;

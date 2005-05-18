@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.50 2005-05-09 18:48:15 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.51 2005-05-18 11:17:27 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -63,7 +63,9 @@ our $base_url = mySociety::Config::get('BASE_URL');
 our $admin_url = mySociety::Config::get('ADMIN_URL');
 our $sms_in_url = mySociety::Config::get('PB_SMS_C360_INCOMING_URL');
 our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
-sub email_n { my $n = shift; return "pbharness+$n\@owl"; }
+our $email_domain = mySociety::Config::get('EMAIL_DOMAIN');
+our $contact_email = mySociety::Config::get('CONTACT_EMAIL');
+sub email_n { my $n = shift; return "pbharness+$n\@$email_domain"; }
 sub name_n { my $n = shift; return ($n == 0 || $n == 100) ? "Peter Setter $n" : "Siegfried Signer $n"; }
 sub mobile_n { my $n = shift; return "9876543$n"; }
 
@@ -92,6 +94,8 @@ my $errors = $wth->log_watcher_get_errors();
 die "Unable to detect errors from PHP" if ($errors !~ m/deliberate_error_to_test_error_handling/);
 
 # Run some pledges through life cycle
+print "Sending message via contact form...\n" if $verbose > 0;
+do_send_contact_message();
 print "Making unconfirmed pledge...\n" if $verbose > 0;
 do_unconfirmed_pledge();
 print "Making private pledge and letting it expire...\n" if $verbose > 0;
@@ -258,6 +262,22 @@ sub call_smsd {
 }
 
 #############################################################################
+sub do_send_contact_message {
+    $b->get($base_url);
+    $b->follow_link(text_regex => qr/Contact/) or die "Contact link missing";
+    $wth->browser_check_contents("Was it useful?");
+    $b->submit_form(form_name => 'contact',
+            fields => { 
+                name => name_n(1000), 
+                email => email_n(1000), 
+                subject => "Lovely site", 
+                message => "Hey, your PledgeBank site rules!" },
+            button => 'submit') or die "Failed to submit password form";
+    $wth->browser_check_contents("Thanks for your feedback");
+    $wth->email_get_containing('%To: '.$contact_email.  '%Subject: Lovely site' . 
+            '%From: '. name_n(1000) . '%rules!%');
+}
+
 sub do_unconfirmed_pledge {
     # Make the pledge
     set_pb_date('1980-12-01');
@@ -357,13 +377,13 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Hey! This is a great pledge.");
     $b->submit_form(form_name => 'commentform', fields => {}, button => 'submit');
     $wth->browser_check_contents("Your comment has now been posted");
-    $b->follow_link(text_regex => qr/to the pledge comments/) or die "Link back to comments broken";
+    $b->follow_link(text_regex => qr/to the pledge comments/) or die "Link back to comments missing";
     $wth->browser_check_contents("Do I have to be a computer to take part?");
     $wth->email_get_containing('%To: '.email_n(0).  '%read the new comment or question%');
 
     # Mail pledge to friends
     $b->get($base_url . "/$pledge_ref");
-    $b->follow_link(text_regex => qr/Email pledge/) or die "Email pledge to friends link not founm";
+    $b->follow_link(text_regex => qr/Email pledge/) or die "Email pledge to friends link not found";
     $wth->browser_check_contents("Email this pledge");
     my $friend_message = "Hello you!";
     $b->submit_form(form_name => 'pledge',

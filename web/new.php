@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.4 2005-05-16 14:34:48 chris Exp $
+// $Id: new.php,v 1.5 2005-05-18 19:55:14 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -17,7 +17,7 @@ require_once '../../phplib/utility.php';
 page_header('Create a New Pledge');
 
 if (get_http_var('newpost')==1) {
-    pledge_form_submitted();
+    pledge_form_one_submitted();
 } elseif (get_http_var('newpost')==2) {
     pledge_form_two_submitted();
 } elseif (get_http_var('newpost')==3) {
@@ -59,6 +59,7 @@ the door of that neighbour whose name you've forgotten.</li>
 </div>
 <?
     }
+    global $pb_time;
 ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="1">
@@ -72,16 +73,24 @@ the door of that neighbour whose name you've forgotten.</li>
 <p><strong>will</strong> <input type="text" id="signup" name="signup"
 size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'do the same') ?>">.</p>
 
-<p>The other people must sign up before <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(e.g. "5th May")</small></p>
+<p>The other people must sign up before <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(e.g. "<?=date('jS F', $pb_time+60*60*24*28) // 28 days ?>")</small></p>
 
-<p>Choose a short name for your pledge (6 to 13 letters):
-<input<? if (array_key_exists('ref', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="20" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
+<p>Choose a short name for your pledge (6 to 16 letters):
+<input<? if (array_key_exists('ref', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
 <br><small>This gives your pledge an easy web address. e.g. www.pledgebank.com/tidyupthepark</small>
 </p>
 
-<p style="margin-bottom: 1em;">Your name: <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> type="text" size="20" name="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
-Email: <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
+<p style="margin-bottom: 1em;"><strong>Your name:</strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> type="text" size="20" name="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+<strong>Email:</strong> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small>(we need your email so we can get in touch with you when your pledge completes, and so on)</small>
+
+<p>On flyers and elsewhere, after your name, how would you like to be described? (optional)
+<br><small>(e.g. "resident of Tamilda Road")</small>
+<input type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
+
+<p id="moreinfo">More details about your pledge: (optional)<br> <small>(links and email addresses will be automatically spotted, no markup needed)</small>
+<br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
+
 </div>
 <p style="text-align: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
 <? if (sizeof($data)) {
@@ -91,17 +100,12 @@ Email: <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?
 <? }
 
 function pledge_form_two($data, $errors = array()) {
-    if (sizeof($errors)) {
-        print '<div id="errors"><ul><li>';
-        print join ('</li><li>', $errors);
-        print '</li></ul></div>';
-    }
-
     $v = 'all';
     if (isset($data['visibility'])) {
         $v = $data['visibility']; if ($v!='password') $v = 'all';
     }
-    $local = (isset($data['local'])) ? $data['local'] : '0';
+    $local = (array_key_exists('local', $data)) && $data['local'] == '1';
+    $notlocal = (array_key_exists('local', $data)) && $data['local'] == '0';
     $isodate = $data['parseddate']['iso'];
     if (!isset($data['comparison']))
         $comparison = "atleast";
@@ -110,30 +114,26 @@ function pledge_form_two($data, $errors = array()) {
 
     $country = '';
     if (isset($data['country'])) $country = $data['country'];
+
+    if (sizeof($errors)) {
+        print '<div id="errors"><ul><li>';
+        print join ('</li><li>', $errors);
+        print '</li></ul></div>';
+    } else {
 ?>
 
 <p>Your pledge looks like this so far:</p>
 <?  
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
-    $partial_pledge->render_box(array());
+    $partial_pledge->render_box(array('showdetails' => true));
+    }
 ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
 <input type="hidden" name="newpost" value="2">
-<p style="float: right">
-<input type="submit" name="newback" value="&lt;&lt; Back to step 1">
-<input type="submit" name="submit" value="Preview &gt;&gt;">
-</p>
 
 <h2>New Pledge &#8211; Step 2 of 3</h2>
-
-<p id="moreinfo">More details about your pledge: (optional)<br> <small>(links and email addresses will be automatically spotted, no markup needed)</small>
-<br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
-
-<p>On flyers and elsewhere, after your name, how would you like to be described? (optional)
-<br><small>(e.g. "resident of Tamilda Road")</small>
-<input type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
 
 <input type="hidden" name="comparison" value="atleast">
 <? /* <p>Should the pledge stop accepting new subscribers when it
@@ -142,10 +142,28 @@ is fulfilled?
 <input type="radio" name="comparison" value="atleast"<?=($comparison == 'atleast') ? ' checked' : '' ?>> No
 </p> */?>
 
-<p>Does your pledge fit into a specific topic or category?</p>
+<p>Which country does your pledge apply to?
+<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onclick="update_postcode_local(true)">
+  <option>(choose one)</option>
+  <!-- needs explicit values for IE Javascript -->
+  <option value="UK" <? if ($country=='UK') print ' selected'; ?> >UK</option>
+  <option value="Global" <? if ($country=='Global') print ' selected'; ?> >Global</option>
+</select>
+</p>
 
+<p><span id="local_line">Within the UK, is your pledge specific to a local area?</span>
+<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> Yes
+<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> No
+<br>
+<span id="postcode_line">
+If yes, enter your postcode so that local people can find your pledge:
+<input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
+</span>
+</p>
+
+<p>Which category does your pledge best fit into?
 <select name="category">
-<option value="-1">no category</option>
+<option value="-1">(choose one)</option>
 <?
     /* XXX should do multiple categories, but ignore that for now. */
     $s = db_query('select id, parent_category_id, name from category order by id');
@@ -159,28 +177,13 @@ is fulfilled?
 
 ?>
 </select>
-
-<p>Which country does your pledge apply to?
-<select name="country">
-  <option<? if ($country=='Global') print ' selected'; ?>>Global</option>
-  <option<? if ($country=='UK') print ' selected'; ?>>UK</option>
-</select>
-</p>
-
-<p>Within your country, is your pledge specific to a local area?
-<input onclick="grey_postcode(false)" type="radio" name="local" value="1"<?=($local?' checked':'') ?>> Yes
-<input onclick="grey_postcode(true)" type="radio" name="local" value="0"<?=(!$local?' checked':'') ?>> No
-<br>
-<span id="postcode_line">
-If yes, enter your postcode so that local people can find your pledge:
-<input type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
-</span>
+<br><small>(this will help more people find your pledge)</small>
 </p>
 
 <p>Who do you want to be able to see your pledge?
 <br><input onclick="grey_password(true)" type="radio" name="visibility" value="all"<?=($v=='all'?' checked':'') ?>> Anyone
 <input onclick="grey_password(false)" type="radio" name="visibility" value="password"<?=($v=='password'?' checked':'') ?>> Only people to whom I give this password:
-<input type="text" id="password" name="password" value="">
+<input <? if (array_key_exists('password', $errors)) print ' class="error"' ?> type="text" id="password" name="password" value="">
 </p>
 
 <p style="text-align: right;">
@@ -194,9 +197,9 @@ If yes, enter your postcode so that local people can find your pledge:
 <?
 }
 
-function pledge_form_submitted() {
+function pledge_form_one_submitted() {
     $data = array();
-    $fields = array('title', 'target', 'name', 'email', 'ref', 'type', 'date', 'signup', 'data');
+    $fields = array('title', 'target', 'name', 'email', 'ref', 'type', 'date', 'signup', 'data','identity','detail');
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
@@ -238,7 +241,7 @@ function step1_error_check($data) {
     $disallowed_refs = array('contact');
     if (!$data['ref']) $errors['ref'] = 'Please enter a PledgeBank reference';
     elseif (strlen($data['ref'])<6) $errors['ref'] = 'The reference must be at least six characters long';
-    elseif (strlen($data['ref'])>13) $errors['ref'] = 'The reference can be at most 13 characters long';
+    elseif (strlen($data['ref'])>16) $errors['ref'] = 'The reference can be at most 20 characters long';
     elseif (in_array($data['ref'], $disallowed_refs)) $errors['ref'] = 'That reference is not allowed.';
     if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = 'The reference must only contain letters, numbers, or a hyphen';
 
@@ -269,15 +272,24 @@ function step2_error_check($data) {
     if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
         $errors[] = 'Please select either "at least" or "exactly" number of people';
     }
-    if ($data['local'] && !$data['postcode']) $errors[] = 'Please enter a postcode';
-    if ($data['visibility'] == 'password' && !$data['password']) $errors[] = 'Please enter a password';
+    if ($data['country'] == "(choose one)") 
+        $errors['country'] = 'Please choose which country your pledge applies to';
+    if ($data['country'] == "UK") 
+        if ((!array_key_exists('local', $data)) || ($data['local'] != '1' && $data['local'] != '0'))
+            $errors['local'] = 'Please choose whether the pledge is local or not';
+    if ($data['local'] && !$data['postcode']) 
+        $errors['postcode'] = 'For local pledges, please enter a postcode';
+    if ($data['local'] && !validate_postcode($data['postcode'])) 
+        $errors['postcode'] = 'Please enter a valid postcode, such as OX1 3DR';
+    if ($data['visibility'] == 'password' && !$data['password']) 
+        $errors['password'] = 'Please enter a password';
     return $errors;
 }
 
 function pledge_form_two_submitted() {
     $errors = array();
     $data = array();
-    $fields = array('detail', 'identity', 'comparison', 'category', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
+    $fields = array('comparison', 'category', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
@@ -321,6 +333,7 @@ function pledge_form_three_submitted() {
     }
     if (get_http_var('newback2')) {
         pledge_form_two($data, $errors);
+        return;
     }
     create_new_pledge($data);
 }
@@ -343,7 +356,7 @@ function preview_pledge($data) {
 <?  
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
-    $partial_pledge->render_box(array());
+    $partial_pledge->render_box(array('showdetails' => true));
     /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ 
 ?>
 
@@ -354,6 +367,16 @@ function preview_pledge($data) {
 
 <ul>
 
+<li>Which country does your pledge apply to?
+<em><?=htmlspecialchars($data['country']) ?></em>
+</li>
+
+<? if ($data['country'] == "UK") { ?>
+<li>Within the UK, is your pledge specific to a local area? <em><?=
+$local ? 'Yes (' . htmlspecialchars($data['postcode']) . ')' : 'No' ?></em>
+</li>
+<? } ?>
+
 <li>Does your pledge fit into a specific topic or category?
 <em><?=
     $data['category'] == -1
@@ -363,19 +386,15 @@ function preview_pledge($data) {
             . '"'
 ?></em></li>
 
-<li>Which country does your pledge apply to?
-<em><?=htmlspecialchars($data['country']) ?></em>
-</li>
-
-<li>Within your country, is your pledge specific to a local area? <em><?=
-$local ? 'Yes (' . htmlspecialchars($data['postcode']) . ')' : 'No' ?></em>
-</li>
-
 <li>Who do you want to be able to see your pledge? <em><?
 if ($v=='all') print 'Anyone';
 if ($v=='password') print ' Only people to whom I give a password I have specified';
 ?></em></li>
 </ul>
+
+<p><strong>You cannot edit your pledge after you have created it.</strong>
+(<a href="/faq#editpledge">why not?</a>)
+</p>
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">

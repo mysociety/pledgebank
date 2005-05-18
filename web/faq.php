@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.4 2005-05-13 15:55:18 francis Exp $
+// $Id: faq.php,v 1.5 2005-05-18 19:55:14 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -118,6 +118,13 @@ Choose the number of people for which you could only just be bothered to carry
 out your part of the pledge.  One less it wouldn't be worth it.  Don't put the
 value any higher than that.  This makes it most likely your pledge will succeed,
 and more people than you expected can always sign up.
+
+<dt><a name="editpledge">Why can't I edit my pledge after I've made it?</a>
+
+<dd>People who sign up to a pledge are signing up to the specific wording of
+the pledge.  If you change the wording, then their signatures would no longer
+be valid.  You can <a href="/contact">contact us</a> if there is a cosmetic
+change that you need to make.
 
 <dt>Who gets to see my email address?
 

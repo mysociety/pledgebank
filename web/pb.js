@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.8 2005-04-21 16:30:12 matthew Exp $
+ * $Id: pb.js,v 1.9 2005-05-18 19:55:14 francis Exp $
  * 
  */
 
@@ -30,15 +30,12 @@ function addEvent(obj, evType, fn){
 function pluralize(t) {
     if (document && document.getElementById) {
         d = document.getElementById('type');
-	s = document.getElementById('signup');
-	v = d.value;
+        v = d.value;
         w = s.value;
-	if (t==1) {
-//            if (w=='sign up') s.value = 'signs up';
-	    if (v=='other local people') d.value = 'other local person';
-	} else {
-//	    if (w=='signs up') s.value = 'sign up';
-	    if (v=='other local person') d.value = 'other local people';
+        if (t==1) {
+            if (v=='other local people') d.value = 'other local person';
+        } else {
+            if (v=='other local person') d.value = 'other local people';
         }
     }
 }
@@ -76,11 +73,11 @@ function greyOutInputs() {
         if (d && d.value.length<6) d.style.color = '#999999'
     }
 
-    if (document.pledge && document.pledge.local)
-        grey_postcode(document.pledge.local[1].checked)
     if (document.pledge && document.pledge.visibility)
         grey_password(document.pledge.visibility[0].checked)
 
+    if (document.pledge && document.pledge.local)
+        update_postcode_local(false)
 }
 
 function checklength(thi) {
@@ -89,20 +86,36 @@ function checklength(thi) {
     else thi.style.color = '#000000'
 }
 
-function grey_postcode(t) {
+// optionclick is "true" if user just clicked, or "false" during page load
+function update_postcode_local(optionclick) {
+    isuk = document.pledge.country.options[document.pledge.country.selectedIndex].value == "UK"
+    islocal = document.pledge.local1.checked
+    grey_local(!isuk, optionclick)
+    grey_postcode(!islocal || !isuk, optionclick)
+}
+function grey_postcode(t, optionclick) {
     if (t) {
         document.getElementById('postcode_line').style.color = '#999999'
     } else {
         document.getElementById('postcode_line').style.color = '#000000'
     }
-    grey_thing(t, 'postcode')
+    grey_thing(t, 'postcode', optionclick)
+}
+function grey_local(t, optionclick) {
+    if (t) {
+        document.getElementById('local_line').style.color = '#999999'
+    } else {
+        document.getElementById('local_line').style.color = '#000000'
+    }
+    grey_thing(t, 'local0', false)
+    grey_thing(t, 'local1', false)
 }
 
 function grey_password(t) {
-    grey_thing(t, 'password')
+    grey_thing(t, 'password', true)
 }
 
-function grey_thing(t, e) {
+function grey_thing(t, e, focus) {
     d = document.getElementById(e)
     if (t) {
         d.disabled = true
@@ -110,6 +123,8 @@ function grey_thing(t, e) {
     } else {
         d.disabled = false
         d.style.color = '#000000'
-        d.focus()
+        if (focus) {
+            d.focus()
+        }
     }
 }

@@ -15,7 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.51 2005-05-18 11:17:27 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.52 2005-05-18 11:30:59 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -94,8 +94,6 @@ my $errors = $wth->log_watcher_get_errors();
 die "Unable to detect errors from PHP" if ($errors !~ m/deliberate_error_to_test_error_handling/);
 
 # Run some pledges through life cycle
-print "Sending message via contact form...\n" if $verbose > 0;
-do_send_contact_message();
 print "Making unconfirmed pledge...\n" if $verbose > 0;
 do_unconfirmed_pledge();
 print "Making private pledge and letting it expire...\n" if $verbose > 0;
@@ -104,6 +102,8 @@ print "Making public pledge and making it succeed...\n" if $verbose > 0;
 do_public_succeeding_pledge();
 print "Testing SMS with pledge...\n" if $verbose > 0;
 do_sms_pledge();
+print "Sending message via contact form...\n" if $verbose > 0;
+do_send_contact_message();
 
 # Check admin pages
 print "Checking administration pages...\n" if $verbose > 0;
@@ -400,7 +400,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Thanks very much for spreading the word");
     $wth->log_watcher_check();
     for (my $i = 10; $i <= 13; $i++) {
-        my $content = $wth->email_get_containing('%To: '.email_n($i).  '%thought you might be interested%');
+        my $content = $wth->email_get_containing('%To: '.email_n($i).  '%thought%you%might%be%interested%');
         $content =~ m#$base_url/$pledge_ref# or die "Failed to find pledge link in friend email";
         $content =~ m#$friend_message# or die "Failed to find message in friend email";
         $content =~ m## or die "Failed to find pledge link in friend email";

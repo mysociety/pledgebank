@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.162 2005-05-09 18:48:15 francis Exp $
+// $Id: index.php,v 1.163 2005-05-18 11:39:08 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -41,6 +41,7 @@ accepting certain kinds at the moment.</p>
     //list_newest_pledges();
     //list_highest_signup_pledges();
     list_frontpage_pledges();
+    list_successful_pledges();
 }
 
 function list_newest_pledges() {
@@ -130,6 +131,42 @@ function list_frontpage_pledges() {
                 date >= pb_current_date() AND 
                 password is NULL AND confirmed
                 ORDER BY id");
+    $pledges = '';
+    while ($r = db_fetch_array($q)) {
+        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
+        $pledges .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
+        if ($r['target'] - $signatures <= 0) {
+            $pledges .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
+        } else {
+            $pledges .= "(${r['daysleft']} "
+                        . make_plural($r['daysleft'], 'day', 'days') /* XXX i18n */
+                        . " left), "
+                    . prettify($r['target'] - $signatures)
+                    . " more needed";
+        }
+        $pledges .= '</li>';
+    }
+    if (!$pledges) {
+        print '<p>There are no featured pledges at the moment.</p>';
+    } else {
+        print '<ol>'.$pledges.'</ol>';
+    }
+}
+
+function list_successful_pledges() {
+?>
+<h2>Recent successful pledges</h2><?
+
+    $q = db_query("
+                SELECT *, date - pb_current_date() AS daysleft
+                FROM pledges
+                WHERE 
+                prominence = 'frontpage' AND
+                date >= pb_current_date() AND 
+                password IS NULL AND 
+                confirmed AND
+                whensucceeded IS NOT NULL
+                ORDER BY whensucceeded DESC");
     $pledges = '';
     while ($r = db_fetch_array($q)) {
         $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));

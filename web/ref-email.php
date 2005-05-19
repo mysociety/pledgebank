@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.2 2005-04-29 18:49:45 francis Exp $
+// $Id: ref-email.php,v 1.3 2005-05-19 12:07:46 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -53,7 +53,7 @@ if (!$errors) {
                 'from_name'=>$fromname, 
                 'from_email' => $fromemail, 
                 'from_message' => $frommessage ? "They added this message: \"$frommessage\"\n\n" : "",
-            ))
+            )), array('From'=>'"' . str_replace('"', '\"', $fromname) . '" <' . $fromemail . '>')
         );
     }
     if ($success) {

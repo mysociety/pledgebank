@@ -1,8 +1,16 @@
-Subject: <?=$values['comment_author_name']?> has commented on your pledge at PledgeBank.com
+Subject: Comment on your pledge
 
-Please click on the link below to read the new comment or question about
-your pledge.  You can also respond to the comment there.
+<?=$values['comment_author_name']?> has left a comment on your pledge, saying: 
 
-<?=$values['comment_url']?>
+    <?=$values['comment_text']?>
+
+
+View your pledge page: <?=$values['pledge_url']?>
+
+Reply to this comment: <?=$values['pledge_url']?>#commentform
+
+Report this comment: <?=$values['abusive_url']?>
+
+View all comments: <?=$values['pledge_url']?>#comments
 
 <?=$values['signature']?>

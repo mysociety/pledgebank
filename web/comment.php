@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.7 2005-04-30 14:35:50 matthew Exp $
+ * $Id: comment.php,v 1.8 2005-05-19 13:33:09 matthew Exp $
  * 
  */
 
@@ -100,7 +100,8 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     db_commit();
     $values = $pledge;
     $values['comment_text'] = $q_text;
-    $values['comment_url'] = OPTION_BASE_URL . "/" . $values['ref'] . "#comments";
+    $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];
+    $values['abusive_url'] = OPTION_BASE_URL . '/abuse?what=comment&id=' . $comment_id;
     $values['comment_author_name'] = $q_author_name;
     $values['comment_author_email'] = $q_author_email;
     $values['comment_author_website'] = $q_author_website;

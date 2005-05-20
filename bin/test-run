@@ -20,8 +20,11 @@
 #   UK postcoded pledges
 #   categories
 #   PDF and RTF stuff from poster.cgi
+#   SMS on failure
+#   sms-confirm-own template
+#   sms-confirm-already template
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.58 2005-05-20 16:45:35 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.59 2005-05-20 18:28:16 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -463,7 +466,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Thanks very much for spreading the word");
     $wth->log_watcher_check();
     for (my $i = 10; $i <= 13; $i++) {
-        my $content = $wth->email_get_containing('%To: '.email_n($i).  '%thought%you%might%be%interested%');
+        my $content = $wth->email_get_containing('%To: '.email_n($i).'%thought%you%might%be%interested%');
         $content =~ m#$base_url/$pledge_ref# or die "Failed to find pledge link in friend email";
         $content =~ m#$friend_message# or die "Failed to find message in friend email";
         $content =~ m## or die "Failed to find pledge link in friend email";

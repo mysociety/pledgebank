@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.41 2005-05-13 18:31:20 matthew Exp $
+# $Id: poster.cgi,v 1.42 2005-05-20 15:09:07 francis Exp $
 #
 
 import os
@@ -505,6 +505,8 @@ while fcgi.isFCGI():
         # Check password
         #req.err.write("password %s\n" % pledge['password'])
         if pledge['password']:
+            if 'pw' not in fs:
+                raise Exception, "Correct password needed for '%s' pledge" % ref
             userpassword = fs['pw'].value
             sha_calc = sha.new()
             sha_calc.update(userpassword)

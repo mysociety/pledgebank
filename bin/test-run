@@ -15,7 +15,13 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.56 2005-05-18 19:55:11 francis Exp $';
+# TODO, add test code for:
+#   "identity" column
+#   UK postcoded pledges
+#   categories
+#   PDF and RTF stuff from poster.cgi
+
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.57 2005-05-20 15:09:07 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -283,40 +289,84 @@ sub do_unconfirmed_pledge {
 #############################################################################
 sub do_private_failing_pledge {
     my $pledge_action_private = 'check private pledges are private';
+    my $pledge_ref = "privatepledge";
     my $private_password = 'zx3uuhai';
     set_pb_date('1980-12-01');
     create_pledge(0, 
         { title => $pledge_action_private, 
-            target => '10', date => 'Dec 31st', ref => 'privatepledge' 
+            target => '10', date => 'Dec 31st', ref => $pledge_ref
         },
         { country => 'Global', visibility => 'password', password => $private_password }
     );
     confirm_pledge(0, $pledge_action_private);
-    $b->get($base_url);
-    $wth->browser_check_no_contents($pledge_action_private);
 
-    my $goto_pledge_page = sub {
-        $b->get($base_url . "/privatepledge");
+    # Go to private pledge page, and submit password to access it
+    my $goto_private_pledge_page = sub {
+        $b->get("$base_url/$pledge_ref");
         $wth->browser_check_contents("Password Protected Pledge");
         $wth->browser_check_no_contents("Incorrect password!");
+        $wth->browser_check_no_contents($pledge_action_private);
         $b->submit_form(form_name => 'pledge',
                 fields => { pw => 'thisisnotthepassword' },
                 button => 'submitpassword') or die "Failed to submit password form";
         $wth->browser_check_contents("Incorrect password!");
+        $wth->browser_check_no_contents($pledge_action_private);
         $b->submit_form(form_name => 'pledge',
                 fields => { pw => $private_password },
                 button => 'submitpassword') or die "Failed to submit password form";
         $wth->browser_check_contents($pledge_action_private);
     };
 
-    &$goto_pledge_page();
+    # Sign up to private pledge
+    &$goto_private_pledge_page();
     $wth->browser_check_no_contents("This pledge is now closed");
     sign_pledge(1, 1);
     confirm_signature($pledge_action_private, 1);
+    
+    # Check pledge really is private on lists of pledges
+    # ... index page, all pledges
+    $b->get($base_url);
+    $wth->browser_check_no_contents($pledge_ref);
+    $wth->browser_check_no_contents($pledge_action_private);
+    # ... all pledges page
+    $b->get($base_url . "/all");
+    $wth->browser_check_no_contents($pledge_ref);
+    $wth->browser_check_no_contents($pledge_action_private);
+    # ... RSS
+    $b->get($base_url . "/rss");
+    $wth->browser_check_no_contents($pledge_ref);
+    $wth->browser_check_no_contents($pledge_action_private);
+
+    # And all its pages require password to get to
+    # ... email friends page
+    $b->get("$base_url/$pledge_ref/email");
+    $wth->browser_check_contents("Password Protected Pledge");
+    $wth->browser_check_no_contents($pledge_action_private);
+        # ... flyers index
+    $b->get("$base_url/$pledge_ref/flyers");
+    $wth->browser_check_contents("Password Protected Pledge");
+    $wth->browser_check_no_contents($pledge_action_private);
+    # ... individual poster
+    $b->get("$base_url/flyers/${pledge_ref}_A4_flyers8.pdf");
+    $wth->browser_check_contents("Correct password needed");
+
+    $wth->log_watcher_check();
+    # ... ical calendar entry
+    $b->get("$base_url/$pledge_ref/ical");
+    $wth->browser_check_contents("Correct password required");
+    $wth->browser_check_no_contents($pledge_action_private);
+    my $errors = $wth->log_watcher_get_errors();
+    die if ($errors !~ m/Correct password required/);
+    # ... sign page
+    $b->get("$base_url/$pledge_ref/sign");
+    $wth->browser_check_contents("Permission denied");
+    $wth->browser_check_no_contents($pledge_action_private);
+    my $errors = $wth->log_watcher_get_errors();
+    die if ($errors !~ m/Permission denied/);
 
     # Test what happens upon expiry
     # ... partially sign the pledge
-    &$goto_pledge_page();
+    &$goto_private_pledge_page();
     sign_pledge(2, 1);
     # ... then expire it
     set_pb_date('1981-01-15');
@@ -328,7 +378,7 @@ sub do_private_failing_pledge {
     $wth->email_get_containing('%Subject: Pledge failed%To: '.email_n(1).  '%');
 
     # Make sure pledge says it is expired, and has no sign up box
-    &$goto_pledge_page();
+    &$goto_private_pledge_page();
     $wth->browser_check_contents("This pledge is now closed");
     $wth->browser_check_no_contents("Sign up now");
 }
@@ -718,3 +768,4 @@ sub do_final_checks {
     # Check there were no errors
     $wth->log_watcher_check();
 }
+

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.2 2005-04-30 15:54:30 francis Exp $
+// $Id: ref-sign.php,v 1.3 2005-05-20 15:09:07 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -43,13 +43,14 @@ function do_sign() {
             array('pw',         '//',              '', null)
             );
     if ($q_email=='<Enter your name>') $q_email='';
-    if (!is_null($errors)) {
-        return $errors;
-    }
 
     $r = db_getRow('select * from pledges where ref ILIKE ?', $q_ref);
     if (!check_password($q_ref, $r['password']))
         err("Permission denied");
+
+    if (!is_null($errors)) {
+        return $errors;
+    }
 
     /* The exact mail we send depends on whether we're already signed up to
      * this pledge. */

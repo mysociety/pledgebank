@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.18 2005-05-20 13:37:13 matthew Exp $
+ * $Id: sms.php,v 1.19 2005-05-20 16:45:36 francis Exp $
  * 
  */
 
@@ -97,7 +97,7 @@ EOF;
                      * determines whether we send a confirmation or a
                      * confirmation reminder mail. */
                     $r = pledge_is_valid_to_sign($pledge_id, $q_email);
-                    $row = db_getRow('select * from pledges where id = ?', $pledge_id);
+                    $row = db_getRow('select * from pledges where id = ? and password is null', $pledge_id);
                     if ($r == PLEDGE_OK) {
                         /* New email address */
                         $token = auth_token_store(
@@ -145,6 +145,7 @@ EOF;
                                             select success
                                             from pledges
                                             where id = ?
+                                            and password is null
                                             for update', $pledge_id);
 
                             db_query('delete from smssubscription where token = ?',
@@ -266,7 +267,7 @@ EOF;
             print "<li>" . htmlspecialchars($errs['email']) . "</li>";
         print '</ul></div>';
     } else {
-        $pledge_info = db_getRow('select * from pledges where id = ?', $pledge_id);
+        $pledge_info = db_getRow('select * from pledges where id = ? and password is null', $pledge_id);
         $sentence = pledge_sentence($pledge_info, array('firstperson'=>true, 'html'=>true));
         $pretty_date = prettify($pledge_info['date']);
         $pretty_name = htmlspecialchars($pledge_info['name']);

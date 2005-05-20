@@ -21,7 +21,7 @@
 #   categories
 #   PDF and RTF stuff from poster.cgi
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.57 2005-05-20 15:09:07 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.58 2005-05-20 16:45:35 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -87,6 +87,7 @@ $wth->database_load_schema('../db/ican-categories.sql');
 $wth->email_setup({ eveld_bin => "$FindBin::Bin/../../services/EvEl/bin/eveld",
                     log_mailbox => "log_mailbox" });
 our $b = $wth->browser_get_agent();
+sms_setup();
 
 # Syntax check all .php files
 print "Syntax check all PHP files...\n" if $verbose > 0;
@@ -322,7 +323,36 @@ sub do_private_failing_pledge {
     $wth->browser_check_no_contents("This pledge is now closed");
     sign_pledge(1, 1);
     confirm_signature($pledge_action_private, 1);
-    
+    &$goto_private_pledge_page();
+    $wth->browser_check_contents("<i>1 person has signed up");
+
+    # Try to sign up by SMS
+    sms_fake_to_pledgebank(10, "pledge $pledge_ref");
+    die "Didn't get OK for incoming SMS" if $b->content() ne "OK";
+    $wth->log_watcher_check();
+    call_smsd();
+    my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
+    print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
+    # Try to sign up by SMS, with partial pledge identifier
+    sms_fake_to_pledgebank(10, "pledge rivatepl");
+    die "Didn't get OK for incoming SMS" if $b->content() ne "OK";
+    $wth->log_watcher_check();
+    call_smsd();
+    my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
+    print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
+    # Wait for delivery notification, which would confirm signature
+    # (want to test that nothing happens, as nothing was signed)
+    set_pb_date('1980-12-02');
+    call_smsd();  # delivery notification
+    call_smsd();  # cull done with message
+    $wth->log_watcher_check();
+    # Check we don't get any information leaks
+    sms_check_none_left();
+    # ... in particular there are no new signups
+    &$goto_private_pledge_page();
+    $wth->browser_check_contents("<i>1 person has signed up");
+    $wth->browser_check_no_contents("This pledge is now closed");
+ 
     # Check pledge really is private on lists of pledges
     # ... index page, all pledges
     $b->get($base_url);
@@ -412,7 +442,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Your comment has now been posted");
     $b->follow_link(text_regex => qr/to the pledge comments/) or die "Link back to comments missing";
     $wth->browser_check_contents("Do I have to be a computer to take part?");
-    $wth->email_get_containing('%To: '.email_n(0).  '%read the new comment or question%');
+    $wth->email_get_containing('%To: '.email_n(0).  '%has left a comment on your pledge%');
 
     # Mail pledge to friends
     $b->get($base_url . "/$pledge_ref");
@@ -535,7 +565,7 @@ sub do_public_succeeding_pledge {
 #############################################################################
 
 sub sms_setup {
-    # Stores SMS messages which have been sent from PledgeBank
+    # Create table for outgoing SMS messages to be stored in (by pb/web/test-sms.cgi)
     dbh()->do("create table testharness_sms (
       id serial not null primary key,
       mobile text not null,
@@ -602,10 +632,6 @@ sub sms_check_none_left {
 }
 
 sub do_sms_pledge {
-    # Create table for outgoing SMS messages to be stored in 
-    # (by pb/web/test-sms.cgi)
-    sms_setup();
-    
     # Make the pledge
     set_pb_date('1982-03-01');
     my $pledge_action_sms = 'pretend to be an SMS aggregating service';
@@ -625,6 +651,7 @@ sub do_sms_pledge {
     $wth->log_watcher_check();
     call_smsd();
     my $conversion_sms = sms_get_containing(mobile_n(101), "%you are the 1st person to pledge%", 0);
+    print "SMS text: $conversion_sms\n" if $verbose > 1;
     # Check not got signup yet
     $b->get($base_url . "/$pledge_ref");
     $wth->browser_check_no_contents("<i>1 person has signed up");
@@ -643,6 +670,7 @@ sub do_sms_pledge {
     $wth->log_watcher_check();
     call_smsd();
     $conversion_sms = sms_get_containing(mobile_n(102), "%you are the 2nd person to pledge%", 0);
+    print "SMS text: $conversion_sms\n" if $verbose > 1;
     my $base_url_without_http = $base_url; $base_url_without_http =~ s#http://##;
     die "Conversion link not found in SMS '$conversion_sms'\n" if ($conversion_sms !~ m#\b($base_url_without_http[^\s]*)\b#m);
     my $conversion_url = "http://".$1;
@@ -697,7 +725,8 @@ sub do_sms_pledge {
     call_smsd();
     # Check they all arrived
     $wth->email_get_containing( '%To: '.email_n(102).'%hurrah!%');
-    sms_get_containing(mobile_n(101), '%Yippee!%', 0);
+    my $sms_text = sms_get_containing(mobile_n(101), '%Yippee!%', 0);
+    print "SMS text: $sms_text\n" if $verbose > 1;
 
     # Check nothing left
     set_pb_date('1982-03-10');

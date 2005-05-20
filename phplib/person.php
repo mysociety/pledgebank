@@ -6,13 +6,17 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.1 2005-05-18 12:56:56 chris Exp $
+ * $Id: person.php,v 1.2 2005-05-20 17:42:05 chris Exp $
  * 
  */
 
 require_once '../../phplib/error.php';
 require_once '../../phplib/utility.php';
 require_once '../phplib/stash.php';
+
+function person_canonicalise_name($n) {
+    return preg_replace('/[^A-Za-z-]/', '', strtolower($n));
+}
 
 class Person {
     /* person ID | EMAIL
@@ -27,8 +31,8 @@ class Person {
             err('value passed to person constructor must be person ID or email address');
         if (is_null($this->id))
             err("No such person '$id'");
-        $this->email = db_getOne('select email from person where id = ?', $id);
-        $this->name = db_getOne('select name from person where id = ?', $id);
+        list($this->email, $this->name, $this->password)
+            = db_getRow_list('select email, name, password from person where id = ?', $id);
     }
 
     /* id [ID]
@@ -65,6 +69,12 @@ class Person {
         db_query('update person set password = ? where id = ?', array(crypt($password), $this->id));
     }
 
+    /* has_password
+     * Return true if the user has set a password. */
+    function has_password() {
+        return !is_null($this->password);
+    }
+
     /* check_password PASSWORD
      * Return true if PASSWORD is the person's password, or false otherwise. */
     function check_password($p) {
@@ -75,6 +85,12 @@ class Person {
             return false;
         else
             return true;
+    }
+
+    /* matches_name [NEWNAME]
+     * Is NEWNAME essentially the same as the person's existing name? */
+    function matches_name($newname) {
+        return person_canonicalise_name($newname) == person_canonicalise_name($this->name);
     }
 }
 
@@ -106,19 +122,28 @@ function person_check_cookie_token($token) {
         return $id;
 }
 
+/* person_if_signed_on
+ * If the user has a valid login cookie, return the corresponding person
+ * object; otherwise, return null. */
+function person_if_signed_on() {
+    if (array_key_exists('pb_person_id', $_COOKIE)) {
+        /* User has a cookie and may be logged in. */
+        $id = person_check_cookie_token($_COOKIE['pb_person_id']);
+        if (!is_null($id))
+            return new Person($id);
+    }
+    return null;   
+}
+
 /* person_signon REASON EMAIL [NAME]
  * Return a record of a person, if necessary requiring them to sign on to an
  * existing account or to create a new one. REASON is the reason why
  * authentication is required, for instance "create the pledge '...'" or
  * "sign the pledge '...'" or */
 function person_signon($reason, $email, $name = null) {
-    if (array_key_exists('pb_person_id', $_COOKIE)) {
-        /* User has a cookie and may be logged in. */
-        $id = person_check_cookie_token($_COOKIE['pb_person_id']);
-print "id = $id";
-        if (!is_null($id))
-            return new Person($id);
-    }
+    $P = person_if_signed_on();
+    if (!is_null($P))
+        return $P;
 
     if (headers_sent())
         err("Headers have already been sent in person_signon without cookie being present");

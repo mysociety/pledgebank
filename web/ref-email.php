@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.4 2005-05-19 12:18:07 matthew Exp $
+// $Id: ref-email.php,v 1.5 2005-05-20 13:37:13 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -25,7 +25,7 @@ if ($password_box) {
 }
 
 $title = "Emailing friends";
-page_header($title);
+page_header($title, array('ref' => $p->url_main() ));
 
 # fromname, fromemail, frommessage
 # email as an array
@@ -67,42 +67,4 @@ if (!$errors) {
 
 page_footer();
 
-function view_friends_form($p, $errors) {
-	if (sizeof($errors) and get_http_var('submit')) {
-		print '<div id="errors"><ul><li>';
-		print join ('</li><li>', $errors);
-		print '</li></ul></div>';
-	} else {
-        ?> <p align="center">Here's a reminder of the pledge you're telling people about:</p> <? 
-        $p->render_box(array());
-    } // errors ?>
-<p></p>
-<form class="generalform" name="pledge" action="email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
-<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
-<h2>Email this pledge</h2>
-<p>
-Please enter these details so that we can send your message to your contacts.
-We will not give or sell either your or their email address to anyone else.
-</p>
-
-<p><strong>Other people's email addresses:</strong></p>
-<div class="formrow"><input type="text" name="email1" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email2" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email3" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email4" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email5" value="" size="40"></div>
-
-<p><strong>Add a message, if you want:</strong></p>
-<div class="formrow"><textarea name="frommessage" rows="5" cols="60"></textarea></div>
-
-<p>
-<div class="formrow"><strong>Your name:</strong> <input type="text" name="fromname" value="" size="18">
-<br><strong>Email:</strong> <input type="text" name="fromemail" value="" size="26"></div>
-
-<p><input name="submit" type="submit" value="Send message"></p>
-
-</form>
-
-<?
-}
 ?>

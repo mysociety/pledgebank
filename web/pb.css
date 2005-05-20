@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.30 2005-05-18 19:55:14 francis Exp $
+ * $Id: pb.css,v 1.31 2005-05-20 13:37:13 matthew Exp $
  * 
  */
 
@@ -58,9 +58,16 @@ blockquote {
 	background-color: #ffcccc;
 }
 
+#reference {
+    text-align: left;
+    font-size: 83%;
+    padding: 2px;
+    margin: 0;
+}
+
 #content {
 	text-align: left;
-	padding: 10px 10%;
+	padding: 5px 10% 10px;
         margin: 0 auto;
 }
 
@@ -83,32 +90,45 @@ blockquote {
 .pledge .c {
     text-align: center;
 }
-.pledge, .pledgesign, .generalform {
-	border: solid 2px #522994;
-	margin: 0 auto 1em;
-	padding: 10px;
-	background-color: #c6b5de;
+.pledge, #pledgeaction {
+    border: solid 2px #522994;
+    margin: 0 auto 1em;
+    padding: 10px;
+    background-color: #c6b5de;
 }
-.pledge h2, .pledgesign h2, #flyeremail h2, .tips h2, .generalform h2 {
-	margin-top: 0;
+.pledge p, #pledgeaction p {
+    margin-bottom: 0;
 }
-.pledge p, .pledgesign p, .generalform p {
-	margin-bottom: 0;
+.pledge h2, #pledgeaction h2, #flyeremail h2, #tips h2, #pledge h2 {
+    margin-top: 0;
 }
-.pledge a:link, .pledge a:visited, .generalform a:visited {
-	color: #000000;
-	background-color: #c6b5de;
+.pledge a:link, .pledge a:visited {
+    color: #000000;
+    background-color: #c6b5de;
 }
-.pledgesign {
+#pledgeaction {
     float: left;
     width: 45%;
     margin: 0 0 0.5em 0;
 }
 
+#tips, #pledge {
+    border: solid 2px #522994;
+    background-color: #f6e5ff;
+    margin: 1em auto;
+    padding: 10px;
+}
+#pledge {
+    text-align: center;
+}
+#tips li, #pledge li {
+    padding: 0;
+    margin: 0 0 1em 0;
+}
+
 #flyeremail {
     float: right;
     width: 45%;
-    min-width: 298px;
 }
 #signatories {
     clear: both;
@@ -218,7 +238,7 @@ label {
     padding: 0;
     margin: 0 0 0 1.5em;
 }
-input.error, input[type=text].error, select.error, input[type=radio] {
+input.error, input[type=text].error, select.error, input[type=radio].error {
     border: solid 2px #990000;
     background-color: #ffcccc;
 }
@@ -234,23 +254,11 @@ input.error, input[type=text].error, select.error, input[type=radio] {
 
 .finished {
 	margin: 0 auto 1em;
-	width: 50%;
+	width: 80%;
 	padding: 10px;
 	text-align: center;
 	background-color: #ffcccc;
 	border: solid 2px #990000;
-}
-
-.tips {
-	border: solid 2px #522994;
-	margin: 1em auto;
-	padding: 10px;
-        background-color: #f6e5ff;
-        text-align: center;
-}
-.tips li {
-    padding: 0;
-    margin: 0 0 1em 0;
 }
 
 #spread {

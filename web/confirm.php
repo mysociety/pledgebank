@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.34 2005-04-30 15:54:30 francis Exp $
+ * $Id: confirm.php,v 1.35 2005-05-20 13:37:13 matthew Exp $
  * 
  */
 
@@ -26,6 +26,7 @@ $err = importparams(
 if (!is_null($err))
     err("Sorry -- something seems to have gone wrong");
 
+$local_pledge = false;
 
 if ($q_type == 'pledge') {
     /* Pledges are confirmed by saving a token in the database and sending it to
@@ -38,14 +39,19 @@ if ($q_type == 'pledge') {
     /* Success. */
     $q = db_query('select * from pledges where id = ?', $pledge_id);
     $r = db_fetch_array($q);
-    page_header("PRINT THIS - CUT IT UP - DELIVER LOCALLY", array('nonav' => true));
+    $local_pledge = ($r['country'] == 'UK' && $r['postcode']) ? true : false;
 
+    if ($local_pledge) {
+        page_header("PRINT THIS - CUT IT UP - DELIVER LOCALLY", array('nonav' => true, 'ref'=>'/'.$r['ref']));
+    } else {
+        page_header('Pledge Confirmation', array('ref'=>'/'.$r['ref']) );
+    }
     db_commit();
     $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($r['ref']));
-    ?>
-    <p class="noprint" align="center">Thank you for confirming your pledge.</p>
-    <p class="noprint" align="center">It is now live at <strong><a href="<?=$url?>"><?=$url?></a></strong> and people can sign up to it there.<p>
-    <?  advertise_flyers($pledge_id);
+?>
+    <p class="noprint" align="center"><strong>Thank you for confirming your pledge.</strong></p>
+    <p class="noprint" align="center">It is now live at <strong><a href="<?=$url?>"><?=$url?></a></strong> and people can sign up to it there.</p>
+<?  advertise($local_pledge, $r);
 } elseif ($q_type == 'signature') {
     /* OK, that wasn't a pledge confirmation token. So we must be signing a
      * pledge. */
@@ -57,10 +63,14 @@ if ($q_type == 'pledge') {
     # double confirm.
     # auth_token_destroy('signup-web', $q_token);
 
-    $title = db_getOne('select title from pledges where id = ?',
+    $row = db_getRow('select * from pledges where id = ?',
                         $data['pledge_id']);
-                        
-    page_header("Sign up to '$title'", array('nonav' => true));
+    $local_pledge = ($row['country'] == 'UK' && $row['postcode']) ? true : false;
+    if ($local_pledge) {                        
+        page_header("Sign up to '$row[title]'", array('nonav' => true, 'ref'=>'/'.$row['ref']));
+    } else {
+        page_header("Sign up to '$row[title]'", array('ref'=>'/'.$row['ref']) );
+    }
 
     $r = PLEDGE_ERROR;
     $f1 = null;
@@ -107,8 +117,8 @@ if ($q_type == 'pledge') {
             /* Has this completed the pledge? */
             print "<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
         else {
-            /* Otherwise advertise flyers. */
-            advertise_flyers($data['pledge_id']);
+            /* Otherwise advertise */
+            advertise($local_pledge, $row);
         }
         db_commit();
     } else {
@@ -122,18 +132,33 @@ if ($q_type == 'pledge') {
         if ($r == PLEDGE_SIGNED) {
             print "<p align=\"center\">You've already signed up to this pledge, there's no need
                     to sign it again.</p>";
-            advertise_flyers($data['pledge_id']);
+            advertise($local_pledge, $row);
         } else {
             oops($r);
         }
     }
 }
-page_footer(array('nonav'=>true));
+if ($local_pledge) {
+    page_footer(array('nonav'=>true));
+} else {
+    page_footer();
+}
 
-/* advertise_flyers PLEDGE
+/* advertise LOCAL PLEDGE_ROW
+   Print relevant advertising */
+function advertise($local, $r) {
+    if ($local) {
+        advertise_flyers($r);
+    } else {
+        advertise_sms($r);
+        $p = new Pledge($r);
+        view_friends_form($p);
+    }
+}
+
+/* advertise_flyers PLEDGE_ROW
  * Print some stuff advertising flyers for PLEDGE. */
-function advertise_flyers($pledge_id) {
-    $r = db_getRow('select * from pledges where id = ?', $pledge_id);
+function advertise_flyers($r) {
     $png_flyers8_url = new_url("/flyers/{$r['ref']}_A4_flyers8.png", false);
 
     ?>
@@ -143,7 +168,7 @@ You will massively increase the chance of this pledge succeeding if you
     if (!$r['password']) {
         print_this_link("print this page out", "");
         ?>
-    (or use <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">these more attractive PDF versions</a>),
+    (or use <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">these more attractive PDF and RTF (Word) versions</a>),
 <?
    } else {
         // TODO - we don't have the password raw here, but really want it on
@@ -162,25 +187,31 @@ go out to the shops or your pledge is unlikely to succeed.</strong></big>
     // work for the password protected ones, you can't POST a password
     // into an IMG SRC= link)
     if (!$r['password']) { ?>
-
 <p align="center"><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
-<?
-    /* Similarly for SMS note, since private pledges can't be signed by SMS. */
-    if (!$r['password'])
-        ?>
-<p class="noprint" align="center">You can also invite people to sign up the the pledge by
-<b>SMS</b>. Simply ask them to text
-<b>pledge&nbsp;<?=htmlspecialchars($r['ref'])?></b> to <b>60022</b>. The SMS
-costs 25p (plus your normal text fee). We will send signers an SMS when the
-pledge completes.</p>
+<?  }
+    advertise_sms($r);
+}
 
-<p class="noprint" style="text-align: center;"><small>The small print: operated by
+/* advertise_sms PLEDGE_ROW
+ * Prints some stuff about SMS for PLEDGE.
+ * Only for passwordless pledges, since private pledges can't be signed by SMS. */
+function advertise_sms($r) {
+    if (!$r['password']) {
+?>
+<p class="noprint"><strong>Take your Pledge to the pub</strong> &ndash; next time you're out and about,
+get your friends to sign up by having them text
+<strong>pledge&nbsp;<?=htmlspecialchars($r['ref'])?></strong> to <strong>60022</strong>.
+The text costs your normal rate, and we'll keep them updated about progress via their
+mobile.</p>
+
+<? # Below not needed as we're currently not charging premium rate
+/* <p class="noprint" style="text-align: center;"><small>The small print: operated by
 mySociety, a project of UK Citizens Online Democracy. Sign-up message costs
-25p + your normal text rate. Further messages from us are free.
+your normal text rate. Further messages from us are free.
 Questions about this SMS service? Call us on 08453&nbsp;330&nbsp;160 or
-email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</small></p>
-<?
-    }
+email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</small></p> */
+?>
+<?   }
 }
 
 /* oops CODE

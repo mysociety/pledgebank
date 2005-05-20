@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.5 2005-05-18 19:55:14 francis Exp $
+// $Id: new.php,v 1.6 2005-05-20 13:37:13 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -36,7 +36,7 @@ function pledge_form_one($data = array(), $errors = array()) {
 		print '</li></ul></div>';
 	} else {
 ?>
-<div class="tips" style="text-align: left">
+<div id="tips">
 <h2>Top Tips for Successful Pledges</h2>
 <ol>
 
@@ -123,16 +123,13 @@ function pledge_form_two($data, $errors = array()) {
 ?>
 
 <p>Your pledge looks like this so far:</p>
-<?  
+<?  }
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
-    }
 ?>
 
-<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
-<input type="hidden" name="newpost" value="2">
-
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="2">
 <h2>New Pledge &#8211; Step 2 of 3</h2>
 
 <input type="hidden" name="comparison" value="atleast">
@@ -152,7 +149,7 @@ is fulfilled?
 </p>
 
 <p><span id="local_line">Within the UK, is your pledge specific to a local area?</span>
-<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> Yes
+<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> Yes
 <input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> No
 <br>
 <span id="postcode_line">
@@ -274,13 +271,14 @@ function step2_error_check($data) {
     }
     if ($data['country'] == "(choose one)") 
         $errors['country'] = 'Please choose which country your pledge applies to';
-    if ($data['country'] == "UK") 
-        if ((!array_key_exists('local', $data)) || ($data['local'] != '1' && $data['local'] != '0'))
+    elseif ($data['country'] == 'UK') { 
+        if ($data['local'] != '1' && $data['local'] != '0')
             $errors['local'] = 'Please choose whether the pledge is local or not';
-    if ($data['local'] && !$data['postcode']) 
-        $errors['postcode'] = 'For local pledges, please enter a postcode';
-    if ($data['local'] && !validate_postcode($data['postcode'])) 
-        $errors['postcode'] = 'Please enter a valid postcode, such as OX1 3DR';
+        if ($data['local'] && !$data['postcode']) 
+            $errors['postcode'] = 'For local pledges, please enter a postcode';
+        if ($data['local'] && !validate_postcode($data['postcode'])) 
+            $errors['postcode'] = 'Please enter a valid postcode, such as OX1 3DR';
+    }
     if ($data['visibility'] == 'password' && !$data['password']) 
         $errors['password'] = 'Please enter a password';
     return $errors;
@@ -298,7 +296,11 @@ function pledge_form_two_submitted() {
     if (!$step1data) $errors[] = 'Transferring the data from Step 1 to Step 2 failed :(';
     unset($data['data']);
     $data = array_merge($step1data, $data);
+
     if (!$data['local']) $data['postcode'] = '';
+    if ($data['country'] != 'UK') {
+        $data['local'] = ''; $data['postcode'] = '';
+    }
     if ($data['visibility'] != 'password') { $data['visibility'] = 'all'; $data['password'] = ''; }
 
     $errors = step2_error_check($data);
@@ -360,7 +362,7 @@ function preview_pledge($data) {
     /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ 
 ?>
 
-<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
 <h2>New Pledge &#8211; Step 3 of 3</h2>
 
 <p>Please check the details you have entered, both the pledge above and other details below, and then either click "Create" to create your pledge, or one of the two "Back" buttons to go back and edit your data.</p>

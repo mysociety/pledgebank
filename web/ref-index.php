@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.4 2005-05-18 11:17:27 francis Exp $
+// $Id: ref-index.php,v 1.5 2005-05-20 13:37:13 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -22,7 +22,7 @@ if ($password_box) {
     exit;
 }
 
-page_header("'I will " . $p->h_title() . "'");
+page_header("'I will " . $p->h_title() . "'", array('ref'=>$p->url_main(), 'noreflink'=>1) );
 
 if (!$p->open()) {
     print '<p class="finished">This pledge is now closed, as its deadline has passed.</p>';
@@ -105,7 +105,7 @@ if ($anon || $unknownname) {
 print '</ul>';
 print '</div>';
 
-print '<div id="comments"><h2><a name="comments">Comments on this pledge</a></h2>';
+print "\n\n" . '<div id="comments"><h2><a name="comments">Comments on this pledge</a></h2>';
 comments_show($p->id()); 
 comments_form($p->id(), 1);
 print '</div>';

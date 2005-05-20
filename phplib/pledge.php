@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.55 2005-05-09 17:33:33 francis Exp $
+ * $Id: pledge.php,v 1.56 2005-05-20 13:37:12 matthew Exp $
  * 
  */
 
@@ -43,7 +43,7 @@ class Pledge {
     // Internal function to calculate some values from data
     function _calc() {
         // Fill in partial pledges (ones being made still)
-        if (!array_key_exists('signers', $this->data)) $this->data['signers'] = 0;
+        if (!array_key_exists('signers', $this->data)) $this->data['signers'] = -1;
         if (!array_key_exists('confirmed', $this->data)) $this->data['confirmed'] = 'f';
         if (!array_key_exists('open', $this->data)) $this->data['open'] = 't';
 
@@ -104,11 +104,13 @@ class Pledge {
     //     showdetails - if present, show "details" field
     function render_box($params) {
 ?>
-<div class="tips">
+<div id="pledge">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($this->data, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
 <p>Deadline: <strong><?=$this->h_pretty_date()?></strong>.
+<? if ($this->signers() >= 0) { ?>
 <i><?=prettify($this->signers()) ?> <?=make_plural($this->signers(), 'person has', 'people have') ?> signed up<?=($this->left()<0?' ('.prettify(-$this->left()).' over target)':', '.prettify($this->left()).' more needed') ?></i>
+<? } ?>
 </p>
 <?
         if (array_key_exists('showdetails', $params) && isset($this->data['detail']) && $this->data['detail']) {
@@ -420,7 +422,7 @@ function pledge_sign_box() {
     else
         $showname = ' checked';
 ?>
-<form accept-charset="utf-8" class="pledgesign" name="pledge" action="/<?=htmlspecialchars(get_http_var('ref')) ?>/sign" method="post">
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=htmlspecialchars(get_http_var('ref')) ?>/sign" method="post">
 <input type="hidden" name="add_signatory" value="1">
 <input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>">

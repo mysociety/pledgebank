@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.22 2005-05-13 18:36:38 matthew Exp $
+// $Id: page.php,v 1.23 2005-05-20 13:37:12 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -44,7 +44,19 @@ function page_header($title, $params = array()) {
 <hr class="v"><?
         if (array_key_exists('noprint', $params) and $params['noprint'])
             print '</div> <!-- noprint -->';
-    } ?>
+    }
+
+        if (array_key_exists('ref', $params)) {
+            $url = OPTION_BASE_URL . $params['ref'];
+            print '<p id="reference">This pledge\'s permanent location: ';
+            if (!array_key_exists('noreflink', $params))
+                print '<a href="' . $url . '">';
+            print '<strong>'. str_replace('http://', '', $url) . '</strong>';
+            if (!array_key_exists('noreflink', $params))
+                print '</a>';
+            print '</p>';
+        }
+?>
 <div id="content"><?    
 
     // Warn that we are on a testing site
@@ -60,6 +72,7 @@ function page_header($title, $params = array()) {
 ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
 <em>Note: On this test site, the date is faked to be <?=$pb_today?></em></p><?
     }
+
     }
 }
 

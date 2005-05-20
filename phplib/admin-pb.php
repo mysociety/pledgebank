@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.44 2005-05-18 12:49:01 francis Exp $
+ * $Id: admin-pb.php,v 1.45 2005-05-20 20:29:50 matthew Exp $
  * 
  */
 
@@ -81,9 +81,9 @@ class ADMIN_PAGE_PB_MAIN {
                 $row .= '<td>None</td>';
 
             $row .= '<td><select name="prominence['.$r['id'].']">';
-            $row .= '<option value="normal" ' . ($r['prominence']=='normal'?'selected':'') . ' >normal</option';
-            $row .= '<option value="frontpage" ' . ($r['prominence']=='frontpage'?'selected':'') . ' >frontpage</option';
-            $row .= '<option value="backpage" ' . ($r['prominence']=='backpage'?'selected':'') . ' >backpage</option';
+            $row .= '<option value="normal"' . ($r['prominence']=='normal'?' selected':'') . '>normal</option>';
+            $row .= '<option value="frontpage"' . ($r['prominence']=='frontpage'?' selected':'') . '>frontpage</option>';
+            $row .= '<option value="backpage"' . ($r['prominence']=='backpage'?' selected':'') . '>backpage</option>';
             $row .= '</select></td>';
 
             if ($r['open'] == 't')

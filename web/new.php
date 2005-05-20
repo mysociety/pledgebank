@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.6 2005-05-20 13:37:13 matthew Exp $
+// $Id: new.php,v 1.7 2005-05-20 14:30:10 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -140,7 +140,7 @@ is fulfilled?
 </p> */?>
 
 <p>Which country does your pledge apply to?
-<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onclick="update_postcode_local(true)">
+<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_postcode_local(this, true)">
   <option>(choose one)</option>
   <!-- needs explicit values for IE Javascript -->
   <option value="UK" <? if ($country=='UK') print ' selected'; ?> >UK</option>
@@ -149,8 +149,8 @@ is fulfilled?
 </p>
 
 <p><span id="local_line">Within the UK, is your pledge specific to a local area?</span>
-<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> Yes
-<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> No
+<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> Yes
+<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> No
 <br>
 <span id="postcode_line">
 If yes, enter your postcode so that local people can find your pledge:

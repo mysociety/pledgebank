@@ -5,21 +5,26 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.25 2005-05-20 13:37:12 matthew Exp $
+// $Id: fns.php,v 1.26 2005-05-20 17:42:21 chris Exp $
 
 require_once "../../phplib/evel.php";
+require_once "pledge.php";
 
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
-    $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
-    $values['sentence_third'] = pledge_sentence($values['id'], array('firstperson' => false));
+    if (array_key_exists('id', $values)) {
+        $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
+        $values['sentence_third'] = pledge_sentence($values['id'], array('firstperson' => false));
+        $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
+        if ($values['actual'] >= $values['target'])
+            $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? 'exceeded' : 'met');
+    }
+    if (array_key_exists('ref', $values))
+        $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];
+    if (array_key_exists('date', $values))
+        $values['pretty_date'] = prettify($values['date'], false);
+        
     $values['signature'] = "-- the PledgeBank.com team\n";
-    $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];
-    $values['pretty_date'] = prettify($values['date'], false);
-
-    $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
-    if ($values['actual'] >= $values['target'])
-        $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? 'exceeded' : 'met');
 
     $template = file_get_contents("../templates/emails/$template_name");
     $spec = array(

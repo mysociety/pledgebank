@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.45 2005-05-20 20:29:50 matthew Exp $
+ * $Id: admin-pb.php,v 1.46 2005-05-21 09:03:00 matthew Exp $
  * 
  */
 
@@ -550,7 +550,7 @@ EOF;
                     
                 /* Info on the pledge. Print for all categories. */
                 print '<table><tr><th colspan="2" style="text-align: center;">Pledge '
-                        . '<a style="color: white;">href="/' . $pledge['ref'] . '">'
+                        . '<a style="color: white;" href="/' . $pledge['ref'] . '">'
                         . htmlspecialchars($pledge['title'])
                         . '</a>'
                         . '</th></tr><tr><th width="15%">Creator</th><td>'

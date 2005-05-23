@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.5 2005-05-23 15:25:00 chris Exp $
+ * $Id: login.php,v 1.6 2005-05-23 15:36:32 chris Exp $
  * 
  */
 
@@ -98,9 +98,8 @@ if (!is_null($P)) {
         change_password_page($P);
     if (!is_null($q_name) && !$P->matches_name($q_name))
         /* ... but they have specified a name which differs from their recorded
-         * name. So we need to present them with a page that lets them alter or
-         * keep their name. */
-        change_name_page($P);
+         * name. Change it. */
+        $P->name($q_name);
     if (!is_null($q_stash))
         /* No name change, just pass them through to the page they actually
          * wanted. */
@@ -142,13 +141,10 @@ else if (!is_null($q_t)) {
 */
     if (true)
         change_password_page($P);
-    else if ($P->matches_name($q_name))
-        stash_redirect($q_stash);
-            /* NOTREACHED */
-    else {
-        change_name_page($P);
-        return;
-    }
+    else if (!$P->matches_name($q_name))
+        $P->name($q_name);
+    stash_redirect($q_stash);
+        /* NOTREACHED */
 }
 
 /* login_page
@@ -171,13 +167,10 @@ function login_page() {
             /* User has logged in correctly. Decide whether they are changing
              * their name. */
             set_login_cookie($P);
-            if ($P->matches_name($q_name))
-                stash_redirect($q_stash);
-                    /* NOTREACHED */
-            else {
-                change_name_page($P);
-                return;
-            }
+            if (!$P->matches_name($q_name))
+                $P->name($q_name);
+            stash_redirect($q_stash);
+                /* NOTREACHED */
         }
     } else if ($q_SendEmail) {
         /* User has asked to be sent email. */
@@ -353,53 +346,6 @@ EOF;
 <p>Alternatively<br>
 <input type="submit" name="NoPassword" value="Continue without setting a password"><br>
 <small>(you can set a password later if you want)</small></p>
-</form>
-
-</div>
-EOF;
-
-    page_footer(array('nonav' => 1));
-    exit();
-}
-
-/* change_name_page PERSON
- * Show the logged-in PERSON a form to allow them to change or keep the
- * stored name for their account. */
-function change_name_page($P) {
-    global $q_name, $q_h_name, $q_h_stash, $q_ChangeName, $q_KeepName;
-error_log("q_ChangeName = $q_ChangeName\n");
-error_log("q_KeepName = $q_KeepName\n");
-    if ($q_ChangeName) {
-        $P->name($q_name);
-        return;
-    } else if ($q_KeepName || $P->matches_name($q_name))
-        return;
-
-    page_header('Your name');
-
-    global $q_h_name;
-    $n = htmlspecialchars($P->name());
-    print <<<EOF
-<p>We notice that the name you've just entered, <strong>$q_h_name</strong>,
-isn't the same as the name you've previously given us, <strong>$n</strong>.
-Would you like to change the name we've stored for you? This won't affect the
-name displayed on any of your previous pledges or comments.</p>
-
-<div class="pledge">
-
-<form class="login" method="POST" accept-charset="utf-8">
-<input type="hidden" name="stash" value="$q_h_stash">
-
-<div class="form_row">
-    <label for="name">Your name</label>
-    <input type="text" name="name" id="name" size="20" value="$q_h_name">
-</div>
-
-<p><input type="submit" name="ChangeName" value="Change my name"></p>
-
-<p><input type="submit" name="KeepName" value="Keep my old name"><br>
-<small>(You can change this later if you want)</small></p>
-</p>
 </form>
 
 </div>

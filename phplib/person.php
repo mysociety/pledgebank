@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.3 2005-05-23 12:05:43 chris Exp $
+ * $Id: person.php,v 1.4 2005-05-23 15:09:15 chris Exp $
  * 
  */
 
@@ -94,14 +94,20 @@ class Person {
     }
 }
 
-/* person_cookie_token ID
- * Return an opaque version of ID to identify a person in a cookie. */
-function person_cookie_token($id) {
+/* person_cookie_token ID [EXPIRES]
+ * Return an opaque version of ID to identify a person in a cookie. If
+ * supplied, EXPIRES is the time at which the cookie will expire (verified by
+ * the server); otherwise a point in the near future is used. */
+function person_cookie_token($id, $expires = null) {
+    if (is_null($expires))
+        $expires = time() + 600; /* XXX should be option */
     if (!preg_match('/^[1-9]\d*$/', $id))
         err("ID should be a decimal integer, not '$id'");
+    if (!preg_match('/^[1-9]\d*$/', $expires) || $expires <= time())
+        err("EXPIRES should be a decimal integer representing a time in the future, not '$expires'");
     $salt = bin2hex(random_bytes(8));
-    $sha = sha1("$id/$salt/" . db_secret());
-    return sprintf('%d/%s/%s', $id, $salt, $sha);
+    $sha = sha1("$id/$expires/$salt/" . db_secret());
+    return sprintf('%d/%d/%s/%s', $id, $expires, $salt, $sha);
 }
 
 /* person_check_cookie_token TOKEN
@@ -111,10 +117,12 @@ function person_cookie_token($id) {
  * have been locked with SELECT ... FOR UPDATE. */
 function person_check_cookie_token($token) {
     $a = array();
-    if (!preg_match('#^([1-9]\d*)/([0-9a-f]+)/([0-9a-f]+)$#', $token, $a))
+    if (!preg_match('#^([1-9]\d*)/([1-9]\d*)/([0-9a-f]+)/([0-9a-f]+)$#', $token, $a))
         return null;
-    list($x, $id, $salt, $sha) = $a;
-    if (sha1("$id/$salt/" . db_secret()) != $sha)
+    list($x, $expires, $id, $salt, $sha) = $a;
+    if (sha1("$id/$expires/$salt/" . db_secret()) != $sha)
+        return null;
+    else if ($expires < time())
         return null;
     else if (is_null(db_getOne('select id from person where id = ? for update', $id)))
         return null;
@@ -147,7 +155,7 @@ function person_signon($reason, $email, $name = null) {
 
     /* Get rid of any previous cookie -- if user is logging in again under a
      * different email, we don't want to remember the old one. */
-    setcookie('pb_person_id', false);
+    setcookie('pb_person_id', false, null, '/', OPTION_WEB_DOMAIN, false);
 
     if (headers_sent())
         err("Headers have already been sent in person_signon without cookie being present");

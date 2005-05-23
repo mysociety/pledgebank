@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.32 2005-05-20 14:30:10 matthew Exp $
+ * $Id: pb.css,v 1.33 2005-05-23 11:00:06 sandpit Exp $
  * 
  */
 
@@ -41,8 +41,24 @@ blockquote {
     font-style: italic;
 }
 
+#tomtalks {
+	float: right;
+    clear: right;
+	border: solid 2px #522994;
+	padding: 3px;
+	text-align: center;
+	font-size: 100%;
+	color: #000000;
+	background-color: #C6B5DE;
+	width: 9em;
+}
+#tomtalks a {
+	color: #000000;
+}
+
 #start a {
 	float: right;
+    clear: right;
 	border: solid 2px #522994;
 	padding: 3px;
 	text-align: center;

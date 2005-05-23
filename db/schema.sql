@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.81 2005-05-18 12:56:56 chris Exp $
+-- $Id: schema.sql,v 1.82 2005-05-23 09:30:09 chris Exp $
 --
 
 -- secret
@@ -701,3 +701,45 @@ create table requeststash (
         ),
     extra text
 );
+
+create function pb_delete_pledge(integer)
+    returns void as '
+    begin
+        delete from abusereport where what_id = $1 and what = ''pledge'';
+        -- messages
+        delete from from message_signer_recipient
+            where signer_id in (select id from signers where pledge_id = $1);
+        delete from message_creator_recipient where pledge_id = $1;
+        delete from message where pledge_id = $1;
+        -- signers etc.
+        delete from smssubscription where pledge_id = $1;
+        delete from smssubscription
+            where signer_id in (select id from signers where pledge_id = $1);
+        delete from signers where pledge_id = $1;
+        -- comments
+        delete from comment where pledge_id = $1;
+        -- the pledge itself
+        delete from pledges where pledge_id = $1;
+        return;
+    end
+' language 'plpgsql';
+
+create function pb_delete_signer(integer)
+    returns void as '
+    begin
+        delete from abusereport where what_id = $1 and what = ''signer'';
+        delete from message_signer_recipient where signer_id = $1;
+        delete from smssubscription where signer_id = $1;
+        delete from signers where id = $1;
+        return;
+    end
+' language 'plpgsql';
+
+create function pb_delete_comment(integer)
+    returns void as '
+    begin
+        delete from abusereport where what_id = $1 and what = ''comment'';
+        delete from comment where id = $1;
+        return;
+    end
+' language 'plpgsql';

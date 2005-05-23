@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.56 2005-05-20 13:37:12 matthew Exp $
+ * $Id: pledge.php,v 1.57 2005-05-23 09:30:09 chris Exp $
  * 
  */
 
@@ -440,3 +440,23 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
 <? 
 
 }
+
+/* pledge_delete_pledge ID
+ * Delete the pledge with the given ID, and all its signers and comments. */
+function pledge_delete_pledge($id) {
+    db_query('select pb_delete_pledge(?)', $id);
+}
+
+/* pledge_delete_signer ID
+ * Delete the siger with the given ID. */
+function pledge_delete_signer($id) {
+    db_query('select pb_delete_signer(?)', $id);
+}
+
+/* pledge_delete_comment ID
+ * Delete the comment with the given ID. */
+function pledge_delete_comment($id) {
+    db_query('select pb_delete_comment(?)', $id);
+}
+
+?>

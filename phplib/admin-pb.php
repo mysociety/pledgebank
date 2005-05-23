@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.46 2005-05-21 09:03:00 matthew Exp $
+ * $Id: admin-pb.php,v 1.47 2005-05-23 09:30:09 chris Exp $
  * 
  */
 
@@ -200,24 +200,13 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function remove_pledge($id) {
-        db_query('DELETE FROM message_signer_recipient WHERE signer_id IN
-            (SELECT id FROM signers WHERE pledge_id = ?)', array($id));
-        db_query('DELETE FROM message_creator_recipient WHERE pledge_id = ?', array($id));
-        db_query('DELETE FROM message WHERE pledge_id = ?', array($id));
-        db_query('DELETE FROM smssubscription WHERE pledge_id = ?', array($id));
-        db_query('DELETE FROM smssubscription WHERE signer_id IN
-            (SELECT id FROM signers WHERE pledge_id = ?)', array($id));
-        db_query('DELETE FROM signers WHERE pledge_id = ?', array($id));
-        db_query('DELETE FROM comment WHERE pledge_id = ?', array($id));
-        db_query('DELETE FROM pledges WHERE id = ?', array($id));
+        pledge_delete_pledge($id);
         db_commit();
         print '<p><em>That pledge has been successfully removed, along with all its signatories.</em></p>';
     }
 
     function remove_signer($id) {
-        db_query('DELETE FROM message_signer_recipient WHERE signer_id = ?', array($id));
-        db_query('DELETE FROM smssubscription WHERE signer_id = ?', array($id));
-        db_query('DELETE FROM signers WHERE id = ?', array($id));
+        pledge_delete_signer($id);
         db_commit();
         print '<p><em>That signer has been successfully removed.</em></p>';
     }
@@ -449,18 +438,24 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
 
     function display($self_link) {
         db_connect();
-
         
         if (array_key_exists('prev_url', $_POST)) {
             $do_discard = false;
             if (get_http_var('discardReports'))
                 $do_discard = true;
             foreach ($_POST as $k => $v) {
-                $m = array();
                 if ($do_discard && preg_match('/^ar_([1-9]\d*)$/', $k, $a))
                     db_query('delete from abusereport where id = ?', $a[1]);
                 if (preg_match('/^delete_(comment|pledge|signer)_([1-9]\d*)$/', $k, $a)) {
-                    /* XXX delete thing. */
+                    if ($a[1] == 'comment')
+                        pledge_delete_comment($a[2]);
+                    else if ($a[1] == 'pledge')
+                        pledge_delete_pledge($a[2]);
+                    else
+                        pledge_delete_signer($a[2]);
+                    print "Deleted "
+                            . htmlspecialchars($a[1])
+                            . " #" . htmlspecialchars($a[2]) . "<br>";
                 }
             }
 
@@ -513,7 +508,10 @@ table.abusereporttable tr.break { border-top: 1px solid white; }
 
     function do_one_list($self_link, $what) {
 
+        print '<form method="POST"><input type="hidden" name="prev_url" value="'
+                    . htmlspecialchars($self_link) . '">';
         print <<<EOF
+<input type="submit" name="discardReports" value="Discard selected abuse reports">
 <table class="abusereporttable">
     <tr>
         <th style="width: 2em;"></th>
@@ -528,7 +526,6 @@ EOF;
 
         while (list($id, $what_id, $reason, $ipaddr, $t) = db_fetch_row($q)) {
             if ($what_id !== $old_id) {
-                print '<form method="POST"><input type="hidden" name="prev_url" value="' . htmlspecialchars($self_link) . '">';
             
                 /* XXX should group by pledge and then by signer/comment, but
                  * can't be arsed... */

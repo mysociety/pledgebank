@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.9 2005-05-23 12:07:28 chris Exp $
+// $Id: new.php,v 1.10 2005-05-23 12:13:56 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -433,7 +433,7 @@ function create_new_pledge($P, $data) {
     db_query('lock table pledges in share mode');
         /* Can't just use SELECT ... FOR UPDATE since that wouldn't prevent an
          * insert on the table. */
-    if (!is_null(db_getOne('select id from pledges where ref = ? for update', $data['ref']))) {
+    if (is_null(db_getOne('select id from pledges where ref = ?', $data['ref']))) {
         $data['id'] = db_getOne("select nextval('pledges_id_seq')");
         db_query('
                 insert into pledges (

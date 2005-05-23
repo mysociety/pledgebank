@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.58 2005-05-23 16:36:12 chris Exp $
+ * $Id: pledge.php,v 1.59 2005-05-23 16:48:07 francis Exp $
  * 
  */
 
@@ -337,7 +337,7 @@ function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
 }
 
 /* check_password REF ACTUAL_PASSWORD
-   Checks to see if password submitted is correct, returns true if it
+   Checks to see if password (PIN) submitted is correct, returns true if it
    is and false for wrong or no password.  */
 function check_password($ref, $actual) {
     $raw = get_http_var('pw');
@@ -370,10 +370,10 @@ function deal_with_password($link, $ref, $actual) {
 
     $html = "";
     if (get_http_var('pw')) {
-        $html .= '<p class="finished">Incorrect password!</p>';
+        $html .= '<p class="finished">Incorrect PIN!</p>';
     }
-    $html .= '<form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>Password Protected Pledge</h2><p>This pledge is password protected.  Please enter the password to proceed.</p>';
-    $html .= '<p><strong>Password:</strong> <input type="password" name="pw" value=""><input type="submit" name="submitpassword" value="Submit"></p>';
+    $html .= '<form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>PIN Protected Pledge</h2><p>This pledge is password protected.  Please enter the PIN to proceed.</p>';
+    $html .= '<p><strong>PIN:</strong> <input type="password" name="pw" value=""><input type="submit" name="submitpassword" value="Submit"></p>';
     $html .= '</form>';
     return $html;
 }

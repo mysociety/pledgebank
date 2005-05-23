@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.11 2005-05-23 15:07:23 chris Exp $
+// $Id: new.php,v 1.12 2005-05-23 16:48:07 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -187,7 +187,7 @@ If yes, enter your postcode so that local people can find your pledge:
 
 <p>Who do you want to be able to see your pledge?
 <br><input onclick="grey_password(true)" type="radio" name="visibility" value="all"<?=($v=='all'?' checked':'') ?>> Anyone
-<input onclick="grey_password(false)" type="radio" name="visibility" value="password"<?=($v=='password'?' checked':'') ?>> Only people to whom I give this password:
+<input onclick="grey_password(false)" type="radio" name="visibility" value="password"<?=($v=='password'?' checked':'') ?>> Only people to whom I give this PIN:
 <input <? if (array_key_exists('password', $errors)) print ' class="error"' ?> type="text" id="password" name="password" value="">
 </p>
 
@@ -406,7 +406,7 @@ if ($v=='password') print ' Only people to whom I give a password I have specifi
 ?></em></li>
 </ul>
 
-<p><strong>You cannot edit your pledge after you have created it.</strong>
+<p><strong>Check carefully, as you cannot edit your pledge after you have created it.</strong>
 (<a href="/faq#editpledge">why not?</a>)
 </p>
 

@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.7 2005-05-23 15:54:37 chris Exp $
+ * $Id: login.php,v 1.8 2005-05-23 16:48:07 francis Exp $
  * 
  */
 
@@ -161,12 +161,10 @@ function login_page() {
     if ($q_LogIn) {
         /* User has tried to log in. */
         global $q_password;
-        if (is_null($q_password))
-            err('A required parameter was missing');
         $P = person_get($q_email);
         if (is_null($P) || !$P->check_password($q_password)) {
-            login_error_page();
-            return;
+            login_form(array('badpassword'=>'Either your email or password weren\'t recognised.  Please try again.'));
+            exit();
         } else {
             /* User has logged in correctly. Decide whether they are changing
              * their name. */
@@ -199,88 +197,76 @@ continue
         exit();
             /* NOTREACHED */
     } else {
-        /* Just render the form. */
-        global $q_h_stash, $q_h_email, $q_h_name;
-
-        page_header('Checking your email address');
-
-        if (is_null($q_name))
-            $q_name = $q_h_name = '';   /* shouldn't happen */
-
-        $reason = htmlspecialchars(stash_get_extra($q_stash));
-
-        /* Split into two forms to avoid "do you want to remember this
-         * password" prompt in, e.g., Mozilla. */
-        print <<<EOF
-<p>Before we can $reason, we need you to confirm your name and email address.
-Please fill out the form below:</p>
-
-<div class="pledge">
-
-<form class="login" method="POST" accept-charset="utf-8">
-<p>If you've used PledgeBank before, and have a password, please type it
-here:<br>
-<input type="hidden" name="stash" value="$q_h_stash">
-<input type="hidden" name="email" value="$q_h_email">
-<input type="hidden" name="name" value="$q_h_name">
-
-<div class="form_row">
-    <label for="password">Your password</label>
-    <input type="password" name="password" id="password" value="">
-</div>
-
-<div class="form_row">
-    <label for="rememberme">Remember me</label>
-    <input type="checkbox" name="rememberme" id="rememberme" value="1"> <small>(don't use this on a public or shared computer</small>
-</div>
-
-<input type="submit" name="LogIn" value="Let me in!"></p>
-</form>
-
-<form class="login" method="POST" accept-charset="utf-8">
-<input type="hidden" name="stash" value="$q_h_stash">
-
-<div class="form_row">
-    <label for="name">Your name</label>
-    <input type="text" size="20" name="name" id="name" value="$q_h_name">
-</div>
-
-<div class="form_row">
-    <label for="email">Your email</label>
-    <input type="text" size="20" name="email" id="email" value="$q_h_email">
-</div>
-
-<p>Otherwise,<br>
-<input type="submit" name="SendEmail" value="Click here to continue"><br>
-<small>(we'll send an email to confirm your address)</small></p>
-</form>
-
-</div>
-EOF;
-
-        page_footer(array('nonav' => 1));
+        login_form();
         exit();
     }
 }
 
-/* login_error_page
- * Page displaying an authentication error. */
-function login_error_page() {
-    global $q_h_stash, $q_h_email, $q_h_name;
-    if (is_null($q_h_stash) || is_null($q_h_email) || is_null($q_h_name))
-        err('A required parameter was missing');
-    page_header("Not recognised");
+/* login_form */
+function login_form($errors = array()) {
+    /* Just render the form. */
+    global $q_h_stash, $q_h_email, $q_h_name, $q_stash, $q_email, $q_name;
+
+    page_header('Checking your email address');
+
+    if (is_null($q_name))
+        $q_name = $q_h_name = '';   /* shouldn't happen */
+
+    $reason = htmlspecialchars(stash_get_extra($q_stash));
+
+	if (sizeof($errors)) {
+		print '<div id="errors"><ul><li>';
+		print join ('</li><li>', array_values($errors));
+		print '</li></ul></div>';
+	}  else {
+        print "<p>Before we can $reason, we need to confirm your name and email address.</p>";
+    }
+
+    /* Split into two forms to avoid "do you want to remember this
+     * password" prompt in, e.g., Mozilla. */
     print <<<EOF
-<p><strong>We didn't recognise your email address or password</strong></p>
-<form method="POST" accept-charset="utf-8">
+
+<div class="pledge">
+
+<p><strong>Do you have a PledgeBank password?</strong></p>
+
+<ul>
+
+<form class="login" method="POST" accept-charset="utf-8">
+<input type="hidden" name="stash" value="$q_h_stash">
+<input type="hidden" name="name" id="name" value="$q_h_name">
+<input type="hidden" name="email" id="email" value="$q_h_email">
+
+<li>No, I haven't used PledgeBank before.
+
+<input type="submit" name="SendEmail" value="Click here to continue"><br>
+<small>(we'll send an email to confirm your address)</small></p>
+
+</li>
+</form>
+
+<form class="login" method="POST" accept-charset="utf-8">
+<li><p>Yes, I have a password:
+
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
-<input type="submit" name="goBack" value="Go back and try again">
+
+<input type="password" name="password" id="password" value="">
+<input type="submit" name="LogIn" value="Let me in"></p>
+
+<input type="checkbox" name="rememberme" id="rememberme" value="1"><strong>Remember me</strong></input>
+<small>(don't use this on a public or shared computer)</small>
+
+</li>
 </form>
+
+</ul>
+
+</div>
 EOF;
-    page_footer(array('nonav' => true));
-    exit();
+
+    page_footer(array('nonav' => 1));
 }
 
 /* change_password_page PERSON

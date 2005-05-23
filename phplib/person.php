@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.5 2005-05-23 15:54:37 chris Exp $
+ * $Id: person.php,v 1.6 2005-05-23 16:48:07 francis Exp $
  * 
  */
 
@@ -167,7 +167,7 @@ function person_signon($reason, $email, $name = null) {
      * page, either to log in or to prove their email address. */
     $st = stash_request($reason);
     db_commit();
-    header("Location: login.php?stash=$st&email=" . urlencode($email) . "&name=" . urlencode($name));
+    header("Location: login?stash=$st&email=" . urlencode($email) . "&name=" . urlencode($name));
     exit();
 }
 

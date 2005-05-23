@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.8 2005-05-23 12:05:43 chris Exp $
+// $Id: new.php,v 1.9 2005-05-23 12:07:28 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -61,6 +61,13 @@ the door of that neighbour whose name you've forgotten.</li>
 <?
     }
     global $pb_time;
+    $P = person_if_signed_on();
+    if (!is_null($P)) {
+        if (!array_key_exists('email', $data))
+            $data['email'] = $P->email();
+        if (!array_key_exists('name', $data))
+            $data['name'] = $P->name();
+    }
 ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="1">

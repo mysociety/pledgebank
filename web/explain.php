@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.1 2005-05-23 15:02:53 sandpit Exp $
+// $Id: explain.php,v 1.2 2005-05-23 15:26:28 sandpit Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -17,11 +17,13 @@ page_header("What is PledgeBank?");
 <h2>Tell the world "I'll do it, but only if you'll help me do it"</h2>
 
 <p>
-mySociety's director Tom Steinberg explains how PledgeBank works.
 You can <a href="tom-on-pledgebank-vbr.mp3">listen to an MP3</a>
 of this instead.
 
-<blockquote>Hello.  I'm Tom Steinberg, the director of mySociety, the charitable
+<blockquote> <a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
+alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0"></a>
+
+Hello.  I'm Tom Steinberg, the director of mySociety, the charitable
 group which is building PledgeBank.  I've taken the unusual step of
 recording this introduction because PledgeBank is a slightly unusual
 idea.  I've found that explaining it in person often works better than
@@ -73,6 +75,8 @@ your community, in your place of employment, your university, amongst
 your friends, or in your street.  Please take a look at PledgeBank.com
 and create a pledge right now.  Thank you.
 </blockquote>
+
+<p><a href="/">To PledgeBank front page</a>
 <?
 
 page_footer();

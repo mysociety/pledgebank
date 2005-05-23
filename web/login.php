@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.6 2005-05-23 15:36:32 chris Exp $
+ * $Id: login.php,v 1.7 2005-05-23 15:54:37 chris Exp $
  * 
  */
 
@@ -91,25 +91,10 @@ importparams(
         array('ChangeName',     '/^.+$/',            '', false)
     );
 
-$P = person_if_signed_on();
-if (!is_null($P)) {
-    /* Person is already signed in. */
-    if ($q_SetPassword)
-        change_password_page($P);
-    if (!is_null($q_name) && !$P->matches_name($q_name))
-        /* ... but they have specified a name which differs from their recorded
-         * name. Change it. */
-        $P->name($q_name);
-    if (!is_null($q_stash))
-        /* No name change, just pass them through to the page they actually
-         * wanted. */
-        stash_redirect($q_stash, array('name' => $P->name()));
-    else
-        err('A required parameter was missing');
-} else if (!is_null($q_stash) && !is_null($q_email) && !is_null($q_name))
-    /* Main login page. */
-    login_page();
-else if (!is_null($q_t)) {
+/* Do token case first because if the user isn't logged in *and* has a token
+ * (unlikely but possible) the other branch would fail for lack of a stash
+ * parameter. */
+if (!is_null($q_t)) {
     /* Process emailed token */
     $d = auth_token_retrieve('login', $q_t);
     if (is_null($d))
@@ -146,6 +131,25 @@ else if (!is_null($q_t)) {
     stash_redirect($q_stash);
         /* NOTREACHED */
 }
+
+$P = person_if_signed_on();
+if (!is_null($P)) {
+    /* Person is already signed in. */
+    if ($q_SetPassword)
+        change_password_page($P);
+    if (!is_null($q_name) && !$P->matches_name($q_name))
+        /* ... but they have specified a name which differs from their recorded
+         * name. Change it. */
+        $P->name($q_name);
+    if (!is_null($q_stash))
+        /* No name change, just pass them through to the page they actually
+         * wanted. */
+        stash_redirect($q_stash);
+    else
+        err('A required parameter was missing');
+} else if (!is_null($q_stash) && !is_null($q_email) && !is_null($q_name))
+    /* Main login page. */
+    login_page();
 
 /* login_page
  * Render the login page, or respond to a button pressed on it. */

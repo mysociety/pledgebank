@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.4 2005-05-23 15:09:15 chris Exp $
+ * $Id: person.php,v 1.5 2005-05-23 15:54:37 chris Exp $
  * 
  */
 
@@ -119,7 +119,7 @@ function person_check_cookie_token($token) {
     $a = array();
     if (!preg_match('#^([1-9]\d*)/([1-9]\d*)/([0-9a-f]+)/([0-9a-f]+)$#', $token, $a))
         return null;
-    list($x, $expires, $id, $salt, $sha) = $a;
+    list($x, $id, $expires, $salt, $sha) = $a;
     if (sha1("$id/$expires/$salt/" . db_secret()) != $sha)
         return null;
     else if ($expires < time())
@@ -150,8 +150,11 @@ function person_if_signed_on() {
  * "sign the pledge '...'" or */
 function person_signon($reason, $email, $name = null) {
     $P = person_if_signed_on();
-    if (!is_null($P) && $P->email() == $email)
+    if (!is_null($P) && $P->email() == $email) {
+        if (!is_null($name) && !$P->matches_name($name))
+            $P->name($name);
         return $P;
+    }
 
     /* Get rid of any previous cookie -- if user is logging in again under a
      * different email, we don't want to remember the old one. */

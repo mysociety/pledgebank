@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.4 2005-05-23 15:11:16 chris Exp $
+ * $Id: login.php,v 1.5 2005-05-23 15:25:00 chris Exp $
  * 
  */
 
@@ -49,6 +49,27 @@ require_once '../phplib/person.php';
 require_once '../phplib/stash.php';
 
 require_once '../../phplib/importparams.php';
+
+/* As a first step try to set a cookie and read it on redirect, so that we can
+ * warn the user explicitly if they appear to be refusing cookies. */
+if (!array_key_exists('pb_test_cookie', $_COOKIE)) {
+    if (array_key_exists('pb_test_cookie', $_GET)) {
+        page_header("Please enable cookies");
+        ?>
+<p>It appears that you don't have "cookies" enabled in your browser.
+<strong>To continue, you must enable cookies</strong>. Please
+read <a href="http://www.google.com/cookies.html">this page from Google
+explaining how to do that</a>, and then click the "back" button and
+try again</p>
+<?
+        page_footer(array('nonav' => 1));
+        exit();
+    } else {
+        setcookie('pb_test_cookie', '1');
+        header("Location: /login.php?" . $_SERVER['QUERY_STRING'] . "&pb_test_cookie=1\n");
+        exit();
+    }
+}
 
 /* Get all the parameters which we might use. */
 importparams(

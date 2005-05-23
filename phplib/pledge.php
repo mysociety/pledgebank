@@ -6,11 +6,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.57 2005-05-23 09:30:09 chris Exp $
+ * $Id: pledge.php,v 1.58 2005-05-23 16:36:12 chris Exp $
  * 
  */
 
 require_once 'db.php';
+require_once 'person.php';
+
 require_once '../../phplib/utility.php';
 require_once '../../phplib/rabx.php';
 
@@ -421,6 +423,20 @@ function pledge_sign_box() {
         $showname = get_http_var('showname') ? ' checked' : '';
     else
         $showname = ' checked';
+
+    $email = get_http_var('email');
+    $name = get_http_var('name');
+
+    $P = person_if_signed_on();
+    if (!is_null($P)) {
+        if (is_null($email) || !$email)
+            $email = $P->email();
+        if (is_null($name) || !$name)
+            $name = $P->name();
+    } else
+        error_log("nobody signed on");
+
+    error_log("$email $name");
 ?>
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=htmlspecialchars(get_http_var('ref')) ?>/sign" method="post">
 <input type="hidden" name="add_signatory" value="1">
@@ -429,8 +445,8 @@ function pledge_sign_box() {
 <h2>Sign up now</h2>
 <? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
 <p><b>
-I, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars(get_http_var('name'))?>">,
-sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars(get_http_var('email')) ?>"></b>
+I, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars($name)?>">,
+sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($email) ?>"></b>
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
 </p>
 <p><input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge </p>

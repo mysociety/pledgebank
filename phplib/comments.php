@@ -6,11 +6,12 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.10 2005-05-09 17:33:33 francis Exp $
+ * $Id: comments.php,v 1.11 2005-05-23 16:36:12 chris Exp $
  * 
  */
 
 require_once('pb.php');
+require_once('person.php');
 require_once('fns.php');
 require_once('db.php');
 
@@ -112,6 +113,15 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
     global $q_h_comment_id;
     global $q_h_author_name, $q_h_author_email, $q_h_author_website;
     global $q_h_text;
+
+    $P = person_if_signed_on();
+    if (!is_null($P)) {
+        if (is_null($q_h_author_name) || !$q_h_author_name)
+            $q_h_author_name = htmlspecialchars($P->name());
+        if (is_null($q_h_author_email) || !$q_h_author_email)
+            $q_h_author_email = htmlspecialchars($P->email());
+    }
+    
 ?>
 <form method="POST" action="comment.php" id="commentform" name="commentform" class="pledge">
 <input type="hidden" name="pledge_id" value="<?=$pledge_id ?>">

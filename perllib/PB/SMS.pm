@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.21 2005-05-20 16:45:35 francis Exp $
+# $Id: SMS.pm,v 1.22 2005-05-23 15:11:49 chris Exp $
 #
 
 package PB::SMS;
@@ -366,7 +366,7 @@ sub receive_sms ($$$$$$) {
                 my ($new_id) =
                     send_sms(
                             $sender,
-                            sprintf('Thanks - you are the %s person to pledge! Go to %s/S/%s to get email instead of texts.',
+                            sprintf('Thanks. You are the %s person to pledge - now nag your friends! Go to %s/S/%s to get emails instead of texts and for more info.',
                                     ordinal($numsigned),
                                     $shorturl,
                                     $token

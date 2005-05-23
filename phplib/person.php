@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.2 2005-05-20 17:42:05 chris Exp $
+ * $Id: person.php,v 1.3 2005-05-23 12:05:43 chris Exp $
  * 
  */
 
@@ -142,8 +142,12 @@ function person_if_signed_on() {
  * "sign the pledge '...'" or */
 function person_signon($reason, $email, $name = null) {
     $P = person_if_signed_on();
-    if (!is_null($P))
+    if (!is_null($P) && $P->email() == $email)
         return $P;
+
+    /* Get rid of any previous cookie -- if user is logging in again under a
+     * different email, we don't want to remember the old one. */
+    setcookie('pb_person_id', false);
 
     if (headers_sent())
         err("Headers have already been sent in person_signon without cookie being present");

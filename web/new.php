@@ -5,10 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.7 2005-05-20 14:30:10 matthew Exp $
+// $Id: new.php,v 1.8 2005-05-23 12:05:43 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
+require_once '../phplib/person.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/auth.php';
 require_once '../phplib/comments.php';
@@ -324,7 +325,7 @@ function pledge_form_three_submitted() {
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
-
+    
     $alldata = unserialize(base64_decode($data['data']));
     if (!$alldata) $errors[] = 'Transferring the data from Preview page failed :(';
     unset($data['data']);
@@ -337,7 +338,11 @@ function pledge_form_three_submitted() {
         pledge_form_two($data, $errors);
         return;
     }
-    create_new_pledge($data);
+
+    /* User must have an account to do this. */
+    $P = person_signon("create the pledge '${data['title']}", $data['email'], $data['name']);
+
+    create_new_pledge($P, $data);
 }
 
 function preview_pledge($data) {
@@ -411,18 +416,23 @@ if ($v=='password') print ' Only people to whom I give a password I have specifi
 }
 
 # Someone has submitted a new pledge
-function create_new_pledge($data) {
+function create_new_pledge($P, $data) {
     $isodate = $data['parseddate']['iso'];
     $token = auth_random_token();
     if ($data['visibility'] == 'all')
         $data['password'] = null;
-    $data['id'] = db_getOne("select nextval('pledges_id_seq')");
-    
-    $add = db_query('
+
+    /* Guard against double-insertion. */
+    db_query('lock table pledges in share mode');
+        /* Can't just use SELECT ... FOR UPDATE since that wouldn't prevent an
+         * insert on the table. */
+    if (!is_null(db_getOne('select id from pledges where ref = ? for update', $data['ref']))) {
+        $data['id'] = db_getOne("select nextval('pledges_id_seq')");
+        db_query('
                 insert into pledges (
                     id, title, target,
                     type, signup, date, datetext,
-                    name, email, ref, token,
+                    person_id, name, ref, token,
                     confirmed,
                     creationtime,
                     detail,
@@ -433,7 +443,7 @@ function create_new_pledge($data) {
                     ?, ?, ?,
                     ?, ?, ?, ?,
                     ?, ?, ?, ?,
-                    false,
+                    true,
                     pb_current_timestamp(),
                     ?,
                     ?,
@@ -442,38 +452,27 @@ function create_new_pledge($data) {
                 )', array(
                     $data['id'], $data['title'], $data['target'],
                     $data['type'], $data['signup'], $isodate, $data['date'],
-                    $data['name'], $data['email'], $data['ref'], $token,
+                    $P->id(), $data['name'], $data['ref'], $token,
                     $data['detail'],
                     $data['comparison'],
                     $data['country'], $data['postcode'],
                     $data['password'] ? sha1($data['password']) : null, $data['identity']
                 ));
 
-    if ($data['category'] != -1)
-        db_query('
-            insert into pledge_category (pledge_id, category_id)
-            values (?, ?)',
-            array($data['id'], $data['category']));
-
-?>
-<h2>Now check your email...</h2>
-<p>You must now click on the link within the email we've just sent you. <strong>Please check your email, and follow the link given there.</strong>  You can start getting other
-people to sign up to your pledge after you have clicked the link in the email.</p>
-<?
-    $url = OPTION_BASE_URL . '/C/' . urlencode($token);
-    $success = pb_send_email_template($data['email'], 'pledge-confirm',
-    array_merge($data, array('url'=>$url, 'date'=>$isodate)));
-    if ($success) {
-        db_commit();
-        global $title;
-        $title = 'Now Check Your Email';
-        return true;
-    } else {
-        db_rollback();
-?>
-<p>Unfortunately, something bad has gone wrong, and we couldn't send an email to the address you gave. Oh dear.</p>
-<?      return false;
+        if ($data['category'] != -1)
+            db_query('
+                insert into pledge_category (pledge_id, category_id)
+                values (?, ?)',
+                array($data['id'], $data['category']));
     }
+
+    db_commit();
+
+    page_header('Pledge created');
+?>
+<p>Your new pledge has been created....</p>
+<p>(placeholder page)</p>
+<?
 }
 
 ?>

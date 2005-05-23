@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.42 2005-05-20 15:09:07 francis Exp $
+# $Id: poster.cgi,v 1.43 2005-05-23 07:50:52 francis Exp $
 #
 
 import os
@@ -213,17 +213,24 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
                 map(lambda text: PyRTF.Paragraph(ss.ParagraphStyles.detail, text), d[1:])
             )
 
-    text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, PyRTF.TEXT('Text', size=int(small_writing+4)),
-            ' ', PyRTF.TEXT('pledge %s' % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
-            ' to ', PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
-            ' or pledge at ', webdomain_text)
     if pledge['password']:
+        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 'Pledge at ', webdomain_text)
         text_para.append(' password ', PyRTF.TEXT('%s' % userpassword, colour=ss.Colours.pb, size=int(small_writing+4)))
+        sms_smallprint = ""
+    else:
+        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 
+                    PyRTF.TEXT('Text', size=int(small_writing+4)), 
+                    ' ', 
+                    PyRTF.TEXT('pledge %s' % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
+                    ' to ', 
+                    PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
+                    ' or pledge at ', webdomain_text)
+        sms_smallprint = "SMS operated by charity UKCOD. Sign-up message costs your normal text rate. Further messages are free. "
 
     story.extend([ text_para, 
         PyRTF.Paragraph(ss.ParagraphStyles.normal, 'This pledge closes on ', PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), '. Thanks!'),
         PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
-            ' SMS operated by charity UKCOD. Sign-up message costs your normal text rate. Further messages are free. Questions? 08453 330 160 or team@pledgebank.com.')
+            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
     ])
 
     c.Sections.append(story)
@@ -339,23 +346,30 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 ('<b>More details:</b> %s' % pledge['detail']).split("\n\n"))
             )
 
-    password_text = ""
     if pledge['password']:
+        pledge_at_text = "Pledge at "
         password_text = ''' password <font color="#522994" size="+2">%s</font>''' % userpassword
+        sms_to_text = ""
+        sms_smallprint = ""
+    else:
+        pledge_at_text = "pledge at "
+        password_text = ""
+        sms_to_text = """<font size="+2">Text</font> <font size="+8" color="#522994">
+            <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
+            or """ % (ref, sms_number)
+        sms_smallprint = """SMS operated by charity UKCOD. Sign-up message
+            costs your normal text rate. Further messages are free. """
 
     story.extend([
-        Paragraph('''<font size="+2">Text</font> <font size="+8" color="#522994">
-            <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
-            or pledge at %s%s''' % 
-            (ref, sms_number, webdomain_text, password_text), p_normal),
+        Paragraph('''%s%s%s%s''' % 
+            (sms_to_text, pledge_at_text, webdomain_text, password_text), p_normal),
         Paragraph('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
             ''' % pledge['date'], p_normal),
         Paragraph('''
-            <b>Small print:</b> SMS operated by charity UKCOD. Sign-up message
-            costs your normal text rate. Further messages are free. Questions?
+            <b>Small print:</b> %s Questions?
             08453 330 160 or team@pledgebank.com.
-            ''', p_smallprint)
+            ''' % sms_smallprint, p_smallprint)
     ])
 
     f = Frame(x1, y1, w, h, showBoundary = 0, 

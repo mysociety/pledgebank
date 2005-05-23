@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.83 2005-05-23 11:24:50 chris Exp $
+-- $Id: schema.sql,v 1.84 2005-05-23 11:51:45 chris Exp $
 --
 
 -- secret
@@ -100,6 +100,9 @@ create table pledges (
     creationtime timestamp not null,
 
     -- confirmation stuff
+    -- XXX now unused because of login mechanism, but there may still be
+    -- unconfirmed pledges floating about so it has to remain for a decent
+    -- interval.
     token text not null,
     confirmed boolean not null default false,
 

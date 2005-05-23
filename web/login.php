@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.3 2005-05-23 12:05:43 chris Exp $
+ * $Id: login.php,v 1.4 2005-05-23 15:11:16 chris Exp $
  * 
  */
 
@@ -197,29 +197,47 @@ continue
 <p>Before we can $reason, we need you to confirm your name and email address.
 Please fill out the form below:</p>
 
-<form method="POST" accept-charset="utf-8">
+<div class="pledge">
+
+<form class="login" method="POST" accept-charset="utf-8">
 <p>If you've used PledgeBank before, and have a password, please type it
 here:<br>
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
-<input type="password" name="password" value=""><br>
+
+<div class="form_row">
+    <label for="password">Your password</label>
+    <input type="password" name="password" id="password" value="">
+</div>
+
+<div class="form_row">
+    <label for="rememberme">Remember me</label>
+    <input type="checkbox" name="rememberme" id="rememberme" value="1"> <small>(don't use this on a public or shared computer</small>
+</div>
+
 <input type="submit" name="LogIn" value="Let me in!"></p>
 </form>
 
-<form method="POST"
+<form class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="$q_h_stash">
 
-<p>Name:
-<input type="text" size="20" name="name" value="$q_h_name"></p>
+<div class="form_row">
+    <label for="name">Your name</label>
+    <input type="text" size="20" name="name" id="name" value="$q_h_name">
+</div>
 
-<p>Email address:
-<input type="text" size="20" name="email" value="$q_h_email"></p>
+<div class="form_row">
+    <label for="email">Your email</label>
+    <input type="text" size="20" name="email" id="email" value="$q_h_email">
+</div>
 
 <p>Otherwise,<br>
 <input type="submit" name="SendEmail" value="Click here to continue"><br>
 <small>(we'll send an email to confirm your address)</small></p>
 </form>
+
+</div>
 EOF;
 
         page_footer(array('nonav' => 1));
@@ -292,20 +310,31 @@ EOF;
         print "<p><strong>$error</strong></p>";
 
     print <<<EOF
-<form method="POST" accept-charset="utf-8">
+<div class="pledge">
+
+<form class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
-<p>Type your password: <input type="password" name="pw1" size="20"><br>
-(again) <input type="password" name="pw2" size="20"></p>
 
-<p><input type="submit" name="SetPassword" value="Set password"></p>
+<div class="form_row">
+    <label for="pw1">Type your password</label>
+    <input type="password" name="pw1" id="pw1" size="20">
+</div>
+
+<div class="form_row">
+    <label for="pw2">(again)</label>
+    <input type="password" name="pw2" size="20">
+</div>
+
+<input type="submit" name="SetPassword" value="Set password">
 
 <p>Alternatively<br>
 <input type="submit" name="NoPassword" value="Continue without setting a password"><br>
 <small>(you can set a password later if you want)</small></p>
 </form>
-</form>
+
+</div>
 EOF;
 
     page_footer(array('nonav' => 1));
@@ -335,9 +364,15 @@ isn't the same as the name you've previously given us, <strong>$n</strong>.
 Would you like to change the name we've stored for you? This won't affect the
 name displayed on any of your previous pledges or comments.</p>
 
-<form method="POST" accept-charset="utf-8">
+<div class="pledge">
+
+<form class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="$q_h_stash">
-<p>Type your name: <input type="text" name="name" size="20" value="$q_h_name"></p>
+
+<div class="form_row">
+    <label for="name">Your name</label>
+    <input type="text" name="name" id="name" size="20" value="$q_h_name">
+</div>
 
 <p><input type="submit" name="ChangeName" value="Change my name"></p>
 
@@ -345,16 +380,19 @@ name displayed on any of your previous pledges or comments.</p>
 <small>(You can change this later if you want)</small></p>
 </p>
 </form>
+
+</div>
 EOF;
 
     page_footer(array('nonav' => 1));
     exit();
 }
 
-/* set_login_cookie PERSON
- * Set a login cookie for the given PERSON. */
-function set_login_cookie($P) {
-    setcookie('pb_person_id', person_cookie_token($P->id()));
+/* set_login_cookie PERSON [EXPIRES]
+ * Set a login cookie for the given PERSON. If set, EXPIRES is the time which
+ * will be set for the cookie to expire; otherwise, a session cookie is set. */
+function set_login_cookie($P, $expires = null) {
+    setcookie('pb_person_id', person_cookie_token($P->id()), $expires, '/', OPTION_WEB_DOMAIN, false);
 }
 
 ?>

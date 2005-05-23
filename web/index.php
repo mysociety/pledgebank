@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.165 2005-05-23 11:00:06 sandpit Exp $
+// $Id: index.php,v 1.166 2005-05-23 15:02:53 sandpit Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -20,49 +20,19 @@ page_footer();
 
 function front_page() {
 ?>
-<p id="tomtalks">
-<a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg" alt=""></a>
-<br>Tom Steinberg explains what all this pledge stuff can do for you.
-<a href="tom-on-pledgebank-vbr.mp3">
-(listen to MP3)</a></p>
 
-<h2>I'll do it if other people will too</h2>
+<h2>Tell the world "I'll do it, but only if you'll help me do it"</h2>
 
-<p>Welcome to PledgeBank, the site that helps you get things done that
-you couldn't do on your own.</p>
+<p><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
+alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0"></a>
+"We all know what it is like to feel powerless, that our own actions
+can't really change the things that we want to change.  PledgeBank is
+about beating that feeling..."
+</p>
 
-<!-- Attempt at transcript (Tom speaks quicker than I type)
-<p>I'm Tom Steinberg the directory of mysociety the charitable group
-which is building 
-
-we all know what it is like to feel powerless, that our own actions
-
-booting that feeling by connecting you with other people who also
-want to make the change, but don't want to take the risk of being
-the only person who wanted to turn up to the meeting or
-
-I'll dos omething but only if other people will pledge to do the same
-thing.
-
-Street party, but only if three people in my street will help me to
-run it
-
-After hours sports club but only if 5 other
-I'll hold a gig but only if 40 people will come along
-
-Real world testing for a while already, and there are some successful
-completed pledges outside
-20 other fans from a BBC radio series to lobby for its release on CD
-8 people who he'd never met to
-5th birthday party.
--->
-
-<p>PledgeBank works by letting people set up pledges like "I'll organise
-a residents' association, but only if 5 people on my street pledge to
-come to my house to talk about it". We've only just entered our
-testing phase; feel free to <a href="/new">set up your own pledges</a>,
-but if you want to publicise them widely, please
-<a href="mailto:team@pledgebank.com">contact us</a> first.</p>
+<p><a href="tom-on-pledgebank-vbr.mp3">Listen to how PledgeBank
+works</a>, as explained by mySociety's director Tom Steinberg.
+Or <a href="/explain">read a full transcript</a>.</p>
 
 <p id="start"><a href="./new"><strong>Start your own pledge &raquo;</strong></a></p>
 
@@ -156,7 +126,7 @@ function list_highest_signup_pledges() {
 
 function list_frontpage_pledges() {
 ?>
-<h2>Some current pledges</h2><?
+<h2>Sign some current pledges</h2><?
 
     $q = db_query("
                 SELECT *, date - pb_current_date() AS daysleft

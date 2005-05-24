@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.59 2005-05-23 16:48:07 francis Exp $
+ * $Id: pledge.php,v 1.60 2005-05-24 11:52:14 francis Exp $
  * 
  */
 
@@ -457,6 +457,79 @@ sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" 
 
 }
 
+/* post_confirm_advertise PLEDGE_ROW
+   Print relevant advertising */
+function post_confirm_advertise($r) {
+    $local = pledge_is_local($r);
+    if ($local) {
+        post_confirm_advertise_flyers($r);
+    } else {
+        post_confirm_advertise_sms($r);
+        $p = new Pledge($r);
+        view_friends_form($p);
+    }
+}
+
+/* post_confirm_advertise_flyers PLEDGE_ROW
+ * Print some stuff advertising flyers for PLEDGE. */
+function post_confirm_advertise_flyers($r) {
+    $png_flyers8_url = new_url("/flyers/{$r['ref']}_A4_flyers8.png", false);
+
+    ?>
+<p class="noprint" align="center"><big><strong>
+You will massively increase the chance of this pledge succeeding if you
+<?
+    if (!$r['password']) {
+        print_this_link("print this page out", "");
+        ?>
+    (or use <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">these more attractive PDF and RTF (Word) versions</a>),
+<?
+   } else {
+        // TODO - we don't have the password raw here, but really want it on
+        // form to pass on for link to flyers page.  Not sure how best to fix
+        // this up.
+        print_link_with_password("/".htmlspecialchars($r['ref'])."/flyers", "", "print these pages out");
+        print ",";
+   }
+?>
+ cut up the flyers and stick them through your neighbours' letterboxes. We
+cannot emphasise this enough &mdash; print them NOW and post them next time you
+go out to the shops or your pledge is unlikely to succeed.</strong></big>
+</p>
+<? 
+    // Show inline graphics only for passwordless pledges (as PNG doesn't
+    // work for the password protected ones, you can't POST a password
+    // into an IMG SRC= link)
+    if (!$r['password']) { ?>
+<p align="center"><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
+<?  }
+    post_confirm_advertise_sms($r);
+}
+
+/* post_confirm_advertise_sms PLEDGE_ROW
+ * Prints some stuff about SMS for PLEDGE.
+ * Only for passwordless pledges, since private pledges can't be signed by SMS. */
+function post_confirm_advertise_sms($r) {
+    if (!$r['password']) {
+?>
+<p class="noprint"><strong>Take your Pledge to the pub</strong> &ndash; next time you're out and about,
+get your friends to sign up by having them text
+<strong>pledge&nbsp;<?=htmlspecialchars($r['ref'])?></strong> to <strong>60022</strong>.
+The text costs your normal rate, and we'll keep them updated about progress via their
+mobile.</p>
+
+<? # Below not needed as we're currently not charging premium rate
+/* <p class="noprint" style="text-align: center;"><small>The small print: operated by
+mySociety, a project of UK Citizens Online Democracy. Sign-up message costs
+your normal text rate. Further messages from us are free.
+Questions about this SMS service? Call us on 08453&nbsp;330&nbsp;160 or
+email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</small></p> */
+?>
+<?   }
+}
+
+
+
 /* pledge_delete_pledge ID
  * Delete the pledge with the given ID, and all its signers and comments. */
 function pledge_delete_pledge($id) {
@@ -473,6 +546,13 @@ function pledge_delete_signer($id) {
  * Delete the comment with the given ID. */
 function pledge_delete_comment($id) {
     db_query('select pb_delete_comment(?)', $id);
+}
+
+/* pledge_is_local R
+ * Given pledge data, returns true if local pledge (where flyers
+ * are useful), or false if it isn't. */
+function pledge_is_local($r) {
+    return $r['country'] == 'UK' && $r['postcode'];
 }
 
 ?>

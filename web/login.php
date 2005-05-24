@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.10 2005-05-24 11:52:14 francis Exp $
+ * $Id: login.php,v 1.11 2005-05-24 13:08:35 chris Exp $
  * 
  */
 
@@ -107,6 +107,9 @@ if (!is_null($q_t)) {
         else
             $P = person_get_or_create($d['email'], $d['name']);
     }
+
+    $P->inc_numlogins();
+    
     db_commit();
 
     /* Now give the user their cookie. */
@@ -120,11 +123,7 @@ if (!is_null($q_t)) {
 
     /* See whether this user has used pledgebank before. If they have, offer to
      * set or reset their password. */
-/*    
-    if (db_getOne('select count(id) from pledges where creator_person_id = ?', $P->id()) > 0
-        || db_getOne('select count(id) from signers where signer_person_id = ?', $P->id()) > 0)
-*/
-    if (true)
+    if ($P->numlogins() > 1)
         change_password_page($P);
     else if (!$P->matches_name($q_name))
         $P->name($q_name);
@@ -171,6 +170,8 @@ function login_page() {
             set_login_cookie($P);
             if (!$P->matches_name($q_name))
                 $P->name($q_name);
+            $P->inc_logins();
+            db_commit();
             stash_redirect($q_stash);
                 /* NOTREACHED */
         }
@@ -207,7 +208,9 @@ continue
     }
 }
 
-/* login_form */
+/* login_form ERRORS
+ * Print the login form. ERRORS is a list of errors encountered when the form
+ * was processed. */
 function login_form($errors = array()) {
     /* Just render the form. */
     global $q_h_stash, $q_h_email, $q_h_name, $q_stash, $q_email, $q_name;
@@ -220,11 +223,11 @@ function login_form($errors = array()) {
     $template_data = unserialize(stash_get_extra($q_stash));
     $reason = htmlspecialchars($template_data['reason']);
 
-	if (sizeof($errors)) {
-		print '<div id="errors"><ul><li>';
-		print join ('</li><li>', array_values($errors));
-		print '</li></ul></div>';
-	}  else {
+    if (sizeof($errors)) {
+        print '<div id="errors"><ul><li>';
+        print join ('</li><li>', array_values($errors));
+        print '</li></ul></div>';
+    }  else {
         print "<p>Before we can $reason, we need to confirm your name and email address.</p>";
     }
 

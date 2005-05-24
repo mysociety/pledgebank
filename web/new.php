@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.14 2005-05-24 11:52:14 francis Exp $
+// $Id: new.php,v 1.15 2005-05-24 14:13:17 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -137,7 +137,7 @@ function pledge_form_two($data, $errors = array()) {
     $partial_pledge->render_box(array('showdetails' => true));
 ?>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="2">
+<form accept-charset="utf-8" id="pledgenew" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="2">
 <h2>New Pledge &#8211; Step 2 of 3</h2>
 
 <input type="hidden" name="comparison" value="atleast">
@@ -376,7 +376,7 @@ function preview_pledge($data) {
     /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ 
 ?>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
+<form accept-charset="utf-8" id="pledgenew" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
 <h2>New Pledge &#8211; Step 3 of 3</h2>
 
 <p>Please check the details you have entered, both the pledge above and other details below, and then either click "Create" to create your pledge, or one of the two "Back" buttons to go back and edit your data.</p>

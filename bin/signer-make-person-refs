@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+#
+# signer-make-person-refs:
+# Script to fix up pre-login signers for the new login schema.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: signer-make-person-refs,v 1.1 2005-05-24 14:37:42 chris Exp $';
+
+use strict;
+
+use strict;
+require 5.8.0;
+our $sms_outgoing_url;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+
+use PB;
+
+dbh()->do('alter table signers add column person_id integer');
+my $st = dbh()->prepare('select id, email, name from signers order by id');
+$st->execute();
+while (my ($signer_id, $email, $name) = $st->fetchrow_array()) {
+    my $person_id = dbh()->selectrow_array('select id from person where email = ?', {}, $email);
+    if (!defined($person_id)) {
+        $person_id = dbh()->selectrow_array("select nextval('person_id_seq')");
+        dbh()->do('insert into person (id, email, name) values (?, ?, ?)', {}, $person_id, $email, $name);
+        print "create user ($person_id, $email, $name)\n";
+    }
+    dbh()->do('update signers set person_id = ? where id = ?', {}, $person_id, $signer_id);
+}
+
+# Drop the old email column in pledges and fix up the person_id column to match
+# its schema definition.
+dbh()->do('alter table signers drop column email');
+dbh()->do('alter table signers alter column person_id set not null');
+dbh()->do('alter table signers add constraint "$2" foreign key(person_id) references person(id)');
+
+dbh()->commit();

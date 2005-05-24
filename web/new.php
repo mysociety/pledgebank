@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.12 2005-05-23 16:48:07 francis Exp $
+// $Id: new.php,v 1.13 2005-05-24 10:29:22 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -347,7 +347,9 @@ function pledge_form_three_submitted() {
     }
 
     /* User must have an account to do this. */
-    $P = person_signon("create the pledge '${data['title']}'", $data['email'], $data['name']);
+    $data['template'] = 'pledge-confirm';
+    $data['reason'] = 'create your new pledge';
+    $P = person_signon($data, $data['email'], $data['name']);
 
     create_new_pledge($P, $data);
 }

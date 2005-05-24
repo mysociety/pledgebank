@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.8 2005-05-23 16:48:07 francis Exp $
+ * $Id: login.php,v 1.9 2005-05-24 10:29:22 francis Exp $
  * 
  */
 
@@ -182,8 +182,13 @@ function login_page() {
                         'stash' => $q_stash
                     ));
         db_commit();
-        $url = OPTION_BASE_URL . "/login.php?t=$token";
-        pb_send_email_template($q_email, 'generic-confirm', array('reason' => stash_get_extra($q_stash), 'url' => $url));
+        $url = OPTION_BASE_URL . "/L/$token";
+        $template_data = unserialize(stash_get_extra($q_stash));
+        $template_data['url'] = $url;
+        pb_send_email_template($q_email, 
+            array_key_exists('template', $template_data) 
+                ?  $template_data['template'] : 'generic-confirm', 
+            $template_data);
         page_header("Now check your email");
     ?>
 <p style="font-size: 150%; font-weight: bold; text-align: center;">
@@ -212,7 +217,8 @@ function login_form($errors = array()) {
     if (is_null($q_name))
         $q_name = $q_h_name = '';   /* shouldn't happen */
 
-    $reason = htmlspecialchars(stash_get_extra($q_stash));
+    $template_data = unserialize(stash_get_extra($q_stash));
+    $reason = htmlspecialchars($template_data['reason']);
 
 	if (sizeof($errors)) {
 		print '<div id="errors"><ul><li>';
@@ -232,20 +238,20 @@ function login_form($errors = array()) {
 
 <ul>
 
-<form class="login" method="POST" accept-charset="utf-8">
+<form name="loginSendEmail" class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="name" id="name" value="$q_h_name">
 <input type="hidden" name="email" id="email" value="$q_h_email">
 
 <li>No, I haven't used PledgeBank before.
 
-<input type="submit" name="SendEmail" value="Click here to continue"><br>
+<input type="submit" name="SendEmail" value="Click here to continue &gt;&gt;"><br>
 <small>(we'll send an email to confirm your address)</small></p>
 
 </li>
 </form>
 
-<form class="login" method="POST" accept-charset="utf-8">
+<form name="loginLogin" class="login" method="POST" accept-charset="utf-8">
 <li><p>Yes, I have a password:
 
 <input type="hidden" name="stash" value="$q_h_stash">
@@ -253,7 +259,7 @@ function login_form($errors = array()) {
 <input type="hidden" name="name" value="$q_h_name">
 
 <input type="password" name="password" id="password" value="">
-<input type="submit" name="LogIn" value="Let me in"></p>
+<input type="submit" name="LogIn" value="Let me in &gt;&gt;"></p>
 
 <input type="checkbox" name="rememberme" id="rememberme" value="1"><strong>Remember me</strong></input>
 <small>(don't use this on a public or shared computer)</small>
@@ -316,27 +322,39 @@ EOF;
     print <<<EOF
 <div class="pledge">
 
-<form class="login" method="POST" accept-charset="utf-8">
+<p><strong>Would you like to set a PledgeBank password?</strong></p>
+
+<ul>
+
+<form name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
+<input type="hidden" name="stash" value="$q_h_stash">
+<input type="hidden" name="email" value="$q_h_email">
+<input type="hidden" name="name" value="$q_h_name">
+<li>No, I don't want to think of a password right now<br>
+<small>(you can set a password later if you want)</small>
+<input type="submit" name="NoPassword" value="Continue &gt;&gt;"><br>
+</li></form>
+
+<form name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
 
+<li><p>Yes, I'd like to set a password, so I can more easily manage my pledge.
 <div class="form_row">
-    <label for="pw1">Type your password</label>
+    <label for="pw1">Password</label>
     <input type="password" name="pw1" id="pw1" size="20">
 </div>
 
 <div class="form_row">
-    <label for="pw2">(again)</label>
+    <label for="pw2">Password (again)</label>
     <input type="password" name="pw2" size="20">
 </div>
-
-<input type="submit" name="SetPassword" value="Set password">
-
-<p>Alternatively<br>
-<input type="submit" name="NoPassword" value="Continue without setting a password"><br>
-<small>(you can set a password later if you want)</small></p>
+<input type="submit" name="SetPassword" value="Set password &gt;&gt;">
+</li>
 </form>
+
+</ul>
 
 </div>
 EOF;

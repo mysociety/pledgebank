@@ -53,6 +53,12 @@ Sent to each signer when a pledge fails.
 
 **************************************************************************
 
+* generic-confirm
+General purpose mail when someone performs an action, they
+are not logged in, and we need to confirm their email address.
+  - reason, what the confirmation is needed for.
+  - url, the URL for confirmation.
+
 * pledge-confirm
 Sent to pledge creator when they make a new pledge, to check their
 email address.

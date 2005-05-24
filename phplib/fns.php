@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.26 2005-05-20 17:42:21 chris Exp $
+// $Id: fns.php,v 1.27 2005-05-24 10:29:21 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -18,6 +18,10 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
         if ($values['actual'] >= $values['target'])
             $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? 'exceeded' : 'met');
+    } else {
+        # TODO, see if this can be default for both cases
+        $values['sentence_first'] = pledge_sentence($values, array('firstperson' => true));
+        $values['sentence_third'] = pledge_sentence($values, array('firstperson' => false));
     }
     if (array_key_exists('ref', $values))
         $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];

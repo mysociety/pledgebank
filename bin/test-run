@@ -24,7 +24,7 @@
 #   sms-confirm-own template
 #   sms-confirm-already template
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.59 2005-05-20 18:28:16 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.60 2005-05-24 10:29:21 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -213,7 +213,11 @@ sub create_pledge {
     $wth->browser_check_contents("will look like this");
     $b->submit_form(form_name => 'pledge',
         button => 'submit') or die "Failed to submit creating form stage 3";
-    $wth->browser_check_contents("You must now click on the link within the email we've just sent you");
+    $wth->browser_check_contents("Do you have a PledgeBank password?");
+    $b->submit_form(form_name => 'loginSendEmail',
+        button => 'SendEmail') or die "Failed to request confirmation email";
+
+    $wth->browser_check_contents("you'll need to click the link");
 
     # Add all to front page
     dbh()->do("update pledges set prominence = 'frontpage'");
@@ -234,6 +238,7 @@ sub confirm_pledge {
     $b->get($1);
     $wth->browser_check_contents("Thank you for confirming your pledge");
 }
+
 # do_not_confirm_pledge WHO ACTION
 sub do_not_confirm_pledge {
     my ($who, $action) = @_;

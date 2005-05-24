@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.6 2005-05-23 16:48:07 francis Exp $
+ * $Id: person.php,v 1.7 2005-05-24 10:29:21 francis Exp $
  * 
  */
 
@@ -145,10 +145,12 @@ function person_if_signed_on() {
 
 /* person_signon REASON EMAIL [NAME]
  * Return a record of a person, if necessary requiring them to sign on to an
- * existing account or to create a new one. REASON is the reason why
- * authentication is required, for instance "create the pledge '...'" or
- * "sign the pledge '...'" or */
-function person_signon($reason, $email, $name = null) {
+ * existing account or to create a new one. TEMPLATE_DATA is an array of data
+ * about the pledge, including 'template' which is the name of the 
+ * template to use for the confirm mail, and 'reason' which is something like
+ * "create the pledge '...'" or "sign the pledge '...'".  The rest of
+ * the data in TEMPLATE_DATA is passed through to the email template. */
+function person_signon($template_data, $email, $name = null) {
     $P = person_if_signed_on();
     if (!is_null($P) && $P->email() == $email) {
         if (!is_null($name) && !$P->matches_name($name))
@@ -165,7 +167,7 @@ function person_signon($reason, $email, $name = null) {
 
     /* No or invalid cookie. We will need to redirect the user via another
      * page, either to log in or to prove their email address. */
-    $st = stash_request($reason);
+    $st = stash_request(serialize($template_data));
     db_commit();
     header("Location: login?stash=$st&email=" . urlencode($email) . "&name=" . urlencode($name));
     exit();

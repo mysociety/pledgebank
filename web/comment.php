@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.8 2005-05-19 13:33:09 matthew Exp $
+ * $Id: comment.php,v 1.9 2005-05-24 15:47:00 francis Exp $
  * 
  */
 
@@ -35,15 +35,15 @@ if (is_null($q_comment_id)) {
 $pledge_id = $q_pledge_id;
 $comment_id = $q_comment_id;
 
-$pledge = db_getRow('select * from pledges where id = ?', $pledge_id);
-if (is_null($pledge))
-    err("Bad pledge ID");
-/* test for commenting on expired pledges etc. */
+$pledge = new Pledge(intval($pledge_id));
+$ref = $pledge->ref();
 
-if (!check_password($pledge['ref'], $pledge['password']))
+if (!check_password($ref, $pledge->password()))
     err("Permission denied");
 
-page_header("Commenting on '${pledge['title']}'");
+// TODO: test for commenting on expired pledges etc.
+
+page_header("Commenting on '" . $pledge->h_title() . "'");
 
 /* Grab comment variables themselves. */
 $err = importparams(
@@ -98,27 +98,27 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
                     $q_text
                 ));
     db_commit();
-    $values = $pledge;
+    $values = $pledge->data;
     $values['comment_text'] = $q_text;
-    $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];
+    $values['pledge_url'] = OPTION_BASE_URL . "/" . $ref;
     $values['abusive_url'] = OPTION_BASE_URL . '/abuse?what=comment&id=' . $comment_id;
     $values['comment_author_name'] = $q_author_name;
     $values['comment_author_email'] = $q_author_email;
     $values['comment_author_website'] = $q_author_website;
-    $success = pb_send_email_template($pledge['email'], 'comment-creator', $values);
+    $success = pb_send_email_template($pledge->creator_email(), 'comment-creator', $values);
     if (!$success) {
         err("Problems sending message to pledge creator.");
     }
     print <<<EOF
 <p>Thank you! Your comment has now been posted.</p>
 EOF;
-    if (is_null($pledge['password']))
+    if (is_null($pledge->password()))
         print <<<EOF
-<p><a href="/${pledge['ref']}#comments">Go back to the pledge comments</a></p>
+<p><a href="/$ref#comments">Go back to the pledge comments</a></p>
 EOF;
     else
         print <<<EOF
-<form method="post" action="/${pledge['ref']}">
+<form method="post" action="/$ref">
 <p>
 <input type="hidden" name="pw" value="$q_h_pw">
 <input type="submit" value="Go back to the pledge">

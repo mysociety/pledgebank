@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: db.php,v 1.16 2005-05-18 12:56:56 chris Exp $
+// $Id: db.php,v 1.17 2005-05-24 15:47:00 francis Exp $
 
 require_once "DB.php";
 require_once "../../phplib/utility.php";
@@ -28,9 +28,10 @@ function db_connect() {
     }
     
     /* Ensure that we have a site shared secret. */
-    $r = $pbdb->query('select secret from secret for update of secret');
-    if (is_null($r))
+    $r = $pbdb->getOne('select secret from secret for update of secret');
+    if (is_null($r)) {
         $pbdb->query('insert into secret (secret) values (?)', array(bin2hex(random_bytes(32))));
+    }
     $pbdb->commit();
     
     $pbdb->autoCommit(false);

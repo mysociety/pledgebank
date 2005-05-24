@@ -8,12 +8,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.26 2005-04-30 15:54:29 francis Exp $
+ * $Id: frequentupdate,v 1.27 2005-05-24 15:46:59 francis Exp $
  *
  */
 
-require_once "../phplib/pledge.php";
+require_once "../conf/general";
+require_once '../phplib/db.php';
+require_once '../phplib/fns.php';
 require_once "../phplib/auth.php";
+require_once '../../phplib/utility.php';
 
 function verbose($str) {
     global $verbose;
@@ -49,11 +52,6 @@ Usage: frequentupdate [--verbose]
         exit;
     }
 }
-
-require_once "../conf/general";
-include_once '../phplib/db.php';
-include_once '../phplib/fns.php';
-include_once '../../phplib/utility.php';
 
 db_connect();
 
@@ -216,7 +214,9 @@ function send_pending_messages() {
             continue;
         }
     
-        $pledge = db_getRow('select * from pledges where id = ?', $msg['pledge_id']);
+        $pledge = db_getRow('select *, person.email as email 
+            from pledges left join person on person.id = pledges.person_id
+            where pledges.id = ?', $msg['pledge_id']);
         verbose("message #${msg['id']} is for pledge #${pledge['id']} (${pledge['ref']}); circumstance '${msg['circumstance']}'");
 
         /* XXX we also need a URL containing a token which is sent on
@@ -308,7 +308,10 @@ function send_pending_messages() {
         verbose("message #${r['id']} to be sent to signer #${r['signer_id']}");
 
         // Make any extra headers
-        $pledge = db_getRow('select * from pledges where id = ?', $r['pledge_id']);
+        $pledge = db_getRow('select *, person.email as email 
+            from pledges left join person on person.id = pledges.person_id
+            where pledges.id = ?', $r['pledge_id']);
+
         $headers = array();
         if ($r['fromaddress'] == 'pledgebank') {
             // the default in pb_send_email_internal is from PledgeBank

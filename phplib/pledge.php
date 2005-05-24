@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.60 2005-05-24 11:52:14 francis Exp $
+ * $Id: pledge.php,v 1.61 2005-05-24 15:47:00 francis Exp $
  * 
  */
 
@@ -22,14 +22,26 @@ class Pledge {
     // Escaped ref used for URLs
     var $h_ref;
 
-    // Construct from ref (TODO: probably can overload this for id constructor)
+    // Construct from either:
+    // - string, a PledgeBank reference
+    // - integer, the internal id from the pledges table
+    // - array, a dictionary of data about the pledge
     function Pledge($ref) {
-        if (gettype($ref) == "string") {
-            $q = db_query('SELECT *, 
+        $main_query_part = "SELECT *, 
                                pb_current_date() <= pledges.date AS open,
-                               (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
+                               (SELECT count(*) FROM signers WHERE 
+                                    signers.pledge_id = pledges.id) AS signers,
+                               person.email AS email
                            FROM pledges
-                           WHERE ref ILIKE ? AND confirmed', array($ref));
+                           LEFT JOIN person ON person.id = pledges.person_id
+                           WHERE confirmed ";
+        if (gettype($ref) == "string") {
+            $q = db_query("$main_query_part AND ref ILIKE ?", array($ref));
+            if (!db_num_rows($q))
+                err('PledgeBank reference not known');
+            $this->data = db_fetch_array($q);
+        } elseif (gettype($ref) == "integer") {
+            $q = db_query("$main_query_part AND pledges.id = ?", array($ref));
             if (!db_num_rows($q))
                 err('PledgeBank reference not known');
             $this->data = db_fetch_array($q);
@@ -76,6 +88,9 @@ class Pledge {
     function target() { return $this->data['target']; }
     function signers() { return $this->data['signers']; }
     function left() { return $this->data['left']; }
+
+    function creator_email() { return $this->data['email']; }
+    function creator_name() { return $this->data['name']; }
 
     function password() { return $this->data['password']; }
 
@@ -433,10 +448,11 @@ function pledge_sign_box() {
             $email = $P->email();
         if (is_null($name) || !$name)
             $name = $P->name();
-    } else
-        error_log("nobody signed on");
+    } else {
+        // error_log("nobody signed on");
+    }
 
-    error_log("$email $name");
+    // error_log("$email $name");
 ?>
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=htmlspecialchars(get_http_var('ref')) ?>/sign" method="post">
 <input type="hidden" name="add_signatory" value="1">

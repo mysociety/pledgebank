@@ -24,7 +24,7 @@
 #   sms-confirm-own template
 #   sms-confirm-already template
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.60 2005-05-24 10:29:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.61 2005-05-24 15:46:59 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -191,11 +191,14 @@ sub confirm_signature {
     }
 }
 
-# create_pledge WHO PAGE1 PAGE2
+# create_pledge WHO PAGE1 PAGE2 LOGIN
 # Creates a new pledge, setter is person number WHO.  PAGE1
 # and PAGE2 contain parameters for each page of the sign-up form.
+# LOGIN defines what to do with regards to log
+#   0 means expect not to be logged in, and don't log in
+#   1 means expect to be already logged in
 sub create_pledge {
-    my ($who, $page1, $page2) = @_;
+    my ($who, $page1, $page2, $login_action) = @_;
     $page1->{name} = name_n($who); 
     $page1->{email} = email_n($who);
 
@@ -213,15 +216,15 @@ sub create_pledge {
     $wth->browser_check_contents("will look like this");
     $b->submit_form(form_name => 'pledge',
         button => 'submit') or die "Failed to submit creating form stage 3";
-    $wth->browser_check_contents("Do you have a PledgeBank password?");
-    $b->submit_form(form_name => 'loginSendEmail',
-        button => 'SendEmail') or die "Failed to request confirmation email";
 
-    $wth->browser_check_contents("you'll need to click the link");
-
-    # Add all to front page
-    dbh()->do("update pledges set prominence = 'frontpage'");
-    dbh()->commit();
+    if ($login_action == 0) {
+        $wth->browser_check_contents("Do you have a PledgeBank password?");
+        $b->submit_form(form_name => 'loginSendEmail',
+            button => 'SendEmail') or die "Failed to request confirmation email";
+        $wth->browser_check_contents("you'll need to click the link");
+    } else {
+        $wth->browser_check_contents("Thank you for confirming your pledge");
+    }
 }
 
 # confirm_pledge WHO ACTION
@@ -236,7 +239,15 @@ sub confirm_pledge {
     print "Pledge confirm URL $1\n" if $verbose > 1;
     $wth->email_check_url($1);
     $b->get($1);
+    $wth->browser_check_contents("Redirect...");
+    $b->submit_form(form_name => 'f',
+        button => '__stash_submit_button_0') or die "Failed to do POST redirect button";
+
     $wth->browser_check_contents("Thank you for confirming your pledge");
+
+    # Add all to front page
+    dbh()->do("update pledges set prominence = 'frontpage'");
+    dbh()->commit();
 }
 
 # do_not_confirm_pledge WHO ACTION
@@ -286,139 +297,14 @@ sub do_unconfirmed_pledge {
             target => '100', type => 'stubborn people', signup => 'will refuse ever to sign it',
             date => 'next thursday', ref => $pledge_ref,
         },
-        { country => 'Global' }
+        { country => 'Global' },
+        0
     );
     do_not_confirm_pledge(0, $pledge_action_unconfirmed);
 
     # Check not on front page
     $b->get($base_url);
     $wth->browser_check_no_contents($pledge_action_unconfirmed);
-}
-
-#############################################################################
-sub do_private_failing_pledge {
-    my $pledge_action_private = 'check private pledges are private';
-    my $pledge_ref = "privatepledge";
-    my $private_password = 'zx3uuhai';
-    set_pb_date('1980-12-01');
-    create_pledge(0, 
-        { title => $pledge_action_private, 
-            target => '10', date => 'Dec 31st', ref => $pledge_ref
-        },
-        { country => 'Global', visibility => 'password', password => $private_password }
-    );
-    confirm_pledge(0, $pledge_action_private);
-
-    # Go to private pledge page, and submit password to access it
-    my $goto_private_pledge_page = sub {
-        $b->get("$base_url/$pledge_ref");
-        $wth->browser_check_contents("Password Protected Pledge");
-        $wth->browser_check_no_contents("Incorrect password!");
-        $wth->browser_check_no_contents($pledge_action_private);
-        $b->submit_form(form_name => 'pledge',
-                fields => { pw => 'thisisnotthepassword' },
-                button => 'submitpassword') or die "Failed to submit password form";
-        $wth->browser_check_contents("Incorrect password!");
-        $wth->browser_check_no_contents($pledge_action_private);
-        $b->submit_form(form_name => 'pledge',
-                fields => { pw => $private_password },
-                button => 'submitpassword') or die "Failed to submit password form";
-        $wth->browser_check_contents($pledge_action_private);
-    };
-
-    # Sign up to private pledge
-    &$goto_private_pledge_page();
-    $wth->browser_check_no_contents("This pledge is now closed");
-    sign_pledge(1, 1);
-    confirm_signature($pledge_action_private, 1);
-    &$goto_private_pledge_page();
-    $wth->browser_check_contents("<i>1 person has signed up");
-
-    # Try to sign up by SMS
-    sms_fake_to_pledgebank(10, "pledge $pledge_ref");
-    die "Didn't get OK for incoming SMS" if $b->content() ne "OK";
-    $wth->log_watcher_check();
-    call_smsd();
-    my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
-    print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
-    # Try to sign up by SMS, with partial pledge identifier
-    sms_fake_to_pledgebank(10, "pledge rivatepl");
-    die "Didn't get OK for incoming SMS" if $b->content() ne "OK";
-    $wth->log_watcher_check();
-    call_smsd();
-    my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
-    print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
-    # Wait for delivery notification, which would confirm signature
-    # (want to test that nothing happens, as nothing was signed)
-    set_pb_date('1980-12-02');
-    call_smsd();  # delivery notification
-    call_smsd();  # cull done with message
-    $wth->log_watcher_check();
-    # Check we don't get any information leaks
-    sms_check_none_left();
-    # ... in particular there are no new signups
-    &$goto_private_pledge_page();
-    $wth->browser_check_contents("<i>1 person has signed up");
-    $wth->browser_check_no_contents("This pledge is now closed");
- 
-    # Check pledge really is private on lists of pledges
-    # ... index page, all pledges
-    $b->get($base_url);
-    $wth->browser_check_no_contents($pledge_ref);
-    $wth->browser_check_no_contents($pledge_action_private);
-    # ... all pledges page
-    $b->get($base_url . "/all");
-    $wth->browser_check_no_contents($pledge_ref);
-    $wth->browser_check_no_contents($pledge_action_private);
-    # ... RSS
-    $b->get($base_url . "/rss");
-    $wth->browser_check_no_contents($pledge_ref);
-    $wth->browser_check_no_contents($pledge_action_private);
-
-    # And all its pages require password to get to
-    # ... email friends page
-    $b->get("$base_url/$pledge_ref/email");
-    $wth->browser_check_contents("Password Protected Pledge");
-    $wth->browser_check_no_contents($pledge_action_private);
-        # ... flyers index
-    $b->get("$base_url/$pledge_ref/flyers");
-    $wth->browser_check_contents("Password Protected Pledge");
-    $wth->browser_check_no_contents($pledge_action_private);
-    # ... individual poster
-    $b->get("$base_url/flyers/${pledge_ref}_A4_flyers8.pdf");
-    $wth->browser_check_contents("Correct password needed");
-
-    $wth->log_watcher_check();
-    # ... ical calendar entry
-    $b->get("$base_url/$pledge_ref/ical");
-    $wth->browser_check_contents("Correct password required");
-    $wth->browser_check_no_contents($pledge_action_private);
-    my $errors = $wth->log_watcher_get_errors();
-    die if ($errors !~ m/Correct password required/);
-    # ... sign page
-    $b->get("$base_url/$pledge_ref/sign");
-    $wth->browser_check_contents("Permission denied");
-    $wth->browser_check_no_contents($pledge_action_private);
-    my $errors = $wth->log_watcher_get_errors();
-    die if ($errors !~ m/Permission denied/);
-
-    # Test what happens upon expiry
-    # ... partially sign the pledge
-    &$goto_private_pledge_page();
-    sign_pledge(2, 1);
-    # ... then expire it
-    set_pb_date('1981-01-15');
-    # ... make sure completing the partial signing fails
-    confirm_signature($pledge_action_private, 2, 'finished');
-    # Check failure emails
-    call_frequentupdate();
-    $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
-    $wth->email_get_containing('%Subject: Pledge failed%To: '.email_n(1).  '%');
-
-    # Make sure pledge says it is expired, and has no sign up box
-    &$goto_private_pledge_page();
-    $wth->browser_check_contents("This pledge is now closed");
-    $wth->browser_check_no_contents("Sign up now");
 }
 
 #############################################################################
@@ -432,7 +318,8 @@ sub do_public_succeeding_pledge {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => '10th February', ref => $pledge_ref,
             detail => "This pledge has just one purpose.  And that is as part of an automated test suite which ensures PledgeBank always works.  It is really quite good, in our humblest opinion.  It would save the planet, if only it was more comprehensive, and updated in a timely manner.\n\nAnd this bit is the start of a brand new shiny paragraph.  It should be formatted below on posters in the correct manner." },
-        { country => 'Global' }
+        { country => 'Global' },
+        0
     );
     confirm_pledge(0, $pledge_action_completion);
 
@@ -571,6 +458,137 @@ sub do_public_succeeding_pledge {
 }
 
 #############################################################################
+sub do_private_failing_pledge {
+    my $pledge_action_private = 'check private pledges are private';
+    my $pledge_ref = "privatepledge";
+    my $private_password = 'zx3uuhai';
+    set_pb_date('1980-12-01');
+    create_pledge(0, 
+        { title => $pledge_action_private, 
+            target => '10', date => 'Dec 31st', ref => $pledge_ref
+        },
+        { country => 'Global', visibility => 'password', password => $private_password },
+        1
+    );
+    # TODO: test log in more tidily, check between different users (maybe they
+    # each need thier own WWW::Mechanize instance for cookie separation!) more
+    # thoroughly.
+    # No need to click any confirmation email, as we should be already logged
+    # in from before
+
+    # Go to private pledge page, and submit password to access it
+    my $goto_private_pledge_page = sub {
+        $b->get("$base_url/$pledge_ref");
+        $wth->browser_check_contents("Password Protected Pledge");
+        $wth->browser_check_no_contents("Incorrect password!");
+        $wth->browser_check_no_contents($pledge_action_private);
+        $b->submit_form(form_name => 'pledge',
+                fields => { pw => 'thisisnotthepassword' },
+                button => 'submitpassword') or die "Failed to submit password form";
+        $wth->browser_check_contents("Incorrect password!");
+        $wth->browser_check_no_contents($pledge_action_private);
+        $b->submit_form(form_name => 'pledge',
+                fields => { pw => $private_password },
+                button => 'submitpassword') or die "Failed to submit password form";
+        $wth->browser_check_contents($pledge_action_private);
+    };
+
+    # Sign up to private pledge
+    &$goto_private_pledge_page();
+    $wth->browser_check_no_contents("This pledge is now closed");
+    sign_pledge(1, 1);
+    confirm_signature($pledge_action_private, 1);
+    &$goto_private_pledge_page();
+    $wth->browser_check_contents("<i>1 person has signed up");
+
+    # Try to sign up by SMS
+    sms_fake_to_pledgebank(10, "pledge $pledge_ref");
+    die "Didn't get OK for incoming SMS" if $b->content() ne "OK";
+    $wth->log_watcher_check();
+    call_smsd();
+    my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
+    print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
+    # Try to sign up by SMS, with partial pledge identifier
+    sms_fake_to_pledgebank(10, "pledge rivatepl");
+    die "Didn't get OK for incoming SMS" if $b->content() ne "OK";
+    $wth->log_watcher_check();
+    call_smsd();
+    my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
+    print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
+    # Wait for delivery notification, which would confirm signature
+    # (want to test that nothing happens, as nothing was signed)
+    set_pb_date('1980-12-02');
+    call_smsd();  # delivery notification
+    call_smsd();  # cull done with message
+    $wth->log_watcher_check();
+    # Check we don't get any information leaks
+    sms_check_none_left();
+    # ... in particular there are no new signups
+    &$goto_private_pledge_page();
+    $wth->browser_check_contents("<i>1 person has signed up");
+    $wth->browser_check_no_contents("This pledge is now closed");
+ 
+    # Check pledge really is private on lists of pledges
+    # ... index page, all pledges
+    $b->get($base_url);
+    $wth->browser_check_no_contents($pledge_ref);
+    $wth->browser_check_no_contents($pledge_action_private);
+    # ... all pledges page
+    $b->get($base_url . "/all");
+    $wth->browser_check_no_contents($pledge_ref);
+    $wth->browser_check_no_contents($pledge_action_private);
+    # ... RSS
+    $b->get($base_url . "/rss");
+    $wth->browser_check_no_contents($pledge_ref);
+    $wth->browser_check_no_contents($pledge_action_private);
+
+    # And all its pages require password to get to
+    # ... email friends page
+    $b->get("$base_url/$pledge_ref/email");
+    $wth->browser_check_contents("Password Protected Pledge");
+    $wth->browser_check_no_contents($pledge_action_private);
+        # ... flyers index
+    $b->get("$base_url/$pledge_ref/flyers");
+    $wth->browser_check_contents("Password Protected Pledge");
+    $wth->browser_check_no_contents($pledge_action_private);
+    # ... individual poster
+    $b->get("$base_url/flyers/${pledge_ref}_A4_flyers8.pdf");
+    $wth->browser_check_contents("Correct password needed");
+
+    $wth->log_watcher_check();
+    # ... ical calendar entry
+    $b->get("$base_url/$pledge_ref/ical");
+    $wth->browser_check_contents("Correct password required");
+    $wth->browser_check_no_contents($pledge_action_private);
+    my $errors = $wth->log_watcher_get_errors();
+    die if ($errors !~ m/Correct password required/);
+    # ... sign page
+    $b->get("$base_url/$pledge_ref/sign");
+    $wth->browser_check_contents("Permission denied");
+    $wth->browser_check_no_contents($pledge_action_private);
+    my $errors = $wth->log_watcher_get_errors();
+    die if ($errors !~ m/Permission denied/);
+
+    # Test what happens upon expiry
+    # ... partially sign the pledge
+    &$goto_private_pledge_page();
+    sign_pledge(2, 1);
+    # ... then expire it
+    set_pb_date('1981-01-15');
+    # ... make sure completing the partial signing fails
+    confirm_signature($pledge_action_private, 2, 'finished');
+    # Check failure emails
+    call_frequentupdate();
+    $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Pledge failed%To: '.email_n(1).  '%');
+
+    # Make sure pledge says it is expired, and has no sign up box
+    &$goto_private_pledge_page();
+    $wth->browser_check_contents("This pledge is now closed");
+    $wth->browser_check_no_contents("Sign up now");
+}
+
+#############################################################################
 
 sub sms_setup {
     # Create table for outgoing SMS messages to be stored in (by pb/web/test-sms.cgi)
@@ -649,7 +667,8 @@ sub do_sms_pledge {
             target => '2', type => 'spoofed texting facilities', signup => 'do the same',
             date => '10th March', ref => $pledge_ref,
             detail => "Not sure what SMS is?  Find out here! www.wikipedia.org/wiki/Short_message_service Fab.  For more information, please visit www.ewb-uk.org/placements/2005/suriname. For more information about Engineers Without Borders UK, please visit www.ewb-uk.org, or email enquiries\@ewb-uk.org. For information regarding the project in Suriname, email suriname2005\@ewb-uk.org." },
-        { country => 'Global' }
+        { country => 'Global' },
+        0
     );
     confirm_pledge(100, $pledge_action_sms);
 

@@ -6,11 +6,10 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: stash.php,v 1.1 2005-05-18 12:56:56 chris Exp $
+ * $Id: stash.php,v 1.2 2005-05-24 15:47:00 francis Exp $
  * 
  */
 
-require_once '../../phplib/error.php';
 require_once '../../phplib/rabx.php';   /* for serialise/unserialise */
 require_once '../../phplib/utility.php';
 
@@ -83,10 +82,13 @@ function stash_redirect($key) {
             printf('<input type="hidden" name="%s" value="%s">', htmlspecialchars($k), htmlspecialchars($v));
 
         $i = 0;
+
+        /* This is for some crazy paranoid case when __stash_submit_button_0 was already
+         * the name of a button in the stashed data... */
         while (array_key_exists("__stash_submit_button_$i", $stashed_POST))
             ++$i;
         ?>
-<input type="submit" name="__stash_submit_button_<?=$i?>" id="__stash_submit_button" value="Click here to continue...">
+<input type="submit" name="__stash_submit_button_<?=$i?>" id="__stash_submit_button_<?=$i?>" value="Click here to continue...">
 </form></body></html>
 <?
         exit();

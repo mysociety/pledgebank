@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.11 2005-05-24 13:08:35 chris Exp $
+ * $Id: login.php,v 1.12 2005-05-24 15:47:00 francis Exp $
  * 
  */
 
@@ -98,7 +98,7 @@ if (!is_null($q_t)) {
     /* Process emailed token */
     $d = auth_token_retrieve('login', $q_t);
     if (is_null($d))
-        /* Bad token -- should do a friendlier message */
+        /* Bad token -- TODO should do a friendlier message */
         err('A required parameter was missing');
     $P = person_get($d['email']);
     if (is_null($P)) {

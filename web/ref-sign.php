@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.3 2005-05-20 15:09:07 francis Exp $
+// $Id: ref-sign.php,v 1.4 2005-05-24 14:56:07 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -37,10 +37,10 @@ function do_sign() {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pw;
     $errors = importparams(
             array('name',       '/^[a-z]/i',        'Please give your name'),
-            array('email',      '/^[^@]+@.+/',     'Please give your email'),
-            array('ref',        '/^[a-z0-9-]+$/i', ''),
-            array('showname',   '//',              'Please enter showname', 0),
-            array('pw',         '//',              '', null)
+            array('email',      '/^[^@]+@.+/',      'Please give your email'),
+            array('ref',        '/^[a-z0-9-]+$/i',  ''),
+            array('showname',   '//',               'Please enter showname', 0),
+            array('pw',         '//',               '', null)
             );
     if ($q_email=='<Enter your name>') $q_email='';
 
@@ -52,35 +52,32 @@ function do_sign() {
         return $errors;
     }
 
-    /* The exact mail we send depends on whether we're already signed up to
-     * this pledge. */
-    $id = db_getOne('select id from signers where pledge_id = ? and email = ?', array($r['id'], $q_email));
-    if (isset($id)) {
-        $success = pb_send_email_template($q_email, 'signature-confirm-already', $r);
-    } else {
-        /* Generate a secure URL to send to the user. */
-        $data = array('email' => $q_email, 'name' => $q_name, 
-                'showname' => $q_showname, 'pledge_id' => $r['id']);
-        $token = auth_token_store('signup-web', $data);
+    /* Get the user to log in. */
+    $r['template'] = 'signature-confirm';
+    $r['reason'] = 'sign the pledge';
+    $P = person_signon($r, $q_email, $q_name);
 
-        $url = OPTION_BASE_URL . "/I/" . $token;
-        $success = pb_send_email_template($q_email, 'signature-confirm-ok',
-                array_merge($r, array('url'=>$url)));
+    if ($P->id() == $r['person_id']) {
+        ?>
+<p><strong>You cannot sign your own pledge!</strong></p>
+<?
+        return;
     }
+   
+    $id = db_getOne('select id from signers where pledge_id = ? and person_id = ?', array($r['id'], $P->id()));
 
-    if ($success) {
-    ?>
-    <p><strong>Now check your email</strong></p>
-    <p>We've sent you an email to confirm your address. Please follow the link
-    we've sent to you to finish signing this pledge.</p>
-    <?
-        db_commit();
+    if (isset($id)) {
+        ?>
+<p><strong>You've already signed this pledge!</strong></p>
+<?
+        return;
     } else {
-    ?>
-    <p>We seem to be having some technical problems. Please could try again in a
-    few minutes, making sure that you carefully check the email address you give.
-    </p>
-    <?
+        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($r['id'], $P->name(), $P->id(), $q_showname));
+        db_commit();
+
+        ?>
+<p><strong>Congratulations! You've just signed this pledge</strong></p>
+<?
     }
 }
 

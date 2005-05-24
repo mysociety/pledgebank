@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.84 2005-05-23 11:51:45 chris Exp $
+-- $Id: schema.sql,v 1.85 2005-05-24 14:56:07 chris Exp $
 --
 
 -- secret
@@ -67,7 +67,8 @@ create table person (
     id serial not null primary key,
     name text not null,
     email text not null,
-    password text
+    password text,
+    numlogins integer not null default 0
 );
 
 create unique index person_email_idx on person(email);
@@ -331,10 +332,10 @@ create table signers (
     pledge_id integer not null references pledges(id),
 
     -- Who has signed the pledge.
-    -- Name may be null because we allow users to sign up by SMS without giving
-    -- their name.
+    -- Name and person_id may be null because we allow users to sign up by SMS
+    -- without giving their name.
     name text,
-    email text,
+    person_id integer references person(id),
     mobile text,
 
     -- whether they want their name public
@@ -347,8 +348,8 @@ create table signers (
     reported boolean not null default false,
 
     check (
-        (name is not null and email is not null)
-        or (name is null and email is null and mobile is not null)
+        (name is not null and person_id is not null)
+        or (name is null and person_id is null and mobile is not null)
     )
 );
 
@@ -356,16 +357,16 @@ create table signers (
 -- phone number.
 create unique index signers_pledge_id_mobile_idx on signers(pledge_id, mobile);
 -- Ditto emails.
-create unique index signers_pledge_id_email_idx on signers(pledge_id, email);
+create unique index signers_pledge_id_person_id_idx on signers(pledge_id, person_id);
 
 -- signers_combine_2 ID1 ID2
 -- Given the IDs ID1 and ID2 of two signers of a pledge, coalesce them into one
--- signer combining the two. One signer should have a name and email address,
--- and the other a mobile phone number only. The ID of the remaining signer is
--- the ID of the signer with the email address. If the pledge was successful
--- before this combination took place, set the removedsigneraftersuccessflag to
--- record this fact. This function has no return value, and raises an exception
--- if any of its preconditions are not met.
+-- signer combining the two. One signer should have a name and person ID, and
+-- the other a mobile phone number only. The ID of the remaining signer is the
+-- ID of the signer with the email address. If the pledge was successful before
+-- this combination took place, set the removedsigneraftersuccessflag to record
+-- this fact. This function has no return value, and raises an exception if any
+-- of its preconditions are not met.
 create function signers_combine_2(integer, integer)
     returns void as '
     declare
@@ -391,16 +392,16 @@ create function signers_combine_2(integer, integer)
             where id = t_pledge_id
             for update;
 
-        if (select email from signers where id = $1) is not null
-            and (select email from signers where id = $2) is null then
+        if (select person_id from signers where id = $1) is not null
+            and (select person_id from signers where id = $2) is null then
             id1 := $1;
             id2 := $2;
-        elsif (select email from signers where id = $1) is null
-            and (select email from signers where id = $2) is not null then
+        elsif (select person_id from signers where id = $1) is null
+            and (select person_id from signers where id = $2) is not null then
             id1 := $2;
             id2 := $1;
         else
-            raise exception ''exactly one of ID1, ID2 must have an email address set'';
+            raise exception ''exactly one of ID1, ID2 must be a logged-in person'';
         end if;
 
         t_mobile = (select mobile from signers where id = id2);

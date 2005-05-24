@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.23 2005-05-20 13:37:12 matthew Exp $
+// $Id: page.php,v 1.24 2005-05-24 08:35:37 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -89,7 +89,7 @@ function page_footer($params = array()) {
 <hr class="v"><h2 class="v">Navigation</h2>
 <ul id="nav">
 <li><a href="/">Home</a></li>
-<li><a href="/new">New Pledge</a></li>
+<li><a href="/new">Start a Pledge</a></li>
 <li><a href="/all">All Pledges</a></li>
 <li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li>
 <li><a href="/contact">Contact</a></li>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.61 2005-05-24 15:47:00 francis Exp $
+ * $Id: pledge.php,v 1.62 2005-05-24 23:18:39 francis Exp $
  * 
  */
 
@@ -92,7 +92,7 @@ class Pledge {
     function creator_email() { return $this->data['email']; }
     function creator_name() { return $this->data['name']; }
 
-    function password() { return $this->data['password']; }
+    function pin() { return $this->data['pin']; }
 
     // Basic data access for HTML display
     function h_title() { return htmlspecialchars($this->data['title']); }
@@ -315,11 +315,11 @@ function pledge_confirm($token) {
  * Add the named SIGNER to the PLEDGE. SHOWNAME indicates whether their name
  * should be displayed publically; EMAIL is their email address. It is the
  * caller's responsibility to check that the signer is authorised to sign a
- * private pledge (by supplying a password, presumably). If CONVERTS is not
- * null, it gives the ID of an existing signer whose signature will be
- * replaced by the new signature on confirmation. This is used to convert SMS
- * subscriptions into email subscriptions. On success returns the new signer
- * ID; on failure, return an error code. */
+ * private pledge (by supplying a PIN, presumably). If CONVERTS is not null, it
+ * gives the ID of an existing signer whose signature will be replaced by the
+ * new signature on confirmation. This is used to convert SMS subscriptions
+ * into email subscriptions. On success returns the new signer ID; on failure,
+ * return an error code. */
 function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
     $e = pledge_is_valid_to_sign($pledge_id, $email);
     if (pledge_is_error($e))
@@ -351,11 +351,11 @@ function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
     return $id;
 }
 
-/* check_password REF ACTUAL_PASSWORD
-   Checks to see if password (PIN) submitted is correct, returns true if it
-   is and false for wrong or no password.  */
-function check_password($ref, $actual) {
-    $raw = get_http_var('pw');
+/* check_pin REF ACTUAL_PIN
+   Checks to see if PIN submitted is correct, returns true if it is and false
+   for wrong or no PIN.  */
+function check_pin($ref, $actual) {
+    $raw = get_http_var('pin');
     $entered = $raw ? sha1($raw) : $raw;
     if (!$actual) 
         return true;
@@ -371,41 +371,41 @@ function check_password($ref, $actual) {
     }
 }
 
-/* deal_with_password LINK REF ACTUAL_PASSWORD
-   Calls check_password and if necessary returns HTML form for asking for password.
+/* deal_with_pin LINK REF ACTUAL_PIN
+   Calls check_pin and if necessary returns HTML form for asking for pin.
    Otherwise returns false.
-       LINK url for password form to post back to
+       LINK url for pin form to post back to
        REF pledge reference
-       ACTUAL_PASSWORD actual password
+       ACTUAL_PIN actual pin
 */
-function deal_with_password($link, $ref, $actual) {
-    if (check_password($ref, $actual)) {
+function deal_with_pin($link, $ref, $actual) {
+    if (check_pin($ref, $actual)) {
         return false;
     }
 
     $html = "";
-    if (get_http_var('pw')) {
+    if (get_http_var('pin')) {
         $html .= '<p class="finished">Incorrect PIN!</p>';
     }
-    $html .= '<form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>PIN Protected Pledge</h2><p>This pledge is password protected.  Please enter the PIN to proceed.</p>';
-    $html .= '<p><strong>PIN:</strong> <input type="password" name="pw" value=""><input type="submit" name="submitpassword" value="Submit"></p>';
+    $html .= '<form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>PIN Protected Pledge</h2><p>This pledge is protected.  Please enter the PIN to proceed.</p>';
+    $html .= '<p><strong>PIN:</strong> <input type="pin" name="pin" value=""><input type="submit" name="submitpin" value="Submit"></p>';
     $html .= '</form>';
     return $html;
 }
 
 
-/* print_link_with_password
+/* print_link_with_pin
    Prints out a link, normally just using <a href=...>.  Title is for
    the title= attribute, and text is the actual text body of the link.
-   If this page has a password, then instead of a link prints a button which
+   If this page has a PIN, then instead of a link prints a button which
    also transmits the passowrd to the link page.  Text to this function
    should be already escaped, or not need escaping, for display in URLs or
    HTML.*/
-function print_link_with_password($link, $title, $text) {
-    if (get_http_var('pw')) {
+function print_link_with_pin($link, $title, $text) {
+    if (get_http_var('pin')) {
 ?> 
     <form class="buttonform" name="buttonform" action="<?=$link?>" method="post" title="<?=$title?>">
-    <input type="hidden" name="pw" value="<?=htmlspecialchars(get_http_var('pw'))?>">
+    <input type="hidden" name="pin" value="<?=htmlspecialchars(get_http_var('pin'))?>">
     <input type="submit" name="submitbuttonform" value="<?=$text?>">
     </form>
 <?
@@ -459,7 +459,7 @@ function pledge_sign_box() {
 <input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
 <h2>Sign up now</h2>
-<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
+<? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">'; ?>
 <p><b>
 I, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars($name)?>">,
 sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($email) ?>"></b>
@@ -495,16 +495,16 @@ function post_confirm_advertise_flyers($r) {
 <p class="noprint" align="center"><big><strong>
 You will massively increase the chance of this pledge succeeding if you
 <?
-    if (!$r['password']) {
+    if (!$r['pin']) {
         print_this_link("print this page out", "");
         ?>
     (or use <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">these more attractive PDF and RTF (Word) versions</a>),
 <?
    } else {
-        // TODO - we don't have the password raw here, but really want it on
+        // TODO - we don't have the PIN raw here, but really want it on
         // form to pass on for link to flyers page.  Not sure how best to fix
         // this up.
-        print_link_with_password("/".htmlspecialchars($r['ref'])."/flyers", "", "print these pages out");
+        print_link_with_pin("/".htmlspecialchars($r['ref'])."/flyers", "", "print these pages out");
         print ",";
    }
 ?>
@@ -513,10 +513,10 @@ cannot emphasise this enough &mdash; print them NOW and post them next time you
 go out to the shops or your pledge is unlikely to succeed.</strong></big>
 </p>
 <? 
-    // Show inline graphics only for passwordless pledges (as PNG doesn't
-    // work for the password protected ones, you can't POST a password
+    // Show inline graphics only for PINless pledges (as PNG doesn't
+    // work for the PIN protected ones, you can't POST a PIN
     // into an IMG SRC= link)
-    if (!$r['password']) { ?>
+    if (!$r['pin']) { ?>
 <p align="center"><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
 <?  }
     post_confirm_advertise_sms($r);
@@ -524,9 +524,9 @@ go out to the shops or your pledge is unlikely to succeed.</strong></big>
 
 /* post_confirm_advertise_sms PLEDGE_ROW
  * Prints some stuff about SMS for PLEDGE.
- * Only for passwordless pledges, since private pledges can't be signed by SMS. */
+ * Only for PINless pledges, since private pledges can't be signed by SMS. */
 function post_confirm_advertise_sms($r) {
-    if (!$r['password']) {
+    if (!$r['pin']) {
 ?>
 <p class="noprint"><strong>Take your Pledge to the pub</strong> &ndash; next time you're out and about,
 get your friends to sign up by having them text

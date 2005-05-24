@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-ical.php,v 1.1 2005-04-29 15:14:12 francis Exp $
+// $Id: ref-ical.php,v 1.2 2005-05-24 23:18:40 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -25,8 +25,8 @@ if (!db_num_rows($q))
 
 $r = db_fetch_array($q);
 
-if (!check_password($q_ref, $r['password']))
-    err('Correct password required');
+if (!check_pin($q_ref, $r['pin']))
+    err('Correct PIN required');
 
 header('Content-Type: text/calendar');
 output_ical($r);
@@ -48,7 +48,7 @@ SUMMARY:Deadline for pledge "<?=$r['title'] ?>"
 GEO:LAT?;LON?
 LOCATION:?
 RESOURCES:At least <?=$r['target']. ' ' . $r['type'] ?> ?
-CLASS:<? if ($r['password']) print 'CONFIDENTIAL'; else print 'PUBLIC'; ?>
+CLASS:<? if ($r['pin']) print 'CONFIDENTIAL'; else print 'PUBLIC'; ?>
 
 TRANSP:TRANSPARENT
 URL:http://pledgebank.com/<?=$r['ref'] ?>

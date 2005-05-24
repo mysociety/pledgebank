@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.167 2005-05-24 08:50:01 francis Exp $
+// $Id: index.php,v 1.168 2005-05-24 23:18:40 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -67,7 +67,7 @@ function list_newest_pledges() {
                 SELECT *, date - pb_current_date() AS daysleft
                 FROM pledges
                 WHERE date >= pb_current_date() AND 
-                password is NULL AND confirmed
+                pin is NULL AND confirmed
                 ORDER BY id
                 DESC LIMIT 5");
     $new = '';
@@ -105,7 +105,7 @@ function list_highest_signup_pledges() {
             FROM pledges, signers
             WHERE pledges.id = signers.pledge_id
                 AND pledges.date >= pb_current_date() AND pledges.confirmed
-                AND pledges.password is NULL
+                AND pledges.pin is NULL
             GROUP BY pledges.id, pledges.name, pledges.title, pledges.date,
                 pledges.target, pledges.type, pledges.signup, pledges.ref,
                 pledges.comparison, pledges.identity
@@ -144,7 +144,7 @@ function list_frontpage_pledges() {
                 WHERE 
                 prominence = 'frontpage' AND
                 date >= pb_current_date() AND 
-                password is NULL AND confirmed
+                pin is NULL AND confirmed
                 ORDER BY id");
     $pledges = '';
     while ($r = db_fetch_array($q)) {
@@ -178,7 +178,7 @@ function list_successful_pledges() {
                 WHERE 
                 prominence != 'backpage' AND
                 date >= pb_current_date() AND 
-                password IS NULL AND 
+                pin IS NULL AND 
                 confirmed AND
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC");

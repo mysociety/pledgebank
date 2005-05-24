@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.22 2005-05-23 15:11:49 chris Exp $
+# $Id: SMS.pm,v 1.23 2005-05-24 23:18:39 francis Exp $
 #
 
 package PB::SMS;
@@ -251,7 +251,7 @@ sub receive_sms ($$$$$$) {
                 my $pledge_id = dbh()->selectrow_array('
                                         select id from pledges
                                         where ref ilike ? and confirmed
-                                        and password is null
+                                        and pin is null
                                     ', {}, $ref);
 
                 # Approximate reference match.
@@ -261,7 +261,7 @@ sub receive_sms ($$$$$$) {
                                             from pledges
                                             where ref ilike '%' || ? || '%'
                                                 and confirmed
-                                                and password is null
+                                                and pin is null
                                         ", {}, $ref);
                     if (@$ids != 1) {
                         send_sms(

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.9 2005-05-24 15:47:00 francis Exp $
+ * $Id: comment.php,v 1.10 2005-05-24 23:18:40 francis Exp $
  * 
  */
 
@@ -19,7 +19,7 @@ require_once('../phplib/comments.php');
 
 $err = importparams(
             array('pledge_id',          '/^[1-9][0-9]*$/',      "Missing pledge id"),
-            array('pw',                 '//',                   "Missing password",     null),
+            array('pin',                 '//',                  "Missing PIN",     null),
             array('comment_id',         '/^[1-9][0-9]*$/',      "Missing comment id",     null)
         );
 
@@ -38,7 +38,7 @@ $comment_id = $q_comment_id;
 $pledge = new Pledge(intval($pledge_id));
 $ref = $pledge->ref();
 
-if (!check_password($ref, $pledge->password()))
+if (!check_pin($ref, $pledge->pin()))
     err("Permission denied");
 
 // TODO: test for commenting on expired pledges etc.
@@ -112,7 +112,7 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     print <<<EOF
 <p>Thank you! Your comment has now been posted.</p>
 EOF;
-    if (is_null($pledge->password()))
+    if (is_null($pledge->pin()))
         print <<<EOF
 <p><a href="/$ref#comments">Go back to the pledge comments</a></p>
 EOF;
@@ -120,7 +120,7 @@ EOF;
         print <<<EOF
 <form method="post" action="/$ref">
 <p>
-<input type="hidden" name="pw" value="$q_h_pw">
+<input type="hidden" name="pin" value="$q_h_pin">
 <input type="submit" value="Go back to the pledge">
 </p>
 </form>

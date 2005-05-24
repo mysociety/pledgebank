@@ -24,7 +24,7 @@
 #   sms-confirm-own template
 #   sms-confirm-already template
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.61 2005-05-24 15:46:59 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.62 2005-05-24 23:18:39 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -127,12 +127,15 @@ print "Everything completed successfully\n";
 #############################################################################
 # Functions to make and sign pledges, and so on
 
-# sign_pledge WHO SHOW_SIGNATURE
+# sign_pledge WHO SHOW_SIGNATURE LOGIN
 # Adds a signer to a pledge, assumes browser is already pointing to pledge
 # signup page.  Adds person number WHO.  SHOW_SIGNATURE is 1 for their
 # signature to be public, undef for private.
+# LOGIN defines what to do with regards to log
+#   0 means expect not to be logged in, and don't log in
+#   1 means expect to be already logged in
 sub sign_pledge {
-    my ($who, $show_signature) = @_;
+    my ($who, $show_signature, $login_action) = @_;
 
     $wth->browser_check_contents("Sign up now");
     $b->submit_form(form_name => 'pledge',
@@ -140,22 +143,27 @@ sub sign_pledge {
             name => name_n($who), email => email_n($who), showname => $show_signature 
             },
         button => 'submit') or die "Failed to submit signing form";
-    $wth->browser_check_contents("We've sent you an email to confirm your address");
-    $wth->log_watcher_check();
+
+    if ($login_action == 0) {
+        $wth->browser_check_contents("Do you have a PledgeBank password?");
+        $b->submit_form(form_name => 'loginSendEmail',
+            button => 'SendEmail') or die "Failed to request confirmation email";
+        $wth->browser_check_contents("you'll need to click the link");
+    }
 }
 
-# find_and_sign_pledge ACTION WHO SHOW_SIGNATURE
+# find_and_sign_pledge ACTION WHO SHOW_SIGNATURE LOGIN
 # Finds a public pledge from the front page use text ACTION, then calls
 # sign_pledge.
 sub find_and_sign_pledge {
-    my ($action, $who, $show_signature) = @_;
+    my ($action, $who, $show_signature, $login_action) = @_;
 
     $b->get($base_url);
     $b->follow_link(text_regex => qr/$action/) or die "Pledge not appeared on front page";
-    sign_pledge($who, $show_signature);
+    sign_pledge($who, $show_signature, $login_action);
 }
 
-# confirm_signature ACTION WHO EXPECTED
+# confirm_signature ACTION WHO EXPECTED LOGIN
 # Looks for confirmation email to WHO with pledge action ACTION.  Follows link to
 # confirm the signature.  EXPECTED indicates what result is expected:
 #   'signed' - a successful signing
@@ -180,6 +188,9 @@ sub confirm_signature {
 
     # Look for appropriate result in web page
     if ($expected eq 'signed' || $expected eq 'reached') {
+        $wth->browser_check_contents("Redirect...");
+        $b->submit_form(form_name => 'f',
+            button => '__stash_submit_button_0') or die "Failed to do POST redirect button";
         $wth->browser_check_contents("Thanks for signing");
         if ($expected eq 'reached') {
             $wth->browser_check_contents("Your signature has made this pledge reach its target!");
@@ -369,7 +380,7 @@ sub do_public_succeeding_pledge {
         print "Signing the pledge $i...\n" if $verbose > 1;
         # Don't show name for one of the users
         my $show_signature = ($i == 2) ? undef : 1;
-        find_and_sign_pledge($pledge_action_completion, $i, $show_signature);
+        find_and_sign_pledge($pledge_action_completion, $i, $show_signature, 0);
     }
     for (my $i = 1; $i <= 3; ++$i) {
         print "Confirming signature $i...\n" if $verbose > 1;
@@ -378,12 +389,12 @@ sub do_public_succeeding_pledge {
     }
 
     # Try to sign the pledge a second time as the same person
-    find_and_sign_pledge($pledge_action_completion, 2, undef);
+    find_and_sign_pledge($pledge_action_completion, 2, undef, 0);
     $wth->email_get_containing('%To: '.email_n(2).
             '%you have already signed it%');
 
     # Partially sign pledge before completion state change...
-    find_and_sign_pledge($pledge_action_completion, 4, 1);
+    find_and_sign_pledge($pledge_action_completion, 4, 1, 0);
 
     # Check pledge has completed
     call_frequentupdate();
@@ -461,13 +472,13 @@ sub do_public_succeeding_pledge {
 sub do_private_failing_pledge {
     my $pledge_action_private = 'check private pledges are private';
     my $pledge_ref = "privatepledge";
-    my $private_password = 'zx3uuhai';
+    my $private_pin = 'zx3uuhai';
     set_pb_date('1980-12-01');
     create_pledge(0, 
         { title => $pledge_action_private, 
             target => '10', date => 'Dec 31st', ref => $pledge_ref
         },
-        { country => 'Global', visibility => 'password', password => $private_password },
+        { country => 'Global', visibility => 'pin', pin => $private_pin },
         1
     );
     # TODO: test log in more tidily, check between different users (maybe they
@@ -476,27 +487,27 @@ sub do_private_failing_pledge {
     # No need to click any confirmation email, as we should be already logged
     # in from before
 
-    # Go to private pledge page, and submit password to access it
+    # Go to private pledge page, and submit PIN to access it
     my $goto_private_pledge_page = sub {
         $b->get("$base_url/$pledge_ref");
-        $wth->browser_check_contents("Password Protected Pledge");
-        $wth->browser_check_no_contents("Incorrect password!");
+        $wth->browser_check_contents("PIN Protected Pledge");
+        $wth->browser_check_no_contents("Incorrect pin!");
         $wth->browser_check_no_contents($pledge_action_private);
         $b->submit_form(form_name => 'pledge',
-                fields => { pw => 'thisisnotthepassword' },
-                button => 'submitpassword') or die "Failed to submit password form";
-        $wth->browser_check_contents("Incorrect password!");
+                fields => { pin => 'thisisnotthepin' },
+                button => 'submitpin') or die "Failed to submit pin form";
+        $wth->browser_check_contents("Incorrect pin!");
         $wth->browser_check_no_contents($pledge_action_private);
         $b->submit_form(form_name => 'pledge',
-                fields => { pw => $private_password },
-                button => 'submitpassword') or die "Failed to submit password form";
+                fields => { pin => $private_pin },
+                button => 'submitpin') or die "Failed to submit pin form";
         $wth->browser_check_contents($pledge_action_private);
     };
 
     # Sign up to private pledge
     &$goto_private_pledge_page();
     $wth->browser_check_no_contents("This pledge is now closed");
-    sign_pledge(1, 1);
+    sign_pledge(1, 1, 0);
     confirm_signature($pledge_action_private, 1);
     &$goto_private_pledge_page();
     $wth->browser_check_contents("<i>1 person has signed up");
@@ -542,26 +553,26 @@ sub do_private_failing_pledge {
     $wth->browser_check_no_contents($pledge_ref);
     $wth->browser_check_no_contents($pledge_action_private);
 
-    # And all its pages require password to get to
+    # And all its pages require PIN to get to
     # ... email friends page
     $b->get("$base_url/$pledge_ref/email");
-    $wth->browser_check_contents("Password Protected Pledge");
+    $wth->browser_check_contents("PIN Protected Pledge");
     $wth->browser_check_no_contents($pledge_action_private);
         # ... flyers index
     $b->get("$base_url/$pledge_ref/flyers");
-    $wth->browser_check_contents("Password Protected Pledge");
+    $wth->browser_check_contents("PIN Protected Pledge");
     $wth->browser_check_no_contents($pledge_action_private);
     # ... individual poster
     $b->get("$base_url/flyers/${pledge_ref}_A4_flyers8.pdf");
-    $wth->browser_check_contents("Correct password needed");
+    $wth->browser_check_contents("Correct PIN needed");
 
     $wth->log_watcher_check();
     # ... ical calendar entry
     $b->get("$base_url/$pledge_ref/ical");
-    $wth->browser_check_contents("Correct password required");
+    $wth->browser_check_contents("Correct PIN required");
     $wth->browser_check_no_contents($pledge_action_private);
     my $errors = $wth->log_watcher_get_errors();
-    die if ($errors !~ m/Correct password required/);
+    die if ($errors !~ m/Correct PIN required/);
     # ... sign page
     $b->get("$base_url/$pledge_ref/sign");
     $wth->browser_check_contents("Permission denied");
@@ -572,7 +583,7 @@ sub do_private_failing_pledge {
     # Test what happens upon expiry
     # ... partially sign the pledge
     &$goto_private_pledge_page();
-    sign_pledge(2, 1);
+    sign_pledge(2, 1, 0);
     # ... then expire it
     set_pb_date('1981-01-15');
     # ... make sure completing the partial signing fails

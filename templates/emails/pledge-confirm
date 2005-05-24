@@ -9,7 +9,7 @@ and your name, and use (but not display) your postcode (if you've
 submitted one) to locate your pledge in the right geographic area.
 The purpose of this is simply to give your pledge greater publicity
 and a greater chance of succeeding. Rest assured that we won't ever
-give or sell anyone your email address. If your pledge is passworded,
+give or sell anyone your email address. If your pledge is PIN protected,
 we won't share anything with any other sites. 
 
 <?=$values['url']?>

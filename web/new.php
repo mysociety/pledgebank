@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.15 2005-05-24 14:13:17 francis Exp $
+// $Id: new.php,v 1.16 2005-05-24 23:18:40 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -110,7 +110,7 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 function pledge_form_two($data, $errors = array()) {
     $v = 'all';
     if (isset($data['visibility'])) {
-        $v = $data['visibility']; if ($v!='password') $v = 'all';
+        $v = $data['visibility']; if ($v!='pin') $v = 'all';
     }
     $local = (array_key_exists('local', $data)) && $data['local'] == '1';
     $notlocal = (array_key_exists('local', $data)) && $data['local'] == '0';
@@ -186,9 +186,9 @@ If yes, enter your postcode so that local people can find your pledge:
 </p>
 
 <p>Who do you want to be able to see your pledge?
-<br><input onclick="grey_password(true)" type="radio" name="visibility" value="all"<?=($v=='all'?' checked':'') ?>> Anyone
-<input onclick="grey_password(false)" type="radio" name="visibility" value="password"<?=($v=='password'?' checked':'') ?>> Only people to whom I give this PIN:
-<input <? if (array_key_exists('password', $errors)) print ' class="error"' ?> type="text" id="password" name="password" value="">
+<br><input onclick="grey_pin(true)" type="radio" name="visibility" value="all"<?=($v=='all'?' checked':'') ?>> Anyone
+<input onclick="grey_pin(false)" type="radio" name="visibility" value="pin"<?=($v=='pin'?' checked':'') ?>> Only people to whom I give this PIN:
+<input <? if (array_key_exists('pin', $errors)) print ' class="error"' ?> type="text" id="pin" name="pin" value="">
 </p>
 
 <p style="text-align: right;">
@@ -287,15 +287,15 @@ function step2_error_check($data) {
         if ($data['local'] && !validate_postcode($data['postcode'])) 
             $errors['postcode'] = 'Please enter a valid postcode, such as OX1 3DR';
     }
-    if ($data['visibility'] == 'password' && !$data['password']) 
-        $errors['password'] = 'Please enter a password';
+    if ($data['visibility'] == 'pin' && !$data['pin']) 
+        $errors['pin'] = 'Please enter a pin';
     return $errors;
 }
 
 function pledge_form_two_submitted() {
     $errors = array();
     $data = array();
-    $fields = array('comparison', 'category', 'country', 'local', 'postcode', 'visibility', 'password', 'data');
+    $fields = array('comparison', 'category', 'country', 'local', 'postcode', 'visibility', 'pin', 'data');
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
@@ -309,7 +309,7 @@ function pledge_form_two_submitted() {
     if ($data['country'] != 'UK') {
         $data['local'] = ''; $data['postcode'] = '';
     }
-    if ($data['visibility'] != 'password') { $data['visibility'] = 'all'; $data['password'] = ''; }
+    if ($data['visibility'] != 'pin') { $data['visibility'] = 'all'; $data['pin'] = ''; }
 
     $errors = step2_error_check($data);
     if (sizeof($errors)) {
@@ -357,7 +357,7 @@ function pledge_form_three_submitted() {
 function preview_pledge($data) {
     $v = 'all';
     if (isset($data['visibility'])) {
-        $v = $data['visibility']; if ($v!='password') $v = 'all';
+        $v = $data['visibility']; if ($v!='pin') $v = 'all';
     }
     $local = (isset($data['local'])) ? $data['local'] : '0';
     $isodate = $data['parseddate']['iso'];
@@ -404,7 +404,7 @@ $local ? 'Yes (' . htmlspecialchars($data['postcode']) . ')' : 'No' ?></em>
 
 <li>Who do you want to be able to see your pledge? <em><?
 if ($v=='all') print 'Anyone';
-if ($v=='password') print ' Only people to whom I give a password I have specified';
+if ($v=='pin') print ' Only people to whom I give a PIN I have specified';
 ?></em></li>
 </ul>
 
@@ -429,7 +429,7 @@ function create_new_pledge($P, $data) {
     $isodate = $data['parseddate']['iso'];
     $token = auth_random_token();
     if ($data['visibility'] == 'all')
-        $data['password'] = null;
+        $data['pin'] = null;
 
     /* Guard against double-insertion. */
     db_query('lock table pledges in share mode');
@@ -447,7 +447,7 @@ function create_new_pledge($P, $data) {
                     detail,
                     comparison,
                     country, postcode,
-                    password, identity
+                    pin, identity
                 ) values (
                     ?, ?, ?,
                     ?, ?, ?, ?,
@@ -465,7 +465,7 @@ function create_new_pledge($P, $data) {
                     $data['detail'],
                     $data['comparison'],
                     $data['country'], $data['postcode'],
-                    $data['password'] ? sha1($data['password']) : null, $data['identity']
+                    $data['pin'] ? sha1($data['pin']) : null, $data['identity']
                 ));
 
         if ($data['category'] != -1)

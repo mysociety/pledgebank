@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.5 2005-05-23 16:48:07 francis Exp $
+// $Id: ref-flyers.php,v 1.6 2005-05-24 23:18:40 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -14,10 +14,10 @@ require_once '../../phplib/utility.php';
 
 $p  = new Pledge(get_http_var('ref'));
 
-$password_box = deal_with_password($p->url_flyers(), $p->ref(), $p->password());
-if ($password_box) {
+$pin_box = deal_with_pin($p->url_flyers(), $p->ref(), $p->pin());
+if ($pin_box) {
     page_header("Enter PIN"); 
-    print $password_box;
+    print $pin_box;
     page_footer();
     exit;
 }
@@ -35,18 +35,18 @@ $png_flyers8_url = $p->url_flyer("A4_flyers8.png");
 <h2>Customised Flyers</h2>
 <p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s or editable <acronym title="Rich Text File">RTF</acronym>s (Word compatible) containing your pledge data, to print out, display, hand out, or whatever.</p>
 <ul>
-<li><? print_link_with_password($pdf_flyers8_url, "", "Flyers for handing out, 8 per page (A4, PDF" . (get_http_var("pw") ? "" : ", like picture below") . ")") ?> </li>
-<li><? print_link_with_password($pdf_flyers1_url, "", "A4 PDF poster" . 
+<li><? print_link_with_pin($pdf_flyers8_url, "", "Flyers for handing out, 8 per page (A4, PDF" . (get_http_var("pin") ? "" : ", like picture below") . ")") ?> </li>
+<li><? print_link_with_pin($pdf_flyers1_url, "", "A4 PDF poster" . 
 ($p->has_details() ? ', including more details' : '') ) ?> </li>
-<li><? print_link_with_password($rtf_flyers1_url, "", "A4 editable poster (RTF)" . 
+<li><? print_link_with_pin($rtf_flyers1_url, "", "A4 editable poster (RTF)" . 
 ($p->has_details() ? ', including more details' : '') ) ?> </li>
 </ul>
 </div>
 <?
-// Show inline graphics only for passwordless pledges (as PNG doesn't
-// work for the password protected ones, you can't POST a password
+// Show inline graphics only for PINless pledges (as PNG doesn't
+// work for the PIN protected ones, you can't POST a PIN
 // into an IMG SRC= link)
-if (!get_http_var('pw')) {
+if (!get_http_var('pin')) {
 ?>
 <p class="noprint">Alternatively, simply 
 <?print_this_link("print this page out", "")?>

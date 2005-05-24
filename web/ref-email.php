@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.6 2005-05-23 16:48:07 francis Exp $
+// $Id: ref-email.php,v 1.7 2005-05-24 23:18:40 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -16,10 +16,10 @@ require_once '../../phplib/utility.php';
 
 $p  = new Pledge(get_http_var('ref'));
 
-$password_box = deal_with_password($p->url_email(), $p->ref(), $p->password());
-if ($password_box) {
+$pin_box = deal_with_pin($p->url_email(), $p->ref(), $p->pin());
+if ($pin_box) {
     page_header("Enter PIN"); 
-    print $password_box;
+    print $pin_box;
     page_footer();
     exit;
 }

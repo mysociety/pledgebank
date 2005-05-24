@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.4 2005-05-24 14:56:07 chris Exp $
+// $Id: ref-sign.php,v 1.5 2005-05-24 23:18:40 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -34,18 +34,18 @@ if (is_array($errors)) {
 page_footer();
 
 function do_sign() {
-    global $q_email, $q_name, $q_showname, $q_ref, $q_pw;
+    global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
     $errors = importparams(
             array('name',       '/^[a-z]/i',        'Please give your name'),
             array('email',      '/^[^@]+@.+/',      'Please give your email'),
             array('ref',        '/^[a-z0-9-]+$/i',  ''),
             array('showname',   '//',               'Please enter showname', 0),
-            array('pw',         '//',               '', null)
+            array('pin',         '//',              '', null)
             );
     if ($q_email=='<Enter your name>') $q_email='';
 
     $r = db_getRow('select * from pledges where ref ILIKE ?', $q_ref);
-    if (!check_password($q_ref, $r['password']))
+    if (!check_pin($q_ref, $r['pin']))
         err("Permission denied");
 
     if (!is_null($errors)) {
@@ -76,8 +76,9 @@ function do_sign() {
         db_commit();
 
         ?>
-<p><strong>Congratulations! You've just signed this pledge</strong></p>
+<p class="noprint" align="center"><strong>Thanks for signing up to this pledge!</strong></p>
 <?
+        post_confirm_advertise($r);
     }
 }
 

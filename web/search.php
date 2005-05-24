@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.1 2005-04-29 15:14:12 francis Exp $
+// $Id: search.php,v 1.2 2005-05-24 23:18:40 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -23,7 +23,7 @@ function search() {
         exit;
     }
 
-    $q = db_query('SELECT date,ref,title, pb_current_date() <= date as open FROM pledges WHERE password IS NULL AND (title ILIKE \'%\' || ? || \'%\' OR detail ILIKE \'%\' || ? || \'%\') ORDER BY date', array($search, $search));
+    $q = db_query('SELECT date,ref,title, pb_current_date() <= date as open FROM pledges WHERE pin IS NULL AND (title ILIKE \'%\' || ? || \'%\' OR detail ILIKE \'%\' || ? || \'%\') ORDER BY date', array($search, $search));
     if (!db_num_rows($q)) {
     } else {
         $success = 1;

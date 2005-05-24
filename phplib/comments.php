@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.11 2005-05-23 16:36:12 chris Exp $
+ * $Id: comments.php,v 1.12 2005-05-24 23:18:39 francis Exp $
  * 
  */
 
@@ -157,7 +157,7 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 <input type="submit" name="submit" value="Post comment">
 <? } ?>
 
-<?  if ($p = get_http_var('pw')) print '<input type="hidden" name="pw" value="$p">'; ?>
+<?  if ($p = get_http_var('pin')) print '<input type="hidden" name="pin" value="$p">'; ?>
 </form>
 <?
 }

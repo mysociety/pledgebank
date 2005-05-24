@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.43 2005-05-23 07:50:52 francis Exp $
+# $Id: poster.cgi,v 1.44 2005-05-24 23:18:40 francis Exp $
 #
 
 import os
@@ -213,9 +213,9 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
                 map(lambda text: PyRTF.Paragraph(ss.ParagraphStyles.detail, text), d[1:])
             )
 
-    if pledge['password']:
+    if pledge['pin']:
         text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 'Pledge at ', webdomain_text)
-        text_para.append(' password ', PyRTF.TEXT('%s' % userpassword, colour=ss.Colours.pb, size=int(small_writing+4)))
+        text_para.append(' pin ', PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
         sms_smallprint = ""
     else:
         text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 
@@ -346,14 +346,14 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 ('<b>More details:</b> %s' % pledge['detail']).split("\n\n"))
             )
 
-    if pledge['password']:
+    if pledge['pin']:
         pledge_at_text = "Pledge at "
-        password_text = ''' password <font color="#522994" size="+2">%s</font>''' % userpassword
+        pin_text = ''' pin <font color="#522994" size="+2">%s</font>''' % userpin
         sms_to_text = ""
         sms_smallprint = ""
     else:
         pledge_at_text = "pledge at "
-        password_text = ""
+        pin_text = ""
         sms_to_text = """<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
             or """ % (ref, sms_number)
@@ -362,7 +362,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
     story.extend([
         Paragraph('''%s%s%s%s''' % 
-            (sms_to_text, pledge_at_text, webdomain_text, password_text), p_normal),
+            (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal),
         Paragraph('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
             ''' % pledge['date'], p_normal),
@@ -507,8 +507,8 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup, password, identity, detail FROM pledges WHERE ref ILIKE %s', ref)
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['password'], pledge['identity'], pledge['detail']) = q.fetchone()
+        q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail FROM pledges WHERE ref ILIKE %s', ref)
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail']) = q.fetchone()
         q.close()
         day = date.day
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
@@ -516,18 +516,18 @@ while fcgi.isFCGI():
             pledge['signup'] = "too"
         sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
-        # Check password
-        #req.err.write("password %s\n" % pledge['password'])
-        if pledge['password']:
-            if 'pw' not in fs:
-                raise Exception, "Correct password needed for '%s' pledge" % ref
-            userpassword = fs['pw'].value
+        # Check pin
+        #req.err.write("pin %s\n" % pledge['pin'])
+        if pledge['pin']:
+            if 'pin' not in fs:
+                raise Exception, "Correct pin needed for '%s' pledge" % ref
+            userpin = fs['pin'].value
             sha_calc = sha.new()
-            sha_calc.update(userpassword)
-            crypt_userpassword = sha_calc.hexdigest()
-            #req.err.write("userpassword %s\n" % crypt_userpassword)
-            if crypt_userpassword != pledge['password']:
-                raise Exception, "Correct password needed for '%s' pledge" % ref
+            sha_calc.update(userpin)
+            crypt_userpin = sha_calc.hexdigest()
+            #req.err.write("userpin %s\n" % crypt_userpin)
+            if crypt_userpin != pledge['pin']:
+                raise Exception, "Correct pin needed for '%s' pledge" % ref
 
         # Header
         if incgi:

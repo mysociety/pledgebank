@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.27 2005-05-24 10:29:21 francis Exp $
+// $Id: fns.php,v 1.28 2005-05-24 23:18:39 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -157,7 +157,7 @@ function view_friends_form($p, $errors = array()) {
         $p->render_box(array('showdetails'=>true));
 ?>
 <form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
-<? if (get_http_var('pw')) print '<input type="hidden" name="pw" value="'.htmlspecialchars(get_http_var('pw')).'">'; ?>
+<? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">'; ?>
 <h2>Email this pledge</h2>
 <p>
 Please enter these details so that we can send your message to your contacts.

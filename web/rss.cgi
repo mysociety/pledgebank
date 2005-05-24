@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.3 2005-05-13 16:06:02 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.4 2005-05-24 23:18:40 francis Exp $';
 
 use strict;
 use warnings;
@@ -97,7 +97,7 @@ sub get_pledges {
 "select id, ref, title, target, date, name, detail
    from pledges
    where confirmed
-   AND password IS NULL 
+   AND pin IS NULL 
    AND prominence <> \'backpage\'
    order by id desc 
 limit $CONF{number_of_pledges}"

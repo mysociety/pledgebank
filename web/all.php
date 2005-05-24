@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.4 2005-05-13 18:31:20 matthew Exp $
+// $Id: all.php,v 1.5 2005-05-24 23:18:40 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -30,7 +30,7 @@ $q = db_query('SELECT title,target,date,name,ref
         FROM pledges 
         WHERE confirmed 
         AND date>=pb_current_date() 
-        AND password IS NULL 
+        AND pin IS NULL 
         AND prominence <> \'backpage\'
         ORDER BY '.$order.' LIMIT 50');
 $out = '<table width="100%"><tr><th><a href="./all?title">Title</a></th><th><a href="./all?target">Target</a></th><th><a href="./all?deadline">Deadline</a></th><th><a href="./all?creator">Creator</a></th><th><a href="./all?ref">Short name</a></th></tr>';

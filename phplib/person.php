@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.7 2005-05-24 10:29:21 francis Exp $
+ * $Id: person.php,v 1.8 2005-05-24 13:02:42 chris Exp $
  * 
  */
 
@@ -31,8 +31,8 @@ class Person {
             err('value passed to person constructor must be person ID or email address');
         if (is_null($this->id))
             err("No such person '$id'");
-        list($this->email, $this->name, $this->password)
-            = db_getRow_list('select email, name, password from person where id = ?', $id);
+        list($this->email, $this->name, $this->password, $this->numlogins)
+            = db_getRow_list('select email, name, password, numlogins from person where id = ?', $id);
     }
 
     /* id [ID]
@@ -61,6 +61,12 @@ class Person {
         return $this->name;
     }
 
+    /* matches_name [NEWNAME]
+     * Is NEWNAME essentially the same as the person's existing name? */
+    function matches_name($newname) {
+        return person_canonicalise_name($newname) == person_canonicalise_name($this->name);
+    }
+
     /* password PASSWORD
      * Set the person's PASSWORD. */
     function password($password) {
@@ -87,10 +93,17 @@ class Person {
             return true;
     }
 
-    /* matches_name [NEWNAME]
-     * Is NEWNAME essentially the same as the person's existing name? */
-    function matches_name($newname) {
-        return person_canonicalise_name($newname) == person_canonicalise_name($this->name);
+    /* numlogins
+     * How many times has this person logged in? */
+    function numlogins() {
+        return $this->numlogins;
+    }
+
+    /* inc_numlogins
+     * Record this person as having logged in an additional time. */
+    function inc_numlogins() {
+        ++$this->numlogins;
+        db_query('update person set numlogins = numlogins + 1 where id = ?', $this->id);
     }
 }
 

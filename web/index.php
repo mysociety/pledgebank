@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.166 2005-05-23 15:02:53 sandpit Exp $
+// $Id: index.php,v 1.167 2005-05-24 08:50:01 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -42,11 +42,21 @@ Or <a href="/explain">read a full transcript</a>.</p>
 <input type="text" id="s" name="q" size="10" value=""></p>
 <p style="margin-top: 0.5em; text-align: right"><input type="submit" value="Go"></p>
 </form>
+
+<?    list_frontpage_pledges(); ?>
+
+<h2>Start your own pledge</h2>
+
+<p>The way it works is simple. You <a href="/new">create a pledge</a>
+which has the basic format 'I'll do something, but only if other people will
+pledge to do the same thing'.  There are some examples of successful
+pledges below, but you can go wild with your own ideas!
+
+<?    list_successful_pledges(); ?>
+
 <?
     //list_newest_pledges();
     //list_highest_signup_pledges();
-    list_frontpage_pledges();
-    list_successful_pledges();
 }
 
 function list_newest_pledges() {

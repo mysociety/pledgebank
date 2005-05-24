@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.2 2005-05-23 15:26:28 sandpit Exp $
+// $Id: explain.php,v 1.3 2005-05-24 08:50:01 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -41,7 +41,7 @@ pounds to a cause that actually needed a thousand.
 <blockquote>The way it works is simple.  You create a pledge which has the basic
 format 'I'll do something, but only if other people will pledge to do
 the same thing'.  For example, if you'd always want to organise a street
-party you could orgnise a pledge which said 'I'll hold a street party,
+party you could organise a pledge which said 'I'll hold a street party,
 but only if three people who live in my street will help me to run it'
 </blockquote>
 

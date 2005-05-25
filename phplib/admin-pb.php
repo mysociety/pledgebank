@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.48 2005-05-25 20:22:32 francis Exp $
+ * $Id: admin-pb.php,v 1.49 2005-05-25 20:44:23 matthew Exp $
  * 
  */
 
@@ -285,13 +285,22 @@ class ADMIN_PAGE_PB_LATEST {
                         WHERE signers.pledge_id = pledges.id
                      ORDER BY signtime DESC');
         while ($r = db_fetch_array($q)) {
+            $signed[$r['id']][$r['email']] = 1;
             $time[$r['epoch']][] = $r;
         }
         $q = db_query('SELECT *,extract(epoch from created) as epoch
                          FROM token
                      ORDER BY created DESC');
         while ($r = db_fetch_array($q)) {
-            $time[$r['epoch']][] = $r;
+            $stuff = $r['data'];
+            $pos = 0;
+            $res = rabx_wire_rd(&$stuff, &$pos);
+            if (rabx_is_error($res)) {
+                $r['error'] = 'RABX Error: ' . $res->text;
+            }
+            if (!isset($signed[$res['pledge_id']]) || !isset($res['email']) || !isset($signed[$res['pledge_id']][$res['email']])) {
+                $time[$r['epoch']][] = array_merge($r, $res);
+            }
         }
         if (!get_http_var('onlysigners')) {
             $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
@@ -381,19 +390,13 @@ dd {
                 print "Message $data[circumstance] queued for pledge " .
                 $this->pledge_link('ref', $data['ref']);
             } elseif (array_key_exists('created', $data)) {
-                $stuff = $data['data'];
-                $pos = 0;
-                $res = rabx_wire_rd(&$stuff, &$pos);
-                if (rabx_is_error($res)) {
-                    print '<em>RABX Error: ' . $res->text . '</em><br>';
+                if (array_key_exists('error', $data)) {
+                    print '<em>' . $data['error'] . '</em><br>';
                 }
                 print "$data[scope] token $data[token] created ";
-                if (array_key_exists('email', $res)) {
-                    print "for $res[name] $res[email], pledge " .
-                    $this->pledge_link('id', $res['pledge_id']);
-#                    if ($signed[$res['pledge_id']][$res['email']]) {
-#                        print ' - confirmed';
-#                    }
+                if (array_key_exists('email', $data)) {
+                    print "for $data[name] $data[email], pledge " .
+                    $this->pledge_link('id', $data['pledge_id']);
                 } elseif (array_key_exists('circumstance', $res)) {
                     print "for pledge " . $this->pledge_link('id', $res['pledge_id']);
                 }

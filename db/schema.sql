@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.87 2005-05-24 23:18:39 francis Exp $
+-- $Id: schema.sql,v 1.88 2005-05-25 13:53:22 chris Exp $
 --
 
 -- secret
@@ -175,7 +175,10 @@ create function pledge_is_valid_to_sign(integer, text, text)
             if $2 = creator_email then
                 return ''signed'';
             end if;
-            perform id from signers where pledge_id = $1 and email = $2 for update;
+            perform signers.id from signers, person
+                where pledge_id = $1
+                    and signers.person_id = person.id
+                    and person.email = $2 for update;
             if found then
                 return ''signed'';
             end if;

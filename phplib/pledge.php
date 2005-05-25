@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.63 2005-05-25 11:56:21 francis Exp $
+ * $Id: pledge.php,v 1.64 2005-05-25 14:06:03 chris Exp $
  * 
  */
 
@@ -281,8 +281,9 @@ function pledge_dbresult_to_code($r) {
 }
 
 /* pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
- * Return true if EMAIL/MOBILE may validly sign PLEDGE. This function locks
- * rows in pledges and signers with select ... for update / lock tables. */
+ * Return a PLEDGE_... code describing whether EMAIL/MOBILE may validly sign
+ * PLEDGE. This function locks rows in pledges and signers with select ... for
+ * update / lock tables. */
 function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null) {
     return pledge_dbresult_to_code(
                 db_getOne('select pledge_is_valid_to_sign(?, ?, ?)',

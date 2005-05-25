@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.11 2005-05-25 09:45:43 chris Exp $
+ * $Id: person.php,v 1.12 2005-05-25 13:40:43 chris Exp $
  * 
  */
 
@@ -175,6 +175,10 @@ function person_if_signed_on() {
  * "create the pledge '...'" or "sign the pledge '...'".  The rest of
  * the data in TEMPLATE_DATA is passed through to the email template. */
 function person_signon($template_data, $email, $name = null) {
+
+    if (!preg_match('/^[^@]+@[^@]+$/', $email))
+        err("'$email' is not a valid email address");
+
     $P = person_if_signed_on();
     if (!is_null($P) && $P->email() == $email) {
         if (!is_null($name) && !$P->matches_name($name))

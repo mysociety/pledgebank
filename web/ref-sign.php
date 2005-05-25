@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.6 2005-05-25 10:53:54 francis Exp $
+// $Id: ref-sign.php,v 1.7 2005-05-25 14:50:05 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -36,11 +36,11 @@ page_footer();
 function do_sign() {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
     $errors = importparams(
-            array('name',       '/^[a-z]/i',        'Please give your name'),
-            array('email',      '/^[^@]+@.+/',      'Please give your email'),
-            array('ref',        '/^[a-z0-9-]+$/i',  ''),
-            array('showname',   '//',               'Please enter showname', 0),
-            array('pin',         '//',              '', null)
+                array('name',       '/^[a-z]/i',        'Please give your name'),
+                array('email',      '/^[^@]+@.+/',      'Please give your email'),
+                array('ref',        '/^[a-z0-9-]+$/i',  ''),
+                array('showname',   '//',               'Please enter showname', 0),
+                array('pin',         '//',              '', null)
             );
     if ($q_email=='<Enter your name>') $q_email='';
 
@@ -48,37 +48,40 @@ function do_sign() {
     if (!check_pin($q_ref, $r['pin']))
         err("Permission denied");
 
-    if (!is_null($errors)) {
+    if (!is_null($errors))
         return $errors;
-    }
 
     /* Get the user to log in. */
     $r['template'] = 'signature-confirm';
     $r['reason'] = 'sign the pledge';
     $P = person_signon($r, $q_email, $q_name);
+    
+    $R = pledge_is_valid_to_sign($r['id'], $P->email());
 
-    if ($P->id() == $r['person_id']) {
-        ?>
-<p><strong>You cannot sign your own pledge!</strong></p>
-<?
-        return;
-    }
-   
-    $id = db_getOne('select id from signers where pledge_id = ? and person_id = ?', array($r['id'], $P->id()));
-
-    if (isset($id)) {
-        ?>
-<p><strong>You've already signed this pledge!</strong></p>
-<?
-        return;
-    } else {
-        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($r['id'], $P->name(), $P->id(), $q_showname ? 't' : 'f'));
+    if (!pledge_is_error($R)) {
+        /* All OK, sign pledge. */
+        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($r['id'], $P->name(), $P->id(), $q_showname));
         db_commit();
-
         ?>
 <p class="noprint" align="center"><strong>Thanks for signing up to this pledge!</strong></p>
 <?
         post_confirm_advertise($r);
+    } else if ($R == PLEDGE_SIGNED) {
+        /* Either has already signer, or is creator. */
+        if ($P->id() == $r['person_id']) {
+        ?>
+<p><strong>You cannot sign your own pledge!</strong></p>
+<?
+        } else {
+        ?>
+<p><strong>You've already signed this pledge!</strong></p>
+<?
+        }
+    } else {
+        /* Something else has gone wrong. */
+        print "<p><strong>Sorry &mdash; it wasn't possible to sign that pledge. "
+                . htmlspecialchars(pledge_strerror($R))
+                . ".</p></strong>";
     }
 }
 

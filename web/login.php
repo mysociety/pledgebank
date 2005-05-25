@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.16 2005-05-25 15:10:10 chris Exp $
+ * $Id: login.php,v 1.17 2005-05-25 15:36:45 chris Exp $
  * 
  */
 
@@ -126,7 +126,7 @@ if (!is_null($q_t)) {
      * set or reset their password. */
     if ($P->numlogins() > 1)
         change_password_page($P);
-    else if (!$P->matches_name($q_name))
+    else if ($q_name && !$P->matches_name($q_name))
         $P->name($q_name);
     stash_redirect($q_stash);
         /* NOTREACHED */
@@ -137,7 +137,7 @@ if (!is_null($P)) {
     /* Person is already signed in. */
     if ($q_SetPassword)
         change_password_page($P);
-    if (!is_null($q_name) && !$P->matches_name($q_name))
+    if ($q_name && !$P->matches_name($q_name))
         /* ... but they have specified a name which differs from their recorded
          * name. Change it. */
         $P->name($q_name);
@@ -170,7 +170,7 @@ function login_page() {
             /* User has logged in correctly. Decide whether they are changing
              * their name. */
             set_login_cookie($P, $q_rememberme ? 28 * 24 * 3600 : null);
-            if (!$P->matches_name($q_name))
+            if ($q_name && !$P->matches_name($q_name))
                 $P->name($q_name);
             $P->inc_numlogins();
             db_commit();

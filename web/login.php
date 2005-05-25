@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.15 2005-05-25 11:56:21 francis Exp $
+ * $Id: login.php,v 1.16 2005-05-25 15:10:10 chris Exp $
  * 
  */
 
@@ -147,7 +147,7 @@ if (!is_null($P)) {
         stash_redirect($q_stash);
     else
         err('A required parameter was missing');
-} else if (!is_null($q_stash) && !is_null($q_email) && !is_null($q_name))
+} else
     /* Main login page. */
     login_page();
 
@@ -155,6 +155,7 @@ if (!is_null($P)) {
  * Render the login page, or respond to a button pressed on it. */
 function login_page() {
     global $q_stash, $q_email, $q_name, $q_LogIn, $q_SendEmail, $q_rememberme;
+
     if (is_null($q_stash) || is_null($q_email) || is_null($q_name))
         err('A required parameter was missing');
 
@@ -171,7 +172,7 @@ function login_page() {
             set_login_cookie($P, $q_rememberme ? 28 * 24 * 3600 : null);
             if (!$P->matches_name($q_name))
                 $P->name($q_name);
-            $P->inc_logins();
+            $P->inc_numlogins();
             db_commit();
             stash_redirect($q_stash);
                 /* NOTREACHED */

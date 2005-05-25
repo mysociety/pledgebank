@@ -1,0 +1,11 @@
+Subject: Access your pledge creator's page at PledgeBank.com
+
+Please click on the link below to confirm your email address. We need
+you to do this so that you can <?=$values['reason']?>.
+
+<?=$values['url']?>
+
+We will never give away or sell your email address to anyone else
+without your permission.
+
+<?=$values['signature']?>

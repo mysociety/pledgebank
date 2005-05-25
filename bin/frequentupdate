@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.27 2005-05-24 15:46:59 francis Exp $
+ * $Id: frequentupdate,v 1.28 2005-05-25 11:56:20 francis Exp $
  *
  */
 
@@ -268,15 +268,16 @@ function send_pending_messages() {
                 select message.*,
                     signers.id as signer_id,
                     signers.name as signer_name,
-                    signers.email as signer_email,
+                    signer_person.email as signer_email,
                     signers.mobile as signer_mobile,
                     extract(epoch from signers.signtime)
                         - extract(epoch from message.whencreated) as howlongago
-                from message, signers, pledges
+                from message, pledges, signers
+                left join person as signer_person on signer_person.id = signers.person_id
                 where sendtosigners
                     and message.pledge_id = signers.pledge_id
                     and message.pledge_id = pledges.id
-                    and (message.sms is not null or signers.email is not null)
+                    and (message.sms is not null or signers.person_id is not null)
                     and (pledges.whensucceeded is null or sendtolatesigners
                             or signers.signtime < pledges.whensucceeded)
                     and (select signer_id

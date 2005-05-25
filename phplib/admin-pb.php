@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.50 2005-05-25 20:48:57 matthew Exp $
+ * $Id: admin-pb.php,v 1.51 2005-05-25 22:38:53 matthew Exp $
  * 
  */
 
@@ -145,6 +145,23 @@ class ADMIN_PAGE_PB_MAIN {
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print "</p>";
 
+        $cats = array();
+        $q = db_query('select id from pledge_category where pledge_id = '.$pdata['id']);
+        while ($r = db_fetch_array($q)) {
+            $cats[$r['id']] = 1;
+        }
+        print '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="pledge" value="'.$pledge.'"><p>Category: <select name="categories" multiple>';
+        $s = db_query('select id, parent_category_id, name from category order by id');
+        while ($a = db_fetch_row($s)) {
+            list($id, $parent_id, $name) = $a;
+            print '<option';
+            if (array_key_exists($id, $cats)) print ' selected';
+            print ' value="' . $id . '">' .
+                (is_null($parent_id) ? '' : '&nbsp;-&nbsp;') . 
+                 htmlspecialchars($name) . ' </option>';
+        }
+        print '</select> <input type="submit" value="Update"></p></form>';
+
         $query = 'SELECT signers.name as signname,person.email as signemail,
                          signers.mobile as signmobile,
                          date_trunc(\'second\',signtime) AS signtime,
@@ -228,6 +245,11 @@ class ADMIN_PAGE_PB_MAIN {
         print "<p><i>Changes to pledge prominence saved</i></p>";
     }
 
+    function update_categories() {
+        db_commit();
+        print '<p><i>Categories updated.</i></p>';
+    }
+
     function display($self_link) {
         db_connect();
 
@@ -247,6 +269,8 @@ class ADMIN_PAGE_PB_MAIN {
                 $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $signer_id");
                 $this->remove_signer($signer_id);
             }
+        } elseif (get_http_var('categories')) {
+            update_categories();
         } elseif (get_http_var('send_announce_token')) {
             $pledge_id = get_http_var('send_announce_token_pledge_id');
             if (ctype_digit($pledge_id)) {

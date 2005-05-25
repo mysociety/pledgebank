@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.64 2005-05-25 14:06:03 chris Exp $
+ * $Id: pledge.php,v 1.65 2005-05-25 14:08:46 chris Exp $
  * 
  */
 
@@ -310,46 +310,6 @@ function pledge_confirm($token) {
                     $pledge_id);
         return $pledge_id;
     }
-}
-
-/* pledge_sign PLEDGE SIGNER SHOWNAME EMAIL [CONVERTS]
- * Add the named SIGNER to the PLEDGE. SHOWNAME indicates whether their name
- * should be displayed publically; EMAIL is their email address. It is the
- * caller's responsibility to check that the signer is authorised to sign a
- * private pledge (by supplying a PIN, presumably). If CONVERTS is not null, it
- * gives the ID of an existing signer whose signature will be replaced by the
- * new signature on confirmation. This is used to convert SMS subscriptions
- * into email subscriptions. On success returns the new signer ID; on failure,
- * return an error code. */
-function pledge_sign($pledge_id, $name, $showname, $email, $converts = null) {
-    $e = pledge_is_valid_to_sign($pledge_id, $email);
-    if (pledge_is_error($e))
-        return $e;
-
-    $id = db_getOne("select nextval('signers_id_seq')");
-    if (!isset($id))
-        return PLEDGE_ERROR;
-
-    if (!db_query('
-                insert into signers (
-                    id,
-                    pledge_id,
-                    name, email, showname,
-                    signtime
-                ) values (
-                    ?,
-                    ?,
-                    ?, ?, ?,
-                    pb_current_timestamp()
-                )', array(
-                    $id,
-                    $pledge_id,
-                    $name, $email, $showname ? 't' : 'f')
-                ))
-        return PLEDGE_ERROR;
-
-    /* Done. */
-    return $id;
 }
 
 /* check_pin REF ACTUAL_PIN

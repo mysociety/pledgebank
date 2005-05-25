@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.49 2005-05-25 20:44:23 matthew Exp $
+ * $Id: admin-pb.php,v 1.50 2005-05-25 20:48:57 matthew Exp $
  * 
  */
 
@@ -302,15 +302,17 @@ class ADMIN_PAGE_PB_LATEST {
                 $time[$r['epoch']][] = array_merge($r, $res);
             }
         }
-        if (!get_http_var('onlysigners')) {
-            $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
-                             FROM pledges
-                         ORDER BY id DESC');
-            $this->pledgeref = array();
-            while ($r = db_fetch_array($q)) {
+        $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
+                         FROM pledges
+                     ORDER BY id DESC');
+        $this->pledgeref = array();
+        while ($r = db_fetch_array($q)) {
+            if (!get_http_var('onlysigners')) {
                 $time[$r['epoch']][] = $r;
-                $this->pledgeref[$r['id']] = $r['ref'];
             }
+            $this->pledgeref[$r['id']] = $r['ref'];
+        }
+        if (!get_http_var('onlysigners')) {
             $q = db_query('SELECT *
                              FROM incomingsms
                          ORDER BY whenreceived DESC');

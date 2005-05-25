@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.13 2005-05-25 09:45:43 chris Exp $
+ * $Id: login.php,v 1.14 2005-05-25 10:53:54 francis Exp $
  * 
  */
 
@@ -330,11 +330,11 @@ EOF;
 
 <ul>
 
-<form name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
+<form name="loginNoPassword" class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
-<li>No, I don't want to think of a password right now<br>
+<li>No, I don't want to think of a password right now.<br>
 <small>(you can set a password later if you want)</small>
 <input type="submit" name="NoPassword" value="Continue &gt;&gt;"><br>
 </li></form>
@@ -344,7 +344,7 @@ EOF;
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
 
-<li><p>Yes, I'd like to set a password, so I can more easily manage my pledge.
+<li><p>Yes, I'd like to set a password, so I don't have to keep going back to my email.
 <div class="form_row">
     <label for="pw1">Password</label>
     <input type="password" name="pw1" id="pw1" size="20">

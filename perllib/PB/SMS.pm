@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.23 2005-05-24 23:18:39 francis Exp $
+# $Id: SMS.pm,v 1.24 2005-05-25 20:00:41 francis Exp $
 #
 
 package PB::SMS;
@@ -290,10 +290,13 @@ sub receive_sms ($$$$$$) {
                 # -- obviously we're not signing it yet, but we might as well
                 # catch the common case here as long as no race condition
                 # remains.
-                my ($signer_id, $email) = dbh()->selectrow_array('
-                                    select id, email from signers
+                my ($signer_id) = dbh()->selectrow_array('
+                                    select signers.id from signers
                                     where pledge_id = ? and mobile = ?
                                     for update', {}, $pledge_id, $sender);
+                my ($email) = dbh()->selectrow_array('
+                                    select person.email from person
+                                    where id = ?', {}, $signer_id);
 
                 my $send_token = 0;
 

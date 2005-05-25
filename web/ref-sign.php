@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.7 2005-05-25 14:50:05 chris Exp $
+// $Id: ref-sign.php,v 1.8 2005-05-25 20:00:41 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -60,7 +60,7 @@ function do_sign() {
 
     if (!pledge_is_error($R)) {
         /* All OK, sign pledge. */
-        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($r['id'], $P->name(), $P->id(), $q_showname));
+        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($r['id'], $P->name(), $P->id(), $q_showname ? 't' : 'f'));
         db_commit();
         ?>
 <p class="noprint" align="center"><strong>Thanks for signing up to this pledge!</strong></p>

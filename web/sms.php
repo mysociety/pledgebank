@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.21 2005-05-25 12:03:25 chris Exp $
+ * $Id: sms.php,v 1.22 2005-05-25 15:08:14 chris Exp $
  * 
  */
 
@@ -33,6 +33,7 @@ $r = db_getRow('
             from smssubscription
             where token = ?
             for update', $q_token);
+
 if (is_null($r))
     bad_token($q_unchecked_token);
 elseif (!isset($r['signer_id'])) {
@@ -58,21 +59,16 @@ $pledge_id = db_getOne('
                 );
 
 /* Don't allow conversion on private pledges. */
-if (!is_null(db_getOne('select pin from pledge where id = ?', $pledge_id)))
+if (!is_null(db_getOne('select pin from pledges where id = ?', $pledge_id)))
     err('Permission denied');
 
-/* Have we already converted? */
-if (db_getOne(
-            'select person_id from signers where id = ?',
-            $signer_id)) {
-    /* ... and converted. */
+/* Have we already converted? If so just show the usual "thank you" page. */
+if (db_getOne('select person_id from signers where id = ?', $signer_id)) {
     page_header('SMS');
-    print <<<EOF
-        <p>
-    You've already signed up and given us your name and email address.
-    There's no need to do so again.
-        </p>
-EOF;
+    ?>
+    <p><strong>Thanks for signing up to this pledge!</strong></p>
+    <?
+    post_confirm_advertise($r);
     page_footer(array('nonav' => 1));
     exit();
 }
@@ -92,7 +88,7 @@ $p = preg_replace("/[^\d]/", '', $q_phone);
 $phone = db_getOne('select mobile from signers where id = ?', $signer_id);
 if (!$phone)
     err("No mobile number recorded for SMS signer $signer_id");
-else if (substr($p, -6) == substr($phone, -6)) {
+else if (substr($p, -6) != substr($phone, -6)) {
     /* Compare last few characters of the phone numbers only, so that we avoid
      * having to know anything about their format. */
     if (!$errs)
@@ -100,24 +96,24 @@ else if (substr($p, -6) == substr($phone, -6)) {
     $errs['phone'] = "That phone number doesn't match our records";
 }
 
+page_header('SMS');
+
 if ($errs) {
     /* Form to supply info for the subscription */
-    page_header('SMS');
     conversion_form($q_f ? $errs : null, $pledge_id);
     page_footer(array('nonav' => 1));
     exit();
 }
 
 /* OK, they win. Make them sign on. */
-$data = db_getRow('select * from pledge where id = (select pledge_id from signers where signers.id = ?)', $signer_id);
+$data = db_getRow('select * from pledges where id = (select pledge_id from signers where signers.id = ?)', $signer_id);
 $data['template'] = 'sms-confirm';
 $data['reason'] = 'confirm your email address';
-$P = person_signon($data, $q_name, $q_email);
+$P = person_signon($data, $q_email, $q_name);
 
 $r = pledge_is_valid_to_sign($pledge_id, $P->email());
 
-page_header('SMS');
-if ($r == PLEDGE_OK) {
+if (!pledge_is_error($r)) {
     /* No existing signer, so just stick this person in
      * to the SMS-signed record. */
     db_query('update signers set person_id = ?, name = ? where id = ?', array($P->id(), $P->name(), $signer_id));
@@ -131,29 +127,35 @@ if ($r == PLEDGE_OK) {
          * email address, so combine the two
          * subscriptions. */
         db_query('select signers_combine_2(?, ?)', array($signer_id, $signer_id2));
+            /* fall through so they just see the "thanks for signing" message */
     else {
         /* Creator trying to sign their own pledge. Need to remove the old
          * signer record. */
         ?>
         <p><strong>You cannot sign your own pledge!</strong></p>
         <?
+        page_tail(array('nonav' => 1));
+        exit();
     }
-} else {
+} else
     oops($r);
-}
+
 db_commit();
 
 ?>
 <p><strong>Thanks for signing up to this pledge!</strong></p>
 <?
 
+post_confirm_advertise($r);
+
 page_tail(array('nonav' => 1));
 
 /* bad_token TOKEN
  * Display some text about TOKEN being invalid. */
 function bad_token($x) {
+    page_header('SMS');
     if (is_null($x)) {
-        err("Oops");
+        err("We couldn't recognise the link you've followed");
     } else {
         $x = htmlspecialchars($x);
         print <<<EOF
@@ -165,6 +167,7 @@ function bad_token($x) {
             </p>
 EOF;
     }
+    page_tail(array('nonav' => 1));
     exit();
 }
 
@@ -173,6 +176,7 @@ EOF;
  * function), print a paragraph of stuff about why the user couldn't be signed
  * up to the pledge. */
 function oops($r, $what = null) {
+    page_header('SMS');
     print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
     if ($r == PLEDGE_FULL || $r == PLEDGE_FINISHED) {
         /* Print a fuller explanation in this (common) case */
@@ -190,6 +194,8 @@ EOF;
         if (!pledge_is_permanent_error($r))
             print "<p><strong>Please try again a bit later.</strong></p>";
     }
+    page_tail(array('nonav' => 1));
+    exit();
 }
 
 /* conversion_form ERRORS

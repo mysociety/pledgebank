@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.20 2005-05-24 23:18:40 francis Exp $
+ * $Id: sms.php,v 1.21 2005-05-25 12:03:25 chris Exp $
  * 
  */
 
@@ -24,183 +24,130 @@ $errs = importparams(
                 array('token',  '/^[0-9a-f]{4}-[0-9a-f]{4}$/',  "The code you've entered isn't valid")
             );
 
-if (is_null($q_token)) {
+if (is_null($q_token))
     bad_token($q_unchecked_token);
-} else {
-    /* We have a token. See whether it's valid. */
-    $r = db_getRow('
-                select pledge_id, signer_id
-                from smssubscription
-                where token = ?
-                for update', $q_token);
-    if (is_null($r)) {
-        bad_token($q_unchecked_token);
-    } elseif (!isset($r['signer_id'])) {
-        /* We're not signed up (because we haven't had confirmation that the
-         * conversion SMS was delivered, presumably). Try a signup now. */
-        $res = pledge_dbresult_to_code(
-                    db_getOne('select smssubscription_sign(null, ?)', $q_token)
-                );
-        if ($res != PLEDGE_OK)
-            oops($res, "before our SMS to you was delivered");
-        else {
-            /* We've now signed up, so just redirect to this script. */
-            header("Location: " . invoked_url());
-            exit();
-        }
-    } else {
-        /* We have signed up. Obtain pledge ID. */
-        $signer_id = $r['signer_id'];
-        $pledge_id = db_getOne('
-                            select pledge_id from signers where id = ?',
-                            $signer_id
-                        );
-        if (db_getOne(
-                    'select email from signers where id = ?',
-                    $signer_id)) {
-            /* ... and converted. */
-            page_header('SMS');
-            print <<<EOF
-                <p>
-            You've already signed up and given us your name and email address.
-            There's no need to do so again.
-                </p>
-EOF;
-            page_footer();
-            exit();
-        } else {
-            /* ... but not converted. Solicit user's name and email address,
-             * and their phone number to check that they're bona fide. */
-            $errs = importparams(
-                        array('phone',  '/[\d\s-+]$/',                  "Please enter your phone number"),
-                        array('name',   '/[a-z]+/i',                    "Please enter your name"),
-                        array('email',  '/^[^@]+@[^@]+$/',              "Please enter your email address"),
-                        array('showname',
-                                        '/^1$/',                        "", 0),
-                        array('f',      '/^1$/',                        "", 0)
-                    );
 
-            $showform = true;
-            if (is_null($errs)) {
-                /* Have all the details we need, hopefully. */
-                /* Check that we can actually sign up. */
-                $p = preg_replace("/[^\d]/", '', $q_phone);
-                $phone = db_getOne('select mobile from signers where id = ?', $signer_id);
-                if (!$phone)
-                    err("No mobile number recorded for SMS signer $signer_id");
-                
-                /* Compare last few characters of the phone numbers, so that we
-                 * avoid having to know anything about their format. */
-                if (substr($p, -6) == substr($phone, -6)) {
-                    /* Token and phone number match. Now see whether that email
-                     * address has been registered in the database before. That
-                     * determines whether we send a confirmation or a
-                     * confirmation reminder mail. */
-                    $r = pledge_is_valid_to_sign($pledge_id, $q_email);
-                    $row = db_getRow('select * from pledges where id = ? and pin is null', $pledge_id);
-                    if ($r == PLEDGE_OK) {
-                        /* New email address */
-                        $token = auth_token_store(
-                                        'signup-web',
-                                        array(
-                                            'email' => $q_email,
-                                            'name' => $q_name,
-                                            'showname' => $q_showname,
-                                            'pledge_id' => $pledge_id,
-                                            'signer_id' => $signer_id
-                                        )
-                                    );
-
-                        $url = OPTION_BASE_URL . "/I/" . $token;
-                        $success = pb_send_email_template(
-                                        $q_email, 'sms-confirm-ok',
-                                        array_merge($row, array('url'=>$url))
-                                    );
-                    } else if ($r == PLEDGE_SIGNED) {
-                        /* Old email address. This is either another signer, in
-                         * which case we update the old signer with the new
-                         * mobile phone number, delete the new signer, and send
-                         * an email saying we've done so; or it's the pledge
-                         * creator, in which case there's not a lot we can do,
-                         * really. */
-                        $existingid = db_getOne('
-                                            select id
-                                            from signers
-                                            where pledge_id = ?
-                                                and email = ?',
-                                            array($pledge_id, $q_email)
-                                        );
-                        if (!is_null($existingid)) {
-                            db_query('select signers_combine_2(?, ?)',
-                                        array($existingid, $signer_id));
-                            $success = pb_send_email_template(
-                                    $q_email, 'sms-confirm-already',
-                                    $row
-                                );
-                        } else {
-                            /* Pledge creator. We need to remove this signer,
-                             * and, if the pledge is successful, we also need
-                             * to record that we've done so. */
-                            $f = db_getOne('
-                                            select success
-                                            from pledges
-                                            where id = ?
-                                            and pin is null
-                                            for update', $pledge_id);
-
-                            db_query('delete from smssubscription where token = ?',
-                                        $q_token);
-                            db_query('delete from signers where id = ?',
-                                        $signer_id);
-                            if ($f == 't') 
-                                db_query('
-                                        update pledges
-                                        set removedsigneraftersuccess = false
-                                        where id = ?',
-                                        $pledge_id
-                                    );
-                            $success = pb_send_email_template(
-                                    $q_email, 'sms-confirm-own',
-                                    $row
-                                );
-                        }
-                    } else {
-                        oops($r);
-                    }
-
-                    page_header('SMS');
-                    if ($success) {
-                        ?>
-<p><strong>Now check your email</strong></p>
-<p>We've sent you an email to confirm your address. Please follow the link
-we've sent to you to finish signing this pledge.</p>
-                        <?
-                        db_query('delete from smssubscription where token = ?',
-                                    $q_token);
-
-                        db_commit();
-                    } else {
-                        ?>
-<p>We seem to be having some technical problems. Please could try again in a
-few minutes, making sure that you carefully check the email address you give.
-</p>
-                        <?
-                    }
-                    page_footer();
-                } else {
-                    $errs = array('phone' => "That phone number doesn't match our records");
-                }
-            }
-
-            if ($errs) {
-                /* Form to supply info for the subscription */
-                page_header('SMS');
-                conversion_form($q_f ? $errs : null, $pledge_id);
-                page_footer();
-            }
-        }
+/* We have a token. See whether it's valid. */
+$r = db_getRow('
+            select pledge_id, signer_id
+            from smssubscription
+            where token = ?
+            for update', $q_token);
+if (is_null($r))
+    bad_token($q_unchecked_token);
+elseif (!isset($r['signer_id'])) {
+    /* We're not signed up (because we haven't had confirmation that the
+     * conversion SMS was delivered, presumably). Try a signup now. */
+    $res = pledge_dbresult_to_code(
+                db_getOne('select smssubscription_sign(null, ?)', $q_token)
+            );
+    if ($res != PLEDGE_OK)
+        oops($res, "before our SMS to you was delivered");
+    else {
+        /* We've now signed up, so just redirect to this script. */
+        header("Location: " . invoked_url());
+        exit();
     }
 }
+
+/* We have signed up. Obtain pledge ID. */
+$signer_id = $r['signer_id'];
+$pledge_id = db_getOne('
+                    select pledge_id from signers where id = ?',
+                    $signer_id
+                );
+
+/* Don't allow conversion on private pledges. */
+if (!is_null(db_getOne('select pin from pledge where id = ?', $pledge_id)))
+    err('Permission denied');
+
+/* Have we already converted? */
+if (db_getOne(
+            'select person_id from signers where id = ?',
+            $signer_id)) {
+    /* ... and converted. */
+    page_header('SMS');
+    print <<<EOF
+        <p>
+    You've already signed up and given us your name and email address.
+    There's no need to do so again.
+        </p>
+EOF;
+    page_footer(array('nonav' => 1));
+    exit();
+}
+
+$errs = importparams(
+            array('phone',  '/[\d\s-+]$/',                  "Please enter your phone number"),
+            array('name',   '/[a-z]+/i',                    "Please enter your name"),
+            array('email',  '/^[^@]+@[^@]+$/',              "Please enter your email address"),
+            array('showname',
+                            '/^1$/',                        "", 0),
+            array('f',      '/^1$/',                        "", 0)
+        );
+
+$showform = true;
+
+$p = preg_replace("/[^\d]/", '', $q_phone);
+$phone = db_getOne('select mobile from signers where id = ?', $signer_id);
+if (!$phone)
+    err("No mobile number recorded for SMS signer $signer_id");
+else if (substr($p, -6) == substr($phone, -6)) {
+    /* Compare last few characters of the phone numbers only, so that we avoid
+     * having to know anything about their format. */
+    if (!$errs)
+        $errs = array();
+    $errs['phone'] = "That phone number doesn't match our records";
+}
+
+if ($errs) {
+    /* Form to supply info for the subscription */
+    page_header('SMS');
+    conversion_form($q_f ? $errs : null, $pledge_id);
+    page_footer(array('nonav' => 1));
+    exit();
+}
+
+/* OK, they win. Make them sign on. */
+$data = db_getRow('select * from pledge where id = (select pledge_id from signers where signers.id = ?)', $signer_id);
+$data['template'] = 'sms-confirm';
+$data['reason'] = 'confirm your email address';
+$P = person_signon($data, $q_name, $q_email);
+
+$r = pledge_is_valid_to_sign($pledge_id, $P->email());
+
+page_header('SMS');
+if ($r == PLEDGE_OK) {
+    /* No existing signer, so just stick this person in
+     * to the SMS-signed record. */
+    db_query('update signers set person_id = ?, name = ? where id = ?', array($P->id(), $P->name(), $signer_id));
+} else if ($r == PLEDGE_SIGNED) {
+    /* Either the pledge creator or somebody who's already
+     * signed up. */
+    db_query('lock table signers in share mode');
+    $signer_id2 = db_getOne('select id from signers where person_id = ?', $P->id());
+    if (!is_null($signer_id2))
+        /* Somebody else has already signed under this
+         * email address, so combine the two
+         * subscriptions. */
+        db_query('select signers_combine_2(?, ?)', array($signer_id, $signer_id2));
+    else {
+        /* Creator trying to sign their own pledge. Need to remove the old
+         * signer record. */
+        ?>
+        <p><strong>You cannot sign your own pledge!</strong></p>
+        <?
+    }
+} else {
+    oops($r);
+}
+db_commit();
+
+?>
+<p><strong>Thanks for signing up to this pledge!</strong></p>
+<?
+
+page_tail(array('nonav' => 1));
 
 /* bad_token TOKEN
  * Display some text about TOKEN being invalid. */
@@ -214,10 +161,11 @@ function bad_token($x) {
         Sorry, we can't make sense of the code '$x'. Please
         could you re-check the address you typed in; the last part of it should
         be two groups of four letters and numbers, joined by a hyphen ("-"),
-        something like "1234-abcd"
+        something like "1234-abcd".
             </p>
 EOF;
     }
+    exit();
 }
 
 /* oops RESULT [WHAT]

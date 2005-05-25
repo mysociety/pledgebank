@@ -1,0 +1,16 @@
+Subject: Signing up to '<?=$values['title']?>' at PledgeBank.com
+
+Please click on the link below to confirm your signature on the
+pledge at the bottom of this email.
+
+By clicking you consent to PledgeBank and the creator of the pledge
+sending you followup emails, reporting on progress, asking for your
+help, and announcing success or failure of your pledge.
+
+<?=$values['url']?>
+
+The pledge reads:
+
+'<?=$values['sentence_third']?>'
+
+<?=$values['signature']?>

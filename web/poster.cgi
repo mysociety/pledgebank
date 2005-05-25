@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.44 2005-05-24 23:18:40 francis Exp $
+# $Id: poster.cgi,v 1.45 2005-05-25 13:47:08 francis Exp $
 #
 
 import os
@@ -520,14 +520,14 @@ while fcgi.isFCGI():
         #req.err.write("pin %s\n" % pledge['pin'])
         if pledge['pin']:
             if 'pin' not in fs:
-                raise Exception, "Correct pin needed for '%s' pledge" % ref
+                raise Exception, "Correct PIN needed for '%s' pledge" % ref
             userpin = fs['pin'].value
             sha_calc = sha.new()
             sha_calc.update(userpin)
             crypt_userpin = sha_calc.hexdigest()
             #req.err.write("userpin %s\n" % crypt_userpin)
             if crypt_userpin != pledge['pin']:
-                raise Exception, "Correct pin needed for '%s' pledge" % ref
+                raise Exception, "Correct PIN needed for '%s' pledge" % ref
 
         # Header
         if incgi:

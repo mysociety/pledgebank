@@ -27,7 +27,7 @@
 #$wth->email_get_containing('%To: '.email_n(2).
 #        '%you have already signed it%');
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.64 2005-05-25 11:56:20 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.65 2005-05-25 13:47:07 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -145,7 +145,7 @@ print "Everything completed successfully\n";
 sub perform_login_action {
     my ($who, $login_action, $email_text) = @_;
 
-    print "perform_login_action $login_action for " . $b->uri() . "\n" if $verbose > 1;
+    print "performing login action '$login_action' for " . $b->uri() . "\n" if $verbose > 1;
 
     if ($login_action eq "viaemail" || $login_action eq "abandon" || 
         $login_action eq "suspend" || $login_action eq "resume") {

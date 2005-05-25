@@ -27,7 +27,7 @@
 #$wth->email_get_containing('%To: '.email_n(2).
 #        '%you have already signed it%');
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.65 2005-05-25 13:47:07 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.66 2005-05-25 19:25:19 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -181,6 +181,7 @@ sub perform_login_action {
                 $b->submit_form(form_name => 'loginNoPassword',
                     button => 'NoPassword') or die "Failed to submit no make password form";
             }
+    exit;
             $wth->browser_check_contents("Redirect...");
             $b->submit_form(form_name => 'f',
                 button => '__stash_submit_button_0') or die "Failed to do POST redirect button";

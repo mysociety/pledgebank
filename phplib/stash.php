@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: stash.php,v 1.2 2005-05-24 15:47:00 francis Exp $
+ * $Id: stash.php,v 1.3 2005-05-25 19:25:19 francis Exp $
  * 
  */
 
@@ -74,19 +74,19 @@ function stash_redirect($key) {
          * but perhaps.... */
         ob_clean();
         header("Content-Type: text/html; charset=utf-8");
+
+        /* This is for some crazy paranoid case when __stash_submit_button_0 was already
+         * the name of a button in the stashed data... */
+        $i = 0;
+        while (array_key_exists("__stash_submit_button_$i", $stashed_POST))
+            ++$i;
         ?>
-<html><head><title>Redirect...</title></head><body onload="document.f.submit()">
-<form name="f" method="POST" action="<?=htmlspecialchars($url)?>">
+<html><head><title>Redirect...</title></head><body onload="document.forms.f.__stash_submit_button_<?=$i?>.click()">
+<form id="f" name="f" method="POST" action="<?=htmlspecialchars($url)?>">
 <?
         foreach ($stashed_POST as $k => $v)
             printf('<input type="hidden" name="%s" value="%s">', htmlspecialchars($k), htmlspecialchars($v));
 
-        $i = 0;
-
-        /* This is for some crazy paranoid case when __stash_submit_button_0 was already
-         * the name of a button in the stashed data... */
-        while (array_key_exists("__stash_submit_button_$i", $stashed_POST))
-            ++$i;
         ?>
 <input type="submit" name="__stash_submit_button_<?=$i?>" id="__stash_submit_button_<?=$i?>" value="Click here to continue...">
 </form></body></html>

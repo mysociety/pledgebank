@@ -27,7 +27,7 @@
 #$wth->email_get_containing('%To: '.email_n(2).
 #        '%you have already signed it%');
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.67 2005-05-25 20:00:41 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.68 2005-05-25 20:22:32 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -840,6 +840,9 @@ sub do_admin_tests {
     $b->follow_link(text_regex => qr/Pledges and Signers/) or die "Pledges and Signers link missing";
     $wth->browser_check_contents("automatedtest");
     $wth->browser_check_contents("privatepledge");
+    $b->follow_link(text_regex => qr/(admin)/) or die "(admin) link not found";
+    $wth->browser_check_contents("automatedtest");
+    $wth->browser_check_contents("Caution! This really is forever");
 
     # Check timeline page
     $b->get($admin_url);
@@ -852,6 +855,9 @@ sub do_admin_tests {
     $wth->browser_check_contents(qr/pledges \(0\)/);
     $wth->browser_check_contents(qr/signers \(1\)/);
     $wth->browser_check_contents(qr/comments \(0\)/);
+    $b->follow_link(text_regex => qr/signers \(1\)/) or die "Signers link missing";
+    my $name = name_n(3);
+    $wth->browser_check_contents(qr/$name/);
 
     # Check there were no errors
     $wth->log_watcher_check();

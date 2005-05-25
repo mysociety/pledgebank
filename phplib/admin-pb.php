@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.47 2005-05-23 09:30:09 chris Exp $
+ * $Id: admin-pb.php,v 1.48 2005-05-25 20:22:32 francis Exp $
  * 
  */
 
@@ -52,12 +52,14 @@ class ADMIN_PAGE_PB_MAIN {
         elseif ($sort=='s') $order = 'signers';
 
         $q = db_query("
-            SELECT id,ref,title,type,target,signup,date,name,email,confirmed,prominence,
+            SELECT pledges.*, person.email,
                 date_trunc('second',whensucceeded) as whensucceeded, 
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 pb_current_date() <= date AS open
-            FROM pledges ORDER BY " . $order);
+            FROM pledges 
+            LEFT JOIN person ON person.id = pledges.person_id
+            ORDER BY " . $order);
         $open = array();
         $closed = array();
         while ($r = db_fetch_array($q)) {
@@ -127,7 +129,8 @@ class ADMIN_PAGE_PB_MAIN {
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 'e';
 
-        $q = db_query('SELECT * FROM pledges where ref ILIKE ?', $pledge);
+        $q = db_query('SELECT pledges.*, person.email FROM pledges 
+            LEFT JOIN person ON person.id = pledges.person_id WHERE ref ILIKE ?', $pledge);
         $pdata = db_fetch_array($q);
 
         print "<h2>Pledge '" . $pdata['ref'] . "' &mdash; " .  $pdata['title'] . "</h2>";
@@ -142,9 +145,13 @@ class ADMIN_PAGE_PB_MAIN {
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print "</p>";
 
-        $query = 'SELECT name as signname,email as signemail,mobile as signmobile,
-        date_trunc(\'second\',signtime) AS signtime,showname, signers.id AS signid FROM signers 
-        WHERE pledge_id=?';
+        $query = 'SELECT signers.name as signname,person.email as signemail,
+                         signers.mobile as signmobile,
+                         date_trunc(\'second\',signtime) AS signtime,
+                         showname, signers.id AS signid 
+                   FROM signers 
+                   LEFT JOIN person ON person.id = signers.person_id
+                   WHERE pledge_id=?';
         if ($sort=='t') $query .= ' ORDER BY signtime DESC';
         elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
         $q = db_query($query, $pdata['id']);
@@ -269,11 +276,12 @@ class ADMIN_PAGE_PB_LATEST {
     # pledges use creationtime
     # signers use signtime
     function show_latest_changes() {
-        $q = db_query('SELECT signers.name, signers.email,
+        $q = db_query('SELECT signers.name, signer_person.email,
                               signers.mobile, signtime, showname, pledges.title,
                               pledges.ref, pledges.id,
                               extract(epoch from signtime) as epoch
-                         FROM signers, pledges
+                         FROM pledges, signers
+                         LEFT JOIN person AS signer_person ON signer_person.id = signers.person_id
                         WHERE signers.pledge_id = pledges.id
                      ORDER BY signtime DESC');
         while ($r = db_fetch_array($q)) {

@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.12 2005-05-24 15:47:00 francis Exp $
+ * $Id: login.php,v 1.13 2005-05-25 09:45:43 chris Exp $
  * 
  */
 
@@ -78,6 +78,7 @@ importparams(
         array('name',           '//',               '', null),
         array('password',       '/[^\s]/',          '', null),
         array('t',              '/^.+$/',           '', null),
+        array('rememberme',     '/./',              '', false),
 
         /* Buttons on login page. */
         array('LogIn',          '/^.+$/',           '', false),
@@ -153,7 +154,7 @@ if (!is_null($P)) {
 /* login_page
  * Render the login page, or respond to a button pressed on it. */
 function login_page() {
-    global $q_stash, $q_email, $q_name, $q_LogIn, $q_SendEmail;
+    global $q_stash, $q_email, $q_name, $q_LogIn, $q_SendEmail, $q_rememberme;
     if (is_null($q_stash) || is_null($q_email) || is_null($q_name))
         err('A required parameter was missing');
 
@@ -167,7 +168,7 @@ function login_page() {
         } else {
             /* User has logged in correctly. Decide whether they are changing
              * their name. */
-            set_login_cookie($P);
+            set_login_cookie($P, $q_rememberme ? 28 * 24 * 3600 : null);
             if (!$P->matches_name($q_name))
                 $P->name($q_name);
             $P->inc_logins();
@@ -366,11 +367,12 @@ EOF;
     exit();
 }
 
-/* set_login_cookie PERSON [EXPIRES]
+/* set_login_cookie PERSON [DURATION]
  * Set a login cookie for the given PERSON. If set, EXPIRES is the time which
  * will be set for the cookie to expire; otherwise, a session cookie is set. */
-function set_login_cookie($P, $expires = null) {
-    setcookie('pb_person_id', person_cookie_token($P->id()), $expires, '/', OPTION_WEB_DOMAIN, false);
+function set_login_cookie($P, $duration = null) {
+    error_log('set cookie');
+    setcookie('pb_person_id', person_cookie_token($P->id(), $duration), is_null($duration) ? null : time() + $duration, '/', OPTION_WEB_DOMAIN, false);
 }
 
 ?>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.10 2005-05-24 15:47:00 francis Exp $
+ * $Id: person.php,v 1.11 2005-05-25 09:45:43 chris Exp $
  * 
  */
 
@@ -106,20 +106,21 @@ class Person {
     }
 }
 
-/* person_cookie_token ID [EXPIRES]
+/* person_cookie_token ID [DURATION]
  * Return an opaque version of ID to identify a person in a cookie. If
- * supplied, EXPIRES is the time at which the cookie will expire (verified by
- * the server); otherwise a point in the near future is used. */
-function person_cookie_token($id, $expires = null) {
-    if (is_null($expires))
-        $expires = time() + 600; /* XXX should be option */
+ * supplied, DURATION is how long the cookie will last (verified by the
+ * server); if not specified, a short default lifetime is used. */
+function person_cookie_token($id, $duration = null) {
+    if (is_null($duration))
+        $duration = 600; /* XXX should be option */
     if (!preg_match('/^[1-9]\d*$/', $id))
         err("ID should be a decimal integer, not '$id'");
-    if (!preg_match('/^[1-9]\d*$/', $expires) || $expires <= time())
-        err("EXPIRES should be a decimal integer representing a time in the future, not '$expires'");
+    if (!preg_match('/^[1-9]\d*$/', $duration) || $duration <= 0)
+        err("DURATION should be a positive decimal integer, not '$duration'");
     $salt = bin2hex(random_bytes(8));
-    $sha = sha1("$id/$expires/$salt/" . db_secret());
-    return sprintf('%d/%d/%s/%s', $id, $expires, $salt, $sha);
+    $start = time();
+    $sha = sha1("$id/$start/$duration/$salt/" . db_secret());
+    return sprintf('%d/%d/%d/%s/%s', $id, $start, $duration, $salt, $sha);
 }
 
 /* person_check_cookie_token TOKEN
@@ -129,17 +130,24 @@ function person_cookie_token($id, $expires = null) {
  * have been locked with SELECT ... FOR UPDATE. */
 function person_check_cookie_token($token) {
     $a = array();
-    if (!preg_match('#^([1-9]\d*)/([1-9]\d*)/([0-9a-f]+)/([0-9a-f]+)$#', $token, $a))
+    if (!preg_match('#^([1-9]\d*)/([1-9]\d*)/([1-9]\d*)/([0-9a-f]+)/([0-9a-f]+)$#', $token, $a))
         return null;
-    list($x, $id, $expires, $salt, $sha) = $a;
-    if (sha1("$id/$expires/$salt/" . db_secret()) != $sha)
+    list($x, $id, $start, $duration, $salt, $sha) = $a;
+    if (sha1("$id/$start/$duration/$salt/" . db_secret()) != $sha)
         return null;
-    else if ($expires < time())
+    else if ($start + $duration < time())
         return null;
     else if (is_null(db_getOne('select id from person where id = ? for update', $id)))
         return null;
     else
         return $id;
+}
+
+/* person_cookie_token_duration TOKEN
+ * Given a valid cookie TOKEN, return the duration for which it was issued. */
+function person_cookie_token_duration($token) {
+    list($x, $start, $duration) = explode('/', $token);
+    return $duration;
 }
 
 /* person_if_signed_on
@@ -149,8 +157,12 @@ function person_if_signed_on() {
     if (array_key_exists('pb_person_id', $_COOKIE)) {
         /* User has a cookie and may be logged in. */
         $id = person_check_cookie_token($_COOKIE['pb_person_id']);
-        if (!is_null($id))
+        if (!is_null($id)) {
+            /* Valid, so renew the cookie. */
+            $duration = person_cookie_token_duration($_COOKIE['pb_person_id']);
+            setcookie('pb_person_id', person_cookie_token($id, $duration), time() + $duration, '/', OPTION_WEB_DOMAIN, false);
             return new Person($id);
+        }
     }
     return null;   
 }

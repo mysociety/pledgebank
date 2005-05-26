@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.39 2005-05-26 18:00:11 chris Exp $
+ * $Id: confirm.php,v 1.40 2005-05-26 18:27:02 chris Exp $
  * 
  */
 
@@ -67,22 +67,23 @@ if ($q_type == 'pledge') {
     # record, if necessary, then constructing the appropriate stash object and
     # redirecting.
 
-    $signer_id = db_getOne('select id from signers, person where signers.pledge_id = ? and signers.person_id = person.id and person.email = ?', array($data['pledge_id'], $data['email']));
+    $signer_id = db_getOne('select signers.id from signers, person where signers.pledge_id = ? and signers.person_id = person.id and person.email = ?', array($data['pledge_id'], $data['email']));
     $P = person_get($data['email']);
     if (is_null($P))
-        $P = person_get_or_create($data['email'], $p['name']);
+        $P = person_get_or_create($data['email'], $data['name']);
 
     # Create the stash.
     $key = bin2hex(random_bytes(4));
-    $stashed_POST = array('email' => $data['email'], 'ref' => db_getOne('select ref from pledges where id = ?', $data['pledge_id']), 'showname' => $data['showname']);
+    $stashed_POST = array('email' => $data['email'], 'name' => $data['name'], 'ref' => db_getOne('select ref from pledges where id = ?', $data['pledge_id']), 'showname' => $data['showname']);
     if (array_key_exists('pin', $data))
         $stashed_POST['pin'] = $data['pin'];
     $ser = '';
     rabx_wire_wr($stashed_POST, $ser);
 
     # Extra data
+    $extra = array('template' => 'signature-confirm', 'reason' => 'sign the pledge');
     $ser2 = '';
-    rabx_wire_wr(array('template' => 'signature-confirm', 'reason' => 'sign the pledge'), $ser2);
+    rabx_wire_wr($extra, $ser2);
     
     db_query("insert into requeststash (key, method, url, post_data, extra) values (?, 'POST', ?, ?, ?)", array($key, "/${stashed_POST['ref']}/sign", $ser, $ser2));
 

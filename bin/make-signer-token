@@ -8,7 +8,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: make-signer-token,v 1.1 2005-05-26 18:28:19 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: make-signer-token,v 1.2 2005-05-26 18:34:04 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -58,5 +58,5 @@ $s->execute();
 
 dbh()->commit();
 
-print "/C/$token\n";
+print "/I/$token\n";
 

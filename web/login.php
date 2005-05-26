@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.18 2005-05-26 11:03:05 francis Exp $
+ * $Id: login.php,v 1.19 2005-05-26 18:19:11 francis Exp $
  * 
  */
 
@@ -92,6 +92,27 @@ importparams(
         array('ChangeName',     '/^.+$/',            '', false)
     );
 
+/* General purpose login, asks for name also. */
+if (get_http_var("now")) {
+    $errs = importparams(
+                array('email',  '/^[^@]+@[^@]+$/',  'Please give your email address'),
+                array('LogIn',  '/./',              '', false)
+            );
+    if ($q_LogIn and !$errs) {
+        $P = person_signon(array(
+                        'reason' => "log into PledgeBank",
+                        'template' => 'generic-confirm'
+                    ), $q_email);
+        page_header("Now check your email");
+        print "You're now logged in as <strong>". htmlspecialchars($P->name()) .
+            "</strong>.  Enjoy using PledgeBank!";
+        page_footer();
+    } else {
+        login_for_no_reason_form($errs);
+    }
+    exit;
+}
+
 /* Do token case first because if the user isn't logged in *and* has a token
  * (unlikely but possible) the other branch would fail for lack of a stash
  * parameter. */
@@ -128,7 +149,7 @@ if (!is_null($q_t)) {
     else if ($q_name && !$P->matches_name($q_name))
         $P->name($q_name);
     stash_redirect($q_stash);
-        /* NOTREACHED */
+    /* NOTREACHED */
 }
 
 $P = person_if_signed_on();
@@ -144,19 +165,24 @@ if (!is_null($P)) {
         /* No name change, just pass them through to the page they actually
          * wanted. */
         stash_redirect($q_stash);
-    else
+    else {
         err('A required parameter was missing');
-} else
+    }
+} elseif (is_null($q_stash)) {
+    header("Location: /login?now=1");
+} else {
     /* Main login page. */
     login_page();
+}
 
 /* login_page
  * Render the login page, or respond to a button pressed on it. */
 function login_page() {
     global $q_stash, $q_email, $q_name, $q_LogIn, $q_SendEmail, $q_rememberme;
 
-    if (is_null($q_stash) || is_null($q_email) || is_null($q_name))
-        err('A required parameter was missing');
+    if (is_null($q_stash) || is_null($q_email) || is_null($q_name)) {
+        err("Required parameter was missing");
+    }
 
     if ($q_LogIn) {
         /* User has tried to log in. */
@@ -174,7 +200,7 @@ function login_page() {
             $P->inc_numlogins();
             db_commit();
             stash_redirect($q_stash);
-                /* NOTREACHED */
+            /* NOTREACHED */
         }
     } else if ($q_SendEmail) {
         /* User has asked to be sent email. */
@@ -193,7 +219,7 @@ function login_page() {
             $template_data);
         page_header("Now check your email");
     ?>
-<p style="font-size: 150%; font-weight: bold; text-align: center;">
+<p id="loudmessage">
 Now check your email!<br>
 We've sent you an email, and you'll need to click the link in it before you can
 continue
@@ -247,7 +273,7 @@ function login_form($errors = array()) {
 <input type="hidden" name="name" id="name" value="$q_h_name">
 <input type="hidden" name="email" id="email" value="$q_h_email">
 
-<li>No, I haven't used PledgeBank before.
+<li>No, I don't have a password.
 
 <input type="submit" name="SendEmail" value="Click here to continue &gt;&gt;"><br>
 <small>(we'll send an email to confirm your address)</small></p>
@@ -373,6 +399,31 @@ EOF;
 function set_login_cookie($P, $duration = null) {
     // error_log('set cookie');
     setcookie('pb_person_id', person_cookie_token($P->id(), $duration), is_null($duration) ? null : time() + $duration, '/', OPTION_WEB_DOMAIN, false);
+}
+
+/* login_for_no_reason_form
+ * When user explicitly requests log in for no particular reason. */
+function login_for_no_reason_form($errors) {
+    global $q_h_email, $q_LogIn;
+
+    page_header('Log in');
+
+	if (sizeof($errors) && $q_LogIn) {
+		print '<div id="errors"><ul><li>';
+		print join ('</li><li>', array_values($errors));
+		print '</li></ul></div>';
+    } else {
+        print '<p>To log in, please type in your email address and click "Continue".</p>';
+    }
+?>
+<form name="logIn" class="pledge" method="POST">
+<div class="form_row">
+    <label for="email"><strong>Email address</strong></label>
+    <input type="text" size="20" name="email" id="email" value="<?=htmlspecialchars(get_http_var('email'))?>">
+    <input type="submit" name="LogIn" value="Continue &gt;&gt;">
+</div>
+</form>
+<?
 }
 
 ?>

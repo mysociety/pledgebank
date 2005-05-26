@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.12 2005-05-25 13:40:43 chris Exp $
+ * $Id: person.php,v 1.13 2005-05-26 18:19:11 francis Exp $
  * 
  */
 
@@ -188,7 +188,7 @@ function person_signon($template_data, $email, $name = null) {
 
     /* Get rid of any previous cookie -- if user is logging in again under a
      * different email, we don't want to remember the old one. */
-    setcookie('pb_person_id', false, null, '/', OPTION_WEB_DOMAIN, false);
+    person_signoff();
 
     if (headers_sent())
         err("Headers have already been sent in person_signon without cookie being present");
@@ -199,6 +199,12 @@ function person_signon($template_data, $email, $name = null) {
     db_commit();
     header("Location: /login?stash=$st&email=" . urlencode($email) . "&name=" . urlencode($name));
     exit();
+}
+
+/* person_signoff
+ * Log out anyone who is logged in */
+function person_signoff() {
+    setcookie('pb_person_id', false, null, '/', OPTION_WEB_DOMAIN, false);
 }
 
 /* person_get EMAIL

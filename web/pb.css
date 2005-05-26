@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.39 2005-05-26 17:35:05 matthew Exp $
+ * $Id: pb.css,v 1.40 2005-05-26 18:19:11 francis Exp $
  * 
  */
 
@@ -79,6 +79,13 @@ blockquote {
 
 #reference {
     text-align: left;
+    font-size: 83%;
+    padding: 2px;
+    margin: 0;
+}
+
+#signedon {
+    text-align: right;
     font-size: 83%;
     padding: 2px;
     margin: 0;
@@ -287,4 +294,11 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #spread {
     margin: 0;
     padding: 0 0 0 1.5em;
+}
+
+/* For example, to tell people to check their email */
+#loudmessage {
+    font-size: 150%; 
+    font-weight: bold; 
+    text-align: center;
 }

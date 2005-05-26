@@ -5,7 +5,9 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.24 2005-05-24 08:35:37 francis Exp $
+// $Id: page.php,v 1.25 2005-05-26 18:19:11 francis Exp $
+
+$signed_on_person = person_if_signed_on();
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -14,8 +16,12 @@
  * then they are not there if the page is printed.  */
 function page_header($title, $params = array()) {
     static $header_outputted = 0;
-    if (!$header_outputted) {
-        $header_outputted = 1;
+    if ($header_outputted) {
+        return;
+    }
+
+    global $signed_on_person;
+    $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
@@ -56,6 +62,11 @@ function page_header($title, $params = array()) {
                 print '</a>';
             print '</p>';
         }
+        if ($signed_on_person) {
+            print '<p id="signedon">Hello, ' . htmlspecialchars($signed_on_person->name);
+            print ' <small>(<a href="/logout">this isn\'t you?  click here</a>)</small>';
+            print '</p>';
+        }
 ?>
 <div id="content"><?    
 
@@ -72,8 +83,6 @@ function page_header($title, $params = array()) {
 ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
 <em>Note: On this test site, the date is faked to be <?=$pb_today?></em></p><?
     }
-
-    }
 }
 
 /* page_footer PARAMS
@@ -84,6 +93,7 @@ function page_footer($params = array()) {
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
         $footer_outputted = 1;
+    global $signed_on_person;
 ?>
 </div>
 <hr class="v"><h2 class="v">Navigation</h2>
@@ -93,6 +103,13 @@ function page_footer($params = array()) {
 <li><a href="/all">All Pledges</a></li>
 <li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li>
 <li><a href="/contact">Contact</a></li>
+<?
+        if ($signed_on_person) {
+?> <li><a href="/logout">Logout</a></li> <?
+        } else {
+?> <li><a href="/login">Login</a></li> <?
+        }
+?>
 </ul>
 <hr class="v">
 <div id="footer"><a href="http://www.mysociety.org/">Built by mySociety</a>.</div>

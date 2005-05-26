@@ -1,0 +1,40 @@
+#!/usr/bin/perl -w
+#
+# outstanding-tokens-make-persons:
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: outstanding-tokens-make-persons,v 1.1 2005-05-26 17:28:16 chris Exp $';
+
+use strict;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use Data::Dumper;
+use IO::String;
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+use RABX;
+
+use PB;
+
+my $s = dbh()->prepare("select token, data from token where scope = 'signup-web'");
+$s->execute();
+
+while (my ($token, $data) = $s->fetchrow_array()) {
+    # $data is RABX-serialised data.
+    my $i = new IO::String($data);
+    my $x = wire_rd($i);
+
+    print "$token:\n", Dumper($x), "\n";
+}
+

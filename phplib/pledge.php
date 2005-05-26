@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.67 2005-05-26 15:48:53 chris Exp $
+ * $Id: pledge.php,v 1.68 2005-05-26 15:53:45 chris Exp $
  * 
  */
 
@@ -82,7 +82,7 @@ class Pledge {
     function id() { return $this->data['id']; }
     function open() { return $this->data['open']; } // not gone past the deadline date
     function finished() { return $this->data['finished']; } // can take no more signers, for whatever reason
-    function successful() {
+    function succeeded() {
         return pledge_is_successful($this->id());
     }
 

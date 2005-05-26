@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.10 2005-05-26 18:19:11 francis Exp $
+// $Id: ref-sign.php,v 1.11 2005-05-26 23:08:46 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -58,6 +58,7 @@ function do_sign() {
     $P = person_signon($r, $q_email, $q_name);
     
     $R = pledge_is_valid_to_sign($pledge->id(), $P->email());
+    $f1 = $pledge->succeeded();
 
     if (!pledge_is_error($R)) {
         /* All OK, sign pledge. */
@@ -66,6 +67,12 @@ function do_sign() {
         ?>
 <p class="noprint" id="loudmessage" align="center">Thanks for signing up to this pledge!</p>
 <?
+
+        /* Grab the row again so the check is current. */
+        $pledge = new Pledge($q_ref);
+        if (!$f1 && $pledge->succeeded())
+            print "<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
+
         post_confirm_advertise($pledge);
     } else if ($R == PLEDGE_SIGNED) {
         /* Either has already signer, or is creator. */

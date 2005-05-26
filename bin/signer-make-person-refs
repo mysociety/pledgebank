@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: signer-make-person-refs,v 1.2 2005-05-24 14:56:07 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: signer-make-person-refs,v 1.3 2005-05-26 15:01:08 chris Exp $';
 
 use strict;
 
@@ -29,7 +29,7 @@ use mySociety::DBHandle qw(dbh);
 use PB;
 
 dbh()->do('alter table signers add column person_id integer');
-my $st = dbh()->prepare('select id, email, name from signers order by id');
+my $st = dbh()->prepare('select id, email, name from signers where email is not null order by id');
 $st->execute();
 while (my ($signer_id, $email, $name) = $st->fetchrow_array()) {
     my $person_id = dbh()->selectrow_array('select id from person where email = ?', {}, $email);
@@ -44,7 +44,6 @@ while (my ($signer_id, $email, $name) = $st->fetchrow_array()) {
 # Drop the old email column in pledges and fix up the person_id column to match
 # its schema definition.
 dbh()->do('alter table signers drop column email');
-dbh()->do('alter table signers alter column person_id set not null');
 dbh()->do('alter table signers add constraint "$3" foreign key(person_id) references person(id)');
 
 dbh()->commit();

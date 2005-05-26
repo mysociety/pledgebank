@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.53 2005-05-26 11:03:05 francis Exp $
+ * $Id: admin-pb.php,v 1.54 2005-05-26 11:09:16 francis Exp $
  * 
  */
 
@@ -336,7 +336,7 @@ class ADMIN_PAGE_PB_LATEST {
             }
         }
     
-        $q = db_query('SELECT *,extract(epoch from creationtime) as epoch, person.email as email
+        $q = db_query('SELECT pledges.*,extract(epoch from creationtime) as epoch, person.email as email
                          FROM pledges LEFT JOIN person ON person.id = pledges.person_id
                      ORDER BY pledges.id DESC');
         $this->pledgeref = array();

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.88 2005-05-25 13:53:22 chris Exp $
+-- $Id: schema.sql,v 1.89 2005-05-26 17:10:44 chris Exp $
 --
 
 -- secret
@@ -593,7 +593,8 @@ create table message (
     circumstance text not null,
     circumstance_count int not null default 0,
     whencreated timestamp not null default pb_current_timestamp(),
-    fromaddress text not null default 'pledgebank' check (fromaddress in('pledgebank','creator')),
+    fromaddress text not null default 'pledgebank'
+        check (fromaddress in ('pledgebank', 'creator')),
 
     -- who should receive it
     sendtocreator boolean not null,

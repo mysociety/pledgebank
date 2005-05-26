@@ -1,9 +1,0 @@
-Subject: You cannot sign your own pledge - '<?=$values['title']?>' at PledgeBank.com
-
-Thanks for signing up by SMS to this pledge at PledgeBank, but
-according to our records you are the creator of this pledge - there's
-no need to add yourself again.
-
-Good luck with your pledge!
-
-<?=$values['signature']?>

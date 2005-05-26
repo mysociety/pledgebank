@@ -23,22 +23,29 @@ Emails and the available variables are:
 
 **************************************************************************
 
-* comment-creator
-Sent to creator when a comment is added to a pledge.
-  - comment_url, link to the comment
-  - comment_text, body text of the comment
-  - comment_author_name, name of commenter
-  - comment_author_email, email address of commenter
-  - comment_author_website, website of commenter
+* pledge-confirm
+Sent to pledge creator when they make a new pledge and need email
+authentication.
+  - url, the URL for confirmation.
 
-**************************************************************************
+* signature-confirm
+Sent to signers when they need email authentication.
+  - url, the URL for confirmation.
 
-* email-friends
-Sent by someone to tell their friends about a pledge.
-  - from_name, who sent message
-  - from_email, email address of sender
-  - from_message, if present a paragraph with the message from sender to their
-    friend, including intro and quotes, otherwise empty string
+* sms-confirm
+Sent to converters from SMS to confirm their email, if necessary.
+  - url, the URL for confirmation.
+
+* creator-confirm
+Sent to creator to authenticate them to the page which gives
+creators extra functions to manage their pledge.
+  - url, the URL for confirmation.
+
+* generic-confirm
+General purpose mail when someone performs an action, they
+are not logged in, and we need to confirm their email address.
+  - reason, what the confirmation is needed for.
+  - url, the URL for confirmation.
 
 **************************************************************************
             
@@ -50,40 +57,6 @@ Sent to creator when a pledge fails.
 Sent to each signer when a pledge fails.
   - actual, number of people who signed up.
   - signer_name, name of the signer this email is going to.
-
-**************************************************************************
-
-* generic-confirm
-General purpose mail when someone performs an action, they
-are not logged in, and we need to confirm their email address.
-  - reason, what the confirmation is needed for.
-  - url, the URL for confirmation.
-
-* pledge-confirm
-Sent to pledge creator when they make a new pledge, to check their
-email address.
-  - url, the URL for confirmation.
-
-**************************************************************************
-
-* signature-confirm-ok
-Sent to signers to confirm their signature and email address.
-  - url, the URL for confirmation.
-
-* signature-confirm-already
-Sent to someone who has tried to sign up a second time.
-
-**************************************************************************
-
-* sms-confirm-ok
-Sent to converters from SMS to confirm their email.
-  - url, the URL for confirmation.
-
-* sms-confirm-already
-Sent to converters from SMS if they have already signed by email.
- 
-* sms-confirm-own
-Sent if SMS subscription is converted to the creator's email address.
 
 **************************************************************************
 
@@ -99,4 +72,25 @@ Sent to each signer when a pledge succeeds.
     pledge went over target or not.
   - signer_name, name of the signer this email is going to.
 
-**************************************************************************
+***************************************************************************
+
+* announce-post
+Sent to creator when admin gives them an announcement to signers.
+  - url, the URL for confirmation.
+
+* comment-creator
+Sent to creator when a comment is added to a pledge.
+  - comment_url, link to the comment
+  - comment_text, body text of the comment
+  - comment_author_name, name of commenter
+  - comment_author_email, email address of commenter
+  - comment_author_website, website of commenter
+
+* email-friends
+Sent by someone to tell their friends about a pledge.
+  - from_name, who sent message
+  - from_email, email address of sender
+  - from_message, if present a paragraph with the message from sender to their
+    friend, including intro and quotes, otherwise empty string
+
+*************************************************************************

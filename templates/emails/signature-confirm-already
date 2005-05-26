@@ -1,8 +1,0 @@
-Subject: Already signed up to '<?=$values['title']?>' at PledgeBank.com
-
-Thanks for signing up to this pledge at PledgeBank, but
-according to our records you have already signed it.
-
-Good luck with the pledge!
-
-<?=$values['signature']?>

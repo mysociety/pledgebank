@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.1 2005-05-26 16:53:41 chris Exp $
+ * $Id: ref-announce.php,v 1.2 2005-05-26 16:59:17 chris Exp $
  * 
  */
 
@@ -38,7 +38,6 @@ if (!$P || $P->id() != $p->creator_id()) {
     header("Location: /$q_ref/creator");
     exit();
 }
-
 
 $descr = array(
                 'failure-announce' => 'failure announcement message',
@@ -97,7 +96,7 @@ if ($p->failed()) {
         $email_subject = "Sorry - pledge failed - '" . $p->title() . "'";
     }
 } else if ($p->succeeded()) {
-    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'failure-announce'", $p->id());
+    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $p->id());
     if (is_null($n))
         $circumstance = 'success-announce'; /* also send SMS */
     else

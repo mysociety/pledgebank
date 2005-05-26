@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.2 2005-05-26 16:59:17 chris Exp $
+ * $Id: ref-announce.php,v 1.3 2005-05-26 17:00:16 chris Exp $
  * 
  */
 
@@ -109,7 +109,7 @@ if ($p->failed()) {
 
 $circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $circumstance));
 
-$do_sms = is_null($has_sms[$circumstance]) ? 0 : 1;
+$do_sms = array_key_exists($circumstance, $has_sms) ? true : false;
 
 $fill_in = "ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE, INCLUDING YOUR CONTACT INFO";
 

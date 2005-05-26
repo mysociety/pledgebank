@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.17 2005-05-25 15:36:45 chris Exp $
+ * $Id: login.php,v 1.18 2005-05-26 11:03:05 francis Exp $
  * 
  */
 
@@ -98,13 +98,12 @@ importparams(
 if (!is_null($q_t)) {
     /* Process emailed token */
     $d = auth_token_retrieve('login', $q_t);
-    if (is_null($d))
-        /* Bad token -- TODO should do a friendlier message */
-        err('A required parameter was missing');
+    if (!$d)
+        err("Please check the URL is copied correctly from your email.  The token wasn't found.");
     $P = person_get($d['email']);
     if (is_null($P)) {
         if (is_null($d['name']))
-            err('A required parameter was missing');
+            err("Please check the URL is copied correctly from your email.  The name wasn't found.");
         else
             $P = person_get_or_create($d['email'], $d['name']);
     }

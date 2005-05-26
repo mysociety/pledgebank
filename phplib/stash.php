@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: stash.php,v 1.3 2005-05-25 19:25:19 francis Exp $
+ * $Id: stash.php,v 1.4 2005-05-26 11:03:05 francis Exp $
  * 
  */
 
@@ -55,7 +55,7 @@ function stash_request($extra = null) {
 function stash_redirect($key) {
     list($method, $url, $post_data) = db_getRow_list('select method, url, post_data from requeststash where key = ?', $key);
     if (is_null($method))
-        err("Unknown stash ID '$key'");
+        err("If you got the email more than a week ago, then your request has probably expired.  Please try doing what you were doing from the beginning.");
     if (headers_sent())
         err("Headers have already been sent in stash_redirect('$key')");
     if ($method == 'GET') {

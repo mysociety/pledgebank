@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.52 2005-05-26 02:19:04 francis Exp $
+ * $Id: admin-pb.php,v 1.53 2005-05-26 11:03:05 francis Exp $
  * 
  */
 
@@ -391,7 +391,7 @@ dd {
         print '<dl>';
         $date = ''; # $signed = array();
         foreach ($time as $epoch => $datas) {
-            $curdate = date('jS F Y', $epoch);
+            $curdate = date('l, jS F Y', $epoch);
             if ($date != $curdate) {
                 print '</dl> <h2>'. $curdate . '</h2> <dl>';
                 $date = $curdate;
@@ -440,7 +440,7 @@ dd {
                 }
                 if ($data['scope'] == "login") {
                     if (!array_key_exists('method', $data)) {
-                        print "<em>No stash found</em>";
+                        print "<em>Stash expired</em>";
                     } else {
                         print " " . $data['method'] . " to " . $data['url'];
                     }

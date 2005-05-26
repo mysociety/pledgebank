@@ -6,7 +6,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: outstanding-tokens-make-persons,v 1.1 2005-05-26 17:28:16 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: outstanding-tokens-make-persons,v 1.2 2005-05-26 17:59:27 sandpit Exp $';
 
 use strict;
 
@@ -23,9 +23,17 @@ BEGIN {
     mySociety::Config::set_file("$FindBin::Bin/../conf/general");
 }
 use mySociety::DBHandle qw(dbh);
+use mySociety::Util qw(random_bytes);
 use RABX;
 
 use PB;
+
+# Make sure nobody treads on our toes.
+print STDERR "locking tables:";
+dbh()->do('lock table signers');
+print STDERR " signers";
+dbh()->do('lock table token');
+print STDERR " token.\n";
 
 my $s = dbh()->prepare("select token, data from token where scope = 'signup-web'");
 $s->execute();
@@ -33,8 +41,39 @@ $s->execute();
 while (my ($token, $data) = $s->fetchrow_array()) {
     # $data is RABX-serialised data.
     my $i = new IO::String($data);
-    my $x = wire_rd($i);
+    my $signer = RABX::wire_rd($i);
 
-    print "$token:\n", Dumper($x), "\n";
+    print "$token:\n", Dumper($signer), "\n";
+    
+    my $id = dbh()->selectrow_array('select signers.id from signers, person where pledge_id = ? and signers.person_id = person.id and person.email = ?', {}, $signer->{pledge_id}, $signer->{email});
+    if (defined($id)) {
+        print "    ... has now signed up\n";
+        dbh()->do("delete from token where scope = 'login' and token = ?", {}, $token);
+    } else {
+        print "    ... has not yet signed up\n";
+
+        # Construct the parameters which they'd need to pass to /ref-sign.php
+        # to sign the pledge.
+        my $pp = {
+                name => $signer->{name},
+                email => $signer->{email},
+                ref => scalar(dbh()->selectrow_array('select ref from pledges where id = ?', {}, $signers->{pledge_id})),
+                showname => $signer->{showname},
+                pin => $signer->{pin}           # XXX?
+            };
+        
+        $i = new IO::String();
+        RABX::wire_wr($i, $pp);
+        my $data = ${$i->string_ref()};
+
+        $i = new IO::String();
+        RABX::wire_wr($i, { template => 'signature-confirm', reason => 'sign the pledge' });
+        my $extra = ${$i->string_ref()};
+
+        # Now insert this into the stash table.
+        my $key = unpack('h*', random_bytes(4));
+        dbh()->do("insert into requeststash (key, method, url, post_data, extra) values (?, 'POST', ?, ?)", {}, $key, "/$pp->{ref}/sign",
+    }
 }
 
+dbh()->rollback();

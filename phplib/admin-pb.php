@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.54 2005-05-26 11:09:16 francis Exp $
+ * $Id: admin-pb.php,v 1.55 2005-05-26 15:34:40 matthew Exp $
  * 
  */
 
@@ -150,7 +150,7 @@ class ADMIN_PAGE_PB_MAIN {
         while ($r = db_fetch_array($q)) {
             $cats[$r['category_id']] = 1;
         }
-        print '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="pledge" value="'.$pledge.'"><p>Category: <select name="categories" multiple>';
+        print '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="pledge_id" value="'.$pdata['id'].'"><p>Category: <select name="categories[]" multiple>';
         $s = db_query('select id, parent_category_id, name from category order by id');
         while ($a = db_fetch_row($s)) {
             list($id, $parent_id, $name) = $a;
@@ -245,7 +245,11 @@ class ADMIN_PAGE_PB_MAIN {
         print "<p><i>Changes to pledge prominence saved</i></p>";
     }
 
-    function update_categories() {
+    function update_categories($pledge_id, $cats) {
+        db_query('delete from pledge_category where pledge_id = ?', $pledge_id);
+        foreach ($cats as $id) {
+            $q = db_query('insert into pledge_category (pledge_id, category_id) VALUES (?, ?)', array($pledge_id, $id));
+        }
         db_commit();
         print '<p><i>Categories updated.</i></p>';
     }
@@ -269,8 +273,9 @@ class ADMIN_PAGE_PB_MAIN {
                 $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $signer_id");
                 $this->remove_signer($signer_id);
             }
-        } elseif (get_http_var('categories')) {
-            update_categories();
+        } elseif ($categories = get_http_var('categories')) {
+            $pledge_id = get_http_var('pledge_id');
+            update_categories($pledge_id, $categories);
         } elseif (get_http_var('send_announce_token')) {
             $pledge_id = get_http_var('send_announce_token_pledge_id');
             if (ctype_digit($pledge_id)) {
@@ -281,7 +286,7 @@ class ADMIN_PAGE_PB_MAIN {
 
         // Display page
         if ($pledge_id) {
-            $pledge = db_getOne("SELECT ref FROM pledges WHERE id = $pledge_id");
+            $pledge = db_getOne('SELECT ref FROM pledges WHERE id = ?', $pledge_id);
         }
         if ($pledge) {
             $this->show_one_pledge($pledge);

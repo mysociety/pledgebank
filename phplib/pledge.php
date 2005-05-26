@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.68 2005-05-26 15:53:45 chris Exp $
+ * $Id: pledge.php,v 1.69 2005-05-26 16:41:23 chris Exp $
  * 
  */
 
@@ -54,6 +54,27 @@ class Pledge {
         $this->_calc();
     }
 
+    /* lock
+     * Lock a pledge in the database using SELECT ... FOR UPDATE. */
+    function lock() {
+        if (!array_key_exists('id', $this->data))
+            err("Pledge is not present in database");
+        else {
+            /* Now we have to grab the data again, since it may have changed
+             * since the constructor was called. */
+            $d = db_getRow('
+                        select *,
+                            (select count(id) from signers
+                                where signers.pledge_id = pledges.id)
+                                    as signers
+                        from pledges
+                        where id = ?
+                        for update of pledges', $this->data['id']);
+            foreach ($d as $k => $v)
+                $this->data[$k] = $v;
+        }
+    }
+
     // Internal function to calculate some values from data
     function _calc() {
         // Fill in partial pledges (ones being made still)
@@ -87,7 +108,7 @@ class Pledge {
     }
 
     function failed() {
-        return $this->finished() && !$this->successful();
+        return $this->finished() && !$this->succeeded();
     }
     
     function exactly() { return ($this->data['comparison'] == 'exactly'); }

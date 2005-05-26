@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.51 2005-05-25 22:38:53 matthew Exp $
+ * $Id: admin-pb.php,v 1.52 2005-05-26 02:19:04 francis Exp $
  * 
  */
 
@@ -146,9 +146,9 @@ class ADMIN_PAGE_PB_MAIN {
         print "</p>";
 
         $cats = array();
-        $q = db_query('select id from pledge_category where pledge_id = '.$pdata['id']);
+        $q = db_query('select category_id from pledge_category where pledge_id = '.$pdata['id']);
         while ($r = db_fetch_array($q)) {
-            $cats[$r['id']] = 1;
+            $cats[$r['category_id']] = 1;
         }
         print '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="pledge" value="'.$pledge.'"><p>Category: <select name="categories" multiple>';
         $s = db_query('select id, parent_category_id, name from category order by id');
@@ -312,6 +312,7 @@ class ADMIN_PAGE_PB_LATEST {
             $signed[$r['id']][$r['email']] = 1;
             $time[$r['epoch']][] = $r;
         }
+
         $q = db_query('SELECT *,extract(epoch from created) as epoch
                          FROM token
                      ORDER BY created DESC');
@@ -322,13 +323,22 @@ class ADMIN_PAGE_PB_LATEST {
             if (rabx_is_error($res)) {
                 $r['error'] = 'RABX Error: ' . $res->text;
             }
-            if (!isset($signed[$res['pledge_id']]) || !isset($res['email']) || !isset($signed[$res['pledge_id']][$res['email']])) {
-                $time[$r['epoch']][] = array_merge($r, $res);
+            if ($r['scope'] == "login") {
+                $stash_data = db_getRow('select * from requeststash where key = ?', $res['stash']);
+                # TODO: Could extract data from post_data here for display if it were useful to do so
+                $time[$r['epoch']][] = array_merge(array_merge($r, $res), $stash_data);
+            } else {
+                if (!isset($signed[$res['pledge_id']]) || 
+                    !isset($res['email']) || 
+                    !isset($signed[$res['pledge_id']][$res['email']])) {
+                        $time[$r['epoch']][] = array_merge($r, $res);
+                }
             }
         }
-        $q = db_query('SELECT *,extract(epoch from creationtime) as epoch
-                         FROM pledges
-                     ORDER BY id DESC');
+    
+        $q = db_query('SELECT *,extract(epoch from creationtime) as epoch, person.email as email
+                         FROM pledges LEFT JOIN person ON person.id = pledges.person_id
+                     ORDER BY pledges.id DESC');
         $this->pledgeref = array();
         while ($r = db_fetch_array($q)) {
             if (!get_http_var('onlysigners')) {
@@ -421,10 +431,19 @@ dd {
                 }
                 print "$data[scope] token $data[token] created ";
                 if (array_key_exists('email', $data)) {
-                    print "for $data[name] $data[email], pledge " .
-                    $this->pledge_link('id', $data['pledge_id']);
+                    print "for $data[name] $data[email] ";
+                    if (array_key_exists('pledge_id', $data)) {
+                        print " pledge " . $this->pledge_link('id', $data['pledge_id']);
+                    }
                 } elseif (array_key_exists('circumstance', $res)) {
                     print "for pledge " . $this->pledge_link('id', $res['pledge_id']);
+                }
+                if ($data['scope'] == "login") {
+                    if (!array_key_exists('method', $data)) {
+                        print "<em>No stash found</em>";
+                    } else {
+                        print " " . $data['method'] . " to " . $data['url'];
+                    }
                 }
             } elseif (array_key_exists('lastsendattempt', $data)) {
                 if ($data['ispremium'] == 't') print 'Premium ';
@@ -598,10 +617,11 @@ EOF;
                 /* Print signer/comment details under pledge. */
                 if ($what == 'signer') {
                     $signer = db_getRow('
-                                    select *,
+                                    select signers.*, person.email,
                                         extract(epoch from signtime) as epoch
                                     from signers
-                                    where id = ?', $what_id);
+                                    left join person on signers.person_id = person.id
+                                    where signers.id = ?', $what_id);
 
                     print '<tr class="break"><th>Signer name</th><td>'
                             . (is_null($signer['name'])

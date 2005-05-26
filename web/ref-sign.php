@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.8 2005-05-25 20:00:41 francis Exp $
+// $Id: ref-sign.php,v 1.9 2005-05-26 02:19:05 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -44,31 +44,32 @@ function do_sign() {
             );
     if ($q_email=='<Enter your name>') $q_email='';
 
-    $r = db_getRow('select * from pledges where ref ILIKE ?', $q_ref);
-    if (!check_pin($q_ref, $r['pin']))
+    $pledge = new Pledge($q_ref);
+    if (!check_pin($q_ref, $pledge->pin()))
         err("Permission denied");
 
     if (!is_null($errors))
         return $errors;
 
     /* Get the user to log in. */
+    $r = $pledge->data;
     $r['template'] = 'signature-confirm';
     $r['reason'] = 'sign the pledge';
     $P = person_signon($r, $q_email, $q_name);
     
-    $R = pledge_is_valid_to_sign($r['id'], $P->email());
+    $R = pledge_is_valid_to_sign($pledge->id(), $P->email());
 
     if (!pledge_is_error($R)) {
         /* All OK, sign pledge. */
-        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($r['id'], $P->name(), $P->id(), $q_showname ? 't' : 'f'));
+        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($pledge->id(), $P->name(), $P->id(), $q_showname ? 't' : 'f'));
         db_commit();
         ?>
 <p class="noprint" align="center"><strong>Thanks for signing up to this pledge!</strong></p>
 <?
-        post_confirm_advertise($r);
+        post_confirm_advertise($pledge);
     } else if ($R == PLEDGE_SIGNED) {
         /* Either has already signer, or is creator. */
-        if ($P->id() == $r['person_id']) {
+        if ($P->id() == $pledge->creator_id()) {
         ?>
 <p><strong>You cannot sign your own pledge!</strong></p>
 <?

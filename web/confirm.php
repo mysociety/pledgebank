@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.36 2005-05-24 11:52:14 francis Exp $
+ * $Id: confirm.php,v 1.37 2005-05-26 02:19:05 francis Exp $
  * 
  */
 
@@ -17,6 +17,10 @@ require_once "../phplib/pledge.php";
 require_once "../phplib/auth.php";
 
 require_once "../../phplib/importparams.php";
+
+# TODO: delete this file
+err("confirm is no longer used");
+exit;
 
 $err = importparams(
             array('token',      '/.+/',             ""),

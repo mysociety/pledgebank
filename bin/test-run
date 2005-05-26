@@ -27,7 +27,7 @@
 #$wth->email_get_containing('%To: '.email_n(2).
 #        '%you have already signed it%');
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.68 2005-05-25 20:22:32 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.69 2005-05-26 02:19:04 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -52,7 +52,8 @@ Actions are a list of tests, run if present in this order:
     public - make a public succeeding pledge
     private - make a private failing pledge
     sms - make a pledge, sign up by SMS and convert
-If you specify no actions, it will run all of them.
+If you specify no actions, it will run all of them, plus some
+extra smaller testes.
 
 Options are:
     --verbose=n   Choose 0 (no progress), 1 (basic actions), 2 (full debug)
@@ -74,7 +75,7 @@ if ($help) {
     help();
     exit(0);
 }
-our ($action_public, $action_private, $action_sms);
+our ($action_all, $action_public, $action_private, $action_sms);
 foreach (@ARGV) {
     if ($_ eq "public") {
         $action_public = 1;
@@ -89,6 +90,7 @@ foreach (@ARGV) {
     }
 }
 if (scalar(@ARGV) == 0) {
+    $action_all = 1;
     $action_public = 1;
     $action_private = 1;
     $action_sms = 1;
@@ -135,8 +137,10 @@ my $errors = $wth->log_watcher_get_errors();
 die "Unable to detect errors from PHP" if ($errors !~ m/deliberate_error_to_test_error_handling/);
 
 # Run some pledges through life cycle
-print "Making unconfirmed pledge...\n" if $verbose > 0;
-do_unconfirmed_pledge();
+if ($action_all) {
+    print "Making unconfirmed pledge...\n" if $verbose > 0;
+    do_unconfirmed_pledge();
+}
 if ($action_public) {
     print "Making public pledge and making it succeed...\n" if $verbose > 0;
     do_public_succeeding_pledge();
@@ -149,10 +153,12 @@ if ($action_sms) {
     print "Testing SMS with pledge...\n" if $verbose > 0;
     do_sms_pledge();
 }
-print "Checking administration functions...\n" if $verbose > 0;
-do_admin_tests();
-print "Final checks (RSS etc.)...\n" if $verbose > 0;
-do_final_checks();
+if ($action_all) {
+    print "Checking administration functions...\n" if $verbose > 0;
+    do_admin_tests();
+    print "Final checks (RSS etc.)...\n" if $verbose > 0;
+    do_final_checks();
+}
 
 # Check for any unhandled mails or errors
 $wth->email_check_none_left();
@@ -198,6 +204,7 @@ sub perform_login_action {
             die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
             $confirmation_url = $1;
             print "Email confirmation URL $confirmation_url\n" if $verbose > 1;
+            #readline(<STDIN>);
             $wth->email_check_url($confirmation_url);
             $wth->log_watcher_check();
         }
@@ -841,8 +848,8 @@ sub do_admin_tests {
     $wth->browser_check_contents("automatedtest");
     $wth->browser_check_contents("privatepledge");
     $b->follow_link(text_regex => qr/(admin)/) or die "(admin) link not found";
-    $wth->browser_check_contents("automatedtest");
-    $wth->browser_check_contents("Caution! This really is forever");
+    $wth->browser_check_contents("smsspoof");
+    $wth->browser_check_contents("This really is forever");
 
     # Check timeline page
     $b->get($admin_url);
@@ -858,6 +865,7 @@ sub do_admin_tests {
     $b->follow_link(text_regex => qr/signers \(1\)/) or die "Signers link missing";
     my $name = name_n(3);
     $wth->browser_check_contents(qr/$name/);
+    $wth->browser_check_contents(qr/Discard selected abuse reports/);
 
     # Check there were no errors
     $wth->log_watcher_check();

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: confirm.php,v 1.38 2005-05-26 11:03:05 francis Exp $
+ * $Id: confirm.php,v 1.39 2005-05-26 18:00:11 chris Exp $
  * 
  */
 
@@ -62,84 +62,36 @@ if ($q_type == 'pledge') {
     if (!$data) {
         err("Your signature hasn't been recognised.  Please check the URL is copied correctly from your email.");
     }
-    # Note that we do NOT delete the token, so it doesn't give an error if they
-    # double confirm.
-    # auth_token_destroy('signup-web', $q_token);
 
-    $row = db_getRow('select * from pledges where id = ?',
-                        $data['pledge_id']);
-    $local_pledge = pledge_is_local($row);
-    if ($local_pledge) {                        
-        page_header("Sign up to '$row[title]'", array('nonav' => true, 'ref'=>'/'.$row['ref']));
-    } else {
-        page_header("Sign up to '$row[title]'", array('ref'=>'/'.$row['ref']) );
-    }
+    # Hack this to do the person/login thing. We do this by creating a person
+    # record, if necessary, then constructing the appropriate stash object and
+    # redirecting.
 
-    $r = PLEDGE_ERROR;
-    $f1 = null;
-    if (array_key_exists('signer_id', $data)) {
-        /* If the data contain a signer ID, then we're converting an SMS
-         * subscription. */
-        $r = pledge_is_valid_to_sign($data['pledge_id'], $data['email']);
-        if (!pledge_is_error($r)) {
-            /* Fine. */
-            db_query('
-                    update signers
-                    set email = ?, name = ?, showname = ?
-                    where id = ?',
-                    array(
-                        $data['email'], $data['name'], $data['showname'],
-                        $data['signer_id']
-                    )
-                );
-        } else {
-            /* Two possibilities:
-             *  1. signer has given same email address as another signer
-             *  2. signer has given email address of pledge creator
-            $id = db_getOne('select id from signers where pledge_id = ? and email = ?', array($data['pledge_id'], $data['signer_id']));
-                /* There's already a signer with that email address; combine them. */
-                db_query('select signers_combine_2(?, ?)', array($id, $data['signer_id']));
-                /* In the other case (where we discover this before sending the
-                 * confirm email, we send a special "hey, you've signed up twice"
-                 * mail. But I don't think that's worth doing here, since we'll
-                 * only get into this condition when the user has already received
-                 * two confirmation mails in short order. Presumably they have
-                 * some idea what they're doing! */
-                $r = PLEDGE_OK;
-            }
-    } else {
-        /* Else this is a new subscription. */
-        $f1 = pledge_is_successful($data['pledge_id']);
-        $r = pledge_sign($data['pledge_id'], $data['name'], $data['showname'], $data['email']);
-    }
+    $signer_id = db_getOne('select id from signers, person where signers.pledge_id = ? and signers.person_id = person.id and person.email = ?', array($data['pledge_id'], $data['email']));
+    $P = person_get($data['email']);
+    if (is_null($P))
+        $P = person_get_or_create($data['email'], $p['name']);
 
-    if (!pledge_is_error($r)) {
-        print '<p class="noprint" align="center">Thanks for signing up to this pledge!</p>';
+    # Create the stash.
+    $key = bin2hex(random_bytes(4));
+    $stashed_POST = array('email' => $data['email'], 'ref' => db_getOne('select ref from pledges where id = ?', $data['pledge_id']), 'showname' => $data['showname']);
+    if (array_key_exists('pin', $data))
+        $stashed_POST['pin'] = $data['pin'];
+    $ser = '';
+    rabx_wire_wr($stashed_POST, $ser);
 
-        if ($f1 === false && pledge_is_successful($data['pledge_id']))
-            /* Has this completed the pledge? */
-            print "<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>";
-        else {
-            /* Otherwise post_confirm_advertise */
-            post_confirm_advertise($row);
-        }
-        db_commit();
-    } else {
-        if (pledge_is_permanent_error($r)) {
-            db_rollback();  /* just in case -- shouldn't matter though */
-            # Note that we do NOT delete the token, so they can get the error
-            # again.
-            # auth_token_destroy('signup-web', $q_token);
-            db_commit();
-        }
-        if ($r == PLEDGE_SIGNED) {
-            print "<p align=\"center\">You've already signed up to this pledge, there's no need
-                    to sign it again.</p>";
-            post_confirm_advertise($row);
-        } else {
-            oops($r);
-        }
-    }
+    # Extra data
+    $ser2 = '';
+    rabx_wire_wr(array('template' => 'signature-confirm', 'reason' => 'sign the pledge'), $ser2);
+    
+    db_query("insert into requeststash (key, method, url, post_data, extra) values (?, 'POST', ?, ?, ?)", array($key, "/${stashed_POST['ref']}/sign", $ser, $ser2));
+
+    db_commit();
+        
+    setcookie('pb_person_id', person_cookie_token($P->id()), null, '/', OPTION_WEB_DOMAIN, false);
+    stash_redirect($key);
+
+    exit();
 }
 if ($local_pledge) {
     page_footer(array('nonav'=>true));

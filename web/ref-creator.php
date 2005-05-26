@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-creator.php,v 1.1 2005-05-25 15:35:06 chris Exp $
+ * $Id: ref-creator.php,v 1.2 2005-05-26 16:58:36 chris Exp $
  * 
  */
 
@@ -14,11 +14,20 @@ require_once '../phplib/pb.php';
 
 require_once '../phplib/page.php';
 require_once '../phplib/person.php';
+require_once '../phplib/pledge.php';
 
 require_once '../../phplib/importparams.php';
 
+$err = importparams(
+            array('ref',   '/./',   '')
+        );
+if (!is_null($err))
+    err("Missing pledge reference");
+
+$p = new Pledge($q_ref);
+
 $P = person_if_signed_on();
-if (is_null($P)) {
+if (!$P || $P->id() != $p->creator_id()) {
     $errs = importparams(
                 array('email',  '/^[^@]+@[^@]+$/',  ''),
                 array('LogIn',  '/./',              '', false)
@@ -48,9 +57,6 @@ EOF;
     }
 }
 
-page_header('Pledge Creator');
-
-
-page_footer();
+header("Location: /$q_ref/announce");
 
 ?>

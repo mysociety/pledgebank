@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.19 2005-05-26 18:19:11 francis Exp $
+ * $Id: login.php,v 1.20 2005-05-30 15:41:55 francis Exp $
  * 
  */
 
@@ -424,6 +424,7 @@ function login_for_no_reason_form($errors) {
 </div>
 </form>
 <?
+    page_footer();
 }
 
 ?>

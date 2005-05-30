@@ -22,13 +22,14 @@
 #   PDF and RTF stuff from poster.cgi
 #   SMS on failure
 #   SMS already signed, and SMS am creator so can't sign
+#   Remember Me button (how do we test Cookie expirty with WWW::Mechanize?)
 # TODO: deal with fallout of this message no longer existing
 #$wth->email_get_containing('%To: '.email_n(2).
 #        '%you have already signed it%');
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.72 2005-05-30 11:58:16 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.73 2005-05-30 15:41:55 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -116,7 +117,7 @@ our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
 our $email_domain = mySociety::Config::get('EMAIL_DOMAIN');
 our $contact_email = mySociety::Config::get('CONTACT_EMAIL');
 sub email_n { my $n = shift; return "pbharness+$n\@$email_domain"; }
-sub name_n { my $n = shift; return ($n == 0 || $n == 100) ? "Peter Setter $n" : "Siegfried Signer $n"; }
+sub name_n { my $n = shift; return ($n % 100  == 0) ? "Peter Setter $n" : "Siegfried Signer $n"; }
 sub mobile_n { my $n = shift; return "9876543$n"; }
 sub password_n { my $n = shift; return "mypass$n"; }
 our $login_count; # reference to hash of person number => how many times they've logged in
@@ -196,6 +197,7 @@ if ($action_all)  {
 #   "viaemail:setpw" is the same, but also sets the user's password if second login
 #   "loggedin" means expect to be already logged in
 #   "password" means the user is not logged in but has a password, so log in with it
+#   "wrongpassword" means the user is not logged in, try logging in with the wrong password
 #   "abandon" means request a confirmation email, check it is there, but don't follow link
 #   "suspend" means request a confirmation email, and leave it in mail queue table
 #   "resume:nopw" means to continue from point of waiting for confirmation mail
@@ -276,6 +278,13 @@ sub perform_login_action {
         $b->submit_form(form_name => 'f',
             button => '__stash_submit_button_0') or die "Failed to do POST redirect button";
         $wth->log_watcher_check();
+    } elsif ($login_action eq "wrongpassword") {
+        $wth->browser_check_contents("Do you have a PledgeBank password?");
+        $b->submit_form(form_name => 'loginLogin',
+            fields => { password => "thispassswordisnonsense"},
+            button => 'LogIn') or die "Failed to try to log in with password";
+        $wth->browser_check_contents("Either your email or password weren't recognised");
+        $wth->log_watcher_check();
     } elsif ($login_action eq "resume") {
         die "Calling function should handle resumes";
     } else {
@@ -312,7 +321,7 @@ sub create_pledge {
 
     # Requires authentication
     perform_login_action($who, $login_action_full, "to confirm that you");
-    return if ($login_action eq "abandon" || $login_action eq "suspend");
+    return if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword");
     $wth->browser_check_contents("Thank you for creating your pledge");
 
     # Add all to front page
@@ -345,7 +354,7 @@ sub sign_pledge {
 
     # Perform appropriate login action
     perform_login_action($who, $login_action_full, "to confirm your signature");
-    return if ($login_action eq "abandon" || $login_action eq "suspend");
+    return if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword");
 
     # Look for appropriate result in web page
     if ($expected eq 'signed' || $expected eq 'reached') {
@@ -869,7 +878,7 @@ sub do_sms_pledge {
 sub do_login_tests {
     # Make the pledge
     set_pb_date('1983-06-06');
-    my $pledge_action_login_1 = 'make multiple pledges uses the magic of login';
+    my $pledge_action_login_1 = 'make multiple pledges using the magic of login';
     my $pledge_action_login_2 = 'be wary about flooding PledgeBank with meaningless pledges';
     my $pledge_action_login_3 = 'carry on making even more pledges forever and ever and ever';
     my $pledge_action_login_4 = 'go on and on and on';
@@ -931,13 +940,30 @@ sub do_login_tests {
     # Fourth pledge, expects already logged in
     create_pledge(200, 
         { title => $pledge_action_login_4, 
-            target => '4', type => 'automated lines of code', signup => 'do the same',
+            target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_4 },
         { country => 'Global' },
         "loggedin"
     );
 
-    # find_and_sign_pledge($pledge_action_completion, $i, $show_signature, "viaemail:nopw", "signed");
+    # Sign all the pledges as another user
+    $b->follow_link(text_regex => qr/Logout/) or die "Logout link missing";
+    $wth->browser_check_contents("now logged out");
+    find_and_sign_pledge($pledge_action_login_1, 201, 1, "viaemail:setpw", "signed");
+    $b->follow_link(text_regex => qr/Logout/) or die "Logout link missing";
+    $wth->browser_check_contents("now logged out");
+    # ... takes a second go to get the set password form
+    find_and_sign_pledge($pledge_action_login_2, 201, 1, "viaemail:setpw", "signed");
+    # Now we can sign as already logged in
+    find_and_sign_pledge($pledge_action_login_3, 201, 1, "loggedin", "signed");
+    # Logout again (in order to log in with password)
+    $b->follow_link(text_regex => qr/Logout/) or die "Logout link missing";
+    $wth->browser_check_contents("now logged out");
+    # ... try with wrong password
+    find_and_sign_pledge($pledge_action_login_4, 201, 1, "wrongpassword", "signed");
+    # ... then with the right one
+    find_and_sign_pledge($pledge_action_login_4, 201, 1, "password", "signed");
+
 }
 
 #############################################################################

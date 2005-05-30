@@ -28,16 +28,19 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.71 2005-05-26 18:19:11 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.72 2005-05-30 11:58:16 francis Exp $';
 
 use strict;
 require 5.8.0;
 
 use Data::Dumper;
-use Carp qw(verbose);
 use Storable;
 use FindBin;
 use Getopt::Long;
+
+# Enable stack backtraces upon "die"
+use Carp qw(confess verbose);
+$SIG{__DIE__} = sub { confess @_ };
 
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
@@ -59,16 +62,19 @@ extra smaller testes.
 
 Options are:
     --verbose=n   Choose 0 (no progress), 1 (basic actions), 2 (full debug)
+    --pause       Pause after displaying URLs read from emails
 
 END
 }
 
 # Parse command line
 our $verbose = 0; # currently 3 levels: 0, 1 and 2
+our $pause = 0;
 our $help;
 if (!GetOptions(
-        'verbose=i' =>  \$verbose,
-        'help' =>               \$help
+        'verbose=i' => \$verbose,
+        'pause' => \$pause,
+        'help' => \$help
     )) {
     help();
     exit(1);
@@ -198,15 +204,15 @@ if ($action_all)  {
 # EMAIL_TEXT is an SQL LIKE query fragment that confirmation mail must match.
 sub perform_login_action {
     my ($who, $login_action_full, $email_text) = @_;
-    my ($action, $action_part) = split(m/:/, $login_action_full);
+    my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
 
     print "login by ".name_n($who)." action '$login_action_full' for " . $b->uri() . "\n" if $verbose > 1;
 
-    if ($action eq "viaemail" || $action eq "abandon" || 
-        $action eq "suspend" || $action eq "resume") {
+    if ($login_action eq "viaemail" || $login_action eq "abandon" || 
+        $login_action eq "suspend" || $login_action eq "resume") {
 
         # Request confirmation email (unless we are resuming request)
-        if ($action ne "resume") {
+        if ($login_action ne "resume") {
             $wth->browser_check_contents("Do you have a PledgeBank password?");
             $b->submit_form(form_name => 'loginSendEmail',
                 button => 'SendEmail') or die "Failed to request confirmation email";
@@ -216,49 +222,52 @@ sub perform_login_action {
 
         # Wait for it to arrive, and extract the link (unless we are suspending request)
         my $confirmation_url;
-        if ($action ne "suspend") {
+        if ($login_action ne "suspend") {
             my $confirmation_email = $wth->email_get_containing(
                 '%To: '.email_n($who).'%'.$email_text.'%');
             die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
             $confirmation_url = $1;
-            print "Email confirmation URL $confirmation_url\n" if $verbose > 1;
-            #readline(<STDIN>);
+            print "Email confirmation URL $confirmation_url\n" if $verbose > 1 || $pause;
+            if ($pause) {
+                print "Press RETURN to continue";
+                readline(<STDIN>);
+            }
             $wth->email_check_url($confirmation_url);
             $wth->log_watcher_check();
         }
 
-        if ($action eq "viaemail" || $action eq "resume") {
+        if ($login_action eq "viaemail" || $login_action eq "resume") {
             # Follow link and confirm
             $b->get($confirmation_url);
             $login_count->{$who}++;
             if ($login_count->{$who} > 1) {
-                if ($action_part eq "setpw") {
+                if ($login_action_part eq "setpw") {
                     # We accept the option to set our password
                     $wth->browser_check_contents("Would you like to set a PledgeBank password?");
                     $b->submit_form(form_name => 'loginSetPassword',
                         fields => { pw1 => password_n($who), pw2 => password_n($who) },
                         button => 'SetPassword') or die "Failed to submit no make password form";
-                } elsif ($action_part eq "nopw") {
+                } elsif ($login_action_part eq "nopw") {
                     # We reject the option to set our password
                     $b->submit_form(form_name => 'loginNoPassword',
                     button => 'NoPassword') or die "Failed to submit no make password form";
                 } else {
-                    die "Unknown action part '$action_part'";
+                    die "Unknown action part '$login_action_part'";
                 }
             }
             $wth->browser_check_contents("Redirect...");
             $b->submit_form(form_name => 'f',
                 button => '__stash_submit_button_0') or die "Failed to do POST redirect button";
             $wth->log_watcher_check();
-        } elsif ($action eq "abandon" || $action eq "suspend") {
+        } elsif ($login_action eq "abandon" || $login_action eq "suspend") {
             # Deliberately stop without following link
             return; 
         } else {
             die;
         }
-    } elsif ($action eq "loggedin") {
+    } elsif ($login_action eq "loggedin") {
         # Nothing to do
-    } elsif ($action eq "password") {
+    } elsif ($login_action eq "password") {
         $wth->browser_check_contents("Do you have a PledgeBank password?");
         $b->submit_form(form_name => 'loginLogin',
             fields => { password => password_n($who) },
@@ -267,10 +276,10 @@ sub perform_login_action {
         $b->submit_form(form_name => 'f',
             button => '__stash_submit_button_0') or die "Failed to do POST redirect button";
         $wth->log_watcher_check();
-    } elsif ($action eq "resume") {
+    } elsif ($login_action eq "resume") {
         die "Calling function should handle resumes";
     } else {
-        die "Unknown login action '$action'";
+        die "Unknown login action '$login_action'";
     }
 }
 
@@ -279,7 +288,9 @@ sub perform_login_action {
 # and PAGE2 contain parameters for each page of the sign-up form.
 # LOGIN_ACTION is passed on to perform_login_action.
 sub create_pledge {
-    my ($who, $page1, $page2, $login_action) = @_;
+    my ($who, $page1, $page2, $login_action_full) = @_;
+    my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
+
     $page1->{name} = name_n($who); 
     $page1->{email} = email_n($who);
     die "'resume' not supported for pledges yet" if ($login_action eq "resume");
@@ -300,7 +311,7 @@ sub create_pledge {
         button => 'submit') or die "Failed to submit creating form stage 3";
 
     # Requires authentication
-    perform_login_action($who, $login_action, "to confirm that you");
+    perform_login_action($who, $login_action_full, "to confirm that you");
     return if ($login_action eq "abandon" || $login_action eq "suspend");
     $wth->browser_check_contents("Thank you for creating your pledge");
 
@@ -319,7 +330,8 @@ sub create_pledge {
 #   'finished' - failed signing, because pledge has finished (closed, expired)
 #   'already' - failed signing, because you've already signed.
 sub sign_pledge {
-    my ($who, $show_signature, $login_action, $expected) = @_;
+    my ($who, $show_signature, $login_action_full, $expected) = @_;
+    my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
 
     # Sign up now, unless we are resuming abandoned signup
     if ($login_action ne "resume") {
@@ -332,7 +344,7 @@ sub sign_pledge {
     }
 
     # Perform appropriate login action
-    perform_login_action($who, $login_action, "to confirm your signature");
+    perform_login_action($who, $login_action_full, "to confirm your signature");
     return if ($login_action eq "abandon" || $login_action eq "suspend");
 
     # Look for appropriate result in web page
@@ -354,13 +366,14 @@ sub sign_pledge {
 # Finds a public pledge from the front page use text ACTION, then calls
 # sign_pledge.
 sub find_and_sign_pledge {
-    my ($action, $who, $show_signature, $login_action, $expected) = @_;
+    my ($action, $who, $show_signature, $login_action_full, $expected) = @_;
+    my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
 
     if ($login_action ne "resume") {
         $b->get($base_url);
         $b->follow_link(text_regex => qr/$action/) or die "Pledge not appeared on front page";
     }
-    sign_pledge($who, $show_signature, $login_action, $expected);
+    sign_pledge($who, $show_signature, $login_action_full, $expected);
 }
 
 # Change the date that all parts of PledgeBank think is today.  Call with no
@@ -572,11 +585,6 @@ sub do_private_failing_pledge {
         { country => 'Global', visibility => 'pin', pin => $private_pin },
         "viaemail:nopw"
     );
-    # TODO: test log in more tidily, check between different users (maybe they
-    # each need thier own WWW::Mechanize instance for cookie separation!) more
-    # thoroughly.
-    # No need to click any confirmation email, as we should be already logged
-    # in from before
 
     # Go to private pledge page, and submit PIN to access it
     my $goto_private_pledge_page = sub {
@@ -602,7 +610,7 @@ sub do_private_failing_pledge {
     &$goto_private_pledge_page();
     $wth->browser_check_contents("<i>1 person has signed up");
 
-    # Try to sign up by SMS
+    # Try to sign up by SMS and fail, as it isn't allowed for private pledges
     sms_fake_to_pledgebank(10, "pledge $pledge_ref");
     die "Didn't get OK for incoming SMS" if $b->content() ne "OK";
     $wth->log_watcher_check();
@@ -629,6 +637,8 @@ sub do_private_failing_pledge {
     $wth->browser_check_contents("<i>1 person has signed up");
     $wth->browser_check_no_contents("This pledge is now closed");
  
+    print "Checking no leaks of private pledge..." if $verbose > 1;
+
     # Check pledge really is private on lists of pledges
     # ... index page, all pledges
     $b->get($base_url);
@@ -964,7 +974,6 @@ sub do_admin_tests {
     $wth->browser_check_contents("automatedtest");
     $wth->browser_check_contents("privatepledge");
     $b->follow_link(text_regex => qr/(admin)/) or die "(admin) link not found";
-    $wth->browser_check_contents("smsspoof");
     $wth->browser_check_contents("This really is forever");
 
     # Check timeline page

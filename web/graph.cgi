@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.1 2005-05-31 16:47:35 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.2 2005-05-31 16:56:20 chris Exp $';
 
 use strict;
 
@@ -211,7 +211,6 @@ while (my $q = new CGI::Fast()) {
             }
 
 my $fontface = 'arial';
-warn "output '$graphfile'";
 
             g(<<EOF
 reset

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.169 2005-05-31 16:13:03 francis Exp $
+// $Id: index.php,v 1.170 2005-05-31 16:56:36 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -65,7 +65,10 @@ function get_pledges_list($query) {
         $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
         $pledges .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
         if ($r['target'] - $signatures <= 0) {
-            $pledges .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
+            if ($r['daysleft'] == 0)
+                $pledges .= 'Target met, pledge open until midnight tonight, London time';
+            else
+                $pledges .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
         } else {
             $left = $r['target'] - $signatures;
             if ($r['daysleft'] == 0) {

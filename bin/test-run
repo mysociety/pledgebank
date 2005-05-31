@@ -29,7 +29,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.74 2005-05-31 10:20:35 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.75 2005-05-31 14:45:40 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -325,6 +325,7 @@ sub create_pledge {
         button => 'submit') or die "Failed to submit creating form stage 2";
     $wth->browser_check_contents("will look like this");
     $b->submit_form(form_name => 'pledge',
+        fields => {confirmconditions => 1},
         button => 'submit') or die "Failed to submit creating form stage 3";
 
     # Requires authentication

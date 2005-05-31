@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.19 2005-05-31 12:43:14 sandpit Exp $
+// $Id: new.php,v 1.20 2005-05-31 14:45:40 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -294,6 +294,14 @@ function step2_error_check($data) {
     return $errors;
 }
 
+function step3_error_check($data) {
+    $errors = array();
+    if (!$data['confirmconditions']) {
+        $errors['confirmconditions'] = 'Please read the terms and conditions paragraph, and check the box to confirm that you have'; 
+    }
+    return $errors;
+}
+
 function pledge_form_two_submitted() {
     $errors = array();
     $data = array();
@@ -313,24 +321,24 @@ function pledge_form_two_submitted() {
     }
     if ($data['visibility'] != 'pin') { $data['visibility'] = 'all'; $data['pin'] = ''; }
 
+    $errors = step1_error_check($data);
+    if (sizeof($errors) || get_http_var('newback')) {
+        pledge_form_one($data, $errors);
+        return;
+    }
     $errors = step2_error_check($data);
     if (sizeof($errors)) {
         pledge_form_two($data, $errors);
         return;
     }
 
-    $errors = step1_error_check($data);
-    if (sizeof($errors) || get_http_var('newback')) {
-        pledge_form_one($data, $errors);
-        return;
-    }
-    preview_pledge($data);
+    preview_pledge($data, $errors);
 }
 
 function pledge_form_three_submitted() {
     $errors = array();
     $data = array();
-    $fields = array('data');
+    $fields = array('data', 'confirmconditions');
     foreach ($fields as $field) {
         $data[$field] = get_http_var($field);
     }
@@ -338,16 +346,24 @@ function pledge_form_three_submitted() {
     $alldata = unserialize(base64_decode($data['data']));
     if (!$alldata) $errors[] = 'Transferring the data from Preview page failed :(';
     unset($data['data']);
-    $data = $alldata;
-    if (get_http_var('newback1')) {
+    $data = array_merge($alldata, $data);
+
+    $errors = step1_error_check($data);
+    if (sizeof($errors) || get_http_var('newback1')) {
         pledge_form_one($data, $errors);
         return;
     }
-    if (get_http_var('newback2')) {
+    $errors = step2_error_check($data);
+    if (sizeof($errors) || get_http_var('newback2')) {
         pledge_form_two($data, $errors);
         return;
     }
-
+    $errors = step3_error_check($data);
+    if (sizeof($errors)) {
+        preview_pledge($data, $errors);
+        return;
+    }
+ 
     /* User must have an account to do this. */
     $data['template'] = 'pledge-confirm';
     $data['reason'] = 'create your new pledge';
@@ -356,7 +372,7 @@ function pledge_form_three_submitted() {
     create_new_pledge($P, $data);
 }
 
-function preview_pledge($data) {
+function preview_pledge($data, $errors) {
     $v = 'all';
     if (isset($data['visibility'])) {
         $v = $data['visibility']; if ($v!='pin') $v = 'all';
@@ -368,7 +384,11 @@ function preview_pledge($data) {
     else
         $comparison = $data['comparison'];
 
-#    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
+	if (sizeof($errors)) {
+		print '<div id="errors"><ul><li>';
+		print join ('</li><li>', array_values($errors));
+		print '</li></ul></div>';
+	} #    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
 ?>
 <p>Your pledge, with reference <em><?=$data['ref'] ?></em>, will look like this:</p>
 <?  
@@ -381,7 +401,14 @@ function preview_pledge($data) {
 <form accept-charset="utf-8" id="pledgenew" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
 <h2>New Pledge &#8211; Step 3 of 3</h2>
 
-<p>Please check the details you have entered, both the pledge above and other details below, and then either click "Create" to create your pledge, or one of the two "Back" buttons to go back and edit your data.</p>
+<p>Please check the details you have entered, both the pledge above and other
+details below.  Click one of the two "Back" buttons if you would like to go
+back and edit your data.  
+<strong>Check carefully, as you cannot edit your pledge after you have
+created it.</strong>
+(<a href="/faq#editpledge">why not?</a>)
+</p>
+
 
 <ul>
 
@@ -410,9 +437,23 @@ if ($v=='pin') print ' Only people to whom I give a PIN I have specified';
 ?></em></li>
 </ul>
 
-<p><strong>Check carefully, as you cannot edit your pledge after you have created it.</strong>
-(<a href="/faq#editpledge">why not?</a>)
+<p>
+<h2>Terms and Conditions</h2>
+<strong>Click "Create" to confirm that you wish PledgeBank.com to display the
+pledge at the top of this page in your name.</strong>  
+<? if ($v == 'pin') { ?>
+<!-- no special terms for private pledge -->
+<? } else { ?>
+You also consent to the syndication of your pledge to other sites &mdash; this means
+that they will be able to display your pledge and your name<? if ($data['country'] == "UK" && $local) { ?>
+, and <strong>use (but not display) your postcode</strong> to locate your pledge in the right geographic area<? } ?>.
+The purpose of this is simply to give your pledge
+greater publicity and a greater chance of succeeding. 
+<? } ?>
+Rest assured that we won't ever give or sell anyone your email address. 
+<input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions">Tick this box to confirm you have read this paragraph</a>.</input>
 </p>
+
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">

@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.20 2005-05-30 15:41:55 francis Exp $
+ * $Id: login.php,v 1.21 2005-05-31 12:43:14 sandpit Exp $
  * 
  */
 
@@ -255,7 +255,7 @@ function login_form($errors = array()) {
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
     }  else {
-        print "<p>Before we can $reason, we need to confirm your name and email address.</p>";
+        print "<p>Before we can $reason, we need to confirm your email address.</p>";
     }
 
     /* Split into two forms to avoid "do you want to remember this

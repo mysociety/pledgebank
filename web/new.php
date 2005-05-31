@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.18 2005-05-26 18:19:11 francis Exp $
+// $Id: new.php,v 1.19 2005-05-31 12:43:14 sandpit Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -171,7 +171,9 @@ If yes, enter your postcode so that local people can find your pledge:
 <option value="-1">(choose one)</option>
 <?
     /* XXX should do multiple categories, but ignore that for now. */
-    $s = db_query('select id, parent_category_id, name from category order by id');
+    $s = db_query('select id, parent_category_id, name from category
+        where parent_category_id is null
+        order by id');
     while ($a = db_fetch_row($s)) {
         list($id, $parent_id, $name) = $a;
         printf("<option value=\"%s\">%s%s</option>",

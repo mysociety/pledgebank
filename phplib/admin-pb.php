@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.56 2005-05-26 17:09:54 sandpit Exp $
+ * $Id: admin-pb.php,v 1.57 2005-05-31 12:43:12 sandpit Exp $
  * 
  */
 
@@ -153,7 +153,9 @@ class ADMIN_PAGE_PB_MAIN {
         print '<form method="post" action="'.$this->self_link.'"><input
         type="hidden" name="pledge_id" value="'.$pdata['id'].'"><input
         type="hidden" name="update_cats" value="1"><p>Category: <select name="categories[]" multiple>';
-        $s = db_query('select id, parent_category_id, name from category order by id');
+        $s = db_query('select id, parent_category_id, name from category 
+            where parent_category_id is null
+            order by id');
         while ($a = db_fetch_row($s)) {
             list($id, $parent_id, $name) = $a;
             print '<option';

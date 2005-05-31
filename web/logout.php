@@ -1,12 +1,12 @@
 <?php
 /*
- * ref-creator.php:
- * Various tools for the pledge creator.
+ * logout.php:
+ * Log user out.
  * 
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: logout.php,v 1.1 2005-05-26 18:19:11 francis Exp $
+ * $Id: logout.php,v 1.2 2005-05-31 12:24:20 chris Exp $
  * 
  */
 

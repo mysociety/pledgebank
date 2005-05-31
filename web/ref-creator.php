@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-creator.php,v 1.2 2005-05-26 16:58:36 chris Exp $
+ * $Id: ref-creator.php,v 1.3 2005-05-31 10:20:35 francis Exp $
  * 
  */
 
@@ -37,10 +37,11 @@ if (!$P || $P->id() != $p->creator_id()) {
         page_header('Pledge Creator');
         print <<<EOF
         $q_email $q_LogIn
-<p>To access this page, please type in your email address and click "Continue".</p>
-<form class="pledge" method="POST">
+<p>To access the pledge creator's page, please type in your email address
+and click "Continue".</p>
+<form class="pledge" name="logIn" method="POST">
 <div class="form_row">
-    <label for="email">Email address</label>
+    <label for="email"><strong>Email address</strong></label>
     <input type="text" size="20" name="email" id="email" value="$q_h_email">
     <input type="submit" name="LogIn" value="Continue &gt;&gt;">
 </div>

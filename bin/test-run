@@ -29,7 +29,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.73 2005-05-30 15:41:55 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.74 2005-05-31 10:20:35 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -190,6 +190,18 @@ if ($action_all)  {
 #############################################################################
 # Functions to make and sign pledges, and so on
 
+# display_url URL
+# Print the URL if in verbose mode.  If --pause set, also print it and 
+# wait for RETURN to be pressed.
+sub display_url {
+    my ($circumstance, $url) = @_;
+    print "$circumstance: " . $url . "\n" if $verbose > 1 || $pause;
+    if ($pause) {
+        print "Press RETURN to continue";
+        readline(<STDIN>);
+    }
+}
+
 # perform_login_action WHO LOGIN_ACTION EMAIL_TEXT
 # Call after doing something which requires login.  LOGIN_ACTION defines what
 # to do about this.
@@ -229,11 +241,7 @@ sub perform_login_action {
                 '%To: '.email_n($who).'%'.$email_text.'%');
             die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
             $confirmation_url = $1;
-            print "Email confirmation URL $confirmation_url\n" if $verbose > 1 || $pause;
-            if ($pause) {
-                print "Press RETURN to continue";
-                readline(<STDIN>);
-            }
+            display_url("Email confirmation URL", $confirmation_url);
             $wth->email_check_url($confirmation_url);
             $wth->log_watcher_check();
         }
@@ -338,6 +346,7 @@ sub create_pledge {
 #   'reached' - a successful signing, which caused pledge to reach its target
 #   'finished' - failed signing, because pledge has finished (closed, expired)
 #   'already' - failed signing, because you've already signed.
+#   'ownpledge' - failed signing, because you're the pledge creator.
 sub sign_pledge {
     my ($who, $show_signature, $login_action_full, $expected) = @_;
     my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
@@ -366,6 +375,8 @@ sub sign_pledge {
         $wth->browser_check_contents("That pledge has already finished");
     } elsif ($expected eq 'already') {
         $wth->browser_check_contents("already signed this pledge");
+    } elsif ($expected eq 'ownpledge') {
+        $wth->browser_check_contents("cannot sign your own");
     } else {
         die "Unknown flag '$expected'";
     }
@@ -485,16 +496,41 @@ sub do_public_succeeding_pledge {
         $content =~ m## or die "Failed to find pledge link in friend email";
     }
 
-    # Sign it a few times
-    for (my $i = 1; $i <= 3; ++$i) {
-        print "Signing the pledge $i...\n" if $verbose > 1;
-        # Don't show name for one of the users
-        my $show_signature = ($i == 2) ? undef : 1;
-        find_and_sign_pledge($pledge_action_completion, $i, $show_signature, "viaemail:nopw", "signed");
-    }
+    # Sign it twice
+    print "Signing the pledge twice...\n" if $verbose > 1;
+    find_and_sign_pledge($pledge_action_completion, 1, 1, "viaemail:nopw", "signed");
+    find_and_sign_pledge($pledge_action_completion, 2, undef, "viaemail:nopw", "signed");
+
+    # Send mid-pledge announcement, to encourage signers to do more to help
+    $b->get($base_url . "/$pledge_ref");
+    $b->follow_link(text_regex => qr/Send message/) or die "Creator page link not found";
+    $b->submit_form(form_name => 'logIn',
+        fields => { email => email_n(0) },
+        button => "LogIn");
+    perform_login_action(0, "viaemail:nopw", "access the pledge creator's page");
+    $wth->browser_check_contents("Send Announcement");
+    $wth->browser_check_no_contents("successful");
+    $b->submit_form(form_name => 'pledge',
+                fields => { message_body => "Hey, please mail all your friends and get them to sign the pledge.  It's sure to work then! Love and kisses, " . name_n(0),
+                },
+        button => 'submit') or die "Failed to submit email success form";
+    $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
+    $wth->log_watcher_check();
+    call_frequentupdate();
+    # Check they all arrived
+    $wth->email_get_containing( '%To: '.email_n(1).  '%From: '.name_n(0).  '%Love and kisses%');
+    $wth->email_get_containing( '%To: '.email_n(2).  '%From: '.name_n(0).  '%Love and kisses%');
+    call_frequentupdate();
+    $wth->email_check_none_left();
+
+    # Sign it once more, this tipping balance
+    print "Signing the pledge once more...\n" if $verbose > 1;
+    find_and_sign_pledge($pledge_action_completion, 3, 1, "viaemail:nopw", "reached");
 
     # Try to sign the pledge a second time as the same person
     find_and_sign_pledge($pledge_action_completion, 2, 1, "viaemail:nopw", "already");
+    # and as the creator, which also isn't allowed
+    find_and_sign_pledge($pledge_action_completion, 0, 1, "viaemail:nopw", "ownpledge");
 
     # Partially sign pledge before completion state change...
     find_and_sign_pledge($pledge_action_completion, 4, 1, "suspend", "signed");
@@ -526,7 +562,7 @@ sub do_public_succeeding_pledge {
 
     # Send message using announcements page, from creator to signers.
     die "Failed to find announcements link" if !$announce_link;
-    print "Announce URL is $announce_link\n" if $verbose > 1;
+    display_url("Announce URL", $announce_link);
     $b->get($announce_link);
     $wth->browser_check_contents("Send Announcement");
     $b->submit_form(form_name => 'pledge',
@@ -556,6 +592,10 @@ sub do_public_succeeding_pledge {
     # Check the late signer (number 4) also recieves the announcement message.
     call_frequentupdate();
     $wth->email_get_containing( '%To: '.email_n(4).'%You signed this pledge after this message was%By merely partaking%');
+
+    # Check for late mid-pledge announce message
+    $wth->email_get_containing( '%To: '.email_n(3).  '%From: '.name_n(0).  '%Love and kisses%');
+    $wth->email_get_containing( '%To: '.email_n(4).  '%From: '.name_n(0).  '%Love and kisses%');
 
     # (commented out as not very important, but hard to auto test without copying
     # lots of code from last find_and_sign_pledge for the last one)

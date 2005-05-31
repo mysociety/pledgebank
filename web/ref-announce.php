@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.3 2005-05-26 17:00:16 chris Exp $
+ * $Id: ref-announce.php,v 1.4 2005-05-31 10:20:35 francis Exp $
  * 
  */
 
@@ -54,7 +54,7 @@ $has_sms = array(
 /* refuse_announce CIRCUMSTANCE
  * Page explaining that punter may not send another message of this type. */
 function refuse_announce($c) {
-    page_header("Send announcement");
+    page_header("Send Announcement");
     $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $c));
     print "<strong>You have already sent ";
     if ($n == 1)
@@ -70,8 +70,8 @@ function refuse_announce($c) {
  * Page thanking punter for sending message. */
 function message_success() {
     page_header("Announcement sent");
-    print "<p><strong>Thank you!</strong> Your message will be sent immediately.</p>";
-    page_footer(array('nonav' => 1));
+    print "<p><strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge.</p>";
+    page_footer();
     exit();
 }
 
@@ -290,7 +290,7 @@ count_sms_characters();
 </script>
 <? } ?>
 
-<h3>Send announcement</h3>
+<h3>Send Announcement</h3>
 
 <p>(Remember, when you send this message <strong>your email address will be given to everyone who signed up</strong> by email) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
 

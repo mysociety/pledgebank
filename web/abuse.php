@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.6 2005-05-20 13:37:13 matthew Exp $
+// $Id: abuse.php,v 1.7 2005-05-31 17:59:44 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -50,7 +50,7 @@ function report_abusive_thing() {
         db_query('insert into abusereport (what, what_id, reason, ipaddr) values (?, ?, ?, ?)', 
             array($q_what, $q_id, $q_reason, $ip));
         db_commit();
-        $admin_url = OPTION_ADMIN_URL . "/?page=pbabusereports";
+        $admin_url = OPTION_ADMIN_URL . "/?page=pbabusereports&what=" . $q_what;
         pb_send_email(OPTION_CONTACT_EMAIL, "PledgeBank abuse report", <<<EOF
 New abuse report for $q_what id $q_id from IP $ip.
 

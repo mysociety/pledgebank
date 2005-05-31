@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-creator.php,v 1.3 2005-05-31 10:20:35 francis Exp $
+ * $Id: ref-creator.php,v 1.4 2005-05-31 15:43:58 francis Exp $
  * 
  */
 
@@ -35,10 +35,21 @@ if (!$P || $P->id() != $p->creator_id()) {
 
     if (!is_null($errs) || !$q_LogIn) {
         page_header('Pledge Creator');
+    if ($P) {
+?>
+    <p>
+    The email address you are logged in with does not seem to be the same as
+    the pledge creator. Please enter that email address to log in as them.
+    </p>
+<?
+    }  else {
         print <<<EOF
-        $q_email $q_LogIn
 <p>To access the pledge creator's page, please type in your email address
-and click "Continue".</p>
+and click "Continue".  You can only access the page if you created the pledge.
+</p>
+EOF;
+    }
+        print <<<EOF
 <form class="pledge" name="logIn" method="POST">
 <div class="form_row">
     <label for="email"><strong>Email address</strong></label>

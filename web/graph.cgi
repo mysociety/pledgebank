@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.7 2005-06-01 14:53:31 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.8 2005-06-01 15:17:24 chris Exp $';
 
 use strict;
 
@@ -142,6 +142,14 @@ while (my $q = new CGI::Fast()) {
 
         throw PB::Error("Unknown pledge_id '$pledge_id'")
             if (!$P);
+
+        if (defined($P->{pin}) && $P->{pin} ne '') {
+            # Don't bother producing the graph: it's only of use as an inline
+            # image, and we don't want to expose the PIN in that.
+            # XXX if you remove this, then add an actual check for the PIN as
+            # well!
+            throw PB::Error("Permission denied");
+        }
 
         my $interval = $q->param('interval');
         $interval = 'pledge'

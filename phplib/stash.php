@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: stash.php,v 1.4 2005-05-26 11:03:05 francis Exp $
+ * $Id: stash.php,v 1.5 2005-06-01 09:22:12 chris Exp $
  * 
  */
 
@@ -22,25 +22,47 @@ db_connect();
  * parameters in the content) in the database, and return a key for the stashed
  * data. EXTRA is an optional extra string stored with the stashed request. */
 function stash_request($extra = null) {
-    $key = bin2hex(random_bytes(4));
     $url = invoked_url();
     if (!is_null($_SERVER['QUERY_STRING']))
         $url .= "?${_SERVER['QUERY_STRING']}";
-    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+    $v = null;
+    if ($_SERVER['REQUEST_METHOD'] == 'POST')
+        $v = $_POST;
+    return stash_new_request($_SERVER['REQUEST_METHOD'], $url, $v, $extra);
+    return $key;
+}
+
+/* stash_new_request METHOD URL PARAMS [EXTRA]
+ * Return a stash key for a new METHOD request to URL with the given PARAMS.
+ * If METHOD is "GET", and PARAMS is not null, then any query part of URL will
+ * be reconstructed from the variables.  This function lets you create a stash
+ * which represents that request, rather than the current one. */
+function stash_new_request($method, $url, $params, $extra = null) {
+    $key = bin2hex(random_bytes(4));
+    if ($method == 'GET') {
+        if (!is_null($params)) {
+            /* Strip query. */
+            $url = preg_replace('/\?.*$/', '', $url);
+            $a = array();
+            foreach ($params as $k => $v) {
+                /* XXX doesn't handle multiple parameters */
+                array_push($a, urlencode($k) . '=' . urlencode($v));
+            }
+            $url .= '?' . implode('&', $a);
+        }
         db_query('
                 insert into requeststash (key, method, url, extra)
                 values (?, ?, ?, ?)',
                 array($key, 'GET', $url, $extra));
-    } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        /* Save form data too. */
+    } else if ($method == 'POST') {
         $ser = '';
-        rabx_wire_wr($_POST, $ser);
+        rabx_wire_wr($params, $ser);
         db_query('
                 insert into requeststash (key, method, url, post_data, extra)
                 values (?, ?, ?, ?, ?)',
                 array($key, 'POST', $url, $ser, $extra));
     } else
-        err("Cannot stash request for method '${_SERVER['REQUEST_METHOD']}'");
+        err("Cannot stash request for method '$method'");
 
     /* Also take this opportunity to remove old stashed state from the db. */
     db_query("delete from requeststash where whensaved < pb_current_timestamp() - '7 days'::interval");

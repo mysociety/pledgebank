@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.5 2005-06-01 14:32:41 francis Exp $
+ * $Id: ref-announce.php,v 1.6 2005-06-01 15:27:18 francis Exp $
  * 
  */
 
@@ -254,8 +254,9 @@ This is to tell them what to do next.
 <h3>Email message</h3>
 
 <p>The message will be sent from your email address, so the people
-who signed your pledge can reply directly to you. <strong>You may want to also give your
-phone number or website</strong>, so they can contact you in other ways.</p>
+who signed your pledge can reply directly to you. <strong>You may want to also
+give your phone number or website</strong>, so they can contact you in other
+ways.</p>
 
 <p><textarea
     name="message_body"
@@ -310,7 +311,7 @@ count_sms_characters();
 
 <h3>Send Announcement</h3>
 
-<p>(Remember, when you send this message <strong>your email address will be given to everyone who signed up</strong> by email) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
+<p>(Remember, when you send this message <strong>your email address will be given to everyone who has signed up or will sign up</strong> to your pledge by email) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
 
 </form>
 </div>

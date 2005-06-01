@@ -6,11 +6,12 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.71 2005-06-01 14:00:33 francis Exp $
+ * $Id: pledge.php,v 1.72 2005-06-01 14:53:13 chris Exp $
  * 
  */
 
 require_once 'db.php';
+require_once 'fns.php';
 require_once 'person.php';
 
 require_once '../../phplib/utility.php';
@@ -123,10 +124,23 @@ class Pledge {
     function creator_name() { return $this->data['name']; }
     function creator_id() { return $this->data['person_id']; }
 
+    function creationtime() { return $this->data['creationtime']; }
+    function creationdate() { return substr($this->data['creationtime'], 0, 10); }
+
+    function date() { return $this->data['date']; }
+
     function pin() { return $this->data['pin']; }
 
     function title() { return $this->data['title']; }
     function type() { return $this->data['type']; }
+
+    function categories() {
+        $c = array();
+        $q = db_query('select category_id, category.name from pledge_category, category where pledge_id = ? and category_id = category.id', $this->id());
+        while ($r = db_fetch_row($q))
+            $c[$r[0]] = $r[1];
+        return $c;
+    }
 
     // Basic data access for HTML display
     function h_title() { return htmlspecialchars($this->data['title']); }
@@ -155,7 +169,7 @@ class Pledge {
     // Draws a plaque containing the pledge.  $params is an array, which
     // can contain the following:
     //     showdetails - if present, show "details" field
-    function render_box($params) {
+    function render_box($params = array()) {
 ?>
 <div id="pledge">
 <p style="margin-top: 0">&quot;<?=pledge_sentence($this->data, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
@@ -178,6 +192,11 @@ class Pledge {
     }
 
     function sentence($params = array()) {
+        return pledge_sentence($this->data, $params);
+    }
+
+    function h_sentence($params = array()) {
+        $params['html'] = true;
         return pledge_sentence($this->data, $params);
     }
 }

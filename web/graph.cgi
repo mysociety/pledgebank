@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.4 2005-06-01 10:20:13 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.5 2005-06-01 11:49:43 chris Exp $';
 
 use strict;
 
@@ -29,6 +29,7 @@ use Date::Calc qw(Add_Delta_Days Add_Delta_YM Day_of_Week Delta_Days);
 use DateTime::Format::Strptime;
 use Digest::SHA1;
 use Encode;
+use Errno;
 use Error qw(:try);
 use POSIX;
 use Time::HiRes qw(sleep);
@@ -37,18 +38,32 @@ use utf8;
 use mySociety::DBHandle qw(dbh);
 use PB;
 
-sub mkdirp ($;$) {
-    my ($dir, $mask) = @_;
-    my @dd = split(/\//, $dir);
-    for (my $i = 1; $i < @dd; ++$i) {
-        my $d = join('/', @dd[0 .. $i]);
-        mkdir($d, $mask);
-    }
-}
-
 # Where we stuff the graphs output.
 my $dir_hash_levels = 2;
 # XXX produce the hashed directories, if we need to
+
+sub xmkdir ($) {
+    die "mkdir: $_[0]: $!" unless (mkdir($_[0], 0755) || $!{EEXIST});
+}
+
+my $dir = mySociety::Config::get('PB_GRAPH_DIR');
+
+sub make_hashed_directories ($$);
+sub make_hashed_directories ($$) {
+    my ($where, $level) = @_;
+    return if ($level == 0);
+    for (my $i = 0; $i < 16; ++$i) {
+        my $d = sprintf('%s/%x', $where, $i);
+        xmkdir($d);
+        make_hashed_directories($d, $level - 1);
+    }
+}
+
+if (!-d $dir) {
+    xmkdir("$dir.new");
+    make_hashed_directories("$dir.new", 2);
+    rename("$dir.new", $dir);
+}
 
 my ($gnuplot_pid, $gnuplot_pipe, $gnuplot_uses);
 

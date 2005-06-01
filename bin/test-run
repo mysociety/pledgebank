@@ -29,7 +29,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.76 2005-06-01 14:32:41 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.77 2005-06-01 14:44:50 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -195,6 +195,7 @@ if ($action_all)  {
 # wait for RETURN to be pressed.
 sub display_url {
     my ($circumstance, $url) = @_;
+    $wth->email_check_url($url);
     print "$circumstance: " . $url . "\n" if $verbose > 1 || $pause;
     if ($pause) {
         print "Press RETURN to continue";
@@ -242,7 +243,6 @@ sub perform_login_action {
             die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
             $confirmation_url = $1;
             display_url("Email confirmation URL", $confirmation_url);
-            $wth->email_check_url($confirmation_url);
             $wth->log_watcher_check();
         }
 
@@ -740,13 +740,33 @@ sub do_private_failing_pledge {
     sign_pledge(2, 1, "resume:nopw", "finished");
     # Check failure emails
     call_frequentupdate();
-    $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
+    my $failure_email = $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
+    die "Failure email link not found\n" if ($failure_email !~ m#^\s*($base_url.*$)#m);
+    my $announce_link = $1;
     $wth->email_get_containing('%Subject: Pledge failed%To: '.email_n(1).  '%');
 
     # Make sure pledge says it is expired, and has no sign up box
     &$goto_private_pledge_page();
     $wth->browser_check_contents("This pledge is now closed");
     $wth->browser_check_no_contents("Sign up now");
+
+    # Send failure message using announcements page, from creators to signers
+    die "Failed to find announcements link" if !$announce_link;
+    display_url("Announce URL", $announce_link);
+    $b->get($announce_link);
+    $wth->browser_check_contents("Send Announcement");
+    $b->submit_form(form_name => 'pledge',
+                fields => { message_body => "What a hassle.  It is so very irksome when a pledge doesn't work.  Please sign all my other pledges instead!\n\nYours sincerely, \n\n" . name_n(0),
+                            message_sms => "U suk. " . (split(m/ /,name_n(0)))[0]. " x"},
+        button => 'submit') or die "Failed to submit email failure form";
+    $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
+    $wth->log_watcher_check();
+    call_frequentupdate();
+    my $success_email = $wth->email_get_containing('%To: '.email_n(1).  '%From: '.name_n(0).  '%What a hassle%');
+    $wth->email_check_none_left();
+    # Try to send second failure, which is not allowed
+    $b->get($base_url . "/$pledge_ref/announce");
+    $wth->browser_check_contents("You have already sent a failure announcement");
 }
 
 #############################################################################

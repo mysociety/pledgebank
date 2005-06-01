@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.72 2005-06-01 14:53:13 chris Exp $
+ * $Id: pledge.php,v 1.73 2005-06-01 17:02:07 francis Exp $
  * 
  */
 
@@ -172,7 +172,9 @@ class Pledge {
     function render_box($params = array()) {
 ?>
 <div id="pledge">
-<p style="margin-top: 0">&quot;<?=pledge_sentence($this->data, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
+<p style="margin-top: 0">
+<? if ($this->data['picture']) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
+&quot;<?=pledge_sentence($this->data, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
 <p>Deadline: <strong><?=$this->h_pretty_date()?></strong>.
 <? if ($this->signers() >= 0) { ?>

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.40 2005-05-26 18:19:11 francis Exp $
+ * $Id: pb.css,v 1.41 2005-06-01 17:02:07 francis Exp $
  * 
  */
 
@@ -302,3 +302,9 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     font-weight: bold; 
     text-align: center;
 }
+
+img.creatorpicture {
+    float: left; 
+    display: inline;
+}
+

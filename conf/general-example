@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.18 2005-06-01 09:39:04 chris Exp $
+ * $Id: general-example,v 1.19 2005-06-01 17:02:07 francis Exp $
  * 
  */
 
@@ -79,21 +79,24 @@ define('OPTION_PB_PDF_CACHE', "/home/francis/tmp/pdfs");
 // ... you need rock.ttf, rockb.ttf and transport.ttf
 define('OPTION_PB_FONTS', "/home/francis/devel/mysociety/pb/fonts");
 
+// Where gnuplot (v 4.x) is installed.
+define('OPTION_GNUPLOT_PATH', '/software/bin/gnuplot');
+// The TrueType font used to write axis labels in gnuplot
+define('OPTION_GNUPLOT_FONT', '/usr/X11R6/lib/X11/fonts/TTF/arial.ttf');
+// Where cache of rendered graphs should go, and where it appears on the
+// web. No trailing '/', in either case.
+define('OPTION_PB_GRAPH_DIR', "/path/to/somehwere/graphs");
+define('OPTION_PB_GRAPH_URL', "http://www.pledgebank.com/g");
+
+// Cache directory for uploaded pictures, and where it appears on the web.
+// No trailing '/', in either case.
+define('OPTION_PB_PICTURE_DIR', "/path/to/somehwere/pictures");
+define('OPTION_PB_PICTURE_URL', "http://www.pledgebank.com/p");
+
 // Log file (used in test harness, and later in admin scripts)
 define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');
 
 // Where web services used are
 define('OPTION_EVEL_URL', 'http://services.mysociety.org/evel');
-
-// Where gnuplot (v 4.x) is installed.
-define('OPTION_GNUPLOT_PATH', '/software/bin/gnuplot');
-
-// The TrueType font used to write axis labels in gnuplot
-define('OPTION_GNUPLOT_FONT', '/usr/X11R6/lib/X11/fonts/TTF/arial.ttf');
-
-// Where cache of rendered graphs should go, and where it appears on the
-// web. No trailing '/', in either case.
-define('OPTION_PB_GRAPH_DIR', "/path/to/somehwere/graphs");
-define('OPTION_PB_GRAPH_URL', "http://www.pledgebank.com/g");
 
 ?>

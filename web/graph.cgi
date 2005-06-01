@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.6 2005-06-01 13:56:42 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.7 2005-06-01 14:53:31 chris Exp $';
 
 use strict;
 
@@ -44,7 +44,6 @@ my $dir_hash_levels = 2;
 sub xmkdir ($) {
     die "mkdir: $_[0]: $!" unless (mkdir($_[0], 0755) || $!{EEXIST});
 }
-
 
 sub make_hashed_directories ($$);
 sub make_hashed_directories ($$) {
@@ -195,9 +194,8 @@ while (my $q = new CGI::Fast()) {
 
             my ($h, $signers_file) = mySociety::Util::named_tempfile();
 
-            # + 1 to account for signer
-            my $n = dbh()->selectrow_array('select count(id) from signers where pledge_id = ? and signtime::date < ?', {}, $pledge_id, $start_date) + 1;
-            my $n1 = dbh()->selectrow_array('select count(id) from signers where pledge_id = ? and signtime::date <= ?', {}, $pledge_id, $end_date) + 1;
+            my $n = dbh()->selectrow_array('select count(id) from signers where pledge_id = ? and signtime::date < ?', {}, $pledge_id, $start_date);
+            my $n1 = dbh()->selectrow_array('select count(id) from signers where pledge_id = ? and signtime::date <= ?', {}, $pledge_id, $end_date);
 
             my $s = dbh()->prepare('
                         select signtime::date from signers
@@ -208,7 +206,7 @@ while (my $q = new CGI::Fast()) {
             $h->printf("%s %d\n", $start_date, $n);
             $s->execute($pledge_id, $start_date, $end_date);
 
-            my %ts = ( );
+            my %ts = ($start_date => 0, $end_date => 0);
             while (my ($date) = $s->fetchrow_array()) {
                 $h->printf("%s %d\n", $date, ++$n);
                 if ($bucket eq 'day') {
@@ -247,6 +245,8 @@ while (my $q = new CGI::Fast()) {
                 $datefmt = "%b '%y";
             }
 
+            # XXX problems: fractional tic intervals; sometimes x tics are too
+            # close together; look of graph when there are very few signups.
             g(<<EOF
 reset
 set term png enhanced size 500,300 xffffff x000000 xaaaaaa x9c7bbd x522994 x21004a font $gnuplot_font_face 9
@@ -255,6 +255,7 @@ set timefmt '%Y-%m-%d'
 set xdata time
 set xrange ['$start_date':'$end_date']
 set yrange [0:*]
+set y2range [0:*]
 set noborder
 set noarrow
 set nolabel

@@ -2,15 +2,8 @@ Subject: Comment on your pledge
 
 <?=$values['comment_author_name']?> has left a comment on your pledge, saying: 
 
-    <?=$values['comment_text']?>
+<?=$values['comment_text']?>
 
-
-View your pledge page: <?=$values['pledge_url']?>
-
-Reply to this comment: <?=$values['pledge_url']?>#commentform
-
-Report this comment: <?=$values['abusive_url']?>
-
-View all comments: <?=$values['pledge_url']?>#comments
+View or reply to this comment: <?=$values['comment_url']?>
 
 <?=$values['signature']?>

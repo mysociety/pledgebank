@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.3 2005-06-01 09:39:05 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.4 2005-06-01 10:20:13 francis Exp $';
 
 use strict;
 
@@ -17,6 +17,11 @@ BEGIN {
     use mySociety::Config;
     mySociety::Config::set_file('../conf/general');
 }
+
+# Set to 0 to hide gnuplot output, or 1 to let it proceed to
+# STDOUT/STDERR.  gnuplot writes lots of junk, so needs to be 0
+# when run as working CGI script.
+my $debug = 1;
 
 use CGI;
 use CGI::Fast;
@@ -71,21 +76,25 @@ sub spawn_gnuplot_if_necessary () {
         umask(0022);
         $gnuplot_pipe->reader();
         POSIX::close(0);
-        POSIX::close(1);
-        POSIX::close(2);
+        if (!$debug) {
+            POSIX::close(1);
+            POSIX::close(2);
+        }
         # stdin from pipe
         POSIX::dup($gnuplot_pipe->fileno());
         $ENV{GDFONTPATH} = $gnuplot_font_dir;
-        # stdout/err to /dev/null
-        POSIX::open('/dev/null', O_WRONLY);
-        POSIX::open('/dev/null', O_WRONLY);
+        if (!$debug) {
+            # stdout/err to /dev/null
+            POSIX::open('/dev/null', O_WRONLY);
+            POSIX::open('/dev/null', O_WRONLY);
             # NB this means that we won't see any error output
             # from gnuplot, but the alternative is to accept
             # screeds of irrelevant crap from it.
+        }
         { exec($gnuplot_bin); }
         exit(1);
     } else {
-        warn "gnuplot's PID is $gnuplot_pid; ours is $$";
+        # warn "gnuplot's PID is $gnuplot_pid; ours is $$";
         $gnuplot_pipe->writer();
         $gnuplot_pipe->autoflush(1);    # don't want print to buffer
         $gnuplot_uses = 0;
@@ -149,8 +158,8 @@ while (my $q = new CGI::Fast()) {
         my $hash = Digest::SHA1::sha1_hex($gparam);
 
         # See where the graph would go.
-        my $filename = join('/', (split(//, $hash))[0 .. ($dir_hash_levels - 1)])
-                        . "/$gparam.png";
+        my $filepath = join('/', (split(//, $hash))[0 .. ($dir_hash_levels - 1)]);
+        my $filename = $filepath . "/$gparam.png";
         if (!-e mySociety::Config::get('PB_GRAPH_DIR') . "/$filename") {
             # Don't have a graph, so create it.
             spawn_gnuplot_if_necessary();
@@ -216,6 +225,7 @@ while (my $q = new CGI::Fast()) {
             }
             $h->close();
 
+            mkdirp(mySociety::Config::get('PB_GRAPH_DIR') . "/$filepath", "0777");
             my $graphfile = mySociety::Config::get('PB_GRAPH_DIR') . "/$filename";
 
             my $datefmt = '%d %b';
@@ -224,8 +234,6 @@ while (my $q = new CGI::Fast()) {
             if ($bucket eq 'month') {
                 $datefmt = "%b '%y";
             }
-
-my $fontface = 'arial';
 
             g(<<EOF
 reset

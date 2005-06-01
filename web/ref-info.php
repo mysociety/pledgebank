@@ -6,12 +6,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.1 2005-06-01 14:53:54 chris Exp $
+ * $Id: ref-info.php,v 1.2 2005-06-01 15:43:08 chris Exp $
  * 
  */
 
 require_once '../phplib/pb.php';
 
+require_once '../phplib/comments.php';
 require_once '../phplib/page.php';
 require_once '../phplib/person.php';
 require_once '../phplib/pledge.php';
@@ -19,13 +20,37 @@ require_once '../phplib/pledge.php';
 require_once '../../phplib/importparams.php';
 
 $err = importparams(
-            array('ref',   '/./',   '')
+            array('ref',        '/./',              ''),
+            array('LetMeIn',    '/./',              '', false),
+            array('email',      '/^[^@]+@[^@]+$/',  '', null)
         );
+
 if (!is_null($err))
     err("Missing pledge reference");
 
 $p = new Pledge($q_ref);
+
+$pin_box = deal_with_pin($p->url_flyers(), $p->ref(), $p->pin());
+if ($pin_box) {
+    page_header("Enter PIN"); 
+    print $pin_box;
+    page_footer();
+    exit;
+}
+
 $P = person_if_signed_on();
+if ($q_LetMeIn && !is_null($q_email)) {
+    /* User wants to log in. Do the signon then redirect back to the normal
+     * page, so that they always view it as a GET. */
+    $P = person_signon(array(
+                    'reason' => "log into PledgeBank",
+                    'template' => 'generic-confirm'
+                ), $q_email);
+    if (!$pin_box) {
+        header("Location: /$q_ref/info");
+        exit();
+    }
+}
 
 /* What is this user allowed to see? */
 define('PRIV_SIGNER', '1');
@@ -33,7 +58,7 @@ define('PRIV_CREATOR', '2');
 $priv = 0;
 
 if (!is_null($P)) {
-    if (db_getOne('select id from signer where person_id = ? and pledge_id = ?', array($P->id(), $p->id())))
+    if (db_getOne('select id from signers where person_id = ? and pledge_id = ?', array($P->id(), $p->id())))
         $priv |= PRIV_SIGNER;
     if ($p->creator_id() == $P->id())
         $priv |= PRIV_CREATOR | PRIV_SIGNER;
@@ -99,6 +124,53 @@ $p->render_box();
 
 <img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="Graph of signers to this pledge" width="500" height="300">
 <?
+
+?>
+<h2>Messages sent by creator to signers</h2>
+<?
+
+if ($priv & PRIV_SIGNER) {
+    $q = db_query('select id, whencreated, fromaddress, emailsubject, emailbody from message where pledge_id = ? and sendtosigners and emailbody is not null', $p->id());
+    $n = 0;
+    while (list($id, $when, $from, $subject, $body) = db_fetch_row($q)) {
+        if ($n++)
+            print '<hr>';
+        ?>
+<table>
+    <tr>
+        <th>From</th>
+        <td><?= $p->h_name() ?> &lt;<?= htmlspecialchars($p->creator_email()) ?>&gt;<td>
+    </tr>
+    <tr>
+        <th>Subject</th>
+        <td><?= htmlspecialchars($subject) ?></td>
+    </tr>
+    <tr>
+        <th>Date</th>
+        <td><?= prettify(substr($when, 0, 10)) ?></td>
+    </tr>
+</table>
+
+<div class="message"><?= comments_text_to_html($body) ?></div>
+<?
+        
+    }
+} else {
+    ?>
+<p><em>The messages can only be shown to people who have signed the pledge. If
+you have signed, please give your email address so that we can identify
+you:</em></p>
+
+<form method="POST">
+<p>Email address:
+<input type="hidden" name="ref" value="<?=$q_h_ref?>">
+<input type="text" name="email" value="">
+<input type="submit" name="LetMeIn" value="Let me in!">
+</p>
+</form>
+
+<?
+}
 
 page_footer();
 

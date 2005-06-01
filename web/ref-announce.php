@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.4 2005-05-31 10:20:35 francis Exp $
+ * $Id: ref-announce.php,v 1.5 2005-06-01 14:32:41 francis Exp $
  * 
  */
 
@@ -51,9 +51,10 @@ $has_sms = array(
                 'success-announce' => 1
             );
 
-/* refuse_announce CIRCUMSTANCE
+/* refuse_announce PLEDGE CIRCUMSTANCE
  * Page explaining that punter may not send another message of this type. */
-function refuse_announce($c) {
+function refuse_announce($p, $c) {
+    global $descr;
     page_header("Send Announcement");
     $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $c));
     print "<strong>You have already sent ";
@@ -61,7 +62,7 @@ function refuse_announce($c) {
         print "a ${descr[$c]}";
     else if ($n > 1)
         print "$n ${descr[$c]}s";   /* XXX i18n */
-    print ", which is all that you're allowed.</strong> Think of your signers' poor inboxes, crumbling under the load of all the mail you want to send them";
+    print ", which is all that you're allowed.</strong> Think of your signers' poor inboxes, crumbling under the load of all the mail you want to send them.";
     page_footer(array('nonav' => 1));
     exit();
 }
@@ -90,7 +91,7 @@ if ($p->failed()) {
     $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'failure-announce'", $p->id());
     if (!is_null($n))
         /* Only get to send one announcement on failure. */
-        refuse_announce('failure-announce');
+        refuse_announce($p, 'failure-announce');
     else {
         $circumstance = 'failure-announce';
         $email_subject = "Sorry - pledge failed - '" . $p->title() . "'";
@@ -135,6 +136,23 @@ $name
 EOF;
 
     $default_sms = "$name here. The " . $p->ref() . " pledge has been successful! <$fill_in>.";
+} elseif ($p->failed()) {
+    $default_message = <<<EOF
+
+Hello, and sorry that our pledge has failed.
+
+'$sentence'
+
+<$fill_in>
+
+Yours sincerely,
+
+$name
+
+EOF;
+
+    $default_sms = "$name here. The " . $p->ref() . " pledge has failed. <$fill_in>.";
+
 } else {
     $default_message = <<<EOF
 

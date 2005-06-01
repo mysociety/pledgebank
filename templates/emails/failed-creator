@@ -8,4 +8,10 @@ Better luck next time - maybe you'd like to hit reply and tell us what you
 think didn't work out? It might help us give better guidance or build further
 useful features in the future.
 
+You can also click on the link below to write a message to console everyone who
+signed the pledge.  Let them know what went wrong, or if you're going to try
+again with an easier pledge or smaller target.
+
+<?=$values['url']?>
+
 <?=$values['signature']?>

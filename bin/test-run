@@ -29,7 +29,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.75 2005-05-31 14:45:40 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.76 2005-06-01 14:32:41 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -626,7 +626,7 @@ sub do_public_succeeding_pledge {
 sub do_private_failing_pledge {
     my $pledge_action_private = 'check private pledges are private';
     my $pledge_ref = "privatepledge";
-    my $private_pin = 'zx3uuhai';
+    my $private_pin = 'mypin';
     set_pb_date('1980-12-01');
     create_pledge(0, 
         { title => $pledge_action_private, 

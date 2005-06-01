@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.5 2005-06-01 11:49:43 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.6 2005-06-01 13:56:42 chris Exp $';
 
 use strict;
 
@@ -40,13 +40,11 @@ use PB;
 
 # Where we stuff the graphs output.
 my $dir_hash_levels = 2;
-# XXX produce the hashed directories, if we need to
 
 sub xmkdir ($) {
     die "mkdir: $_[0]: $!" unless (mkdir($_[0], 0755) || $!{EEXIST});
 }
 
-my $dir = mySociety::Config::get('PB_GRAPH_DIR');
 
 sub make_hashed_directories ($$);
 sub make_hashed_directories ($$) {
@@ -59,10 +57,11 @@ sub make_hashed_directories ($$) {
     }
 }
 
-if (!-d $dir) {
-    xmkdir("$dir.new");
-    make_hashed_directories("$dir.new", 2);
-    rename("$dir.new", $dir);
+my $graph_dir = mySociety::Config::get('PB_GRAPH_DIR');
+if (!-d $graph_dir) {
+    xmkdir("$graph_dir.new");
+    make_hashed_directories("$graph_dir.new", 2);
+    rename("$graph_dir.new", $graph_dir);
 }
 
 my ($gnuplot_pid, $gnuplot_pipe, $gnuplot_uses);
@@ -70,7 +69,7 @@ my ($gnuplot_pid, $gnuplot_pipe, $gnuplot_uses);
 my $gnuplot_font = mySociety::Config::get('GNUPLOT_FONT');
 die "font for axis labels in gnuplot should be an absolute pathname ending '.ttf', not '$gnuplot_font'"
     unless ($gnuplot_font =~ m#^/.+/[^/]+\.ttf$# && -e $gnuplot_font);
-my ($gnuplot_font_dir, $gnuplot_font_face) = ($gnuplot_font =~ m#^/(.+)/([^/]+)\.ttf$#);
+my ($gnuplot_font_dir, $gnuplot_font_face) = ($gnuplot_font =~ m#^(/.+)/([^/]+)\.ttf$#);
 
 # spawn_gnuplot_if_necessary
 # Ensure that we have a pipe to gnuplot.
@@ -109,7 +108,6 @@ sub spawn_gnuplot_if_necessary () {
         { exec($gnuplot_bin); }
         exit(1);
     } else {
-        # warn "gnuplot's PID is $gnuplot_pid; ours is $$";
         $gnuplot_pipe->writer();
         $gnuplot_pipe->autoflush(1);    # don't want print to buffer
         $gnuplot_uses = 0;
@@ -175,7 +173,7 @@ while (my $q = new CGI::Fast()) {
         # See where the graph would go.
         my $filepath = join('/', (split(//, $hash))[0 .. ($dir_hash_levels - 1)]);
         my $filename = $filepath . "/$gparam.png";
-        if (!-e mySociety::Config::get('PB_GRAPH_DIR') . "/$filename") {
+        if (!-e "$graph_dir/$filename") {
             # Don't have a graph, so create it.
             spawn_gnuplot_if_necessary();
 
@@ -240,8 +238,7 @@ while (my $q = new CGI::Fast()) {
             }
             $h->close();
 
-            mkdirp(mySociety::Config::get('PB_GRAPH_DIR') . "/$filepath", "0777");
-            my $graphfile = mySociety::Config::get('PB_GRAPH_DIR') . "/$filename";
+            my $graphfile = "$graph_dir/$filename";
 
             my $datefmt = '%d %b';
                 # XXX really we should do something more sensible, like
@@ -252,7 +249,7 @@ while (my $q = new CGI::Fast()) {
 
             g(<<EOF
 reset
-set term png enhanced size 500,300 xffffff x000000 xaaaaaa x9c7bbd x522994 x21004a font $gnuplot_font_face 10
+set term png enhanced size 500,300 xffffff x000000 xaaaaaa x9c7bbd x522994 x21004a font $gnuplot_font_face 9
 set output '$graphfile.new'
 set timefmt '%Y-%m-%d'
 set xdata time
@@ -267,6 +264,7 @@ set xtics nomirror
 set ytics nomirror
 set y2tics
 set y2label "total number of signers"
+set tics out
 set format x '$datefmt'
 set ylabel 'signups per $bucket'
 plot "$signuprate_file" using 1:2 with impulses lt 1 lw 15, "$signers_file" using 1:2 axes x1y2 with steps lt -1 lw 1

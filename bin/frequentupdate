@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.29 2005-05-25 13:47:07 francis Exp $
+ * $Id: frequentupdate,v 1.30 2005-06-01 14:00:32 francis Exp $
  *
  */
 
@@ -16,6 +16,7 @@ require_once "../conf/general";
 require_once '../phplib/db.php';
 require_once '../phplib/fns.php';
 require_once "../phplib/auth.php";
+require_once "../phplib/person.php";
 require_once '../../phplib/utility.php';
 
 function verbose($str) {
@@ -214,10 +215,9 @@ function send_pending_messages() {
             continue;
         }
     
-        $pledge = db_getRow('select pledges.*, person.email as email 
-            from pledges left join person on person.id = pledges.person_id
-            where pledges.id = ?', $msg['pledge_id']);
-        verbose("message #${msg['id']} is for pledge #${pledge['id']} (${pledge['ref']}); circumstance '${msg['circumstance']}'");
+        $pledge = new Pledge(intval($msg['pledge_id']));
+        $data = $pledge->data;
+        verbose("message #${msg['id']} is for pledge #".$pledge->id()." (".$pledge->ref()."); circumstance '${msg['circumstance']}'");
 
         /* XXX we also need a URL containing a token which is sent on
          * success to the signer. For now just generate this here, but
@@ -225,13 +225,9 @@ function send_pending_messages() {
          * reminders. */
         if ($msg['circumstance'] == 'success-auto-creator' or
             $msg['circumstance'] == 'announce-post') {
-            $token = auth_token_store('announce-post', array(
-                                'pledge_id' => $pledge['id'],
-                                'circumstance' => $msg['circumstance'],
-                                'circumstance_count' => $msg['circumstance_count'])
-                            );
-            $url = OPTION_BASE_URL . '/M/' . $token;
-            $pledge['url'] = $url;
+            $url = person_make_signon_url(array("reason" => "send an announcement"),
+                $pledge->creator_email(), "GET", $pledge->url_announce(), array());
+            $data['url'] = $url;
         }
 
         // Make any extra headers
@@ -241,10 +237,10 @@ function send_pending_messages() {
         $f = false;
         if (isset($msg['emailtemplatename'])) {
             verbose("sending message #${msg['id']} using email template '${msg['emailtemplatename']}'");
-            $f = pb_send_email_template($pledge['email'], $msg['emailtemplatename'], $pledge, $headers);
+            $f = pb_send_email_template($pledge->creator_email(), $msg['emailtemplatename'], $data, $headers);
         } else {
             verbose("sending message #${msg['id']} as raw email, subject '${msg['emailsubject']}'");
-            $f = pb_send_email($pledge['email'], $msg['emailsubject'], $msg['emailbody'], $headers);
+            $f = pb_send_email($pledge->creator_email(), $msg['emailsubject'], $msg['emailbody'], $headers);
         }
 
         // Store success
@@ -252,7 +248,7 @@ function send_pending_messages() {
             db_query('
                     insert into message_creator_recipient
                         (message_id, pledge_id)
-                    values (?, ?)', array($msg['id'], $pledge['id']));
+                    values (?, ?)', array($msg['id'], $pledge->id()));
         else
             error("failed to send message #${msg['id']} to creator of pledge #${pledge['id']} (${pledge['ref']})");
 

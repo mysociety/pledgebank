@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.21 2005-05-31 12:43:14 sandpit Exp $
+ * $Id: login.php,v 1.22 2005-06-01 09:52:31 chris Exp $
  * 
  */
 
@@ -142,12 +142,16 @@ if (!is_null($q_t)) {
     $q_h_name = htmlspecialchars($q_name = $d['name']);
     $q_h_stash = htmlspecialchars($q_stash = $d['stash']);
 
-    /* See whether this user has used pledgebank before. If they have, offer to
-     * set or reset their password. */
-    if ($P->numlogins() > 1)
-        change_password_page($P);
-    else if ($q_name && !$P->matches_name($q_name))
-        $P->name($q_name);
+    /* If the 'direct' key exists in the token, don't do any intervening
+     * pages. */
+    if (!array_key_exists('direct', $d)) {
+        /* See whether this user has used pledgebank before. If they have, offer to
+         * set or reset their password. */
+        if ($P->numlogins() > 1)
+            change_password_page($P);
+        else if ($q_name && !$P->matches_name($q_name))
+            $P->name($q_name);
+    }
     stash_redirect($q_stash);
     /* NOTREACHED */
 }

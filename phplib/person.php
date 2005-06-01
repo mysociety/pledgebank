@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.13 2005-05-26 18:19:11 francis Exp $
+ * $Id: person.php,v 1.14 2005-06-01 09:52:31 chris Exp $
  * 
  */
 
@@ -167,13 +167,13 @@ function person_if_signed_on() {
     return null;   
 }
 
-/* person_signon REASON EMAIL [NAME]
+/* person_signon DATA EMAIL [NAME]
  * Return a record of a person, if necessary requiring them to sign on to an
- * existing account or to create a new one. TEMPLATE_DATA is an array of data
- * about the pledge, including 'template' which is the name of the 
- * template to use for the confirm mail, and 'reason' which is something like
- * "create the pledge '...'" or "sign the pledge '...'".  The rest of
- * the data in TEMPLATE_DATA is passed through to the email template. */
+ * existing account or to create a new one. DATA is an array of data about the
+ * pledge, including 'template' which is the name of the template to use for
+ * the confirm mail, and 'reason' which is something like "create the pledge
+ * '...'" or "sign the pledge '...'".  The rest of the DATA is passed through
+ * to the email template. */
 function person_signon($template_data, $email, $name = null) {
 
     if (!preg_match('/^[^@]+@[^@]+$/', $email))
@@ -206,6 +206,25 @@ function person_signon($template_data, $email, $name = null) {
 function person_signoff() {
     setcookie('pb_person_id', false, null, '/', OPTION_WEB_DOMAIN, false);
 }
+
+/* person_make_signon_url DATA EMAIL METHOD URL PARAMETERS
+ * Returns a URL which, if clicked on, will log the user in as EMAIL and have
+ * them do the request described by METHOD, URL and PARAMETERS (as used in
+ * stash_new_request). DATA is as for person_signon (but the 'template'
+ * entry is unlikely to be used since presumably the caller is constructing
+ * its own email to send). */
+function person_make_signon_url($data, $email, $method, $url, $params) {
+    $st = stash_new_request($method, $url, $params, $data);
+    /* XXX should combine this and the similar code in login.php. */
+    $token = auth_token_store('login', array(
+                    'email' => $email,
+                    'name' => null,
+                    'stash' => $st,
+                    'direct' => 1
+                ));
+    return OPTION_BASE_URL . "/L/$token";
+}
+
 
 /* person_get EMAIL
  * Return a person object for the account with the given EMAIL address, if one

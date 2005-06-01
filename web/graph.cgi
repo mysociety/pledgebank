@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.2 2005-05-31 16:56:20 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.3 2005-06-01 09:39:05 chris Exp $';
 
 use strict;
 
@@ -32,10 +32,25 @@ use utf8;
 use mySociety::DBHandle qw(dbh);
 use PB;
 
+sub mkdirp ($;$) {
+    my ($dir, $mask) = @_;
+    my @dd = split(/\//, $dir);
+    for (my $i = 1; $i < @dd; ++$i) {
+        my $d = join('/', @dd[0 .. $i]);
+        mkdir($d, $mask);
+    }
+}
+
+# Where we stuff the graphs output.
 my $dir_hash_levels = 2;
 # XXX produce the hashed directories, if we need to
 
 my ($gnuplot_pid, $gnuplot_pipe, $gnuplot_uses);
+
+my $gnuplot_font = mySociety::Config::get('GNUPLOT_FONT');
+die "font for axis labels in gnuplot should be an absolute pathname ending '.ttf', not '$gnuplot_font'"
+    unless ($gnuplot_font =~ m#^/.+/[^/]+\.ttf$# && -e $gnuplot_font);
+my ($gnuplot_font_dir, $gnuplot_font_face) = ($gnuplot_font =~ m#^/(.+)/([^/]+)\.ttf$#);
 
 # spawn_gnuplot_if_necessary
 # Ensure that we have a pipe to gnuplot.
@@ -60,7 +75,7 @@ sub spawn_gnuplot_if_necessary () {
         POSIX::close(2);
         # stdin from pipe
         POSIX::dup($gnuplot_pipe->fileno());
-        $ENV{GDFONTPATH} = '/usr/X11R6/lib/X11/fonts/TTF';
+        $ENV{GDFONTPATH} = $gnuplot_font_dir;
         # stdout/err to /dev/null
         POSIX::open('/dev/null', O_WRONLY);
         POSIX::open('/dev/null', O_WRONLY);
@@ -214,7 +229,7 @@ my $fontface = 'arial';
 
             g(<<EOF
 reset
-set term png enhanced size 500,300 xffffff x000000 xaaaaaa x9c7bbd x522994 x21004a font $fontface 10
+set term png enhanced size 500,300 xffffff x000000 xaaaaaa x9c7bbd x522994 x21004a font $gnuplot_font_face 10
 set output '$graphfile.new'
 set timefmt '%Y-%m-%d'
 set xdata time

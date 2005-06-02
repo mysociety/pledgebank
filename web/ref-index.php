@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.9 2005-06-02 06:57:33 francis Exp $
+// $Id: ref-index.php,v 1.10 2005-06-02 07:59:22 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -46,14 +46,15 @@ if (!$p->finished()) {
 }
 
 ?>
-<div id="flyeremail">
+<div id="spreadword">
 <?    if (!$p->finished()) { ?>
 <h2>Spread the word</h2>
 <ul id="spread">
 <li> <? print_link_with_pin($p->url_email(), "", "Email pledge to your friends") ?></li>
 <li> <? print_link_with_pin($p->url_ical(), "", "Add deadline to your calendar") ?> </li>
 <li> <? print_link_with_pin($p->url_flyers(), "Stick them places!", "Print out customised flyers") ?>
-<li> <? print_link_with_pin($p->url_creator(), "Only if you made this pledge", "Pledge creator's administration page") ?>
+<li> <a href="<?=$p->url_announce()?>" title="Only if you made this pledge">Send message to signers</a> (creator only)
+<li> <a href="<?=$p->url_creator()?>" title="Only if you made this pledge">Add a picture to your pledge</a> (creator only)
 </li>
 </ul>
 <br clear="all">

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-creator.php,v 1.5 2005-06-01 17:02:07 francis Exp $
+ * $Id: ref-creator.php,v 1.6 2005-06-02 06:57:33 francis Exp $
  * 
  */
 
@@ -120,7 +120,7 @@ $pledge->render_box(array('showdetails' => true));
 
 ?>
     <h2>Things you can do</h2>
-    <a href="/<?=$q_h_ref?>/announce">Send announcement to all pledge signers</a>
+    <a href="/<?=$q_h_ref?>/announce">Send message to all pledge signers</a>
     <br>
 <?
     if ($picture_upload_allowed) { 

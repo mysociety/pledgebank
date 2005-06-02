@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.8 2005-05-31 10:20:35 francis Exp $
+// $Id: ref-index.php,v 1.9 2005-06-02 06:57:33 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -53,7 +53,7 @@ if (!$p->finished()) {
 <li> <? print_link_with_pin($p->url_email(), "", "Email pledge to your friends") ?></li>
 <li> <? print_link_with_pin($p->url_ical(), "", "Add deadline to your calendar") ?> </li>
 <li> <? print_link_with_pin($p->url_flyers(), "Stick them places!", "Print out customised flyers") ?>
-<li> <? print_link_with_pin($p->url_creator(), "Only if you made this pledge", "Send message to all signers") ?>
+<li> <? print_link_with_pin($p->url_creator(), "Only if you made this pledge", "Pledge creator's administration page") ?>
 </li>
 </ul>
 <br clear="all">

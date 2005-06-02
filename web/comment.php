@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.11 2005-06-02 06:57:33 francis Exp $
+ * $Id: comment.php,v 1.12 2005-06-02 19:20:04 matthew Exp $
  * 
  */
 
@@ -63,7 +63,7 @@ $err = array();
 $q_author_name = trim($q_author_name);
 $q_author_email = trim($q_author_email);
 if (!is_null($q_author_website))
-    $author_website = trim($q_author_website);
+    $q_author_website = trim($q_author_website);
 $q_text = trim($q_text);
 
 if (!$q_author_email)
@@ -80,7 +80,7 @@ if (strlen($q_text) == 0)
 if ($q_author_website == '')
     $q_author_website = null;
 if (!is_null($q_author_website) && !preg_match('#^https?://.+#', $q_author_website))
-    array_push($err, "Your website address should begin 'http://'");
+    $q_author_website = 'http://' . $q_author_website;
 
 if (sizeof($err) == 0 && isset($_POST['submit'])) {
     /* Actually post the comment. Guard against double-insertion. */

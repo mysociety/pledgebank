@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.170 2005-05-31 16:56:36 chris Exp $
+// $Id: index.php,v 1.171 2005-06-02 09:55:46 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -24,7 +24,8 @@ function front_page() {
 <h2>Tell the world "I'll do it, but only if you'll help me do it"</h2>
 
 <p><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
-alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0"></a>
+alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;
+"></a>
 "We all know what it is like to feel powerless, that our own actions
 can't really change the things that we want to change.  PledgeBank is
 about beating that feeling..."

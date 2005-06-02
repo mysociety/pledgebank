@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.26 2005-06-02 07:10:29 francis Exp $
+// $Id: page.php,v 1.27 2005-06-02 09:55:46 francis Exp $
 
 $signed_on_person = person_if_signed_on();
 
@@ -71,16 +71,19 @@ function page_header($title, $params = array()) {
 <div id="content"><?    
 
     // Warn that we are on a testing site
+    $devwarning = array();
     if (OPTION_PB_STAGING) {
-?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
-<em>This is a test site for developers only. You probably want
-<a href="http://www.pledgebank.com/">the real site</a>.</em><?
+        $devwarning[] = 'This is a test site for developers only. You probably want
+<a href="http://www.pledgebank.com/">the real site</a>.';
     }
-
-    // Warn that date has been set for debugging
     global $pb_today;
     if ($pb_today != date('Y-m-d')) {
-?><br><em>Note: On this test site, the date is faked to be <?=$pb_today?></em><?
+        $devwarning[] = "Note: On this test site, the date is faked to be $pb_today";
+    }
+    if (count($devwarning) > 0) {
+        ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff"><?
+        print join('<br>', $devwarning);
+        ?></p><?
     }
 }
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.57 2005-05-31 12:43:12 sandpit Exp $
+ * $Id: admin-pb.php,v 1.58 2005-06-02 19:06:06 matthew Exp $
  * 
  */
 
@@ -46,7 +46,7 @@ class ADMIN_PAGE_PB_MAIN {
         elseif ($sort=='t') $order = 'target';
         elseif ($sort=='d') $order = 'date';
         elseif ($sort=='e') $order = 'email';
-        elseif ($sort=='c') $order = 'creationtime';
+        elseif ($sort=='c') $order = 'pledges.creationtime';
         elseif ($sort=='u') $order = 'whensucceeded';
         elseif ($sort=='p') $order = 'prominence desc';
         elseif ($sort=='s') $order = 'signers';

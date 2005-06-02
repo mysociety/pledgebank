@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.171 2005-06-02 09:55:46 francis Exp $
+// $Id: index.php,v 1.172 2005-06-02 10:52:56 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -68,13 +68,17 @@ function get_pledges_list($query) {
         if ($r['target'] - $signatures <= 0) {
             if ($r['daysleft'] == 0)
                 $pledges .= 'Target met, pledge open until midnight tonight, London time';
+            elseif ($r['daysleft'] < 0)
+                $pledges .= 'Target met, pledge over';
             else
                 $pledges .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
         } else {
             $left = $r['target'] - $signatures;
-            if ($r['daysleft'] == 0) {
+            if ($r['daysleft'] == 0)
                 $pledges .= "(needs $left more by midnight tonight, London time)";
-            } else {
+            elseif ($r['daysleft'] < 0)
+                $pledges .= 'Deadline expired, pledge failed';
+            else {
                 $pledges .= "(";
                 if ($r['daysleft'] <= 3) {
                     $pledges .= "just ";
@@ -130,11 +134,11 @@ function list_successful_pledges() {
                 FROM pledges
                 WHERE 
                 prominence != 'backpage' AND
-                date >= pb_current_date() AND 
                 pin IS NULL AND 
                 confirmed AND
                 whensucceeded IS NOT NULL
-                ORDER BY whensucceeded DESC");
+                ORDER BY whensucceeded DESC
+                LIMIT 10");
     if (!$pledges) {
         print '<p>There are no featured pledges at the moment.</p>';
     } else {

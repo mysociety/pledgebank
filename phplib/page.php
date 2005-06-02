@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.25 2005-05-26 18:19:11 francis Exp $
+// $Id: page.php,v 1.26 2005-06-02 07:10:29 francis Exp $
 
 $signed_on_person = person_if_signed_on();
 
@@ -74,14 +74,13 @@ function page_header($title, $params = array()) {
     if (OPTION_PB_STAGING) {
 ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
 <em>This is a test site for developers only. You probably want
-<a href="http://www.pledgebank.com/">the real site</a>.</em></p><?
+<a href="http://www.pledgebank.com/">the real site</a>.</em><?
     }
 
     // Warn that date has been set for debugging
     global $pb_today;
     if ($pb_today != date('Y-m-d')) {
-?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff">
-<em>Note: On this test site, the date is faked to be <?=$pb_today?></em></p><?
+?><br><em>Note: On this test site, the date is faked to be <?=$pb_today?></em><?
     }
 }
 

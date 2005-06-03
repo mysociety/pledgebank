@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.8 2005-06-01 15:17:24 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.9 2005-06-03 16:01:38 chris Exp $';
 
 use strict;
 
@@ -67,7 +67,9 @@ my ($gnuplot_pid, $gnuplot_pipe, $gnuplot_uses);
 
 my $gnuplot_font = mySociety::Config::get('GNUPLOT_FONT');
 die "font for axis labels in gnuplot should be an absolute pathname ending '.ttf', not '$gnuplot_font'"
-    unless ($gnuplot_font =~ m#^/.+/[^/]+\.ttf$# && -e $gnuplot_font);
+    unless ($gnuplot_font =~ m#^/.+/[^/]+\.ttf$#);
+die "font file '$gnuplot_font' does not exist"
+    unless (-e $gnuplot_font);
 my ($gnuplot_font_dir, $gnuplot_font_face) = ($gnuplot_font =~ m#^(/.+)/([^/]+)\.ttf$#);
 
 # spawn_gnuplot_if_necessary

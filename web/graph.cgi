@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.9 2005-06-03 16:01:38 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.10 2005-06-03 16:25:44 chris Exp $';
 
 use strict;
 
@@ -41,27 +41,9 @@ use PB;
 # Where we stuff the graphs output.
 my $dir_hash_levels = 2;
 
-sub xmkdir ($) {
-    die "mkdir: $_[0]: $!" unless (mkdir($_[0], 0755) || $!{EEXIST});
-}
-
-sub make_hashed_directories ($$);
-sub make_hashed_directories ($$) {
-    my ($where, $level) = @_;
-    return if ($level == 0);
-    for (my $i = 0; $i < 16; ++$i) {
-        my $d = sprintf('%s/%x', $where, $i);
-        xmkdir($d);
-        make_hashed_directories($d, $level - 1);
-    }
-}
-
 my $graph_dir = mySociety::Config::get('PB_GRAPH_DIR');
-if (!-d $graph_dir) {
-    xmkdir("$graph_dir.new");
-    make_hashed_directories("$graph_dir.new", 2);
-    rename("$graph_dir.new", $graph_dir);
-}
+die "graph output directory '$graph_dir' does not exist and cannot be created"
+    unless (-d $graph_dir || mkdir($graph_dir, 0755));
 
 my ($gnuplot_pid, $gnuplot_pipe, $gnuplot_uses);
 
@@ -179,9 +161,18 @@ while (my $q = new CGI::Fast()) {
         my $gparam = join(',', $pledge_id, $start_date, $end_date);
         my $hash = Digest::SHA1::sha1_hex($gparam);
 
-        # See where the graph would go.
-        my $filepath = join('/', (split(//, $hash))[0 .. ($dir_hash_levels - 1)]);
-        my $filename = $filepath . "/$gparam.png";
+        # Determine hashed location for graph, creating the directories if
+        # needed.
+        my @dirnames = (split(//, $hash))[0 .. ($dir_hash_levels - 1)];
+        my $filepath;
+        for (my $i = 0; $i < @dirnames; ++$i) {
+            $filepath = join('/', @dirnames[0 .. $i]);
+            mkdir("$graph_dir/$filepath", 0755)
+                if (!-d "$graph_dir/$filepath");
+            # This is nasty but this script will be so slow anyway it doesn't
+            # really matter that much.
+        }
+        my $filename = "$filepath/$gparam.png";
         if (!-e "$graph_dir/$filename") {
             # Don't have a graph, so create it.
             spawn_gnuplot_if_necessary();

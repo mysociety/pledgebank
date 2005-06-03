@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.2 2005-06-01 15:43:08 chris Exp $
+ * $Id: ref-info.php,v 1.3 2005-06-03 16:23:35 matthew Exp $
  * 
  */
 
@@ -71,8 +71,9 @@ $p->render_box();
 
 ?>
 
+<div id="pledgeaction">
 <h2>General pledge information</h2>
-<table>
+<table border="0" cellpadding="3" cellspacing="0">
 <tr>
     <th>Creator</th>
     <td><?=$p->h_name_and_identity()?></td>
@@ -115,12 +116,13 @@ $p->render_box();
     }
     ?></td>
 </table>
+</div>
 <?
 
 /* Pretty graph of pledge signup, and some notes about how quickly the pledge
  * is progressing. */
 ?>
-<h3>Rate of signups</h3>
+<h3 style="clear:both">Rate of signups</h3>
 
 <img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="Graph of signers to this pledge" width="500" height="300">
 <?

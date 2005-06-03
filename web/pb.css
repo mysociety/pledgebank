@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.44 2005-06-02 19:20:04 matthew Exp $
+ * $Id: pb.css,v 1.45 2005-06-03 13:44:00 matthew Exp $
  * 
  */
 
@@ -77,21 +77,24 @@ blockquote {
 	background-color: #ffcccc;
 }
 
-#reference {
-    text-align: left;
+#reference, #signedon {
     font-size: 83%;
     padding: 2px;
     margin: 0;
+}
+
+#reference {
+    float: left;
+    width: 48%;
+    text-align: left;
 }
 
 #signedon {
     text-align: right;
-    font-size: 83%;
-    padding: 2px;
-    margin: 0;
 }
 
 #content {
+    clear: both;
 	text-align: left;
 	padding: 5px 10% 10px;
         margin: 0 auto;

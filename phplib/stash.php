@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: stash.php,v 1.6 2005-06-01 14:00:33 francis Exp $
+ * $Id: stash.php,v 1.7 2005-06-06 13:23:48 francis Exp $
  * 
  */
 
@@ -86,37 +86,45 @@ function stash_redirect($key) {
         /* should we ob_clean here? */
         header("Location: $url");
         exit();
-    } else {
-        /* Postgres/PEAR DB BYTEA madness -- see comment in auth.php. */
-        $post_data = pg_unescape_bytea($post_data);
-        $pos = 0;
-        $stashed_POST = rabx_wire_rd(&$post_data, &$pos);
-        if (rabx_is_error($stashed_POST))
-            err("Bad serialised POST data in stash_redirect('$key')");
-        /* Nasty. XXX can we manually stuff things into the $_POST array
-         * instead? Not in general, because that could turn a POST into a GET,
-         * but perhaps.... */
-        ob_clean();
-        header("Content-Type: text/html; charset=utf-8");
-
-        /* This is for some crazy paranoid case when __stash_submit_button_0 was already
-         * the name of a button in the stashed data... */
-        $i = 0;
-        while (array_key_exists("__stash_submit_button_$i", $stashed_POST))
-            ++$i;
-        ?>
-<html><head><title>Redirect...</title></head><body onload="document.forms.f.__stash_submit_button_<?=$i?>.click()">
-<form id="f" name="f" method="POST" action="<?=htmlspecialchars($url)?>">
-<?
-        foreach ($stashed_POST as $k => $v)
-            printf('<input type="hidden" name="%s" value="%s">', htmlspecialchars($k), htmlspecialchars($v));
-
-        ?>
-<input type="submit" name="__stash_submit_button_<?=$i?>" id="__stash_submit_button_<?=$i?>" value="Click here to continue...">
-</form></body></html>
-<?
+    } else { // POST
+        /* add token on end so can pull out POST params after redirect */
+        if (strstr($url, "?")) {
+            $url .= "&";
+        } else {
+            $url .= "?";
+        }
+        $url .= "stashpost=" . $key;
+        header("Location: $url");
+        #print "Going to $url";
         exit();
     }
+}
+
+/* stash_check_for_post_redirect
+ * If we are in the middle of a POST redirect, stuffs the appropriate
+ * data into $_POST. */
+function stash_check_for_post_redirect() {
+    /* Are we doing a POST redirect? */
+    $key = get_http_var('stashpost');
+    if (!$key) {
+        return;
+    }
+
+    /* Extract the post data */
+    list($method, $url, $post_data) = db_getRow_list('select method, url, post_data from requeststash where key = ?', $key);
+    if (is_null($method))
+        err("If you got the email more than a week ago, then your request has probably expired.  Please try doing what you were doing from the beginning.");
+
+    /* Postgres/PEAR DB BYTEA madness -- see comment in auth.php. */
+    $post_data = pg_unescape_bytea($post_data);
+    $pos = 0;
+    $stashed_POST = rabx_wire_rd(&$post_data, &$pos);
+    if (rabx_is_error($stashed_POST))
+        err("Bad serialised POST data in stash_redirect('$key')");
+
+    /* Fix $_POST to make this look like one */
+    $_POST = $stashed_POST;
+    # print_r($stashed_POST);
 }
 
 /* stash_get_extra KEY

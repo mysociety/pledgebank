@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.10 2005-05-26 18:19:11 francis Exp $
+ * $Id: pb.php,v 1.11 2005-06-06 13:23:48 francis Exp $
  * 
  */
 
@@ -15,10 +15,14 @@
 require_once "../conf/general";
 
 require_once '../phplib/db.php';
+require_once '../phplib/stash.php';
 require_once '../phplib/person.php';
 require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
 require_once 'page.php';
+
+/* POST redirects */
+stash_check_for_post_redirect();
 
 /* Date which PledgeBank application believes it is */
 $pb_today = db_getOne('select pb_current_date()');

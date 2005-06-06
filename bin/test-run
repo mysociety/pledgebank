@@ -29,7 +29,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.79 2005-06-02 10:52:56 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.80 2005-06-06 13:23:48 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -265,9 +265,6 @@ sub perform_login_action {
                     die "Unknown action part '$login_action_part'";
                 }
             }
-            $wth->browser_check_contents("Redirect...");
-            $b->submit_form(form_name => 'f',
-                button => '__stash_submit_button_0') or die "Failed to do POST redirect button";
             $wth->log_watcher_check();
         } elsif ($login_action eq "abandon" || $login_action eq "suspend") {
             # Deliberately stop without following link
@@ -282,9 +279,6 @@ sub perform_login_action {
         $b->submit_form(form_name => 'loginLogin',
             fields => { password => password_n($who) },
             button => 'LogIn') or die "Failed to log in with password";
-        $wth->browser_check_contents("Redirect...");
-        $b->submit_form(form_name => 'f',
-            button => '__stash_submit_button_0') or die "Failed to do POST redirect button";
         $wth->log_watcher_check();
     } elsif ($login_action eq "wrongpassword") {
         $wth->browser_check_contents("Do you have a PledgeBank password?");
@@ -611,9 +605,6 @@ sub do_public_succeeding_pledge {
 
     # Check what happens when the pledge expires
     set_pb_date('1982-02-11');
-    # Front page should no longer have pledge on it
-    $b->get($base_url);
-    $wth->browser_check_no_contents($pledge_action_completion);
     # Pledge should say the right things
     $b->get($base_url . "/$pledge_ref");
     $wth->browser_check_contents("This pledge is now closed");
@@ -892,7 +883,7 @@ sub do_sms_pledge {
             },
         button => 'submit') or die "Failed to submit SMS conversion form";
     perform_login_action(102, "viaemail:nopw", "to confirm your signature");
-    $wth->browser_check_contents("Thanks for signing up to this pledge");
+    $wth->browser_check_contents("Thanks for signing up");
     # Check signup now appears
     $b->get($base_url . "/$pledge_ref");
     $wth->browser_check_contents(name_n(102));

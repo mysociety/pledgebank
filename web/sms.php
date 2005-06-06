@@ -6,12 +6,12 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.24 2005-05-26 02:19:05 francis Exp $
+ * $Id: sms.php,v 1.25 2005-06-06 13:23:48 francis Exp $
  * 
  */
 
-require_once "../phplib/db.php";
 require_once "../phplib/pb.php";
+require_once "../phplib/db.php";
 require_once "../phplib/fns.php";
 require_once "../phplib/pledge.php";
 require_once "../phplib/auth.php";
@@ -208,9 +208,8 @@ function conversion_form($errs, $pledge_id) {
 <h2>Thanks for signing up!</h2>
 
 <p>On this page you can let us have your name and email address so that you can
-get email from the pledge creator and, if you want, discuss the pledge with
-other signers. If you give us your email address we can also email you when the
-pledge succeeds, rather than sending an SMS.</p>
+get email from the pledge creator.  We will also email you when the pledge
+succeeds, rather than sending an SMS.</p>
 EOF;
     if ($errs) {
         print '<div id="errors"><ul>';
@@ -222,22 +221,14 @@ EOF;
             print "<li>" . htmlspecialchars($errs['email']) . "</li>";
         print '</ul></div>';
     } else {
-        $pledge_info = db_getRow('select * from pledges where id = ? and pin is null', $pledge_id);
-        $sentence = pledge_sentence($pledge_info, array('firstperson'=>true, 'html'=>true));
-        $pretty_date = prettify($pledge_info['date']);
-        $pretty_name = htmlspecialchars($pledge_info['name']);
-    
-        print <<<EOF
-        <div id="tips">
-        <p style="margin-top: 0">&quot;$sentence&quot;</p>
-        <p>Deadline: <strong>$pretty_date</strong></p>
-        </div>
-EOF;
-
+        $p = new Pledge(intval($pledge_id));
+        if ($p->pin()) { err("No SMS for private pledges"); }
+        $p->render_box(array('showdetails' => false));
     }
 
     print <<<EOF
-<form accept-charset="utf-8" class="pledge" method="post" name="pledge">
+<form accept-charset="utf-8" id="pledgeaction" class="pledge" method="post" name="pledge">
+<h2>Get updates by email</h2>
 <input type="hidden" name="f" value="1">
 <input type="hidden" name="token" value="$q_h_token">
 <p>

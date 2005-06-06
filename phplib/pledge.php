@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.75 2005-06-02 07:59:22 francis Exp $
+ * $Id: pledge.php,v 1.76 2005-06-06 13:23:48 francis Exp $
  * 
  */
 
@@ -168,7 +168,7 @@ class Pledge {
 
     // Draws a plaque containing the pledge.  $params is an array, which
     // can contain the following:
-    //     showdetails - if present, show "details" field
+    //     showdetails - if present and true, show "details" field
     function render_box($params = array()) {
 ?>
 <div id="pledge">
@@ -182,7 +182,7 @@ class Pledge {
 <? } ?>
 </p>
 <?
-        if (array_key_exists('showdetails', $params) && isset($this->data['detail']) && $this->data['detail']) {
+        if (array_key_exists('showdetails', $params) && $params['showdetails'] && isset($this->data['detail']) && $this->data['detail']) {
             $det = htmlspecialchars($this->data['detail']);
             $det = make_clickable($det);
             $det = nl2br($det);

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.15 2005-06-06 17:56:55 francis Exp $
+ * $Id: person.php,v 1.16 2005-06-06 18:28:53 francis Exp $
  * 
  */
 
@@ -206,7 +206,11 @@ function person_signon($template_data, $email = null, $name = null) {
         $email_part = "&email=" . urlencode($email);
     else
         $email_part = "";
-    header("Location: /login?stash=$st$email_part&name=" . urlencode($name));
+    if ($name) 
+        $name_part = "&name=" . urlencode($name);
+    else
+        $name_part = "";
+    header("Location: /login?stash=$st$email_part$name_part");
     exit();
 }
 

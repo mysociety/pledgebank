@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.45 2005-05-25 13:47:08 francis Exp $
+# $Id: poster.cgi,v 1.46 2005-06-06 22:02:19 matthew Exp $
 #
 
 import os
@@ -20,6 +20,9 @@ import fcgi
 import tempfile
 import string
 import sha
+import locale
+
+locale.setlocale(locale.LC_ALL, 'en_GB.ISO8859-1')
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
@@ -198,7 +201,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
     story = PyRTF.Section()
     story.Footer.append(PyRTF.Paragraph(ss.ParagraphStyles.footer, "PledgeBank.com"))
     story.extend([
-        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.B('If'), ' ', PyRTF.TEXT('%s' % pledge['target'], colour=ss.Colours.pb),
+        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.B('If'), ' ', PyRTF.TEXT(locale.format("%d", pledge['target'], True), colour=ss.Colours.pb),
         ''' %s will %s, then ''' % (pledge['type'], pledge['signup']), PyRTF.TEXT('I',colour=ss.Colours.pb),
         ' will %s.' % pledge['title']),
         PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\x97 ', PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
@@ -331,7 +334,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
             <b>If</b> <font color="#522994">%s</font> %s will %s, 
             then <font color="#522994">I</font> will %s.
             ''' % (
-                pledge['target'], pledge['type'], pledge['signup'],
+                locale.format("%d", pledge['target'], True), pledge['type'], pledge['signup'],
                 pledge['title']
             ), p_head),
         Paragraph(u'''<para align="right">\u2014 

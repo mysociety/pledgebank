@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.7 2005-05-24 23:18:40 francis Exp $
+// $Id: ref-email.php,v 1.8 2005-06-06 19:26:08 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -35,7 +35,7 @@ $frommessage = get_http_var('frommessage');
 $emails = array();
 for ($i = 1; $i <= 5; $i++) {
     if (get_http_var("email$i")) 
-        $emails[] = get_http_var("email$i");
+        $emails[] = trim(get_http_var("email$i"));
 }
 $errors = array();
 if (!$fromname) $errors[] = "Please enter your name";

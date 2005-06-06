@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.77 2005-06-06 18:28:53 francis Exp $
+ * $Id: pledge.php,v 1.78 2005-06-06 23:48:15 francis Exp $
  * 
  */
 
@@ -134,6 +134,8 @@ class Pledge {
     function title() { return $this->data['title']; }
     function type() { return $this->data['type']; }
 
+    function has_picture() { return array_key_exists('picture', $this->data) && $this->data['picture']; }
+    
     function categories() {
         $c = array();
         $q = db_query('select category_id, category.name from pledge_category, category where pledge_id = ? and category_id = category.id', $this->id());
@@ -161,7 +163,7 @@ class Pledge {
     function url_flyers() { return "/" . $this->h_ref . "/flyers"; }
     function url_flyer($type) { return "/flyers/" . $this->h_ref . "_$type"; }
     function url_comments() { return "/" . $this->h_ref . "#comments"; }
-    function url_addpicture() { return "/" . $this->h_ref . "/addpicture"; }
+    function url_picture() { return "/" . $this->h_ref . "/picture"; }
     function url_announce() { return "/" . $this->h_ref . "/announce"; }
 
     // Rendering the pledge in various ways
@@ -173,7 +175,7 @@ class Pledge {
 ?>
 <div id="pledge">
 <p style="margin-top: 0">
-<? if (array_key_exists('picture', $this->data) && $this->data['picture']) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
+<? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
 &quot;<?=pledge_sentence($this->data, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
 <p>Deadline: <strong><?=$this->h_pretty_date()?></strong>.

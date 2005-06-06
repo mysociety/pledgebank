@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-creator.php,v 1.6 2005-06-02 06:57:33 francis Exp $
+ * $Id: ref-creator.php,v 1.7 2005-06-06 17:56:55 francis Exp $
  * 
  */
 
@@ -30,49 +30,22 @@ if (!is_null($err))
 $pledge = new Pledge($q_ref);
 
 $P = person_if_signed_on();
-if (!$P || $P->id() != $pledge->creator_id()) {
-    $errs = importparams(
-                array('email',  '/^[^@]+@[^@]+$/',  ''),
-                array('LogIn',  '/./',              '', false)
-            );
-
-    if (!is_null($errs) || !$q_LogIn) {
-        page_header("Pledge creator's page");
-    if ($P) {
-?>
-    <p>
-    The email address you are logged in with does not seem to be the same as
-    the pledge creator. Please enter that email address to log in as them.
-    </p>
-<?
-    }  else {
-        print <<<EOF
-<p>To access the pledge creator's page, please type in your email address
-and click "Continue".  You can only access the page if you created the pledge.
-</p>
-EOF;
-    }
-        print <<<EOF
-<form class="pledge" name="logIn" method="POST">
-<div class="form_row">
-    <label for="email"><strong>Email address</strong></label>
-    <input type="text" size="20" name="email" id="email" value="$q_h_email">
-    <input type="submit" name="LogIn" value="Continue &gt;&gt;">
-</div>
-</form>
-EOF;
-        /* XXX needs "send me a reminder" email */
-        page_footer(array('nonav' => 1));
-        exit();
-    } else {
-        $P = person_signon(array(
-                        'reason' => "access the pledge creator's page",
-                        'template' => 'creator-confirm'
-                    ), $q_email);
-    }
+if (!$P) {
+    $P = person_signon(array(
+                    'reason' => "access the pledge author's page",
+                    'template' => 'creator-confirm'
+                ));
 }
 
-page_header("Pledge creator's page");
+if ($P->id() != $pledge->creator_id()) {
+    page_header("Pledge author's page");
+    print "You must be the pledge author to access this page.  Please
+        <a href=\"/logout\">log out</a> and try again.";
+    page_footer();
+    exit;
+}
+
+page_header("Pledge author's page");
 
 // Upload picture
 $picture_upload_allowed = is_null($pledge->pin());

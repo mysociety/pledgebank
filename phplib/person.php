@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.14 2005-06-01 09:52:31 chris Exp $
+ * $Id: person.php,v 1.15 2005-06-06 17:56:55 francis Exp $
  * 
  */
 
@@ -167,20 +167,25 @@ function person_if_signed_on() {
     return null;   
 }
 
-/* person_signon DATA EMAIL [NAME]
+/* person_signon DATA [EMAIL] [NAME]
  * Return a record of a person, if necessary requiring them to sign on to an
  * existing account or to create a new one. DATA is an array of data about the
  * pledge, including 'template' which is the name of the template to use for
  * the confirm mail, and 'reason' which is something like "create the pledge
  * '...'" or "sign the pledge '...'".  The rest of the DATA is passed through
- * to the email template. */
-function person_signon($template_data, $email, $name = null) {
+ * to the email template. 
+ * 
+ * EMAIL, if present, is the email address to log in with.  Otherwise,
+ * an email addresses is prompted for.  NAME is also optional, and if present
+ * updates/creates the default name record for the email address.
+ */
+function person_signon($template_data, $email = null, $name = null) {
 
-    if (!preg_match('/^[^@]+@[^@]+$/', $email))
+    if (!is_null($email) && !preg_match('/^[^@]+@[^@]+$/', $email))
         err("'$email' is not a valid email address");
 
     $P = person_if_signed_on();
-    if (!is_null($P) && $P->email() == $email) {
+    if (!is_null($P) && (is_null($email) || $P->email() == $email)) {
         if (!is_null($name) && !$P->matches_name($name))
             $P->name($name);
         return $P;
@@ -197,7 +202,11 @@ function person_signon($template_data, $email, $name = null) {
      * page, either to log in or to prove their email address. */
     $st = stash_request(serialize($template_data));
     db_commit();
-    header("Location: /login?stash=$st&email=" . urlencode($email) . "&name=" . urlencode($name));
+    if ($email)
+        $email_part = "&email=" . urlencode($email);
+    else
+        $email_part = "";
+    header("Location: /login?stash=$st$email_part&name=" . urlencode($name));
     exit();
 }
 

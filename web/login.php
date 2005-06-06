@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.22 2005-06-01 09:52:31 chris Exp $
+ * $Id: login.php,v 1.23 2005-06-06 17:56:55 francis Exp $
  * 
  */
 
@@ -91,25 +91,21 @@ importparams(
         array('KeepName',       '/^.+$/',            '', false),
         array('ChangeName',     '/^.+$/',            '', false)
     );
+if ($q_name=='<Enter your name>') {
+    $q_name=null;
+    $q_h_email=null;
+}
 
-/* General purpose login, asks for name also. */
+/* General purpose login, asks for email also. */
 if (get_http_var("now")) {
-    $errs = importparams(
-                array('email',  '/^[^@]+@[^@]+$/',  'Please give your email address'),
-                array('LogIn',  '/./',              '', false)
-            );
-    if ($q_LogIn and !$errs) {
-        $P = person_signon(array(
-                        'reason' => "log into PledgeBank",
-                        'template' => 'generic-confirm'
-                    ), $q_email);
-        page_header("Now check your email");
-        print "You're now logged in as <strong>". htmlspecialchars($P->name()) .
-            "</strong>.  Enjoy using PledgeBank!";
-        page_footer();
-    } else {
-        login_for_no_reason_form($errs);
-    }
+    $P = person_signon(array(
+                    'reason' => "log into PledgeBank",
+                    'template' => 'generic-confirm'
+                ));
+    page_header("Logged in");
+    print "You're now logged in as <strong>". htmlspecialchars($P->name()) .
+        "</strong>.  Enjoy using PledgeBank!";
+    page_footer();
     exit;
 }
 
@@ -184,16 +180,20 @@ if (!is_null($P)) {
 function login_page() {
     global $q_stash, $q_email, $q_name, $q_LogIn, $q_SendEmail, $q_rememberme;
 
-    if (is_null($q_stash) || is_null($q_email) || is_null($q_name)) {
+    if (is_null($q_stash)) {
         err("Required parameter was missing");
     }
 
     if ($q_LogIn) {
         /* User has tried to log in. */
+        if (is_null($q_email)) {
+            login_form(array('email'=>'Please enter your email address.'));
+            exit();
+        }
         global $q_password;
         $P = person_get($q_email);
         if (is_null($P) || !$P->check_password($q_password)) {
-            login_form(array('badpassword'=>'Either your email or password weren\'t recognised.  Please try again.'));
+            login_form(array('badpass'=>'Either your email or password weren\'t recognised.  Please try again.'));
             exit();
         } else {
             /* User has logged in correctly. Decide whether they are changing
@@ -208,6 +208,10 @@ function login_page() {
         }
     } else if ($q_SendEmail) {
         /* User has asked to be sent email. */
+        if (is_null($q_email)) {
+            login_form(array('email'=>'Please enter your email address.'));
+            exit();
+        }
         $token = auth_token_store('login', array(
                         'email' => $q_email,
                         'name' => $q_name,
@@ -264,18 +268,33 @@ function login_form($errors = array()) {
 
     /* Split into two forms to avoid "do you want to remember this
      * password" prompt in, e.g., Mozilla. */
-    print <<<EOF
+?>
 
 <div class="pledge">
+<form name="login" class="login" method="POST" accept-charset="utf-8">
+<input type="hidden" name="stash" value="<?=$q_h_stash?>">
+<input type="hidden" name="name" id="name" value="<?=$q_h_name?>">
+
+
+<? if (is_null($q_email) || $errors) { ?>
+<p><strong>First, enter your email address</strong></p>
+
+<ul>
+
+<li> Email address: <input<? if (array_key_exists('email', $errors) || array_key_exists('badpass', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<?=$q_h_email?>">
+
+</ul>
+
+<? } else { ?>
+
+<input type="hidden" name="email" value="<?=$q_h_email?>">
+
+<? } ?>
 
 <p><strong>Do you have a PledgeBank password?</strong></p>
 
 <ul>
 
-<form name="loginSendEmail" class="login" method="POST" accept-charset="utf-8">
-<input type="hidden" name="stash" value="$q_h_stash">
-<input type="hidden" name="name" id="name" value="$q_h_name">
-<input type="hidden" name="email" id="email" value="$q_h_email">
 
 <li>No, I don't have a password.
 
@@ -283,28 +302,22 @@ function login_form($errors = array()) {
 <small>(we'll send an email to confirm your address)</small></p>
 
 </li>
-</form>
 
-<form name="loginLogin" class="login" method="POST" accept-charset="utf-8">
 <li><p>Yes, I have a password:
 
-<input type="hidden" name="stash" value="$q_h_stash">
-<input type="hidden" name="email" value="$q_h_email">
-<input type="hidden" name="name" value="$q_h_name">
-
-<input type="password" name="password" id="password" value="">
+<input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
 <input type="submit" name="LogIn" value="Let me in &gt;&gt;"></p>
 
 <input type="checkbox" name="rememberme" id="rememberme" value="1"><strong>Remember me</strong></input>
 <small>(don't use this on a public or shared computer)</small>
 
 </li>
-</form>
 
 </ul>
 
+</form>
 </div>
-EOF;
+<?
 
     page_footer(array('nonav' => 1));
 }
@@ -403,32 +416,6 @@ EOF;
 function set_login_cookie($P, $duration = null) {
     // error_log('set cookie');
     setcookie('pb_person_id', person_cookie_token($P->id(), $duration), is_null($duration) ? null : time() + $duration, '/', OPTION_WEB_DOMAIN, false);
-}
-
-/* login_for_no_reason_form
- * When user explicitly requests log in for no particular reason. */
-function login_for_no_reason_form($errors) {
-    global $q_h_email, $q_LogIn;
-
-    page_header('Log in');
-
-	if (sizeof($errors) && $q_LogIn) {
-		print '<div id="errors"><ul><li>';
-		print join ('</li><li>', array_values($errors));
-		print '</li></ul></div>';
-    } else {
-        print '<p>To log in, please type in your email address and click "Continue".</p>';
-    }
-?>
-<form name="logIn" class="pledge" method="POST">
-<div class="form_row">
-    <label for="email"><strong>Email address</strong></label>
-    <input type="text" size="20" name="email" id="email" value="<?=htmlspecialchars(get_http_var('email'))?>">
-    <input type="submit" name="LogIn" value="Continue &gt;&gt;">
-</div>
-</form>
-<?
-    page_footer();
 }
 
 ?>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.7 2005-06-06 13:23:48 francis Exp $
+ * $Id: ref-announce.php,v 1.8 2005-06-06 17:56:55 francis Exp $
  * 
  */
 
@@ -31,13 +31,20 @@ $p = new Pledge($q_ref);
 $p->lock();
 
 $P = person_if_signed_on();
-if (!$P || $P->id() != $p->creator_id()) {
-    /* Nobody is logged in or the logged in person isn't the owner of this
-     * pledge. So just redirect back to the creators' page where they can
-     * log in with their email address. */
-    header("Location: /$q_ref/creator");
-    exit();
+if (!$P) {
+    $P = person_signon(array(
+                    'reason' => "send a message to all signers",
+                    'template' => 'creator-confirm'
+                ));
 }
+if ($P->id() != $p->creator_id()) {
+    page_header("Pledge author's page");
+    print "You must be the pledge author to send a message to all signers.
+        Please <a href=\"/logout\">log out</a> and try again.";
+    page_footer();
+    exit;
+}
+
 
 $descr = array(
                 'failure-announce' => 'failure announcement message',

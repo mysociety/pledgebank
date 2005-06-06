@@ -29,7 +29,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.80 2005-06-06 13:23:48 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.81 2005-06-06 17:56:55 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -203,25 +203,31 @@ sub display_url {
     }
 }
 
-# perform_login_action WHO LOGIN_ACTION EMAIL_TEXT
-# Call after doing something which requires login.  LOGIN_ACTION defines what
-# to do about this.
-#   "viaemail:nopw" means request a confirmation email, wait for it, and follow link in it
-#   "viaemail:setpw" is the same, but also sets the user's password if second login
-#   "loggedin" means expect to be already logged in
-#   "password" means the user is not logged in but has a password, so log in with it
-#   "wrongpassword" means the user is not logged in, try logging in with the wrong password
-#   "abandon" means request a confirmation email, check it is there, but don't follow link
-#   "suspend" means request a confirmation email, and leave it in mail queue table
-#   "resume:nopw" means to continue from point of waiting for confirmation mail
-#   "resume:setpw" is the same, but also sets the user's password if second login
+# perform_login_action WHO LOGIN_OPTIONS EMAIL_TEXT
+# Call after doing something which requires login.  LOGIN_OPTIONS defines what
+# to do about this.  It is a hashref of values.  They are:
+#   "action" which can have the values
+#       "viaemail" means request a confirmation email, wait for it, and follow link in it
+#       "loggedin" means expect to be already logged in
+#       "password" means the user is not logged in but has a password, so log in with it
+#       "wrongpassword" means the user is not logged in, try logging in with the wrong password
+#       "abandon" means request a confirmation email, check it is there, but don't follow link
+#       "suspend" means request a confirmation email, and leave it in mail queue table
+#       "resume" means to continue from point of waiting for confirmation mail
+#   "setpassword" which applies for "viaemail" and "resume" types and can have the values:
+#       0 never to set the user's password
+#       1 to set the user's password if second login
+#   "givemail" applies for every type except "resume" and "loggedin"
+#       0 the login form does not require email (was entered in an earlier form)
+#       1 the login form requires email
 #   TODO distinguish viaemail already logged in from not?
 # EMAIL_TEXT is an SQL LIKE query fragment that confirmation mail must match.
 sub perform_login_action {
-    my ($who, $login_action_full, $email_text) = @_;
-    my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
+    my ($who, $login_options, $email_text) = @_;
+    my $login_action = $login_options->{'action'};
+    my $login_fields = $login_options->{'giveemail'} ? { email => email_n($who) } : {};
 
-    print "login by ".name_n($who)." action '$login_action_full' for " . $b->uri() . "\n" if $verbose > 1;
+    print "login by ".name_n($who)." action '$login_action' for " . $b->uri() . "\n" if $verbose > 1;
 
     if ($login_action eq "viaemail" || $login_action eq "abandon" || 
         $login_action eq "suspend" || $login_action eq "resume") {
@@ -229,7 +235,8 @@ sub perform_login_action {
         # Request confirmation email (unless we are resuming request)
         if ($login_action ne "resume") {
             $wth->browser_check_contents("Do you have a PledgeBank password?");
-            $b->submit_form(form_name => 'loginSendEmail',
+            $b->submit_form(form_name => 'login',
+                fields => $login_fields,
                 button => 'SendEmail') or die "Failed to request confirmation email";
             $wth->browser_check_contents("you'll need to click the link");
             $wth->log_watcher_check();
@@ -251,18 +258,16 @@ sub perform_login_action {
             $b->get($confirmation_url);
             $login_count->{$who}++;
             if ($login_count->{$who} > 1) {
-                if ($login_action_part eq "setpw") {
+                if ($login_options->{'setpassword'}) {
                     # We accept the option to set our password
                     $wth->browser_check_contents("Would you like to set a PledgeBank password?");
                     $b->submit_form(form_name => 'loginSetPassword',
                         fields => { pw1 => password_n($who), pw2 => password_n($who) },
                         button => 'SetPassword') or die "Failed to submit no make password form";
-                } elsif ($login_action_part eq "nopw") {
+                } else {
                     # We reject the option to set our password
                     $b->submit_form(form_name => 'loginNoPassword',
                     button => 'NoPassword') or die "Failed to submit no make password form";
-                } else {
-                    die "Unknown action part '$login_action_part'";
                 }
             }
             $wth->log_watcher_check();
@@ -276,14 +281,16 @@ sub perform_login_action {
         # Nothing to do
     } elsif ($login_action eq "password") {
         $wth->browser_check_contents("Do you have a PledgeBank password?");
-        $b->submit_form(form_name => 'loginLogin',
-            fields => { password => password_n($who) },
+        $login_fields->{'password'} = password_n($who);
+        $b->submit_form(form_name => 'login',
+            fields => $login_fields,
             button => 'LogIn') or die "Failed to log in with password";
         $wth->log_watcher_check();
     } elsif ($login_action eq "wrongpassword") {
         $wth->browser_check_contents("Do you have a PledgeBank password?");
-        $b->submit_form(form_name => 'loginLogin',
-            fields => { password => "thispassswordisnonsense"},
+        $login_fields->{'password'} = "thispassswordisnonsense";
+        $b->submit_form(form_name => 'login',
+            fields => $login_fields,
             button => 'LogIn') or die "Failed to try to log in with password";
         $wth->browser_check_contents("Either your email or password weren't recognised");
         $wth->log_watcher_check();
@@ -299,8 +306,8 @@ sub perform_login_action {
 # and PAGE2 contain parameters for each page of the sign-up form.
 # LOGIN_ACTION is passed on to perform_login_action.
 sub create_pledge {
-    my ($who, $page1, $page2, $login_action_full) = @_;
-    my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
+    my ($who, $page1, $page2, $login_options) = @_;
+    my $login_action = $login_options->{'action'};
 
     $page1->{name} = name_n($who); 
     $page1->{email} = email_n($who);
@@ -323,7 +330,7 @@ sub create_pledge {
         button => 'submit') or die "Failed to submit creating form stage 3";
 
     # Requires authentication
-    perform_login_action($who, $login_action_full, "to confirm that you");
+    perform_login_action($who, $login_options, "to confirm that you");
     return if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword");
     $wth->browser_check_contents("Thank you for creating your pledge");
 
@@ -343,8 +350,8 @@ sub create_pledge {
 #   'already' - failed signing, because you've already signed.
 #   'ownpledge' - failed signing, because you're the pledge creator.
 sub sign_pledge {
-    my ($who, $show_signature, $login_action_full, $expected) = @_;
-    my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
+    my ($who, $show_signature, $login_options, $expected) = @_;
+    my $login_action = $login_options->{'action'};
 
     # Sign up now, unless we are resuming abandoned signup
     if ($login_action ne "resume") {
@@ -357,7 +364,7 @@ sub sign_pledge {
     }
 
     # Perform appropriate login action
-    perform_login_action($who, $login_action_full, "to confirm your signature");
+    perform_login_action($who, $login_options, "to confirm your signature");
     return if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword");
 
     # Look for appropriate result in web page
@@ -381,14 +388,14 @@ sub sign_pledge {
 # Finds a public pledge from the front page use text ACTION, then calls
 # sign_pledge.
 sub find_and_sign_pledge {
-    my ($action, $who, $show_signature, $login_action_full, $expected) = @_;
-    my ($login_action, $login_action_part) = split(m/:/, $login_action_full);
+    my ($action, $who, $show_signature, $login_options, $expected) = @_;
+    my $login_action = $login_options->{'action'};
 
     if ($login_action ne "resume") {
         $b->get($base_url);
         $b->follow_link(text_regex => qr/$action/) or die "Pledge not appeared on front page";
     }
-    sign_pledge($who, $show_signature, $login_action_full, $expected);
+    sign_pledge($who, $show_signature, $login_options, $expected);
 }
 
 # Change the date that all parts of PledgeBank think is today.  Call with no
@@ -427,7 +434,7 @@ sub do_unconfirmed_pledge {
             date => 'next thursday', ref => $pledge_ref,
         },
         { country => 'Global' },
-        "abandon"
+        { action => "abandon" }
     );
 
     # Check not on front page
@@ -447,7 +454,7 @@ sub do_public_succeeding_pledge {
             date => '10th February', ref => $pledge_ref,
             detail => "This pledge has just one purpose.  And that is as part of an automated test suite which ensures PledgeBank always works.  It is really quite good, in our humblest opinion.  It would save the planet, if only it was more comprehensive, and updated in a timely manner.\n\nAnd this bit is the start of a brand new shiny paragraph.  It should be formatted below on posters in the correct manner." },
         { country => 'Global' },
-        "viaemail:nopw"
+        { action => "viaemail" }
     );
 
     # Add a comment
@@ -493,17 +500,18 @@ sub do_public_succeeding_pledge {
 
     # Sign it twice
     print "Signing the pledge twice...\n" if $verbose > 1;
-    find_and_sign_pledge($pledge_action_completion, 1, 1, "viaemail:nopw", "signed");
-    find_and_sign_pledge($pledge_action_completion, 2, undef, "viaemail:nopw", "signed");
+    find_and_sign_pledge($pledge_action_completion, 1, 1, {action=>"viaemail"}, "signed");
+    find_and_sign_pledge($pledge_action_completion, 2, undef, {action=>"viaemail"}, "signed");
 
+    # Check can't get to announce page as a mere signer
+    $b->get($base_url . "/$pledge_ref");
+    $b->follow_link(text_regex => qr/message to signers/) or die "Creator page link not found";
+    $wth->browser_check_contents("must be the pledge author");
+    $b->follow_link(text_regex => qr/log out/) or die "Log out not found";
     # Send mid-pledge announcement, to encourage signers to do more to help
     $b->get($base_url . "/$pledge_ref");
     $b->follow_link(text_regex => qr/message to signers/) or die "Creator page link not found";
-    $b->submit_form(form_name => 'logIn',
-        fields => { email => email_n(0) },
-        button => "LogIn");
-    perform_login_action(0, "viaemail:nopw", "access the pledge creator's page");
-    $b->follow_link(text_regex => qr/Send message/) or die "Announce page link not found";
+    perform_login_action(0, {action=>"viaemail", giveemail=>1}, "send a message to all signers");
     $wth->browser_check_contents("Send Announcement");
     $wth->browser_check_no_contents("successful");
     $b->submit_form(form_name => 'pledge',
@@ -521,15 +529,15 @@ sub do_public_succeeding_pledge {
 
     # Sign it once more, this tipping balance
     print "Signing the pledge once more...\n" if $verbose > 1;
-    find_and_sign_pledge($pledge_action_completion, 3, 1, "viaemail:nopw", "reached");
+    find_and_sign_pledge($pledge_action_completion, 3, 1, {action=>"viaemail"}, "reached");
 
     # Try to sign the pledge a second time as the same person
-    find_and_sign_pledge($pledge_action_completion, 2, 1, "viaemail:nopw", "already");
+    find_and_sign_pledge($pledge_action_completion, 2, 1, {action=>"viaemail"}, "already");
     # and as the creator, which also isn't allowed
-    find_and_sign_pledge($pledge_action_completion, 0, 1, "viaemail:nopw", "ownpledge");
+    find_and_sign_pledge($pledge_action_completion, 0, 1, {action=>"viaemail"}, "ownpledge");
 
     # Partially sign pledge before completion state change...
-    find_and_sign_pledge($pledge_action_completion, 4, 1, "suspend", "signed");
+    find_and_sign_pledge($pledge_action_completion, 4, 1, {action=>"suspend"}, "signed");
 
     # Check pledge has completed
     call_frequentupdate();
@@ -584,7 +592,7 @@ sub do_public_succeeding_pledge {
     # ... now complete partial signature
     # (a day later, so it contains new extra header)
     set_pb_date('1982-02-02');
-    find_and_sign_pledge($pledge_action_completion, 4, undef, "resume:nopw", "signed");
+    find_and_sign_pledge($pledge_action_completion, 4, undef, {action=>"resume"}, "signed");
     # Check the late signer (number 4) also recieves the announcement message.
     call_frequentupdate();
     $wth->email_get_containing( '%To: '.email_n(4).'%You signed this pledge after this message was%By merely partaking%');
@@ -596,12 +604,12 @@ sub do_public_succeeding_pledge {
     # (commented out as not very important, but hard to auto test without copying
     # lots of code from last find_and_sign_pledge for the last one)
     ## Stash test for expired tokens
-    #find_and_sign_pledge($pledge_action_completion, 5, 1, "suspend", "signed");
+    #find_and_sign_pledge($pledge_action_completion, 5, 1, {action=>"suspend"}, "signed");
     #set_pb_date('1982-02-10');
     ## ... this as side effect provokes deletion of 7 day old stashes
-    #find_and_sign_pledge($pledge_action_completion, 6, 1, "abandon", "signed");
+    #find_and_sign_pledge($pledge_action_completion, 6, 1, {action=>"abandon"}, "signed");
     ## ... and check what error we get
-    #find_and_sign_pledge($pledge_action_completion, 5, 1, "resume:nopw", "signed");
+    #find_and_sign_pledge($pledge_action_completion, 5, 1, {aciton=>"resume:nopw"}, "signed");
 
     # Check what happens when the pledge expires
     set_pb_date('1982-02-11');
@@ -625,7 +633,7 @@ sub do_private_failing_pledge {
             target => '10', date => 'Dec 31st', ref => $pledge_ref
         },
         { country => 'Global', visibility => 'pin', pin => $private_pin },
-        "viaemail:nopw"
+        { action => "viaemail" }
     );
 
     # Go to private pledge page, and submit PIN to access it
@@ -648,7 +656,7 @@ sub do_private_failing_pledge {
     # Sign up to private pledge
     &$goto_private_pledge_page();
     $wth->browser_check_no_contents("This pledge is now closed");
-    sign_pledge(1, 1, "viaemail:nopw", "signed");
+    sign_pledge(1, 1, {action=>"viaemail"}, "signed");
     &$goto_private_pledge_page();
     $wth->browser_check_contents("<i>1 person has signed up");
 
@@ -725,11 +733,11 @@ sub do_private_failing_pledge {
     # Test what happens upon expiry
     # ... partially sign the pledge
     &$goto_private_pledge_page();
-    sign_pledge(2, 1, "suspend", undef);
+    sign_pledge(2, 1, {action=>"suspend"}, undef);
     # ... then expire it
     set_pb_date('1981-01-15');
     # ... make sure completing the partial signing fails
-    sign_pledge(2, 1, "resume:nopw", "finished");
+    sign_pledge(2, 1, {action=>"resume"}, "finished");
     # Check failure emails
     call_frequentupdate();
     my $failure_email = $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
@@ -841,7 +849,7 @@ sub do_sms_pledge {
             date => '10th March', ref => $pledge_ref,
             detail => "Not sure what SMS is?  Find out here! www.wikipedia.org/wiki/Short_message_service Fab.  For more information, please visit www.ewb-uk.org/placements/2005/suriname. For more information about Engineers Without Borders UK, please visit www.ewb-uk.org, or email enquiries\@ewb-uk.org. For information regarding the project in Suriname, email suriname2005\@ewb-uk.org." },
         { country => 'Global' },
-        "viaemail:nopw"
+        { action => "viaemail" }
     );
 
     # A basic SMS signup
@@ -882,7 +890,7 @@ sub do_sms_pledge {
             phone => mobile_n(102), name => name_n(102), email => email_n(102), showname => 1
             },
         button => 'submit') or die "Failed to submit SMS conversion form";
-    perform_login_action(102, "viaemail:nopw", "to confirm your signature");
+    perform_login_action(102, {action=>"viaemail"}, "to confirm your signature");
     $wth->browser_check_contents("Thanks for signing up");
     # Check signup now appears
     $b->get($base_url . "/$pledge_ref");
@@ -946,7 +954,7 @@ sub do_login_tests {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_1 },
         { country => 'Global' },
-        "viaemail:setpw"
+        { action => "viaemail", setpassword => 1 }
     );
     # Checked logged in, and then logout
     $b->get($base_url);
@@ -962,7 +970,7 @@ sub do_login_tests {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_2 },
         { country => 'Global' },
-        "viaemail:setpw"
+        { action => "viaemail", setpassword => 1 }
     );
     # Log out again
     $b->get($base_url);
@@ -975,7 +983,7 @@ sub do_login_tests {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_3 },
         { country => 'Global' },
-        "password"
+        { action => "password" }
     );
     # Log out again
     $b->get($base_url);
@@ -985,10 +993,7 @@ sub do_login_tests {
     # Log in explicitly with "login" link
     $b->get($base_url);
     $b->follow_link(text_regex => qr/Login/) or die "Login link missing";
-    $b->submit_form(form_name => 'logIn',
-        fields => { email => email_n(200) },
-        button => "LogIn");
-    perform_login_action(200, "password", undef);
+    perform_login_action(200, {action=>"password", giveemail=>1}, undef);
     $wth->browser_check_contents("logged in");
     # Fourth pledge, expects already logged in
     create_pledge(200, 
@@ -996,26 +1001,26 @@ sub do_login_tests {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_4 },
         { country => 'Global' },
-        "loggedin"
+        { action => "loggedin" }
     );
 
     # Sign all the pledges as another user
     $b->follow_link(text_regex => qr/Logout/) or die "Logout link missing";
     $wth->browser_check_contents("now logged out");
-    find_and_sign_pledge($pledge_action_login_1, 201, 1, "viaemail:setpw", "signed");
+    find_and_sign_pledge($pledge_action_login_1, 201, 1, {action=>"viaemail",setpassword=>1}, "signed");
     $b->follow_link(text_regex => qr/Logout/) or die "Logout link missing";
     $wth->browser_check_contents("now logged out");
     # ... takes a second go to get the set password form
-    find_and_sign_pledge($pledge_action_login_2, 201, 1, "viaemail:setpw", "signed");
+    find_and_sign_pledge($pledge_action_login_2, 201, 1, {action=>"viaemail",setpassword=>1}, "signed");
     # Now we can sign as already logged in
-    find_and_sign_pledge($pledge_action_login_3, 201, 1, "loggedin", "signed");
+    find_and_sign_pledge($pledge_action_login_3, 201, 1, {action=>"loggedin"}, "signed");
     # Logout again (in order to log in with password)
     $b->follow_link(text_regex => qr/Logout/) or die "Logout link missing";
     $wth->browser_check_contents("now logged out");
     # ... try with wrong password
-    find_and_sign_pledge($pledge_action_login_4, 201, 1, "wrongpassword", "signed");
+    find_and_sign_pledge($pledge_action_login_4, 201, 1, {action=>"wrongpassword"}, "signed");
     # ... then with the right one
-    find_and_sign_pledge($pledge_action_login_4, 201, 1, "password", "signed");
+    find_and_sign_pledge($pledge_action_login_4, 201, 1, {action=>"password"}, "signed");
 
 }
 

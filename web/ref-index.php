@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.15 2005-06-07 00:29:03 francis Exp $
+// $Id: ref-index.php,v 1.16 2005-06-07 17:13:17 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -115,6 +115,19 @@ function draw_comments($p) {
     print '</div>';
 }
 
+function draw_connections($p) {
+    if (0 == db_getOne('select count(*) from pledge_connection where a_pledge_id = ? or b_pledge_id = ?', array($p->id(), $p->id())))
+        return;
+    print "\n\n" . '<div id="connections"><h2><a name="connections">People who signed this also signed...</a></h2><ul>';
+    $s = db_query('select a_pledge_id, b_pledge_id from pledge_connection where a_pledge_id = ? or b_pledge_id = ? order by strength desc limit 6', array($p->id(), $p->id()));
+    while (list($a, $b) = db_fetch_row($s)) {
+        $id = $a == $p->id() ? $b : $a;
+        $p2 = new Pledge(intval($id));
+        print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a></li>';
+    }
+    print '</ul></div>';
+}
+
 page_header("'I will " . $p->h_title() . "'", array('ref'=>$p->url_main(), 'noreflink'=>1) );
 draw_status_plaque($p);
 $p->render_box(array('showdetails' => true));
@@ -122,6 +135,7 @@ if (!$p->finished()) { pledge_sign_box(); }
 draw_spreadword($p);
 draw_signatories($p);
 draw_comments($p);
+draw_connections($p);
 
 page_footer();
 ?>

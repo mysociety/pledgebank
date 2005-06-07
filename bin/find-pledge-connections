@@ -1,0 +1,63 @@
+#!/usr/bin/perl -w
+#
+# find-pledge-connections:
+# Compute connections between pledges on a "people who signed ... also
+# signed..." basis. Designed to be run from cron.
+#
+# This is kind-of nasty. It would be cheaper but harder to update this
+# on-the-fly as pledges are signed.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.1 2005-06-07 16:18:31 chris Exp $';
+
+use strict;
+require 5.8.0;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+
+use PB;
+
+dbh()->do('delete from pledge_connection');
+
+my $s = dbh()->prepare('select id from person');
+$s->execute();
+while (my ($person_id) = $s->fetchrow_array()) {
+    # We have to be careful not to leak information here. Because a single
+    # person can sign several pledges under different names (but giving the
+    # same email address) we must only show connections in cases where the
+    # names are the same. And we must avoid showing connections to private
+    # pledges, since doing so might reveal their existence.
+    my $s2 = dbh()->prepare("select pledge_id, name from signers where person_id = ? and coalesce((select pin from pledges where id = pledge_id), '') = ''");
+    $s2->execute($person_id);
+    my %pledges;
+    while (my ($pledge_id, $name) = $s2->fetchrow_array()) {
+        $name = lc($name);
+        $name =~ s/[^A-Za-z-]//g;
+        push(@{$pledges{$name}}, $pledge_id);
+    }
+
+    foreach my $p (values %pledges) {
+        my @pledges = sort { $a <=> $b } @$p;
+        for (my $i = 0; $i < @pledges - 1; ++$i) {
+            for (my $j = $i + 1; $j < @pledges; ++$j) {
+                if (1 != dbh()->do('update pledge_connection set strength = strength + 1 where a_pledge_id = ? and b_pledge_id = ?', {}, $pledges[$i], $pledges[$j])) {
+                    dbh()->do('insert into pledge_connection (a_pledge_id, b_pledge_id, strength) values (?, ?, 1)', {}, $pledges[$i], $pledges[$j]);
+                }
+            }
+        }
+    }
+}
+
+dbh()->commit();

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.90 2005-06-01 17:02:07 francis Exp $
+-- $Id: schema.sql,v 1.91 2005-06-07 15:42:17 chris Exp $
 --
 
 -- secret
@@ -212,6 +212,22 @@ create function pledge_is_valid_to_sign(integer, text, text)
         return ''ok'';
     end;
     ' language 'plpgsql';
+
+-- Connections between pledges (to be computed by a "signers who signed this
+-- pledge also signed" scheme).
+create table pledge_connection (
+    a_pledge_id integer references pledges(id),
+    b_pledge_id integer references pledges(id),
+    strength real not null,     -- number indicating strength of connection;
+                                -- higher is stronger
+    check (a_pledge_id < b_pledge_id),
+    primary key (a_pledge_id, b_pledge_id)
+);
+
+create index pledge_connection_a_pledge_id_idx
+    on pledge_connection(a_pledge_id);
+create index pledge_connection_b_pledge_id_idx
+    on pledge_connection(b_pledge_id);
 
 create table outgoingsms (
     id serial not null primary key,

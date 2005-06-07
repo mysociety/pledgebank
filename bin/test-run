@@ -23,13 +23,12 @@
 #   SMS on failure
 #   SMS already signed, and SMS am creator so can't sign
 #   Remember Me button (how do we test Cookie expirty with WWW::Mechanize?)
-# TODO: deal with fallout of this message no longer existing
-#$wth->email_get_containing('%To: '.email_n(2).
-#        '%you have already signed it%');
+#   Picture uploading
+#   Info page and graph
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.81 2005-06-06 17:56:55 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.82 2005-06-07 00:29:03 francis Exp $';
 
 use strict;
 require 5.8.0;

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.46 2005-06-06 22:02:19 matthew Exp $
+# $Id: poster.cgi,v 1.47 2005-06-07 00:57:02 francis Exp $
 #
 
 import os
@@ -20,9 +20,6 @@ import fcgi
 import tempfile
 import string
 import sha
-import locale
-
-locale.setlocale(locale.LC_ALL, 'en_GB.ISO8859-1')
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
@@ -36,6 +33,16 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph, Frame
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+
+# Add commas as thousand separators to integers.  Code taken from
+# http://groups.google.co.uk/group/comp.lang.python/browse_thread/thread/650005d9dff61adb/29c4c0920f6c95bb?q=python+thousand+separator&rnum=16&hl=en#29c4c0920f6c95bb
+def format_integer(i, places=3, separator=','):
+    s = `i`
+    r = ''
+    while len(s) > places:
+        r = separator + s[-places:] + r
+        s = s[:-places]
+    return s + r 
 
 # This is a special function to be able to use bold and italic in TTFs
 # See May 2004 Reportlab Users mailing list
@@ -201,7 +208,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
     story = PyRTF.Section()
     story.Footer.append(PyRTF.Paragraph(ss.ParagraphStyles.footer, "PledgeBank.com"))
     story.extend([
-        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.B('If'), ' ', PyRTF.TEXT(locale.format("%d", pledge['target'], True), colour=ss.Colours.pb),
+        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.B('If'), ' ', PyRTF.TEXT(format_integer(pledge['target']), colour=ss.Colours.pb),
         ''' %s will %s, then ''' % (pledge['type'], pledge['signup']), PyRTF.TEXT('I',colour=ss.Colours.pb),
         ' will %s.' % pledge['title']),
         PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\x97 ', PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
@@ -334,7 +341,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
             <b>If</b> <font color="#522994">%s</font> %s will %s, 
             then <font color="#522994">I</font> will %s.
             ''' % (
-                locale.format("%d", pledge['target'], True), pledge['type'], pledge['signup'],
+                format_integer(pledge['target']), pledge['type'], pledge['signup'],
                 pledge['title']
             ), p_head),
         Paragraph(u'''<para align="right">\u2014 

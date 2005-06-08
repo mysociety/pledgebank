@@ -25,10 +25,11 @@
 #   Remember Me button (how do we test Cookie expirty with WWW::Mechanize?)
 #   Picture uploading
 #   Info page and graph
+#   Run pledge connections part of crontab
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.82 2005-06-07 00:29:03 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.83 2005-06-08 14:32:24 francis Exp $';
 
 use strict;
 require 5.8.0;

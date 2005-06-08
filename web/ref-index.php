@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.16 2005-06-07 17:13:17 chris Exp $
+// $Id: ref-index.php,v 1.17 2005-06-08 11:54:52 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -116,25 +116,37 @@ function draw_comments($p) {
 }
 
 function draw_connections($p) {
-    if (0 == db_getOne('select count(*) from pledge_connection where a_pledge_id = ? or b_pledge_id = ?', array($p->id(), $p->id())))
+    $s = db_query('SELECT a_pledge_id, b_pledge_id, strength 
+        FROM pledge_connection 
+            LEFT JOIN pledges AS a_pledges ON a_pledge_id = a_pledges.id
+            LEFT JOIN pledges AS b_pledges ON b_pledge_id = b_pledges.id
+        WHERE 
+            (a_pledge_id = ? AND b_pledges.date >= pb_current_date()) OR
+            (b_pledge_id = ? AND a_pledges.date >= pb_current_date())
+        ORDER BY STRENGTH DESC 
+        LIMIT 6', array($p->id(), $p->id()));
+    if (0 == db_num_rows($s))
         return;
-    print "\n\n" . '<div id="connections"><h2><a name="connections">People who signed this also signed...</a></h2><ul>';
-    $s = db_query('select a_pledge_id, b_pledge_id from pledge_connection where a_pledge_id = ? or b_pledge_id = ? order by strength desc limit 6', array($p->id(), $p->id()));
-    while (list($a, $b) = db_fetch_row($s)) {
+
+    print "\n\n" . '<div id="connections"><h2><a name="connections">People who signed this pledge also pledged to...</a></h2><ul>' . "\n\n";
+    while (list($a, $b, $strength) = db_fetch_row($s)) {
         $id = $a == $p->id() ? $b : $a;
         $p2 = new Pledge(intval($id));
         print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a></li>';
+        print "<!-- strength $strength -->\n";
     }
+    print "\n\n";
     print '</ul></div>';
 }
 
 page_header("'I will " . $p->h_title() . "'", array('ref'=>$p->url_main(), 'noreflink'=>1) );
 draw_status_plaque($p);
+
 $p->render_box(array('showdetails' => true));
-if (!$p->finished()) { pledge_sign_box(); }
+if (!$p->finished()) { pledge_sign_box(); } else { draw_comments($p); }
 draw_spreadword($p);
 draw_signatories($p);
-draw_comments($p);
+if (!$p->finished()) { draw_comments($p); }
 draw_connections($p);
 
 page_footer();

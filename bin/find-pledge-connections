@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.2 2005-06-07 16:43:18 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.3 2005-06-08 11:30:13 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -41,7 +41,7 @@ while (my ($person_id) = $s->fetchrow_array()) {
     # pledges, since doing so might reveal their existence.
 
     # Obtain all the pledges which this person has signed...
-    my $s2 = dbh()->prepare("select pledge_id, name from signers where person_id = ? and coalesce((select pin from pledges where id = pledge_id), '') = ''");
+    my $s2 = dbh()->prepare("select pledge_id, name from signers where person_id = ? and showname and coalesce((select pin from pledges where id = pledge_id), '') = ''");
     $s2->execute($person_id);
     my %pledges;
     while (my ($pledge_id, $name) = $s2->fetchrow_array()) {

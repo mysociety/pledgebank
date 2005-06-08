@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.50 2005-06-08 12:00:46 francis Exp $
+ * $Id: pb.css,v 1.51 2005-06-08 17:56:56 matthew Exp $
  * 
  */
 
@@ -131,7 +131,7 @@ th {
 .pledge p, #pledgeaction p {
     margin-bottom: 0;
 }
-.pledge h2, #pledgeaction h2, p#spreadword h2, #tips h2, #pledge h2 {
+.pledge h2, #pledgeaction h2, #spreadword h2, #tips h2, #pledge h2, #signatories h2, #connections h2, #comments h2 {
     margin-top: 0;
 }
 .pledge a:link, .pledge a:visited {
@@ -167,20 +167,19 @@ th {
     width: 45%;
 }
 #signatories {
+    clear: left;
+    float: left;
     margin-top: 1em;
     width: 45%;
-}
-#signatories h2 {
-    margin-top: 0;
 }
 #connections {
+/*  clear: right;
+    float: right; */
     margin-top: 1em;
     width: 45%;
 }
-#connections h2 {
-    margin-top: 0;
-}
 #comments {
+    margin-top: 1em;
     clear: right;
     float: right;
     width: 45%;

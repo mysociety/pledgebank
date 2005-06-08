@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.17 2005-06-08 11:54:52 francis Exp $
+// $Id: ref-index.php,v 1.18 2005-06-08 17:56:56 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -40,9 +40,8 @@ function draw_status_plaque($p) {
 }
 
 function draw_spreadword($p) {
-    ?>
+    if (!$p->finished()) { ?>
     <div id="spreadword">
-    <?    if (!$p->finished()) { ?>
     <h2>Spread the word</h2>
     <ul id="spread">
     <li> <? print_link_with_pin($p->url_email(), "", "Email pledge to your friends") ?></li>
@@ -53,10 +52,9 @@ function draw_spreadword($p) {
     </li>
     </ul>
     <br clear="all">
-    <?
-    } ?>
     </div>
     <?
+    }
 }
 
 function draw_signatories($p) {

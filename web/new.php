@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.21 2005-06-02 09:55:46 francis Exp $
+// $Id: new.php,v 1.22 2005-06-09 11:22:42 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -66,7 +66,7 @@ the door of that neighbour whose name you've forgotten.</li>
         if (!array_key_exists('email', $data))
             $data['email'] = $P->email();
         if (!array_key_exists('name', $data))
-            $data['name'] = $P->name();
+            $data['name'] = $P->name_or_blank();
     }
 ?>
 
@@ -401,9 +401,9 @@ function preview_pledge($data, $errors) {
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
 <h2>New Pledge &#8211; Step 3 of 3</h2>
 
-<p>Please check the details you have entered, both the pledge above and other
-details below.  Click one of the two "Back" buttons if you would like to go
-back and edit your data.  
+<p>Please check the details you have entered, both the pledge itself (see left)
+and other details below.  Click one of the two "Back" buttons if you would like
+to go back and edit your data.  
 <strong>Check carefully, as you cannot edit your pledge after you have
 created it.</strong>
 (<a href="/faq#editpledge">why not?</a>)

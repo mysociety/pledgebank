@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.31 2005-06-02 09:55:46 francis Exp $
+// $Id: fns.php,v 1.32 2005-06-09 11:22:41 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -183,4 +183,6 @@ We will not give or sell either your or their email address to anyone else.
 
 <?
 }
+
+
 ?>

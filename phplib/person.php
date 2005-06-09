@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.16 2005-06-06 18:28:53 francis Exp $
+ * $Id: person.php,v 1.17 2005-06-09 11:22:41 francis Exp $
  * 
  */
 
@@ -56,13 +56,35 @@ class Person {
         if (!is_null($name)) {
             db_query('update person set name = ? where id = ?', array($name, $this->id));
             $this->name = $name;
+        } elseif (is_null($this->name)) {
+            err("Person has no name in name() function"); // try calling name_or_blank or has_name 
         }
         return $this->name;
+    }
+    
+    /* name_or_blank
+     * Get the person's name, or empty string if unknown.  Use this as
+     * prefilled name field in forms. */
+    function name_or_blank() {
+        if ($this->name) 
+            return $this->name;
+        else
+            return "";
+    }
+
+    /* has_name
+     * Returns true if we have a name for the person */
+    function has_name() {
+        return !is_null($this->name);
     }
 
     /* matches_name [NEWNAME]
      * Is NEWNAME essentially the same as the person's existing name? */
     function matches_name($newname) {
+        if (!$this->name)
+            return false;
+        if (!$newname) 
+            err("Name expected in matches_name");
         return person_canonicalise_name($newname) == person_canonicalise_name($this->name);
     }
 
@@ -177,7 +199,11 @@ function person_if_signed_on() {
  * 
  * EMAIL, if present, is the email address to log in with.  Otherwise,
  * an email addresses is prompted for.  NAME is also optional, and if present
- * updates/creates the default name record for the email address.
+ * updates/creates the default name record for the email address.  If you
+ * do not specify a name here, then calling the $this->name() function later will
+ * give an error.  Instead call $this->name_or_blank() or $this->has_name().  The
+ * intention here is that if the action requires a name, you will have prompted
+ * for it in an earlier form and included it in the call to this function.
  */
 function person_signon($template_data, $email = null, $name = null) {
 
@@ -250,13 +276,13 @@ function person_get($email) {
         return new Person($id);
 }
 
-/* person_get_or_create EMAIL NAME
+/* person_get_or_create EMAIL [NAME]
  * If there is an existing account for the given EMAIL address, return the
  * person object describing it. Otherwise, create a new account for EMAIL and
  * NAME, and return the object describing it. */
-function person_get_or_create($email, $name) {
-    if (is_null($email) || is_null($name))
-        err('EMAIL or NAME null in person_get_or_create');
+function person_get_or_create($email, $name = null) {
+    if (is_null($email))
+        err('EMAIL null in person_get_or_create');
         /* XXX case-insensitivity of email addresses? */
     $id = db_getOne('select id from person where email = ? for update', $email);
     if (is_null($id)) {

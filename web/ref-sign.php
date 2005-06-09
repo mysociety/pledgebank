@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.11 2005-05-26 23:08:46 chris Exp $
+// $Id: ref-sign.php,v 1.12 2005-06-09 11:22:42 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -15,12 +15,7 @@ require_once '../phplib/comments.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/importparams.php';
 
-$ref = get_http_var('ref'); 
-$h_ref = htmlspecialchars($ref);
-$q = db_query('SELECT *, pb_current_date() <= date as open FROM pledges WHERE ref ILIKE ?', array($ref));
-if (!db_num_rows($q)) {
-    err('PledgeBank reference not known');
-} 
+$p = new Pledge(get_http_var('ref'));
 
 $title = 'Signature addition';
 page_header($title);
@@ -29,6 +24,7 @@ if (is_array($errors)) {
     print '<div id="errors"><ul><li>';
     print join ('</li><li>', $errors);
     print '</li></ul></div>';
+     $p->render_box(array('showdetails'=>false));
     pledge_sign_box();
 }
 page_footer();

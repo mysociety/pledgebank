@@ -16,6 +16,7 @@
 #
 
 # TODO, add test code for:
+#   Local alerts, nameless signups
 #   "identity" column
 #   UK postcoded pledges
 #   categories
@@ -30,7 +31,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.84 2005-06-09 09:06:00 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.85 2005-06-09 11:22:41 francis Exp $';
 
 use strict;
 require 5.8.0;

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.79 2005-06-07 00:29:03 francis Exp $
+ * $Id: pledge.php,v 1.80 2005-06-09 11:22:42 francis Exp $
  * 
  */
 
@@ -468,7 +468,7 @@ function pledge_sign_box() {
         if (is_null($email) || !$email)
             $email = $P->email();
         if (is_null($name) || !$name)
-            $name = $P->name();
+            $name = $P->name_or_blank();
     } else {
         // error_log("nobody signed on");
     }

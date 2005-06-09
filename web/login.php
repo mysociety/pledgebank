@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.23 2005-06-06 17:56:55 francis Exp $
+ * $Id: login.php,v 1.24 2005-06-09 11:22:42 francis Exp $
  * 
  */
 
@@ -103,8 +103,12 @@ if (get_http_var("now")) {
                     'template' => 'generic-confirm'
                 ));
     page_header("Logged in");
-    print "You're now logged in as <strong>". htmlspecialchars($P->name()) .
-        "</strong>.  Enjoy using PledgeBank!";
+    print "You're now logged in as <strong>";
+    if ($P->has_name())
+        print htmlspecialchars($P->name);
+    else 
+        print htmlspecialchars($P->email);
+    print "</strong>.  Enjoy using PledgeBank!";
     page_footer();
     exit;
 }
@@ -119,10 +123,7 @@ if (!is_null($q_t)) {
         err("Please check the URL is copied correctly from your email.  The token wasn't found.");
     $P = person_get($d['email']);
     if (is_null($P)) {
-        if (is_null($d['name']))
-            err("Please check the URL is copied correctly from your email.  The name wasn't found.");
-        else
-            $P = person_get_or_create($d['email'], $d['name']);
+        $P = person_get_or_create($d['email'], $d['name']);
     }
 
     $P->inc_numlogins();
@@ -135,7 +136,11 @@ if (!is_null($q_t)) {
     /* Recover "parameters" from token. */
     auth_token_destroy('login', $q_t);
     $q_h_email = htmlspecialchars($q_email = $d['email']);
-    $q_h_name = htmlspecialchars($q_name = $d['name']);
+    if (array_key_exists('name', $d) && !is_null($d['name'])) {
+        $q_h_name = htmlspecialchars($q_name = $d['name']);
+    } else {
+        $q_h_name = $q_name = null;
+    }
     $q_h_stash = htmlspecialchars($q_stash = $d['stash']);
 
     /* If the 'direct' key exists in the token, don't do any intervening
@@ -328,6 +333,9 @@ function login_form($errors = array()) {
 function change_password_page($P) {
     global $q_stash, $q_email, $q_name, $q_SetPassword, $q_NoPassword;
     global $q_h_stash, $q_h_email, $q_h_name;
+
+    if (is_null($q_name))
+        $q_name = $q_h_name = '';   /* shouldn't happen */
 
     $error = null;
     if ($q_SetPassword) {

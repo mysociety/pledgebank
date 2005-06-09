@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.27 2005-06-02 09:55:46 francis Exp $
+// $Id: page.php,v 1.28 2005-06-09 11:22:41 francis Exp $
 
 $signed_on_person = person_if_signed_on();
 
@@ -63,7 +63,11 @@ function page_header($title, $params = array()) {
             print '</p>';
         }
         if ($signed_on_person) {
-            print '<p id="signedon">Hello, ' . htmlspecialchars($signed_on_person->name);
+            print '<p id="signedon">Hello, ';
+            if ($signed_on_person->has_name())
+                print htmlspecialchars($signed_on_person->name);
+            else 
+                print htmlspecialchars($signed_on_person->email);
             print ' <small>(<a href="/logout">this isn\'t you?  click here</a>)</small>';
             print '</p>';
         }

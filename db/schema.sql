@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.92 2005-06-09 09:03:27 chris Exp $
+-- $Id: schema.sql,v 1.93 2005-06-09 11:22:41 francis Exp $
 --
 
 -- secret
@@ -65,7 +65,7 @@ create unique index category_ican_id_idx on category(ican_id);
 -- its name in every statement....
 create table person (
     id serial not null primary key,
-    name text not null,
+    name text,
     email text not null,
     password text,
     numlogins integer not null default 0
@@ -677,6 +677,16 @@ create table comment (
 
 create index comment_pledge_id_idx on comment(pledge_id);
 create index comment_pledge_id_whenposted_idx on comment(pledge_id, whenposted);
+
+-- Alerts and notifications
+
+-- get emailed when there is a new pledge in your area
+create table local_alert (
+    person_id integer references person(id), 
+    postcode text not null 
+);
+
+create unique index local_alert_person_id_idx on local_alert(person_id);
 
 -- table of abuse reports on comments, pledges and signers.
 create table abusereport (

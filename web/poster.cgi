@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.47 2005-06-07 00:57:02 francis Exp $
+# $Id: poster.cgi,v 1.48 2005-06-09 14:56:35 francis Exp $
 #
 
 import os
@@ -33,6 +33,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph, Frame
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+
+boilerplate_sms_smallprint = "SMS operated by charity UKCOD. Available in UK only. Sign-up message costs your normal text rate. Further messages are free. "
 
 # Add commas as thousand separators to integers.  Code taken from
 # http://groups.google.co.uk/group/comp.lang.python/browse_thread/thread/650005d9dff61adb/29c4c0920f6c95bb?q=python+thousand+separator&rnum=16&hl=en#29c4c0920f6c95bb
@@ -96,6 +98,15 @@ def ordinal(day):
         return 'rd'
     return 'th'
 
+def has_sms(pledge):
+    if pledge['pin']:
+        return False
+    return True
+
+
+############################################################################
+# Tiled cards on a sheet.
+
 def draw_short_pledge(x, y):
     text = "\"I will %s\"" % pledge['title']
     size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
@@ -111,9 +122,6 @@ def draw_short_pledge(x, y):
     size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
     c.setFont("Helvetica", size)
     c.drawCentredString(x, (y-3)*cm, text)
-
-############################################################################
-# Tiled cards on a sheet.
 
 def cards():
     c.setStrokeColorRGB(0,0,0)
@@ -223,9 +231,10 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
                 map(lambda text: PyRTF.Paragraph(ss.ParagraphStyles.detail, text), d[1:])
             )
 
-    if pledge['pin']:
+    if not has_sms(pledge):
         text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 'Pledge at ', webdomain_text)
-        text_para.append(' pin ', PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
+        if pledge['pin']:
+            text_para.append(' pin ', PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
         sms_smallprint = ""
     else:
         text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 
@@ -235,7 +244,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
                     ' to ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
                     ' or pledge at ', webdomain_text)
-        sms_smallprint = "SMS operated by charity UKCOD. Sign-up message costs your normal text rate. Further messages are free. "
+        sms_smallprint = boilerplate_sms_smallprint
 
     story.extend([ text_para, 
         PyRTF.Paragraph(ss.ParagraphStyles.normal, 'This pledge closes on ', PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), '. Thanks!'),
@@ -356,9 +365,12 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 ('<b>More details:</b> %s' % pledge['detail']).split("\n\n"))
             )
 
-    if pledge['pin']:
+    if not has_sms(pledge):
         pledge_at_text = "Pledge at "
-        pin_text = ''' pin <font color="#522994" size="+2">%s</font>''' % userpin
+        if pledge['pin']:
+            pin_text = ''' pin <font color="#522994" size="+2">%s</font>''' % userpin
+        else:
+            pin_text = ''
         sms_to_text = ""
         sms_smallprint = ""
     else:
@@ -367,8 +379,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         sms_to_text = """<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
             or """ % (ref, sms_number)
-        sms_smallprint = """SMS operated by charity UKCOD. Sign-up message
-            costs your normal text rate. Further messages are free. """
+        sms_smallprint = boilerplate_sms_smallprint
 
     story.extend([
         Paragraph('''%s%s%s%s''' % 
@@ -517,8 +528,8 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail FROM pledges WHERE ref ILIKE %s', ref)
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail']) = q.fetchone()
+        q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail, country FROM pledges WHERE ref ILIKE %s', ref)
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country']) = q.fetchone()
         q.close()
         day = date.day
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))

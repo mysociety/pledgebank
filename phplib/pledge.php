@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.82 2005-06-09 18:53:47 matthew Exp $
+ * $Id: pledge.php,v 1.83 2005-06-09 19:18:22 matthew Exp $
  * 
  */
 
@@ -175,15 +175,15 @@ class Pledge {
     //     href - if present must contain a URL, which is used as a link for
     //            the pledge sentence
     function render_box($params = array()) {
-        $id = "pledge";
-        if (array_key_exists('id', $params)) 
-            $id = $params['id'];
         $sentence_params = array('firstperson'=>true, 'html'=>true);
         if (array_key_exists('href', $params)) {
             $sentence_params['href'] = $params['href'];
         }
+        if (array_key_exists('all', $params))
+            print '<div class="pledge pledge-' . $params['all'] . '">';
+        else
+            print '<div id="pledge">';
 ?>
-<div id="<?=$id?>">
 <p style="margin-top: 0">
 <? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
 &quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;</p>

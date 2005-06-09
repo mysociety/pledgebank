@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.28 2005-06-09 11:22:41 francis Exp $
+// $Id: page.php,v 1.29 2005-06-09 19:18:22 matthew Exp $
 
 $signed_on_person = person_if_signed_on();
 
@@ -34,12 +34,21 @@ function page_header($title, $params = array()) {
 ?> PledgeBank - Not Finished Yet</title>
 <style type="text/css" media="all">@import url('/pb.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
-<?  if (array_key_exists('rss', $params))
+<?
+
+    $category = '';
+    if (array_key_exists('ref', $params)) {
+        $category = db_getOne('SELECT name FROM category,pledge_category WHERE category_id=id AND pledge_id=(SELECT id FROM pledges WHERE ref=?)', substr($params['ref'],1) );
+        if ($category && is_file('../web/css/' . strtolower($category) . '.css'))
+            print '<style type="text/css" media="all">@import url(\'/css/' . rawurlencode(strtolower($category)) . '.css\');</style>';
+    }
+
+    if (array_key_exists('rss', $params))
         print '<link rel="alternate" type="application/rss+xml" title="New Pledges at PledgeBank.com" href="/rss">';
 ?>
 <script type="text/javascript" src="/pb.js"></script>
 </head>
-<body>
+<body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
 <?
     // Display title bar
     if (!array_key_exists('nonav', $params) or !$params['nonav']) {
@@ -60,6 +69,9 @@ function page_header($title, $params = array()) {
             print '<strong>'. str_replace('http://', '', $url) . '</strong>';
             if (!array_key_exists('noreflink', $params))
                 print '</a>';
+            if ($category) {
+                print '<br>This pledge is in the <strong>' . $category . '</strong> category';
+            }
             print '</p>';
         }
         if ($signed_on_person) {

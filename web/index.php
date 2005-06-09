@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.174 2005-06-09 11:22:42 francis Exp $
+// $Id: index.php,v 1.175 2005-06-09 14:13:10 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -20,8 +20,14 @@ front_page();
 page_footer();
 
 function front_page() {
-    if (!local_alert_subscribed())
-        local_alert_subscribe_box();
+    if (!local_alert_subscribed()) {
+?>
+<p id="localsignupad">
+<a href="./alert">
+Sign up to recieve an email when someone creates a new pledge near you &raquo;
+</a></p>
+<?
+    }
 ?>
 
 <h2>Tell the world "I'll do it, but only if you'll help me do it"</h2>
@@ -38,7 +44,7 @@ about beating that feeling..."
 works</a>, as explained by mySociety's director Tom Steinberg.
 Or <a href="/explain">read a full transcript</a>.</p>
 
-<p id="start"><a href="./new"><strong>Start your own pledge &raquo;</strong></a></p>
+<p id="start"><a href="./new">Start your own pledge &raquo;</a></p>
 
 <form accept-charset="utf-8" id="search" action="/search" method="get">
 <h2>Search</h2>

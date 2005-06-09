@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.53 2005-06-08 23:57:48 francis Exp $
+ * $Id: pb.css,v 1.54 2005-06-09 14:13:10 francis Exp $
  * 
  */
 
@@ -62,7 +62,7 @@ th {
 	color: #000000;
 }
 
-#start a {
+#start a, #localsignupad a {
 	float: right;
     clear: right;
 	border: solid 2px #522994;
@@ -74,7 +74,7 @@ th {
 	width: 6em;
 	text-decoration: none;
 }
-#start a:hover {
+#start a:hover, #localsignupad a:hover {
 	border: solid 2px #990000;
 	color: #ff0000;
 	background-color: #ffcccc;

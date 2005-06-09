@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.80 2005-06-09 11:22:42 francis Exp $
+ * $Id: pledge.php,v 1.81 2005-06-09 18:12:39 francis Exp $
  * 
  */
 
@@ -172,12 +172,21 @@ class Pledge {
     // Draws a plaque containing the pledge.  $params is an array, which
     // can contain the following:
     //     showdetails - if present and true, show "details" field
+    //     href - if present must contain a URL, which is used as a link for
+    //            the pledge sentence
     function render_box($params = array()) {
+        $id = "pledge";
+        if (array_key_exists('id', $params)) 
+            $id = $params['id'];
+        $sentence_params = array('firstperson'=>true, 'html'=>true);
+        if (array_key_exists('href', $params)) {
+            $sentence_params['href'] = $params['href'];
+        }
 ?>
-<div id="pledge">
+<div id="<?=$id?>">
 <p style="margin-top: 0">
 <? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
-&quot;<?=pledge_sentence($this->data, array('firstperson'=>true, 'html'=>true)) ?>&quot;</p>
+&quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
 <p>Deadline: <strong><?=$this->h_pretty_date()?></strong>.
 <? if ($this->signers() >= 0) { ?>

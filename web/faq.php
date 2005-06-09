@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.5 2005-05-18 19:55:14 francis Exp $
+// $Id: faq.php,v 1.6 2005-06-09 08:52:01 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -68,11 +68,10 @@ improved chance of achieving whatever change it is you want.
 
 <dt>Is it free?
 
-<dd>Other than a 25p charge for SMS subscribers (to cover our costs of
-sending update SMSes back to them), the site is free to use, no matter
-how big a pledge you create. PledgeBank is run by a charitable
-organisation, though, so if you want to run an especially big pledge,
-and feel like making a contribution, please contact us.
+<dd>The site is free to use, no matter how big a pledge you create. PledgeBank
+is run by a charitable organisation, though, so if you want to run an
+especially big pledge, and feel like making a contribution, please contact us.
+SMS messages to PledgeBank cost your normal text fee.
 
 <dt>Who built PledgeBank?
 

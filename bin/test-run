@@ -26,10 +26,11 @@
 #   Picture uploading
 #   Info page and graph
 #   Run pledge connections part of crontab
+#   Admin:  Test delete signer, and delete pledge.
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.83 2005-06-08 14:32:24 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.84 2005-06-09 09:06:00 francis Exp $';
 
 use strict;
 require 5.8.0;

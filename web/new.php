@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.23 2005-06-10 09:30:55 francis Exp $
+// $Id: new.php,v 1.24 2005-06-10 10:12:18 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -453,7 +453,7 @@ The purpose of this is simply to give your pledge
 greater publicity and a greater chance of succeeding. 
 <? } ?>
 Rest assured that we won't ever give or sell anyone your email address. 
-<input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions">Tick this box to confirm you have read this paragraph</a>.</input>
+<br><input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions">Tick this box to confirm you have read this paragraph</a>.</input>
 </p>
 
 

@@ -3,16 +3,20 @@
 # pbsmsd:
 # Pledgebank SMS daemon.
 #
-# This does three things: 
-# 'processing' - calling code to process messages which have been received.
-# 'sending' - managing the sending of SMS messages from the outgoing message queue.
-# 'gathering' - polling for delivery reports and missed messages.
+# This does three things:
+#
+#   - processing: calling code to process messages which have been received;
+#
+#   - sending: managing the sending of SMS messages from the outgoing message
+#     queue; and
+#
+#   - gathering: polling for delivery reports and missed messages.
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.26 2005-06-07 15:34:12 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.27 2005-06-10 10:34:31 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -27,6 +31,7 @@ use Encode;
 use Error qw(:try);
 use Getopt::Long;
 use LWP::UserAgent;
+use HTML::Entities;
 use HTTP::Request;
 use HTTP::Response;
 use Pod::Usage;
@@ -160,16 +165,19 @@ sub run_sending_process () {
                         intPremium => ($ispremium ? 25 : 0)     # XXX
                     );
 
-                # Now we need to send the message. That means trying to
-                # encode it in IA5.
-                eval {
-                    $p{strMessage} = PB::SMS::encode_ia5($message);
-                };
-                if ($@) {
+                # Now we need to send the message. Only messages which are
+                # representable in IA5 can be sent.
+                if (!PB::SMS::check_ia5($message)) {
                     print_log('err', "outgoing #$id, '$message', cannot be expressed in IA5; abandoning message");
                     # Mark failed so that the message is processed.
                     dbh()->do("update outgoingsms set status = 'failed' where id = ?", {}, $id);
                 } else {
+                    # encode any "difficult" characters using the &#x....;
+                    # syntax of XML, which is apparently what the C360 back-end
+                    # expects.
+                    $p{strMessage} = $message;
+                    $p{strMessage} =~ s/([^A-Z0-9])/sprintf('&#x%04x;', ord($1))/gei;
+                
                     # We're OK to attempt sending.
                     my ($status, $extra);
 
@@ -455,7 +463,10 @@ sub run_gathering_process () {
                         $sender =~ s#^([^+])#+$1#;
                             # recipient is a short code
 
-                        PB::SMS::receive_sms($sender, $recipient, $network, PB::SMS::decode_ia5($message), $foreignid, $whensent);
+                        # Message received will have any strange characters
+                        # represented as XML-style entities.
+                        HTML::Entities::decode_entities($message);
+                        PB::SMS::receive_sms($sender, $recipient, $network, $message, $foreignid, $whensent);
                     }
 
                     # Record that we've polled these gaps and drop any which
@@ -705,5 +716,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.26 2005-06-07 15:34:12 chris Exp $
+$Id: pbsmsd,v 1.27 2005-06-10 10:34:31 chris Exp $
 

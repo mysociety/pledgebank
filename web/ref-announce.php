@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.8 2005-06-06 17:56:55 francis Exp $
+ * $Id: ref-announce.php,v 1.9 2005-06-10 10:13:35 chris Exp $
  * 
  */
 
@@ -195,9 +195,21 @@ if ($q_submit) {
             array_push($errors, "Please add instructions for the pledge signers to the SMS message.");
         if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
             array_push($errors, "Please shorten the text of the SMS message to 160 characters or fewer");
-        /* XXX else we must check that the text is representable in IA5; if it
-         * isn't, we must get the user to fix it, since otherwise it cannot be
-         * transmitted. */
+
+        /* Now check that the text is representable in IA5. See the table in
+         * perllib/PB/SMS.pm. */
+        if (preg_match_all('/([^@\{00a3}$\{00a5}\{00e8}\{00e9}\{00f9}\{00ec}\{00f2}\{00c7}\{000a}\{00d8}\{00f8}\{000d}\{00c5}\{00e5}\{0394}\{005f}\{03a6}\{0393}\{039b}\{03a9}\{03a0}\{03a8}\{03a3}\{0398}\{039e}\{001b}\{00c6}\{00e6}\{00df}\{00c9} !"#\{00a4}%&\'()*+,-.\/0123456789:;<=>?\{00a1}ABCDEFGHIJKLMNOPQRSTUVWXYZ\{00c4}\{00d6}\{00d1}\{00dc}\{00a7}\{00bf}abcdefghijklmnopqrstuvwxyz\{00e4}\{00f6}\{00f1}\{00fc}\{00e0}])/u', $q_message_sms, $m)) {
+            $badchars = $m[1];
+            if (sizeof($badchars) == 1) {
+                array_push($errors, "Unfortunately, we can't send the character '${badchars[0]}' in an SMS message; please rewrite your message without it");
+            } else if (sizeof($badchars) > 1) {
+                $str = "'${badchars[0]}'";
+                for ($i = 1; $i < sizeof($badchars) - 1; ++$i)
+                    $str .= ", '${badchars[$i]}'";
+                $str .= " and '${badchars[$i]}'";
+                array_push($errors, "Unfortunately, we can't send the characters $str in an SMS message; please rewrite your message without them");
+            }
+        }
     }
 
     if (trim(merge_spaces($q_message_body)) == trim(merge_spaces($default_message)))

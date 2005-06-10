@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.7 2005-06-10 11:59:42 sandpit Exp $
+ * $Id: ref-info.php,v 1.8 2005-06-10 12:11:27 matthew Exp $
  * 
  */
 
@@ -30,7 +30,7 @@ if (!is_null($err))
 
 $p = new Pledge($q_ref);
 
-pin_box = deal_with_pin($p->url_info(), $p->ref(), $p->pin());
+$pin_box = deal_with_pin($p->url_info(), $p->ref(), $p->pin());
 if ($pin_box) {
     page_header("Enter PIN"); 
     print $pin_box;

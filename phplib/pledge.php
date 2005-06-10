@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.83 2005-06-09 19:18:22 matthew Exp $
+ * $Id: pledge.php,v 1.84 2005-06-10 00:49:32 matthew Exp $
  * 
  */
 
@@ -198,7 +198,7 @@ class Pledge {
             $det = htmlspecialchars($this->data['detail']);
             $det = make_clickable($det);
             $det = nl2br($det);
-            print '<p align="left"><strong>More details</strong><br>' . $det . '</p>';
+            print '<p id="moredetails"><strong>More details</strong><br>' . $det . '</p>';
         }
 ?>
 </div>

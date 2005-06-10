@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.25 2005-06-10 10:29:12 chris Exp $
+# $Id: SMS.pm,v 1.26 2005-06-10 13:31:33 chris Exp $
 #
 
 package PB::SMS;
@@ -53,6 +53,7 @@ my @ia5_to_unicode = (0 .. 127);
         0x3a3, 0x398, 0x39e, 0x1b, 0xc6, 0xe6, 0xdf, 0xc9
     );
 
+$ia5_to_unicode[0x24] = 0xa4;
 $ia5_to_unicode[0x40] = 0xa1;
 @ia5_to_unicode[0x5b .. 0x60] = (0xc4, 0xd6, 0xd1, 0xdc, 0xa7, 0xbf);
 @ia5_to_unicode[0x7b .. 0x7f] = (0xe4, 0xf6, 0xf1, 0xfc, 0xe0);

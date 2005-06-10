@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.24 2005-05-25 20:00:41 francis Exp $
+# $Id: SMS.pm,v 1.25 2005-06-10 10:29:12 chris Exp $
 #
 
 package PB::SMS;
@@ -59,38 +59,17 @@ $ia5_to_unicode[0x40] = 0xa1;
 
 my %unicode_to_ia5 = map { $ia5_to_unicode[$_] => $_ } (0 .. 127);
 
-=item decode_ia5 DATA
+=item check_ia5 TEXT
 
-Convert DATA, which is in the bastardised variant of IA5 spoken by mobile
-'phones, into UTF8.
-
-=cut
-sub decode_ia5 ($) {
-    my @octets = unpack('C*', $_[0]);
-    my $ret = '';
-    foreach (@octets) {
-        throw PB::Error("Character in IA5 input had value $_; should be <128")
-            if ($_ > 127);
-        $ret .= sprintf('%c', $ia5_to_unicode[$_]);
-    }
-    return $ret;
-}
-
-=item encode_ia5 TEXT
-
-Convert TEXT, in UTF8, to the bastardised variant of IA5 spoken by mobile
-'phones.
+Verify that TEXT is representable in IA5.
 
 =cut
-sub encode_ia5 ($) {
-    my @chars = map { ord($_) } split(//, $_[0]);
-    my $ret = '';
-    foreach (@chars) {
-        throw PB::Error(sprintf("UNICODE character \\x{%04x} cannot be expressed in IA5", $_))
-            if (!exists($unicode_to_ia5{$_}));
-        $ret .= pack('C', $unicode_to_ia5{$_});
+sub check_ia5 ($) {
+    if (grep { !exists($unicode_to_ia5{ord($_)}) } split(//, $_[0])) {
+        return 0;
+    } else {
+        return 1;
     }
-    return $ret;
 }
 
 =item send_sms RECIPIENTS MESSAGE [ISPREMIUM]

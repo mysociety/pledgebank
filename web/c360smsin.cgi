@@ -18,7 +18,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.3 2005-03-29 15:29:52 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.4 2005-06-10 10:35:12 chris Exp $';
 
 use strict;
 
@@ -34,6 +34,7 @@ use CGI::Fast;
 use DateTime::Format::Strptime;
 use Encode;
 use Error qw(:try);
+use HTML::Entities;
 use Net::Netmask;
 use utf8;
 
@@ -92,7 +93,8 @@ while (my $q = new CGI::Fast()) {
             my $recipient = $P{intDestination};
 #            $recipient =~ s#^([^+])#+$1#;      # destination is a short code
 
-            PB::SMS::receive_sms($sender, $recipient, $P{intDeliverer}, PB::SMS::decode_ia5($message), $smsid, $whensent);
+            HTML::Entities::decode_entities($message);
+            PB::SMS::receive_sms($sender, $recipient, $P{intDeliverer}, $message, $smsid, $whensent);
 
             $resp = "OK";
         } else {

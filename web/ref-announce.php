@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.10 2005-06-10 14:08:37 chris Exp $
+ * $Id: ref-announce.php,v 1.11 2005-06-10 14:15:29 chris Exp $
  * 
  */
 
@@ -198,6 +198,9 @@ if ($q_submit) {
 
         /* Now check that the text is representable in IA5. See the table in
          * perllib/PB/SMS.pm. */
+
+        /* XXX this would be the place to, e.g., convert "smart" to ASCII
+         * quotes, if that turns out to be a problem. */
         if (preg_match_all('/([^@\x{00a3}$\x{00a5}\x{00e8}\x{00e9}\x{00f9}\x{00ec}\x{00f2}\x{00c7}\x{000a}\x{00d8}\x{00f8}\x{000d}\x{00c5}\x{00e5}\x{0394}\x{005f}\x{03a6}\x{0393}\x{039b}\x{03a9}\x{03a0}\x{03a8}\x{03a3}\x{0398}\x{039e}\x{001b}\x{00c6}\x{00e6}\x{00df}\x{00c9} !"#\x{00a4}%&\'()*+,-.\/0123456789:;<=>?\x{00a1}ABCDEFGHIJKLMNOPQRSTUVWXYZ\x{00c4}\x{00d6}\x{00d1}\x{00dc}\x{00a7}\x{00bf}abcdefghijklmnopqrstuvwxyz\x{00e4}\x{00f6}\x{00f1}\x{00fc}\x{00e0}])/u', $q_message_sms, $m)) {
             $badchars = $m[1];
             if (sizeof($badchars) == 1) {

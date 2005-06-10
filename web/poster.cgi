@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.48 2005-06-09 14:56:35 francis Exp $
+# $Id: poster.cgi,v 1.49 2005-06-10 18:16:32 matthew Exp $
 #
 
 import os
@@ -224,7 +224,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
     ])
 
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
-        d = pledge['detail'].split("\n\n")
+        d = pledge['detail'].split("\r?\n\r?\n")
         story.append(PyRTF.Paragraph(ss.ParagraphStyles.detail, PyRTF.B('More details:'), ' ', d[0]))
         if len(d)>0:
             story.extend(
@@ -362,7 +362,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
         story.extend(
             map(lambda text: Paragraph(text, p_detail), 
-                ('<b>More details:</b> %s' % pledge['detail']).split("\n\n"))
+                ('<b>More details:</b> %s' % pledge['detail']).split("\r?\n\r?\n"))
             )
 
     if not has_sms(pledge):

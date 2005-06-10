@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.7 2005-06-09 19:18:23 matthew Exp $
+// $Id: all.php,v 1.8 2005-06-10 10:58:43 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -26,7 +26,8 @@ if ($type == 'title') {
 } elseif ($type =='ref') {
     $order = 'ref';
 }
-$q = db_query('SELECT *
+$q = db_query('SELECT *, (SELECT count(*) FROM signers
+                            WHERE signers.pledge_id = pledges.id) AS signers
         FROM pledges 
         WHERE confirmed 
         AND date>=pb_current_date() 

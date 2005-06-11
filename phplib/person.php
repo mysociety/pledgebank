@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.20 2005-06-11 19:12:47 chris Exp $
+ * $Id: person.php,v 1.21 2005-06-11 19:54:01 chris Exp $
  * 
  */
 
@@ -172,18 +172,34 @@ function person_cookie_token_duration($token) {
     return $duration;
 }
 
-/* person_if_signed_on
+/* Global variable storing the identity of any signed-on person. Since
+ * person_if_signed_on renews the user's cookie and multiple calls to
+ * setcookie() with the same cookie name just add further Set-Cookie: headers,
+ * we need to make sure the cookie is only sent once. Really the proper way to
+ * do this is to have a flag which means "cookie sent", but that turned out to
+ * be a historical impossibility.... */
+$person_signed_on = null;
+
+/* person_if_signed_on [NORENEW]
  * If the user has a valid login cookie, return the corresponding person
- * object; otherwise, return null. */
-function person_if_signed_on() {
+ * object; otherwise, return null. This function will renew any login cookie,
+ * unless NORENEW is set. */
+function person_if_signed_on($norenew = false) {
+    global $person_signed_on;
+    if (!is_null($person_signed_on))
+        return $person_signed_on;
     if (array_key_exists('pb_person_id', $_COOKIE)) {
         /* User has a cookie and may be logged in. */
         $id = person_check_cookie_token($_COOKIE['pb_person_id']);
         if (!is_null($id)) {
-            /* Valid, so renew the cookie. */
-            $duration = person_cookie_token_duration($_COOKIE['pb_person_id']);
-            setcookie('pb_person_id', person_cookie_token($id, $duration), time() + $duration, '/', OPTION_WEB_DOMAIN, false);
-            return new Person($id);
+            $P = new Person($id);
+            if (!$norenew) {
+                /* Valid, so renew the cookie. */
+                $duration = person_cookie_token_duration($_COOKIE['pb_person_id']);
+                setcookie('pb_person_id', person_cookie_token($id, $duration), time() + $duration, '/', OPTION_WEB_DOMAIN, false);
+                $person_signed_on = $P; /* save this here so we will renew the cookie on a later call to this function without NORENEW */
+            }
+            return $P;
         }
     }
     return null;   
@@ -206,12 +222,10 @@ function person_if_signed_on() {
  * for it in an earlier form and included it in the call to this function.
  */
 function person_signon($template_data, $email = null, $name = null) {
-    global $person_signed_on;
-
     if (!is_null($email) && !preg_match('/^[^@]+@[^@]+$/', $email))
         err("'$email' is not a valid email address");
 
-    $P = $person_signed_on;
+    $P = person_if_signed_on();
     if (!is_null($P) && (is_null($email) || $P->email() == $email)) {
         if (!is_null($name) && !$P->matches_name($name))
             $P->name($name);

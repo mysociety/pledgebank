@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.87 2005-06-11 19:12:47 chris Exp $
+ * $Id: pledge.php,v 1.88 2005-06-11 19:54:01 chris Exp $
  * 
  */
 
@@ -497,7 +497,6 @@ function send_announce_token($pledge_id) {
 
 /* Display form for pledge signing. */
 function pledge_sign_box() {
-    global $person_signed_on;
     if (get_http_var('add_signatory'))
         $showname = get_http_var('showname') ? ' checked' : '';
     else
@@ -506,7 +505,7 @@ function pledge_sign_box() {
     $email = get_http_var('email');
     $name = get_http_var('name');
 
-    $P = $person_signed_on;
+    $P = person_if_signed_on();
     if (!is_null($P)) {
         if (is_null($email) || !$email)
             $email = $P->email();

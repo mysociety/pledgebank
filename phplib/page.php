@@ -5,9 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.34 2005-06-11 19:12:47 chris Exp $
-
-$person_signed_on = person_if_signed_on();
+// $Id: page.php,v 1.35 2005-06-11 19:54:01 chris Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -19,8 +17,9 @@ function page_header($title, $params = array()) {
     if ($header_outputted) {
         return;
     }
+    
+    $P = person_if_signed_on(true); /* Don't renew any login cookie. */
 
-    global $person_signed_on;
     $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
@@ -75,12 +74,12 @@ function page_header($title, $params = array()) {
             } */
             print '</p>';
         }
-        if ($person_signed_on) {
+        if ($P) {
             print '<p id="signedon">Hello, ';
-            if ($person_signed_on->has_name())
-                print htmlspecialchars($person_signed_on->name);
+            if ($P->has_name())
+                print htmlspecialchars($P->name);
             else 
-                print htmlspecialchars($person_signed_on->email);
+                print htmlspecialchars($P->email);
             print ' <small>(<a href="/logout">this isn\'t you?  click here</a>)</small>';
             print '</p>';
         }
@@ -112,7 +111,6 @@ function page_footer($params = array()) {
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
         $footer_outputted = 1;
-    global $person_signed_on;
 ?>
 </div>
 <hr class="v"><h2 class="v">Navigation</h2>
@@ -127,7 +125,8 @@ function page_footer($params = array()) {
 <li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li>
 <li><a href="/contact">Contact</a></li>
 <?
-        if ($person_signed_on) {
+        $P = person_if_signed_on(true); /* Don't renew any login cookie. */
+        if ($P) {
 ?> <li><a href="/logout">Logout</a></li> <?
         } else {
 ?> <li><a href="/login">Login</a></li> <?

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.31 2005-06-11 07:31:31 francis Exp $
+// $Id: page.php,v 1.32 2005-06-11 08:53:54 matthew Exp $
 
 $signed_on_person = person_if_signed_on();
 
@@ -98,7 +98,7 @@ function page_header($title, $params = array()) {
         $devwarning[] = "Note: On this test site, the date is faked to be $pb_today";
     }
     if (count($devwarning) > 0) {
-        ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff"><?
+        ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff; margin-top: 0;"><?
         print join('<br>', $devwarning);
         ?></p><?
     }

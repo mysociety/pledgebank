@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.177 2005-06-11 06:59:55 francis Exp $
+// $Id: index.php,v 1.178 2005-06-11 19:01:14 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -20,9 +20,10 @@ front_page();
 page_footer();
 
 function front_page() {
+    global $signed_on_person;
     if (!local_alert_subscribed()) {
         $email = '';
-        $P = person_if_signed_on();
+        $P = $signed_on_person;
         if (!is_null($P)) {
             $email = $P->email();
         } ?>

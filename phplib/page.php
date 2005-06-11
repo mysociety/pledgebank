@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.32 2005-06-11 08:53:54 matthew Exp $
+// $Id: page.php,v 1.33 2005-06-11 19:01:12 matthew Exp $
 
 $signed_on_person = person_if_signed_on();
 
@@ -31,7 +31,7 @@ function page_header($title, $params = array()) {
         print htmlspecialchars($title) . " - ";
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
-?> PledgeBank Beta</title>
+?> PledgeBank - Tell the world "I'll do it, but only if you'll help"</title>
 <style type="text/css" media="all">@import url('/pb.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <?

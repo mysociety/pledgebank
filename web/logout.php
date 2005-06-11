@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: logout.php,v 1.2 2005-05-31 12:24:20 chris Exp $
+ * $Id: logout.php,v 1.3 2005-06-11 19:01:14 matthew Exp $
  * 
  */
 
@@ -15,8 +15,7 @@ require_once '../phplib/pb.php';
 require_once '../phplib/page.php';
 require_once '../phplib/person.php';
 
-$P = person_if_signed_on();
-if ($P) {
+if ($signed_on_person) {
     person_signoff();
     header("Location: /logout");
     exit;

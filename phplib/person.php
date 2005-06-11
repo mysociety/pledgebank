@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.17 2005-06-09 11:22:41 francis Exp $
+ * $Id: person.php,v 1.18 2005-06-11 17:44:38 chris Exp $
  * 
  */
 
@@ -182,6 +182,8 @@ function person_if_signed_on() {
         if (!is_null($id)) {
             /* Valid, so renew the cookie. */
             $duration = person_cookie_token_duration($_COOKIE['pb_person_id']);
+            /* Delete any existing cookie so that we don't set lots. */
+            setcookie('pb_person_id', false, null, '/', OPTION_WEB_DOMAIN, false);
             setcookie('pb_person_id', person_cookie_token($id, $duration), time() + $duration, '/', OPTION_WEB_DOMAIN, false);
             return new Person($id);
         }

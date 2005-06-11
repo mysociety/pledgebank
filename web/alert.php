@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.4 2005-06-11 19:01:14 matthew Exp $
+// $Id: alert.php,v 1.5 2005-06-11 19:12:46 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -53,11 +53,11 @@ function do_local_alert_subscribe() {
 
 /* Display form for email alert sign up. */
 function local_alert_subscribe_box() {
-    global $signed_on_person;
+    global $person_signed_on;
     $email = get_http_var('email');
     $postcode = get_http_var('postcode');
 
-    $P = $signed_on_person;
+    $P = $person_signed_on;
     if (!is_null($P)) {
         if (is_null($email) || !$email)
             $email = $P->email();

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.19 2005-06-11 19:01:12 matthew Exp $
+ * $Id: person.php,v 1.20 2005-06-11 19:12:47 chris Exp $
  * 
  */
 
@@ -206,12 +206,12 @@ function person_if_signed_on() {
  * for it in an earlier form and included it in the call to this function.
  */
 function person_signon($template_data, $email = null, $name = null) {
-    global $signed_on_person;
+    global $person_signed_on;
 
     if (!is_null($email) && !preg_match('/^[^@]+@[^@]+$/', $email))
         err("'$email' is not a valid email address");
 
-    $P = $signed_on_person;
+    $P = $person_signed_on;
     if (!is_null($P) && (is_null($email) || $P->email() == $email)) {
         if (!is_null($name) && !$P->matches_name($name))
             $P->name($name);

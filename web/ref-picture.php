@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.4 2005-06-11 19:01:14 matthew Exp $
+ * $Id: ref-picture.php,v 1.5 2005-06-11 19:12:46 chris Exp $
  * 
  */
 
@@ -29,7 +29,7 @@ if (!is_null($err))
 
 $pledge = new Pledge($q_ref);
 
-$P = $signed_on_person;
+$P = $person_signed_on;
 if (!$P) {
     $P = person_signon(array(
                     'reason' => $pledge->has_picture() ?

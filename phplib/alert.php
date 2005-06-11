@@ -5,15 +5,15 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.2 2005-06-09 14:13:10 francis Exp $
+// $Id: alert.php,v 1.3 2005-06-11 19:12:47 chris Exp $
 
 /* Returns true if the signed on user is already subscribed */
 function local_alert_subscribed() {
-    global $signed_on_person;
-    if (!$signed_on_person)
+    global $person_signed_on;
+    if (!$person_signed_on)
         return false;
     
-    $already_signed = db_getOne("select count(*) from local_alert where person_id = ?", array($signed_on_person->id()));
+    $already_signed = db_getOne("select count(*) from local_alert where person_id = ?", array($person_signed_on->id()));
     if ($already_signed == 0)
         return false;
     elseif ($already_signed == 1)

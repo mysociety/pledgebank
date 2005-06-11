@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.25 2005-06-11 19:01:14 matthew Exp $
+ * $Id: login.php,v 1.26 2005-06-11 19:12:46 chris Exp $
  * 
  */
 
@@ -157,7 +157,7 @@ if (!is_null($q_t)) {
     /* NOTREACHED */
 }
 
-$P = $signed_on_person;
+$P = $person_signed_on;
 if (!is_null($P)) {
     /* Person is already signed in. */
     if ($q_SetPassword)

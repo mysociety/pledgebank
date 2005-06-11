@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.9 2005-06-11 19:01:14 matthew Exp $
+ * $Id: ref-info.php,v 1.10 2005-06-11 19:12:46 chris Exp $
  * 
  */
 
@@ -38,7 +38,7 @@ if ($pin_box) {
     exit;
 }
 
-$P = $signed_on_person;
+$P = $person_signed_on;
 if ($q_LetMeIn && !is_null($q_email)) {
     /* User wants to log in. Do the signon then redirect back to the normal
      * page, so that they always view it as a GET. */

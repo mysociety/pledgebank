@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.12 2005-06-11 19:01:14 matthew Exp $
+ * $Id: ref-announce.php,v 1.13 2005-06-11 19:12:46 chris Exp $
  * 
  */
 
@@ -30,7 +30,7 @@ $p = new Pledge($q_ref);
 /* Lock the pledge here, before we do any other checks. */
 $p->lock();
 
-$P = $signed_on_person;
+$P = $person_signed_on;
 if (!$P) {
     $P = person_signon(array(
                     'reason' => "send a message to all signers",

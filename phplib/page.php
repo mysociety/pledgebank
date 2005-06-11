@@ -5,9 +5,9 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.33 2005-06-11 19:01:12 matthew Exp $
+// $Id: page.php,v 1.34 2005-06-11 19:12:47 chris Exp $
 
-$signed_on_person = person_if_signed_on();
+$person_signed_on = person_if_signed_on();
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -20,7 +20,7 @@ function page_header($title, $params = array()) {
         return;
     }
 
-    global $signed_on_person;
+    global $person_signed_on;
     $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
@@ -75,12 +75,12 @@ function page_header($title, $params = array()) {
             } */
             print '</p>';
         }
-        if ($signed_on_person) {
+        if ($person_signed_on) {
             print '<p id="signedon">Hello, ';
-            if ($signed_on_person->has_name())
-                print htmlspecialchars($signed_on_person->name);
+            if ($person_signed_on->has_name())
+                print htmlspecialchars($person_signed_on->name);
             else 
-                print htmlspecialchars($signed_on_person->email);
+                print htmlspecialchars($person_signed_on->email);
             print ' <small>(<a href="/logout">this isn\'t you?  click here</a>)</small>';
             print '</p>';
         }
@@ -112,7 +112,7 @@ function page_footer($params = array()) {
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
         $footer_outputted = 1;
-    global $signed_on_person;
+    global $person_signed_on;
 ?>
 </div>
 <hr class="v"><h2 class="v">Navigation</h2>
@@ -127,7 +127,7 @@ function page_footer($params = array()) {
 <li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li>
 <li><a href="/contact">Contact</a></li>
 <?
-        if ($signed_on_person) {
+        if ($person_signed_on) {
 ?> <li><a href="/logout">Logout</a></li> <?
         } else {
 ?> <li><a href="/login">Login</a></li> <?

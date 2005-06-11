@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.14 2005-06-11 06:25:10 matthew Exp $
+ * $Id: comments.php,v 1.15 2005-06-11 06:59:55 francis Exp $
  * 
  */
 
@@ -101,6 +101,16 @@ function comments_show($pledge, $noabuse = false) {
     print "</div>";
 }
 
+/* comment_summary COMMENT 
+ * Display comment for index, such as front page or search results.
+ */
+function comment_summary($r) {
+    return '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' .
+        (strlen($r['text'])>20 ? substr($r['text'], 0, 20) : $r['text']) . '...</a> by ' . 
+    htmlspecialchars($r['name']) . ', on pledge <a href="/' . $r['ref'] . '">' . $r['ref'] . '</a> at ' .
+        prettify($r['whenposted']);
+}
+
 function latest_comments() { ?>
 <div id="comments">
 <h2>Latest comments</h2>
@@ -109,10 +119,7 @@ function latest_comments() { ?>
     print '<ul>';
     while($r = db_fetch_array($q)) {
         print '<li>';
-        print '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' .
-        (strlen($r['text'])>20 ? substr($r['text'], 0, 20) : $r['text']) . '...</a> by ' . 
-        htmlspecialchars($r['name']) . ', on pledge <a href="/' . $r['ref'] . '">' . $r['ref'] . '</a> at ' .
-            prettify($r['whenposted']);
+        print comment_summary($r);
         #        comments_show_one($r, true);
         print '</li>';
     }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.176 2005-06-11 06:25:13 matthew Exp $
+// $Id: index.php,v 1.177 2005-06-11 06:59:55 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -29,8 +29,8 @@ function front_page() {
 <form accept-charset="utf-8" id="localsignup" name="pledge" action="/alert" method="post">
 <input type="hidden" name="subscribe_alert" value="1">
 <p><strong>Get emails about local pledges &mdash;</strong>
-<label for="email">Email:</label><input type="text" size="20" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
-<label for="postcode">Postcode:</label><input type="text" size="15" name="postcode" id="postcode" value="">
+<label for="email">Email:</label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
+<label for="postcode">Postcode:</label><input type="text" size="12" name="postcode" id="postcode" value="">
 
 <input type="submit" name="submit" value="Subscribe"> </p>
 </form>
@@ -52,11 +52,10 @@ Or <a href="/explain">read a full transcript</a>.</p>
 
 <div id="startblurb">
 <h2>Start your own pledge</h2>
-<p>The way it works is simple. You <a href="/new">create a pledge</a>
-which has the basic format 'I'll do something, but only if other people will
-pledge to do the same thing'.  There are some examples of successful
-pledges on this page, but you can go wild with your own ideas!
-<p id="start"><a href="./new">Start your own pledge &raquo;</a></p>
+<p>Pledgebank is free and easy to use. Once you've thought of something you'd like
+to do, just <a href="/new">create a pledge</a> which says "I'll do this, but
+only if 5 other people will do the same".
+<p id="start"><a href="./new">Start your own pledge&nbsp;&raquo;</a></p>
 </div>
 
 <div id="currentpledges"><?    list_frontpage_pledges(); ?>
@@ -74,30 +73,10 @@ function get_pledges_list($query) {
     $q = db_query($query);
     $pledges = '';
     while ($r = db_fetch_array($q)) {
-        $signatures = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
-        $pledges .= '<li>' . pledge_sentence($r, array('html'=>true, 'href'=>$r['ref'])) . ' ';
-        if ($r['target'] - $signatures <= 0) {
-            if ($r['daysleft'] == 0)
-                $pledges .= 'Target met, pledge open until midnight tonight, London time';
-            elseif ($r['daysleft'] < 0)
-                $pledges .= 'Target met, pledge over';
-            else
-                $pledges .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days');
-        } else {
-            $left = $r['target'] - $signatures;
-            if ($r['daysleft'] == 0)
-                $pledges .= "(needs $left more by midnight tonight, London time)";
-            elseif ($r['daysleft'] < 0)
-                $pledges .= 'Deadline expired, pledge failed';
-            else {
-                $pledges .= "(";
-                if ($r['daysleft'] <= 3) {
-                    $pledges .= "just ";
-                }
-                $pledges .= "${r['daysleft']} " . make_plural($r['daysleft'], 'day', 'days') . " left";
-                $pledges .=  ", $left more signatures needed)";
-            }
-        }
+        $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
+        $pledges .= '<li>';
+        $pledges .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+        
         $pledges .= '</li>';
     }
     return $pledges;

@@ -5,10 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.3 2005-06-03 14:46:22 matthew Exp $
+// $Id: search.php,v 1.4 2005-06-11 06:59:55 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
+require_once '../phplib/comments.php';
 
 page_header("Search Results");
 print search();
@@ -23,27 +24,60 @@ function search() {
         exit;
     }
 
-    $q = db_query('SELECT date,ref,title, pb_current_date() <= date as open FROM pledges WHERE pin IS NULL AND (title ILIKE \'%\' || ? || \'%\' OR detail ILIKE \'%\' || ? || \'%\' OR ref ILIKE \'%\' || ? || \'%\') ORDER BY date', array($search, $search, $search));
-    if (!db_num_rows($q)) {
-    } else {
+    $q = db_query('SELECT *, pb_current_date() <= date as open,
+                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
+                date - pb_current_date() AS daysleft
+                FROM pledges 
+                WHERE pin IS NULL 
+                    AND (title ILIKE \'%\' || ? || \'%\' OR 
+                         detail ILIKE \'%\' || ? || \'%\' OR 
+                         ref ILIKE \'%\' || ? || \'%\') 
+                ORDER BY date DESC', array($search, $search, $search));
+    $closed = ''; $open = '';
+    if (db_num_rows($q)) {
         $success = 1;
-        $closed = ''; $open = '';
         while ($r = db_fetch_array($q)) {
-            $text = '<li><a href="' . $r['ref'] . '">' . htmlspecialchars($r['title']) . '</a></li>';
+            $text = '<li>';
+            $text .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+            $text .= '</li>';
             if ($r['open']=='t') {
                 $open .= $text;
             } else {
                 $closed .= $text;
             }
         }
-        if ($open) {
-            $out .= '<p>The following currently open pledges matched your search term "' . htmlspecialchars($search) . '" in either their title, reference, or More Details:</p>';
-            $out .= '<ul>' . $open . '</ul>';
+    }
+
+    if ($open) {
+        $out .= '<p>Results for <strong>open pledges</strong> matching <strong>' . htmlspecialchars($search) . '</strong>:</p>';
+        $out .= '<ul>' . $open . '</ul>';
+    }
+
+    if ($closed) {
+        $out .= '<p>Results for <strong>closed pledges</strong> matching <strong>'.htmlspecialchars($search).'</strong>:</p>';
+        $out .= '<ul>' . $closed . '</ul>';
+    }
+
+    // Comments
+    $comments_to_show = 10;
+    $q = db_query('SELECT comment.id,
+                          extract(epoch from whenposted) as whenposted,
+                          text,comment.name,website,ref 
+                   FROM comment,pledges 
+                   WHERE comment.pledge_id = pledges.id 
+                        AND NOT ishidden 
+                        AND text ILIKE \'%\' || ? || \'%\'
+                   ORDER BY whenposted DESC', array($search));
+    if (db_num_rows($q)) {
+        $success = 1;
+        $out .= "<p>Results for <strong>comments</strong> matching <strong>".htmlspecialchars($search)."</strong>:</p>";
+        $out .= '<ul>';
+        while($r = db_fetch_array($q)) {
+            $out .= '<li>';
+            $out .= comment_summary($r);
+            $out .= '</li>';
         }
-        if ($closed) {
-            $out .= '<p>The following are closed pledges that match your search term:</p>';
-            $out .= '<ul>' . $closed . '</ul>';
-        }
+        $out .= '</ul>';
     }
 
     $people = array();
@@ -57,14 +91,15 @@ function search() {
     }
     if (sizeof($people)) {
         $success = 1;
-        $out .= '<p>The following creators or signatures matched your search term "'.htmlspecialchars($search).'":</p> <dl>';
+        $out .= '<p>Results for <strong>people</strong> matching <strong>'.
+            htmlspecialchars($search).'</strong>:</p> <dl>';
         ksort($people);
         foreach ($people as $name => $array) {
             $out .= '<dt><b>'.htmlspecialchars($name). '</b></dt> <dd>';
             foreach ($array as $item) {
                 $out .= '<dd>';
                 $out .= '<a href="' . $item[0] . '">' . $item[1] . '</a>';
-                if ($item[2] == 'creator') $out .= " (creator)";
+                if ($item[2] == 'creator') $out .= " (author)";
                 $out .= '</dd>';
             }
         }

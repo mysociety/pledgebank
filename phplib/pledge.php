@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.84 2005-06-10 00:49:32 matthew Exp $
+ * $Id: pledge.php,v 1.85 2005-06-11 06:59:55 francis Exp $
  * 
  */
 
@@ -305,7 +305,7 @@ function pledge_sentence($r, $params = array()) {
     $s .= prettify($r['target'])
             . '</strong>'
             . " ${r['type']} will "
-            . ($r['signup'] == 'do the same' ? 'too' : $r['signup'])
+            . ($r['signup'] == 'do the same' ? 'too' : trim($r['signup']))
             . ".";
     if (!$html or array_key_exists('href', $params))
         $s = preg_replace('#</?strong>#', '', $s);
@@ -314,6 +314,39 @@ function pledge_sentence($r, $params = array()) {
     $s = preg_replace('#\.\.#', '.', $s);
 
     return $s;
+}
+
+
+/* pledge_sentence PLEDGE PARAMS
+ * Return pledge text in a format suitable for a (long) summary on a list of
+ * pledges, such as the front page.  PLEDGE is an array of info about the
+ * pledge.  PARAMS are passed to pledge_sentence.
+ */
+function pledge_summary($r, $params) {
+    $text = pledge_sentence($r, $params) . ' ';
+    if ($r['target'] - $r['signers'] <= 0) {
+        if ($r['daysleft'] == 0)
+            $text .= 'Target met, pledge open until midnight tonight, London time.';
+        elseif ($r['daysleft'] < 0)
+            $text .= 'Target met, pledge over.';
+        else
+            $text .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days') . '.';
+    } else {
+        $left = $r['target'] - $r['signers'];
+        if ($r['daysleft'] == 0)
+            $text .= "(needs $left more by midnight tonight, London time)";
+        elseif ($r['daysleft'] < 0)
+            $text .= 'Deadline expired, pledge failed.';
+        else {
+            $text .= "(";
+            if ($r['daysleft'] <= 3) {
+                $text .= "just ";
+            }
+            $text .= "${r['daysleft']} " . make_plural($r['daysleft'], 'day', 'days') . " left";
+            $text .=  ", $left more signatures needed)";
+        }
+    }
+    return $text;
 }
 
 /* pledge_is_successful PLEDGE

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.29 2005-06-09 19:18:22 matthew Exp $
+// $Id: page.php,v 1.30 2005-06-11 06:25:10 matthew Exp $
 
 $signed_on_person = person_if_signed_on();
 
@@ -31,7 +31,7 @@ function page_header($title, $params = array()) {
         print htmlspecialchars($title) . " - ";
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
-?> PledgeBank - Not Finished Yet</title>
+?> PledgeBank Beta</title>
 <style type="text/css" media="all">@import url('/pb.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <?
@@ -55,7 +55,8 @@ function page_header($title, $params = array()) {
         if (array_key_exists('noprint', $params) and $params['noprint'])
             print '<div class="noprint">';
 ?>
-<h1><a href="/"><span class="logo_pledge">Pledge</span><span class="logo_bank">Bank</span></a> &mdash; Not Finished Yet</h1>
+<h1><a href="/"><!-- <img src="http://very.unfortu.net/~tom/tspblogo.png" alt="PledgeBank - beta"></a> -->
+<span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a> <span id="beta">Beta</span></h1>
 <hr class="v"><?
         if (array_key_exists('noprint', $params) and $params['noprint'])
             print '</div> <!-- noprint -->';
@@ -69,9 +70,9 @@ function page_header($title, $params = array()) {
             print '<strong>'. str_replace('http://', '', $url) . '</strong>';
             if (!array_key_exists('noreflink', $params))
                 print '</a>';
-            if ($category) {
+/*            if ($category) {
                 print '<br>This pledge is in the <strong>' . $category . '</strong> category';
-            }
+            } */
             print '</p>';
         }
         if ($signed_on_person) {
@@ -89,8 +90,8 @@ function page_header($title, $params = array()) {
     // Warn that we are on a testing site
     $devwarning = array();
     if (OPTION_PB_STAGING) {
-        $devwarning[] = 'This is a test site for developers only. You probably want
-<a href="http://www.pledgebank.com/">the real site</a>.';
+#        $devwarning[] = 'This is a test site for developers only. You probably want
+#<a href="http://www.pledgebank.com/">the real site</a>.';
     }
     global $pb_today;
     if ($pb_today != date('Y-m-d')) {
@@ -115,6 +116,10 @@ function page_footer($params = array()) {
 ?>
 </div>
 <hr class="v"><h2 class="v">Navigation</h2>
+<form id="search" accept-charset="utf-8" action="/search" method="get">
+<p><label for="s">Search:</label>
+<input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="Go"></p>
+</form>
 <ul id="nav">
 <li><a href="/">Home</a></li>
 <li><a href="/new">Start a Pledge</a></li>

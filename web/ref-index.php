@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.20 2005-06-08 23:57:48 francis Exp $
+// $Id: ref-index.php,v 1.21 2005-06-11 06:25:14 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -43,7 +43,7 @@ function draw_spreadword($p) {
     if (!$p->finished()) { ?>
     <div id="spreadword">
     <h2>Spread the word on and offline</h2>
-    <ul id="spread">
+    <ul>
     <li> <? print_link_with_pin($p->url_email(), "", "Email pledge to your friends") ?></li>
 <!--    <li> <? print_link_with_pin($p->url_ical(), "", "Add deadline to your calendar") ?> </li> -->
     <li> <? print_link_with_pin($p->url_flyers(), "Stick them places!", "Print out customised flyers") ?>

@@ -5,119 +5,224 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.58 2005-06-10 10:43:52 matthew Exp $
+ * $Id: pb.css,v 1.59 2005-06-11 06:25:13 matthew Exp $
  * 
  */
 
+/* Site wide styles */
+
 body {
-	text-align: center;
-	font-family: "Lucida Grande", "Lucida Sans", sans-serif;
-	margin: 0;
-	padding: 0;
-        color: #000000;
-        background-color: #ffffff;
+    text-align: center;
+    font-family: "Lucida Grande", "Lucida Sans", sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #000000;
+    background-color: #ffffff;
 }
-h1 {
-	font-size: 200%;
-	padding: 0.4em 10px;
-	text-align: left;
-	margin: 0;
-	color: #ffffff;
-	background-color: #9C7BBD;
-	border-bottom: solid 2px #522994;
+h2 {
+    margin-top: 0;
 }
-h1 span.logo_pledge {
-	background-color: #9C7BBD;
-	color: #ffffff;
-}
-h1 span.logo_bank {
-	background-color: #9C7BBD;
-	color: #21004A;
-}
-a:link { color: #9C7BBD; }
-a:visited { color: #9C7BBD; }
+a:link { color: #522994; }
+a:visited { color: #7b52a5; }
 a:hover, a:active { color: #000000; }
 h1 a:link, h1 a:visited {
     text-decoration: none;
 }
 blockquote {
-    font-style: italic;
+    font-style: normal;
+    margin: 0;
 }
 th {
     text-align: right;
 }
+dt {
+    font-weight: bold;
+    margin-top: 0.5em;
+}
+form {
+    margin: 0;
+    padding: 3px;
+}
+form.buttonform {
+    padding: 0;
+}
+input[type=text], input[type=password], input[type=submit], textarea {
+    background-color: #ffffff;
+    color: #000000;
+    border: solid 2px #9c7bbd;
+}
+textarea:hover, textarea:focus, input[type=text]:hover, input[type=submit]:hover, input[type=password]:hover, input[type=text]:focus, input[type=submit]:focus, input[type=password]:focus {
+    border: solid 2px #522994;
+}
+textarea {
+    max-width: 100%;
+}
+label {
+    cursor: pointer;
+}
 
-#tomtalks {
-	float: right;
-    clear: right;
-	border: solid 2px #522994;
-	padding: 3px;
-	text-align: center;
-	font-size: 100%;
-	color: #000000;
-	background-color: #C6B5DE;
-	width: 9em;
+/* Header */
+
+h1 {
+    font-size: 200%;
+    margin: 0;
+    padding: 0.4em 10px;
+    text-align: left;
+    margin: 0;
+    color: #ffffff;
+    background-color: #9c7bbd;
+    border-bottom: solid 2px #522994;
 }
-#tomtalks a {
-	color: #000000;
+h1 span#logo_pledge {
+    background-color: #9C7BBD;
+    color: #ffffff;
+}
+h1 span#logo_bank {
+    background-color: #9C7BBD;
+    color: #21004A;
+}
+h1 span#beta {
+    font-size: 40%;
+    vertical-align: top;
+}
+/* Site wide elements */
+
+.v {
+    display: none;
 }
 
-#start a, #localsignupad a {
-	float: right;
-    clear: right;
-	border: solid 2px #522994;
-	padding: 3px;
-	text-align: center;
-	font-size: 150%;
-	color: #000000;
-	background-color: #C6B5DE;
-	width: 6em;
-	text-decoration: none;
+#search {
+    color: #21004a;
+    position: absolute;
+    top: 2px; right: 2px;
+    font-size: 83%;
 }
-#start a:hover, #localsignupad a:hover {
-	border: solid 2px #990000;
-	color: #ff0000;
-	background-color: #ffcccc;
+#search p {
+    margin: 0;
 }
+
+#content {
+    clear: both;
+    text-align: left;
+    padding: 5px 5% 10px;
+    margin: 1em auto 0;
+    max-width: 70em;
+}
+
+#footer {
+    clear: both;
+    padding: 3px;
+    border-top: solid 1px #c6b5d3;
+    font-size: 90%;
+    width: 50%;
+    margin: 1em auto 0;
+}
+
+.fr {
+    margin-bottom: 2px;
+}
+
+#errors {
+    margin: 0 auto 1em;
+    color: #ff0000;
+    background-color: #ffcccc;
+    border: solid 2px #990000;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#errors ul {
+    padding: 0;
+    margin: 0 0 0 1.5em;
+}
+input.error, input[type=text].error, select.error, input[type=radio].error {
+    border: solid 2px #990000;
+    background-color: #ffcccc;
+}
+
+/* Front page */
+
+#tellworld {
+    float: left;
+    width: 60%;
+    border: solid 2px #522994;
+    padding: 10px;
+}
+#startblurb {
+    float: right;
+    width: 33%;
+    border: solid 2px #522994;
+    background-color: #f6e5ff;
+    padding: 10px;
+}
+#start {
+    margin: 0;
+    text-align: center;
+    font-size: 150%;
+}
+#localsignup {
+    text-align: center;
+    margin-bottom: 1em;
+}
+#localsignup p {
+    margin: 0;
+}
+#currentpledges {
+    clear: left;
+    margin-top: 1em;
+}
+#successfulpledges {
+    clear: left;
+}
+#currentpledges, #successfulpledges {
+    width: 60%;
+    float: left;
+}
+#currentpledges li, #successfulpledges li {
+    padding-bottom: 0.5em;
+    border-bottom: dotted 1px #999999;
+    margin-bottom: 0.5em;
+}
+
+#photo {
+    background: url("http://very.unfortu.net/~tom/phoneandflyers.jpg") no-repeat 50% 50%;
+    dmargin-top: 1em;
+    float: right;
+    padding: 10px;
+    width: 33%;
+    height: 191px;
+}
+#front #comments {
+    font-size: 95%;
+    width: 33%;
+}
+#front #comments ul {
+    padding-left: 1.5em;
+    margin: 0;
+    list-style-type: disc;
+}
+#front #comments li {
+    padding-bottom: 0em;
+    border-bottom: dotted 0px #999999;
+    margin-bottom: 0em;
+}
+
+/* Blurb underneath header */
 
 #reference, #signedon {
     font-size: 83%;
     padding: 2px;
     margin: 0;
 }
-
 #reference {
     float: left;
     width: 60%;
     text-align: left;
 }
-
 #signedon {
     text-align: right;
 }
 
-#content {
-    clear: both;
-	text-align: left;
-	padding: 5px 5% 10px;
-    margin: 0 auto;
-}
-
-#search {
-	border: solid 2px #522994;
-	clear: right;
-	float: right;
-	margin-top: 1em;
-	width: 9em;
-}
-#search h2 {
-	margin: 0;
-	font-size: 100%;
-}
-#search p {
-	margin: 0;
-	font-size: 83%;
-}
+/* Forms for signing up, new pledges, etc. */
 
 .pledge .c {
     text-align: center;
@@ -131,69 +236,59 @@ th {
 .pledge p, #pledgeaction p {
     margin-bottom: 0;
 }
-.pledge h2, #pledgeaction h2, #spreadword h2, #tips h2, #pledge h2, #signatories h2, #connections h2, #comments h2 {
-    margin-top: 0;
-}
-/*.pledge a:link, .pledge a:visited {
-    color: #000000;
-    background-color: #c6b5de;
-} */
 #pledgeaction {
     float: right;
     width: 45%;
     margin: 1em 0 0.5em 0;
 }
-
 #tips, #pledge, #all .pledge {
     border: solid 2px #522994;
     background-color: #f6e5ff;
-    margin: 1em auto;
+    margin-bottom: 1em;
     padding: 10px;
 }
-#pledge {
-    text-align: center;
-    width: 45%;
-    float: left;
-}
-#tips li, #pledge li {
+#tips li {
     padding: 0;
     margin: 0 0 1em 0;
 }
 
+/* An individual pledge page */
+
+#pledge {
+    text-align: center;
+    width: 45%;
+    float: left;
+    margin: 1em auto;
+}
 #moredetails {
     text-align: left;
     font-size: 95%; 
 }
-
 #spreadword {
     border: solid 2px #ff8429;
     background-color: #ffff99;
     padding: 10px;
-    margin-top: 1em;
-    float: right;
-    clear: right;
-    width: 45%;
 }
 #spreadword ul {
     line-height: 1.4;
+    margin: 0;
+    padding: 0 0 0 1.5em;
 }
+
 #spreadword a {
     font-weight: bold;
 }
-
-#signatories {
+#signatories ul, #connections ul {
+    margin: 0;
+    padding: 0 0 0 1.5em;
+}
+#signatories, #connections {
     clear: left;
     float: left;
     margin-top: 1em;
     width: 45%;
 }
-#connections {
-    clear: left;
-    float: left; 
-    margin-top: 1em;
-    width: 45%;
-}
-#comments {
+#comments, #spreadword {
     margin-top: 1em;
     clear: right;
     float: right;
@@ -222,112 +317,55 @@ th {
     margin-bottom: 2px;
 }
 
-dt {
-    font-weight: bold;
-    margin-top: 0.5em;
-}
-
-ul#nav {
-	list-style-type: none;
-	position: absolute;
-	top: 2.8em;
-	right: 0;
-	margin: 0 1em 0 0;
-	padding: 0;
-}
-ul#nav a {
-	text-decoration: none;
-}
-ul#nav li {
-	margin: 0;
-	padding: 1px 5px;
-	text-align: center;
-	position: relative;
-	top: 2px;
-	background-color: #ffffff;
-	color: #21004a;
-	margin-left: 0.5em;
-	display: inline;
-	border: solid 1px #522994;
-	border-width: 2px 2px 0 2px;
-}
-form {
-	margin: 0;
-	padding: 3px;
-}
-form.buttonform {
-	padding: 0;
-}
-input[type=text], input[type=password], input[type=submit], textarea {
-	background-color: #ffffff;
-	color: #000000;
-	border: solid 2px #9c7bbd;
-}
-textarea:hover, textarea:focus, input[type=text]:hover, input[type=submit]:hover, input[type=password]:hover, input[type=text]:focus, input[type=submit]:focus, input[type=password]:focus {
-	border: solid 2px #522994;
-}
-textarea {
-    max-width: 100%;
-}
-
-.v {
-	display: none;
-}
-
-#footer {
-    clear: both;
-	padding: 3px;
-	border-top: solid 1px #c6b5d3;
-	font-size: 90%;
-	width: 50%;
-	margin: 1em auto 0;
-}
-
-label {
-	cursor: pointer;
-}
-.fr {
-	margin-bottom: 2px;
-}
-
-#errors {
-    margin: 0 auto 1em;
-    color: #ff0000;
-    background-color: #ffcccc;
-    border: solid 2px #990000;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-#errors ul {
-    padding: 0;
-    margin: 0 0 0 1.5em;
-}
-input.error, input[type=text].error, select.error, input[type=radio].error {
-    border: solid 2px #990000;
-    background-color: #ffcccc;
-}
-
 .success {
-	margin: 0 auto 1em;
-	width: 80%;
-	padding: 10px;
-	text-align: center;
-	background-color: #ccffcc;
-	border: solid 2px #009900;
+    margin: 0 auto 1em;
+    width: 80%;
+    padding: 10px;
+    text-align: center;
+    background-color: #ccffcc;
+    border: solid 2px #009900;
 }
 
 .finished {
-	margin: 0 auto 1em;
-	width: 80%;
-	padding: 10px;
-	text-align: center;
-	background-color: #ffcccc;
-	border: solid 2px #990000;
+    margin: 0 auto 1em;
+    width: 80%;
+    padding: 10px;
+    text-align: center;
+    background-color: #ffcccc;
+    border: solid 2px #990000;
 }
 
-#spread {
+img.creatorpicture {
+    float: left; 
+    display: inline;
+    margin-right: 10px;
+}
+
+/* Navigation */
+
+ul#nav {
+    list-style-type: none;
+    position: absolute;
+    top: 2.8em;
+    right: 0;
+    margin: 0 1em 0 0;
+    padding: 0;
+}
+ul#nav a {
+    text-decoration: none;
+}
+ul#nav li {
     margin: 0;
-    padding: 0 0 0 1.5em;
+    padding: 1px 5px;
+    text-align: center;
+    position: relative;
+    top: 2px;
+    background-color: #ffffff;
+    color: #21004a;
+    margin-left: 0.5em;
+    display: inline;
+    border: solid 1px #522994;
+    border-width: 2px 2px 0 2px;
 }
 
 /* For example, to tell people to check their email */
@@ -337,11 +375,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     text-align: center;
 }
 
-img.creatorpicture {
-    float: left; 
-    display: inline;
-    margin-right: 10px;
-}
+/* All pledges page */
 
 .pledge-0 {
     float: left;
@@ -356,4 +390,3 @@ img.creatorpicture {
 #all .pledge {
     text-align: center;
 }
-

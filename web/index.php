@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.175 2005-06-09 14:13:10 francis Exp $
+// $Id: index.php,v 1.176 2005-06-11 06:25:13 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,56 +15,58 @@ require_once '../phplib/alert.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
-page_header(null, array('rss'=>1));
+page_header(null, array('rss'=>1, 'id'=>'front'));
 front_page();
 page_footer();
 
 function front_page() {
     if (!local_alert_subscribed()) {
-?>
-<p id="localsignupad">
-<a href="./alert">
-Sign up to recieve an email when someone creates a new pledge near you &raquo;
-</a></p>
-<?
-    }
-?>
+        $email = '';
+        $P = person_if_signed_on();
+        if (!is_null($P)) {
+            $email = $P->email();
+        } ?>
+<form accept-charset="utf-8" id="localsignup" name="pledge" action="/alert" method="post">
+<input type="hidden" name="subscribe_alert" value="1">
+<p><strong>Get emails about local pledges &mdash;</strong>
+<label for="email">Email:</label><input type="text" size="20" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
+<label for="postcode">Postcode:</label><input type="text" size="15" name="postcode" id="postcode" value="">
 
-<h2>Tell the world "I'll do it, but only if you'll help me do it"</h2>
+<input type="submit" name="submit" value="Subscribe"> </p>
+</form>
+<?  } ?>
 
-<p><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
+<div id="tellworld">
+<h2>Tell the world &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
+<blockquote><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
 alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;
 "></a>
 "We all know what it is like to feel powerless, that our own actions
 can't really change the things that we want to change.  PledgeBank is
 about beating that feeling..."
-</p>
-
+</blockquote>
 <p><a href="tom-on-pledgebank-vbr.mp3">Listen to how PledgeBank
 works</a>, as explained by mySociety's director Tom Steinberg.
 Or <a href="/explain">read a full transcript</a>.</p>
+</div>
 
-<p id="start"><a href="./new">Start your own pledge &raquo;</a></p>
-
-<form accept-charset="utf-8" id="search" action="/search" method="get">
-<h2>Search</h2>
-<p><label for="s">Enter a PledgeBank Reference, or a search string:</label>
-<input type="text" id="s" name="q" size="10" value=""></p>
-<p style="margin-top: 0.5em; text-align: right"><input type="submit" value="Go"></p>
-</form>
-
-<?    list_frontpage_pledges(); ?>
-
+<div id="startblurb">
 <h2>Start your own pledge</h2>
-
 <p>The way it works is simple. You <a href="/new">create a pledge</a>
 which has the basic format 'I'll do something, but only if other people will
 pledge to do the same thing'.  There are some examples of successful
-pledges below, but you can go wild with your own ideas!
+pledges on this page, but you can go wild with your own ideas!
+<p id="start"><a href="./new">Start your own pledge &raquo;</a></p>
+</div>
 
-<?    list_successful_pledges(); ?>
+<div id="currentpledges"><?    list_frontpage_pledges(); ?>
 
-<?
+<?    list_successful_pledges(); ?></div>
+
+<div id="photo"></div>
+
+<?  latest_comments();
+
     //list_newest_pledges();
 }
 
@@ -93,7 +95,7 @@ function get_pledges_list($query) {
                     $pledges .= "just ";
                 }
                 $pledges .= "${r['daysleft']} " . make_plural($r['daysleft'], 'day', 'days') . " left";
-                $pledges .=  ", $left more needed)";
+                $pledges .=  ", $left more signatures needed)";
             }
         }
         $pledges .= '</li>';
@@ -119,7 +121,7 @@ function list_newest_pledges() {
 }
 
 function list_frontpage_pledges() {
-?><h2>Sign some current pledges</h2><?
+?><h2>Why not sign a live pledge?</h2><?
 
     $pledges = get_pledges_list("
                 SELECT *, date - pb_current_date() AS daysleft

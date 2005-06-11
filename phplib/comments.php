@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.13 2005-06-09 11:22:41 francis Exp $
+ * $Id: comments.php,v 1.14 2005-06-11 06:25:10 matthew Exp $
  * 
  */
 
@@ -39,6 +39,10 @@ function comments_show_one($comment, $noabuse = false) {
             . comments_text_to_html($comment['text'])
             . '</div>';
     print '<div class="commentheader"><small>';  /* XXX or h1 or something? */
+    if (isset($comment['ref'])) {
+        print 'To pledge <a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a> by ';
+    }
+
     if (isset($comment['website']))
         print '<a href="' . htmlspecialchars($comment['website']) . '">'
                 . htmlspecialchars($comment['name'])
@@ -48,19 +52,7 @@ function comments_show_one($comment, $noabuse = false) {
 
     /* Format the time sanely. */
     if (isset($comment['whenposted'])) {
-        $w = $comment['whenposted'];
-        $tt = strftime('%H:%M', $w);
-        $t = time();
-        if (strftime('%Y%m%d', $w) == strftime('%Y%m%d', $t))
-            $tt = "$tt today";
-        elseif (strftime('%U', $w) == strftime('%U', $t))
-            $tt = "$tt, " . strftime('%A', $w);
-        elseif (strftime('%Y', $w) == strftime('%Y', $t))
-            $tt = "$tt, " . strftime('%A %e %B', $w);
-        else
-            $tt = "$tt, " . strftime('%a %e %B %Y', $w);
-
-        print " at $tt.";
+        print ' at ' . prettify($comment['whenposted']) . '.';
     }
 
     if (isset($comment['id']) && !$noabuse)
@@ -107,6 +99,24 @@ function comments_show($pledge, $noabuse = false) {
         print "</ul>";
     }
     print "</div>";
+}
+
+function latest_comments() { ?>
+<div id="comments">
+<h2>Latest comments</h2>
+<?  $comments_to_show = 10;
+    $q = db_query('SELECT comment.id,extract(epoch from whenposted) as whenposted,text,comment.name,website,ref FROM comment,pledges WHERE comment.pledge_id = pledges.id AND NOT ishidden ORDER BY whenposted DESC LIMIT ' . $comments_to_show);
+    print '<ul>';
+    while($r = db_fetch_array($q)) {
+        print '<li>';
+        print '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' .
+        (strlen($r['text'])>20 ? substr($r['text'], 0, 20) : $r['text']) . '...</a> by ' . 
+        htmlspecialchars($r['name']) . ', on pledge <a href="/' . $r['ref'] . '">' . $r['ref'] . '</a> at ' .
+            prettify($r['whenposted']);
+        #        comments_show_one($r, true);
+        print '</li>';
+    }
+    print '</ul></div>';
 }
 
 function comments_form($pledge_id, $nextn, $allow_post = false) {

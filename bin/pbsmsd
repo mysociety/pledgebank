@@ -16,7 +16,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.28 2005-06-10 12:02:09 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.29 2005-06-11 10:36:08 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -176,7 +176,7 @@ sub run_sending_process () {
                     # syntax of XML, which is apparently what the C360 back-end
                     # expects.
                     $p{strMessage} = $message;
-                    $p{strMessage} =~ s/([^@$ !"#%'()*+,-.\/0-9:;=?A-Z])/sprintf('&#x%04x;', ord($1))/gei;
+                    $p{strMessage} =~ s/([^@\$ !"#%'()*+,-.\/0-9:;=?A-Z_])/sprintf('&#x%04x;', ord($1))/gei;
                 
                     # We're OK to attempt sending.
                     my ($status, $extra);
@@ -716,5 +716,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.28 2005-06-10 12:02:09 chris Exp $
+$Id: pbsmsd,v 1.29 2005-06-11 10:36:08 chris Exp $
 

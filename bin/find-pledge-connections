@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.4 2005-06-12 23:39:49 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.5 2005-06-12 23:42:42 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -51,7 +51,7 @@ while (my ($person_id) = $s->fetchrow_array()) {
     }
 
     # ... and those which they have created
-    $s2 = dbh()->prepare("select id, name from pledges where person_id = ? and pin is null or pin = ''"); # XXX can we do this as only one query?
+    $s2 = dbh()->prepare("select id, name from pledges where confirmed and person_id = ? and pin is null or pin = ''"); # XXX can we do this as only one query?
     $s2->execute($person_id);
     while (my ($pledge_id, $name) = $s2->fetchrow_array()) {
         $name = lc($name);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: offline.php,v 1.7 2005-06-12 21:03:28 matthew Exp $
+// $Id: offline.php,v 1.8 2005-06-12 21:04:11 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -26,7 +26,7 @@ involved even if they never use the internet.</p>
 </div>
 
 <div class="offline">
-<img src="flyer-example3.png" title="Example PledgeBank flyer" width="298" height="211" alt="">
+<img src="flyer-example.png" title="Example PledgeBank flyer" width="298" height="211" alt="">
 <h2>Flyers</h2>
 
 <p>Every pledge created on PledgeBank comes with a set of automatically

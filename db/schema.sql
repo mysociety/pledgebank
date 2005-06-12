@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.93 2005-06-09 11:22:41 francis Exp $
+-- $Id: schema.sql,v 1.94 2005-06-12 20:47:25 chris Exp $
 --
 
 -- secret
@@ -138,6 +138,122 @@ create table pledges (
         prominence = 'frontpage' or -- pledge appears on front page
         prominence = 'backpage' ) -- pledge isn't in "all pledges" list
 );
+
+-- index of pledge reference
+create table pledge_ref_part (
+    pledge_id integer not null references pledges(id),
+    refpart char(3) not null,
+    count integer not null
+);
+
+create index pledge_ref_part_pledge_id_idx on pledge_ref_part(pledge_id);
+create index pledge_ref_part_refpart_idx on pledge_ref_part(refpart);
+
+create function index_pledge_ref_parts(integer)
+    returns void as '
+    declare
+        t_pledge_id integer;
+        t_ref text;
+        t_part text;
+        o integer;
+    begin
+        t_pledge_id = $1;
+        select into t_ref lower(ref) from pledges where id = t_pledge_id;
+        if not found then
+            raise exception ''bad pledge ID %'', t_pledge_id;
+        end if;
+        delete from pledge_ref_part where pledge_id = t_pledge_id;
+        for o in 1 .. length(t_ref) - 2 loop
+            t_part = substring(t_ref from o for 3);
+            update pledge_ref_part
+                set count = count + 1
+                where pledge_id = t_pledge_id
+                    and refpart = t_part;
+            if not found then
+                insert into pledge_ref_part (pledge_id, refpart, count)
+                    values (t_pledge_id, t_part, 1);
+            end if;
+        end loop;
+        return;
+    end;
+' language 'plpgsql';
+
+create function pledges_ref_index()
+    returns trigger as '
+    begin
+        perform index_pledge_ref_parts(new.id);
+        return null;
+    end;
+' language 'plpgsql';
+
+create trigger pledges_change_trigger after insert or update on pledges
+    for each row execute procedure pledges_ref_index();
+
+-- "type" used as return from pledge_find_fuzzily().
+create type pledge_ref_fuzzy_match as (
+    pledge_id integer,  -- primary key references pledges(id)
+    score integer       -- not null
+);
+
+-- pledge_find_fuzzily QUERY
+-- Given QUERY, a pledge reference which did not exactly match any pledge,
+-- return possible matches to that string. This should be used as a table
+-- function, i.e. "select * from pledge_find_fuzzily('...')".
+create function pledge_find_fuzzily(text)
+    returns setof pledge_ref_fuzzy_match as '
+    declare
+        t_ref text;
+        o integer;
+        l integer;
+        t_part text;
+        r record;
+        f pledge_ref_fuzzy_match%rowtype;
+    begin
+        t_ref = $1;
+
+        -- We need a temporary table to accumulate results in. Create it if it
+        -- does not exist. (The alternative, dropping it on return from this
+        -- function, is no good because PL/PGSQL caches query plans, so it will
+        -- get all confused that the table has gone away and been recreated on
+        -- the second call to this function.)
+        perform relname from pg_class
+            where relname = ''pledge_ref_fuzzy_match_tmp'';
+        if not found then
+            create temporary table pledge_ref_fuzzy_match_tmp (
+                pledge_id integer,
+                score integer
+            );
+        end if;
+
+        for o in 1 .. length(t_ref) - 2 loop
+            t_part = substring(t_ref from o for 3);
+            for r in
+                select pledge_id from pledge_ref_part where refpart = t_part
+                loop
+                update pledge_ref_fuzzy_match_tmp
+                    set score = score + 1
+                    where pledge_id = r.pledge_id;
+                if not found then
+                    insert into pledge_ref_fuzzy_match_tmp (pledge_id, score)
+                        values (r.pledge_id, 1);
+                end if;
+            end loop;
+        end loop;
+
+        -- now want to return all the rows collected
+        for f in
+            select pledge_id, score
+                from pledge_ref_fuzzy_match_tmp
+                order by score desc
+            loop
+            return next f;
+        end loop;
+
+        delete from pledge_ref_fuzzy_match_tmp;
+
+        return;
+    end;
+' language 'plpgsql';
 
 -- categories of which a pledge is member
 create table pledge_category (
@@ -760,6 +876,8 @@ create function pb_delete_pledge(integer)
         delete from comment where pledge_id = $1;
         -- pledge connections
         delete from pledge_connection where a_pledge_id = $1 or b_pledge_id = $1;
+        -- reference parts
+        delete from pledge_ref_part where pledge_id = $1;
         -- the pledge itself
         delete from pledges where id = $1;
         return;

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.6 2005-06-11 19:54:01 chris Exp $
+ * $Id: ref-picture.php,v 1.7 2005-06-12 22:00:44 chris Exp $
  * 
  */
 
@@ -27,6 +27,7 @@ $err = importparams(
 if (!is_null($err))
     err("Missing pledge reference");
 
+page_check_ref(get_http_var('ref'));
 $pledge = new Pledge($q_ref);
 
 $P = person_if_signed_on();

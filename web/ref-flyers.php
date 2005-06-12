@@ -5,13 +5,14 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.6 2005-05-24 23:18:40 francis Exp $
+// $Id: ref-flyers.php,v 1.7 2005-06-12 22:00:44 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../../phplib/utility.php';
 
+page_check_ref(get_http_var('ref'));
 $p  = new Pledge(get_http_var('ref'));
 
 $pin_box = deal_with_pin($p->url_flyers(), $p->ref(), $p->pin());

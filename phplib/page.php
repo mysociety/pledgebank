@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.35 2005-06-11 19:54:01 chris Exp $
+// $Id: page.php,v 1.36 2005-06-12 22:00:44 chris Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -104,9 +104,8 @@ function page_header($title, $params = array()) {
 }
 
 /* page_footer PARAMS
- * Print bottom of HTML page. This closes the "content" <div>. 
- * If PARAMS['nonav'] is true then the footer navigation is not displayed.
- */
+ * Print bottom of HTML page. This closes the "content" <div>.  If
+ * PARAMS['nonav'] is true then the footer navigation is not displayed. */
 function page_footer($params = array()) {
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
@@ -151,4 +150,47 @@ function print_this_link($link_text, $after_text) {
 </noscript> 
 <?
 }
+
+/* page_check_ref REFERENCE
+ * Given a pledge REFERENCE, check whether it uniquely identifies a pledge. If
+ * it does, return. Otherwise, fuzzily find possibly matching pledges and
+ * show the user a set of possible pages. */
+function page_check_ref($ref) {
+    if (!is_null(db_getOne('select ref from pledges where ref = ?', $ref)))
+        return;
+    page_header("We couldn't find that pledge");
+    print "<p>We couldn't find the pledge with reference \"" . htmlspecialchars($ref) . "\".";
+    $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);
+    if (db_num_rows($s) == 0) {
+        print "There don't seem to be any other pledges with similar references either, so we can't help you. Please check the reference and try again, have a look at <a href=\"/all\">the list of all pledges</a>, or search for the pledge you want by entering some words in this box:</p>";
+    } else {
+        print "Here are some pledges with references like the one you've given:</p><dl>";
+        while ($r = db_fetch_array($s)) {
+            $p = new Pledge((int)$r['pledge_id']);
+            print "<dt><a href=\"/"
+                        /* XXX for the moment, just link to pledge index page,
+                         * but we should figure out which page the user
+                         * actually wanted and link to that instead. */
+                        . htmlspecialchars($p->ref()) . "\">"
+                        . htmlspecialchars($p->ref()) . "</a>"
+                    . "</dt><dd>"
+                    . $p->h_sentence()
+                    . "</dd>";
+        }
+        print "</dl>";
+        print "<p>If none of those look like what you want, you can search for the pledge you want by entering some words in this box:</p>";
+    }
+
+    ?>
+<form accept-charset="utf-8" action="/search" method="get">
+<p><label for="s">Search:</label>
+<input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="Go"></p>
+</form>
+<?
+    
+    page_footer(array('nonav' => 1));
+
+    exit();
+}
+
 ?>

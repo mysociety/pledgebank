@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.61 2005-06-11 19:28:30 matthew Exp $
+ * $Id: pb.css,v 1.62 2005-06-12 17:56:24 francis Exp $
  * 
  */
 
@@ -184,12 +184,13 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 }
 
 #photo {
-    background: url("http://very.unfortu.net/~tom/phoneandflyers.jpg") no-repeat 50% 50%;
-    dmargin-top: 1em;
+    /* background: url("leaflet-phone-scissors-275px.png") no-repeat 50% 50%; */
+    margin-top: 1em;
     float: right;
-    padding: 10px;
-    width: 32%;
-    height: 191px;
+    border: solid 2px #522994;
+}
+#photo img {
+    border: none;
 }
 #front #comments {
     font-size: 95%;

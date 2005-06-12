@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.6 2005-06-09 08:52:01 francis Exp $
+// $Id: faq.php,v 1.7 2005-06-12 18:16:02 sandpit Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -112,11 +112,12 @@ want to launch a bigger pledge.
 
 <dt>How many people should I ask for?
 
-<dd>We recommend that you pick the lowest target you can possibly bare to.
+<dd>We recommend that you pick the lowest target you can possibly bear to.
 Choose the number of people for which you could only just be bothered to carry
-out your part of the pledge.  One less it wouldn't be worth it.  Don't put the
-value any higher than that.  This makes it most likely your pledge will succeed,
-and more people than you expected can always sign up.
+out your part of the pledge.  One more than the number where it wouldn't
+be worth it.  Don't put the value any higher than that.  This makes it
+most likely your pledge will succeed, and more people than you expected
+can always sign up.
 
 <dt><a name="editpledge">Why can't I edit my pledge after I've made it?</a>
 

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.49 2005-06-10 18:16:32 matthew Exp $
+# $Id: poster.cgi,v 1.50 2005-06-12 21:03:28 matthew Exp $
 #
 
 import os
@@ -248,8 +248,9 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
 
     story.extend([ text_para, 
         PyRTF.Paragraph(ss.ParagraphStyles.normal, 'This pledge closes on ', PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), '. Thanks!'),
-        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
-            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, 'Remember, you only have to act if %d other people sign up \x96 that\x92s what PledgeBank is all about.' % pledge['target'])
+#        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
+#            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
     ])
 
     c.Sections.append(story)
@@ -387,10 +388,11 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         Paragraph('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
             ''' % pledge['date'], p_normal),
-        Paragraph('''
-            <b>Small print:</b> %s Questions?
-            08453 330 160 or team@pledgebank.com.
-            ''' % sms_smallprint, p_smallprint)
+        Paragraph(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.'.encode('utf-8') % pledge['target'], p_normal)
+#        Paragraph('''
+#            <b>Small print:</b> %s Questions?
+#            08453 330 160 or team@pledgebank.com.
+#            ''' % sms_smallprint, p_smallprint)
     ])
 
     f = Frame(x1, y1, w, h, showBoundary = 0, 

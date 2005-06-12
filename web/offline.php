@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: offline.php,v 1.4 2005-06-12 19:18:18 chris Exp $
+// $Id: offline.php,v 1.5 2005-06-12 19:25:07 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -45,7 +45,7 @@ simple two word text message.</p>
 
 <h2>Mobile Phones</h2>
 
-<img src="phone-alone.jpg" style="float: left;
+<img src="phone-200px.jpg" style="float: left;
 clear:left; margin-right: 10px;">
 
 <p>The ability to sign up via text message is powerful because it means

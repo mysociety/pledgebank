@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.6 2005-06-11 19:54:01 chris Exp $
+// $Id: alert.php,v 1.7 2005-06-12 02:12:41 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -68,16 +68,12 @@ function local_alert_subscribe_box() {
 <h2>Get emails about local pledges</h2>
 <p>Fill in the form, and we'll email you when someone creates a new pledge near you.</p>
 <p>
-<label for="email"><strong>Your email:</strong></label> 
+<label for="email"><strong>Email:</strong></label> 
 <input type="text" size="20" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
-<br>
 <label for="postcode"><strong>Postcode:</strong></label> 
 <input type="text" size="15" name="postcode" id="postcode" value="<?=htmlspecialchars($postcode) ?>">
-(e.g. OX1 3DR)
+<input type="submit" name="submit" value="Subscribe">
 </p>
-
-</p>
-<p><input type="submit" name="submit" value="Subscribe"> </p>
 </form>
 
 <? 

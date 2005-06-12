@@ -31,7 +31,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.85 2005-06-09 11:22:41 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.86 2005-06-12 19:08:37 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -236,7 +236,7 @@ sub perform_login_action {
 
         # Request confirmation email (unless we are resuming request)
         if ($login_action ne "resume") {
-            $wth->browser_check_contents("Do you have a PledgeBank password?");
+            $wth->browser_check_contents("we need to check that your email is working");
             $b->submit_form(form_name => 'login',
                 fields => $login_fields,
                 button => 'SendEmail') or die "Failed to request confirmation email";
@@ -259,7 +259,7 @@ sub perform_login_action {
             # Follow link and confirm
             $b->get($confirmation_url);
             $login_count->{$who}++;
-            if ($login_count->{$who} > 1) {
+            if ($login_count->{$who} > 0) {
                 if ($login_options->{'setpassword'}) {
                     # We accept the option to set our password
                     $wth->browser_check_contents("Would you like to set a PledgeBank password?");
@@ -282,14 +282,14 @@ sub perform_login_action {
     } elsif ($login_action eq "loggedin") {
         # Nothing to do
     } elsif ($login_action eq "password") {
-        $wth->browser_check_contents("Do you have a PledgeBank password?");
+        $wth->browser_check_contents("we need to check that your email is working");
         $login_fields->{'password'} = password_n($who);
         $b->submit_form(form_name => 'login',
             fields => $login_fields,
             button => 'LogIn') or die "Failed to log in with password";
         $wth->log_watcher_check();
     } elsif ($login_action eq "wrongpassword") {
-        $wth->browser_check_contents("Do you have a PledgeBank password?");
+        $wth->browser_check_contents("we need to check that your email is working");
         $login_fields->{'password'} = "thispassswordisnonsense";
         $b->submit_form(form_name => 'login',
             fields => $login_fields,

@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.27 2005-06-11 19:54:01 chris Exp $
+ * $Id: login.php,v 1.28 2005-06-12 19:08:37 francis Exp $
  * 
  */
 
@@ -146,12 +146,10 @@ if (!is_null($q_t)) {
     /* If the 'direct' key exists in the token, don't do any intervening
      * pages. */
     if (!array_key_exists('direct', $d)) {
-        /* See whether this user has used pledgebank before. If they have, offer to
-         * set or reset their password. */
-        if ($P->numlogins() > 1)
-            change_password_page($P);
-        else if ($q_name && !$P->matches_name($q_name))
+        if ($q_name && !$P->matches_name($q_name))
             $P->name($q_name);
+        /* Can set this to some condition if you don't want to always offer password */
+        change_password_page($P);
     }
     stash_redirect($q_stash);
     /* NOTREACHED */
@@ -267,8 +265,6 @@ function login_form($errors = array()) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
-    }  else {
-        print "<p>Before we can $reason, we need to confirm your email address.</p>";
     }
 
     /* Split into two forms to avoid "do you want to remember this
@@ -280,15 +276,17 @@ function login_form($errors = array()) {
 <input type="hidden" name="stash" value="<?=$q_h_stash?>">
 <input type="hidden" name="name" id="name" value="<?=$q_h_name?>">
 
+<p><strong>Before you can <?=$reason?>, we need to check that your email is working.</strong></p>
 
 <? if (is_null($q_email) || $errors) { ?>
-<p><strong>First, enter your email address</strong></p>
 
 <ul>
 
-<li> Email address: <input<? if (array_key_exists('email', $errors) || array_key_exists('badpass', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<?=$q_h_email?>">
+<li> Enter your email address: <input<? if (array_key_exists('email', $errors) || array_key_exists('badpass', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<?=$q_h_email?>">
 
 </ul>
+
+<p><strong>Have you used PledgeBank before?</strong></p>
 
 <? } else { ?>
 
@@ -296,19 +294,17 @@ function login_form($errors = array()) {
 
 <? } ?>
 
-<p><strong>Do you have a PledgeBank password?</strong></p>
-
 <ul>
 
 
-<li>No, I don't have a password.
+<li>I've never used PledgeBank before, let me confirm my email address now.
 
 <input type="submit" name="SendEmail" value="Click here to continue &gt;&gt;"><br>
-<small>(we'll send an email to confirm your address)</small></p>
+<small>(we'll send an email, click the link in it to confirm your email is working)</small></p>
 
 </li>
 
-<li><p>Yes, I have a password:
+<li><p>I've been here before, and I have a PledgeBank password:
 
 <input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
 <input type="submit" name="LogIn" value="Let me in &gt;&gt;"></p>

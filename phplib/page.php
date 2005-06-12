@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.36 2005-06-12 22:00:44 chris Exp $
+// $Id: page.php,v 1.37 2005-06-12 22:29:29 chris Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -188,7 +188,7 @@ function page_check_ref($ref) {
 </form>
 <?
     
-    page_footer(array('nonav' => 1));
+    page_footer();
 
     exit();
 }

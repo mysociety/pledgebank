@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.94 2005-06-12 20:47:25 chris Exp $
+-- $Id: schema.sql,v 1.95 2005-06-12 22:00:03 chris Exp $
 --
 
 -- secret
@@ -158,6 +158,11 @@ create function index_pledge_ref_parts(integer)
         o integer;
     begin
         t_pledge_id = $1;
+        -- do not index private pledges or unconfirmed pledges
+        if coalesce((select pin from pledges where id = t_pledge_id), '''') <> ''''
+            or not (select confirmed from pledges where id = t_pledge_id) then
+            return;
+        end if;
         select into t_ref lower(ref) from pledges where id = t_pledge_id;
         if not found then
             raise exception ''bad pledge ID %'', t_pledge_id;
@@ -209,7 +214,7 @@ create function pledge_find_fuzzily(text)
         r record;
         f pledge_ref_fuzzy_match%rowtype;
     begin
-        t_ref = $1;
+        t_ref := $1;
 
         -- We need a temporary table to accumulate results in. Create it if it
         -- does not exist. (The alternative, dropping it on return from this

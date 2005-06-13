@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.59 2005-06-13 14:32:25 francis Exp $
+ * $Id: admin-pb.php,v 1.60 2005-06-13 14:54:16 francis Exp $
  * 
  */
 
@@ -82,11 +82,7 @@ class ADMIN_PAGE_PB_MAIN {
             else
                 $row .= '<td>None</td>';
 
-            $row .= '<td><select name="prominence['.$r['id'].']">';
-            $row .= '<option value="normal"' . ($r['prominence']=='normal'?' selected':'') . '>normal</option>';
-            $row .= '<option value="frontpage"' . ($r['prominence']=='frontpage'?' selected':'') . '>frontpage</option>';
-            $row .= '<option value="backpage"' . ($r['prominence']=='backpage'?' selected':'') . '>backpage</option>';
-            $row .= '</select></td>';
+            $row .= '<td>'.$r['prominence'].'</td>';
 
             if ($r['open'] == 't')
                 $open[] = $row;
@@ -94,8 +90,6 @@ class ADMIN_PAGE_PB_MAIN {
                 $closed[] = $row;
         }
          
-        print '<form method="post" action="'.$this->self_link.'">'."\n";
-        print '<input type="hidden" name="s" value="' . get_http_var('s') . '">';
         if (count($open)) {
             print "<h2>All Open Pledges</h2>\n";
             $this->pledge_header($sort);
@@ -119,8 +113,6 @@ class ADMIN_PAGE_PB_MAIN {
             print '</table>';
         }
         print '<p>';
-        print '<input type="submit" name="update" value="Save changes">';
-        print '</form>';
     }
 
     function show_one_pledge($pledge) {
@@ -145,27 +137,18 @@ class ADMIN_PAGE_PB_MAIN {
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print "</p>";
 
-        $cats = array();
-        $q = db_query('select category_id from pledge_category where pledge_id = '.$pdata['id']);
-        while ($r = db_fetch_array($q)) {
-            $cats[$r['category_id']] = 1;
-        }
-        print '<form method="post" action="'.$this->self_link.'"><input
-        type="hidden" name="pledge_id" value="'.$pdata['id'].'"><input
-        type="hidden" name="update_cats" value="1"><p>Category: <select name="categories[]" multiple>';
-        $s = db_query('select id, parent_category_id, name from category 
-            where parent_category_id is null
-            order by id');
-        while ($a = db_fetch_row($s)) {
-            list($id, $parent_id, $name) = $a;
-            print '<option';
-            if (array_key_exists($id, $cats)) print ' selected';
-            print ' value="' . $id . '">' .
-                (is_null($parent_id) ? '' : '&nbsp;-&nbsp;') . 
-                 htmlspecialchars($name) . ' </option>';
-        }
-        print '</select> <input type="submit" value="Update"></p></form>';
+        // Prominence
+        print '<form method="post" action="'.$this->self_link.'">';
+        print '<input type="hidden" name="update_prom" value="1">';
+        print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+        print '<td>Prominence: <select name="prominence">';
+        print '<option value="normal"' . ($pdata['prominence']=='normal'?' selected':'') . '>normal</option>';
+        print '<option value="frontpage"' . ($pdata['prominence']=='frontpage'?' selected':'') . '>frontpage</option>';
+        print '<option value="backpage"' . ($pdata['prominence']=='backpage'?' selected':'') . '>backpage</option>';
+        print '</select></td>';
+        print '<input name="update" type="submit" value="Update"></p></form>';
 
+        // Signers
         $query = 'SELECT signers.name as signname,person.email as signemail,
                          signers.mobile as signmobile,
                          date_trunc(\'second\',signtime) AS signtime,
@@ -220,10 +203,39 @@ class ADMIN_PAGE_PB_MAIN {
                 print '</tr>';
             }
             print '</table>';
+        } else {
+            print '<p>Nobody has signed up to this pledge.</p>';
         }
         print '<p>';
+
+        // Category setting
+        $cats = array();
+        $q = db_query('select category_id from pledge_category where pledge_id = '.$pdata['id']);
+        while ($r = db_fetch_array($q)) {
+            $cats[$r['category_id']] = 1;
+        }
+        print '<form method="post" action="'.$this->self_link.'">
+            <input type="hidden" name="pledge_id" value="'.$pdata['id'].'">
+            <input type="hidden" name="update_cats" value="1">
+            <h2>Categories</h2>
+            <p><select name="categories[]" multiple>';
+        $s = db_query('select id, parent_category_id, name from category 
+            where parent_category_id is null
+            order by id');
+        while ($a = db_fetch_row($s)) {
+            list($id, $parent_id, $name) = $a;
+            print '<option';
+            if (array_key_exists($id, $cats)) print ' selected';
+            print ' value="' . $id . '">' .
+                (is_null($parent_id) ? '' : '&nbsp;-&nbsp;') . 
+                 htmlspecialchars($name) . ' </option>';
+        }
+        print '</select> <input type="submit" value="Update"></p></form>';
+
+        print '<h2>Actions</h2>';
         print '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="send_announce_token_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="send_announce_token" value="Send announce URL to creator"></form>';
-        print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
+
+print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
 
     }
 
@@ -239,12 +251,8 @@ class ADMIN_PAGE_PB_MAIN {
         print '<p><em>That signer has been successfully removed.</em></p>';
     }
 
-    function update_changes() {
-        if (array_key_exists('prominence', $_POST)) {
-            foreach ($_POST['prominence'] as $id=>$value) {
-                db_query('UPDATE pledges set prominence = ? where id = ?', array($value, $id));
-            }
-        }
+    function update_prominence($pledge_id) {
+        db_query('UPDATE pledges set prominence = ? where id = ?', array(get_http_var('prominence'), $pledge_id));
         db_commit();
         print "<p><i>Changes to pledge prominence saved</i></p>";
     }
@@ -268,8 +276,9 @@ class ADMIN_PAGE_PB_MAIN {
         $pledge_id = null;
 
         // Perform actions
-        if (get_http_var('update')) {
-            $this->update_changes();
+        if (get_http_var('update_prom')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_prominence($pledge_id);
         } elseif (get_http_var('remove_pledge_id')) {
             $remove_id = get_http_var('remove_pledge_id');
             if (ctype_digit($remove_id))

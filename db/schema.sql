@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.96 2005-06-13 16:53:16 francis Exp $
+-- $Id: schema.sql,v 1.97 2005-06-13 17:33:19 chris Exp $
 --
 
 -- secret
@@ -120,8 +120,28 @@ create table pledges (
             -- or comparison = 'exactly' -- exactly is disabled for now, as not clear we need it
         ),
 
-    country text not null default '',
-    postcode text not null default '',
+    -- Country. At the moment this is 'UK' for 'GB' and 'Global' for none
+    -- specified. Later we should change this to an ISO country code (or
+    -- perhaps a list of them?) with null meaning "global".
+    -- XXX what about, e.g., pledges which anyone in the EU can sign? Add
+    -- regions too?
+    country text not null check(country = 'UK' or country = 'Global'),
+    -- Postcode or ZIP-code or whatever. Later we will want to check this for
+    -- validity wrt the pledge's specific country.
+    postcode text check(postcode is null or postcode <> ''),
+    -- XXX add place field looked up in hierarchical gazeteer of
+    -- countries+cities, for countries where we can't do postcode->coordinates
+    -- translation.
+
+    -- Geographical coordinates for pledges where we know them. Use lat/lon in
+    -- the WGS84 system so that this still works when we make it possible to
+    -- locate pledges in other countries.
+    longitude double precision,     -- east-positive, degrees
+    latitude double precision,      -- north-positive, degrees
+        -- NB use double precision not real since real has probably only six
+        -- digits of accuracy or about ~30m over the whole globe. If we're
+        -- going to have missile coordinates, let's have *proper* missile
+        -- coordinates!
 
     -- It's possible (hopefully rare) for subscribers to be removed from a
     -- pledge after it's been marked as successful. But once a pledge has
@@ -134,10 +154,19 @@ create table pledges (
 
     -- categorisation
     prominence text not null default 'normal' check (
-        prominence = 'normal' or -- default
-        prominence = 'frontpage' or -- pledge appears on front page
-        prominence = 'backpage' ) -- pledge isn't in "all pledges" list
+        prominence = 'normal' or        -- default
+        prominence = 'frontpage' or     -- pledge appears on front page
+        prominence = 'backpage'         -- pledge isn't in "all pledges" list
+    ),
+
+    check ((latitude is null and longitude is null)
+            or (latitude is not null and longitude is not null)),
+    check (latitude is null or (latitude >= -90 and latitude <= +90)),
+    check (longitude is null or (longitude >= -180 and latitude < 180)),
 );
+
+create index pledges_latitude_idx on pledges(latitude);
+create index pledges_longitude_idx on pledges(longitude);
 
 -- index of pledge reference
 create table pledge_ref_part (

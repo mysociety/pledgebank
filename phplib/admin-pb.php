@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.58 2005-06-02 19:06:06 matthew Exp $
+ * $Id: admin-pb.php,v 1.59 2005-06-13 14:32:25 francis Exp $
  * 
  */
 
@@ -325,6 +325,9 @@ class ADMIN_PAGE_PB_LATEST {
             $time[$r['epoch']][] = $r;
         }
 
+        // Token display not so useful, and wastes too much space
+        // (what would be useful is unused tokens)
+        /*
         $q = db_query('SELECT *,extract(epoch from created) as epoch
                          FROM token
                      ORDER BY created DESC');
@@ -347,6 +350,7 @@ class ADMIN_PAGE_PB_LATEST {
                 }
             }
         }
+        */
     
         $q = db_query('SELECT pledges.*,extract(epoch from creationtime) as epoch, person.email as email
                          FROM pledges LEFT JOIN person ON person.id = pledges.person_id
@@ -401,7 +405,7 @@ dd {
 </style>
 <?
         print '<dl>';
-        $date = ''; # $signed = array();
+        $date = ''; 
         foreach ($time as $epoch => $datas) {
             $curdate = date('l, jS F Y', $epoch);
             if ($date != $curdate) {
@@ -411,17 +415,13 @@ dd {
             print '<dt><b>' . date('H:i:s', $epoch) . ':</b></dt> <dd>';
             foreach ($datas as $data) {
             if (array_key_exists('signtime', $data)) {
+                print $this->pledge_link('ref', $data['ref']);
+                if ($data['showname'] == 'f')
+                    print ' anonymously';
+                print ' signed by ';
                 print $data['name'];
                 if ($data['email']) print ' &lt;'.$data['email'].'&gt;';
                 if ($data['mobile']) print ' (' . $data['mobile'] . ')';
-                print ' signed up to ' .
-                $this->pledge_link('ref', $data['ref']);
-                if ($data['showname'] == 'f') {
-                    print ' (anonymously)';
-                }
-#                if ($data['email']) {
-#                    $signed[$data['id']][$data['email']] = 1;
-#                }
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, ";
                 if ($data['confirmed']=='f') {
@@ -458,9 +458,10 @@ dd {
                     }
                 }
             } elseif (array_key_exists('lastsendattempt', $data)) {
-                if ($data['ispremium'] == 't') print 'Premium ';
+                if ($data['ispremium'] == 't') 
+                    print 'Premium ';
                 print "SMS sent to $data[recipient], message
-                '$data[message]' status $data[lastsendstatus]";
+                    '$data[message]' status $data[lastsendstatus]";
             } elseif (array_key_exists('commentposted', $data)) {
                 print "$data[name] &lt;$data[email]&gt; commented on " .
                     $this->pledge_link('id', $data['pledge_id']) . " saying

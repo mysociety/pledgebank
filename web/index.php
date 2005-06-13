@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.184 2005-06-13 08:38:27 chris Exp $
+// $Id: index.php,v 1.185 2005-06-13 16:53:16 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -38,7 +38,7 @@ function front_page() {
 
 <div id="tellworld">
 <h2>Tell the world &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
-<blockquote><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
+<blockquote class="noindent"><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
 alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;
 "></a>
 "We all know what it is like to feel powerless, that our own actions

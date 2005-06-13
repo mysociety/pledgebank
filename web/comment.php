@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.13 2005-06-10 10:49:22 matthew Exp $
+ * $Id: comment.php,v 1.14 2005-06-13 16:53:16 francis Exp $
  * 
  */
 
@@ -132,9 +132,10 @@ EOF;
                     . implode('</li><li>', array_map('htmlspecialchars', $err))
                     . '</li></div>';
 
-        print "<h2>Here's how your comment will appear</h2><blockquote>";
+        print "<h2>Here's how your comment will appear</h2><blockquote class=\"noindent\">";
         comments_show_one(array('name' => $q_author_name, 'email' => $q_author_email, 'website' => $q_author_website, 'text' => $q_text));
         print '</blockquote>';
+        print '<p></p>';
     }
 
     comments_form($pledge_id, $nextn, sizeof($err) == 0);

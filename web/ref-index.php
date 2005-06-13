@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.22 2005-06-12 22:00:44 chris Exp $
+// $Id: ref-index.php,v 1.23 2005-06-13 16:53:16 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -76,7 +76,7 @@ function draw_signatories($p) {
                         . htmlspecialchars($r['name'])
                         .' <small>(<a href="/abuse?what=signer&amp;id='
                             . htmlspecialchars($r['id'])
-                        . '">suspicious signer?</a>)</small>'
+                        . '">suspect? report it</a>)</small>'
                         . '</li>';
             } else {
                 ++$unknownname;
@@ -141,7 +141,7 @@ function draw_connections($p) {
 
 page_header("'I will " . $p->h_title() . "'", array('ref'=>$p->url_main(), 'noreflink'=>1) );
 draw_status_plaque($p);
-$p->render_box(array('showdetails' => true));
+$p->render_box(array('showdetails' => true, 'reportlink' => true));
 if (!$p->finished()) { pledge_sign_box(); } 
 if (!$p->finished()) { draw_spreadword($p); }
 draw_comments($p);

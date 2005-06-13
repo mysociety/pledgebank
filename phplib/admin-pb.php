@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.61 2005-06-13 15:12:12 francis Exp $
+ * $Id: admin-pb.php,v 1.62 2005-06-13 16:53:16 francis Exp $
  * 
  */
 
@@ -554,16 +554,14 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
                         pledge_delete_pledge($a[2]);
                     else
                         pledge_delete_signer($a[2]);
-                    print "Deleted "
+                    print "<em>Deleted "
                             . htmlspecialchars($a[1])
-                            . " #" . htmlspecialchars($a[2]) . "<br>";
+                            . " #" . htmlspecialchars($a[2]) . "</em><br>";
                 }
             }
 
             db_commit();
 
-            print '<a href="' . htmlspecialchars(get_http_var('prev_url')) . '">Return to report list</a>';
-            return;
         }
 
         
@@ -584,12 +582,12 @@ table.abusereporttable tr.break { border-top: 1px solid white; }
     function showlist($self_link) {
         global $q_what;
         importparams(
-                array('what',       '/^(comment|pledge|signer)$/',      '',     'pledge')
+                array('what',       '/^(comment|pledge|signer)$/',      '',     'signer')
             );
 
         print "<p><strong>See reports on:</strong> ";
 
-        $ww = array('pledge', 'signer', 'comment');
+        $ww = array('signer', 'comment', 'pledge');
         $i = 0;
         foreach ($ww as $w) {
             if ($w != $q_what)
@@ -612,14 +610,8 @@ table.abusereporttable tr.break { border-top: 1px solid white; }
         print '<form method="POST"><input type="hidden" name="prev_url" value="'
                     . htmlspecialchars($self_link) . '">';
         print <<<EOF
-<input type="submit" name="discardReports" value="Discard selected abuse reports">
+<p><input type="submit" name="discardReports" value="Discard selected abuse reports"></p>
 <table class="abusereporttable">
-    <tr>
-        <th style="width: 2em;"></th>
-        <th width="15%">Time</th>
-        <th width="15%">Reporting IP address</th>
-        <th>Reason</th>
-    </tr>
 EOF;
 
         $old_id = null;
@@ -647,17 +639,12 @@ EOF;
                                 where id = ?', $pledge_id);
                     
                 /* Info on the pledge. Print for all categories. */
-                print '<table><tr><th colspan="2" style="text-align: center;">Pledge '
-                        . '<a style="color: white;" href="/' . $pledge['ref'] . '">'
-                        . htmlspecialchars($pledge['title'])
-                        . '</a>'
-                        . '</th></tr><tr><th width="15%">Creator</th><td>'
-                            . htmlspecialchars($pledge['name'])
-                        . '</td></tr><tr><th>Created</th><td>'
-                            . date('Y-m-d H:i', $pledge['createdepoch'])
-                        . '</td></tr><tr><th>Deadline</th><td>'
-                            . date('Y-m-d', $pledge['deadlineepoch'])
-                        . '</td></tr>';
+                print '<table>';
+                print '<tr><td><b>Pledge:</b> ';
+                $pledge_obj = new Pledge($pledge);
+                print $pledge_obj->h_sentence(array());
+                print ' <a href="'.$pledge_obj->url_main().'">'.$pledge_obj->ref().'</a> ';
+                print '<a href="?page=pb&amp;pledge='.$pledge_obj->ref().'">(admin)</a> ';
                         
                 /* Print signer/comment details under pledge. */
                 if ($what == 'signer') {
@@ -668,11 +655,12 @@ EOF;
                                     left join person on signers.person_id = person.id
                                     where signers.id = ?', $what_id);
 
-                    print '<tr class="break"><th>Signer name</th><td>'
+                    print '</td></tr>';
+                    print '<tr class="break"><td><b>Signer:</b> '
                             . (is_null($signer['name'])
                                     ? "<em>not known</em>"
                                     : htmlspecialchars($signer['name']))
-                            . '</td></tr><tr><th>Contact details</th><td>';
+                            . ' ';
 
                     if (!is_null($signer['email']))
                         print '<a href="mailto:'
@@ -684,10 +672,7 @@ EOF;
                     if (!is_null($signer['mobile']))
                         print htmlspecialchars($signer['mobile']);
 
-                    print '</td></tr>'
-                            . '<tr><th>Signed at</th><td>'
-                            . date('Y-m-d H:M', $signer['epoch'])
-                            . '</td></tr>';
+                    print '<b>Signed at:</b> ' . date('Y-m-d H:m', $signer['epoch']);
                 } elseif ($what == 'comment') {
                     $comment = db_getRow('
                                     select id,
@@ -697,30 +682,31 @@ EOF;
                                     from comment
                                     where id = ?', $what_id);
 
-                    print '<tr class="break"><th>Comment</th><td>';
-                    comments_show_one($comment, true);
                     print '</td></tr>';
+                    print '<tr class="break">';
+                    print '<td><b>Comment:</b> ';
+                    comments_show_one($comment, true);
                 }
 
-                print '</td></tr><tr><td></td><td>'
-                        . "<input type=\"submit\" name=\"delete_${what}_${what_id}\" value=\"Delete this $what\">"
-                        . '</td></tr></table>';
+                print " <input type=\"submit\" name=\"delete_${what}_${what_id}\" value=\"Delete this $what\">"
+                      . '</td></tr>';
+                print '</table>';
                 $old_id = $what_id;
             }
 
             print '<tr><td>'
                         . '<input type="checkbox" name="ar_' . $id . '" value="1">'
-                    . '</td><td>'
+                    . '</td><td><b>Abuse report:</b> '
                         . date('Y-m-d H:i', $t)
-                    . '</td><td>'
+                        . ' from '
                         . $ipaddr
-                    . '</td><td>'
+                    . '</td><td><b>Reason: </b>'
                         . $reason
                     . '</td></tr>';
         }
 
         print '</table>'
-                . '<input type="submit" name="discardReports" value="Discard selected abuse reports"></form>';
+                . '<p><input type="submit" name="discardReports" value="Discard selected abuse reports"></form>';
     }
 }
 

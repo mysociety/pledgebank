@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.7 2005-05-31 17:59:44 matthew Exp $
+// $Id: abuse.php,v 1.8 2005-06-13 16:53:16 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -72,8 +72,9 @@ EOF;
 
     print <<<EOF
 <form accept-charset="utf-8" action="abuse" method="post" name="abuse" class="pledge">
-<h2>Report abusive $w</h2>
-<p>You are reporting the $w:</p> 
+<h2>Report something wrong with a $w</h2>
+<p>You are reporting the following $w as being abusive, suspicious or having
+something wrong with it.</p> 
 <blockquote>
 EOF;
 
@@ -87,14 +88,14 @@ EOF;
     }
     print '</blockquote>';
     if ($q_what != 'pledge') {
-        print "<p>on the pledge <strong>$title</strong>.</p>";
+        print "<p>This is on the pledge <strong>$title</strong>.</p>";
     }
 
     print <<<EOF
 <input type="hidden" name="abusive" value="1">
 <input type="hidden" name="what" value="$q_h_what">
 <input type="hidden" name="id" value="$q_h_id">
-<p>Please give a short reason for reporting this $w<br>
+<p>Please give a short reason for reporting this $w.<br>
 <input type="text" name="reason" size="60"></p>
 <p><input name="submit" type="submit" value="Submit"></p>
 </form>

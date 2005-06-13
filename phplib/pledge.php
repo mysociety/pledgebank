@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.91 2005-06-13 10:38:33 francis Exp $
+ * $Id: pledge.php,v 1.92 2005-06-13 16:53:16 francis Exp $
  * 
  */
 
@@ -175,6 +175,7 @@ class Pledge {
     //     showdetails - if present and true, show "details" field
     //     href - if present must contain a URL, which is used as a link for
     //            the pledge sentence
+    //     reportlink - if present and true, show "report this pledge" link
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
         if (array_key_exists('href', $params)) {
@@ -202,6 +203,11 @@ class Pledge {
             print '<p id="moredetails"><strong>More details</strong><br>' . $det . '</p>';
         }
 ?>
+
+<? if (array_key_exists('reportlink', $params) && $params['reportlink']) { ?>
+<div id="reportpledge"><a href="/abuse?what=pledge&amp;id=<?=$this->id()?>">Anything wrong with this pledge?  Tell us!</a></div>
+<? } ?>
+
 </div>
 <?
     }

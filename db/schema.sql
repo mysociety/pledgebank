@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.95 2005-06-12 22:00:03 chris Exp $
+-- $Id: schema.sql,v 1.96 2005-06-13 16:53:16 francis Exp $
 --
 
 -- secret
@@ -883,6 +883,8 @@ create function pb_delete_pledge(integer)
         delete from pledge_connection where a_pledge_id = $1 or b_pledge_id = $1;
         -- reference parts
         delete from pledge_ref_part where pledge_id = $1;
+        -- categories
+        delete from pledge_category where pledge_id = $1;
         -- the pledge itself
         delete from pledges where id = $1;
         return;

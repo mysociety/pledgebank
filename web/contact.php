@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.11 2005-05-18 11:17:27 francis Exp $
+// $Id: contact.php,v 1.12 2005-06-13 18:34:38 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -48,7 +48,11 @@ Did you <a href="/faq">read the FAQ</a> first?
 <? }
 
 function contact_form_submitted() {
-	$name = get_http_var('name'); $email = get_http_var('email'); $subject = get_http_var('subject'); $message = get_http_var('message');
+    $name = get_http_var('name');
+    if ($name == '<Enter your name>') $name = '';
+    $email = get_http_var('email');
+    $subject = get_http_var('subject');
+    $message = get_http_var('message');
     $errors = array();
 	if (!$name) $errors[] = 'Please enter your name';
 	if (!$email) $errors[] = 'Please enter your mail address';
@@ -62,8 +66,10 @@ function contact_form_submitted() {
 }
 
 function send_contact_form($name, $email, $subject, $message) {
-	$header = 'Sent by contact.php from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . "\n\n";
-	$success = @mail(OPTION_CONTACT_EMAIL, $subject, $header . $message, "From: $name <$email>");
+    $header = 'Sent by contact.php from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . "\n\n";
+    $from = 'From: "' . str_replace(array('\\','"'), array('\\\\','\"'), $name) . '" <' . $email . '>')
+    $success = @mail(OPTION_CONTACT_EMAIL, $subject, $header . $message, $from);
+);
 ?>
     Thanks for your feedback.  We'll get back to you as soon as we can!
 <?

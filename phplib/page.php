@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.38 2005-06-13 07:47:43 francis Exp $
+// $Id: page.php,v 1.39 2005-06-13 08:37:47 chris Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -117,21 +117,15 @@ function page_footer($params = array()) {
 <p><label for="s">Search:</label>
 <input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="Go"></p>
 </form>
-<ul id="nav">
-<li><a href="/">Home</a></li>
-<li><a href="/new">Start a Pledge</a></li>
-<li><a href="/all">All Pledges</a></li>
-<li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li>
-<li><a href="/contact">Contact</a></li>
-<?
+<!-- remove all extraneous whitespace to avoid IE bug -->
+<ul id="nav"><li><a href="/">Home</a></li><li><a href="/new">Start a Pledge</a></li><li><a href="/all">All Pledges</a></li><li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li><li><a href="/contact">Contact</a></li><?
         $P = person_if_signed_on(true); /* Don't renew any login cookie. */
         if ($P) {
-?> <li><a href="/logout">Logout</a></li> <?
+?><li><a href="/logout">Logout</a></li><?
         } else {
-?> <li><a href="/login">Login</a></li> <?
+?><li><a href="/login">Login</a></li><?
         }
-?>
-</ul>
+?></ul>
 <hr class="v">
 <div id="footer"><a href="http://www.mysociety.org/">Built by mySociety</a>.</div>
 <?

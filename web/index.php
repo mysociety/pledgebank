@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.182 2005-06-12 18:44:11 sandpit Exp $
+// $Id: index.php,v 1.183 2005-06-13 08:02:19 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -115,7 +115,7 @@ function list_frontpage_pledges() {
                 pin is NULL AND 
                 confirmed AND
                 whensucceeded IS NULL
-                ORDER BY date");
+                ORDER BY RANDOM()");
     if (!$pledges) {
         print '<p>There are no featured pledges at the moment.</p>';
     } else {

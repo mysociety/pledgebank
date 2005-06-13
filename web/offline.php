@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: offline.php,v 1.8 2005-06-12 21:04:11 matthew Exp $
+// $Id: offline.php,v 1.9 2005-06-13 08:02:19 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -14,7 +14,7 @@ page_header("You never bump into your neighbours online");
 
 ?>
 <div class="offline">
-<img src="monitor-neighbours-250px.jpg" style="margin-left: 26px;" title="You never bump in to your neighbours online" width="245" height="250" alt="">
+<img src="monitor-neighbours-250px.jpg" class="l" style="margin-right: 20px;" title="You never bump in to your neighbours online" width="245" height="250" alt="">
 <h2>You never bump in to your neighbours online</h2>
 <p>Have you ever noticed that you never bump into your neighbours online?
 This means that most websites can't offer much help to people trying
@@ -26,7 +26,7 @@ involved even if they never use the internet.</p>
 </div>
 
 <div class="offline">
-<img src="flyer-example.png" title="Example PledgeBank flyer" width="298" height="211" alt="">
+<img src="flyer-example.png" class="r" style="margin-left: 20px;" title="Example PledgeBank flyer" width="298" height="211" alt="">
 <h2>Flyers</h2>
 
 <p>Every pledge created on PledgeBank comes with a set of automatically
@@ -43,7 +43,7 @@ simple two word text message.</p>
 </div>
 
 <div class="offline">
-<img src="phone-200px.jpg" style="margin-left: 65px;" width="168" height="200" alt="">
+<img src="phone-200px.jpg" class="l" style="margin-right: 20px;" width="168" height="200" alt="">
 <h2>Mobile Phones</h2>
 <p>The ability to sign up via text message is powerful because it means
 that people who never use the Internet can sign up, and you can get

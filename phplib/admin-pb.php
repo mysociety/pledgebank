@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.60 2005-06-13 14:54:16 francis Exp $
+ * $Id: admin-pb.php,v 1.61 2005-06-13 15:12:12 francis Exp $
  * 
  */
 
@@ -125,10 +125,10 @@ class ADMIN_PAGE_PB_MAIN {
             LEFT JOIN person ON person.id = pledges.person_id WHERE ref ILIKE ?', $pledge);
         $pdata = db_fetch_array($q);
 
-        print "<h2>Pledge '" . $pdata['ref'] . "' &mdash; " .  $pdata['title'] . "</h2>";
+        print "<h2>Pledge '<a href=\"/".$pdata['ref']."\">" . $pdata['ref'] . "</a>' &mdash; " .  $pdata['title'] . "</h2>";
 
         if ($pdata['confirmed'] == 'f') {
-            print "<p><i>Pledge creator's email address not confirmed</b></i>";
+            print "<p><em>Pledge creator's email address not confirmed</b></em>";
         }
         
         print "<p>Set by: <b>" . $pdata['name'] . " &lt;" .  $pdata['email'] . "&gt;</b>";
@@ -172,8 +172,18 @@ class ADMIN_PAGE_PB_MAIN {
             $e = join("<br>", $e);
             $out[$e] = '<td>'.$e.'</td>';
             $out[$e] .= '<td>'.prettify($r['signtime']).'</td>';
-            $out[$e] .= '<td align="center">'.($r['showname']?'Yes':'No').'</td>';
-            $out[$e] .= '<td><form method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_signer_id" value="' . $r['signid'] . '"><input type="submit" name="remove_signer" value="Remove signer permanently"></form></td>';
+
+            $out[$e] .= '<td><form method="post" action="'.$this->self_link.'"><input type="hidden" name="showname_signer_id" value="' . $r['signid'] . '">';
+            $out[$e] .= '<select name="showname">';
+            $out[$e] .=  '<option value="1"' . ($r['showname'] == 't'?' selected':'') . '>Yes</option>';
+            $out[$e] .=  '<option value="0"' . ($r['showname'] == 'f'?' selected':'') . '>No</option>';
+            $out[$e] .=  '</select>';
+            $out[$e] .= '<input type="submit" name="showname_signer" value="update">';
+            $out[$e] .= '</form></td>';
+
+            $out[$e] .= '<td>';
+            $out[$e] .= '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_signer_id" value="' . $r['signid'] . '"><input type="submit" name="remove_signer" value="Remove signer permanently"></form>';
+            $out[$e] .= '</td>';
         }
         if ($sort == 'e') {
             function sort_by_domain($a, $b) {
@@ -251,10 +261,17 @@ print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</stron
         print '<p><em>That signer has been successfully removed.</em></p>';
     }
 
+    function showname_signer($id) {
+        db_query('UPDATE signers set showname = ? where id = ?', 
+            array(get_http_var('showname') ? true : false, $id));
+        db_commit();
+        print '<p><em>Show name for signer updated</em></p>';
+    }
+
     function update_prominence($pledge_id) {
         db_query('UPDATE pledges set prominence = ? where id = ?', array(get_http_var('prominence'), $pledge_id));
         db_commit();
-        print "<p><i>Changes to pledge prominence saved</i></p>";
+        print "<p><em>Changes to pledge prominence saved</em></p>";
     }
 
     function update_categories($pledge_id) {
@@ -266,7 +283,7 @@ print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</stron
             }
         }
         db_commit();
-        print '<p><i>Categories updated.</i></p>';
+        print '<p><em>Categories updated.</em></p>';
     }
 
     function display($self_link) {
@@ -289,7 +306,13 @@ print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</stron
                 $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $signer_id");
                 $this->remove_signer($signer_id);
             }
-        } elseif (get_http_var('update_cats')) {
+        } elseif (get_http_var('showname_signer_id')) {
+            $signer_id = get_http_var('showname_signer_id');
+            if (ctype_digit($signer_id)) {
+                $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $signer_id");
+                $this->showname_signer($signer_id);
+            }
+         } elseif (get_http_var('update_cats')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_categories($pledge_id);
         } elseif (get_http_var('send_announce_token')) {

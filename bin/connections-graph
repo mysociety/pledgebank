@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+#
+# connections-graph:
+# Simple code to generate GraphViz code from the pledge_connections table.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: connections-graph,v 1.1 2005-06-13 22:46:19 chris Exp $';
+
+use strict;
+require 5.8.0;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+
+use PB;
+
+print <<EOF;
+graph pbconnections {
+EOF
+
+my $s = dbh()->prepare("select id, ref from pledges where confirmed and coalesce(pin, '') = '' order by id");
+$s->execute();
+while (my ($id, $ref) = $s->fetchrow_array()) {
+    printf "    node p%d [ label=\"%s\" ];\n", $id, $ref;
+}
+
+$s = dbh()->prepare('select a_pledge_id, b_pledge_id, strength from pledge_connection');
+$s->execute();
+while (my ($a, $b, $str) = $s->fetchrow_array()) {
+    printf "    p%d -- p%d [ weight=%d ]\n", $a, $b, $str;
+}
+
+print <<EOF;
+}
+EOF

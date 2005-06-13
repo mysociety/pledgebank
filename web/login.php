@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.28 2005-06-12 19:08:37 francis Exp $
+ * $Id: login.php,v 1.29 2005-06-13 10:41:57 francis Exp $
  * 
  */
 
@@ -120,7 +120,7 @@ if (!is_null($q_t)) {
     /* Process emailed token */
     $d = auth_token_retrieve('login', $q_t);
     if (!$d)
-        err("Please check the URL is copied correctly from your email.  The token wasn't found.");
+        err("Please check the URL is copied correctly from your email.  The token '$q_t' wasn't found.");
     $P = person_get($d['email']);
     if (is_null($P)) {
         $P = person_get_or_create($d['email'], $d['name']);

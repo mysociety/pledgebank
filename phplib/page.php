@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.37 2005-06-12 22:29:29 chris Exp $
+// $Id: page.php,v 1.38 2005-06-13 07:47:43 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -159,12 +159,13 @@ function page_check_ref($ref) {
     if (!is_null(db_getOne('select ref from pledges where ref = ?', $ref)))
         return;
     page_header("We couldn't find that pledge");
-    print "<p>We couldn't find the pledge with reference \"" . htmlspecialchars($ref) . "\".";
     $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);
     if (db_num_rows($s) == 0) {
-        print "There don't seem to be any other pledges with similar references either, so we can't help you. Please check the reference and try again, have a look at <a href=\"/all\">the list of all pledges</a>, or search for the pledge you want by entering some words in this box:</p>";
+        print "<p>We couldn't find any pledge with a reference like \"" . htmlspecialchars($ref) . "\". ";
+        print "Try the following: </p>";
     } else {
-        print "Here are some pledges with references like the one you've given:</p><dl>";
+        print "<p>We couldn't find the pledge with reference \"" . htmlspecialchars($ref) . "\". ";
+        print "Did you mean one of these pledges?</p><dl>";
         while ($r = db_fetch_array($s)) {
             $p = new Pledge((int)$r['pledge_id']);
             print "<dt><a href=\"/"
@@ -178,13 +179,17 @@ function page_check_ref($ref) {
                     . "</dd>";
         }
         print "</dl>";
-        print "<p>If none of those look like what you want, you can search for the pledge you want by entering some words in this box:</p>";
+        print "<p>If none of those look like what you want, try the following:</p>";
     }
 
+    print "<p> <ul>
+        <li>If you typed in the location, check it carefully and try typing it again.</li>
+        <li>Look for the pledge on <a href=\"/all\">the list of all pledges</a>.</li>
+        <li>Search for the pledge you want by entering words below.</ul></p>";
     ?>
-<form accept-charset="utf-8" action="/search" method="get">
-<p><label for="s">Search:</label>
-<input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="Go"></p>
+<form accept-charset="utf-8" action="/search" method="get" class="pledge">
+<label for="s">Search for a pledge:</label>
+<input type="text" id="s" name="q" size="15" value=""> <input type="submit" value="Go"></p>
 </form>
 <?
     

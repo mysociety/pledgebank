@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.4 2005-06-11 06:59:55 francis Exp $
+// $Id: search.php,v 1.5 2005-06-13 07:47:43 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -16,23 +16,31 @@ print search();
 page_footer();
 
 function search() {
+    $pledge_select = 'SELECT *, pb_current_date() <= date as open,
+                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
+                date - pb_current_date() AS daysleft';
+
     $out = ''; $success = 0;
     $search = get_http_var('q');
-    $id = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', $search);
-    if ($id) {
-        Header("Location: " . OPTION_BASE_URL . '/' . $search);
-        exit;
+    $q = db_query("$pledge_select FROM pledges WHERE ref ILIKE ?", $search);
+    if (db_num_rows($q)) {
+        $success = 1;
+        $r = db_fetch_array($q);
+        $out .= '<p>Result <strong>exactly matching</strong> pledge <strong>' . htmlspecialchars($search) . '</strong>:</p>';
+        $out .= '<ul><li>';
+        $out .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+        $out .= '</li></ul>';
     }
 
-    $q = db_query('SELECT *, pb_current_date() <= date as open,
-                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                date - pb_current_date() AS daysleft
-                FROM pledges 
+    $q = db_query($pledge_select . ' FROM pledges 
                 WHERE pin IS NULL 
                     AND (title ILIKE \'%\' || ? || \'%\' OR 
                          detail ILIKE \'%\' || ? || \'%\' OR 
-                         ref ILIKE \'%\' || ? || \'%\') 
-                ORDER BY date DESC', array($search, $search, $search));
+                         ref ILIKE \'%\' || ? || \'%\' OR
+                         id in (select pledge_id from pledge_find_fuzzily(?) limit 5)
+                         )
+                    AND ref NOT ILIKE ?
+                ORDER BY date DESC', array($search, $search, $search, $search, $search));
     $closed = ''; $open = '';
     if (db_num_rows($q)) {
         $success = 1;

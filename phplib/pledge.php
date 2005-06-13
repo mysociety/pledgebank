@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.89 2005-06-12 16:30:31 francis Exp $
+ * $Id: pledge.php,v 1.90 2005-06-13 07:47:43 francis Exp $
  * 
  */
 
@@ -39,12 +39,6 @@ class Pledge {
         if (gettype($ref) == "string") {
             $q = db_query("$main_query_part AND ref ILIKE ?", array($ref));
             if (!db_num_rows($q)) {
-                // Fuzzy matches
-                /*db_query("SELECT * FROM pledges
-                          WHERE 
-                          SOUNDEX(ref) = SOUNDEX(?) OR 
-                          ref ILIKE \'%\' || ? || \'%\'
-                          ". array($ref, $ref, $ref)); */
                 err('We couldn\'t find that pledge.  Please check the URL again carefully.  Alternatively, try the search at the top right.');
             }
             $this->data = db_fetch_array($q);

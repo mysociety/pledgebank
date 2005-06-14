@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.102 2005-06-14 11:29:42 chris Exp $
+-- $Id: schema.sql,v 1.103 2005-06-14 14:39:28 chris Exp $
 --
 
 -- secret
@@ -110,7 +110,7 @@ create table pledges (
     confirmed boolean not null default false,
 
     -- PIN for private pledges
-    pin text default '',
+    pin text check (pin <> ''),
 
     -- XXX optionally, add a flag which prohibits signup by SMS?
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.13 2005-06-14 10:12:59 francis Exp $
+ * $Id: ref-info.php,v 1.14 2005-06-14 14:23:38 chris Exp $
  * 
  */
 
@@ -125,7 +125,8 @@ $p->render_box();
 ?>
 <h3 style="clear:both">Rate of signups</h3>
 
-<img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="Graph of signers to this pledge" width="500" height="300">
+<img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="Graph of signers to this pledge" width="500" height="300"><br>
+<small>Graph updated once per day</small>
 <?
 
 ?>

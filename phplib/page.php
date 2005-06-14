@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.39 2005-06-13 08:37:47 chris Exp $
+// $Id: page.php,v 1.40 2005-06-14 11:03:23 chris Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -150,7 +150,7 @@ function print_this_link($link_text, $after_text) {
  * it does, return. Otherwise, fuzzily find possibly matching pledges and
  * show the user a set of possible pages. */
 function page_check_ref($ref) {
-    if (!is_null(db_getOne('select ref from pledges where ref = ?', $ref)))
+    if (!is_null(db_getOne('select ref from pledges where ref ilike ?', $ref)))
         return;
     page_header("We couldn't find that pledge");
     $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);

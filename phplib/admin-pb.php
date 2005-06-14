@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.63 2005-06-13 17:03:50 francis Exp $
+ * $Id: admin-pb.php,v 1.64 2005-06-14 15:30:53 francis Exp $
  * 
  */
 
@@ -40,16 +40,16 @@ class ADMIN_PAGE_PB_MAIN {
 
     function list_all_pledges() {
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdecspu]/', $sort)) $sort = 'd';
+        if (!$sort || preg_match('/[^ratdecspu]/', $sort)) $sort = 'c';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
         elseif ($sort=='t') $order = 'target';
-        elseif ($sort=='d') $order = 'date';
+        elseif ($sort=='d') $order = 'date desc';
         elseif ($sort=='e') $order = 'email';
-        elseif ($sort=='c') $order = 'pledges.creationtime';
-        elseif ($sort=='u') $order = 'whensucceeded';
+        elseif ($sort=='c') $order = 'pledges.creationtime desc';
+        elseif ($sort=='u') $order = 'pledges.whensucceeded desc';
         elseif ($sort=='p') $order = 'prominence desc';
-        elseif ($sort=='s') $order = 'signers';
+        elseif ($sort=='s') $order = 'signers desc';
 
         $q = db_query("
             SELECT pledges.*, person.email,

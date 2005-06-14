@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.9 2005-06-14 15:00:02 chris Exp $
+// $Id: all.php,v 1.10 2005-06-14 15:06:25 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -20,8 +20,8 @@ $err = importparams(
 
 page_header("All Pledges", array('id'=>'all'));
 
-$s = db_query("select id from pledges where pin is null and confirmed and prominence <> 'backpage' order by ref limit ? offset $q_offset", PAGE_SIZE); /* PG bug: mustn't quote parameter of offset */
-$ntotal = db_getOne("select count(id) from pledges where pin is null and confirmed and prominence <> 'backpage'");
+$s = db_query("select id from pledges where pin is null and confirmed and date >= pb_current_date() and prominence <> 'backpage' order by ref limit ? offset $q_offset", PAGE_SIZE); /* PG bug: mustn't quote parameter of offset */
+$ntotal = db_getOne("select count(id) from pledges where pin is null and confirmed and date >= pb_current_date() and prominence <> 'backpage'");
 
 if ($ntotal > 0) {
     print "<h2>All $ntotal Open Pledges</h2>";

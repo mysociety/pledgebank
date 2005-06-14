@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.19 2005-06-14 10:21:24 francis Exp $
+ * $Id: comments.php,v 1.20 2005-06-14 13:16:03 francis Exp $
  * 
  */
 
@@ -128,15 +128,15 @@ function latest_comments() { ?>
 
 function comments_form($pledge_id, $nextn, $allow_post = false) {
     global $q_h_comment_id;
-    global $q_h__name, $q_h_author_email, $q_h_author_website;
+    global $q_h_author_name, $q_h_author_email, $q_h_author_website;
     global $q_h_text;
 
     $P = person_if_signed_on();
     if (!is_null($P)) {
-        if (is_null($q_h__name) || !$q_h_author_name)
-            $q_h__name = htmlspecialchars($P->name_or_blank());
-        if (is_null($q_h__email) || !$q_h_author_email)
-            $q_h__email = htmlspecialchars($P->email());
+        if (is_null($q_h_author_name) || !$q_h_author_name)
+            $q_h_author_name = htmlspecialchars($P->name_or_blank());
+        if (is_null($q_h_author_email) || !$q_h_author_email)
+            $q_h_author_email = htmlspecialchars($P->email());
     }
     
 ?>
@@ -145,18 +145,18 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 <h2>Add Comment</h2>
 
 <div class="form_row">
- <label for="_name">Your name</label>
- <input type="text" id="_name" name="author_name" value="<?=$q_h_author_name?>" size="30">
+ <label for="author_name">Your name</label>
+ <input type="text" id="author_name" name="author_name" value="<?=$q_h_author_name?>" size="30">
 </div>
 
 <div class="form_row">
-<label for="_email">Your email</label>
-  <input type="text" id="_email" name="author_email" value="<?=$q_h_author_email?>" size="30">
+<label for="author_email">Your email</label>
+  <input type="text" id="author_email" name="author_email" value="<?=$q_h_author_email?>" size="30">
 </div>
 
 <div class="form_row">
-<label for="_website">Your web site</label> <small><i>(Optional)</i></small>
-  <input type="text" id="_website" name="author_website" value="<?=$q_h_author_website?>" size="30">
+<label for="author_website">Your web site</label> <small><i>(Optional)</i></small>
+  <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="30">
 </div>
 
 <div class="form_row">

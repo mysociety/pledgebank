@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.15 2005-06-12 22:00:44 chris Exp $
+ * $Id: ref-announce.php,v 1.16 2005-06-14 10:12:59 francis Exp $
  * 
  */
 
@@ -39,8 +39,8 @@ if (!$P) {
                 ));
 }
 if ($P->id() != $p->creator_id()) {
-    page_header("Pledge author's page");
-    print "You must be the pledge author to send a message to all signers.
+    page_header("Pledge creator's page");
+    print "You must be the pledge creator to send a message to all signers.
         Please <a href=\"/logout\">log out</a> and try again.";
     page_footer();
     exit;

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.7 2005-06-12 22:00:44 chris Exp $
+ * $Id: ref-picture.php,v 1.8 2005-06-14 10:12:59 francis Exp $
  * 
  */
 
@@ -42,7 +42,7 @@ if (!$P) {
 
 if ($P->id() != $pledge->creator_id()) {
     page_header("Add picture to pledge", array('ref' => $pledge->url_main()) );
-    print "You must be the pledge author to add a picture to a pledge.  Please
+    print "You must be the pledge creator to add a picture to a pledge.  Please
         <a href=\"/logout\">log out</a> and log in again as them.";
     page_footer();
     exit;

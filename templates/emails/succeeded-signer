@@ -5,10 +5,10 @@ Congratulations!
 We are pleased to tell you that the pledge you signed up to
 <?=$values['exceeded_or_met']?> its target in the required time.
 
-The pledge reads:
-'<?=$values['sentence_third']?>'
+The pledge, created by <?=$values['creator_name']?>, reads:
+'<?=$values['sentence_first']?>'
 
-Now it is your turn to do what you pledged.  <?=$values['name']?> will
+Now it is your turn to do what you pledged.  <?=$values['creator_name']?> will
 email you soon to give you any further information you need.
 
 To see who else signed up, please follow this link:

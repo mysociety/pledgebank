@@ -10,6 +10,9 @@ Values which are available in all emails are:
   - type, description of the people, e.g. "residents of Eglwysbach";
   - signup, description of what pledge signers will do;
 
+  - creator_name, name of pledge creator
+  - creator_email, email of pledge creator (don't leak this where it shouldn't be)
+
   - pretty_date, deadline date in pretty format;
   - detail, extra description of the pledge;
 
@@ -23,30 +26,30 @@ Emails and the available variables are:
 
 **************************************************************************
 
+All the confirmation emails below have these parameters in common.
+  - url, the URL for confirmation.
+  - user_email, the confirming user's email
+  - user_name, the confirming user's name (if given)
+
 * pledge-confirm
 Sent to pledge creator when they make a new pledge and need email
 authentication.
-  - url, the URL for confirmation.
 
 * signature-confirm
 Sent to signers when they need email authentication.
-  - url, the URL for confirmation.
 
 * sms-confirm
 Sent to converters from SMS to confirm their email, if necessary.
-  - url, the URL for confirmation.
 
 * creator-confirm
 Sent to creator to authenticate them to the page which gives
 creators extra functions to manage their pledge.
-  - url, the URL for confirmation.
 
 * generic-confirm
 General purpose mail when someone performs an action, they
 are not logged in, and we need to confirm their email address.
   - reason, what the confirmation is needed for.
-  - url, the URL for confirmation.
-
+ 
 **************************************************************************
             
 * failed-creator

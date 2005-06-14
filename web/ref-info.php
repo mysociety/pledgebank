@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.12 2005-06-12 22:00:44 chris Exp $
+ * $Id: ref-info.php,v 1.13 2005-06-14 10:12:59 francis Exp $
  * 
  */
 
@@ -159,7 +159,7 @@ if ($priv & PRIV_SIGNER) {
         
     }
     if (!$n) {
-?><p>The pledge author has not sent any announcements yet.</p><?
+?><p>The pledge creator has not sent any announcements yet.</p><?
     }
 } else {
     ?>

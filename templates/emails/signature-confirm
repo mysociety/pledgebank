@@ -1,12 +1,14 @@
 Subject: Signing up to '<?=$values['title']?>' at PledgeBank.com
 
+<?=$values['user_name']?>,
+
 Please click on the link below to confirm your signature on the
 pledge at the bottom of this email. 
 
 <?=$values['url']?>
 
-The pledge reads:
+The pledge was created by <?=$values['creator_name']?> and reads:
 
-'<?=$values['sentence_third']?>'
+'<?=$values['sentence_first']?>'
 
 <?=$values['signature']?>

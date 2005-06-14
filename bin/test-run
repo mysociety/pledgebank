@@ -31,7 +31,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.86 2005-06-12 19:08:37 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.87 2005-06-14 10:12:58 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -432,7 +432,7 @@ sub do_unconfirmed_pledge {
     my $pledge_ref = "neverconfirm";
     create_pledge(0, 
         { title => $pledge_action_unconfirmed, 
-            target => '100', type => 'stubborn people', signup => 'will refuse ever to sign it',
+            target => '50', type => 'stubborn people', signup => 'will refuse ever to sign it',
             date => 'next thursday', ref => $pledge_ref,
         },
         { country => 'Global' },
@@ -1043,10 +1043,10 @@ sub do_admin_tests {
     $wth->email_get_containing('%To: '.$contact_email.  '%Subject: Lovely site' . 
             '%From: '. name_n(1000) . '%rules!%');
 
-    # Submit abusive signature report
+    # Submit abusive comment report
     $b->get($base_url . "/automatedtest");
-    $b->follow_link(text_regex => qr/suspicious signer/, n => 2) or die "Signature abuse link missing";
-    $wth->browser_check_contents("Report abusive signature");
+    $b->follow_link(text_regex => qr/Abusive/, n => 2) or die "Comment abuse link missing";
+    $wth->browser_check_contents("Report something wrong with a comment");
     $b->submit_form(form_name => 'abuse',
             fields => { 
                 reason => "I hate signer 3, he sucks" },
@@ -1071,10 +1071,10 @@ sub do_admin_tests {
     $b->get($admin_url);
     $b->follow_link(text_regex => qr/Abuse reports/) or die "Abuse reports link missing";
     $wth->browser_check_contents(qr/pledges \(0\)/);
-    $wth->browser_check_contents(qr/signers \(1\)/);
-    $wth->browser_check_contents(qr/comments \(0\)/);
-    $b->follow_link(text_regex => qr/signers \(1\)/) or die "Signers link missing";
-    my $name = name_n(3);
+    $wth->browser_check_contents(qr/signers \(0\)/);
+    $wth->browser_check_contents(qr/comments \(1\)/);
+    $b->follow_link(text_regex => qr/comments \(1\)/) or die "Comments link missing";
+    my $name = name_n(90);
     $wth->browser_check_contents(qr/$name/);
     $wth->browser_check_contents(qr/Discard selected abuse reports/);
 

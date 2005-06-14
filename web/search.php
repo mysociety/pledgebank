@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.5 2005-06-13 07:47:43 francis Exp $
+// $Id: search.php,v 1.6 2005-06-14 10:12:59 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -107,7 +107,7 @@ function search() {
             foreach ($array as $item) {
                 $out .= '<dd>';
                 $out .= '<a href="' . $item[0] . '">' . $item[1] . '</a>';
-                if ($item[2] == 'creator') $out .= " (author)";
+                if ($item[2] == 'creator') $out .= " (creator)";
                 $out .= '</dd>';
             }
         }

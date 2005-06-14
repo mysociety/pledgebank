@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.33 2005-06-11 06:25:10 matthew Exp $
+// $Id: fns.php,v 1.34 2005-06-14 10:12:58 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -26,6 +26,14 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];
     if (array_key_exists('date', $values))
         $values['pretty_date'] = prettify($values['date'], false);
+    if (array_key_exists('name', $values)) {
+        $values['creator_name'] = $values['name'];
+        $values['name'] = null;
+    }
+    if (array_key_exists('email', $values)) {
+        $values['creator_email'] = $values['email'];
+        $values['email'] = null;
+    }
         
     $values['signature'] = "-- the PledgeBank.com team\n";
 

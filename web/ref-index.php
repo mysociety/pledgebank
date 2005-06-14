@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.24 2005-06-13 17:03:50 francis Exp $
+// $Id: ref-index.php,v 1.25 2005-06-14 10:12:59 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -49,8 +49,8 @@ function draw_spreadword($p) {
     <li> <? print_link_with_pin($p->url_email(), "", "Email pledge to your friends") ?></li>
 <!--    <li> <? print_link_with_pin($p->url_ical(), "", "Add deadline to your calendar") ?> </li> -->
     <li> <? print_link_with_pin($p->url_flyers(), "Stick them places!", "Print out customised flyers") ?>
-    <li> <a href="<?=$p->url_announce()?>" title="Only if you made this pledge">Send message to signers</a> (author only)
-    <li> <a href="<?=$p->url_picture()?>" title="Only if you made this pledge"><? if ($p->has_picture()) { ?>Change the pledge picture<? } else { ?>Add a picture to your pledge<? } ?></a> (author only)
+    <li> <a href="<?=$p->url_announce()?>" title="Only if you made this pledge">Send message to signers</a> (creator only)
+    <li> <a href="<?=$p->url_picture()?>" title="Only if you made this pledge"><? if ($p->has_picture()) { ?>Change the pledge picture<? } else { ?>Add a picture to your pledge<? } ?></a> (creator only)
     </li>
     </ul>
     <!--    <br clear="all"> -->
@@ -64,7 +64,7 @@ function draw_signatories($p) {
     <div id="signatories">
     <h2><a name="signers">Current signatories</a></h2><?
 
-    $out = '<li>' . $p->h_name() . ' (Pledge Author)</li>';
+    $out = '<li>' . $p->h_name() . ' (Pledge Creator)</li>';
     $anon = 0;
     $unknownname = 0;
     $q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($p->id()));

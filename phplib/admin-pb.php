@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.64 2005-06-14 15:30:53 francis Exp $
+ * $Id: admin-pb.php,v 1.65 2005-06-14 15:38:01 francis Exp $
  * 
  */
 
@@ -339,6 +339,12 @@ class ADMIN_PAGE_PB_LATEST {
     function ADMIN_PAGE_PB_LATEST() {
         $this->id = 'pblatest';
         $this->navname = 'Timeline';
+
+        if (get_http_var('linelimit')) {
+            $this->linelimit = get_http_var('linelimit');
+        } else {
+            $this->linelimit = 250;
+        }
     }
 
     # pledges use creationtime
@@ -438,7 +444,14 @@ dd {
 <?
         print '<dl>';
         $date = ''; 
+        $linecount = 0;
         foreach ($time as $epoch => $datas) {
+            $linecount++;
+            if ($linecount > $this->linelimit) {
+                print '<dt><br><a href="'.$this->self_link.
+                        '&linelimit='.htmlspecialchars($this->linelimit + 250).'">Expand timeline...</a></dt>';
+                break;
+            }
             $curdate = date('l, jS F Y', $epoch);
             if ($date != $curdate) {
                 print '</dl> <h2>'. $curdate . '</h2> <dl>';
@@ -539,7 +552,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
 
     function display($self_link) {
         db_connect();
-        
+
         if (array_key_exists('prev_url', $_POST)) {
             $do_discard = false;
             if (get_http_var('discardReports'))

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.100 2005-06-14 11:26:57 chris Exp $
+-- $Id: schema.sql,v 1.101 2005-06-14 11:28:23 francis Exp $
 --
 
 -- secret
@@ -162,7 +162,7 @@ create table pledges (
     check ((latitude is null and longitude is null)
             or (latitude is not null and longitude is not null)),
     check (latitude is null or (latitude >= -90 and latitude <= +90)),
-    check (longitude is null or (longitude >= -180 and latitude < 180)),
+    check (longitude is null or (longitude >= -180 and latitude < 180))
 );
 
 create index pledges_latitude_idx on pledges(latitude);

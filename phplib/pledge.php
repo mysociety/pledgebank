@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.92 2005-06-13 16:53:16 francis Exp $
+ * $Id: pledge.php,v 1.93 2005-06-14 11:59:18 francis Exp $
  * 
  */
 
@@ -191,6 +191,7 @@ class Pledge {
 &quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
 <p>Deadline: <strong><?=$this->h_pretty_date()?></strong>.
+<br>
 <? if ($this->signers() >= 0) { ?>
 <i><?=prettify($this->signers()) ?> <?=make_plural($this->signers(), 'person has', 'people have') ?> signed up<?=($this->left()<0?' ('.(-$this->left()).' over target)':', '.($this->left()).' more needed') ?></i>
 <? } ?>

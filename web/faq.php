@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.9 2005-06-14 10:57:39 francis Exp $
+// $Id: faq.php,v 1.10 2005-06-14 11:00:36 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -149,7 +149,7 @@ else.
 <dt>Do you need any help with the project?
 
 <dd>Yes, we can use help in all sorts of ways, technical or non-technical.
-Please contact us if you want to get in touch.
+Please <a href="/contact">contact us</a> if you want to get in touch.
 
 <dt>Can I put up pledges in languages other than English?
 

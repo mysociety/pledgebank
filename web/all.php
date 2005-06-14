@@ -5,40 +5,43 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.8 2005-06-10 10:58:43 matthew Exp $
+// $Id: all.php,v 1.9 2005-06-14 15:00:02 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 
+require_once '../../phplib/importparams.php';
+
+define('PAGE_SIZE', 50);
+
+$err = importparams(
+            array('offset', '/^(0|[1-9]\d*)$/', '', 0)
+        );
+
 page_header("All Pledges", array('id'=>'all'));
 
-$type = $_SERVER['REQUEST_URI'];
-$type = substr($type, strpos($type, '?')+1);
-$order = 'date';
-if ($type == 'title') {
-    $order = 'title';
-} elseif ($type =='target') {
-    $order = 'target';
-} elseif ($type =='deadline') {
-    $order = 'date';
-} elseif ($type =='creator') {
-    $order = 'name';
-} elseif ($type =='ref') {
-    $order = 'ref';
-}
-$q = db_query('SELECT *, (SELECT count(*) FROM signers
-                            WHERE signers.pledge_id = pledges.id) AS signers
-        FROM pledges 
-        WHERE confirmed 
-        AND date>=pb_current_date() 
-        AND pin IS NULL 
-        AND prominence <> \'backpage\'
-        ORDER BY '.$order.' LIMIT 50');
-if (db_num_rows($q)) {
-    print '<h2>All '.db_num_rows($q).' Open Pledges</h2>';
+$s = db_query("select id from pledges where pin is null and confirmed and prominence <> 'backpage' order by ref limit ? offset $q_offset", PAGE_SIZE); /* PG bug: mustn't quote parameter of offset */
+$ntotal = db_getOne("select count(id) from pledges where pin is null and confirmed and prominence <> 'backpage'");
+
+if ($ntotal > 0) {
+    print "<h2>All $ntotal Open Pledges</h2>";
+    if ($ntotal > 50) {
+        printf('<p>Showing pledges %d &mdash; %d of %d</p>', $q_offset + 1, $q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE, $ntotal);
+        
+        print "<p>";
+        if ($q_offset > 0) {
+            $n = $q_offset - PAGE_SIZE;
+            if ($n < 0) $n = 0;
+            print "<a href=\"all?offset=$n\">&lt;&lt; Previous page</a>\n";
+        } else if ($q_offset + PAGE_SIZE < $ntotal) {
+            $n = $q_offset + PAGE_SIZE;
+            print "<a href=\"all?offset=$n\">Next page &gt;&gt;</a>";
+        }
+        print "</p>";
+    }
     $c = 0;
-    while ($r = db_fetch_array($q)) {
-        $pledge = new Pledge($r);
+    while (list($id) = db_fetch_row($s)) {
+        $pledge = new Pledge(intval($id));
         $pledge->render_box(array('all'=>$c%2, 'href'=>$pledge->url_main()));
         $c++;
     }

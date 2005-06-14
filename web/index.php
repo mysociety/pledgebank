@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.185 2005-06-13 16:53:16 francis Exp $
+// $Id: index.php,v 1.186 2005-06-14 20:20:02 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -102,7 +102,8 @@ function list_newest_pledges() {
 }
 
 function list_frontpage_pledges() {
-?><h2>Why not sign a live pledge?</h2><?
+?><a href="/rss"><img align="right" border="0" src="rss.gif" alt="RSS feed of newest pledges"></a>
+<h2>Why not sign a live pledge?</h2><?
 
     $pledges = get_pledges_list("
                 SELECT *, date - pb_current_date() AS daysleft

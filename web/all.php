@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.13 2005-06-14 20:58:02 matthew Exp $
+// $Id: all.php,v 1.14 2005-06-14 22:57:51 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -41,23 +41,21 @@ if ($ntotal > 0) {
     print "<h2>All $ntotal Open Pledges</h2>";
     $navlinks = '';
     if ($ntotal > PAGE_SIZE) {
+        $sort = ($q_sort) ? '&amp;sort=' . $q_sort : '';
+        $off = ($q_offset) ? '&amp;offset=' . $q_offset : '';
         $prev = '<span class="greyed">&laquo; Previous page</span>'; $next = '<span class="greyed">Next page &raquo;</span>';
         if ($q_offset > 0) {
             $n = $q_offset - PAGE_SIZE;
             if ($n < 0) $n = 0;
-            $prev = "<a href=\"all?offset=$n\">&laquo; Previous page</a>";
+            $prev = "<a href=\"all?offset=$n$sort\">&laquo; Previous page</a>";
         }
         if ($q_offset + PAGE_SIZE < $ntotal) {
             $n = $q_offset + PAGE_SIZE;
-            $next = "<a href=\"all?offset=$n\">Next page &raquo;</a>";
+            $next = "<a href=\"all?offset=$n$sort\">Next page &raquo;</a>";
         }
         $navlinks = '<p align="center">' . $prev . ' | Pledges ' . ($q_offset + 1) . ' &ndash; ' . 
             ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
             $ntotal . ' | ' . $next . '<br>Sort by: ';
-        $off = '';
-        if ($q_offset) {
-            $off = '&amp;offset=' . $q_offset;
-        }
         if ($q_sort != 'title') $navlinks .= "<a href=\"all?sort=title$off\">Title</a>"; else $navlinks .= 'Title';
         $navlinks .= ' | ';
         if ($q_sort != 'target') $navlinks .= "<a href=\"all?sort=target$off\">Target</a>"; else $navlinks .= 'Target';

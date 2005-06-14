@@ -5,14 +5,14 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.12 2005-06-14 20:20:02 matthew Exp $
+// $Id: all.php,v 1.13 2005-06-14 20:58:02 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 
 require_once '../../phplib/importparams.php';
 
-define('PAGE_SIZE', 6);
+define('PAGE_SIZE', 50);
 
 $err = importparams(
             array('offset', '/^(0|[1-9]\d*)$/', '', 0),

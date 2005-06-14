@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.8 2005-06-14 00:19:38 francis Exp $
+// $Id: faq.php,v 1.9 2005-06-14 10:57:39 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -103,7 +103,7 @@ a wireless enabled laptop from door to door, and get people to sign up
 then and there, you're more likely to be successful than someone who
 puts their pledge up and forgets about it.
 
-<dt>Why have you imposed a 200 person cap?
+<dt>Why have you imposed a <?=OPTION_PB_TARGET_CAP?> person cap?
 
 <dd>In order to focus people's minds on highly achievable pledges, we have
 set this relatively low cap of maximum subscribers. We can raise the

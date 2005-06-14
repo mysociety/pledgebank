@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.103 2005-06-14 14:39:28 chris Exp $
+-- $Id: schema.sql,v 1.104 2005-06-14 14:42:38 chris Exp $
 --
 
 -- secret
@@ -243,7 +243,7 @@ create function index_pledge_ref_parts(integer)
     begin
         t_pledge_id = $1;
         -- do not index private pledges or unconfirmed pledges
-        if coalesce((select pin from pledges where id = t_pledge_id), '''') <> ''''
+        if (select pin from pledges where id = t_pledge_id) is not null
             or not (select confirmed from pledges where id = t_pledge_id) then
             return;
         end if;

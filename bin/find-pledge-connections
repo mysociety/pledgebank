@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.7 2005-06-13 08:30:28 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.8 2005-06-14 14:42:37 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -46,7 +46,7 @@ while (my ($person_id) = $s->fetchrow_array()) {
                     from signers, pledges
                     where pledges.id = signers.pledge_id
                         and pledges.prominence <> 'backpage'
-                        and coalesce(pledges.pin, '') = ''
+                        and pledges.pin is null
                         and pledges.confirmed
                         and signers.person_id = ?
                         and signers.showname");
@@ -65,7 +65,7 @@ while (my ($person_id) = $s->fetchrow_array()) {
                     where confirmed
                         and prominence <> 'backpage'
                         and person_id = ?
-                        and coalesce(pin, '') = ''"); # XXX can we do this as only one query?
+                        and pin is null"); # XXX can we do this as only one query?
     $s2->execute($person_id);
     while (my ($pledge_id, $name) = $s2->fetchrow_array()) {
         $name = lc($name);

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.99 2005-06-14 10:21:24 francis Exp $
+-- $Id: schema.sql,v 1.100 2005-06-14 11:26:57 chris Exp $
 --
 
 -- secret
@@ -207,7 +207,7 @@ create function pledge_find_nearby(double precision, double precision, double pr
     --  http://en.wikipedia.org/wiki/Earth_radius
 '
     select id,
-            R_e() * arccos(
+            R_e() * acos(
                 sin(radians($1)) * sin(radians(latitude))
                 + cos(radians($2)) * cos(radians(latitude))
                     * cos(radians($2 - longitude))

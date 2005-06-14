@@ -49,7 +49,7 @@ $pdf = PB::PDF->new( {
                 'people' => 'other local people',
                 'people-text' => 'come along too',
 
-                'author' => 'Tom Steinberg',
+                'creator' => 'Tom Steinberg',
                 'date' => '15th March 2005',
                 'sms' => 12345,
 		      });

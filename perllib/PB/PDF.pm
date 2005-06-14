@@ -66,8 +66,8 @@ sub make {
     # todo - work out a better way of doing vertical line spacing;
     # maybe have a stack and peek ahead?
 
-    unless ($self->{'pledge'}{'author'}) {
-        $self->{'pledge'}{'author'} = 'me';
+    unless ($self->{'pledge'}{'creator'}) {
+        $self->{'pledge'}{'creator'} = 'me';
     }
 
     my $poster_type = $self->{'pledge'}{'poster-type'};
@@ -92,12 +92,12 @@ R,80,
 XY,$page_centre,120
 B,20,Go to pledgebank.com/$self->{'pledge'}{'ref'}
 B,20,or send an SMS to $self->{'pledge'}{'sms'} (costs 25p)
-B,20,to make the same pledge as $self->{'pledge'}{'author'}
+B,20,to make the same pledge as $self->{'pledge'}{'creator'}
 OUTPUT
     } elsif ($poster_type eq "friendly-flyer") {
         $output_text = <<OUTPUT;
 XY,$page_centre,720
-R,30,I, $self->{'pledge'}{'author'},
+R,30,I, $self->{'pledge'}{'creator'},
 R,15,
 B,30,$self->{'pledge'}{'text'}
 R,15,

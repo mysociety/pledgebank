@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.98 2005-06-14 09:43:30 chris Exp $
+-- $Id: schema.sql,v 1.99 2005-06-14 10:21:24 francis Exp $
 --
 
 -- secret
@@ -874,10 +874,10 @@ create table comment (
     website text,
     -- add a reply_comment_id here if we ever want threading
     whenposted timestamp not null default pb_current_timestamp(),
-    text text not null,                     -- as entered by author
+    text text not null,                     -- as entered by comment author
     ishidden boolean not null default false -- hidden from view
     -- other fields? one to indicate whether this was written by the pledge
-    -- author and should be highlighted in the display?
+    -- creator and should be highlighted in the display?
 );
 
 create index comment_pledge_id_idx on comment(pledge_id);

@@ -31,7 +31,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.87 2005-06-14 10:12:58 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.88 2005-06-14 10:21:24 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -508,7 +508,7 @@ sub do_public_succeeding_pledge {
     # Check can't get to announce page as a mere signer
     $b->get($base_url . "/$pledge_ref");
     $b->follow_link(text_regex => qr/message to signers/) or die "Creator page link not found";
-    $wth->browser_check_contents("must be the pledge author");
+    $wth->browser_check_contents("must be the pledge creator");
     $b->follow_link(text_regex => qr/log out/) or die "Log out not found";
     # Send mid-pledge announcement, to encourage signers to do more to help
     $b->get($base_url . "/$pledge_ref");

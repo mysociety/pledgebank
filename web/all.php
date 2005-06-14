@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.10 2005-06-14 15:06:25 chris Exp $
+// $Id: all.php,v 1.11 2005-06-14 16:41:24 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -25,19 +25,21 @@ $ntotal = db_getOne("select count(id) from pledges where pin is null and confirm
 
 if ($ntotal > 0) {
     print "<h2>All $ntotal Open Pledges</h2>";
+    $navlinks = '';
     if ($ntotal > 50) {
         printf('<p>Showing pledges %d &mdash; %d of %d</p>', $q_offset + 1, $q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE, $ntotal);
         
-        print "<p>";
+        $navlinks = "<p>";
         if ($q_offset > 0) {
             $n = $q_offset - PAGE_SIZE;
             if ($n < 0) $n = 0;
-            print "<a href=\"all?offset=$n\">&lt;&lt; Previous page</a>\n";
+            $navlinks .= "<a href=\"all?offset=$n\">&lt;&lt; Previous page</a>\n";
         } else if ($q_offset + PAGE_SIZE < $ntotal) {
             $n = $q_offset + PAGE_SIZE;
-            print "<a href=\"all?offset=$n\">Next page &gt;&gt;</a>";
+            $navlinks .= "<a href=\"all?offset=$n\">Next page &gt;&gt;</a>";
         }
-        print "</p>";
+        $navlinks .= "</p>";
+        print $navlinks;
     }
     $c = 0;
     while (list($id) = db_fetch_row($s)) {
@@ -45,6 +47,8 @@ if ($ntotal > 0) {
         $pledge->render_box(array('all'=>$c%2, 'href'=>$pledge->url_main()));
         $c++;
     }
+    if ($ntotal > 50)
+        print "<br style=\"clear: both;\">$navlinks";
 } else {
     print '<h2>All Open Pledges</h2><p>There are currently no open pledges.</p>';
 }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.13 2005-06-14 11:00:36 francis Exp $
+// $Id: contact.php,v 1.14 2005-06-14 23:46:10 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -66,9 +66,12 @@ function contact_form_submitted() {
 }
 
 function send_contact_form($name, $email, $subject, $message) {
-    $header = 'Sent by contact.php from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . "\n\n";
-    $from = 'From: "' . str_replace(array('\\','"'), array('\\\\','\"'), $name) . '" <' . $email . '>';
-    $success = @mail(OPTION_CONTACT_EMAIL, $subject, $header . $message, $from);
+    $postfix = 'Sent by contact.php from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . "\n\n";
+    $headers = array();
+    $headers['From'] = '"' . str_replace(array('\\','"'), array('\\\\','\"'), $name) . '" <' . $email . '>';
+    $success = pb_send_email(OPTION_CONTACT_EMAIL, $subject, $message . "\n\n" . $postfix, $headers);
+    if (!$success) 
+        err("Failed to send message.  Please try again, or <a href=\"mailto:team@pledgebank.com\">email us</a>.");
 ?>
     Thanks for your feedback.  We'll get back to you as soon as we can!
 <?

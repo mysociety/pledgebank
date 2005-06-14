@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.31 2005-06-14 10:57:39 francis Exp $
+// $Id: new.php,v 1.32 2005-06-14 15:23:37 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -368,8 +368,8 @@ function pledge_form_three_submitted() {
     }
  
     /* User must have an account to do this. */
+    $data['reason_web'] = 'Before creating your new pledge, we need to check that your email is working.';
     $data['template'] = 'pledge-confirm';
-    $data['reason'] = 'create your new pledge';
     $P = person_signon($data, $data['email'], $data['name']);
 
     create_new_pledge($P, $data);
@@ -483,6 +483,9 @@ function create_new_pledge($P, $data) {
          * insert on the table. */
     if (is_null(db_getOne('select id from pledges where ref = ?', $data['ref']))) {
         $data['id'] = db_getOne("select nextval('pledges_id_seq')");
+        if ($data['postcode'] == '') {
+            $data['postcode'] = null;
+        }
         db_query('
                 insert into pledges (
                     id, title, target,

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.13 2005-06-12 22:00:44 chris Exp $
+// $Id: ref-sign.php,v 1.14 2005-06-14 15:23:37 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -50,8 +50,8 @@ function do_sign() {
 
     /* Get the user to log in. */
     $r = $pledge->data;
+    $r['reason_web'] = 'Before putting your signature on the pledge, we need to check that your email is working.';
     $r['template'] = 'signature-confirm';
-    $r['reason'] = 'sign the pledge';
     $P = person_signon($r, $q_email, $q_name);
     
     $R = pledge_is_valid_to_sign($pledge->id(), $P->email());

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.25 2005-06-06 13:23:48 francis Exp $
+ * $Id: sms.php,v 1.26 2005-06-14 15:23:37 francis Exp $
  * 
  */
 
@@ -108,8 +108,8 @@ if ($errs) {
 
 /* OK, they win. Make them sign on. */
 $data = db_getRow('select * from pledges where id = (select pledge_id from signers where signers.id = ?)', $signer_id);
+$data['reason_web'] = 'Next, we need to verify your email address.';
 $data['template'] = 'sms-confirm';
-$data['reason'] = 'confirm your email address';
 $P = person_signon($data, $q_email, $q_name);
 
 $r = pledge_is_valid_to_sign($pledge_id, $P->email());

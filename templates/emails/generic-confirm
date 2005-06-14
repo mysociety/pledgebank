@@ -1,7 +1,7 @@
-Subject: Confirm your email address at PledgeBank.com
+Subject: <?=$values['reason_email_subject']?>
 
-Please click on the link below to confirm your email address. We need
-you to do this so that we can <?=$values['reason']?>.
+Please click on the link below to confirm your email address.  
+<?=$values['reason_email']?>
 
 <?=$values['url']?>
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.14 2005-06-14 14:23:38 chris Exp $
+ * $Id: ref-info.php,v 1.15 2005-06-14 15:23:37 francis Exp $
  * 
  */
 
@@ -44,8 +44,9 @@ if ($q_LetMeIn && !is_null($q_email)) {
     /* User wants to log in. Do the signon then redirect back to the normal
      * page, so that they always view it as a GET. */
     $P = person_signon(array(
-                    'reason' => "log into PledgeBank",
-                    'template' => 'generic-confirm'
+                    'reason_web' => 'To view announcement messages for a pledge, we need to check you have signed it.',
+                    'reason_email' => 'Then you will be able to view announcement messages.',
+                    'reason_email_subject' => 'View pledge announcements archive on PledgeBank.com',
                 ), $q_email);
     if (!$pin_box) {
         header("Location: /$q_ref/info");

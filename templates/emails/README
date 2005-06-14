@@ -41,14 +41,11 @@ Sent to signers when they need email authentication.
 * sms-confirm
 Sent to converters from SMS to confirm their email, if necessary.
 
-* creator-confirm
-Sent to creator to authenticate them to the page which gives
-creators extra functions to manage their pledge.
-
 * generic-confirm
 General purpose mail when someone performs an action, they
 are not logged in, and we need to confirm their email address.
-  - reason, what the confirmation is needed for.
+  - reason_email_subject, for the Subject line of the email.
+  - reason_email, what the confirmation is needed for.
  
 **************************************************************************
             

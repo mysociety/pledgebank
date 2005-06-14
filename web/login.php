@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.31 2005-06-14 10:12:59 francis Exp $
+ * $Id: login.php,v 1.32 2005-06-14 15:23:37 francis Exp $
  * 
  */
 
@@ -99,8 +99,10 @@ if ($q_name=='<Enter your name>') {
 /* General purpose login, asks for email also. */
 if (get_http_var("now")) {
     $P = person_signon(array(
-                    'reason' => "log into PledgeBank",
-                    'template' => 'generic-confirm'
+                    'reason_web' => "To log into Pledge Bank, we need to check your email address.",
+                    'reason_email' => "Then you will be logged into PledgeBank, and can set or change your password.",
+                    'reason_email_subject' => 'Log into PledgeBank.com'
+
                 ));
     page_header("Logged in");
     print "You're now logged in as <strong>";
@@ -260,7 +262,7 @@ function login_form($errors = array()) {
         $q_name = $q_h_name = '';   /* shouldn't happen */
 
     $template_data = unserialize(stash_get_extra($q_stash));
-    $reason = htmlspecialchars($template_data['reason']);
+    $reason = htmlspecialchars($template_data['reason_web']);
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -277,7 +279,7 @@ function login_form($errors = array()) {
 <input type="hidden" name="stash" value="<?=$q_h_stash?>">
 <input type="hidden" name="name" id="name" value="<?=$q_h_name?>">
 
-<p><strong>Before you can <?=$reason?>, we need to check that your email is working.</strong></p>
+<p><strong><?=$reason?></strong></p>
 
 <? if (is_null($q_email) || $errors) { ?>
 

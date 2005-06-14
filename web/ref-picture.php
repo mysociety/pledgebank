@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.8 2005-06-14 10:12:59 francis Exp $
+ * $Id: ref-picture.php,v 1.9 2005-06-14 15:23:37 francis Exp $
  * 
  */
 
@@ -32,12 +32,13 @@ $pledge = new Pledge($q_ref);
 
 $P = person_if_signed_on();
 if (!$P) {
+    $reason_clause = $pledge->has_picture() ?  "change the pledge's picture" : "add a picture to the pledge";
+    $reason_clause_you = $pledge->has_picture() ?  "change your pledge's picture" : "add a picture to your pledge";
     $P = person_signon(array(
-                    'reason' => $pledge->has_picture() ?
-                        "add a picture to the pledge" :
-                        "change the pledge's picture",
-                    'template' => 'creator-confirm'
-                ));
+                    "reason_web" => "Before you can $reason_clause, we need to check that you created the pledge.",
+                    "reason_email" => "Then you will be able to $reason_clause_you.",
+                    "reason_email_subject" => ucfirst($reason_clause_you) . " at PledgeBank.com")
+                );
 }
 
 if ($P->id() != $pledge->creator_id()) {

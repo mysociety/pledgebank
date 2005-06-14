@@ -31,7 +31,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.88 2005-06-14 10:21:24 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.89 2005-06-14 15:23:37 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -236,7 +236,7 @@ sub perform_login_action {
 
         # Request confirmation email (unless we are resuming request)
         if ($login_action ne "resume") {
-            $wth->browser_check_contents("we need to check that your email is working");
+            $wth->browser_check_contents("I've never used PledgeBank before");
             $b->submit_form(form_name => 'login',
                 fields => $login_fields,
                 button => 'SendEmail') or die "Failed to request confirmation email";
@@ -282,14 +282,14 @@ sub perform_login_action {
     } elsif ($login_action eq "loggedin") {
         # Nothing to do
     } elsif ($login_action eq "password") {
-        $wth->browser_check_contents("we need to check that your email is working");
+        $wth->browser_check_contents("I have a PledgeBank password");
         $login_fields->{'password'} = password_n($who);
         $b->submit_form(form_name => 'login',
             fields => $login_fields,
             button => 'LogIn') or die "Failed to log in with password";
         $wth->log_watcher_check();
     } elsif ($login_action eq "wrongpassword") {
-        $wth->browser_check_contents("we need to check that your email is working");
+        $wth->browser_check_contents("I have a PledgeBank password");
         $login_fields->{'password'} = "thispassswordisnonsense";
         $b->submit_form(form_name => 'login',
             fields => $login_fields,
@@ -513,7 +513,7 @@ sub do_public_succeeding_pledge {
     # Send mid-pledge announcement, to encourage signers to do more to help
     $b->get($base_url . "/$pledge_ref");
     $b->follow_link(text_regex => qr/message to signers/) or die "Creator page link not found";
-    perform_login_action(0, {action=>"viaemail", giveemail=>1}, "send a message to all signers");
+    perform_login_action(0, {action=>"viaemail", giveemail=>1}, "send a message to everyone who has signed your pledge");
     $wth->browser_check_contents("Send Announcement");
     $wth->browser_check_no_contents("successful");
     $b->submit_form(form_name => 'pledge',

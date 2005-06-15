@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.5 2005-06-15 15:20:32 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.6 2005-06-15 21:07:42 matthew Exp $';
 
 use strict;
 use warnings;
@@ -49,24 +49,12 @@ sub run {
 
     # Get the data from the database.
     my $pledges = get_pledges();
-    my $signers = get_signers();
 
     # Add the pledges to the RSS.
     foreach my $pledge (@$pledges) {
 
         # Put together the title and description.
-        my $signed_up = $$signers{ $$pledge{id} } || 0;
-        my $title     = "$$pledge{title} - ";
-        if ($signed_up > $$pledge{target}) {
-            my $over = $signed_up - $$pledge{target};
-            $title .= "$over over target";
-        } elsif ($signed_up == $$pledge{target}) {
-            $title .= "exact target reached";
-        } else {
-            my $more = $$pledge{target} - $signed_up;
-            $title .= "$signed_up signed up, $more more needed";
-        }
-
+        my $title     = "$$pledge{title} (target $$pledge{target}, deadline $$pledge{date})";
         my $description = "Pledge by $$pledge{name}";
         $description .= "\n\n$$pledge{detail}" if $$pledge{detail};
 
@@ -112,28 +100,6 @@ limit $CONF{number_of_pledges}"
     }
 
     return $arrayref;
-}
-
-# Get signers.
-sub get_signers {
-    my $query =
-      dbh()
-      ->prepare( 
-"select pledge_id, count(id) as count
-  from signers
-  where pledge_id in
-    ( select id from pledges where confirmed order by id desc limit $CONF{number_of_pledges})
-  group by pledge_id " );
-
-    $query->execute;
-
-    my $hashref = {};
-
-    while ( my $row = $query->fetchrow_hashref ) {
-        $$hashref{ $$row{pledge_id} } = $$row{count} || 0;
-    }
-
-    return $hashref;
 }
 
 # Create an RSS object.

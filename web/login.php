@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.36 2005-06-15 10:47:52 francis Exp $
+ * $Id: login.php,v 1.37 2005-06-15 14:18:47 francis Exp $
  * 
  */
 
@@ -400,7 +400,7 @@ EOF;
 <br>
     <strong>Password:</strong> <input type="password" name="pw1" id="pw1" size="15">
     <strong>Password (again):</strong> <input type="password" name="pw2" size="15">
-<input type="submit" value="Set password &gt;&gt;">
+    <input type="submit" name="SetPassword" value="Set password &gt;&gt;">
 </li>
 </form>
 

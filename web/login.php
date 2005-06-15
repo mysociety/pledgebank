@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.34 2005-06-15 07:00:25 matthew Exp $
+ * $Id: login.php,v 1.35 2005-06-15 09:53:56 chris Exp $
  * 
  */
 
@@ -275,7 +275,7 @@ function login_form($errors = array()) {
 ?>
 
 <div class="pledge">
-<form action="login" name="login" class="login" method="POST" accept-charset="utf-8">
+<form action="/login" name="login" class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="<?=$q_h_stash?>">
 <input type="hidden" name="name" id="name" value="<?=$q_h_name?>">
 
@@ -381,7 +381,7 @@ EOF;
 
 <ul>
 
-<form action="login" name="loginNoPassword" class="login" method="POST" accept-charset="utf-8">
+<form action="/login" name="loginNoPassword" class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
@@ -390,7 +390,7 @@ EOF;
 <br><small>(you can set a password another time)</small>
 </li></form>
 
-<form action="login" name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
+<form action="/login" name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">

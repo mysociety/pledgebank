@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.65 2005-06-14 15:38:01 francis Exp $
+ * $Id: admin-pb.php,v 1.66 2005-06-15 16:14:58 francis Exp $
  * 
  */
 
@@ -125,7 +125,7 @@ class ADMIN_PAGE_PB_MAIN {
             LEFT JOIN person ON person.id = pledges.person_id WHERE ref ILIKE ?', $pledge);
         $pdata = db_fetch_array($q);
 
-        print "<h2>Pledge '<a href=\"/".$pdata['ref']."\">" . $pdata['ref'] . "</a>' &mdash; " .  $pdata['title'] . "</h2>";
+        print "<h2>Pledge '<a href=\"".OPTION_BASE_URL.'/'.$pdata['ref']."\">" . $pdata['ref'] . "</a>' &mdash; " .  $pdata['title'] . "</h2>";
 
         if ($pdata['confirmed'] == 'f') {
             print "<p><em>Pledge creator's email address not confirmed</b></em>";

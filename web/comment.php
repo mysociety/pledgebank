@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.14 2005-06-13 16:53:16 francis Exp $
+ * $Id: comment.php,v 1.15 2005-06-15 15:05:35 francis Exp $
  * 
  */
 
@@ -83,6 +83,13 @@ if (!is_null($q_author_website) && !preg_match('#^https?://.+#', $q_author_websi
     $q_author_website = 'http://' . $q_author_website;
 
 if (sizeof($err) == 0 && isset($_POST['submit'])) {
+    /* Require login for comments */
+    $r = $pledge->data;
+    $r['reason_web'] = 'Before adding your comment to the pledge, we need to check that your email is working.';
+    $r['reason_email'] = 'Your comment will then be displayed on the pledge page.';
+    $r['reason_email_subject'] = 'Adding your comment to a pledge at PledgeBank.com';
+    $P = person_signon($r, $q_author_email, $q_author_name);
+
     /* Actually post the comment. Guard against double-insertion. */
     $id = db_getOne('select id from comment where id = ? for update', $comment_id);
     if (is_null($id))

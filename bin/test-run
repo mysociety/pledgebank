@@ -32,7 +32,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.92 2005-06-15 08:21:30 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.93 2005-06-15 15:05:35 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -471,6 +471,7 @@ sub do_public_succeeding_pledge {
         button => 'preview');
     $wth->browser_check_contents("Hey! This is a great pledge.");
     $b->submit_form(form_name => 'commentform', fields => {}, button => 'submit');
+    perform_login_action(90, {action=>"viaemail"}, "comment will then be displayed");
     $wth->browser_check_contents("Your comment has now been posted");
     $b->follow_link(text_regex => qr/to the pledge comments/) or die "Link back to comments missing";
     $wth->browser_check_contents("Do I have to be a computer to take part?");

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.20 2005-06-14 13:16:03 francis Exp $
+ * $Id: comments.php,v 1.21 2005-06-15 15:05:35 francis Exp $
  * 
  */
 
@@ -169,7 +169,10 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 <input type="hidden" name="n" value="<?=$nextn?>">
 </div>
 
-<input type="submit" name="preview" value="Preview">
+<p><small>(Your name and web site, if given, will be shown on your comment,
+but your email address will not be)</small></p>
+
+<p><input type="submit" name="preview" value="Preview">
 <? if ($allow_post) { ?>
 <input type="submit" name="submit" value="Post comment">
 <? } ?>

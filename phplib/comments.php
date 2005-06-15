@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.21 2005-06-15 15:05:35 francis Exp $
+ * $Id: comments.php,v 1.22 2005-06-15 17:53:43 chris Exp $
  * 
  */
 
@@ -115,7 +115,16 @@ function latest_comments() { ?>
 <div id="comments">
 <h2>Latest comments</h2>
 <?  $comments_to_show = 10;
-    $q = db_query('SELECT comment.id,extract(epoch from whenposted) as whenposted,text,comment.name,website,ref FROM comment,pledges WHERE comment.pledge_id = pledges.id AND NOT ishidden ORDER BY whenposted DESC LIMIT ' . $comments_to_show);
+    $q = db_query("
+                SELECT comment.id,
+                    extract(epoch from whenposted) as whenposted, text,
+                    comment.name, website, ref
+                FROM comment, pledges
+                WHERE comment.pledge_id = pledges.id
+                    AND NOT ishidden
+                    AND pb_pledge_prominence(pledges.id) <> 'backpage'
+                ORDER BY whenposted DESC
+                LIMIT $comments_to_show");
     print '<ul>';
     while($r = db_fetch_array($q)) {
         print '<li>';

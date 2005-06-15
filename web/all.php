@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.15 2005-06-15 15:20:32 chris Exp $
+// $Id: all.php,v 1.16 2005-06-15 16:38:03 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -44,37 +44,37 @@ $s = db_query("
             ORDER BY lower($q_sort) LIMIT ? OFFSET $q_offset", PAGE_SIZE);
 /* PG bug: mustn't quote parameter of offset */
 
+print "<h2>All Pledges <small>(which at least a few people have signed up to)</small></h2>";
 if ($ntotal > 0) {
-    print "<h2>All $ntotal Open Pledges</h2>";
+    
     $navlinks = '';
-    if ($ntotal > PAGE_SIZE) {
-        $sort = ($q_sort) ? '&amp;sort=' . $q_sort : '';
-        $off = ($q_offset) ? '&amp;offset=' . $q_offset : '';
-        $prev = '<span class="greyed">&laquo; Previous page</span>'; $next = '<span class="greyed">Next page &raquo;</span>';
-        if ($q_offset > 0) {
-            $n = $q_offset - PAGE_SIZE;
-            if ($n < 0) $n = 0;
-            $prev = "<a href=\"all?offset=$n$sort\">&laquo; Previous page</a>";
-        }
-        if ($q_offset + PAGE_SIZE < $ntotal) {
-            $n = $q_offset + PAGE_SIZE;
-            $next = "<a href=\"all?offset=$n$sort\">Next page &raquo;</a>";
-        }
-        $navlinks = '<p align="center">' . $prev . ' | Pledges ' . ($q_offset + 1) . ' &ndash; ' . 
-            ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
-            $ntotal . ' | ' . $next . '<br>Sort by: ';
-        if ($q_sort != 'title') $navlinks .= "<a href=\"all?sort=title$off\">Title</a>"; else $navlinks .= 'Title';
-        $navlinks .= ' | ';
-        if ($q_sort != 'target') $navlinks .= "<a href=\"all?sort=target$off\">Target</a>"; else $navlinks .= 'Target';
-        $navlinks .= ' | ';
-        if ($q_sort != 'date') $navlinks .= "<a href=\"all?sort=date$off\">Deadline</a>"; else $navlinks .= 'Deadline';
-        $navlinks .= ' | ';
-        if ($q_sort != 'name') $navlinks .= "<a href=\"all?sort=name$off\">Creator</a>"; else $navlinks .= 'Creator';
-        $navlinks .= ' | ';
-        if ($q_sort != 'ref') $navlinks .= "<a href=\"all?sort=ref$off\">Reference</a>"; else $navlinks .= 'Reference';
-        $navlinks .= '</p>';
-        print $navlinks;
+    $sort = ($q_sort) ? '&amp;sort=' . $q_sort : '';
+    $off = ($q_offset) ? '&amp;offset=' . $q_offset : '';
+    $prev = '<span class="greyed">&laquo; Previous page</span>'; $next = '<span class="greyed">Next page &raquo;</span>';
+    if ($q_offset > 0) {
+        $n = $q_offset - PAGE_SIZE;
+        if ($n < 0) $n = 0;
+        $prev = "<a href=\"all?offset=$n$sort\">&laquo; Previous page</a>";
     }
+    if ($q_offset + PAGE_SIZE < $ntotal) {
+        $n = $q_offset + PAGE_SIZE;
+        $next = "<a href=\"all?offset=$n$sort\">Next page &raquo;</a>";
+    }
+    $navlinks = '<p align="center">' . $prev . ' | Pledges ' . ($q_offset + 1) . ' &ndash; ' . 
+        ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
+        $ntotal . ' | ' . $next . '<br>Sort by: ';
+    if ($q_sort != 'title') $navlinks .= "<a href=\"all?sort=title$off\">Title</a>"; else $navlinks .= 'Title';
+    $navlinks .= ' | ';
+    if ($q_sort != 'target') $navlinks .= "<a href=\"all?sort=target$off\">Target</a>"; else $navlinks .= 'Target';
+    $navlinks .= ' | ';
+    if ($q_sort != 'date') $navlinks .= "<a href=\"all?sort=date$off\">Deadline</a>"; else $navlinks .= 'Deadline';
+    $navlinks .= ' | ';
+    if ($q_sort != 'name') $navlinks .= "<a href=\"all?sort=name$off\">Creator</a>"; else $navlinks .= 'Creator';
+    $navlinks .= ' | ';
+    if ($q_sort != 'ref') $navlinks .= "<a href=\"all?sort=ref$off\">Reference</a>"; else $navlinks .= 'Reference';
+    $navlinks .= '</p>';
+    print $navlinks;
+
     $c = 0;
     while (list($id) = db_fetch_row($s)) {
         $pledge = new Pledge(intval($id));
@@ -84,7 +84,7 @@ if ($ntotal > 0) {
     if ($ntotal > PAGE_SIZE)
         print "<br style=\"clear: both;\">$navlinks";
 } else {
-    print '<h2>All Open Pledges</h2><p>There are currently no open pledges.</p>';
+    print '<p>There are currently none.</p>';
 }
 
 page_footer();

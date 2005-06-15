@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.33 2005-06-15 14:40:15 chris Exp $
+// $Id: new.php,v 1.34 2005-06-15 16:38:03 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -539,6 +539,7 @@ function create_new_pledge($P, $data) {
 ?>
     <p class="noprint" id="loudmessage">Thank you for creating your pledge.</p>
     <p class="noprint" id="loudmessage" align="center">It is now live at <strong><a href="<?=$url?>"><?=$url?></a></strong> <br>and people can sign up to it there.</p>
+    <p class="noprint" id="loudmessage" align="center">Your pledge will be publicised elsewhere on the site when a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.</p>
 <?  post_confirm_advertise($p);
 }
 

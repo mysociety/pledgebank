@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.106 2005-06-15 15:32:00 francis Exp $
+-- $Id: schema.sql,v 1.107 2005-06-15 21:58:42 chris Exp $
 --
 
 -- secret
@@ -165,6 +165,44 @@ create table pledges (
     check (longitude is null or (longitude >= -180 and latitude < 180))
 );
 
+-- Make connections-finding faster.
+create index pledges_person_id_idx on pledges(person_id);
+
+--
+-- Prominence of pledges
+-- 
+
+-- pb_pledge_prominence PROMINENCE SIGNERS
+-- Return the effective prominence of a pledge having assigned PROMINENCE and
+-- the given number of SIGNERS, as follows:
+--
+--  assigned    number of   effective
+--  prominence  signers     prominence
+--  ----------- ----------- -----------
+--  frontpage   n/a         frontpage
+--  backpage    n/a         backpage
+--  normal      < 4         backpage
+--  normal      >= 4        normal
+create function pb_pledge_prominence(text, integer)
+    returns text as '
+select case
+    when $1 = ''frontpage'' then ''frontpage''
+    when $1 = ''backpage'' then ''backpage''
+    when $2 < 4 then ''backpage''
+    else ''normal''
+    end;
+' language sql;
+
+-- pb_pledge_prominence ID
+-- Return the effective prominence of the pledge with the given ID.
+create function pb_pledge_prominence(integer)
+    returns text as '
+select pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer);
+' language sql;
+
+-- 
+-- Geographical stuff
+-- 
 create index pledges_latitude_idx on pledges(latitude);
 create index pledges_longitude_idx on pledges(longitude);
 
@@ -587,6 +625,9 @@ create table signers (
 create unique index signers_pledge_id_mobile_idx on signers(pledge_id, mobile);
 -- Ditto emails.
 create unique index signers_pledge_id_person_id_idx on signers(pledge_id, person_id);
+
+-- Used to make connection-finding faster.
+create index signers_person_id_idx on signers(person_id);
 
 -- signers_combine_2 ID1 ID2
 -- Given the IDs ID1 and ID2 of two signers of a pledge, coalesce them into one

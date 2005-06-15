@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.21 2005-06-15 15:28:02 chris Exp $
+ * $Id: general-example,v 1.22 2005-06-15 19:12:21 chris Exp $
  * 
  */
 
@@ -48,22 +48,12 @@ define('OPTION_PHP_DEBUG_LEVEL', 0);
 // Is this a staging site?  Affects how errors are displayed.
 define('OPTION_PB_STAGING', 1);
 
-// By default, no SMS service.
-define('OPTION_PB_SMS_MODE', 'none');
-
 // C360 aggregator specific values.
 define('OPTION_PB_SMS_C360_INCOMING_URL', 'http://pledgebank.owl/c360smsin.cgi');
+define('OPTION_PB_SMS_C360_SOURCE_IP', '10.73.48.0/24');
 define('OPTION_PB_SMS_C360_OUTGOING_URL', 'http://www.c360uk.com/...blah...');
 
-// SMS sending and receiving may be done over HTTP via the MX Telecom
-// aggregator.  Access to this service is authenticated by this username and
-// password.
-define('OPTION_PB_SMS_MODE', 'mxtelecom');
-define('OPTION_PB_SMS_MXTELECOM_USER', 'username');
-define('OPTION_PB_SMS_MXTELECOM_PASS', 'password');
-
-// The SMS number and (optional) message prefix that we need.
-define('OPTION_PB_SMS_NUMBER', 'XXXXX');
+// The SMS message prefix that we need.
 define('OPTION_PB_SMS_PREFIX', 'PLEDGE');
 // For use on posters and on website
 define('OPTION_PB_SMS_DISPLAY_NUMBER', 'XXXXX');

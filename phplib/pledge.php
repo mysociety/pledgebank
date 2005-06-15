@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.93 2005-06-14 11:59:18 francis Exp $
+ * $Id: pledge.php,v 1.94 2005-06-15 10:54:42 francis Exp $
  * 
  */
 
@@ -158,15 +158,15 @@ class Pledge {
 
     // Links.  The semantics here is that the URLs are all escaped, but didn't
     // need escaping.  They can safely be used in HTML or plain text.
-    function url_main() { return "/" . $this->h_ref; }
-    function url_email() { return "/" . $this->h_ref . "/email"; }
-    function url_ical() { return "/" . $this->h_ref . "/ical"; }
-    function url_flyers() { return "/" . $this->h_ref . "/flyers"; }
-    function url_flyer($type) { return "/flyers/" . $this->h_ref . "_$type"; }
-    function url_comments() { return "/" . $this->h_ref . "#comments"; }
-    function url_picture() { return "/" . $this->h_ref . "/picture"; }
-    function url_announce() { return "/" . $this->h_ref . "/announce"; }
-    function url_info() { return "/" . $this->h_ref . "/info"; }
+    function url_main() { return OPTION_BASE_URL . "/" . $this->h_ref; }
+    function url_email() { return OPTION_BASE_URL . "/" . $this->h_ref . "/email"; }
+    function url_ical() { return OPTION_BASE_URL . "/" . $this->h_ref . "/ical"; }
+    function url_flyers() { return OPTION_BASE_URL . "/" . $this->h_ref . "/flyers"; }
+    function url_flyer($type) { return OPTION_BASE_URL . "/flyers/" . $this->h_ref . "_$type"; }
+    function url_comments() { return OPTION_BASE_URL . "/" . $this->h_ref . "#comments"; }
+    function url_picture() { return OPTION_BASE_URL . "/" . $this->h_ref . "/picture"; }
+    function url_announce() { return OPTION_BASE_URL . "/" . $this->h_ref . "/announce"; }
+    function url_info() { return OPTION_BASE_URL . "/" . $this->h_ref . "/info"; }
 
     // Rendering the pledge in various ways
 

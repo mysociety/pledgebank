@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.8 2005-06-13 16:53:16 francis Exp $
+// $Id: abuse.php,v 1.9 2005-06-15 20:31:52 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -24,12 +24,13 @@ function report_abusive_thing() {
     $what = get_http_var('what');
     global $q_what, $q_id, $q_reason;
     global $q_h_what, $q_h_id, $q_h_reason;
-    if (!is_null(importparams(
+    $errors = importparams(
                 array('what',       '/^(comment|pledge|signer)$/',  ''),
                 array('id',         '/^[1-9]\d*$/',                 ''),
                 array('reason',     '//',                           '', null)
-            )))
-        err("A required parameter was missing");
+            );
+    if (!is_null($errors))
+        err("A required parameter was missing.  " . join(" ",$errors));
 
     /* Find information about the associated pledge. */
     $w = $q_what;

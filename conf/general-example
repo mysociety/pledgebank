@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.20 2005-06-14 10:57:39 francis Exp $
+ * $Id: general-example,v 1.21 2005-06-15 15:28:02 chris Exp $
  * 
  */
 
@@ -98,6 +98,7 @@ define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');
 
 // Where web services used are
 define('OPTION_EVEL_URL', 'http://services.mysociety.org/evel');
+define('OPTION_MAPIT_URL', 'http://services.mysociety.org/mapit');
 
 // Limit on new pledges
 define('OPTION_PB_TARGET_CAP', '50');

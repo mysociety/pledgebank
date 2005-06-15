@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.108 2005-06-15 22:00:01 chris Exp $
+-- $Id: schema.sql,v 1.109 2005-06-15 22:05:05 chris Exp $
 --
 
 -- secret
@@ -167,6 +167,9 @@ create table pledges (
 
 -- Make connections-finding faster.
 create index pledges_person_id_idx on pledges(person_id);
+
+-- Make finding recently successful pledges faster.
+create index pledges_whensucceeded_idx on pledges(whensucceeded);
 
 --
 -- Prominence of pledges

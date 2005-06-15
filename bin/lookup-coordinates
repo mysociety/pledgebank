@@ -1,0 +1,77 @@
+#!/usr/bin/perl -w
+#
+# lookup-coordinates:
+# Look up coordinates for UK pledges which have postcodes specified.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: lookup-coordinates,v 1.1 2005-06-15 13:10:16 chris Exp $';
+
+use strict;
+require 5.8.0;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use Error qw(:try);
+use Geography::NationalGrid;
+use Geo::HelmertTransform;
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+use mySociety::MaPit;
+mySociety::MaPit::configure(mySociety::Config::get('MAPIT_URL'));
+
+use PB;
+
+my $airy1830 = Geo::HelmertTransform::datum('Airy1830');
+my $airy1830m = Geo::HelmertTransform::datum('Airy1830Modified');
+my $wgs84 = Geo::HelmertTransform::datum('WGS84');
+
+my $s = dbh()->prepare("select id, postcode from pledges where country = 'UK' and postcode is not null and latitude is null");
+$s->execute();
+while (my ($id, $postcode) = $s->fetchrow_array()) {
+    try {
+        my $loc = mySociety::MaPit::get_location($postcode);
+        my ($grid, $E, $N) = @$loc;
+        my ($lat, $lon, $h) = (0, 0, 0);
+        my $d;
+        if ($grid eq 'G') {
+            my $p = new Geography::NationalGrid('GB', Easting => $E, Northing => $N);
+            $lat = $p->latitude();
+            $lon = $p->longitude();
+            $d = $airy1830;
+        } elsif ($grid eq 'I') {
+            my $p = new Geography::NationalGrid('IE', Easting => $E, Northing => $N);
+            $lat = $p->latitude();
+            $lon = $p->longitude();
+            $d = $airy1830m;
+        }
+
+        ($lat, $lon, $h) = Geo::HelmertTransform::convert_datum($d, $wgs84, $lat, $lon, $h);
+
+        dbh()->do('update pledges set latitude = ?, longitude = ? where id = ?', {}, $lat, $lon, $id);
+    } catch RABX::Error with {
+        my $e = shift;
+        if ($e->value() == mySociety::MaPit::BAD_POSTCODE
+            || $e->value() == mySociety::MaPit::POSTCODE_NOT_FOUND) {
+            warn "#$id '$postcode': bad/not found\n";
+            # dbh()->do('update pledges set postcode = null where id = ?', {}, $id);
+        } else {
+            die "#$id '$postcode': $e; aborting\n";
+        }
+    } otherwise {
+        my $e = shift;
+        die "$e\n";
+    };
+}
+
+dbh()->commit();
+

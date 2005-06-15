@@ -25,13 +25,14 @@
 #   SMS already signed, and SMS am creator so can't sign
 #   Remember Me button (how do we test Cookie expirty with WWW::Mechanize?)
 #   Picture uploading
-#   Info page and graph
+#   Info page graph
+#   Info page announcement archive
 #   Run pledge connections part of crontab
 #   Admin:  Test delete signer, and delete pledge.
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.91 2005-06-15 01:42:37 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.92 2005-06-15 08:21:30 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1075,6 +1076,8 @@ sub do_admin_tests {
     $wth->browser_check_contents(qr/pledges \(0\)/);
     $wth->browser_check_contents(qr/signers \(0\)/);
     $wth->browser_check_contents(qr/comments \(1\)/);
+    $b->follow_link(text_regex => qr/pledges \(0\)/) or die "Pledges link missing";
+    $b->follow_link(text_regex => qr/signers \(0\)/) or die "Signers link missing";
     $b->follow_link(text_regex => qr/comments \(1\)/) or die "Comments link missing";
     my $name = name_n(90);
     $wth->browser_check_contents(qr/$name/);

@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.32 2005-06-14 15:23:37 francis Exp $
+ * $Id: login.php,v 1.33 2005-06-15 00:46:51 francis Exp $
  * 
  */
 
@@ -364,9 +364,10 @@ EOF;
     } else {
         page_header('Set a password');
         print <<<EOF
-<p>We note that you've used PledgeBank in the past. On this page you can set
-a password which you can use to identify yourself to PledgeBank, so that you
-don't have to check your email in the future.</p>
+<p>On this page you can set a password which you can use to identify yourself
+to PledgeBank, so that you don't have to check your email in the future.
+You don't have to set a password if you don't want to.
+</p>
 EOF;
     }
 
@@ -384,9 +385,9 @@ EOF;
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
-<li>No, I don't want to think of a password right now.<br>
-<small>(you can set a password later if you want)</small>
-<input type="submit" name="NoPassword" value="Continue &gt;&gt;"><br>
+<li>No, I don't want to think of a password right now.
+<input type="submit" name="NoPassword" value="Click here to continue &gt;&gt;">
+<br><small>(you can set a password another time)</small>
 </li></form>
 
 <form name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
@@ -395,15 +396,9 @@ EOF;
 <input type="hidden" name="name" value="$q_h_name">
 
 <li><p>Yes, I'd like to set a password, so I don't have to keep going back to my email.
-<div class="form_row">
-    <label for="pw1">Password</label>
-    <input type="password" name="pw1" id="pw1" size="20">
-</div>
-
-<div class="form_row">
-    <label for="pw2">Password (again)</label>
-    <input type="password" name="pw2" size="20">
-</div>
+<br>
+    <strong>Password:</strong> <input type="password" name="pw1" id="pw1" size="15">
+    <strong>Password (again):</strong> <input type="password" name="pw2" size="15">
 <input type="submit" name="SetPassword" value="Set password &gt;&gt;">
 </li>
 </form>

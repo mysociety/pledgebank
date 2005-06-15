@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.8 2005-06-14 14:42:37 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.9 2005-06-15 15:20:32 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -45,7 +45,7 @@ while (my ($person_id) = $s->fetchrow_array()) {
                     select pledge_id, signers.name
                     from signers, pledges
                     where pledges.id = signers.pledge_id
-                        and pledges.prominence <> 'backpage'
+                        and pb_pledge_prominence(pledges.id) <> 'backpage'
                         and pledges.pin is null
                         and pledges.confirmed
                         and signers.person_id = ?
@@ -63,7 +63,7 @@ while (my ($person_id) = $s->fetchrow_array()) {
                     select id, name
                     from pledges
                     where confirmed
-                        and prominence <> 'backpage'
+                        and pb_pledge_prominence(id) <> 'backpage'
                         and person_id = ?
                         and pin is null"); # XXX can we do this as only one query?
     $s2->execute($person_id);

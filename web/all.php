@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.14 2005-06-14 22:57:51 matthew Exp $
+// $Id: all.php,v 1.15 2005-06-15 15:20:32 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -24,17 +24,24 @@ if ($err) {
 
 page_header("All Pledges", array('id'=>'all'));
 
-$ntotal = db_getOne("select count(id) from pledges where pin is null and confirmed and date >= pb_current_date() and prominence <> 'backpage'");
+$ntotal = db_getOne("
+                select count(id)
+                from pledges
+                where pin is null
+                    and confirmed
+                    and date >= pb_current_date()
+                    and pb_pledge_prominence(id) <> 'backpage'");
 if ($ntotal < $q_offset) $q_offset = $ntotal - PAGE_SIZE;
 
-$s = db_query('SELECT *, (SELECT count(*) FROM signers
-                            WHERE signers.pledge_id = pledges.id) AS signers
-        FROM pledges 
-        WHERE confirmed 
-        AND date >= pb_current_date() 
-        AND pin IS NULL 
-        AND prominence <> \'backpage\'
-        ORDER BY lower(' . $q_sort . ') LIMIT ? OFFSET ' . $q_offset, PAGE_SIZE );
+$s = db_query("
+        SELECT *, (SELECT count(*) FROM signers
+                    WHERE signers.pledge_id = pledges.id) AS signers
+            FROM pledges 
+            WHERE confirmed 
+            AND date >= pb_current_date() 
+            AND pin IS NULL 
+            AND pb_pledge_prominence(id) <> 'backpage'
+            ORDER BY lower($q_sort) LIMIT ? OFFSET $q_offset", PAGE_SIZE);
 /* PG bug: mustn't quote parameter of offset */
 
 if ($ntotal > 0) {

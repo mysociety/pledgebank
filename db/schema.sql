@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.107 2005-06-15 21:58:42 chris Exp $
+-- $Id: schema.sql,v 1.108 2005-06-15 22:00:01 chris Exp $
 --
 
 -- secret
@@ -619,6 +619,8 @@ create table signers (
         or (name is null and person_id is null and mobile is not null)
     )
 );
+
+create index signers_pledge_id_idx on signers(pledge_id)
 
 -- There may be only one signature on any given pledge from any given mobile
 -- phone number.

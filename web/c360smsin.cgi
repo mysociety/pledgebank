@@ -18,7 +18,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.4 2005-06-10 10:35:12 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.5 2005-06-15 19:05:50 chris Exp $';
 
 use strict;
 
@@ -42,6 +42,8 @@ use mySociety::DBHandle qw(dbh);
 use PB;
 use PB::SMS;
 
+my $mask = new Net::Netmask(mySociety::Config::get('PB_SMS_C360_SOURCE_IP'));
+
 my $D = new DateTime::Format::Strptime(
                 pattern => '%Y%m%d%H%M%S'
                 # XXX locale and timezone?
@@ -55,6 +57,8 @@ while (my $q = new CGI::Fast()) {
         my $ip = $ENV{REMOTE_ADDR};
         throw PB::Error('REMOTE_ADDR not defined; this program must be run in a CGI/FastCGI environment')
             unless (defined($ip));
+        throw PB::Error("Attempt at access from prohibited address $ip")
+            unless ($mask->match($ip));
 
         throw PB::Error("Script must be called by POST, not " . $q->request_method())
             unless ($q->request_method() eq 'POST');

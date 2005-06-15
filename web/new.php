@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.32 2005-06-14 15:23:37 francis Exp $
+// $Id: new.php,v 1.33 2005-06-15 14:40:15 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -14,6 +14,7 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/auth.php';
 require_once '../phplib/comments.php';
 require_once '../../phplib/utility.php';
+require_once '../../phplib/mapit.php';      # To test validity of postcodes
 
 page_header('Create a New Pledge');
 
@@ -277,6 +278,8 @@ function step1_error_check($data) {
     return $errors;
 }
 
+
+
 function step2_error_check($data) {
     $errors = array();
     if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
@@ -287,10 +290,14 @@ function step2_error_check($data) {
     elseif ($data['country'] == 'UK') { 
         if ($data['local'] != '1' && $data['local'] != '0')
             $errors['local'] = 'Please choose whether the pledge is local or not';
-        if ($data['local'] && !$data['postcode']) 
-            $errors['postcode'] = 'For local pledges, please enter a postcode';
-        if ($data['local'] && !validate_postcode($data['postcode'])) 
-            $errors['postcode'] = 'Please enter a valid postcode, such as OX1 3DR';
+        if ($data['local']) {
+            if (!$data['postcode']) 
+                $errors['postcode'] = 'For local pledges, please enter a postcode';
+            else if (!validate_postcode($data['postcode'])) 
+                $errors['postcode'] = 'Please enter a valid postcode, such as OX1 3DR';
+            else if (mapit_get_error(mapit_get_location($data['postcode'])))
+                $errors['postcode'] = "We couldn't recognise that postcode; please re-check it";
+        }
     }
     if ($data['visibility'] == 'pin' && !$data['pin']) 
         $errors['pin'] = 'Please enter a pin';

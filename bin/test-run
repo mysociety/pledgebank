@@ -31,7 +31,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.90 2005-06-15 00:46:51 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.91 2005-06-15 01:42:37 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1040,17 +1040,19 @@ sub do_admin_tests {
                 message => "Hey, your PledgeBank site rules!" },
             button => 'submit') or die "Failed to submit contact form";
     $wth->browser_check_contents("Thanks for your feedback");
-    $wth->email_get_containing('%To: '.$contact_email.  '%Subject: Lovely site' . 
+    $wth->email_get_containing(
+            '%Subject: Lovely site' . 
+            '%To: '.$contact_email.  
             '%From: "'. name_n(1000) . '"%rules!%');
 
     # Submit abusive comment report
     $b->get($base_url . "/automatedtest");
-    $b->follow_link(text_regex => qr/Abusive/, n => 2) or die "Comment abuse link missing";
+    $b->follow_link(text_regex => qr/Abusive/, n => 1) or die "Comment abuse link missing";
     $wth->browser_check_contents("Report something wrong with a comment");
     $b->submit_form(form_name => 'abuse',
             fields => { 
-                reason => "I hate signer 3, he sucks" },
-            button => 'submit') or die "Failed to submit signature abuse form";
+                reason => "I hate this comment, it sucks" },
+            button => 'submit') or die "Failed to submit comment abuse form";
     $wth->browser_check_contents("One of our team will investigate");
     $wth->email_get_containing('%To: '.$contact_email.  '%New abuse report for%');
 

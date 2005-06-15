@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.16 2005-06-15 16:38:03 francis Exp $
+// $Id: all.php,v 1.17 2005-06-15 16:50:44 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -16,7 +16,7 @@ define('PAGE_SIZE', 50);
 
 $err = importparams(
             array('offset', '/^(0|[1-9]\d*)$/', '', 0),
-            array('sort', '/^(title|target|date|name|ref)$/', '', 'ref')
+            array('sort', '/^(title|target|date|name|ref)$/', '', 'date')
         );
 if ($err) {
     err('Illegal offset or sort parameter passed');

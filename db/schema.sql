@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.105 2005-06-15 15:08:55 chris Exp $
+-- $Id: schema.sql,v 1.106 2005-06-15 15:32:00 francis Exp $
 --
 
 -- secret
@@ -167,36 +167,6 @@ create table pledges (
 
 create index pledges_latitude_idx on pledges(latitude);
 create index pledges_longitude_idx on pledges(longitude);
-
--- prominence of pledges.
-
--- pb_pledge_prominence PROMINENCE SIGNERS
--- Return the effective prominence of a pledge having assigned PROMINENCE and
--- the given number of SIGNERS, as follows:
---
---  assigned    number of   effective
---  prominence  signers     prominence
---  ----------- ----------- -----------
---  frontpage   n/a         frontpage
---  backpage    n/a         backpage
---  normal      < 4         backpage
---  normal      >= 4        normal
-create function pb_pledge_prominence(text, integer)
-    returns text as '
-select case
-    when $1 = ''frontpage'' then ''frontpage''
-    when $1 = ''backpage'' then ''backpage''
-    when $2 < 4 then ''backpage''
-    else ''normal''
-    end;
-' language sql;
-
--- pb_pledge_prominence ID
--- Return the effective prominence of the pledge with the given ID.
-create function pb_pledge_prominence(integer)
-    returns text as '
-select pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer);
-' language sql;
 
 -- angle_between A1 A2
 -- Given two angles A1 and A2 on a circle expressed in radians, return the
@@ -824,6 +794,37 @@ create function smssubscription_sign(integer, text)
         return ''ok'';
     end;
 ' language 'plpgsql';
+
+-- prominence of pledges.
+
+-- pb_pledge_prominence PROMINENCE SIGNERS
+-- Return the effective prominence of a pledge having assigned PROMINENCE and
+-- the given number of SIGNERS, as follows:
+--
+--  assigned    number of   effective
+--  prominence  signers     prominence
+--  ----------- ----------- -----------
+--  frontpage   n/a         frontpage
+--  backpage    n/a         backpage
+--  normal      < 4         backpage
+--  normal      >= 4        normal
+create function pb_pledge_prominence(text, integer)
+    returns text as '
+select case
+    when $1 = ''frontpage'' then ''frontpage''
+    when $1 = ''backpage'' then ''backpage''
+    when $2 < 4 then ''backpage''
+    else ''normal''
+    end;
+' language sql;
+
+-- pb_pledge_prominence ID
+-- Return the effective prominence of the pledge with the given ID.
+create function pb_pledge_prominence(integer)
+    returns text as '
+select pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer);
+' language sql;
+
 
 -- Stores randomly generated tokens and serialised hash arrays associated
 -- with them.

@@ -29,10 +29,11 @@
 #   Info page announcement archive
 #   Run pledge connections part of crontab
 #   Admin:  Test delete signer, and delete pledge.
+#   more complex prominence stuff
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.93 2005-06-15 15:05:35 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.94 2005-06-15 15:32:00 francis Exp $';
 
 use strict;
 require 5.8.0;

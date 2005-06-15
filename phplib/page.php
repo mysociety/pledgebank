@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.40 2005-06-14 11:03:23 chris Exp $
+// $Id: page.php,v 1.41 2005-06-15 15:46:01 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -62,7 +62,7 @@ function page_header($title, $params = array()) {
     }
 
         if (array_key_exists('ref', $params)) {
-            $url = OPTION_BASE_URL . $params['ref'];
+            $url = $params['ref'];
             print '<p id="reference">This pledge\'s permanent location: ';
             if (!array_key_exists('noreflink', $params))
                 print '<a href="' . $url . '">';

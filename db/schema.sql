@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.111 2005-06-16 08:24:18 francis Exp $
+-- $Id: schema.sql,v 1.112 2005-06-16 10:08:25 chris Exp $
 --
 
 -- secret
@@ -841,7 +841,13 @@ select case
 -- Return the effective prominence of the pledge with the given ID.
 create function pb_pledge_prominence(integer)
     returns text as '
-select pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer);
+select case
+    when (select prominence from pledges where id = $1) = ''backpage''
+        then ''backpage''
+    when (select prominence from pledges where id = $1) = ''frontpage''
+        then ''frontpage''
+    else
+        pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer);
 ' language sql;
 
 

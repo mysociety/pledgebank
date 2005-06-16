@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.68 2005-06-16 08:41:18 francis Exp $
+ * $Id: admin-pb.php,v 1.69 2005-06-16 22:24:38 matthew Exp $
  * 
  */
 
@@ -35,7 +35,8 @@ class ADMIN_PAGE_PB_MAIN {
             'p'=>'Prominence', 
             'e'=>'Creator', 
             'c'=>'Creation Time', 
-            'u'=>'Success Time'
+            'u'=>'Success Time',
+            'o'=>'% complete',
         );
         foreach ($cols as $s => $col) {
             print '<th>';
@@ -49,8 +50,10 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function list_all_pledges() {
+        global $open;
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdecspu]/', $sort)) $sort = 'c';
+        if (!$sort || preg_match('/[^ratdecspuo]/', $sort)) $sort = 'c';
+        $order = '';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
         elseif ($sort=='t') $order = 'target';
@@ -68,8 +71,8 @@ class ADMIN_PAGE_PB_MAIN {
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 pb_current_date() <= date AS open
             FROM pledges 
-            LEFT JOIN person ON person.id = pledges.person_id
-            ORDER BY " . $order);
+            LEFT JOIN person ON person.id = pledges.person_id" .
+            ($order ? ' ORDER BY ' . $order : '') );
         $open = array();
         $closed = array();
         while ($r = db_fetch_array($q)) {
@@ -100,10 +103,22 @@ class ADMIN_PAGE_PB_MAIN {
             else
                 $row .= '<td>None</td>';
 
+            $row .= '<td>' . str_replace('.00', '', number_format($r['signers']/$r['target']*100,2)) . '%</td>';
+
             if ($r['open'] == 't')
                 $open[] = $row;
             else
                 $closed[] = $row;
+        }
+        if ($sort=='o') {
+            function sort_by_percent($a, $b) {
+                global $open;
+                preg_match('#<td>([\d\.]+)%</td>#', $open[$a], $m); $aa = $m[1];
+                preg_match('#<td>([\d\.]+)%</td>#', $open[$b], $m); $bb = $m[1];
+                if ($aa==$bb) return 0;
+                return ($aa<$bb) ? 1 : -1;
+            }
+            uksort($open, 'sort_by_percent');
         }
          
         if (count($open)) {

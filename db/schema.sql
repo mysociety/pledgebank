@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.109 2005-06-15 22:05:05 chris Exp $
+-- $Id: schema.sql,v 1.110 2005-06-16 06:11:18 francis Exp $
 --
 
 -- secret
@@ -170,38 +170,6 @@ create index pledges_person_id_idx on pledges(person_id);
 
 -- Make finding recently successful pledges faster.
 create index pledges_whensucceeded_idx on pledges(whensucceeded);
-
---
--- Prominence of pledges
--- 
-
--- pb_pledge_prominence PROMINENCE SIGNERS
--- Return the effective prominence of a pledge having assigned PROMINENCE and
--- the given number of SIGNERS, as follows:
---
---  assigned    number of   effective
---  prominence  signers     prominence
---  ----------- ----------- -----------
---  frontpage   n/a         frontpage
---  backpage    n/a         backpage
---  normal      < 4         backpage
---  normal      >= 4        normal
-create function pb_pledge_prominence(text, integer)
-    returns text as '
-select case
-    when $1 = ''frontpage'' then ''frontpage''
-    when $1 = ''backpage'' then ''backpage''
-    when $2 < 4 then ''backpage''
-    else ''normal''
-    end;
-' language sql;
-
--- pb_pledge_prominence ID
--- Return the effective prominence of the pledge with the given ID.
-create function pb_pledge_prominence(integer)
-    returns text as '
-select pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer);
-' language sql;
 
 -- 
 -- Geographical stuff
@@ -623,7 +591,7 @@ create table signers (
     )
 );
 
-create index signers_pledge_id_idx on signers(pledge_id)
+create index signers_pledge_id_idx on signers(pledge_id);
 
 -- There may be only one signature on any given pledge from any given mobile
 -- phone number.
@@ -841,7 +809,9 @@ create function smssubscription_sign(integer, text)
     end;
 ' language 'plpgsql';
 
--- prominence of pledges.
+--
+-- Prominence of pledges
+-- 
 
 -- pb_pledge_prominence PROMINENCE SIGNERS
 -- Return the effective prominence of a pledge having assigned PROMINENCE and

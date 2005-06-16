@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.112 2005-06-16 10:08:25 chris Exp $
+-- $Id: schema.sql,v 1.113 2005-06-16 10:10:21 chris Exp $
 --
 
 -- secret
@@ -847,7 +847,8 @@ select case
     when (select prominence from pledges where id = $1) = ''frontpage''
         then ''frontpage''
     else
-        pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer);
+        pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer)
+    end;
 ' language sql;
 
 

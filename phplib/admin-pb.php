@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.67 2005-06-16 07:00:47 francis Exp $
+ * $Id: admin-pb.php,v 1.68 2005-06-16 08:41:18 francis Exp $
  * 
  */
 
@@ -26,7 +26,17 @@ class ADMIN_PAGE_PB_MAIN {
 
     function pledge_header($sort) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
-        $cols = array('r'=>'Ref', 'a'=>'Title', 't'=>'Target', 's'=>'Signers', 'd'=>'Deadline', 'e'=>'Creator', 'c'=>'Creation Time', 'u'=>'Success Time', 'p'=>'Prominence');
+        $cols = array(
+            'r'=>'Ref', 
+            'a'=>'Title', 
+            't'=>'Target', 
+            's'=>'Signers', 
+            'd'=>'Deadline', 
+            'p'=>'Prominence', 
+            'e'=>'Creator', 
+            'c'=>'Creation Time', 
+            'u'=>'Success Time'
+        );
         foreach ($cols as $s => $col) {
             print '<th>';
             if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.'">';
@@ -64,9 +74,11 @@ class ADMIN_PAGE_PB_MAIN {
         $closed = array();
         while ($r = db_fetch_array($q)) {
             $r = array_map('htmlspecialchars', $r);
-            $row = '<td><a href="'.OPTION_BASE_URL . "/" . $r['ref'] .'">'.$r['ref'].'</a>'.
-                '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">(admin)</a>'.
-                '</td>';
+            $row = "";
+
+            $row .= '<td><a href="'.OPTION_BASE_URL . "/" . $r['ref'] .'">'.$r['ref'].'</a>'.
+                '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">(admin)</a>';
+            $row .= '</td>';
             $row .= '<td>'.  $r['title'];
             if ($r['confirmed'] == 'f') {
                 $row .= "<br><b>not confirmed</b>";
@@ -75,14 +87,18 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '<td>'.$r['target'].' '.$r['type'].'</td>';
             $row .= '<td>'.$r['signers'].'</td>';
             $row .= '<td>'.prettify($r['date']).'</td>';
-            $row .= '<td>'.$r['name'].'<br>'.$r['email'].'</td>';
+
+            $row .= '<td>'.$r['prominence'];
+            if ($r['pin']) 
+                $row .= '<br><b>private</b> ';
+            $row .= '</td>';
+
+            $row .= '<td>'.$r['name'].'<br>'.str_replace('@','@ ',$r['email']).'</td>';
             $row .= '<td>'.prettify($r['creationtime']).'</td>';
             if ($r['whensucceeded']) 
                 $row .= '<td>'.prettify($r['whensucceeded']).'</td>';
             else
                 $row .= '<td>None</td>';
-
-            $row .= '<td>'.$r['prominence'].'</td>';
 
             if ($r['open'] == 't')
                 $open[] = $row;
@@ -141,7 +157,10 @@ class ADMIN_PAGE_PB_MAIN {
         print '<form method="post" action="'.$this->self_link.'">';
         print '<input type="hidden" name="update_prom" value="1">';
         print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
-        print '<td>Prominence: <select name="prominence">';
+        print '<td>Prominence: ';
+        if ($pdata['pin'])
+            print "<b>private</b> ";
+        print '<select name="prominence">';
         print '<option value="normal"' . ($pdata['prominence']=='normal'?' selected':'') . '>normal</option>';
         print '<option value="frontpage"' . ($pdata['prominence']=='frontpage'?' selected':'') . '>frontpage</option>';
         print '<option value="backpage"' . ($pdata['prominence']=='backpage'?' selected':'') . '>backpage</option>';

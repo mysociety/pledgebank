@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.25 2005-06-14 10:12:59 francis Exp $
+// $Id: ref-index.php,v 1.26 2005-06-16 16:37:02 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -98,9 +98,7 @@ function draw_signatories($p) {
             $extra .= ($anon ? ', and' : 'Plus')
                         . " $unknownname "
                         . make_plural($unknownname, 'other')
-                        . ' whose '
-                        . make_plural($unknownname, 'name')
-                        . " we don't know.";
+                        . ' who signed up via mobile.';
         print "<li>$extra</li>";
     }
     print '</ul>';

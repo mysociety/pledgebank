@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.9 2005-06-15 15:20:32 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.10 2005-06-16 09:55:09 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -29,51 +29,10 @@ use mySociety::DBHandle qw(dbh);
 
 use PB;
 
-dbh()->do('delete from pledge_connection');
-
-my $s = dbh()->prepare('select id from person');
-$s->execute();
-while (my ($person_id) = $s->fetchrow_array()) {
-    # We have to be careful not to leak information here. Because a single
-    # person can sign several pledges under different names (but giving the
-    # same email address) we must only show connections in cases where the
-    # names are the same. And we must avoid showing connections to private
-    # pledges, since doing so might reveal their existence.
-
-    # Obtain all the pledges which this person has signed...
-    my $s2 = dbh()->prepare("
-                    select pledge_id, signers.name
-                    from signers, pledges
-                    where pledges.id = signers.pledge_id
-                        and pb_pledge_prominence(pledges.id) <> 'backpage'
-                        and pledges.pin is null
-                        and pledges.confirmed
-                        and signers.person_id = ?
-                        and signers.showname");
-    $s2->execute($person_id);
-    my %pledges;
-    while (my ($pledge_id, $name) = $s2->fetchrow_array()) {
-        $name = lc($name);
-        $name =~ s/[^A-Za-z-]//g;
-        push(@{$pledges{$name}}, $pledge_id);
-    }
-
-    # ... and those which they have created
-    $s2 = dbh()->prepare("
-                    select id, name
-                    from pledges
-                    where confirmed
-                        and pb_pledge_prominence(id) <> 'backpage'
-                        and person_id = ?
-                        and pin is null"); # XXX can we do this as only one query?
-    $s2->execute($person_id);
-    while (my ($pledge_id, $name) = $s2->fetchrow_array()) {
-        $name = lc($name);
-        $name =~ s/[^A-Za-z-]//g;
-        push(@{$pledges{$name}}, $pledge_id);
-    }
-
-    foreach my $p (values %pledges) {
+sub do_connections ($) {
+    my $np = shift;
+    foreach my $p (values %$np) {
+        next unless (@$p > 1);
         my @pledges = sort { $a <=> $b } @$p;
         for (my $i = 0; $i < @pledges - 1; ++$i) {
             for (my $j = $i + 1; $j < @pledges; ++$j) {
@@ -84,5 +43,58 @@ while (my ($person_id) = $s->fetchrow_array()) {
         }
     }
 }
+
+dbh()->do('delete from pledge_connection');
+
+# Don't check prominence here, as it can be checked on display. That means that
+# the list should appear to update more rapidly when a pledge becomes visible
+# because it has enough signers.
+my $s = dbh()->prepare("
+                    select pledge_id, signers.person_id, signers.name
+                    from signers, pledges
+                    where pledges.id = pledge_id
+                        and signers.person_id is not null
+                        and pledges.pin is null
+                        and pledges.confirmed
+                        and signers.showname
+                    order by signers.person_id");
+$s->execute();
+
+my $last_person_id;
+my %name_pledge;
+while (my ($pledge_id, $person_id, $name) = $s->fetchrow_array()) {
+    if (defined($last_person_id) && $person_id != $last_person_id) {
+        do_connections(\%name_pledge);
+        %name_pledge = ( );
+    }
+    $last_person_id = $person_id;
+    $name = lc($name);
+    $name =~ s/[^a-z-]//g;
+    push(@{$name_pledge{$name}}, $pledge_id);
+}
+
+do_connections(\%name_pledge);
+
+$s = dbh()->prepare("
+                select id, person_id, name
+                from pledges
+                where pin is null
+                    and confirmed
+                order by person_id");
+$s->execute();
+$last_person_id = undef;
+%name_pledge = ( );
+while (my ($pledge_id, $person_id, $name) = $s->fetchrow_array()) {
+    if (defined($last_person_id) && $person_id != $last_person_id) {
+        do_connections(\%name_pledge);
+        %name_pledge = ( );
+    }
+    $last_person_id = $person_id;
+    $name = lc($name);
+    $name =~ s/[^a-z-]//g;
+    push(@{$name_pledge{$name}}, $pledge_id);
+}
+
+do_connections(\%name_pledge);
 
 dbh()->commit();

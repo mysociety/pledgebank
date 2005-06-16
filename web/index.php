@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.188 2005-06-16 07:16:48 francis Exp $
+// $Id: index.php,v 1.189 2005-06-16 07:31:49 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -30,7 +30,7 @@ function front_page() {
 <input type="hidden" name="subscribe_alert" value="1">
 <p><strong>Get emails about local pledges &mdash;</strong>
 <label for="email">Email:</label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
-<label for="postcode">Postcode:</label><input type="text" size="12" name="postcode" id="postcode" value="">
+<label for="postcode">UK Postcode:</label><input type="text" size="12" name="postcode" id="postcode" value="">
 
 <input type="submit" name="submit" value="Subscribe"> </p>
 </form>

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.113 2005-06-16 10:10:21 chris Exp $
+-- $Id: schema.sql,v 1.114 2005-06-16 10:19:23 chris Exp $
 --
 
 -- secret
@@ -840,6 +840,10 @@ select case
 -- pb_pledge_prominence ID
 -- Return the effective prominence of the pledge with the given ID.
 create function pb_pledge_prominence(integer)
+    -- Point of the short-circuiting design is to avoid doing the expensive
+    -- select count ... when we can. As time goes on (i.e. when the majority
+    -- of pledges have prominence 'normal') this will start to suck a bit more
+    -- and we'll have to look in to setting a flag explicitly.
     returns text as '
 select case
     when (select prominence from pledges where id = $1) = ''backpage''

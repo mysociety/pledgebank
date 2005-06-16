@@ -16,7 +16,7 @@
 #
 
 # TODO, add test code for:
-#   Local alerts, nameless signups
+#   Nameless signups
 #   "identity" column
 #   UK postcoded pledges
 #   categories
@@ -33,7 +33,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.95 2005-06-16 07:00:47 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.96 2005-06-16 07:16:48 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -448,6 +448,18 @@ sub do_unconfirmed_pledge {
 
 #############################################################################
 sub do_public_succeeding_pledge {
+    # Sign up to local alert
+    $b->get($base_url);
+    $b->submit_form(form_name => 'localalert',
+        fields => {
+            email => email_n(11),  # use same signer as one below, to test conversion from 
+                                   # nameless to named person in the person table.
+            postcode => 'CB23QJ',  # The Guildhall, Cambridge
+        },
+        button => 'submit');
+    perform_login_action(11, {action=>"viaemail"}, "emailed whenever a new");
+    $wth->browser_check_contents("Thanks for subscribing!");
+
     # Make the pledge
     set_pb_date('1982-02-01');
     my $pledge_action_completion = 'make sure a pledge can be completed';

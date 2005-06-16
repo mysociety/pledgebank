@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.8 2005-06-14 15:23:37 francis Exp $
+// $Id: alert.php,v 1.9 2005-06-16 07:16:48 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -43,7 +43,7 @@ function do_local_alert_subscribe() {
     $r = array();
     $r['reason_web'] = 'Before subscribing you to local pledge email alerts, we need to confirm your email address.';
     $r['reason_email'] = "You'll then be emailed whenever a new pledge appears in your area.";
-    $r['reason_subject'] = "Subscribe to local pledge alerts at PledgeBank.com";
+    $r['reason_email_subject'] = "Subscribe to local pledge alerts at PledgeBank.com";
     $person = person_signon($r, $q_email);
 
     db_query('insert into local_alert (person_id, postcode) values (?, ?)', array($person->id(), $q_email));
@@ -65,7 +65,7 @@ function local_alert_subscribe_box() {
     }
 
 ?>
-<form accept-charset="utf-8" class="pledge" name="pledge" action="/alert" method="post">
+<form accept-charset="utf-8" class="pledge" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_alert" value="1">
 <h2>Get emails about local pledges</h2>
 <p>Fill in the form, and we'll email you when someone creates a new pledge near you.</p>

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.110 2005-06-16 06:11:18 francis Exp $
+-- $Id: schema.sql,v 1.111 2005-06-16 08:24:18 francis Exp $
 --
 
 -- secret
@@ -170,6 +170,9 @@ create index pledges_person_id_idx on pledges(person_id);
 
 -- Make finding recently successful pledges faster.
 create index pledges_whensucceeded_idx on pledges(whensucceeded);
+
+-- Speculative that this will help, as we often look up confirmed
+create index pledges_confirmed_idx on pledges(confirmed);
 
 -- 
 -- Geographical stuff

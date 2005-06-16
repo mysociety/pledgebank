@@ -33,7 +33,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.94 2005-06-15 15:32:00 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.95 2005-06-16 07:00:47 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1093,8 +1093,8 @@ sub do_admin_tests {
 sub do_final_checks {
     # Check RSS works and has correct entries
     $b->get($base_url . "/rss");
-    $wth->browser_check_contents("pretend to be an SMS aggregating service - exact target reached");
-    $wth->browser_check_contents("make sure a pledge can be completed - 1 over target");
+    $wth->browser_check_contents(qr/pretend to be an SMS aggregating service \(target 2, deadline 1982-03-10\)/);
+    $wth->browser_check_contents(qr/make sure a pledge can be completed \(target 3, deadline 1982-02-10\)/);
     $wth->browser_check_no_contents("privatepledge");
 
     # Check there were no errors

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.66 2005-06-15 16:14:58 francis Exp $
+ * $Id: admin-pb.php,v 1.67 2005-06-16 07:00:47 francis Exp $
  * 
  */
 
@@ -149,6 +149,7 @@ class ADMIN_PAGE_PB_MAIN {
         print '<input name="update" type="submit" value="Update"></p></form>';
 
         // Signers
+        print "<h2>Signers</h2>";
         $query = 'SELECT signers.name as signname,person.email as signemail,
                          signers.mobile as signmobile,
                          date_trunc(\'second\',signtime) AS signtime,
@@ -217,6 +218,48 @@ class ADMIN_PAGE_PB_MAIN {
             print '<p>Nobody has signed up to this pledge.</p>';
         }
         print '<p>';
+        
+        // Messages
+        print "<h2>Messages</h2>";
+        $q = db_query('select * from message 
+                where pledge_id = ? order by whencreated', $pdata['id']);
+
+        $n = 0;
+        while ($r = db_fetch_array($q)) {
+            if ($n++)
+                print '<hr>';
+
+            $got_creator_count = db_getOne('select count(*) from message_creator_recipient where message_id = ?', $r['id']);
+            $got_signer_count = db_getOne('select count(*) from message_signer_recipient where message_id = ?', $r['id']);
+
+            $whom = array();
+            if ($r['sendtocreator'] == 't') { $whom[] = 'creator'; }
+            if ($r['sendtosigners'] == 't') { $whom[] = 'signers'; }
+            if ($r['sendtolatesigners'] == 't') { $whom[] = 'late signers'; }
+
+            print "<p>";
+            print "<strong>". $r['circumstance'] . ' ' . $r['circumstance_count'] . '</strong>';
+            print " created on ". prettify(substr($r['whencreated'], 0, 19));
+            print " to be sent from <strong>" . $r['fromaddress'] . "</strong> to <strong>";
+            print join(", ", $whom) . "</strong>";
+            print "<br>has been queued to evel for ";
+            print "<strong>$got_creator_count creators</strong>";
+            print " and <strong>$got_signer_count signers</strong>";
+            if ($r['sms'])
+                print "<br><strong>sms content:</strong> " . $r['sms'];
+            if ($r['emailtemplatename'])
+                print "<br><strong>email template:</strong> " . $r['emailtemplatename'];
+            if ($r['emailsubject'])
+                print "<br><strong>email subject:</strong> " . $r['emailsubject'];
+            if ($r['emailbody']) {
+                ?><br><strong>email body:</strong>
+                <div class="message"><?= comments_text_to_html($r['emailbody']) ?></div> <?
+            }
+
+        }
+        if ($n == 0) {
+            print "No messages yet.";
+        }
 
         // Category setting
         $cats = array();

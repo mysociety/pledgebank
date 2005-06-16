@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.35 2005-06-15 18:36:20 matthew Exp $
+// $Id: new.php,v 1.36 2005-06-16 16:25:32 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -85,7 +85,7 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 <p>The other people must sign up before <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="Deadline date" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(e.g. "<?=date('jS F', $pb_time+60*60*24*28) // 28 days ?>")</small></p>
 
 <p>Choose a short name for your pledge (6 to 16 letters):
-<input<? if (array_key_exists('ref', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
+<input<? if (array_key_exists('ref', $errors) || array_key_exists('ref2', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
 <br><small>This gives your pledge an easy web address. e.g. www.pledgebank.com/tidyupthepark</small>
 </p>
 
@@ -250,14 +250,14 @@ function step1_error_check($data) {
     }
 
     $disallowed_refs = array('contact');
-    if (!$data['ref']) $errors['ref'] = 'Please enter a PledgeBank reference';
-    elseif (strlen($data['ref'])<6) $errors['ref'] = 'The reference must be at least six characters long';
-    elseif (strlen($data['ref'])>16) $errors['ref'] = 'The reference can be at most 20 characters long';
-    elseif (in_array($data['ref'], $disallowed_refs)) $errors['ref'] = 'That reference is not allowed.';
-    if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = 'The reference must only contain letters, numbers, or a hyphen';
+    if (!$data['ref']) $errors['ref'] = 'Please enter a short name for your pledge';
+    elseif (strlen($data['ref'])<6) $errors['ref'] = 'The short name must be at least six characters long';
+    elseif (strlen($data['ref'])>16) $errors['ref'] = 'The short name can be at most 20 characters long';
+    elseif (in_array($data['ref'], $disallowed_refs)) $errors['ref'] = 'That short name is not allowed.';
+    if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = 'The short name must only contain letters, numbers, or a hyphen';
 
     $dupe = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', array($data['ref']));
-    if ($dupe) $errors['ref'] = 'That reference is already taken!';
+    if ($dupe) $errors['ref'] = 'That short name is already taken!';
     if (!$data['title']) $errors['title'] = 'Please enter a pledge';
 
     $pb_today_arr = explode('-', $pb_today);
@@ -400,7 +400,7 @@ function preview_pledge($data, $errors) {
 		print '</li></ul></div>';
 	} #    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
 ?>
-<p>Your pledge, with reference <em><?=$data['ref'] ?></em>, will look like this:</p>
+<p>Your pledge, with short name <em><?=$data['ref'] ?></em>, will look like this:</p>
 <?  
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);

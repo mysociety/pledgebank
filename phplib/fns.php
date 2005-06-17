@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.34 2005-06-14 10:12:58 francis Exp $
+// $Id: fns.php,v 1.35 2005-06-17 13:44:07 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -22,8 +22,11 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['sentence_first'] = pledge_sentence($values, array('firstperson' => true));
         $values['sentence_third'] = pledge_sentence($values, array('firstperson' => false));
     }
-    if (array_key_exists('ref', $values))
+    if (array_key_exists('ref', $values)) {
         $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];
+        $values['pledge_url_email'] = OPTION_BASE_URL . "/" . $values['ref'] . "/email";
+        $values['pledge_url_flyers'] = OPTION_BASE_URL . "/" . $values['ref'] . "/flyers";
+    }
     if (array_key_exists('date', $values))
         $values['pretty_date'] = prettify($values['date'], false);
     if (array_key_exists('name', $values)) {
@@ -34,6 +37,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['creator_email'] = $values['email'];
         $values['email'] = null;
     }
+    $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
         
     $values['signature'] = "-- the PledgeBank.com team\n";
 

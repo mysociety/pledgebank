@@ -5,6 +5,7 @@ syntax:
 
 Values which are available in all emails are:
 
+  - ref, pledge reference;
   - title, many body text of the pledge saying what pledge setter will do;
   - target, how many people are needed for the pledge to succeed;
   - type, description of the people, e.g. "residents of Eglwysbach";
@@ -85,6 +86,9 @@ Sent to creator when a comment is added to a pledge.
   - comment_author_name, name of commenter
   - comment_author_email, email address of commenter
   - comment_author_website, website of commenter
+
+* chivvy-creator
+Sent 2 days after creation of a new pledge if it doesn't have many signups.
 
 * email-friends
 Sent by someone to tell their friends about a pledge.

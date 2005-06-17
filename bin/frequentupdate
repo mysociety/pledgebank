@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.32 2005-06-14 15:23:37 francis Exp $
+ * $Id: frequentupdate,v 1.33 2005-06-17 13:44:06 francis Exp $
  *
  */
 
@@ -58,6 +58,7 @@ db_connect();
 
 mark_pledges_successful();
 send_automatic_failure_messages();
+chivvy_creators_into_promoting_pledge();
 send_pending_messages();
 
 /* mark_pledges_successful
@@ -69,7 +70,7 @@ function mark_pledges_successful() {
             select * from pledges
             where confirmed
                 and whensucceeded is null
-                and pb_current_timestamp() < date
+                and pb_current_date() < date
                 and (select count(id) from signers
                     where pledge_id = pledges.id) >= target
             for update');
@@ -119,7 +120,7 @@ function send_fallback_announcement_messages() {
                 select * from pledges
                 where confirmed
                     and whensucceeded is not null
-                    and whensucceeded < pb_current_timestamp - '1 week'::interval
+                    and whensucceeded < pb_current_timestamp() - '1 week'::interval
                     and (select id
                         from message
                         where pledge_id = pledges.id
@@ -181,6 +182,54 @@ function send_automatic_failure_messages() {
 
     verbose("finished newly failed pledges");
 }
+
+/* chivvy_creators_into_promoting_pledge
+ * Send message to pledge creators who haven't managed to get many signers.
+ * This message is sent once to any pledge which:
+ * - has fewer than 4 signers (or whatever number pb_pledge_prominence() uses).
+ * - has target of at least 8
+ * - has not passed the deadline yet
+ * - has not succeeded yet
+ * - at least 2 days have passed since the pledge was created
+ * - and not marked by admin as backpage (it will obviously be backpage in the
+ *   pb_pledge_prominence algorithm)
+ */
+function chivvy_creators_into_promoting_pledge() {
+    verbose("finding young pledges with few signups");
+    $q = db_query("
+                select * from pledges
+                where confirmed
+                    and whensucceeded is null
+                    and (select count(*) from signers where signers.pledge_id = pledges.id) < 4
+                    and target >= 8
+                    and pb_current_date() <= date
+                    and pb_current_timestamp() > creationtime + '2 day'::interval
+                    and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
+                    and (select id
+                        from message
+                        where pledge_id = pledges.id
+                        and circumstance = 'chivvy-creator') is null
+                for update");
+
+    while ($pledge = db_fetch_array($q)) {
+        verbose("pledge #${pledge['id']} (${pledge['ref']}) creator being sent chivvy email");
+
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendtolatesigners,
+                    emailtemplatename
+                ) values (
+                    ?, 'chivvy-creator',
+                    true, false, false,
+                    'chivvy-creator'
+                )", $pledge['id']);
+    }
+    
+    db_commit();
+    verbose("finished finding young pledges with few signups");
+}
+
 
 /* send_pending_messages
  * Dispatch messages to pledge signers and creators which have not yet been

@@ -33,7 +33,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.96 2005-06-16 07:16:48 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.97 2005-06-17 13:44:07 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -703,6 +703,7 @@ sub do_private_failing_pledge {
     &$goto_private_pledge_page();
     $wth->browser_check_contents("<i>1 person has signed up");
     $wth->browser_check_no_contents("This pledge is now closed");
+    $wth->log_watcher_check();
  
     print "Checking no leaks of private pledge..." if $verbose > 1;
 
@@ -719,6 +720,7 @@ sub do_private_failing_pledge {
     $b->get($base_url . "/rss");
     $wth->browser_check_no_contents($pledge_ref);
     $wth->browser_check_no_contents($pledge_action_private);
+    $wth->log_watcher_check();
 
     # And all its pages require PIN to get to
     # ... email friends page
@@ -732,8 +734,8 @@ sub do_private_failing_pledge {
     # ... individual poster
     $b->get("$base_url/flyers/${pledge_ref}_A4_flyers8.pdf");
     $wth->browser_check_contents("Correct PIN needed");
-
     $wth->log_watcher_check();
+
     # ... ical calendar entry
     $b->get("$base_url/$pledge_ref/ical");
     $wth->browser_check_contents("Correct PIN required");
@@ -746,6 +748,12 @@ sub do_private_failing_pledge {
     $wth->browser_check_no_contents($pledge_action_private);
     my $errors = $wth->log_watcher_get_errors();
     die if ($errors !~ m/Permission denied/);
+    $wth->log_watcher_check();
+
+    # Provoke chivvy email
+    set_pb_date('1980-12-10');
+    call_frequentupdate();
+    $wth->email_get_containing('%Subject: Helping your pledge%To: '.email_n(0).  '%');
 
     # Test what happens upon expiry
     # ... partially sign the pledge

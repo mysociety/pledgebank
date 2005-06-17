@@ -4,7 +4,7 @@ Hello, we've noticed that the pledge you set up hasn't been, erm, growing very
 quickly.  Just to remind you, we're talking about '<?=$values['sentence_first']?>'
 at <?=$values['pledge_url']?>
 
-PledgeBank relies on you, the creator to publicise and spread your pledge -
+PledgeBank relies on you, the creator, to publicise and spread your pledge -
 very few pledges succeed just because casual browsers happen to sign them.
 There are a number of ways of promoting your pledge:
 
@@ -22,8 +22,9 @@ station, or wherever you feel comfortable.
 <?=$values['pledge_url_flyers']?>
 
 3. When you are out with friends, explain to them what you're trying to do, and
-get them to text 'pledge <?=$values['ref']?>' to <?=$values['sms_number']?> (UK
-only at the moment, sorry).
+get them to text two words - pledge <?=$values['ref']?> - to
+<?=$values['sms_number']?> (UK only at the moment, sorry; texts cost your
+normal text rate).
 
 So don't just sit there! Fire up your email, fill up the printer, write to your
 local newspaper and, of course, don't forget to get the words "Text 'pledge

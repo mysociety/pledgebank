@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.38 2005-06-17 10:42:13 francis Exp $
+ * $Id: login.php,v 1.39 2005-06-17 21:57:06 francis Exp $
  * 
  */
 
@@ -372,7 +372,7 @@ EOF;
     }
 
     if (!is_null($error))
-        print "<p><strong>$error</strong></p>";
+        print "<div id=\"errors\"><ul><li>$error</li><ul></div>";
 
     print <<<EOF
 <div class="pledge">

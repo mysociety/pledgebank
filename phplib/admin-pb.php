@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.69 2005-06-16 22:24:38 matthew Exp $
+ * $Id: admin-pb.php,v 1.70 2005-06-17 13:02:24 francis Exp $
  * 
  */
 
@@ -637,13 +637,16 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
             foreach ($_POST as $k => $v) {
                 if ($do_discard && preg_match('/^ar_([1-9]\d*)$/', $k, $a))
                     db_query('delete from abusereport where id = ?', $a[1]);
-                if (preg_match('/^delete_(comment|pledge|signer)_([1-9]\d*)$/', $k, $a)) {
-                    if ($a[1] == 'comment')
+                // Don't think delete pledge is safe as a button here
+                # if (preg_match('/^delete_(comment|pledge|signer)_([1-9]\d*)$/', $k, $a)) {
+                if (preg_match('/^delete_(comment)_([1-9]\d*)$/', $k, $a)) {
+                    if ($a[1] == 'comment') {
                         pledge_delete_comment($a[2]);
-                    else if ($a[1] == 'pledge')
-                        pledge_delete_pledge($a[2]);
-                    else
-                        pledge_delete_signer($a[2]);
+                    } else if ($a[1] == 'pledge') {
+                        // pledge_delete_pledge($a[2]);
+                    } else {
+                        // pledge_delete_signer($a[2]);
+                    }
                     print "<em>Deleted "
                             . htmlspecialchars($a[1])
                             . " #" . htmlspecialchars($a[2]) . "</em><br>";
@@ -778,8 +781,10 @@ EOF;
                     comments_show_one($comment, true);
                 }
 
-                print " <input type=\"submit\" name=\"delete_${what}_${what_id}\" value=\"Delete this $what\">"
-                      . '</td></tr>';
+                if ($what == "comment") {
+                    print " <input type=\"submit\" name=\"delete_${what}_${what_id}\" value=\"Delete this $what\">";
+                }
+                print '</td></tr>';
                 print '</table>';
                 $old_id = $what_id;
             }

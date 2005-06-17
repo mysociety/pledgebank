@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.17 2005-06-14 15:23:37 francis Exp $
+ * $Id: ref-announce.php,v 1.18 2005-06-17 10:42:13 francis Exp $
  * 
  */
 
@@ -73,7 +73,7 @@ function refuse_announce($p, $c) {
     else if ($n > 1)
         print "$n ${descr[$c]}s";   /* XXX i18n */
     print ", which is all that you're allowed.</strong> Think of your signers' poor inboxes, crumbling under the load of all the mail you want to send them.";
-    page_footer(array('nonav' => 1));
+    page_footer();
     exit();
 }
 

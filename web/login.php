@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.37 2005-06-15 14:18:47 francis Exp $
+ * $Id: login.php,v 1.38 2005-06-17 10:42:13 francis Exp $
  * 
  */
 
@@ -62,7 +62,7 @@ read <a href="http://www.google.com/cookies.html">this page from Google
 explaining how to do that</a>, and then click the "back" button and
 try again</p>
 <?
-        page_footer(array('nonav' => 1));
+        page_footer();
         exit();
     } else {
         setcookie('pb_test_cookie', '1', null, '/',OPTION_WEB_DOMAIN, false);
@@ -323,7 +323,7 @@ function login_form($errors = array()) {
 </div>
 <?
 
-    page_footer(array('nonav' => 1));
+    page_footer();
 }
 
 /* change_password_page PERSON

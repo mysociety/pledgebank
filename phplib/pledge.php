@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.94 2005-06-15 10:54:42 francis Exp $
+ * $Id: pledge.php,v 1.95 2005-06-17 10:42:13 francis Exp $
  * 
  */
 
@@ -532,7 +532,7 @@ function pledge_sign_box() {
 <h2>Sign up now</h2>
 <? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">'; ?>
 <p><b>
-I, <input onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="name" id="name" value="<?=htmlspecialchars($name)?>">,
+I, <input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="<?=htmlspecialchars($name)?>">,
 sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($email) ?>"></b>
 <br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
 </p>

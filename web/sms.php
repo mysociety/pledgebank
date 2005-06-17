@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.26 2005-06-14 15:23:37 francis Exp $
+ * $Id: sms.php,v 1.27 2005-06-17 10:42:13 francis Exp $
  * 
  */
 
@@ -70,7 +70,7 @@ if (db_getOne('select person_id from signers where id = ?', $signer_id)) {
     <p><strong>Thanks for signing up to this pledge!</strong></p>
     <?
     post_confirm_advertise($pledge);
-    page_footer(array('nonav' => 1));
+    page_footer();
     exit();
 }
 
@@ -135,7 +135,7 @@ if (!pledge_is_error($r)) {
         ?>
         <p><strong>You cannot sign your own pledge!</strong></p>
         <?
-        page_footer(array('nonav' => 1));
+        page_footer();
         exit();
     }
 } else
@@ -149,7 +149,7 @@ db_commit();
 
 post_confirm_advertise($pledge);
 
-page_footer(array('nonav' => 1));
+page_footer();
 
 /* bad_token TOKEN
  * Display some text about TOKEN being invalid. */
@@ -195,7 +195,7 @@ EOF;
         if (!pledge_is_permanent_error($r))
             print "<p><strong>Please try again a bit later.</strong></p>";
     }
-    page_footer(array('nonav' => 1));
+    page_footer();
     exit();
 }
 

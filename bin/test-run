@@ -33,7 +33,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.97 2005-06-17 13:44:07 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.98 2005-06-17 16:01:07 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -323,6 +323,11 @@ sub create_pledge {
     $wth->browser_check_contents("New Pledge");
     $b->submit_form(form_name => 'pledge', fields => $page1,
         button => 'submit') or die "Failed to submit creating form stage 1";
+    if ($page1->{target} >= 20) {
+        $wth->browser_check_contents("Rethink your target");
+        $b->submit_form(form_name => 'pledge', fields => { target => $page1->{target} },
+            button => 'submit') or die "Failed to submit target warning";
+    }
     $wth->browser_check_contents("Step 2");
     $wth->log_watcher_check();
     $b->submit_form(form_name => 'pledge',

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.37 2005-06-17 07:16:20 francis Exp $
+// $Id: new.php,v 1.38 2005-06-17 16:01:08 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -20,6 +20,8 @@ page_header('Create a New Pledge');
 
 if (get_http_var('newpost')==1) {
     pledge_form_one_submitted();
+} elseif (get_http_var('newpost')=='tw') {
+    pledge_form_target_warning_submitted();
 } elseif (get_http_var('newpost')==2) {
     pledge_form_two_submitted();
 } elseif (get_http_var('newpost')==3) {
@@ -101,12 +103,60 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
 </div>
-<p style="text-align: right"><input type="submit" name="submit" value="Next &gt;&gt;"></p>
+<p style="text-align: right">
+Did you read the tips at the top of the page? They'll help you make a successful pledge <input type="submit" name="submit" value="Next &gt;&gt;"></p>
 <? if (sizeof($data)) {
     print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
 } ?>
 </form>
-<? }
+<? 
+}
+
+function pledge_form_target_warning($data) {
+    $errors = array();
+?>
+
+<p>Your pledge looks like this so far:</p>
+<?  
+    $isodate = $data['parseddate']['iso'];
+    $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
+    $partial_pledge = new Pledge($row);
+    $partial_pledge->render_box(array('showdetails' => true));
+    
+?>
+
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="tw">
+
+<h2>Rethink your target</h2>
+
+<p>Hello - we've noticed that your pledge is aiming to recruit more than <?=OPTION_PB_TARGET_WARNING?>  people.</p>
+
+<p>Recruiting more than <?=OPTION_PB_TARGET_WARNING?>  people to a pledge is a
+lot of work, and many people who have set up pledges larger than this have not
+succeeded.  You should only set a large target if you are preprared to do some
+serious marketing of your pledge.</p>
+
+<p>Please take advantage of this box to change your target.
+</p>
+
+<p><strong>My target</strong> is  
+<input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'') ?>">
+<strong><?=$data['type']?></strong></p>
+
+<p>Remember, a small but successful pledge can be the perfect preparation
+for a larger and more ambitious one.</p>
+
+<p style="text-align: right;">
+<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
+<input type="submit" name="newback" value="&lt;&lt; Back to step 1">
+<input type="submit" name="submit" value="Next &gt;&gt;">
+</p>
+
+</form>
+
+<?
+}
+
 
 function pledge_form_two($data, $errors = array()) {
     $v = 'all';
@@ -228,6 +278,28 @@ function pledge_form_one_submitted() {
         $data = array_merge($stepdata, $data);
     if (sizeof($errors)) {
         pledge_form_one($data, $errors);
+    } elseif ($data['target'] > OPTION_PB_TARGET_WARNING) {
+        pledge_form_target_warning($data);
+    } else {
+        pledge_form_two($data);
+    }
+}
+
+function pledge_form_target_warning_submitted() {
+    $data = array();
+    $fields = array('data','target');
+    foreach ($fields as $field) {
+        $data[$field] = get_http_var($field);
+    }
+    $steptwdata = unserialize(base64_decode($data['data']));
+    if (!$steptwdata) $errors[] = 'Transferring the data from target warning failed!';
+    unset($data['data']);
+    $data = array_merge($steptwdata, $data);
+
+    $errors = step1_error_check($data);
+
+    if (sizeof($errors) || get_http_var('newback')) {
+        pledge_form_one($data, $errors);
     } else {
         pledge_form_two($data);
     }
@@ -277,8 +349,6 @@ function step1_error_check($data) {
     if (!$data['email']) $errors['email'] = 'Please enter your email address';
     return $errors;
 }
-
-
 
 function step2_error_check($data) {
     $errors = array();

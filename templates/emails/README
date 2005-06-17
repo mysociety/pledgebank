@@ -64,8 +64,13 @@ Sent to each signer when a pledge fails.
 * succeeded-creator
 Sent to creator when a pledge succeeds.
   - actual, number of people who signed up.
-  - execeeded_or_met, either the word "met" or "exceeded" according to whether
+  - exceeded_or_met, either the word "met" or "exceeded" according to whether
     pledge went over target or not.
+
+* succeeded-creator-reminder
+Sent to creator 3 days after a pledge succeeds, if they haven't sent a success
+announce message.
+  - actual, exceeded_or_met as above
 
 * succeeded-signer
 Sent to each signer when a pledge succeeds.

@@ -33,7 +33,7 @@
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.98 2005-06-17 16:01:07 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.99 2005-06-17 22:30:14 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -578,13 +578,15 @@ sub do_public_succeeding_pledge {
         }
         # Check got success emails
         my $success_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
-        # For the creator success message, get announcement link
-        if ($i == 0) {
-            die "Success email link not found\n" if ($success_email !~ m#^\s*($base_url.*$)#m);
-            $announce_link = $1;
-        }
     }
     $wth->log_watcher_check();
+
+    # Wait for reminder message
+    set_pb_date('1982-02-04');
+    call_frequentupdate();
+    my $success_email = $wth->email_get_containing( '%To: '.email_n(0).'%However, you haven\'t sent a message yet%');
+    die "Success email link not found\n" if ($success_email !~ m#^\s*($base_url.*$)#m);
+    $announce_link = $1;
 
     # Send message using announcements page, from creator to signers.
     die "Failed to find announcements link" if !$announce_link;
@@ -613,7 +615,7 @@ sub do_public_succeeding_pledge {
 
     # ... now complete partial signature
     # (a day later, so it contains new extra header)
-    set_pb_date('1982-02-02');
+    set_pb_date('1982-02-05');
     find_and_sign_pledge($pledge_action_completion, 4, undef, {action=>"resume"}, "signed");
     # Check the late signer (number 4) also recieves the announcement message.
     call_frequentupdate();

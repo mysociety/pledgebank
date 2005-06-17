@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.34 2005-06-17 14:31:44 francis Exp $
+ * $Id: frequentupdate,v 1.35 2005-06-17 14:57:38 francis Exp $
  *
  */
 
@@ -58,7 +58,7 @@ db_connect();
 
 mark_pledges_successful();
 send_automatic_failure_messages();
-#chivvy_creators_into_promoting_pledge();
+chivvy_creators_into_promoting_pledge();
 send_pending_messages();
 
 /* mark_pledges_successful

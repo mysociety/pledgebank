@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.17 2005-06-15 16:50:44 francis Exp $
+// $Id: all.php,v 1.18 2005-06-17 07:50:30 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -41,7 +41,7 @@ $s = db_query("
             AND date >= pb_current_date() 
             AND pin IS NULL 
             AND pb_pledge_prominence(id) <> 'backpage'
-            ORDER BY lower($q_sort) LIMIT ? OFFSET $q_offset", PAGE_SIZE);
+            ORDER BY $q_sort LIMIT ? OFFSET $q_offset", PAGE_SIZE);
 /* PG bug: mustn't quote parameter of offset */
 
 print "<h2>All Pledges <small>(which at least a few people have signed up to)</small></h2>";
@@ -63,15 +63,11 @@ if ($ntotal > 0) {
     $navlinks = '<p align="center">' . $prev . ' | Pledges ' . ($q_offset + 1) . ' &ndash; ' . 
         ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
         $ntotal . ' | ' . $next . '<br>Sort by: ';
-    if ($q_sort != 'title') $navlinks .= "<a href=\"all?sort=title$off\">Title</a>"; else $navlinks .= 'Title';
-    $navlinks .= ' | ';
-    if ($q_sort != 'target') $navlinks .= "<a href=\"all?sort=target$off\">Target</a>"; else $navlinks .= 'Target';
-    $navlinks .= ' | ';
-    if ($q_sort != 'date') $navlinks .= "<a href=\"all?sort=date$off\">Deadline</a>"; else $navlinks .= 'Deadline';
-    $navlinks .= ' | ';
-    if ($q_sort != 'name') $navlinks .= "<a href=\"all?sort=name$off\">Creator</a>"; else $navlinks .= 'Creator';
-    $navlinks .= ' | ';
-    if ($q_sort != 'ref') $navlinks .= "<a href=\"all?sort=ref$off\">Reference</a>"; else $navlinks .= 'Reference';
+    $arr = array('title'=>'Title', 'target'=>'Target', 'date'=>'Deadline', 'name'=>'Creator', 'ref'=>'Short name');
+    foreach ($arr as $s => $desc) {
+        if ($q_sort != $s) $navlinks .= "<a href=\"all?sort=$s$off\">$desc</a>"; else $navlinks .= $desc;
+        if ($s != 'ref') $navlinks .= ' | ';
+    }
     $navlinks .= '</p>';
     print $navlinks;
 

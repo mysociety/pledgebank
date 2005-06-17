@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.36 2005-06-16 16:25:32 matthew Exp $
+// $Id: new.php,v 1.37 2005-06-17 07:16:20 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -254,7 +254,7 @@ function step1_error_check($data) {
     elseif (strlen($data['ref'])<6) $errors['ref'] = 'The short name must be at least six characters long';
     elseif (strlen($data['ref'])>16) $errors['ref'] = 'The short name can be at most 20 characters long';
     elseif (in_array($data['ref'], $disallowed_refs)) $errors['ref'] = 'That short name is not allowed.';
-    if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = 'The short name must only contain letters, numbers, or a hyphen';
+    if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = 'The short name must only contain letters, numbers, or a hyphen.  Spaces are not allowed.';
 
     $dupe = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', array($data['ref']));
     if ($dupe) $errors['ref'] = 'That short name is already taken!';

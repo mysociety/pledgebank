@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.11 2005-06-14 14:42:38 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.12 2005-06-17 15:04:04 matthew Exp $';
 
 use strict;
 
@@ -139,6 +139,7 @@ while (my $q = new CGI::Fast()) {
         $interval = 'pledge'
             if (!defined($interval) || $interval !~ /^(pledge|week|month|year)$/);
 
+        my $target = $P->{target};
         # Compute start and end dates of the plot.
         my $end_date = $P->{graph_date};
         my $start_date;
@@ -259,6 +260,7 @@ set yrange [0:*]
 set y2range [0:*]
 set noborder
 set noarrow
+set arrow from '$start_date',second $target to '$end_date',second $target nohead lt 6
 set nolabel
 set nozeroaxis
 set nokey

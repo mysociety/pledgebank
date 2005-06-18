@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.9 2005-06-15 20:31:52 francis Exp $
+// $Id: abuse.php,v 1.10 2005-06-18 00:09:45 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -35,7 +35,7 @@ function report_abusive_thing() {
     /* Find information about the associated pledge. */
     $w = $q_what;
     if ($q_what == 'pledge')
-        $pledge_id = $q_id;
+        $pledge_id = db_getOne('select id from pledges where id = ?', $q_id);
     elseif ($q_what == 'comment')
         $pledge_id = db_getOne('select pledge_id from comment where id = ?', $q_id);
     elseif ($q_what == 'signer') {
@@ -43,8 +43,11 @@ function report_abusive_thing() {
         $pledge_id = db_getOne('select pledge_id from signers where id = ?', $q_id);
     }
 
-    if (is_null($pledge_id))
-        err("Bad ID value");
+    if (is_null($pledge_id)) {
+        print "<h2>Report abuse</h2>";
+        print "The $w couldn't be found.  It has probably been deleted already.";
+        return;
+    }
 
     if (!is_null($q_reason)) {
         $ip = $_SERVER["REMOTE_ADDR"];

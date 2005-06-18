@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.10 2005-06-16 09:55:09 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.11 2005-06-18 00:39:07 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -50,14 +50,15 @@ dbh()->do('delete from pledge_connection');
 # the list should appear to update more rapidly when a pledge becomes visible
 # because it has enough signers.
 my $s = dbh()->prepare("
-                    select pledge_id, signers.person_id, signers.name
-                    from signers, pledges
-                    where pledges.id = pledge_id
-                        and signers.person_id is not null
-                        and pledges.pin is null
-                        and pledges.confirmed
-                        and signers.showname
-                    order by signers.person_id");
+                select pledge_id, signers.person_id, signers.name
+                from signers, pledges
+                where pledges.id = pledge_id
+                    and signers.person_id is not null
+                    and pledges.pin is null
+                    and pledges.confirmed
+                    and signers.showname
+                    and pb_pledge_prominence(pledge_id) <> 'backpage'
+                order by signers.person_id");
 $s->execute();
 
 my $last_person_id;
@@ -80,6 +81,7 @@ $s = dbh()->prepare("
                 from pledges
                 where pin is null
                     and confirmed
+                    and pb_pledge_prominence(id) <> 'backpage'
                 order by person_id");
 $s->execute();
 $last_person_id = undef;

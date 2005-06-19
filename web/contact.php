@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.16 2005-06-16 06:16:51 francis Exp $
+// $Id: contact.php,v 1.17 2005-06-19 23:02:13 adam Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -24,13 +24,14 @@ page_footer();
 
 function contact_form($errors = array()) { ?>
 <h2>Contact Us</h2>
-<p>Was it useful?  How could it be better?  
+<p>Was it useful?  How could it be better?
 We make PledgeBank and thrive off feedback, good and bad.
-Use this form to contact us.  
-If you prefer, you can email <a href="mailto:<?=OPTION_CONTACT_EMAIL?>"><?=OPTION_CONTACT_EMAIL?></a> instead of using the form.
+Use this form to contact us.
+If you prefer, you can email <a href="mailto:<?=OPTION_CONTACT_EMAIL?>"><?=OPTION_CONTACT_EMAIL?></a> instead of using the form.</p>
 <p><a href="/faq">Read the FAQ</a> first, it might be a quicker
-way to answer your question.  
+way to answer your question.
 </p>
+<p>If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge: these messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator</p>
 <?	if (sizeof($errors)) {
 		print '<ul id="errors"><li>';
 		print join ('</li><li>', $errors);
@@ -62,7 +63,7 @@ function contact_form_submitted() {
 		contact_form($errors);
 	} else {
 		send_contact_form($name, $email, $subject, $message);
-	}	
+	}
 }
 
 function send_contact_form($name, $email, $subject, $message) {
@@ -73,7 +74,7 @@ function send_contact_form($name, $email, $subject, $message) {
     $headers = array();
     $headers['From'] = '"' . str_replace(array('\\','"'), array('\\\\','\"'), $name) . '" <' . $email . '>';
     $success = pb_send_email(OPTION_CONTACT_EMAIL, $subject, $message . "\n\n" . $postfix, $headers);
-    if (!$success) 
+    if (!$success)
         err("Failed to send message.  Please try again, or <a href=\"mailto:team@pledgebank.com\">email us</a>.");
 ?>
     Thanks for your feedback.  We'll get back to you as soon as we can!

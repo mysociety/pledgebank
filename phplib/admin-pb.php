@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.70 2005-06-17 13:02:24 francis Exp $
+ * $Id: admin-pb.php,v 1.71 2005-06-19 21:44:40 matthew Exp $
  * 
  */
 
@@ -80,7 +80,8 @@ class ADMIN_PAGE_PB_MAIN {
             $row = "";
 
             $row .= '<td><a href="'.OPTION_BASE_URL . "/" . $r['ref'] .'">'.$r['ref'].'</a>'.
-                '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">(admin)</a>';
+                '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">admin</a> |
+                <a href="?page=pblatest&amp;ref='.$r['ref'].'">Timeline</a>';
             $row .= '</td>';
             $row .= '<td>'.  $r['title'];
             if ($r['confirmed'] == 'f') {
@@ -422,6 +423,11 @@ class ADMIN_PAGE_PB_LATEST {
         } else {
             $this->linelimit = 250;
         }
+
+        $this->ref = null;
+        if ($ref = get_http_var('ref')) {
+            $this->ref = db_getOne('select id from pledges where ref=?', $ref);
+        }
     }
 
     # pledges use creationtime
@@ -436,8 +442,10 @@ class ADMIN_PAGE_PB_LATEST {
                         WHERE signers.pledge_id = pledges.id
                      ORDER BY signtime DESC');
         while ($r = db_fetch_array($q)) {
-            $signed[$r['id']][$r['email']] = 1;
-            $time[$r['epoch']][] = $r;
+            if (!$this->ref || $this->ref==$r['id']) {
+                $signed[$r['id']][$r['email']] = 1;
+                $time[$r['epoch']][] = $r;
+            }
         }
 
         // Token display not so useful, and wastes too much space
@@ -472,10 +480,12 @@ class ADMIN_PAGE_PB_LATEST {
                      ORDER BY pledges.id DESC');
         $this->pledgeref = array();
         while ($r = db_fetch_array($q)) {
-            if (!get_http_var('onlysigners')) {
-                $time[$r['epoch']][] = $r;
+            if (!$this->ref || $this->ref==$r['id']) {
+                if (!get_http_var('onlysigners')) {
+                    $time[$r['epoch']][] = $r;
+                }
+                $this->pledgeref[$r['id']] = $r['ref'];
             }
-            $this->pledgeref[$r['id']] = $r['ref'];
         }
         if (!get_http_var('onlysigners')) {
             $q = db_query('SELECT *
@@ -488,20 +498,26 @@ class ADMIN_PAGE_PB_LATEST {
                              FROM outgoingsms
                          ORDER BY lastsendattempt DESC LIMIT 10');
             while ($r = db_fetch_array($q)) {
-                $time[$r['lastsendattempt']][] = $r;
+                if (!$this->ref) {
+                    $time[$r['lastsendattempt']][] = $r;
+                }
             }
-            $q = db_query('SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch
+            $q = db_query('SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch, pledges.id
                              FROM message, pledges
                             WHERE message.pledge_id = pledges.id
                          ORDER BY whencreated DESC');
             while ($r = db_fetch_array($q)) {
-                $time[$r['epoch']][] = $r;
+                if (!$this->ref || $this->ref==$r['id']) {
+                    $time[$r['epoch']][] = $r;
+                }
             }
             $q = db_query('SELECT *, extract(epoch from whenposted) as commentposted
                              FROM comment
                          ORDER BY whenposted DESC');
             while ($r = db_fetch_array($q)) {
-                $time[$r['commentposted']][] = $r;
+                if (!$this->ref || $this->ref==$r['pledge_id']) {
+                    $time[$r['commentposted']][] = $r;
+                }
             }
         }
         krsort($time);

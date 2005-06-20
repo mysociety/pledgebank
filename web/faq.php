@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.10 2005-06-14 11:00:36 francis Exp $
+// $Id: faq.php,v 1.11 2005-06-20 12:06:02 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -103,14 +103,7 @@ a wireless enabled laptop from door to door, and get people to sign up
 then and there, you're more likely to be successful than someone who
 puts their pledge up and forgets about it.
 
-<dt>Why have you imposed a <?=OPTION_PB_TARGET_CAP?> person cap?
-
-<dd>In order to focus people's minds on highly achievable pledges, we have
-set this relatively low cap of maximum subscribers. We can raise the
-cap for individuals and organisations who ask - just contact us if you
-want to launch a bigger pledge.
-
-<dt>How many people should I ask for?
+<dt><a name="targets">How many people should I ask for?</a>
 
 <dd>We recommend that you pick the lowest target you can possibly bear to.
 Choose the number of people for which you could only just be bothered to carry
@@ -118,6 +111,12 @@ out your part of the pledge.  One more than the number where it wouldn't
 be worth it.  Don't put the value any higher than that.  This makes it
 most likely your pledge will succeed, and more people than you expected
 can always sign up.
+
+<dt>Why have you imposed a <?=OPTION_PB_TARGET_CAP?> person cap?
+
+<dd>In order to focus people's minds on highly achievable pledges, we have
+set this cap of maximum subscribers. We can raise the cap for individuals and
+organisations who ask - just contact us if you want to launch a bigger pledge.
 
 <dt><a name="editpledge">Why can't I edit my pledge after I've made it?</a>
 

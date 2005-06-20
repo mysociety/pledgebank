@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.38 2005-06-17 16:01:08 francis Exp $
+// $Id: new.php,v 1.39 2005-06-20 12:06:02 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -78,7 +78,7 @@ the door of that neighbour whose name you've forgotten.</li>
 <div class="c">
 <p><strong>I will</strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
-<p><strong>but only if</strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'3') ?>">
+<p><strong>but only if</strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
 <input type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):'other local people') ?>"></p>
 
 <p><strong>will</strong> <input type="text" id="signup" name="signup"
@@ -112,8 +112,14 @@ Did you read the tips at the top of the page? They'll help you make a successful
 <? 
 }
 
-function pledge_form_target_warning($data) {
-    $errors = array();
+function pledge_form_target_warning($data, $errors) {
+
+	if (sizeof($errors)) {
+		print '<div id="errors"><ul><li>';
+		print join ('</li><li>', array_values($errors));
+		print '</li></ul></div>';
+    }
+
 ?>
 
 <p>Your pledge looks like this so far:</p>
@@ -129,18 +135,19 @@ function pledge_form_target_warning($data) {
 
 <h2>Rethink your target</h2>
 
-<p>Hello - we've noticed that your pledge is aiming to recruit more than <?=OPTION_PB_TARGET_WARNING?>  people.</p>
+<p>Hello - we've noticed that your pledge is aiming to recruit more than
+<?=OPTION_PB_TARGET_WARNING?>  people.</p>
 
 <p>Recruiting more than <?=OPTION_PB_TARGET_WARNING?>  people to a pledge is a
 lot of work, and many people who have set up pledges larger than this have not
 succeeded.  You should only set a large target if you are preprared to do some
-serious marketing of your pledge.</p>
+serious marketing of your pledge.  
 
-<p>Please take advantage of this box to change your target.
-</p>
+<p>Please take advantage of this box to change your target.  There is <a
+href="/faq#targets">more advice</a> about choosing a target in the FAQ.
 
 <p><strong>My target</strong> is  
-<input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'') ?>">
+<input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?='' /*(isset($data['target'])?htmlspecialchars($data['target']):'')*/ ?>">
 <strong><?=$data['type']?></strong></p>
 
 <p>Remember, a small but successful pledge can be the perfect preparation
@@ -269,20 +276,23 @@ function pledge_form_one_submitted() {
     if (!$data['signup']) $data['signup'] = 'sign up';
     $data['signup'] = preg_replace('#\.$#', '', $data['signup']);
 
-    $errors = step1_error_check($data);
-
     $stepdata = unserialize(base64_decode($data['data']));
     if ($stepdata && !is_array($stepdata)) $errors[] = 'Transferring the data between steps failed!';
     unset($data['data']);
     if ($stepdata)
         $data = array_merge($stepdata, $data);
+
+    $errors = step1_error_check($data);
     if (sizeof($errors)) {
         pledge_form_one($data, $errors);
-    } elseif ($data['target'] > OPTION_PB_TARGET_WARNING) {
-        pledge_form_target_warning($data);
-    } else {
-        pledge_form_two($data);
+        return;
+    } 
+    $errors = target_warning_error_check($data);
+    if (sizeof($errors) || $data['target'] > OPTION_PB_TARGET_WARNING) {
+        pledge_form_target_warning($data, $errors);
+        return;
     }
+    pledge_form_two($data);
 }
 
 function pledge_form_target_warning_submitted() {
@@ -296,8 +306,13 @@ function pledge_form_target_warning_submitted() {
     unset($data['data']);
     $data = array_merge($steptwdata, $data);
 
-    $errors = step1_error_check($data);
+    $errors = target_warning_error_check($data);
+    if (sizeof($errors) && !get_http_var('newback')) {
+        pledge_form_target_warning($data, $errors);
+        return;
+    }
 
+    $errors = step1_error_check($data);
     if (sizeof($errors) || get_http_var('newback')) {
         pledge_form_one($data, $errors);
     } else {
@@ -311,15 +326,6 @@ function step1_error_check($data) {
     $errors = array();
     if (!$data['target']) $errors['target'] = 'Please enter a target';
     elseif (!ctype_digit($data['target']) || $data['target'] < 1) $errors['target'] = 'The target must be a positive number';
-    elseif ($data['target'] > OPTION_PB_TARGET_CAP) {
-        $errors['target'] = 'We have imposed a cap of '.OPTION_PB_TARGET_CAP.'
-        people maximum on each pledge. This is not a hard limit, just a way of
-        encouraging people to aim at smaller and more achievable targets. If
-        you want a target higher than '.OPTION_PB_TARGET_CAP.' people, we\'d be
-        glad to set it up for you. Just drop us a quick email to 
-        <a href="mailto:team@pledgebank.com">team@pledgebank.com</a> 
-        letting us know who you are and what you are aiming to do.';
-    }
 
     $disallowed_refs = array('contact');
     if (!$data['ref']) $errors['ref'] = 'Please enter a short name for your pledge';
@@ -350,6 +356,26 @@ function step1_error_check($data) {
     return $errors;
 }
 
+function target_warning_error_check($data) {
+    global $pb_today;
+
+    $errors = array();
+    if (!$data['target']) 
+        $errors['target'] = 'Please enter a target';
+    elseif ($data['target'] > OPTION_PB_TARGET_CAP) {
+        $errors['target'] = 'We have imposed a cap of
+            '.OPTION_PB_TARGET_CAP.' people maximum on each pledge. This is not a
+            hard limit, just a way of encouraging people to aim at smaller and more
+            achievable targets. If you want a target higher than '
+            .OPTION_PB_TARGET_CAP.' people, we\'d be glad to set it up for you.
+            Just drop us a quick email to <a
+            href="mailto:team@pledgebank.com">team@pledgebank.com</a> letting us
+            know who you are and what you are aiming to do.';
+    }
+
+    return $errors;
+}
+ 
 function step2_error_check($data) {
     $errors = array();
     if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
@@ -406,6 +432,11 @@ function pledge_form_two_submitted() {
         pledge_form_one($data, $errors);
         return;
     }
+    $errors = target_warning_error_check($data);
+    if (sizeof($errors)) {
+        pledge_form_target_warning($data, $errors);
+        return;
+    }
     $errors = step2_error_check($data);
     if (sizeof($errors)) {
         pledge_form_two($data, $errors);
@@ -431,6 +462,11 @@ function pledge_form_three_submitted() {
     $errors = step1_error_check($data);
     if (sizeof($errors) || get_http_var('newback1')) {
         pledge_form_one($data, $errors);
+        return;
+    }
+    $errors = target_warning_error_check($data);
+    if (sizeof($errors)) {
+        pledge_form_target_warning($data, $errors);
         return;
     }
     $errors = step2_error_check($data);

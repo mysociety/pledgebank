@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.114 2005-06-16 10:19:23 chris Exp $
+-- $Id: schema.sql,v 1.115 2005-06-20 17:24:45 francis Exp $
 --
 
 -- secret
@@ -585,9 +585,6 @@ create table signers (
     -- when they signed
     signtime timestamp not null,
   
-    -- Name has been reported
-    reported boolean not null default false,
-
     check (
         (name is not null and person_id is not null)
         or (name is null and person_id is null and mobile is not null)

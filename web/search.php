@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.6 2005-06-14 10:12:59 francis Exp $
+// $Id: search.php,v 1.7 2005-06-20 17:24:46 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -93,7 +93,7 @@ function search() {
     while ($r = db_fetch_array($q)) {
         $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
     }
-    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges WHERE showname AND NOT reported AND signers.pledge_id = pledges.id AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges WHERE showname AND signers.pledge_id = pledges.id AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
     while ($r = db_fetch_array($q)) {
         $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
     }

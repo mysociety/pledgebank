@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.19 2005-06-20 18:35:21 matthew Exp $
+ * $Id: ref-announce.php,v 1.20 2005-06-20 22:32:25 francis Exp $
  * 
  */
 
@@ -251,19 +251,20 @@ if (!sizeof($errors) && $q_submit) {
     message_success();
 } else {
  
-    if ($p->succeeded())
-        print '<p class="success">Your pledge is successful!</p>';
- 
+
     // Display errors or success header
     if (sizeof($errors))
         print '<div id="errors"><ul><li>'
                 . join('</li><li>', array_map('htmlspecialchars', $errors))
                 . '</li></ul></div>';
-
+    elseif ($p->succeeded())
+        print '<p class="success">Your pledge is successful!</p>';
+ 
+    $p->render_box(array('showdetails'=>false));
+        
     // Display form
     $howmany = $p->signers();
 
-    $p->render_box(array('showdetails'=>false));
 ?>
 <p></p>
 

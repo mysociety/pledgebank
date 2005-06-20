@@ -1,17 +1,17 @@
-Subject: Sorry, your pledge failed - '<?=$values['title']?>' at PledgeBank.com
+Subject: Sorry, your pledge failed - '<?=$values['title']?>' at PledgeBank.com. 
 
 We are sorry to have to tell you that your pledge did not meet its target in
-the required time.  You required <?=$values['target']?> <?=$values['type']?>, 
+the required time.  You required <?=$values['target']?> <?=$values['type']?>,
 but achieved only <?=$values['actual']?>.
 
-Please click on the link below to write a message to console everyone who
-signed the pledge.  Let them know what went wrong, or if you're going to try
-again with an easier pledge or smaller target.
+The pledge read: '<?=$values['sentence_first']?>'
+
+Bad luck, but don't be disheartened! This link will enable you to write to all
+your signers. Ask them what they'd like to do next, how you could do better
+next time, and whether they'd like to create a new pledge.
 
 <?=$values['url']?>
 
-Better luck next time - maybe you'd like to hit reply and tell us what you
-think didn't work out? It might help us give better guidance or build further
-useful features in the future.
+Go on, get writing!
 
 <?=$values['signature']?>

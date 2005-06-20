@@ -4,7 +4,6 @@ Congratulations!
 
 We are pleased to tell you that the pledge you signed up to
 <?=$values['exceeded_or_met']?> its target in the required time.
-
 The pledge, created by <?=$values['creator_name']?>, reads:
 '<?=$values['sentence_first']?>'
 
@@ -15,3 +14,6 @@ To see who else signed up, please follow this link:
 <?=$values['pledge_url']?>
 
 <?=$values['signature']?>
+
+P.S. Why not take some photos of yourself carrying out your pledge?  We love to
+see PledgeBank in action.

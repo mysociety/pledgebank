@@ -3,7 +3,7 @@ Subject: Pledge successful - '<?=$values['title']?>' at PledgeBank.com
 Congratulations!
 
 We are pleased to tell you that your pledge <?=$values['exceeded_or_met']?> its
-target in the required time.
+target in the required time.  Your pledge reads: '<?=$values['sentence_first']?>'
 
 Next, please click on the link below and write a message to tell everyone who
 signed the pledge what you want them to do next.

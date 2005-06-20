@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.66 2005-06-14 20:20:02 matthew Exp $
+ * $Id: pb.css,v 1.67 2005-06-20 18:35:21 matthew Exp $
  * 
  */
 
@@ -13,7 +13,7 @@
 
 body {
     text-align: center;
-    font-family: "Lucida Grande", "Lucida Sans", sans-serif;
+    font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, sans-serif;
     margin: 0;
     padding: 0;
     color: #000000;

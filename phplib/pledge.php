@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.97 2005-06-20 23:16:04 matthew Exp $
+ * $Id: pledge.php,v 1.98 2005-06-21 16:51:52 francis Exp $
  * 
  */
 
@@ -176,13 +176,14 @@ class Pledge {
     //     href - if present must contain a URL, which is used as a link for
     //            the pledge sentence
     //     reportlink - if present and true, show "report this pledge" link
+    //     class - adds the given classes (space separated) to the division
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
         if (array_key_exists('href', $params)) {
             $sentence_params['href'] = $params['href'];
         }
-        if (array_key_exists('all', $params))
-            print '<div class="pledge pledge-' . $params['all'] . '">';
+        if (array_key_exists('class', $params))
+            print '<div class="pledge ' . $params['class'] . '">';
         else
             print '<div id="pledge">';
 ?>

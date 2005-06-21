@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.67 2005-06-20 18:35:21 matthew Exp $
+ * $Id: pb.css,v 1.68 2005-06-21 16:51:53 francis Exp $
  * 
  */
 
@@ -173,14 +173,19 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #successfulpledges {
     clear: left;
 }
-#currentpledges, #successfulpledges {
+#currentpledges, #successfulpledges, #yoursignedpledges {
     width: 59%;
     float: left;
 }
-#currentpledges li, #successfulpledges li {
+#currentpledges li, #successfulpledges li, #yoursignedpledges li, #yourconnections li {
     padding-bottom: 0.5em;
     border-bottom: dotted 1px #999999;
     margin-bottom: 0.5em;
+}
+.pledge-yourcreated {
+    float: left;
+    clear: left;
+    width: 60%;
 }
 
 #photo {
@@ -242,7 +247,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     width: 45%;
     margin: 1em 0 0.5em 0;
 }
-#tips, #pledge, #all .pledge {
+#tips, #pledge, #all .pledge, #yourpledges .pledge {
     border: solid 2px #522994;
     background-color: #f6e5ff;
     margin-bottom: 1em;
@@ -279,7 +284,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #spreadword a {
     font-weight: bold;
 }
-#signatories ul, #connections ul {
+#signatories ul, #connections ul, #yourconnections ul {
     margin: 0;
     padding: 0 0 0 1.5em;
 }
@@ -294,6 +299,12 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     clear: right;
     float: right;
     width: 45%;
+}
+#yourconnections {
+    margin-top: 1em;
+    clear: right;
+    float: right;
+    width: 32%;
 }
 #comments ul {
     padding: 0;
@@ -382,7 +393,6 @@ ul#nav li {
 }
 
 /* All pledges page */
-
 .pledge-0 {
     float: left;
     clear: left;

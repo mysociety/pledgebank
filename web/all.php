@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.20 2005-06-18 00:19:10 francis Exp $
+// $Id: all.php,v 1.21 2005-06-21 16:51:53 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -79,7 +79,7 @@ if ($ntotal > 0) {
     $c = 0;
     while (list($id) = db_fetch_row($qrows)) {
         $pledge = new Pledge(intval($id));
-        $pledge->render_box(array('all'=>$c%2, 'href'=>$pledge->url_main()));
+        $pledge->render_box(array('class'=>"pledge-".$c%2, 'href'=>$pledge->url_main()));
         $c++;
     }
     if ($ntotal > PAGE_SIZE)

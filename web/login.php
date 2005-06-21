@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.39 2005-06-17 21:57:06 francis Exp $
+ * $Id: login.php,v 1.40 2005-06-21 16:51:53 francis Exp $
  * 
  */
 
@@ -104,14 +104,8 @@ if (get_http_var("now")) {
                     'reason_email_subject' => 'Log into PledgeBank.com'
 
                 ));
-    page_header("Logged in");
-    print "You're now logged in as <strong>";
-    if ($P->has_name())
-        print htmlspecialchars($P->name);
-    else 
-        print htmlspecialchars($P->email);
-    print "</strong>.  Enjoy using PledgeBank!";
-    page_footer();
+
+    header("Location: /your");
     exit;
 }
 

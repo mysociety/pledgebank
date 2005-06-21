@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.40 2005-06-21 16:51:53 francis Exp $
+ * $Id: login.php,v 1.41 2005-06-21 19:35:01 chris Exp $
  * 
  */
 
@@ -226,11 +226,16 @@ function login_page() {
                 ?  $template_data['template'] : 'generic-confirm', 
             $template_data);
         page_header("Now check your email");
+        /* XXX show message only for Hotmail users? Probably not worth it. */
     ?>
 <p id="loudmessage">
 Now check your email!<br>
 We've sent you an email, and you'll need to click the link in it before you can
 continue
+<br>
+<small>If you use <acronym title="Web based email">Webmail</acronym> or have
+'junk mail' filters, you may wish to check your bulk/spam mail folders:
+sometimes, our messages, are marked that way.</small>
 </p>
 <?
 

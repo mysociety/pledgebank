@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.115 2005-06-20 17:24:45 francis Exp $
+-- $Id: schema.sql,v 1.116 2005-06-21 16:36:24 chris Exp $
 --
 
 -- secret
@@ -192,7 +192,8 @@ select case
 ' language sql;
 
 -- R_e
--- Radius of the earth, in km.
+-- Radius of the earth, in km. This is something like 6372.8 km:
+--  http://en.wikipedia.org/wiki/Earth_radius
 create function R_e()
     returns double precision as 'select 6372.8::double precision;' language sql;
 
@@ -213,14 +214,12 @@ create function pledge_find_nearby(double precision, double precision, double pr
     --  http://www.ga.gov.au/nmd/geodesy/datums/distance.jsp
     -- We index pledges on lat/lon so that we can select the pledges which lie
     -- within a wedge of side about 2 * DISTANCE. That cuts down substantially
-    -- on the amount of work we have to do. The radius of the earth, R_e, is
-    -- something like 6372.8 km:
-    --  http://en.wikipedia.org/wiki/Earth_radius
+    -- on the amount of work we have to do.
 '
     select id,
             R_e() * acos(
                 sin(radians($1)) * sin(radians(latitude))
-                + cos(radians($2)) * cos(radians(latitude))
+                + cos(radians($1)) * cos(radians(latitude))
                     * cos(radians($2 - longitude))
             ) as distance
         from pledges

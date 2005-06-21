@@ -30,10 +30,11 @@
 #   Run pledge connections part of crontab
 #   Admin:  Test delete signer, and delete pledge.
 #   more complex prominence stuff
+#   call call_findpledgeconnections
 
 # Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.100 2005-06-20 23:27:59 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.101 2005-06-21 11:53:54 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -424,6 +425,12 @@ sub call_frequentupdate {
         and die "Failed to call frequentupdate";
 }
 
+# Call find-pledge-connections cron job
+sub call_findpledgeconnections {
+    system("php", "find-pledge-connections", $verbose > 1 ? qw(--verbose) : ()) 
+        and die "Failed to call find-pledge-connections";
+}
+
 # Run pbsmsd once
 sub call_smsd {
     system("./pbsmsd", "--once", $verbose > 1 ? qw(--debug) : ()) 
@@ -756,10 +763,17 @@ sub do_private_failing_pledge {
     die if ($errors !~ m/Permission denied/);
     $wth->log_watcher_check();
 
-    # Provoke chivvy email
-    set_pb_date('1980-12-10');
+    # Provoke chivvy too few signers email
+    set_pb_date('1980-12-06');
     call_frequentupdate();
     $wth->email_get_containing('%Subject: Helping your pledge%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    # Provoke chivvy rate too low mail (we get it even though low signers count
+    # as we are 'frontpage')
+    set_pb_date('1980-12-10');
+    call_frequentupdate();
+    $wth->email_get_containing('%To: '.email_n(0).  '%rate of growth you\'ve had over the last week%');
+    $wth->email_check_none_left();
 
     # Test what happens upon expiry
     # ... partially sign the pledge

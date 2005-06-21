@@ -95,6 +95,11 @@ Sent to creator when a comment is added to a pledge.
 * chivvy-creator
 Sent 2 days after creation of a new pledge if it doesn't have many signups.
 
+* chivvy-creator-lowrate
+Sent if the rate of signups of a pledge seems too low.
+    - probable_will_reach, number of signers expected by final date (is less
+      than target, or this message wouldn't be being sent)
+
 * email-friends
 Sent by someone to tell their friends about a pledge.
   - from_name, who sent message

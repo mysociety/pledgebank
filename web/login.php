@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.41 2005-06-21 19:35:01 chris Exp $
+ * $Id: login.php,v 1.42 2005-06-21 19:36:43 chris Exp $
  * 
  */
 
@@ -235,7 +235,7 @@ continue
 <br>
 <small>If you use <acronym title="Web based email">Webmail</acronym> or have
 'junk mail' filters, you may wish to check your bulk/spam mail folders:
-sometimes, our messages, are marked that way.</small>
+sometimes, our messages are marked that way.</small>
 </p>
 <?
 

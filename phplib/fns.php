@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.35 2005-06-17 13:44:07 francis Exp $
+// $Id: fns.php,v 1.36 2005-06-21 08:41:58 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -39,7 +39,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
     }
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
         
-    $values['signature'] = "-- the PledgeBank.com team\n";
+    $values['signature'] = "-- the PledgeBank.com team";
 
     $template = file_get_contents("../templates/emails/$template_name");
     $spec = array(

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.50 2005-06-12 21:03:28 matthew Exp $
+# $Id: poster.cgi,v 1.51 2005-06-22 12:29:25 francis Exp $
 #
 
 import os
@@ -652,8 +652,16 @@ while fcgi.isFCGI():
                 cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outdir + '/' + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outdir + '/' + outfile
                 child = popen2.Popen3(cmd, True) # capture stderr
                 child.tochild.close()
-                # req.err.write(child.fromchild.read()) # no need for stdout in log file, just stderr
-                req.err.write(child.childerr.read())
+                # no need for stdout in log file, so ignore this
+                # req.err.write(child.fromchild.read()) 
+                # fetch standard error lines
+                errorlines = child.childerr.readlines()
+                # filter out progress messages from errors
+                errorlines = filter(lambda x: 'making histogram' not in x, errorlines)
+                errorlines = filter(lambda x: 'colors found' not in x, errorlines)
+                errorlines = filter(lambda x: 'colors...' not in x, errorlines)
+                # write out anything left to apache log
+                req.err.writelines(errorlines)
                 status = child.wait()
                 if os.WIFSIGNALED(status):
                     raise Exception, "%s: killed by signal %d" % (cmd, os.WTERMSIG(status))

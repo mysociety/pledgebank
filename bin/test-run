@@ -13,7 +13,6 @@
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
-#
 
 # TODO, add test code for:
 #   Nameless signups
@@ -27,14 +26,11 @@
 #   Picture uploading
 #   Info page graph
 #   Info page announcement archive
-#   Run pledge connections part of crontab
 #   Admin:  Test delete signer, and delete pledge.
 #   more complex prominence stuff
-#   call call_findpledgeconnections
+#   Log in with wrong password
 
-# Log in with wrong password
-
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.101 2005-06-21 11:53:54 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.102 2005-06-22 11:18:24 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -427,7 +423,7 @@ sub call_frequentupdate {
 
 # Call find-pledge-connections cron job
 sub call_findpledgeconnections {
-    system("php", "find-pledge-connections", $verbose > 1 ? qw(--verbose) : ()) 
+    system("./find-pledge-connections", $verbose > 1 ? qw(--verbose) : ()) 
         and die "Failed to call find-pledge-connections";
 }
 
@@ -1037,9 +1033,17 @@ sub do_login_tests {
 
     # Log in explicitly with "login" link
     $wth->browser_get($base_url);
+    # ... first update pledge connections (to test that a bit on your pledges page)
+    call_findpledgeconnections();
     $wth->browser_follow_link(text_regex => qr/Login/);
     perform_login_action(200, {action=>"password", giveemail=>1}, undef);
-    $wth->browser_check_contents("logged in");
+    # ... check gone to Your Pledges page correctly
+    $wth->browser_check_contents("Pledges You Created");
+    $wth->browser_check_contents($pledge_action_login_1);
+    $wth->browser_check_contents($pledge_action_login_2);
+    $wth->browser_check_contents($pledge_action_login_3);
+    $wth->browser_check_no_contents($pledge_action_login_4);
+
     # Fourth pledge, expects already logged in
     create_pledge(200, 
         { title => $pledge_action_login_4, 

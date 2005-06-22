@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.1 2005-06-21 16:51:53 francis Exp $
+// $Id: your.php,v 1.2 2005-06-22 11:18:24 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -89,6 +89,7 @@ $qrows = db_query("
             ", $P->id());
 print '<div id="yoursignedpledges">';
 print "<h2>Pledges You Signed</h2>";
+$successful_ever = 0;
 if (db_num_rows($qrows) > 0) {
     print '<ol>';
     while ($r = db_fetch_array($qrows)) {
@@ -97,12 +98,15 @@ if (db_num_rows($qrows) > 0) {
         print pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
         
         print '</li>';
+        if ($r['whensucceeded']) 
+            $successful_ever = 1;
     }
     print '</ol>';
 } else {
     print '<p>You have signed no pledges.</p>';
 }
-print "<p>Why not <a href=\"mailto:team@pledgebank.com\">send us photos</a> of yourself carrying out successful pledges?</p>";
+if ($successful_ever)
+    print "<p>Why not <a href=\"mailto:team@pledgebank.com\">send us photos</a> of yourself carrying out successful pledges?</p>";
 print '</div>';
 
 page_footer();

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: offline.php,v 1.9 2005-06-13 08:02:19 francis Exp $
+// $Id: offline.php,v 1.10 2005-06-22 17:23:34 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -51,7 +51,7 @@ someone to sign up even if they're nowhere near a computer.</p>
 
 <p>Anyone with a mobile can sign up to a pledge by texting the word
 <strong>pledge</strong> followed by the pledge reference to
-<strong>60022</strong> (for the moment, this works only in the UK).</p>
+<strong><?=OPTION_PB_SMS_DISPLAY_NUMBER?></strong> (for the moment, this works only in the UK).</p>
 
 <p>Text messages cost whatever you normally pay for a normal SMS, and as
 a pledge creator you can write to your mobile signers when your pledge

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.45 2005-06-22 11:18:24 francis Exp $
+// $Id: page.php,v 1.46 2005-06-22 11:53:26 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -117,7 +117,7 @@ function page_footer($params = array()) {
 <input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="Go"></p>
 </form>
 <!-- remove all extraneous whitespace to avoid IE bug -->
-<ul id="nav"><li><a href="/">Home</a></li><li><a href="/all">All Pledges</a></li><li><a href="/new">Start a Pledge</a></li><li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li><li><a href="/contact">Contact</a></li><li><a href="/your">Your Pledges</a></li><?
+<ul id="nav"><li><a href="/">Home</a></li><li><a href="/all">All Pledges</a></li><li><a href="/your">Your Pledges</a></li><li><a href="/new">Start a Pledge</a></li><li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li><li><a href="/contact">Contact</a></li><?
         $P = person_if_signed_on(true); /* Don't renew any login cookie. */
         if ($P) {
 ?><li><a href="/logout">Logout</a></li><?

@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.42 2005-06-21 19:36:43 chris Exp $
+ * $Id: login.php,v 1.43 2005-06-22 11:53:26 francis Exp $
  * 
  */
 
@@ -232,7 +232,7 @@ function login_page() {
 Now check your email!<br>
 We've sent you an email, and you'll need to click the link in it before you can
 continue
-<br>
+<p id="loudmessage">
 <small>If you use <acronym title="Web based email">Webmail</acronym> or have
 'junk mail' filters, you may wish to check your bulk/spam mail folders:
 sometimes, our messages are marked that way.</small>
@@ -313,6 +313,13 @@ function login_form($errors = array()) {
 
 <input type="checkbox" name="rememberme" id="rememberme" value="1"><strong>Remember me</strong></input>
 <small>(don't use this on a public or shared computer)</small>
+
+</li>
+
+<li><p>I've been here before, but I've forgotten or don't have a password.
+
+<input type="submit" name="SendEmail" value="Click here to continue &gt;&gt;"><br>
+</p>
 
 </li>
 

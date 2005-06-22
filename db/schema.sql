@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.116 2005-06-21 16:36:24 chris Exp $
+-- $Id: schema.sql,v 1.117 2005-06-22 12:15:29 francis Exp $
 --
 
 -- secret
@@ -68,6 +68,7 @@ create table person (
     name text,
     email text not null,
     password text,
+    website text,
     numlogins integer not null default 0
 );
 
@@ -925,8 +926,14 @@ create unique index message_signer_recipient_message_id_signer_id_idx
 create table comment (
     id serial not null primary key,
     pledge_id integer not null references pledges(id),
+
+    person_id integer references person(id),
     name text not null,
-    email text not null,
+    -- email is obsolete, from before we forced login for comments
+    email text,
+    check ((person_id is null and email is not null) or
+           (person_id is not null and email is null)),
+
     website text,
     -- add a reply_comment_id here if we ever want threading
     whenposted timestamp not null default pb_current_timestamp(),

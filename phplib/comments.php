@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.23 2005-06-15 20:36:13 matthew Exp $
+ * $Id: comments.php,v 1.24 2005-06-22 12:15:29 francis Exp $
  * 
  */
 
@@ -146,6 +146,8 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
             $q_h_author_name = htmlspecialchars($P->name_or_blank());
         if (is_null($q_h_author_email) || !$q_h_author_email)
             $q_h_author_email = htmlspecialchars($P->email());
+        if (is_null($q_h_author_website) || !$q_h_author_website)
+            $q_h_author_website = htmlspecialchars($P->website_or_blank());
     }
     
 ?>

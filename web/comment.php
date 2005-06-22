@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.16 2005-06-17 11:37:16 matthew Exp $
+ * $Id: comment.php,v 1.17 2005-06-22 12:15:29 francis Exp $
  * 
  */
 
@@ -89,19 +89,20 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     $r['reason_email'] = 'Your comment will then be displayed on the pledge page.';
     $r['reason_email_subject'] = 'Adding your comment to a pledge at PledgeBank.com';
     $P = person_signon($r, $q_author_email, $q_author_name);
+    $P->set_website($q_author_website);
 
     /* Actually post the comment. Guard against double-insertion. */
     $id = db_getOne('select id from comment where id = ? for update', $comment_id);
     if (is_null($id))
         db_query('
-                insert into comment (id, pledge_id, name, email, website, text)
+                insert into comment (id, pledge_id, person_id, name, website, text)
                 values (
                     ?, ?,
                     ?, ?, ?,
                     ?)',
                 array(
                     $comment_id, $pledge_id,
-                    $q_author_name, $q_author_email, $q_author_website,
+                    $P->id(), $q_author_name, $q_author_website,
                     $q_text
                 ));
     db_commit();

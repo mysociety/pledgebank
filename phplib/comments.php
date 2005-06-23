@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.25 2005-06-23 20:51:01 francis Exp $
+ * $Id: comments.php,v 1.26 2005-06-23 22:41:07 matthew Exp $
  * 
  */
 
@@ -35,28 +35,32 @@ function comments_format_timestamp($time) {
  * described. If NOABUSE is true, don't show the link for reporting an abusive
  * comment. */
 function comments_show_one($comment, $noabuse = false) {
+    $name = htmlspecialchars($comment['name']);
+    if (isset($comment['website']))
+        $name = '<a href="' . htmlspecialchars($comment['website']) . '">' . $name . '</a>';
+
     print '<div class="commentcontent">'
             . comments_text_to_html($comment['text'])
             . '</div>';
     print '<div class="commentheader"><small>';  /* XXX or h1 or something? */
     if (isset($comment['ref'])) {
-        print 'To pledge <a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a> by ';
-    }
-
-    if (isset($comment['website']))
-        print '<a href="' . htmlspecialchars($comment['website']) . '">'
-                . htmlspecialchars($comment['name'])
-                . '</a>';
-    else
-        print htmlspecialchars($comment['name']);
-
-    /* Format the time sanely. */
-    if (isset($comment['whenposted'])) {
-        print ' at ' . prettify($comment['whenposted']) . '.';
+        $r = '<a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a>';
+        if (isset($comment['whenposted'])) {
+            printf(_('To pledge %s by %s at %s.'), $r, $name, prettify($comment['whenposted']));
+        } else {
+            printf(_('To pledge %s by %s.'), $r, $name);
+        }
+    } else {
+        /* Format the time sanely. */
+        if (isset($comment['whenposted'])) {
+            printf(_('%s at %s.'), $name, prettify($comment['whenposted']));
+        } else {
+            print $name;
+        }
     }
 
     if (isset($comment['id']) && !$noabuse)
-        print ' <a class="abusivecommentlink" href="/abuse?what=comment&amp;id=' . $comment['id'] . '">Abusive? Report it!</a>';
+        print ' <a class="abusivecommentlink" href="/abuse?what=comment&amp;id=' . $comment['id'] . '">' . _('Abusive? Report it!') . '</a>';
 
     print '</small></div>';
 }
@@ -71,12 +75,12 @@ function comments_show($pledge, $noabuse = false) {
         $id = db_getOne('select id from pledges where ref = ?', $pledge);
 
     if (is_null($id))
-        err("No pledge '$pledge'");
+        err(sprintf(_("No pledge '%s'"), $pledge));
 
     print '<div class="commentsbox">';
     
     if (db_getOne('select count(id) from comment where pledge_id = ?', $id) == 0)
-        print '<p><em>No comments yet! Why not add one?</em></p>';
+        print _('<p><em>No comments yet! Why not add one?</em></p>');
     else {
         print '<ul class="commentslist">';
 
@@ -105,15 +109,16 @@ function comments_show($pledge, $noabuse = false) {
  * Display comment for index, such as front page or search results.
  */
 function comment_summary($r) {
-    return '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' .
-        (strlen($r['text'])>20 ? substr($r['text'], 0, 20) : $r['text']) . '...</a> by ' . 
-    htmlspecialchars($r['name']) . ', on pledge <a href="/' . $r['ref'] . '">' . $r['ref'] . '</a> at ' .
-        prettify($r['whenposted']);
+    $text = $r['text'];
+    if (strlen($text) > 20) $text = substr($text, 0, 20) . '...';
+    $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . $text . '</a>';
+    
+    return printf(_('%s by %s, on pledge %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
 }
 
 function latest_comments() { ?>
 <div id="comments">
-<h2>Latest comments</h2>
+<?=_('<h2>Latest comments</h2>') ?>
 <?  $comments_to_show = 10;
     $q = db_query("
                 SELECT comment.id,
@@ -155,24 +160,24 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 ?>
 <form method="POST" action="comment.php" id="commentform" name="commentform" class="pledge">
 <input type="hidden" name="pledge_id" value="<?=$pledge_id ?>">
-<h2>Add Comment</h2>
+<?=_('<h2>Add Comment</h2>') ?>
 
 <div class="form_row">
- <label for="author_name">Your name</label>
+ <label for="author_name"><?=_('Your name') ?></label>
  <input type="text" id="author_name" name="author_name" value="<?=$q_h_author_name?>" size="30">
 </div>
 
 <div class="form_row">
-<label for="author_email">Your email</label>
+<label for="author_email"><?=_('Your email') ?></label>
   <input type="text" id="author_email" name="author_email" value="<?=$q_h_author_email?>" size="30">
 </div>
 
 <div class="form_row">
-<label for="author_website">Your web site</label> <small><i>(optional)</i></small>
+<label for="author_website"><?=_('Your web site') ?></label> <small><i><?=_('(optional)') ?></i></small>
   <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="30">
 </div>
 
-<p><strong>Your comment</strong>
+<p><strong><?=_('Your comment') ?></strong>
 <br><textarea style="max-width: 100%" name="text" id="text" cols="40" rows="10"><?=$q_h_text?></textarea>
 </p>
 
@@ -181,15 +186,14 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 <? } ?>
 <input type="hidden" name="n" value="<?=$nextn?>">
 
-<p><small>Your name and web site, if given, will be shown on your comment,
-but your email address will not be.</small></p>
-
+<?=_('<p><small>Your name and web site, if given, will be shown on your comment,
+but your email address will not be.</small></p>') ?>
 <p><input type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ? "checked" : ""?>>
-Email me any replies to my comment</input></p>
+<?=_('Email me any replies to my comment') ?></input></p>
 
-<p><input type="submit" name="preview" value="Preview">
+<p><input type="submit" name="preview" value="<?=_('Preview') ?>">
 <? if ($allow_post) { ?>
-<input type="submit" name="submit" value="Post comment">
+<input type="submit" name="submit" value="<?=_('Post comment') ?>">
 <? } ?>
 
 <?  if ($p = get_http_var('pin')) print '<input type="hidden" name="pin" value="$p">'; ?>

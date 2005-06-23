@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.26 2005-06-10 13:31:33 chris Exp $
+# $Id: SMS.pm,v 1.27 2005-06-23 16:07:45 chris Exp $
 #
 
 package PB::SMS;
@@ -224,7 +224,7 @@ sub receive_sms ($$$$$$) {
         sub ($$$$$) {
             my ($id, $message, $sender, $recipient) = @_;
             my $keyword = mySociety::Config::get('PB_SMS_PREFIX', '');
-            if ($message =~ m#^\s*\Q$keyword\E\s*([^\s]+)#i) {
+            if ($message =~ m#^\s*\Q$keyword\E\s*([a-z0-9-]+)#i) {
                 # Could be a signup request.
                 my $ref = $1;
                 # Exact reference match.

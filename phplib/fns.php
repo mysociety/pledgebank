@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.37 2005-06-23 20:51:01 francis Exp $
+// $Id: fns.php,v 1.38 2005-06-23 23:20:57 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -39,7 +39,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
     }
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
         
-    $values['signature'] = "-- the PledgeBank.com team";
+    $values['signature'] = _("-- the PledgeBank.com team");
 
     $template = file_get_contents("../templates/emails/$template_name");
     $spec = array(
@@ -182,28 +182,25 @@ function view_friends_form($p, $errors = array()) {
     $p->render_box(array('showdetails'=>false));
 ?>
 <form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
-<? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">'; ?>
-<h2>Email this pledge</h2>
-<p>
-Please enter these details so that we can send your message to your contacts.
-We will not give or sell either your or their email address to anyone else.
-</p>
-
-<p><strong>Other people's email addresses:</strong></p>
+<? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">';
+print _('<h2>Email this pledge</h2>');
+print _('<p>Please enter these details so that we can send your message to your contacts.
+We will not give or sell either your or their email address to anyone else.</p>'); ?>
+<p><strong><?=_('Other people\'s email addresses:') ?></strong></p>
 <div class="formrow"><input type="text" name="email1" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email2" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email3" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email4" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email5" value="" size="40"></div>
 
-<p><strong>Add a message, if you want:</strong></p>
+<p><strong><?=_('Add a message, if you want:') ?></strong></p>
 <div class="formrow"><textarea name="frommessage" rows="8" cols="40"></textarea></div>
 
 <p>
-<div class="formrow"><strong>Your name:</strong> <input type="text" name="fromname" value="" size="18">
-<br><strong>Email:</strong> <input type="text" name="fromemail" value="" size="26"></div>
+<div class="formrow"><strong><?=_('Your name:') ?></strong> <input type="text" name="fromname" value="" size="18">
+<br><strong><?=_('Email:') ?></strong> <input type="text" name="fromemail" value="" size="26"></div>
 
-<p><input name="submit" type="submit" value="Send message"></p>
+<p><input name="submit" type="submit" value="<?=_('Send message') ?>"></p>
 
 </form>
 

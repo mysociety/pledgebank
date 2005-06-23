@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.98 2005-06-21 16:51:52 francis Exp $
+ * $Id: pledge.php,v 1.99 2005-06-23 23:20:57 matthew Exp $
  * 
  */
 
@@ -39,13 +39,13 @@ class Pledge {
         if (gettype($ref) == "string") {
             $q = db_query("$main_query_part AND ref ILIKE ?", array($ref));
             if (!db_num_rows($q)) {
-                err('We couldn\'t find that pledge.  Please check the URL again carefully.  Alternatively, try the search at the top right.');
+                err(_('We couldn\'t find that pledge.  Please check the URL again carefully.  Alternatively, try the search at the top right.'));
             }
             $this->data = db_fetch_array($q);
         } elseif (gettype($ref) == "integer") {
             $q = db_query("$main_query_part AND pledges.id = ?", array($ref));
             if (!db_num_rows($q))
-                err('PledgeBank reference not known');
+                err(_('PledgeBank reference not known'));
             $this->data = db_fetch_array($q);
         } elseif (gettype($ref) == "array") {
             $this->data = $ref;
@@ -60,7 +60,7 @@ class Pledge {
      * Lock a pledge in the database using SELECT ... FOR UPDATE. */
     function lock() {
         if (!array_key_exists('id', $this->data))
-            err("Pledge is not present in database");
+            err(_("Pledge is not present in database"));
         else {
             /* Now we have to grab the data again, since it may have changed
              * since the constructor was called. */
@@ -202,12 +202,12 @@ class Pledge {
             $det = htmlspecialchars($this->data['detail']);
             $det = make_clickable($det, array('contract'=>true));
             $det = nl2br($det);
-            print '<p id="moredetails"><strong>More details</strong><br>' . $det . '</p>';
+            print '<p id="moredetails"><strong>' . _('More details') . '</strong><br>' . $det . '</p>';
         }
 ?>
 
 <? if (array_key_exists('reportlink', $params) && $params['reportlink']) { ?>
-<div id="reportpledge"><a href="/abuse?what=pledge&amp;id=<?=$this->id()?>">Anything wrong with this pledge?  Tell us!</a></div>
+<div id="reportpledge"><a href="/abuse?what=pledge&amp;id=<?=$this->id()?>"><?=_('Anything wrong with this pledge?  Tell us!') ?></a></div>
 <? } ?>
 
 </div>
@@ -248,23 +248,23 @@ function pledge_is_error($res) {
 function pledge_strerror($e) {
     switch ($e) {
     case PLEDGE_OK:
-        return "Success";
+        return _("Success");
 
     case PLEDGE_FINISHED:
-        return "That pledge has already finished";
+        return _("That pledge has already finished");
 
     case PLEDGE_FULL:
-        return "That pledge is already full";
+        return _("That pledge is already full");
 
     case PLEDGE_SIGNED:
-        return "You've already signed that pledge";
+        return _("You've already signed that pledge");
 
     case PLEDGE_DENIED:
-        return "Permission denied";
+        return _("Permission denied");
 
     case PLEDGE_ERROR:
     default:
-        return "Something went wrong unexpectedly";
+        return _("Something went wrong unexpectedly");
     }
 }
 
@@ -298,24 +298,22 @@ function pledge_sentence($r, $params = array()) {
     if ($html)
         $r = array_map('htmlspecialchars', $r);
         
-    $s = ($firstperson ? "I" : $r['name']);
-    if ($firstperson === "includename") {
-        $s .= ", " . $r['name'] . ",";
-    }
-    $s .= " will ";
     if (array_key_exists('href', $params)) {
-            $s .= "<a href=\"".$params['href']."\">"
-            . $r['title'] . "</a>";
+        $title = sprintf("<a href=\"%s\">%s</a>", $params['href'], $r['title']);
     } else {
-            $s .= "<strong>" . $r['title'] . "</strong>";
+        $title = sprintf("<strong>%s</strong>", $r['title']);
     }
-    $s .= " but only if "
-            . '<strong>';
-    $s .= prettify($r['target'])
-            . '</strong>'
-            . " ${r['type']} will "
-            . ($r['signup'] == 'do the same' ? 'too' : trim($r['signup']))
-            . ".";
+
+    if ($firstperson) {
+        if ($firstperson === "includename") {
+            $s = sprintf("I, %s, will %s but only if <strong>%s</strong> %s will %s.", $r['name'], $title, prettify($r['target']), $r['type'], ($r['signup'] == 'do the same' ? 'too' : trim($r['signup']) ) );
+        } else {
+            $s = sprintf("I will %s but only if <strong>%s</strong> %s will %s.", $title, prettify($r['target']), $r['type'], ($r['signup'] == 'do the same' ? 'too' : trim($r['signup']) ) );
+        }
+    } else {
+        $s = sprintf("%s will %s but only if <strong>%s</strong> %s will %s.", $r['name'], $title, prettify($r['target']), $r['type'], ($r['signup'] == 'do the same' ? 'too' : trim($r['signup']) ) );
+    }
+
     if (!$html or array_key_exists('href', $params))
         $s = preg_replace('#</?strong>#', '', $s);
 
@@ -335,24 +333,25 @@ function pledge_summary($r, $params) {
     $text = pledge_sentence($r, $params) . ' ';
     if ($r['target'] - $r['signers'] <= 0) {
         if ($r['daysleft'] == 0)
-            $text .= 'Target met, pledge open until midnight tonight, London time.';
+            $text .= _('Target met, pledge open until midnight tonight, London time.');
         elseif ($r['daysleft'] < 0)
-            $text .= 'Target met, pledge over.';
+            $text .= _('Target met, pledge over.');
         else
-            $text .= 'Target met, pledge still open for ' . $r['daysleft'] . ' ' . make_plural($r['daysleft'], 'day', 'days') . '.';
+            $text .= sprintf(ngettext('Target met, pledge still open for %d day.', 'Target met, pledge still open for %d days.', $r['daysleft']), $r['daysleft']);
     } else {
         $left = $r['target'] - $r['signers'];
         if ($r['daysleft'] == 0)
-            $text .= "(needs $left more by midnight tonight, London time)";
+            $text .= sprintf(_("(needs %d more by midnight tonight, London time)"), $left);
         elseif ($r['daysleft'] < 0)
-            $text .= 'Deadline expired, pledge failed.';
+            $text .= _('Deadline expired, pledge failed.');
         else {
             $text .= "(";
             if ($r['daysleft'] <= 3) {
-                $text .= "just ";
+                $text .= sprintf(ngettext('just %d day left', 'just %d days left', $r['daysleft']), $r['daysleft']);
+            } else {
+                $text .= sprintf(ngettext('%d day left', '%d days left', $r['daysleft']), $r['daysleft']);
             }
-            $text .= "${r['daysleft']} " . make_plural($r['daysleft'], 'day', 'days') . " left";
-            $text .=  ", $left more signatures needed)";
+            $text .= sprintf(ngettext(', %d more signature needed)', ', %d more signatures needed)', $left), $left);
         }
     }
     return $text;
@@ -457,14 +456,14 @@ function deal_with_pin($link, $ref, $actual) {
 
     $html = "";
     if (get_http_var('pin')) {
-        $html .= '<p class="finished">Incorrect PIN!</p>';
+        $html .= '<p class="finished">' . _('Incorrect PIN!') . '</p>';
     }
-    $html .= '<p><form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>PIN Protected Pledge</h2><p>This pledge is protected.  Please enter the PIN to proceed.</p>';
-    $html .= '<p><strong>PIN:</strong> <input type="pin" name="pin" value=""><input type="submit" name="submitpin" value="Submit"></p>';
+    $html .= '<p><form class="pledge" name="pledge" action="'.$link.'" method="post">' .
+        _('<h2>PIN Protected Pledge</h2>') . _('<p>This pledge is protected.  Please enter the PIN to proceed.</p>');
+    $html .= '<p><strong>PIN:</strong> <input type="pin" name="pin" value=""><input type="submit" name="submitpin" value="' . _('Submit') . '"></p>';
     $html .= '</form></p>';
     return $html;
 }
-
 
 /* print_link_with_pin
    Prints out a link, normally just using <a href=...>.  Title is for
@@ -530,19 +529,16 @@ function pledge_sign_box() {
 <input type="hidden" name="add_signatory" value="1">
 <input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
-<h2>Sign up now</h2>
-<? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">'; ?>
-<p><b>
-I, <input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="<?=htmlspecialchars($name)?>">,
-sign up to the pledge.<br>Your email: <input type="text" size="30" name="email" value="<?=htmlspecialchars($email) ?>"></b>
-<br><small>(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)</small>
+<?  print _('<h2>Sign up now</h2>');
+    if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">';
+    $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
+    printf(_('<p><b>I, %s, sign up to the pledge.'), $namebox);
+    print '<br>' . _('Your email') . ': <input type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"></b><br><small>';
+    print _('(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)') . '</small>
 </p>
-<p><input type="checkbox" name="showname" value="1"<?=$showname?>> Show my name on this pledge </p>
-<p><input type="submit" name="submit" value="Sign Pledge"> </p>
-</form>
-
-<? 
-
+<p><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name on this pledge') . ' </p>
+<p><input type="submit" name="submit" value="' . _('Sign Pledge') . '"> </p>
+</form>';
 }
 
 /* post_confirm_advertise PLEDGE_ROW
@@ -561,34 +557,29 @@ function post_confirm_advertise($pledge) {
  * Print some stuff advertising flyers for PLEDGE. */
 function post_confirm_advertise_flyers($r) {
     $png_flyers8_url = new_url("/flyers/{$r['ref']}_A4_flyers8.png", false);
-
-    ?>
+?>
 <p class="noprint" align="center"><big><strong>
-You will massively increase the chance of this pledge succeeding if you
 <?
+    print _('You will massively increase the chance of this pledge succeeding if you ');
     if (!$r['pin']) {
-        print_this_link("print this page out", "");
-        ?>
-    (or use <a href="/<?=htmlspecialchars($r['ref']) ?>/flyers">these more attractive PDF and RTF (Word) versions</a>),
-<?
+        print_this_link(_("print this page out"), "");
+        $flyerurl = '<a href="/' . htmlspecialchars($r['ref']) . '/flyers">' . _('these more attractive PDF and RTF (Word) versions') . '</a>';
+        printf(_('(or use %s), cut up the flyers and stick them through your neighbours\' letterboxes.'), $flyerurl);
    } else {
         // TODO - we don't have the PIN raw here, but really want it on
         // form to pass on for link to flyers page.  Not sure how best to fix
         // this up.
-        print_link_with_pin("/".htmlspecialchars($r['ref'])."/flyers", "", "print these pages out");
-        print ",";
+        print_link_with_pin("/".htmlspecialchars($r['ref'])."/flyers", "", _("print these pages out"));
+        print _(", cut up the flyers and stick them through your neighbours' letterboxes.");
    }
-?>
- cut up the flyers and stick them through your neighbours' letterboxes. We
-cannot emphasise this enough &mdash; print them NOW and post them next time you
-go out to the shops or your pledge is unlikely to succeed.</strong></big>
-</p>
-<? 
+    print _('We cannot emphasise this enough &mdash; print them NOW and post them next time you
+go out to the shops or your pledge is unlikely to succeed.') . '</strong></big>
+</p>';
     // Show inline graphics only for PINless pledges (as PNG doesn't
     // work for the PIN protected ones, you can't POST a PIN
     // into an IMG SRC= link)
     if (!$r['pin']) { ?>
-<p align="center"><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
+<p align="center"><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="<?=_('Graphic of flyers for printing') ?>"></a></p>
 <?  }
     post_confirm_advertise_sms($r);
 }
@@ -598,24 +589,19 @@ go out to the shops or your pledge is unlikely to succeed.</strong></big>
  * Only for PINless pledges, since private pledges can't be signed by SMS. */
 function post_confirm_advertise_sms($r) {
     if (!$r['pin']) {
-?>
-<p class="noprint"><strong>Take your Pledge to the pub</strong> &ndash; next time you're out and about,
+        printf(_('<p class="noprint"><strong>Take your Pledge to the pub</strong> &ndash; next time you\'re out and about,
 get your friends to sign up by having them text
-<strong>pledge&nbsp;<?=htmlspecialchars($r['ref'])?></strong> to <strong>60022</strong>.
-The text costs your normal rate, and we'll keep them updated about progress via their
-mobile.</p>
-
-<? # Below not needed as we're currently not charging premium rate
+<strong>pledge&nbsp;%s</strong> to <strong>60022</strong>.
+The text costs your normal rate, and we\'ll keep them updated about progress via their
+mobile.</p>'), htmlspecialchars($r['ref']) );
+# Below not needed as we're currently not charging premium rate
 /* <p class="noprint" style="text-align: center;"><small>The small print: operated by
 mySociety, a project of UK Citizens Online Democracy. Sign-up message costs
 your normal text rate. Further messages from us are free.
 Questions about this SMS service? Call us on 08453&nbsp;330&nbsp;160 or
 email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</small></p> */
-?>
-<?   }
+    }
 }
-
-
 
 /* pledge_delete_pledge ID
  * Delete the pledge with the given ID, and all its signers and comments. */

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.46 2005-06-22 11:53:26 francis Exp $
+// $Id: page.php,v 1.47 2005-06-23 23:20:57 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -20,9 +20,21 @@ function page_header($title, $params = array()) {
     
     $P = person_if_signed_on(true); /* Don't renew any login cookie. */
 
+    require_once 'HTTP.php';
+    $langs = array('en'=>true); # Translations available of PledgeBank
+    $langmap = array('en'=>'en_GB'); # Map of lang to directory
+    $langhtml = array('en'=>'en'); # Map for <html> element
+    $lang = get_http_var('lang');
+    if (!$lang) $lang = HTTP::negotiateLanguage($langs);
+    if ($lang=='en-US' || !$lang) $lang = 'en'; # Default override
+    putenv('LANG='.$langmap[$lang].'.ISO8859-1');
+    setlocale(LC_MESSAGES, $langmap[$lang].'.ISO8859-1');
+    bindtextdomain('PledgeBank', '../../locale');
+    textdomain('PledgeBank');
+
     $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
+<html lang="<?=$langhtml[$lang] ?>">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><?
@@ -30,7 +42,7 @@ function page_header($title, $params = array()) {
         print htmlspecialchars($title) . " - ";
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
-?> PledgeBank - Tell the world "I'll do it, but only if you'll help"</title>
+?> PledgeBank - <?=_("Tell the world \"I'll do it, but only if you'll help\"") ?></title>
 <style type="text/css" media="all">@import url('/pb.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <?
@@ -43,7 +55,7 @@ function page_header($title, $params = array()) {
     }
 
     if (array_key_exists('rss', $params))
-        print '<link rel="alternate" type="application/rss+xml" title="New Pledges at PledgeBank.com" href="/rss">';
+        print '<link rel="alternate" type="application/rss+xml" title="' . _('New Pledges at PledgeBank.com') . '" href="/rss">';
 ?>
 <script type="text/javascript" src="/pb.js"></script>
 </head>
@@ -62,7 +74,8 @@ function page_header($title, $params = array()) {
 
         if (array_key_exists('ref', $params)) {
             $url = $params['ref'];
-            print '<p id="reference">This pledge\'s permanent location: ';
+            print '<p id="reference">';
+            print _('This pledge\'s permanent location: ');
             if (!array_key_exists('noreflink', $params))
                 print '<a href="' . $url . '">';
             print '<strong>'. str_replace('http://', '', $url) . '</strong>';
@@ -74,13 +87,15 @@ function page_header($title, $params = array()) {
             print '</p>';
         }
         if ($P) {
-            print '<p id="signedon">Hello, ';
+            print '<p id="signedon">';
+            print _('Hello, ');
             if ($P->has_name())
                 print htmlspecialchars($P->name);
             else 
                 print htmlspecialchars($P->email);
-            print ' <small>(<a href="/logout">this isn\'t you?  click here</a>)</small>';
-            print '</p>';
+            print ' <small>(<a href="/logout">';
+            print _('this isn\'t you?  click here');
+            print '</a>)</small></p>';
         }
 ?>
 <div id="content"><?    
@@ -88,12 +103,12 @@ function page_header($title, $params = array()) {
     // Warn that we are on a testing site
     $devwarning = array();
     if (OPTION_PB_STAGING) {
-        $devwarning[] = 'This is a test site for developers only. You probably want
-<a href="http://www.pledgebank.com/">the real site</a>.';
+        $devwarning[] = _('This is a test site for developers only. You probably want
+<a href="http://www.pledgebank.com/">the real site</a>.');
     }
     global $pb_today;
     if ($pb_today != date('Y-m-d')) {
-        $devwarning[] = "Note: On this test site, the date is faked to be $pb_today";
+        $devwarning[] = _("Note: On this test site, the date is faked to be") . " $pb_today";
     }
     if (count($devwarning) > 0) {
         ?><p class="noprint" align="center" style="color: #cc0000; background-color: #ffffff; margin-top: 0;"><?
@@ -111,22 +126,22 @@ function page_footer($params = array()) {
         $footer_outputted = 1;
 ?>
 </div>
-<hr class="v"><h2 class="v">Navigation</h2>
+<hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
-<p><label for="s">Search:</label>
-<input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="Go"></p>
+<p><label for="s"><?=_('Search') ?>:</label>
+<input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="<?=_('Go') ?>"></p>
 </form>
 <!-- remove all extraneous whitespace to avoid IE bug -->
-<ul id="nav"><li><a href="/">Home</a></li><li><a href="/all">All Pledges</a></li><li><a href="/your">Your Pledges</a></li><li><a href="/new">Start a Pledge</a></li><li><a href="/faq"><acronym title="Frequently Asked Questions">FAQ</acronym></a></li><li><a href="/contact">Contact</a></li><?
+<ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/all"><?=_('All Pledges') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>">FAQ</acronym></a></li><li><a href="/contact"><?=_('Contact') ?></a></li><?
         $P = person_if_signed_on(true); /* Don't renew any login cookie. */
         if ($P) {
-?><li><a href="/logout">Logout</a></li><?
+?><li><a href="/logout"><?=_('Logout') ?></a></li><?
         } else {
-?><li><a href="/login">Login</a></li><?
+?><li><a href="/login"><?=_('Login') ?></a></li><?
         }
 ?></ul>
 <hr class="v">
-<div id="footer"><a href="http://www.mysociety.org/">Built by mySociety</a>.</div>
+<div id="footer"><a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>. <a href="?lang=en-gb">English</a> | <a href="?lang=fr">Fran&ccedil;ais</a></div>
 <?
     }
 ?>
@@ -151,7 +166,7 @@ function print_this_link($link_text, $after_text) {
 function page_check_ref($ref) {
     if (!is_null(db_getOne('select ref from pledges where ref ilike ?', $ref)))
         return;
-    page_header("We couldn't find that pledge");
+    page_header(_("We couldn't find that pledge"));
     $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);
     if (db_num_rows($s) == 0) {
         print "<p>We couldn't find any pledge with a reference like \"" . htmlspecialchars($ref) . "\". ";
@@ -172,16 +187,16 @@ function page_check_ref($ref) {
                     . "</dd>";
         }
         print "</dl>";
-        print "<p>If none of those look like what you want, try the following:</p>";
+        print _("<p>If none of those look like what you want, try the following:</p>");
     }
 
     print "<p> <ul>
-        <li>If you typed in the location, check it carefully and try typing it again.</li>
-        <li>Look for the pledge on <a href=\"/all\">the list of all pledges</a>.</li>
-        <li>Search for the pledge you want by entering words below.</ul></p>";
+        <li>" . _('If you typed in the location, check it carefully and try typing it again.') . '</li>
+        <li>' . _('Look for the pledge on <a href=\"/all\">the list of all pledges</a>.') . '</li>
+        <li>' . _('Search for the pledge you want by entering words below.') . '</ul></p>';
     ?>
 <form accept-charset="utf-8" action="/search" method="get" class="pledge">
-<label for="s">Search for a pledge:</label>
+<label for="s"><?=_('Search for a pledge') ?>:</label>
 <input type="text" id="s" name="q" size="15" value=""> <input type="submit" value="Go"></p>
 </form>
 <?

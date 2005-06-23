@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.12 2005-06-15 10:47:52 francis Exp $
+ * $Id: pb.php,v 1.13 2005-06-23 23:20:57 matthew Exp $
  * 
  */
 
@@ -41,14 +41,14 @@ ob_start();
  * Display a PHP error message to the user. */
 function pb_handle_error($num, $message, $file, $line, $context) {
     if (OPTION_PB_STAGING) {
-        page_header("Sorry! Something's gone wrong.");
+        page_header(_("Sorry! Something's gone wrong."));
         print("<strong>$message</strong> in $file:$line");
         page_footer();
     } else {
         /* Nuke any existing page output to display the error message. */
         ob_clean();
         /* Message will be in log file, don't display it for cleanliness */
-        $err = '<p>Please try again later, or <a href="mailto:team@pledgebank.com">email us</a> for help resolving the problem.</p>';
+        $err = _('<p>Please try again later, or <a href="mailto:team@pledgebank.com">email us</a> for help resolving the problem.</p>');
         if ($num & E_USER_ERROR) {
             $err = "<p><em>$message</em></p> $err";
         }
@@ -60,11 +60,9 @@ err_set_handler_display('pb_handle_error');
 /* pb_show_error MESSAGE
  * General purpose eror display. */
 function pb_show_error($message) {
-    page_header("Sorry! Something's gone wrong.");
-?>
-<h2>Sorry!  Something's gone wrong.</h2>
-<p><?=$message ?></p>
-<?
+    page_header(_("Sorry! Something's gone wrong."));
+    print _('<h2>Sorry!  Something\'s gone wrong.</h2>') .
+        "\n<p>" . $message . '</p>';
     page_footer();
 }
 

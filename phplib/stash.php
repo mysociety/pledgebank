@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: stash.php,v 1.7 2005-06-06 13:23:48 francis Exp $
+ * $Id: stash.php,v 1.8 2005-06-23 23:20:57 matthew Exp $
  * 
  */
 
@@ -79,7 +79,7 @@ function stash_new_request($method, $url, $params, $extra = null) {
 function stash_redirect($key) {
     list($method, $url, $post_data) = db_getRow_list('select method, url, post_data from requeststash where key = ?', $key);
     if (is_null($method))
-        err("If you got the email more than a week ago, then your request has probably expired.  Please try doing what you were doing from the beginning.");
+        err(_("If you got the email more than a week ago, then your request has probably expired.  Please try doing what you were doing from the beginning."));
     if (headers_sent())
         err("Headers have already been sent in stash_redirect('$key')");
     if ($method == 'GET') {
@@ -113,7 +113,7 @@ function stash_check_for_post_redirect() {
     /* Extract the post data */
     list($method, $url, $post_data) = db_getRow_list('select method, url, post_data from requeststash where key = ?', $key);
     if (is_null($method))
-        err("If you got the email more than a week ago, then your request has probably expired.  Please try doing what you were doing from the beginning.");
+        err(_("If you got the email more than a week ago, then your request has probably expired.  Please try doing what you were doing from the beginning."));
 
     /* Postgres/PEAR DB BYTEA madness -- see comment in auth.php. */
     $post_data = pg_unescape_bytea($post_data);

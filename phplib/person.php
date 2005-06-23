@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.25 2005-06-23 20:51:01 francis Exp $
+ * $Id: person.php,v 1.26 2005-06-23 23:20:57 matthew Exp $
  * 
  */
 
@@ -57,7 +57,7 @@ class Person {
             db_query('update person set name = ? where id = ?', array($name, $this->id));
             $this->name = $name;
         } elseif (is_null($this->name)) {
-            err("Person has no name in name() function"); // try calling name_or_blank or has_name 
+            err(_("Person has no name in name() function")); // try calling name_or_blank or has_name 
         }
         return $this->name;
     }
@@ -101,7 +101,7 @@ class Person {
         if (!$this->name)
             return false;
         if (!$newname) 
-            err("Name expected in matches_name");
+            err(_("Name expected in matches_name"));
         return person_canonicalise_name($newname) == person_canonicalise_name($this->name);
     }
 
@@ -109,7 +109,7 @@ class Person {
      * Set the person's PASSWORD. */
     function password($password) {
         if (is_null($password))
-            err("PASSWORD must not be null in password method");
+            err(_("PASSWORD must not be null in password method"));
         db_query('update person set password = ? where id = ?', array(crypt($password), $this->id));
     }
 

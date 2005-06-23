@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.24 2005-06-22 12:15:29 francis Exp $
+ * $Id: comments.php,v 1.25 2005-06-23 20:51:01 francis Exp $
  * 
  */
 
@@ -137,7 +137,7 @@ function latest_comments() { ?>
 
 function comments_form($pledge_id, $nextn, $allow_post = false) {
     global $q_h_comment_id;
-    global $q_h_author_name, $q_h_author_email, $q_h_author_website;
+    global $q_h_author_name, $q_h_author_email, $q_h_author_website, $q_comment_alert_signup;
     global $q_h_text;
 
     $P = person_if_signed_on();
@@ -149,6 +149,8 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
         if (is_null($q_h_author_website) || !$q_h_author_website)
             $q_h_author_website = htmlspecialchars($P->website_or_blank());
     }
+    if ($nextn == 1 && (is_null($q_comment_alert_signup) || !$q_comment_alert_signup))
+        $q_comment_alert_signup = 1;
     
 ?>
 <form method="POST" action="comment.php" id="commentform" name="commentform" class="pledge">
@@ -166,22 +168,24 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 </div>
 
 <div class="form_row">
-<label for="author_website">Your web site</label> <small><i>(Optional)</i></small>
+<label for="author_website">Your web site</label> <small><i>(optional)</i></small>
   <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="30">
 </div>
 
-<div class="form_row">
-<label for="text">Your comment</label>
-  <textarea style="max-width: 100%" name="text" id="text" cols="40" rows="10"><?=$q_h_text?></textarea>
+<p><strong>Your comment</strong>
+<br><textarea style="max-width: 100%" name="text" id="text" cols="40" rows="10"><?=$q_h_text?></textarea>
+</p>
 
 <? if ($q_h_comment_id) { ?>
 <input type="hidden" name="comment_id" value="<?=$q_h_comment_id?>">
 <? } ?>
 <input type="hidden" name="n" value="<?=$nextn?>">
-</div>
 
-<p><small>(Your name and web site, if given, will be shown on your comment,
-but your email address will not be)</small></p>
+<p><small>Your name and web site, if given, will be shown on your comment,
+but your email address will not be.</small></p>
+
+<p><input type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ? "checked" : ""?>>
+Email me any replies to my comment</input></p>
 
 <p><input type="submit" name="preview" value="Preview">
 <? if ($allow_post) { ?>

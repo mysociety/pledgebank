@@ -1,0 +1,115 @@
+#!/usr/local/bin/php -q
+<?php
+/* 
+ * sendalerts:
+ * Run from cron regularly to send email alerts.
+ *
+ * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: sendalerts,v 1.1 2005-06-23 20:51:01 francis Exp $
+ *
+ */
+
+require_once "../conf/general";
+require_once '../phplib/db.php';
+require_once '../phplib/fns.php';
+require_once "../phplib/auth.php";
+require_once "../phplib/person.php";
+require_once "../phplib/alert.php";
+require_once '../../phplib/utility.php';
+
+function verbose($str) {
+    global $verbose;
+    if ($verbose) 
+        fwrite(STDERR, "sendalerts: $str\n");
+}
+function error($str) {
+    fwrite(STDERR, "sendalerts: ERROR: $str\n");
+}
+
+$short_opts = '';
+$long_opts = array('verbose','help');
+require_once 'phpcgi';
+
+$switches = $options[0];
+$args = $options[1];
+$verbose = 0; 
+foreach ($switches as $switch) {
+    if ($switch[0]=='--verbose') $verbose = 1;
+    if ($switch[0]=='--help') {
+?>
+
+PledgeBank alert sending script.  This sends emails for any
+new events which people are signed up to be told about.
+
+Usage: sendalerts [--verbose]
+
+--help      Display this help message
+--verbose   Display more information
+
+<?
+        exit;
+    }
+}
+
+// Main code at end.
+
+// send_comment_alerts sends alerts for new comments on a pledge
+function send_comment_alerts() {
+    verbose("sending comment alerts");
+
+    // Search for alert
+    $q = db_query("
+            select alert.id as alert_id, alert.person_id, alert.pledge_id, comment.id as comment_id,
+                   comment.text as comment_text,
+                   comment.name as comment_author_name,
+                   comment.website as comment_author_website,
+                   pledges.*,
+                   alerted.name as alerted_name,
+                   alerted.email as alerted_email
+            from alert
+                left join comment on alert.pledge_id = comment.pledge_id
+                left join pledges on alert.pledge_id = pledges.id
+                left join person as alerted on alert.person_id = alerted.id
+            where
+                event_code = 'comments/ref' and
+                whenposted >= whensubscribed and
+                (select whenqueued from alert_sent where
+                    alert_sent.alert_id = alert.id and
+                    alert_sent.comment_id = comment.id) is null
+                and comment.person_id <> alert.person_id
+            order by whenposted
+            ");
+
+    while ($row = db_fetch_array($q)) {
+        verbose("person #${row['person_id']} (${row['alerted_name']}) has alert on pledge ${row['ref']} for comment #${row['comment_id']} (by ${row['comment_author_name']})");
+
+        # Store that alert has been send
+        db_query("
+                insert into alert_sent (
+                    alert_id, comment_id
+                ) values (
+                    ?, ?
+                )", array($row['alert_id'], $row['comment_id']));
+
+        # Send email
+        $pledge = new Pledge($row);
+        $row['comment_url'] = $pledge->url_comments();
+        $row['comment_text'] = trim($row['comment_text']);
+        $row['unsubscribe_url'] = alert_unsubscribe_link($row['alert_id'], $row['alerted_email']);
+        $f = pb_send_email_template($row['alerted_email'], 'alert-comment', $row, array());
+        if (!$f) {
+            err("Failed to send comment alert to " . $row['alerted_email'] . " alert #" . $row['alert_id'] . " comment #" . $row['comment_id']);
+        }
+
+        # Commit that it has been sent
+        db_commit();
+    }
+
+    verbose("finished sending comment alerts");
+}
+
+db_connect();
+send_comment_alerts();
+

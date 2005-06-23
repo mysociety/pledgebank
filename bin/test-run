@@ -30,7 +30,7 @@
 #   more complex prominence stuff
 #   Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.102 2005-06-22 11:18:24 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.103 2005-06-23 20:51:01 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -178,6 +178,8 @@ if ($action_all) {
 }
 
 # Check for any unhandled mails or errors
+call_frequentupdate();
+call_sendalerts();
 $wth->email_check_none_left();
 sms_check_none_left();
 $wth->log_watcher_check();
@@ -421,6 +423,12 @@ sub call_frequentupdate {
         and die "Failed to call frequentupdate";
 }
 
+# Call sendalerts cron job
+sub call_sendalerts {
+    system("php", "sendalerts", $verbose > 1 ? qw(--verbose) : ()) 
+        and die "Failed to call sendalerts";
+}
+
 # Call find-pledge-connections cron job
 sub call_findpledgeconnections {
     system("./find-pledge-connections", $verbose > 1 ? qw(--verbose) : ()) 
@@ -480,7 +488,8 @@ sub do_public_succeeding_pledge {
         { action => "viaemail" }
     );
 
-    # Add a comment
+    # Add a comment, which will subscribe user 90 to comment alerts
+    # (TODO: put these three comment posts in a local function)
     $wth->browser_get($base_url . "/$pledge_ref");
     $wth->browser_submit_form(form_name => 'commentform',
         fields => {
@@ -496,6 +505,45 @@ sub do_public_succeeding_pledge {
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("Do I have to be a computer to take part?");
     $wth->email_get_containing('%To: '.email_n(0).  '%has left a comment on your pledge%');
+    # Add another comment so its email goes
+    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_submit_form(form_name => 'commentform',
+        fields => {
+            author_name => name_n(91), author_email => email_n(91),
+            text => "This is a second comment, which should be sent by email to first commenter."
+        },
+        button => 'preview');
+    $wth->browser_check_contents("This is a second comment");
+    $wth->browser_submit_form(form_name => 'commentform', fields => {}, button => 'submit');
+    perform_login_action(91, {action=>"viaemail"}, "comment will then be displayed");
+    $wth->browser_check_contents("Your comment has now been posted");
+    $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
+    $wth->browser_check_contents("This is a second comment");
+    call_sendalerts();
+    $wth->email_get_containing('%To: '.email_n(0).  '%has left a comment on your pledge%');
+    my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%This is a second comment%');
+    $wth->email_check_none_left();
+    die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\s($base_url/L/.*$)#m);
+    my $comment_unsubscribe_url = $1;
+    $wth->get($comment_unsubscribe_url);
+    $wth->browser_check_contents("You won't receive more email");
+    # Send third comment, check don't get alert
+    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_submit_form(form_name => 'commentform',
+        fields => {
+            author_name => name_n(91), author_email => email_n(91),
+            text => "This is a third comment, which should not be sent by email to first commenter."
+        },
+        button => 'preview');
+    $wth->browser_check_contents("This is a third comment");
+    $wth->browser_submit_form(form_name => 'commentform', fields => {}, button => 'submit');
+    perform_login_action(91, {action=>"viaemail"}, "comment will then be displayed");
+    $wth->browser_check_contents("Your comment has now been posted");
+    $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
+    $wth->browser_check_contents("This is a third comment");
+    call_sendalerts();
+    $wth->email_get_containing('%To: '.email_n(0).  '%has left a comment on your pledge%');
+    $wth->email_check_none_left();
 
     # Mail pledge to friends
     $wth->browser_get($base_url . "/$pledge_ref");

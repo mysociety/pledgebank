@@ -85,6 +85,7 @@ Sent to creator when admin gives them an announcement to signers.
   - url, the URL for confirmation.
 
 * comment-creator
+TODO: migrate this to alert-comment system
 Sent to creator when a comment is added to a pledge.
   - comment_url, link to the comment
   - comment_text, body text of the comment
@@ -106,5 +107,16 @@ Sent by someone to tell their friends about a pledge.
   - from_email, email address of sender
   - from_message, if present a paragraph with the message from sender to their
     friend, including intro and quotes, otherwise empty string
+
+*************************************************************************
+
+* alert-comment
+Sent when a new comment is posted on a pledge, to people who are 
+subscribed for that notification.
+  - comment_url, link to the comment
+  - comment_text, body text of the comment
+  - comment_author_name, name of commenter
+  - comment_author_website, website of commenter
+  - unsubscribe_url, link to unsubscribe from these alerts
 
 *************************************************************************

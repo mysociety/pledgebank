@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.10 2005-06-16 07:31:49 matthew Exp $
+// $Id: alert.php,v 1.11 2005-06-23 20:51:01 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -24,6 +24,19 @@ if (get_http_var('subscribe_alert')) {
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
         local_alert_subscribe_box();
+    }
+} elseif (get_http_var('direct_unsubscribe')) {
+    // Clicked from email to unsubscribe
+    $alert_id = get_http_var('direct_unsubscribe');
+    $P = person_if_signed_on();
+    if (!$P) 
+        err('Unexpectedly not signed on after following unsubscribe link');
+    $desc = alert_h_description($alert_id);
+    if ($desc) {
+        alert_unsubscribe($P->id(), $alert_id);
+        print "<p>Thanks!  You won't receive more email about " . $desc . ".</p>";
+    } else {
+        print "<p>Thanks!  You are already unsubscribed from that alert.</p>";
     }
 } else {
     local_alert_subscribe_box();

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.24 2005-06-22 12:15:29 francis Exp $
+ * $Id: person.php,v 1.25 2005-06-23 20:51:01 francis Exp $
  * 
  */
 
@@ -294,8 +294,8 @@ function person_signoff() {
 /* person_make_signon_url DATA EMAIL METHOD URL PARAMETERS
  * Returns a URL which, if clicked on, will log the user in as EMAIL and have
  * them do the request described by METHOD, URL and PARAMETERS (as used in
- * stash_new_request). DATA is as for person_signon (but the 'template'
- * entry is unlikely to be used since presumably the caller is constructing
+ * stash_new_request). DATA is as for person_signon (but the 'template' and
+ * 'reason_' entires won't be used since presumably the caller is constructing
  * its own email to send). */
 function person_make_signon_url($data, $email, $method, $url, $params) {
     $st = stash_new_request($method, $url, $params, $data);

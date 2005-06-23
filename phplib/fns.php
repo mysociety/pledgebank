@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.36 2005-06-21 08:41:58 francis Exp $
+// $Id: fns.php,v 1.37 2005-06-23 20:51:01 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -102,7 +102,7 @@ function prettify($s, $html = true) {
             return date('j<\sup>S</\sup> F Y', $e)." $tim";
         return date('jS F Y', $e)." $tim";
     }
-    if ($s>1000000000) {
+    if ($s>100000000) {
         # Assume it's an epoch
         $tt = strftime('%H:%M', $s);
         $t = time();

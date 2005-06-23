@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.117 2005-06-22 12:15:29 francis Exp $
+-- $Id: schema.sql,v 1.118 2005-06-23 20:51:01 francis Exp $
 --
 
 -- secret
@@ -956,6 +956,41 @@ create table local_alert (
 
 create unique index local_alert_person_id_idx on local_alert(person_id);
 
+-- get emailed when various events happen
+create table alert (
+    id serial not null primary key,
+    person_id integer not null references person(id),
+    event_code text not null,
+
+    -- ref indicates a pledge reference
+    check (event_code = 'comments/ref' or
+           event_code = 'pledges/local/GB'),
+
+    -- specific pledge for "ref/" event codes
+    pledge_id integer references pledges(id),
+
+    whensubscribed timestamp not null default pb_current_timestamp()
+);
+
+create index alert_person_id_idx on alert(person_id);
+create index alert_event_code_idx on alert(event_code);
+create index alert_pledge_id_idx on alert(pledge_id);
+
+create table alert_sent (
+    alert_id integer not null references alert(id),
+    
+    -- which pledge for event codes "pledges/"
+    pledge_id integer references comment(id),
+    -- which comment for event code "/comments"
+    comment_id integer references comment(id),
+
+    whenqueued timestamp not null default pb_current_timestamp()
+);
+
+create index alert_sent_alert_id_idx on alert_sent(alert_id);
+create index alert_sent_pledge_id_idx on alert_sent(pledge_id);
+create index alert_sent_comment_id_idx on alert_sent(comment_id);
+
 -- table of abuse reports on comments, pledges and signers.
 create table abusereport (
     id serial not null primary key,
@@ -1057,3 +1092,8 @@ create function pb_delete_comment(integer)
         return;
     end
 ' language 'plpgsql';
+
+
+
+
+

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.37 2005-06-21 11:53:54 francis Exp $
+ * $Id: frequentupdate,v 1.38 2005-06-23 20:51:01 francis Exp $
  *
  */
 
@@ -29,7 +29,7 @@ function error($str) {
 }
 
 $short_opts = '';
-$long_opts = array('verbose','testrun','help');
+$long_opts = array('verbose','help');
 require_once 'phpcgi';
 
 $switches = $options[0];
@@ -348,13 +348,8 @@ function send_pending_messages() {
             $msg['circumstance'] == 'success-auto-creator-reminder' or
             $msg['circumstance'] == 'failure-auto-creator' or
             $msg['circumstance'] == 'announce-post') {
-            $url = person_make_signon_url(array(
-                    "reason_web" => "Before you can send a message to all the signers, we need to check that you created the pledge.",
-                    "reason_email" => "Then you will be able to send a message to everyone who has signed your pledge.",
-                    "reason_email_subject" => "Send a message to your pledge signers at PledgeBank.com"),
-
-                $pledge->creator_email(), "GET", $pledge->url_announce(), array());
-            $data['url'] = $url;
+            $data['url'] = person_make_signon_url(array(), $pledge->creator_email(), 
+                "GET", $pledge->url_announce(), array());
         }
         // Number of signers reached at current probably rate
         if ($msg['circumstance'] == 'chivvy-creator-lowrate') {

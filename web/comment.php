@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.17 2005-06-22 12:15:29 francis Exp $
+ * $Id: comment.php,v 1.18 2005-06-23 20:51:01 francis Exp $
  * 
  */
 
@@ -16,6 +16,7 @@ require_once('../../phplib/emailaddress.php');
 
 require_once('../phplib/pledge.php');
 require_once('../phplib/comments.php');
+require_once('../phplib/alert.php');
 
 $err = importparams(
             array('pledge_id',          '/^[1-9][0-9]*$/',      "Missing pledge id"),
@@ -50,6 +51,7 @@ $err = importparams(
             array('author_name',        '//',                   "",     null),
             array('author_email',       '//',                   "",     null),
             array('author_website',     '//',                   "",     null),
+            array('comment_alert_signup',     '/./',                   "",     false),
             array('text',               '//',                   "",     ""),
             array('n',                  '/^[0-9]+$/',           "",     0),
             array('submit',             '//',                   "",     false)
@@ -93,7 +95,7 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
 
     /* Actually post the comment. Guard against double-insertion. */
     $id = db_getOne('select id from comment where id = ? for update', $comment_id);
-    if (is_null($id))
+    if (is_null($id)) {
         db_query('
                 insert into comment (id, pledge_id, person_id, name, website, text)
                 values (
@@ -105,6 +107,10 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
                     $P->id(), $q_author_name, $q_author_website,
                     $q_text
                 ));
+        if ($q_comment_alert_signup) {
+            alert_signup($P->id(), "comments/ref", array('pledge_id' => $pledge->id()));
+        }
+    }
     db_commit();
     $values = $pledge->data;
     $values['comment_text'] = $q_text;
@@ -116,9 +122,10 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     if (!$success) {
         err("Problems sending message to pledge creator.");
     }
-    print <<<EOF
-<p>Thank you! Your comment has now been posted.</p>
-EOF;
+    print "<p>Thank you! Your comment has now been posted.";
+    if ($q_comment_alert_signup)
+        print " You will be emailed when anyone adds a comment to the pledge.";
+    print "</p>";
     if (is_null($pledge->pin()))
         print <<<EOF
 <p><a href="/$ref#comments">Go back to the pledge comments</a></p>
@@ -140,22 +147,18 @@ EOF;
                     . implode('</li><li>', array_map('htmlspecialchars', $err))
                     . '</li></div>';
 
-        print "<h2>Here's how your comment will appear</h2><blockquote class=\"noindent\">";
-        comments_show_one(array('name' => $q_author_name, 'email' => $q_author_email, 'website' => $q_author_website, 'text' => $q_text));
-        print '</blockquote>';
-        print '<p></p>';
+        print '<div id="preview"><div id="comments">';
+        print "<h2>Here's how your comment will appear</h2>";
+        print '<ul class="commentslist"><li class="comment">';
+        comments_show_one(array('name' => $q_author_name, 'email' => $q_author_email, 
+                'website' => $q_author_website, 'text' => $q_text, 
+                'whenposted' => strval($pb_time)));
+        print '</li></ul></div></div>';
     }
 
+    print "\n\n" . '<div id="comments">';
     comments_form($pledge_id, $nextn, sizeof($err) == 0);
-
-    print <<<EOF
-    </td>
-</tr>
-</table>
-
-</form>
-</div>
-EOF;
+    print '</div>';
 }
 
 page_footer();

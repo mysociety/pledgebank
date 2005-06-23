@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: logout.php,v 1.5 2005-06-11 19:54:01 chris Exp $
+ * $Id: logout.php,v 1.6 2005-06-23 23:32:32 matthew Exp $
  * 
  */
 
@@ -21,12 +21,8 @@ if (person_if_signed_on(true)) {
     exit;
 }
 
-page_header('Logged out');
-
-?>
-<p>You're now logged out.  Thanks for using PledgeBank!</p>
-<?
-
+page_header(_('Logged out'));
+print _('<p>You\'re now logged out.  Thanks for using PledgeBank!</p>');
 page_footer();
 
 ?>

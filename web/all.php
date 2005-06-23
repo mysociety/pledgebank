@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.21 2005-06-21 16:51:53 francis Exp $
+// $Id: all.php,v 1.22 2005-06-23 23:32:32 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -19,10 +19,10 @@ $err = importparams(
             array('sort', '/^(title|target|date|name|ref|creationtime)$/', '', 'date')
         );
 if ($err) {
-    err('Illegal offset or sort parameter passed');
+    err(_('Illegal offset or sort parameter passed'));
 }
 
-page_header("All Pledges", array('id'=>'all'));
+page_header(_("All Pledges"), array('id'=>'all'));
 
 $ntotal = db_getOne("
                 select count(id)
@@ -49,7 +49,7 @@ $qrows = db_query("
             ORDER BY $sort_phrase LIMIT ? OFFSET $q_offset", PAGE_SIZE);
 /* PG bug: mustn't quote parameter of offset */
 
-print "<h2>All Pledges <small>(which at least a few people have signed up to)</small></h2>";
+print _("<h2>All Pledges <small>(which at least a few people have signed up to)</small></h2>");
 if ($ntotal > 0) {
     
     $navlinks = '';
@@ -85,7 +85,7 @@ if ($ntotal > 0) {
     if ($ntotal > PAGE_SIZE)
         print "<br style=\"clear: both;\">$navlinks";
 } else {
-    print '<p>There are currently none.</p>';
+    print _('<p>There are currently none.</p>');
 }
 
 page_footer();

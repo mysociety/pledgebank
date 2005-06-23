@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.189 2005-06-16 07:31:49 matthew Exp $
+// $Id: index.php,v 1.190 2005-06-23 23:32:32 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -28,34 +28,34 @@ function front_page() {
         } ?>
 <form accept-charset="utf-8" id="localsignup" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_alert" value="1">
-<p><strong>Get emails about local pledges &mdash;</strong>
-<label for="email">Email:</label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
-<label for="postcode">UK Postcode:</label><input type="text" size="12" name="postcode" id="postcode" value="">
+<p><strong><?=_('Get emails about local pledges') ?> &mdash;</strong>
+<label for="email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
+<label for="postcode"><?=_('UK Postcode:') ?></label><input type="text" size="12" name="postcode" id="postcode" value="">
 
-<input type="submit" name="submit" value="Subscribe"> </p>
+<input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 <?  } ?>
 
 <div id="tellworld">
-<h2>Tell the world &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
+<h2><?=_('Tell the world &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;') ?></h2>
 <blockquote class="noindent"><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
 alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;
 "></a>
-"We all know what it is like to feel powerless, that our own actions
-can't really change the things that we want to change.  PledgeBank is
-about beating that feeling..."
+<?=_('"We all know what it is like to feel powerless, that our own actions
+can\'t really change the things that we want to change.  PledgeBank is
+about beating that feeling..."') ?>
 </blockquote>
-<p><a href="tom-on-pledgebank-vbr.mp3">Listen to how PledgeBank
-works</a>, as explained by mySociety's director Tom Steinberg.
-Or <a href="/explain">read a full transcript</a>.</p>
+<p><a href="tom-on-pledgebank-vbr.mp3"><?=_('Listen to how PledgeBank
+works</a>, as explained by mySociety\'s director Tom Steinberg.
+Or <a href="/explain">read a full transcript') ?></a>.</p>
 </div>
 
 <div id="startblurb">
-<h2>Start your own pledge</h2>
-<p>Pledgebank is free and easy to use. Once you've thought of something you'd like
-to do, just <a href="/new">create a pledge</a> which says "I'll do this, but
-only if 5 other people will do the same".
-<p id="start"><a href="./new">Start your own pledge&nbsp;&raquo;</a></p>
+<h2><?=_('Start your own pledge') ?></h2>
+<p><?=_('Pledgebank is free and easy to use. Once you\'ve thought of something you\'d like
+to do, just <a href="/new">create a pledge</a> which says "I\'ll do this, but
+only if 5 other people will do the same".') ?>
+<p id="start"><a href="./new"><?=_('Start your own pledge&nbsp;&raquo;') ?></a></p>
 </div>
 
 <div id="currentpledges">
@@ -63,8 +63,8 @@ only if 5 other people will do the same".
 <?    list_successful_pledges(); ?>
 </div>
 
-<div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-text-275px.jpg" alt="How scissors, a phone and some printouts
-can make your pledge succeed &raquo;"></a></div>
+<div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-text-275px.jpg" alt="<?=_('How scissors, a phone and some printouts
+can make your pledge succeed &raquo;') ?>"></a></div>
 
 <?  latest_comments();
 
@@ -85,7 +85,7 @@ function get_pledges_list($query) {
 }
 
 function list_newest_pledges() {
-?><h2>Sign up to one of our five newest pledges</h2><?
+    print '<h2>' . _('Sign up to one of our five newest pledges') . '</h2>';
 
     $pledges = get_pledges_list("
                 SELECT *, date - pb_current_date() AS daysleft
@@ -95,15 +95,15 @@ function list_newest_pledges() {
                 ORDER BY id DESC
                 DESC LIMIT 5");
     if (!$pledges) {
-        print '<p>There are no new pledges at the moment.</p>';
+        print '<p>' . _('There are no new pledges at the moment.') . '</p>';
     } else {
         print '<ol>'.$pledges.'</ol>';
     }
 }
 
 function list_frontpage_pledges() {
-?><a href="/rss"><img align="right" border="0" src="rss.gif" alt="RSS feed of newest pledges"></a>
-<h2>Why not sign a live pledge?</h2><?
+?><a href="/rss"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of newest pledges') ?>"></a>
+<h2><?=_('Why not sign a live pledge?') ?></h2><?
 
     $pledges = get_pledges_list("
                 SELECT *, date - pb_current_date() AS daysleft
@@ -116,14 +116,14 @@ function list_frontpage_pledges() {
                 whensucceeded IS NULL
                 ORDER BY RANDOM()");
     if (!$pledges) {
-        print '<p>There are no featured pledges at the moment.</p>';
+        print '<p>' . _('There are no featured pledges at the moment.') . '</p>';
     } else {
-        print '<ol>'.$pledges.'</ol>';
+        print '<ol>' . $pledges . '</ol>';
     }
 }
 
 function list_successful_pledges() {
-?><h2>Recent successful pledges</h2><?
+    print '<h2>' . _('Recent successful pledges') . '</h2>';
     $pledges = get_pledges_list("
                 SELECT *, date - pb_current_date() AS daysleft
                 FROM pledges
@@ -135,11 +135,10 @@ function list_successful_pledges() {
                 ORDER BY whensucceeded DESC
                 LIMIT 10");
     if (!$pledges) {
-        print '<p>There are no featured pledges at the moment.</p>';
+        print '<p>' . _('There are no featured pledges at the moment.') . '</p>';
     } else {
         print '<ol>'.$pledges.'</ol>';
     }
 }
-
 
 ?>

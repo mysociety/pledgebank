@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.7 2005-06-12 22:00:44 chris Exp $
+// $Id: ref-flyers.php,v 1.8 2005-06-23 23:32:32 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -17,13 +17,13 @@ $p  = new Pledge(get_http_var('ref'));
 
 $pin_box = deal_with_pin($p->url_flyers(), $p->ref(), $p->pin());
 if ($pin_box) {
-    page_header("Enter PIN"); 
+    page_header(_("Enter PIN"));
     print $pin_box;
     page_footer();
     exit;
 }
 
-$title = "Flyers";
+$title = _("Flyers");
 page_header($title, array('ref' => $p->url_main()) );
 
 $pdf_flyers8_url = $p->url_flyer("A4_flyers8.pdf");
@@ -54,7 +54,7 @@ if (!get_http_var('pin')) {
 to get these flyers.
 </p>
 
-<p><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="Graphic of flyers for printing"></a></p>
+<p><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="<?=_('Graphic of flyers for printing') ?>"></a></p>
 <?  
 }
 

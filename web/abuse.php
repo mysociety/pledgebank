@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.10 2005-06-18 00:09:45 francis Exp $
+// $Id: abuse.php,v 1.11 2005-06-23 23:32:32 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -14,7 +14,7 @@ require_once '../phplib/comments.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
-page_header('Report Abuse');
+page_header(_('Report Abuse'));
 report_abusive_thing();
 page_footer();
 
@@ -30,22 +30,24 @@ function report_abusive_thing() {
                 array('reason',     '//',                           '', null)
             );
     if (!is_null($errors))
-        err("A required parameter was missing.  " . join(" ",$errors));
+        err(_("A required parameter was missing.  ") . join(" ",$errors));
 
     /* Find information about the associated pledge. */
     $w = $q_what;
     if ($q_what == 'pledge')
+        $w = _('pledge');
         $pledge_id = db_getOne('select id from pledges where id = ?', $q_id);
     elseif ($q_what == 'comment')
+        $w = _('comment');
         $pledge_id = db_getOne('select pledge_id from comment where id = ?', $q_id);
     elseif ($q_what == 'signer') {
-        $w = 'signature';
+        $w = _('signature');
         $pledge_id = db_getOne('select pledge_id from signers where id = ?', $q_id);
     }
 
     if (is_null($pledge_id)) {
-        print "<h2>Report abuse</h2>";
-        print "The $w couldn't be found.  It has probably been deleted already.";
+        print _('<h2>Report abuse</h2>');
+        printf(_("The %s couldn't be found.  It has probably been deleted already."), $w);
         return;
     }
 
@@ -55,33 +57,26 @@ function report_abusive_thing() {
             array($q_what, $q_id, $q_reason, $ip));
         db_commit();
         $admin_url = OPTION_ADMIN_URL . "/?page=pbabusereports&what=" . $q_what;
-        pb_send_email(OPTION_CONTACT_EMAIL, "PledgeBank abuse report", <<<EOF
+        pb_send_email(OPTION_CONTACT_EMAIL, _("PledgeBank abuse report"), _(<<<EOF
 New abuse report for $q_what id $q_id from IP $ip.
 
 $admin_url
 
 Reason given: $q_reason
 EOF
-);
-        print <<<EOF
-<p><strong>Thank you!</strong> One of our team will investigate that $w as soon
-as possible. </p>
-
-<p><a href="./">Return to the home page</a>.</p>
-EOF;
+));
+        printf(_('<p><strong>Thank you!</strong> One of our team will investigate that %s as soon
+as possible. </p>'), $w);
+        print _('<p><a href="./">Return to the home page</a>.</p>');
         return;
     }
 
     $title = htmlspecialchars(db_getOne('select title from pledges where id = ?', $pledge_id));
 
-    print <<<EOF
-<form accept-charset="utf-8" action="abuse" method="post" name="abuse" class="pledge">
-<h2>Report something wrong with a $w</h2>
-<p>You are reporting the following $w as being abusive, suspicious or having
-something wrong with it.</p> 
-<blockquote>
-EOF;
-
+    print '<form accept-charset="utf-8" action="abuse" method="post" name="abuse" class="pledge">';
+    printf(_('<h2>Report something wrong with a %s</h2>'), $w);
+    printf(_('<p>You are reporting the following %s as being abusive, suspicious or having something wrong with it.</p>'), $w);
+    print '<blockquote>';
     if ($q_what == 'pledge') {
         print $title;
     } elseif ($q_what == 'signer') {
@@ -92,19 +87,18 @@ EOF;
     }
     print '</blockquote>';
     if ($q_what != 'pledge') {
-        print "<p>This is on the pledge <strong>$title</strong>.</p>";
+        printf(_("<p>This is on the pledge <strong>%s</strong>.</p>"), $title);
     }
 
     print <<<EOF
 <input type="hidden" name="abusive" value="1">
 <input type="hidden" name="what" value="$q_h_what">
 <input type="hidden" name="id" value="$q_h_id">
-<p>Please give a short reason for reporting this $w.<br>
-<input type="text" name="reason" size="60"></p>
-<p><input name="submit" type="submit" value="Submit"></p>
-</form>
 EOF;
+    printf(_('<p>Please give a short reason for reporting this %s.<br>'), $w);
+    print '<input type="text" name="reason" size="60"></p>
+<p><input name="submit" type="submit" value="' . _('Submit') . '"></p>
+</form>';
 
 }
-
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.7 2005-06-20 17:24:46 francis Exp $
+// $Id: search.php,v 1.8 2005-06-23 11:02:41 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -22,7 +22,7 @@ function search() {
 
     $out = ''; $success = 0;
     $search = get_http_var('q');
-    $q = db_query("$pledge_select FROM pledges WHERE ref ILIKE ?", $search);
+    $q = db_query("$pledge_select FROM pledges WHERE pin is NULL AND ref ILIKE ?", $search);
     if (db_num_rows($q)) {
         $success = 1;
         $r = db_fetch_array($q);
@@ -72,7 +72,8 @@ function search() {
                           extract(epoch from whenposted) as whenposted,
                           text,comment.name,website,ref 
                    FROM comment,pledges 
-                   WHERE comment.pledge_id = pledges.id 
+                   WHERE pin IS NULL
+                        AND comment.pledge_id = pledges.id 
                         AND NOT ishidden 
                         AND text ILIKE \'%\' || ? || \'%\'
                    ORDER BY whenposted DESC', array($search));
@@ -89,11 +90,11 @@ function search() {
     }
 
     $people = array();
-    $q = db_query('SELECT ref, title, name FROM pledges WHERE confirmed AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    $q = db_query('SELECT ref, title, name FROM pledges WHERE confirmed AND pin IS NULL AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
     while ($r = db_fetch_array($q)) {
         $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
     }
-    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges WHERE showname AND signers.pledge_id = pledges.id AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges WHERE showname AND pin IS NULL AND signers.pledge_id = pledges.id AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
     while ($r = db_fetch_array($q)) {
         $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
     }

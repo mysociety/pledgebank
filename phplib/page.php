@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.48 2005-06-24 12:27:01 matthew Exp $
+// $Id: page.php,v 1.49 2005-06-24 12:39:38 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -141,7 +141,7 @@ function page_footer($params = array()) {
         }
 ?></ul>
 <hr class="v">
-<div id="footer"><a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>. <a href="?lang=en-gb">English</a> | <a href="?lang=fr">Fran&ccedil;ais</a></div>
+<div id="footer"><a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
 <?
     }
 ?>

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.18 2005-06-23 20:51:01 francis Exp $
+ * $Id: comment.php,v 1.19 2005-06-24 10:03:20 matthew Exp $
  * 
  */
 
@@ -19,13 +19,13 @@ require_once('../phplib/comments.php');
 require_once('../phplib/alert.php');
 
 $err = importparams(
-            array('pledge_id',          '/^[1-9][0-9]*$/',      "Missing pledge id"),
-            array('pin',                 '//',                  "Missing PIN",     null),
-            array('comment_id',         '/^[1-9][0-9]*$/',      "Missing comment id",     null)
+            array('pledge_id',          '/^[1-9][0-9]*$/',      _("Missing pledge id")),
+            array('pin',                 '//',                  _("Missing PIN"),     null),
+            array('comment_id',         '/^[1-9][0-9]*$/',      _("Missing comment id"),     null)
         );
 
 if (!is_null($err))
-    err("Sorry -- something seems to have gone wrong");
+    err(_("Sorry -- something seems to have gone wrong"));
 
 /* Allocate a comment ID here to stop double-posting. */
 if (is_null($q_comment_id)) {
@@ -40,11 +40,11 @@ $pledge = new Pledge(intval($pledge_id));
 $ref = $pledge->ref();
 
 if (!check_pin($ref, $pledge->pin()))
-    err("Permission denied");
+    err(_("Permission denied"));
 
 // TODO: test for commenting on expired pledges etc.
 
-page_header("Commenting on '" . $pledge->h_title() . "'");
+page_header(sprintf(_("Commenting on '%s'", $pledge->h_title()));
 
 /* Grab comment variables themselves. */
 $err = importparams(
@@ -58,7 +58,7 @@ $err = importparams(
         );
 
 if (!is_null($err))
-    err("Sorry -- something seems to have gone wrong");
+    err(_("Sorry -- something seems to have gone wrong"));
 
 $err = array();
 
@@ -69,15 +69,15 @@ if (!is_null($q_author_website))
 $q_text = trim($q_text);
 
 if (!$q_author_email)
-    array_push($err, "Please give your email address");
+    array_push($err, _("Please give your email address"));
 elseif (!emailaddress_is_valid($q_author_email))
-    array_push($err, htmlspecialchars("'$q_author_email'") . " is not a valid email address; please check it carefully");
+    array_push($err, sprintf(_("'%s' is not a valid email address; please check it carefully"), htmlspecialchars($q_author_email)));
 
 if (strlen($q_author_name) == 0)
-    array_push($err, "Please give your name $q_author_name");
+    array_push($err, sprintf(_("Please give your name %s"), $q_author_name));
 
 if (strlen($q_text) == 0)
-    array_push($err, "Please enter a message");
+    array_push($err, _("Please enter a message"));
 
 if ($q_author_website == '')
     $q_author_website = null;
@@ -87,9 +87,9 @@ if (!is_null($q_author_website) && !preg_match('#^https?://.+#', $q_author_websi
 if (sizeof($err) == 0 && isset($_POST['submit'])) {
     /* Require login for comments */
     $r = $pledge->data;
-    $r['reason_web'] = 'Before adding your comment to the pledge, we need to check that your email is working.';
-    $r['reason_email'] = 'Your comment will then be displayed on the pledge page.';
-    $r['reason_email_subject'] = 'Adding your comment to a pledge at PledgeBank.com';
+    $r['reason_web'] = _('Before adding your comment to the pledge, we need to check that your email is working.');
+    $r['reason_email'] = _('Your comment will then be displayed on the pledge page.');
+    $r['reason_email_subject'] = _('Adding your comment to a pledge at PledgeBank.com');
     $P = person_signon($r, $q_author_email, $q_author_name);
     $P->set_website($q_author_website);
 
@@ -120,25 +120,22 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     $values['comment_author_website'] = $q_author_website;
     $success = pb_send_email_template($pledge->creator_email(), 'comment-creator', $values);
     if (!$success) {
-        err("Problems sending message to pledge creator.");
+        err(_("Problems sending message to pledge creator."));
     }
-    print "<p>Thank you! Your comment has now been posted.";
+    print '<p>' . _("Thank you! Your comment has now been posted.");
     if ($q_comment_alert_signup)
-        print " You will be emailed when anyone adds a comment to the pledge.";
+        print ' ' . _("You will be emailed when anyone adds a comment to the pledge.");
     print "</p>";
     if (is_null($pledge->pin()))
-        print <<<EOF
-<p><a href="/$ref#comments">Go back to the pledge comments</a></p>
-EOF;
-    else
-        print <<<EOF
-<form method="post" action="/$ref">
+        print "<p><a href=\"/$ref#comments\">" . _('Go back to the pledge comments') . '</a></p>';
+    else { ?>
+<form method="post" action="/<?=$ref ?>">
 <p>
-<input type="hidden" name="pin" value="$q_h_pin">
-<input type="submit" value="Go back to the pledge">
+<input type="hidden" name="pin" value="<?=$q_h_pin ?>">
+<input type="submit" value="<?=_('Go back to the pledge') ?>">
 </p>
 </form>
-EOF;
+<?  }
 } else {
     $nextn = $q_n + 1;
     if ($q_n > 0) {
@@ -148,7 +145,7 @@ EOF;
                     . '</li></div>';
 
         print '<div id="preview"><div id="comments">';
-        print "<h2>Here's how your comment will appear</h2>";
+        print _("<h2>Here's how your comment will appear</h2>");
         print '<ul class="commentslist"><li class="comment">';
         comments_show_one(array('name' => $q_author_name, 'email' => $q_author_email, 
                 'website' => $q_author_website, 'text' => $q_text, 

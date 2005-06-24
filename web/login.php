@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.43 2005-06-22 11:53:26 francis Exp $
+ * $Id: login.php,v 1.44 2005-06-24 10:03:20 matthew Exp $
  * 
  */
 
@@ -54,14 +54,12 @@ require_once '../../phplib/importparams.php';
  * warn the user explicitly if they appear to be refusing cookies. */
 if (!array_key_exists('pb_test_cookie', $_COOKIE)) {
     if (array_key_exists('pb_test_cookie', $_GET)) {
-        page_header("Please enable cookies");
-        ?>
-<p>It appears that you don't have "cookies" enabled in your browser.
+        page_header(_("Please enable cookies"));
+        print _('<p>It appears that you don\'t have "cookies" enabled in your browser.
 <strong>To continue, you must enable cookies</strong>. Please
 read <a href="http://www.google.com/cookies.html">this page from Google
 explaining how to do that</a>, and then click the "back" button and
-try again</p>
-<?
+try again</p>');
         page_footer();
         exit();
     } else {
@@ -99,9 +97,9 @@ if ($q_name=='<Enter your name>') {
 /* General purpose login, asks for email also. */
 if (get_http_var("now")) {
     $P = person_signon(array(
-                    'reason_web' => "To log into Pledge Bank, we need to check your email address.",
-                    'reason_email' => "Then you will be logged into PledgeBank, and can set or change your password.",
-                    'reason_email_subject' => 'Log into PledgeBank.com'
+                    'reason_web' => _("To log into Pledge Bank, we need to check your email address."),
+                    'reason_email' => _("Then you will be logged into PledgeBank, and can set or change your password."),
+                    'reason_email_subject' => _('Log into PledgeBank.com')
 
                 ));
 
@@ -116,7 +114,7 @@ if (!is_null($q_t)) {
     /* Process emailed token */
     $d = auth_token_retrieve('login', $q_t);
     if (!$d)
-        err("Please check the URL (i.e. the long code of letters and numbers) is copied correctly from your email.  Technical details: The token '$q_t' wasn't found.");
+        err(sprintf(_("Please check the URL (i.e. the long code of letters and numbers) is copied correctly from your email.  Technical details: The token '%s' wasn't found."), $q_t));
     $P = person_get($d['email']);
     if (is_null($P)) {
         $P = person_get_or_create($d['email'], $d['name']);
@@ -164,7 +162,7 @@ if (!is_null($P)) {
          * wanted. */
         stash_redirect($q_stash);
     else {
-        err('A required parameter was missing');
+        err(_('A required parameter was missing'));
     }
 } elseif (is_null($q_stash)) {
     header("Location: /login?now=1");
@@ -179,19 +177,19 @@ function login_page() {
     global $q_stash, $q_email, $q_name, $q_LogIn, $q_SendEmail, $q_rememberme;
 
     if (is_null($q_stash)) {
-        err("Required parameter was missing");
+        err(_("Required parameter was missing"));
     }
 
     if ($q_LogIn) {
         /* User has tried to log in. */
         if (is_null($q_email)) {
-            login_form(array('email'=>'Please enter your email address.'));
+            login_form(array('email'=>_('Please enter your email address.')));
             exit();
         }
         global $q_password;
         $P = person_get($q_email);
         if (is_null($P) || !$P->check_password($q_password)) {
-            login_form(array('badpass'=>'Either your email or password weren\'t recognised.  Please try again.'));
+            login_form(array('badpass'=>_('Either your email or password weren\'t recognised.  Please try again.')));
             exit();
         } else {
             /* User has logged in correctly. Decide whether they are changing
@@ -207,7 +205,7 @@ function login_page() {
     } else if ($q_SendEmail) {
         /* User has asked to be sent email. */
         if (is_null($q_email)) {
-            login_form(array('email'=>'Please enter your email address.'));
+            login_form(array('email'=>_('Please enter your email address.')));
             exit();
         }
         $token = auth_token_store('login', array(
@@ -225,17 +223,17 @@ function login_page() {
             array_key_exists('template', $template_data) 
                 ?  $template_data['template'] : 'generic-confirm', 
             $template_data);
-        page_header("Now check your email");
+        page_header(_("Now check your email"));
         /* XXX show message only for Hotmail users? Probably not worth it. */
     ?>
 <p id="loudmessage">
-Now check your email!<br>
-We've sent you an email, and you'll need to click the link in it before you can
-continue
+<?=_('Now check your email!') ?><br>
+<?=_("We've sent you an email, and you'll need to click the link in it before you can
+continue") ?>
 <p id="loudmessage">
-<small>If you use <acronym title="Web based email">Webmail</acronym> or have
-'junk mail' filters, you may wish to check your bulk/spam mail folders:
-sometimes, our messages are marked that way.</small>
+<small><?=_('If you use <acronym title="Web based email">Webmail</acronym> or have
+"junk mail" filters, you may wish to check your bulk/spam mail folders:
+sometimes, our messages are marked that way.') ?></small>
 </p>
 <?
 
@@ -255,7 +253,7 @@ function login_form($errors = array()) {
     /* Just render the form. */
     global $q_h_stash, $q_h_email, $q_h_name, $q_stash, $q_email, $q_name;
 
-    page_header('Checking your email address');
+    page_header(_('Checking your email address'));
 
     if (is_null($q_name))
         $q_name = $q_h_name = '';   /* shouldn't happen */
@@ -284,11 +282,11 @@ function login_form($errors = array()) {
 
 <ul>
 
-<li> Enter your email address: <input<? if (array_key_exists('email', $errors) || array_key_exists('badpass', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<?=$q_h_email?>">
+<li> <?=_('Enter your email address:') ?> <input<? if (array_key_exists('email', $errors) || array_key_exists('badpass', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<?=$q_h_email?>">
 
 </ul>
 
-<p><strong>Have you used PledgeBank before?</strong></p>
+<p><strong><?=_('Have you used PledgeBank before?') ?></strong></p>
 
 <? } else { ?>
 
@@ -299,26 +297,26 @@ function login_form($errors = array()) {
 <ul>
 
 
-<li>I've never used PledgeBank before, let me confirm my email address now.
+<li><?=_("I've never used PledgeBank before, let me confirm my email address now.") ?>
 
-<input type="submit" name="SendEmail" value="Click here to continue &gt;&gt;"><br>
-<small>(we'll send an email, click the link in it to confirm your email is working)</small></p>
+<input type="submit" name="SendEmail" value="<?=_('Click here to continue') ?> &gt;&gt;"><br>
+<small><?=_("(we'll send an email, click the link in it to confirm your email is working)") ?></small></p>
 
 </li>
 
-<li><p>I've been here before, and I have a PledgeBank password:
+<li><p><?=_("I've been here before, and I have a PledgeBank password:") ?>
 
 <input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
-<input type="submit" name="LogIn" value="Let me in &gt;&gt;"></p>
+<input type="submit" name="LogIn" value="<?=_('Let me in') ?> &gt;&gt;"></p>
 
-<input type="checkbox" name="rememberme" id="rememberme" value="1"><strong>Remember me</strong></input>
-<small>(don't use this on a public or shared computer)</small>
+<input type="checkbox" name="rememberme" id="rememberme" value="1"><strong><?=_('Remember me') ?></strong></input>
+<small><?=_("(don't use this on a public or shared computer)") ?></small>
 
 </li>
 
-<li><p>I've been here before, but I've forgotten or don't have a password.
+<li><p><?=_("I've been here before, but I've forgotten or don't have a password.") ?>
 
-<input type="submit" name="SendEmail" value="Click here to continue &gt;&gt;"><br>
+<input type="submit" name="SendEmail" value="<?=_('Click here to continue') ?> &gt;&gt;"><br>
 </p>
 
 </li>
@@ -350,9 +348,9 @@ function change_password_page($P) {
                 array('pw2',        '/[^\s]{5,}/',      '', null)
             );
         if (is_null($q_pw1) || is_null($q_pw2))
-            $error = "Please type your new password twice";
+            $error = _("Please type your new password twice");
         else if ($q_pw1 != $q_pw2)
-            $error = "Please type the same password twice";
+            $error = _("Please type the same password twice");
         else {
             $P->password($q_pw1);
             db_commit();
@@ -362,28 +360,21 @@ function change_password_page($P) {
         return;
 
     if ($P->has_password()) {
-        page_header('Change your password');
-        print <<<EOF
-<p>There is a password set for your email address on PledgeBank. Perhaps
-you've forgotten it? You can set a new password using this form:</p>
-EOF;
+        page_header(_('Change your password'));
+        print _("<p>There is a password set for your email address on PledgeBank. Perhaps
+you've forgotten it? You can set a new password using this form:</p>");
     } else {
-        page_header('Set a password');
-        print <<<EOF
-<p>On this page you can set a password which you can use to identify yourself
+        page_header(_('Set a password'));
+        print _("<p>On this page you can set a password which you can use to identify yourself
 to PledgeBank, so that you don't have to check your email in the future.
-You don't have to set a password if you don't want to.
-</p>
-EOF;
+You don't have to set a password if you don't want to.</p>");
     }
 
     if (!is_null($error))
         print "<div id=\"errors\"><ul><li>$error</li><ul></div>";
 
-    print <<<EOF
-<div class="pledge">
-
-<p><strong>Would you like to set a PledgeBank password?</strong></p>
+    print '<div class="pledge">';
+    print '<p><strong>' . _('Would you like to set a PledgeBank password?') . '</strong></p>'; ?>
 
 <ul>
 
@@ -391,9 +382,9 @@ EOF;
 <input type="hidden" name="stash" value="$q_h_stash">
 <input type="hidden" name="email" value="$q_h_email">
 <input type="hidden" name="name" value="$q_h_name">
-<li>No, I don't want to think of a password right now.
-<input type="submit" name="NoPassword" value="Click here to continue &gt;&gt;">
-<br><small>(you can set a password another time)</small>
+<li><?=_("No, I don't want to think of a password right now.") ?>
+<input type="submit" name="NoPassword" value="<?=_('Click here to continue') ?> &gt;&gt;">
+<br><small><?=_('(you can set a password another time)') ?></small>
 </li></form>
 
 <form action="/login" name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
@@ -402,19 +393,18 @@ EOF;
 <input type="hidden" name="name" value="$q_h_name">
 <input type="hidden" name="SetPassword" value="1">
 
-<li><p>Yes, I'd like to set a password, so I don't have to keep going back to my email.
+<li><p><?=_("Yes, I'd like to set a password, so I don't have to keep going back to my email.") ?>
 <br>
-    <strong>Password:</strong> <input type="password" name="pw1" id="pw1" size="15">
-    <strong>Password (again):</strong> <input type="password" name="pw2" size="15">
-    <input type="submit" name="SetPassword" value="Set password &gt;&gt;">
+    <strong><?=_('Password:') ?></strong> <input type="password" name="pw1" id="pw1" size="15">
+    <strong><?=_('Password (again):') ?></strong> <input type="password" name="pw2" size="15">
+    <input type="submit" name="SetPassword" value="<?=_('Set password') ?> &gt;&gt;">
 </li>
 </form>
 
 </ul>
 
 </div>
-EOF;
-
+<?
     page_footer(array('nonav' => 1));
     exit();
 }

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.72 2005-06-20 17:19:14 francis Exp $
+ * $Id: admin-pb.php,v 1.73 2005-06-24 12:13:52 matthew Exp $
  * 
  */
 
@@ -21,7 +21,7 @@ require_once "../../phplib/importparams.php";
 class ADMIN_PAGE_PB_MAIN {
     function ADMIN_PAGE_PB_MAIN () {
         $this->id = "pb";
-        $this->navname = "Pledges and Signers";
+        $this->navname = _("Pledges and Signers");
     }
 
     function pledge_header($sort) {
@@ -123,7 +123,7 @@ class ADMIN_PAGE_PB_MAIN {
         }
          
         if (count($open)) {
-            print "<h2>All Open Pledges</h2>\n";
+            print h2(_("All Open Pledges"));
             $this->pledge_header($sort);
             $a = 0;
             foreach ($open as $row) {
@@ -134,7 +134,7 @@ class ADMIN_PAGE_PB_MAIN {
             print '</table>';
         }
         if (count($closed)) {
-            print "<h2>All Closed Pledges</h2>\n";
+            print h2(_("All Closed Pledges"));
             $this->pledge_header($sort);
             $a = 0;
             foreach ($closed as $row) {
@@ -148,7 +148,7 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function show_one_pledge($pledge) {
-        print '<p><a href="'.$this->self_link.'">List of all pledges</a></p>';
+        print '<p><a href="'.$this->self_link.'">' . _('List of all pledges') . '</a></p>';
 
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 'e';
@@ -158,11 +158,11 @@ class ADMIN_PAGE_PB_MAIN {
         $pdata = db_fetch_array($q);
 
         print "<h2>Pledge '<a href=\"".OPTION_BASE_URL.'/'.$pdata['ref']."\">" . $pdata['ref'] . "</a>'";
-        print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">timeline</a>)';
+        print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
         print " &mdash; " .  $pdata['title'] . "</h2>";
 
         if ($pdata['confirmed'] == 'f') {
-            print "<p><em>Pledge creator's email address not confirmed</b></em>";
+            print '<p><em>' . _("Pledge creator's email address not confirmed") . '</em></p>';
         }
         
         print "<p>Set by: <b>" . $pdata['name'] . " &lt;" .  $pdata['email'] . "&gt;</b>";
@@ -257,7 +257,7 @@ class ADMIN_PAGE_PB_MAIN {
         print '<p>';
         
         // Messages
-        print "<h2>Messages</h2>";
+        print h2(_("Messages"));
         $q = db_query('select * from message 
                 where pledge_id = ? order by whencreated', $pdata['id']);
 
@@ -332,26 +332,26 @@ print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</stron
     function remove_pledge($id) {
         pledge_delete_pledge($id);
         db_commit();
-        print '<p><em>That pledge has been successfully removed, along with all its signatories.</em></p>';
+        print p(_('<em>That pledge has been successfully removed, along with all its signatories.</em>'));
     }
 
     function remove_signer($id) {
         pledge_delete_signer($id);
         db_commit();
-        print '<p><em>That signer has been successfully removed.</em></p>';
+        print p(_('<em>That signer has been successfully removed.</em>'));
     }
 
     function showname_signer($id) {
         db_query('UPDATE signers set showname = ? where id = ?', 
             array(get_http_var('showname') ? true : false, $id));
         db_commit();
-        print '<p><em>Show name for signer updated</em></p>';
+        print p(_('<em>Show name for signer updated</em>'));
     }
 
     function update_prominence($pledge_id) {
         db_query('UPDATE pledges set prominence = ? where id = ?', array(get_http_var('prominence'), $pledge_id));
         db_commit();
-        print "<p><em>Changes to pledge prominence saved</em></p>";
+        print p(_("<em>Changes to pledge prominence saved</em>"));
     }
 
     function update_categories($pledge_id) {
@@ -363,7 +363,7 @@ print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</stron
             }
         }
         db_commit();
-        print '<p><em>Categories updated.</em></p>';
+        print p(_('<em>Categories updated.</em>'));
     }
 
     function display($self_link) {
@@ -399,7 +399,7 @@ print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</stron
             $pledge_id = get_http_var('send_announce_token_pledge_id');
             if (ctype_digit($pledge_id)) {
                 send_announce_token($pledge_id);
-                print '<p><em>Announcement permission mail sent</em></p>';
+                print p(_('<em>Announcement permission mail sent</em>'));
             }
         }
 
@@ -643,7 +643,7 @@ dd {
 class ADMIN_PAGE_PB_ABUSEREPORTS {
     function ADMIN_PAGE_PB_ABUSEREPORTS() {
         $this->id = 'pbabusereports';
-        $this->navname = 'Abuse reports';
+        $this->navname = _('Abuse reports');
     }
 
     function display($self_link) {
@@ -820,7 +820,7 @@ EOF;
         }
 
         print '</table>'
-                . '<p><input type="submit" name="discardReports" value="Discard selected abuse reports"></form>';
+                . '<p><input type="submit" name="discardReports" value="' . _('Discard selected abuse reports') . '"></form>';
     }
 }
 

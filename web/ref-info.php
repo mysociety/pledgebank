@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.17 2005-06-24 11:27:41 matthew Exp $
+ * $Id: ref-info.php,v 1.18 2005-06-24 12:27:02 matthew Exp $
  * 
  */
 
@@ -158,12 +158,12 @@ if ($priv & PRIV_SIGNER) {
         
     }
     if (!$n) {
-        print _('<p>The pledge creator has not sent any announcements yet.</p>');
+        print p(_('The pledge creator has not sent any announcements yet.'));
     }
 } else {
-    print _('<p><em>The messages can only be shown to people who have signed the pledge. If
+    print p(_('<em>The messages can only be shown to people who have signed the pledge. If
 you have signed, please give your email address so that we can identify
-you:</em></p>');
+you:</em>'));
 ?>
 <form class="pledge" name="logIn" method="POST">
 <strong><?=_('Email address') ?></strong>

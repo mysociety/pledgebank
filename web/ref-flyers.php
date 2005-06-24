@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.10 2005-06-24 10:12:13 matthew Exp $
+// $Id: ref-flyers.php,v 1.11 2005-06-24 12:27:02 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -34,7 +34,7 @@ $png_flyers8_url = $p->url_flyer("A4_flyers8.png");
 ?>
 <div class="noprint">
 <?  print _('<h2>Customised Flyers</h2>');
-print _('<p>Here you can get <acronym title="Portable Document Format">PDF</acronym>s or editable <acronym title="Rich Text File">RTF</acronym>s (Word compatible) containing your pledge data, to print out, display, hand out, or whatever.</p>');
+print p(_('Here you can get <acronym title="Portable Document Format">PDF</acronym>s or editable <acronym title="Rich Text File">RTF</acronym>s (Word compatible) containing your pledge data, to print out, display, hand out, or whatever.'));
 ?>
 <ul>
 <li><? print_link_with_pin($pdf_flyers8_url, "", _("Flyers for handing out, 8 per page (A4, PDF") . (get_http_var("pin") ? "" : _(", like picture below")) . ")") ?> </li>

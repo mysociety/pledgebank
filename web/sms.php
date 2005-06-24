@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.29 2005-06-24 11:27:41 matthew Exp $
+ * $Id: sms.php,v 1.30 2005-06-24 12:27:02 matthew Exp $
  * 
  */
 
@@ -66,7 +66,7 @@ if (!is_null(db_getOne('select pin from pledges where id = ?', $pledge_id)))
 /* Have we already converted? If so just show the usual "thank you" page. */
 if (db_getOne('select person_id from signers where id = ?', $signer_id)) {
     page_header(_('SMS'));
-    print _('<p><strong>Thanks for signing up to this pledge!</strong></p>');
+    print p(strong(_('Thanks for signing up to this pledge!')));
     post_confirm_advertise($pledge);
     page_footer();
     exit();
@@ -130,7 +130,7 @@ if (!pledge_is_error($r)) {
     else {
         /* Creator trying to sign their own pledge. Need to remove the old
          * signer record. */
-        print _('<p><strong>You cannot sign your own pledge!</strong></p>');
+        print p(strong(_('You cannot sign your own pledge!')));
         page_footer();
         exit();
     }
@@ -139,7 +139,7 @@ if (!pledge_is_error($r)) {
 
 db_commit();
 
-print _('<p><strong>Thanks for signing up to this pledge!</strong></p>');
+print p(strong(_('Thanks for signing up to this pledge!')));
 
 post_confirm_advertise($pledge);
 
@@ -153,10 +153,10 @@ function bad_token($x) {
         err(_("We couldn't recognise the link you've followed"));
     } else {
         $x = htmlspecialchars($x);
-        printf(_("<p>Sorry, we can't make sense of the code '%s'. Please
+        printf(p(_("Sorry, we can't make sense of the code '%s'. Please
         could you re-check the address you typed in; the last part of it should
         be two groups of four letters and numbers, joined by a hyphen (\"-\"),
-        something like \"1234-abcd\".</p>"), $x);
+        something like \"1234-abcd\".")), $x);
     }
     page_footer(array('nonav' => 1));
     exit();
@@ -168,7 +168,7 @@ function bad_token($x) {
  * up to the pledge. */
 function oops($r, $what = null) {
     page_header(_('SMS'));
-    print _("<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>");
+    print p(strong(_("Sorry, we couldn't sign you up to that pledge:")));
     if ($r == PLEDGE_FULL || $r == PLEDGE_FINISHED) {
         /* Print a fuller explanation in this (common) case */
         print '<p>';
@@ -190,7 +190,7 @@ function oops($r, $what = null) {
     } else {
         print "<p>" . htmlspecialchars(pledge_strerror($r)) . "</p>";
         if (!pledge_is_permanent_error($r))
-            print _("<p><strong>Please try again a bit later.</strong></p>");
+            print p(strong(_("Please try again a bit later.")));
     }
     page_footer();
     exit();
@@ -202,9 +202,9 @@ function oops($r, $what = null) {
 function conversion_form($errs, $pledge_id) {
     global $q_h_token, $q_unchecked_h_phone, $q_unchecked_h_email, $q_unchecked_h_name;
     print _('<h2>Thanks for signing up!</h2>');
-    print _('<p>On this page you can let us have your name and email address so that you can
+    print p(_('On this page you can let us have your name and email address so that you can
 get email from the pledge creator.  We will also email you when the pledge
-succeeds, rather than sending an SMS.</p>');
+succeeds, rather than sending an SMS.'));
     if ($errs) {
         print '<div id="errors"><ul>';
         if (array_key_exists('phone', $errs))

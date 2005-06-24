@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: all.php,v 1.22 2005-06-23 23:32:32 matthew Exp $
+// $Id: all.php,v 1.23 2005-06-24 12:27:02 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -85,7 +85,7 @@ if ($ntotal > 0) {
     if ($ntotal > PAGE_SIZE)
         print "<br style=\"clear: both;\">$navlinks";
 } else {
-    print _('<p>There are currently none.</p>');
+    print p(_('There are currently none.'));
 }
 
 page_footer();

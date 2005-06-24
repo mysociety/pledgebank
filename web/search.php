@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.10 2005-06-24 10:12:13 matthew Exp $
+// $Id: search.php,v 1.11 2005-06-24 12:27:02 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -26,7 +26,7 @@ function search() {
     if (db_num_rows($q)) {
         $success = 1;
         $r = db_fetch_array($q);
-        $out .= sprintf(_('<p>Result <strong>exactly matching</strong> pledge <strong>%s</strong>:</p>'), htmlspecialchars($search) );
+        $out .= sprintf(p(_('Result <strong>exactly matching</strong> pledge <strong>%s</strong>:')), htmlspecialchars($search) );
         $out .= '<ul><li>';
         $out .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
         $out .= '</li></ul>';
@@ -57,12 +57,12 @@ function search() {
     }
 
     if ($open) {
-        $out .= sprintf(_('<p>Results for <strong>open pledges</strong> matching <strong>%s</strong>:</p>'), htmlspecialchars($search) );
+        $out .= sprintf(p(_('Results for <strong>open pledges</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
         $out .= '<ul>' . $open . '</ul>';
     }
 
     if ($closed) {
-        $out .= sprintf(_('<p>Results for <strong>closed pledges</strong> matching <strong>%s</strong>:</p>'), htmlspecialchars($search) );
+        $out .= sprintf(p(_('Results for <strong>closed pledges</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
         $out .= '<ul>' . $closed . '</ul>';
     }
 
@@ -79,7 +79,7 @@ function search() {
                    ORDER BY whenposted DESC', array($search));
     if (db_num_rows($q)) {
         $success = 1;
-        $out .= sprintf(_("<p>Results for <strong>comments</strong> matching <strong>%s</strong>:</p>"), htmlspecialchars($search) );
+        $out .= sprintf(p(_("Results for <strong>comments</strong> matching <strong>%s</strong>:")), htmlspecialchars($search) );
         $out .= '<ul>';
         while($r = db_fetch_array($q)) {
             $out .= '<li>';
@@ -100,7 +100,8 @@ function search() {
     }
     if (sizeof($people)) {
         $success = 1;
-        $out .= sprintf(_('<p>Results for <strong>people</strong> matching <strong>%s</strong>:</p> <dl>'), htmlspecialchars($search) );
+        $out .= sprintf(p(_('Results for <strong>people</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
+        $out .= '<dl>';
         ksort($people);
         foreach ($people as $name => $array) {
             $out .= '<dt><b>'.htmlspecialchars($name). '</b></dt> <dd>';
@@ -115,7 +116,7 @@ function search() {
     }
 
     if (!$success) {
-        $out .= sprintf(_('<p>Sorry, we could find nothing that matched "%s".</p>'), htmlspecialchars($search) );
+        $out .= sprintf(p(_('Sorry, we could find nothing that matched "%s".')), htmlspecialchars($search) );
     }
     return $out;
 }

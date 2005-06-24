@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.22 2005-06-24 10:12:13 matthew Exp $
+ * $Id: ref-announce.php,v 1.23 2005-06-24 12:27:02 matthew Exp $
  * 
  */
 
@@ -79,7 +79,7 @@ function refuse_announce($p, $c) {
  * Page thanking punter for sending message. */
 function message_success() {
     page_header(_("Announcement sent"));
-    print _("<p><strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge.</p>");
+    print p(_("<strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge."));
     page_footer();
     exit();
 }
@@ -238,10 +238,10 @@ if (!sizeof($errors) && $q_submit) {
 </p>
 
 <?  print _('<h3>Email message</h3>');
-    print _('<p>The message will be sent from your email address, so the people
+    print p(_('The message will be sent from your email address, so the people
 who signed your pledge can reply directly to you. <strong>You may want to also
 give your phone number or website</strong>, so they can contact you in other
-ways.</p>'); ?>
+ways.')); ?>
 
 <p><textarea
     name="message_body"
@@ -251,10 +251,10 @@ ways.</p>'); ?>
 
 <?  if ($do_sms) {
         print _('<h3>SMS message</h3>');
-        print _('<p>Enter a short (160 or fewer characters) summary of your main message,
+        print p(_('Enter a short (160 or fewer characters) summary of your main message,
 which can be sent to anyone who has signed up to your pledge by SMS only.
 <strong>Include contact details, such as your phone number or email address.</strong>
-Otherwise people who signed up by text won\'t be able to contact you again.</p>');
+Otherwise people who signed up by text won\'t be able to contact you again.'));
 ?>
 <script type="text/javascript">
 <!--

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.14 2005-06-24 12:07:59 matthew Exp $
+// $Id: abuse.php,v 1.15 2005-06-24 12:27:02 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -65,9 +65,9 @@ $admin_url
 Reason given: $q_reason
 EOF
 ));
-        printf(_('<p><strong>Thank you!</strong> One of our team will investigate that %s as soon
-as possible. </p>'), $w);
-        print _('<p><a href="./">Return to the home page</a>.</p>');
+        printf(p(_('<strong>Thank you!</strong> One of our team will investigate that %s as soon
+as possible.')), $w);
+        print p(_('<a href="./">Return to the home page</a>.'));
         return;
     }
 
@@ -87,7 +87,7 @@ as possible. </p>'), $w);
     }
     print '</blockquote>';
     if ($q_what != 'pledge') {
-        printf(_("<p>This is on the pledge <strong>%s</strong>.</p>"), $title);
+        printf(p(_("This is on the pledge <strong>%s</strong>.")), $title);
     }
 
     print <<<EOF
@@ -95,8 +95,9 @@ as possible. </p>'), $w);
 <input type="hidden" name="what" value="$q_h_what">
 <input type="hidden" name="id" value="$q_h_id">
 EOF;
-    printf(_('<p>Please give a short reason for reporting this %s.<br>'), $w);
-    print '<input type="text" name="reason" size="60"></p>
+    print '<p>';
+    printf(_('Please give a short reason for reporting this %s.'), $w);
+    print '<br><input type="text" name="reason" size="60"></p>
 <p><input name="submit" type="submit" value="' . _('Submit') . '"></p>
 </form>';
 

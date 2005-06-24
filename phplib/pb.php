@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.13 2005-06-23 23:20:57 matthew Exp $
+ * $Id: pb.php,v 1.14 2005-06-24 12:27:01 matthew Exp $
  * 
  */
 
@@ -48,7 +48,7 @@ function pb_handle_error($num, $message, $file, $line, $context) {
         /* Nuke any existing page output to display the error message. */
         ob_clean();
         /* Message will be in log file, don't display it for cleanliness */
-        $err = _('<p>Please try again later, or <a href="mailto:team@pledgebank.com">email us</a> for help resolving the problem.</p>');
+        $err = p(_('Please try again later, or <a href="mailto:team@pledgebank.com">email us</a> for help resolving the problem.'));
         if ($num & E_USER_ERROR) {
             $err = "<p><em>$message</em></p> $err";
         }

@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.45 2005-06-24 11:27:41 matthew Exp $
+ * $Id: login.php,v 1.46 2005-06-24 12:27:02 matthew Exp $
  * 
  */
 
@@ -55,11 +55,11 @@ require_once '../../phplib/importparams.php';
 if (!array_key_exists('pb_test_cookie', $_COOKIE)) {
     if (array_key_exists('pb_test_cookie', $_GET)) {
         page_header(_("Please enable cookies"));
-        print _('<p>It appears that you don\'t have "cookies" enabled in your browser.
+        print p(_('It appears that you don\'t have "cookies" enabled in your browser.
 <strong>To continue, you must enable cookies</strong>. Please
 read <a href="http://www.google.com/cookies.html">this page from Google
 explaining how to do that</a>, and then click the "back" button and
-try again</p>');
+try again'));
         page_footer();
         exit();
     } else {
@@ -361,13 +361,13 @@ function change_password_page($P) {
 
     if ($P->has_password()) {
         page_header(_('Change your password'));
-        print _("<p>There is a password set for your email address on PledgeBank. Perhaps
-you've forgotten it? You can set a new password using this form:</p>");
+        print p(_("There is a password set for your email address on PledgeBank. Perhaps
+you've forgotten it? You can set a new password using this form:"));
     } else {
         page_header(_('Set a password'));
-        print _("<p>On this page you can set a password which you can use to identify yourself
+        print p(_("On this page you can set a password which you can use to identify yourself
 to PledgeBank, so that you don't have to check your email in the future.
-You don't have to set a password if you don't want to.</p>");
+You don't have to set a password if you don't want to."));
     }
 
     if (!is_null($error))

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.12 2005-06-24 12:07:59 matthew Exp $
+ * $Id: ref-picture.php,v 1.13 2005-06-24 12:27:02 matthew Exp $
  * 
  */
 
@@ -146,16 +146,16 @@ $pledge->render_box(array('showdetails' => true));
         print h2(_('Add picture to your pledge'));
     } ?>
         <input type="hidden" name="MAX_FILE_SIZE" value="<?=$picture_size_limit*1024?>">
-    <?  print _('<p>Choose the photo, logo or drawing that you would like to display on
+    <?  print p(_('Choose the photo, logo or drawing that you would like to display on
         your pledge.  Keep it small so it fits well on the page.  You can use
-        an image saved as either GIF, JPEG or PNG type.</p>'); ?>
+        an image saved as either GIF, JPEG or PNG type.')); ?>
     <p><input name="userfile" type="file"><input type="submit" value="<?=_('Submit') ?>">
     <?  if ($pledge->has_picture()) {
-            printf(_('<p>Or you can %s if you don\'t want any image on your pledge any more.'), '<input name="removepicture" type="submit" value="' . _('Remove the picture') . '">');
+            printf(p(_('Or you can %s if you don\'t want any image on your pledge any more.')), '<input name="removepicture" type="submit" value="' . _('Remove the picture') . '">');
         }
         print '</form>';
     } else {
-        print _("<p>Pictures are not available for private pledges.  Please let us know if this is a problem.");
+        print p(_("Pictures are not available for private pledges.  Please let us know if this is a problem."));
     }
 
 #header("Location: /$q_ref/announce");

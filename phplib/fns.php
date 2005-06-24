@@ -5,13 +5,14 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.41 2005-06-24 12:07:56 matthew Exp $
+// $Id: fns.php,v 1.42 2005-06-24 12:27:01 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
 
 function p($s) { return "<p>$s</p>\n"; }
 function h2($s) { return "<h2>$s</h2>\n"; }
+function strong($s) { return "<strong>$s</strong>"; }
 
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {

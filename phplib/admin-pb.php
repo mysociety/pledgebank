@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.75 2005-06-24 19:34:39 francis Exp $
+ * $Id: admin-pb.php,v 1.76 2005-06-24 20:45:34 francis Exp $
  * 
  */
 
@@ -705,108 +705,112 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
 
     function do_one_list($self_link, $what) {
 
-        print '<form method="POST" action="'.$this->self_link.'"><input type="hidden" name="prev_url" value="'
-                    . htmlspecialchars($self_link) . '">';
-        print <<<EOF
-<p><input type="submit" name="discardReports" value="Discard selected abuse reports"></p>
-<table class="abusereporttable">
-EOF;
-
         $old_id = null;
         $q = db_query('select id, what_id, reason, ipaddr, extract(epoch from whenreported) as epoch from abusereport where what = ? order by what_id, whenreported desc', $what);
 
-        while (list($id, $what_id, $reason, $ipaddr, $t) = db_fetch_row($q)) {
-            if ($what_id !== $old_id) {
-            
-                /* XXX should group by pledge and then by signer/comment, but
-                 * can't be arsed... */
-                print '<tr style="background-color: #eee;"><td colspan="4">';
+        if (db_num_rows($q) > 0) {
 
-                if ($what == 'pledge')
-                    $pledge_id = $what_id;
-                elseif ($what == 'signer')
-                    $pledge_id = db_getRow('select pledge_id from signers where id = ?', $what_id);
-                elseif ($what == 'comment')
-                    $pledge_id = db_getOne('select pledge_id from comment where id = ?', $what_id);
+            print '<form method="POST" action="'.$this->self_link.'"><input type="hidden" name="prev_url" value="'
+                        . htmlspecialchars($self_link) . '">';
+            print '
+    <p><input type="submit" name="discardReports" value="Discard selected abuse reports"></p>
+    <table class="abusereporttable">
+    ';
+            while (list($id, $what_id, $reason, $ipaddr, $t) = db_fetch_row($q)) {
+                if ($what_id !== $old_id) {
                 
-                $pledge = db_getRow('
-                                select *,
-                                    extract(epoch from creationtime) as createdepoch,
-                                    extract(epoch from date) as deadlineepoch
-                                from pledges
-                                where id = ?', $pledge_id);
+                    /* XXX should group by pledge and then by signer/comment, but
+                     * can't be arsed... */
+                    print '<tr style="background-color: #eee;"><td colspan="4">';
+
+                    if ($what == 'pledge')
+                        $pledge_id = $what_id;
+                    elseif ($what == 'signer')
+                        $pledge_id = db_getRow('select pledge_id from signers where id = ?', $what_id);
+                    elseif ($what == 'comment')
+                        $pledge_id = db_getOne('select pledge_id from comment where id = ?', $what_id);
                     
-                /* Info on the pledge. Print for all categories. */
-                print '<table>';
-                print '<tr><td><b>Pledge:</b> ';
-                $pledge_obj = new Pledge($pledge);
-                print $pledge_obj->h_sentence(array());
-                print ' <a href="'.$pledge_obj->url_main().'">'.$pledge_obj->ref().'</a> ';
-                print '<a href="?page=pb&amp;pledge='.$pledge_obj->ref().'">(admin)</a> ';
+                    $pledge = db_getRow('
+                                    select *,
+                                        extract(epoch from creationtime) as createdepoch,
+                                        extract(epoch from date) as deadlineepoch
+                                    from pledges
+                                    where id = ?', $pledge_id);
                         
-                /* Print signer/comment details under pledge. */
-                if ($what == 'signer') {
-                    $signer = db_getRow('
-                                    select signers.*, person.email,
-                                        extract(epoch from signtime) as epoch
-                                    from signers
-                                    left join person on signers.person_id = person.id
-                                    where signers.id = ?', $what_id);
+                    /* Info on the pledge. Print for all categories. */
+                    print '<table>';
+                    print '<tr><td><b>Pledge:</b> ';
+                    $pledge_obj = new Pledge($pledge);
+                    print $pledge_obj->h_sentence(array());
+                    print ' <a href="'.$pledge_obj->url_main().'">'.$pledge_obj->ref().'</a> ';
+                    print '<a href="?page=pb&amp;pledge='.$pledge_obj->ref().'">(admin)</a> ';
+                            
+                    /* Print signer/comment details under pledge. */
+                    if ($what == 'signer') {
+                        $signer = db_getRow('
+                                        select signers.*, person.email,
+                                            extract(epoch from signtime) as epoch
+                                        from signers
+                                        left join person on signers.person_id = person.id
+                                        where signers.id = ?', $what_id);
 
+                        print '</td></tr>';
+                        print '<tr class="break"><td><b>Signer:</b> '
+                                . (is_null($signer['name'])
+                                        ? "<em>not known</em>"
+                                        : htmlspecialchars($signer['name']))
+                                . ' ';
+
+                        if (!is_null($signer['email']))
+                            print '<a href="mailto:'
+                                    . htmlspecialchars($signer['email'])
+                                    . '">'
+                                    . htmlspecialchars($signer['email'])
+                                    . '</a> ';
+
+                        if (!is_null($signer['mobile']))
+                            print htmlspecialchars($signer['mobile']);
+
+                        print '<b>Signed at:</b> ' . date('Y-m-d H:m', $signer['epoch']);
+                    } elseif ($what == 'comment') {
+                        $comment = db_getRow('
+                                        select id,
+                                            extract(epoch from whenposted)
+                                                as whenposted,
+                                            text, name, website
+                                        from comment
+                                        where id = ?', $what_id);
+
+                        print '</td></tr>';
+                        print '<tr class="break">';
+                        print '<td><b>Comment:</b> ';
+                        comments_show_one($comment, true);
+                    }
+
+                    if ($what == "comment") {
+                        print " <input type=\"submit\" name=\"delete_${what}_${what_id}\" value=\"Delete this $what\">";
+                    }
                     print '</td></tr>';
-                    print '<tr class="break"><td><b>Signer:</b> '
-                            . (is_null($signer['name'])
-                                    ? "<em>not known</em>"
-                                    : htmlspecialchars($signer['name']))
-                            . ' ';
-
-                    if (!is_null($signer['email']))
-                        print '<a href="mailto:'
-                                . htmlspecialchars($signer['email'])
-                                . '">'
-                                . htmlspecialchars($signer['email'])
-                                . '</a> ';
-
-                    if (!is_null($signer['mobile']))
-                        print htmlspecialchars($signer['mobile']);
-
-                    print '<b>Signed at:</b> ' . date('Y-m-d H:m', $signer['epoch']);
-                } elseif ($what == 'comment') {
-                    $comment = db_getRow('
-                                    select id,
-                                        extract(epoch from whenposted)
-                                            as whenposted,
-                                        text, name, website
-                                    from comment
-                                    where id = ?', $what_id);
-
-                    print '</td></tr>';
-                    print '<tr class="break">';
-                    print '<td><b>Comment:</b> ';
-                    comments_show_one($comment, true);
+                    print '</table>';
+                    $old_id = $what_id;
                 }
 
-                if ($what == "comment") {
-                    print " <input type=\"submit\" name=\"delete_${what}_${what_id}\" value=\"Delete this $what\">";
-                }
-                print '</td></tr>';
-                print '</table>';
-                $old_id = $what_id;
+                print '<tr><td>'
+                            . '<input type="checkbox" name="ar_' . $id . '" value="1">'
+                        . '</td><td><b>Abuse report:</b> '
+                            . date('Y-m-d H:i', $t)
+                            . ' from '
+                            . $ipaddr
+                        . '</td><td><b>Reason: </b>'
+                            . $reason
+                        . '</td></tr>';
             }
 
-            print '<tr><td>'
-                        . '<input type="checkbox" name="ar_' . $id . '" value="1">'
-                    . '</td><td><b>Abuse report:</b> '
-                        . date('Y-m-d H:i', $t)
-                        . ' from '
-                        . $ipaddr
-                    . '</td><td><b>Reason: </b>'
-                        . $reason
-                    . '</td></tr>';
+            print '</table>';
+            print '<p><input type="submit" name="discardReports" value="' . _('Discard selected abuse reports') . '"></form>';
+        } else {
+            print '<p>No abuse reports of this type.</p>';
         }
-
-        print '</table>'
-                . '<p><input type="submit" name="discardReports" value="' . _('Discard selected abuse reports') . '"></form>';
     }
 }
 

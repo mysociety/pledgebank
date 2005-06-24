@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.40 2005-06-24 09:51:10 matthew Exp $
+// $Id: new.php,v 1.41 2005-06-24 10:12:13 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -548,7 +548,7 @@ if ($v=='pin') print _('Only people to whom I give a PIN I have specified');
     print _('<h2>Terms and Conditions</h2>');
     print _('<strong>Click "Create" to confirm that you wish PledgeBank.com to display the
 pledge at the top of this page in your name.</strong>');
-<?  if ($v == 'pin') { ?>
+    if ($v == 'pin') { ?>
 <!-- no special terms for private pledge -->
 <?  } else {
         print _('You also consent to the syndication of your pledge to other sites &mdash; this means that they will be able to display your pledge and your name');
@@ -637,7 +637,7 @@ function create_new_pledge($P, $data) {
     $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($p->data['ref']));
 ?>
     <p class="noprint" id="loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
-    <p class="noprint" id="loudmessage" align="center"><? printf(_('It is now live at <strong>%s</strong><br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a></strong>' ?></p>
+    <p class="noprint" id="loudmessage" align="center"><? printf(_('It is now live at <strong>%s</strong><br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a></strong>') ?></p>
     <p class="noprint" id="loudmessage" align="center"><?=_('Your pledge will be publicised elsewhere on the site when a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
 <?  post_confirm_advertise($p);
 }

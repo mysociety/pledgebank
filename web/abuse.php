@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.11 2005-06-23 23:32:32 matthew Exp $
+// $Id: abuse.php,v 1.12 2005-06-24 10:12:13 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -34,13 +34,13 @@ function report_abusive_thing() {
 
     /* Find information about the associated pledge. */
     $w = $q_what;
-    if ($q_what == 'pledge')
+    if ($q_what == 'pledge') {
         $w = _('pledge');
         $pledge_id = db_getOne('select id from pledges where id = ?', $q_id);
-    elseif ($q_what == 'comment')
+    } elseif ($q_what == 'comment') {
         $w = _('comment');
         $pledge_id = db_getOne('select pledge_id from comment where id = ?', $q_id);
-    elseif ($q_what == 'signer') {
+    } elseif ($q_what == 'signer') {
         $w = _('signature');
         $pledge_id = db_getOne('select pledge_id from signers where id = ?', $q_id);
     }

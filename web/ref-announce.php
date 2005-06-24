@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.21 2005-06-24 08:49:38 matthew Exp $
+ * $Id: ref-announce.php,v 1.22 2005-06-24 10:12:13 matthew Exp $
  * 
  */
 
@@ -255,7 +255,7 @@ ways.</p>'); ?>
 which can be sent to anyone who has signed up to your pledge by SMS only.
 <strong>Include contact details, such as your phone number or email address.</strong>
 Otherwise people who signed up by text won\'t be able to contact you again.</p>');
-
+?>
 <script type="text/javascript">
 <!--
 function count_sms_characters() {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.9 2005-06-24 08:49:38 matthew Exp $
+// $Id: search.php,v 1.10 2005-06-24 10:12:13 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -115,7 +115,7 @@ function search() {
     }
 
     if (!$success) {
-        $out .= sprintf(_('<p>Sorry, we could find nothing that matched "%s".</p>', htmlspecialchars($search) );
+        $out .= sprintf(_('<p>Sorry, we could find nothing that matched "%s".</p>'), htmlspecialchars($search) );
     }
     return $out;
 }

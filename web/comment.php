@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.19 2005-06-24 10:03:20 matthew Exp $
+ * $Id: comment.php,v 1.20 2005-06-24 10:12:13 matthew Exp $
  * 
  */
 
@@ -44,7 +44,7 @@ if (!check_pin($ref, $pledge->pin()))
 
 // TODO: test for commenting on expired pledges etc.
 
-page_header(sprintf(_("Commenting on '%s'", $pledge->h_title()));
+page_header(sprintf(_("Commenting on '%s'"), $pledge->h_title()));
 
 /* Grab comment variables themselves. */
 $err = importparams(

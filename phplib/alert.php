@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.5 2005-06-23 20:51:01 francis Exp $
+// $Id: alert.php,v 1.6 2005-06-24 10:06:04 matthew Exp $
 
 /* alert_signup PERSON_ID EVENT_CODE PARAMS
  * 
@@ -34,10 +34,10 @@ function alert_signup($person_id, $event_code, $params) {
 function alert_unsubscribe($person_id, $alert_id) {
     $row = db_getRow("select * from alert where id = ?", $alert_id);
     if (!$row) 
-        err("Unknown alert " . intval($alert_id));
+        err(sprintf(_("Unknown alert %d"), intval($alert_id)));
 
     if ($person_id != $row['person_id'])   
-        err("Alert " . intval($alert_id) . " does not belong to person " . intval($person_id));
+        err(sprintf(_("Alert %d does not belong to person %d"), intval($alert_id), intval($person_id)));
 
     db_query("delete from alert_sent where alert_id = ?", $alert_id);
     db_query("delete from alert where id = ?", $alert_id);
@@ -54,10 +54,10 @@ function alert_h_description($alert_id) {
 
     if ($row['event_code'] == "comments/ref") { 
         $pledge = new Pledge(intval($row['pledge_id']));
-        return "new comments on the pledge '" . $pledge->ref() . "'";
+        return sprintf(_("new comments on the pledge '%s'"), $pledge->ref() );
     }
     else {
-        err("Unknown event code '".$row['event_code']."'");
+        err(sprintf(_("Unknown event code '%s'"), $row['event_code']));
     }
 }
 

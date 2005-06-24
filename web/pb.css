@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.69 2005-06-23 20:51:02 francis Exp $
+ * $Id: pb.css,v 1.70 2005-06-24 16:48:21 francis Exp $
  * 
  */
 
@@ -197,16 +197,16 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #photo img {
     border: none;
 }
-#front #comments {
+#front .comments {
     font-size: 95%;
     width: 32%;
 }
-#front #comments ul {
+#front .comments ul {
     padding-left: 1.5em;
     margin: 0;
     list-style-type: disc;
 }
-#front #comments li {
+#front .comments li {
     padding-bottom: 0em;
     border-bottom: dotted 0px #999999;
     margin-bottom: 0em;
@@ -294,13 +294,13 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     margin-top: 1em;
     width: 45%;
 }
-#comments, #spreadword {
+.comments, #spreadword {
     margin-top: 1em;
     clear: right;
     float: right;
     width: 45%;
 }
-#preview #comments {
+#preview .comments {
     float: left;
     clear: left;
 }
@@ -310,17 +310,17 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     float: right;
     width: 32%;
 }
-#comments ul {
+.comments ul {
     padding: 0;
     margin: 0;
     list-style-type: none;
 }
-#comments li {
+.comments li {
     padding-bottom: 0.5em;
     border-bottom: dotted 1px #999999;
     margin-bottom: 0.5em;
 }
-#comments li div.commentheader {
+.comments li div.commentheader {
     margin-top: 0.25em;
     text-align: right;
 }
@@ -390,7 +390,7 @@ ul#nav li {
 }
 
 /* For example, to tell people to check their email */
-#loudmessage {
+.loudmessage {
     font-size: 150%; 
     font-weight: bold; 
     text-align: center;

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.44 2005-06-24 12:07:59 matthew Exp $
+// $Id: new.php,v 1.45 2005-06-24 16:48:21 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -546,10 +546,10 @@ if ($v=='pin') print _('Only people to whom I give a PIN I have specified');
 ?></em></li>
 </ul>
 
-<p><?
+<?
     print h2(_('Terms and Conditions'));
-    print '<strong>' . _('Click "Create" to confirm that you wish PledgeBank.com to display the
-pledge at the top of this page in your name.') . '</strong>';
+    print '<p><strong>' . _('Click "Create" to confirm that you wish PledgeBank.com to display the
+pledge at the top of this page in your name.') . '</strong> ';
     if ($v == 'pin') { ?>
 <!-- no special terms for private pledge -->
 <?  } else {
@@ -562,7 +562,7 @@ pledge at the top of this page in your name.') . '</strong>';
 greater publicity and a greater chance of succeeding.');
     }
     print _("Rest assured that we won't ever give or sell anyone your email address."); ?>
-<br><input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions"><?=_('Tick this box to confirm you have read this paragraph') ?></a>.</input>
+<br><input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions"><?=_('Tick this box to confirm you have read this paragraph') ?>.</label>
 </p>
 
 
@@ -646,9 +646,9 @@ function create_new_pledge($P, $data) {
     page_header(_('Pledge created'));
     $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($p->data['ref']));
 ?>
-    <p class="noprint" id="loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
-    <p class="noprint" id="loudmessage" align="center"><? printf(_('It is now live at <strong>%s</strong><br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a></strong>') ?></p>
-    <p class="noprint" id="loudmessage" align="center"><?=_('Your pledge will be publicised elsewhere on the site when a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
+    <p class="noprint loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
+    <p class="noprint loudmessage" align="center"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<strong><a href="'.$url.'">'.$url.'</a></strong>') ?></p>
+    <p class="noprint loudmessage" align="center"><?=_('Your pledge will be publicised elsewhere on the site when a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
 <?  post_confirm_advertise($p);
 }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.51 2005-06-24 13:50:04 matthew Exp $
+// $Id: page.php,v 1.52 2005-06-24 16:48:20 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -111,11 +111,11 @@ function page_header($title, $params = array()) {
  * Print bottom of HTML page. This closes the "content" <div>.  If
  * PARAMS['nonav'] is true then the footer navigation is not displayed. */
 function page_footer($params = array()) {
+?></div><? # id="content"
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
         $footer_outputted = 1;
 ?>
-</div>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
 <p><label for="s"><?=_('Search') ?>:</label>

@@ -30,7 +30,7 @@
 #   more complex prominence stuff
 #   Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.105 2005-06-24 15:34:00 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.106 2005-06-24 16:48:20 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -135,6 +135,7 @@ $wth->database_load_schema('../db/ican-categories.sql');
 $wth->database_cycle_sequences(200);
 $wth->email_setup({ eveld_bin => "$FindBin::Bin/../../services/EvEl/bin/eveld",
                     log_mailbox => "log_mailbox" });
+$wth->browser_validate_all_html("/usr/bin/validate");
 sms_setup();
 
 # Syntax check all .php files

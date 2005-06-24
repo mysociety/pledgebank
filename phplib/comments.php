@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.28 2005-06-24 13:39:18 matthew Exp $
+ * $Id: comments.php,v 1.29 2005-06-24 16:48:20 francis Exp $
  * 
  */
 
@@ -116,10 +116,8 @@ function comment_summary($r) {
     return sprintf(_('%s by %s, on pledge %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
 }
 
-function latest_comments() { ?>
-<div id="comments">
-<?=_('<h2>Latest comments</h2>') ?>
-<?  $comments_to_show = 10;
+function latest_comments() { 
+    $comments_to_show = 10;
     $q = db_query("
                 SELECT comment.id,
                     extract(epoch from whenposted) as whenposted, text,
@@ -130,14 +128,18 @@ function latest_comments() { ?>
                     AND pb_pledge_prominence(pledges.id) <> 'backpage'
                 ORDER BY whenposted DESC
                 LIMIT $comments_to_show");
-    print '<ul>';
-    while($r = db_fetch_array($q)) {
-        print '<li>';
-        print comment_summary($r);
-        #        comments_show_one($r, true);
-        print '</li>';
+    if (db_num_rows($q) > 0) {
+        ?><div class="comments">
+        <?=_('<h2>Latest comments</h2>') ?> <?  
+        print '<ul>';
+        while($r = db_fetch_array($q)) {
+            print '<li>';
+            print comment_summary($r);
+            #        comments_show_one($r, true);
+            print '</li>';
+        }
+        print '</ul></div>';
     }
-    print '</ul></div>';
 }
 
 function comments_form($pledge_id, $nextn, $allow_post = false) {
@@ -188,7 +190,7 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 <p><small><?=_('Your name and web site, if given, will be shown on your comment,
 but your email address will not be.') ?></small></p>
 <p><input type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ? "checked" : ""?>>
-<?=_('Email me any replies to my comment') ?></input></p>
+<?=_('Email me any replies to my comment') ?></p>
 
 <p><input type="submit" name="preview" value="<?=_('Preview') ?>">
 <? if ($allow_post) { ?>

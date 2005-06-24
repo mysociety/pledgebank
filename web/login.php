@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.47 2005-06-24 15:16:43 francis Exp $
+ * $Id: login.php,v 1.48 2005-06-24 16:48:21 francis Exp $
  * 
  */
 
@@ -226,11 +226,11 @@ function login_page() {
         page_header(_("Now check your email!"));
         /* XXX show message only for Hotmail users? Probably not worth it. */
     ?>
-<p id="loudmessage">
+<p class="loudmessage">
 <?=_('Now check your email!') ?><br>
 <?=_("We've sent you an email, and you'll need to click the link in it before you can
 continue") ?>
-<p id="loudmessage">
+<p class="loudmessage">
 <small><?=_('If you use <acronym title="Web based email">Webmail</acronym> or have
 "junk mail" filters, you may wish to check your bulk/spam mail folders:
 sometimes, our messages are marked that way.') ?></small>
@@ -300,7 +300,7 @@ function login_form($errors = array()) {
 <li><?=_("I've never used PledgeBank before, let me confirm my email address now.") ?>
 
 <input type="submit" name="SendEmail" value="<?=_('Click here to continue') ?> &gt;&gt;"><br>
-<small><?=_("(we'll send an email, click the link in it to confirm your email is working)") ?></small></p>
+<small><?=_("(we'll send an email, click the link in it to confirm your email is working)") ?></small>
 
 </li>
 
@@ -309,7 +309,7 @@ function login_form($errors = array()) {
 <input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
 <input type="submit" name="LogIn" value="<?=_('Let me in') ?> &gt;&gt;"></p>
 
-<input type="checkbox" name="rememberme" id="rememberme" value="1"><strong><?=_('Remember me') ?></strong></input>
+<input type="checkbox" name="rememberme" id="rememberme" value="1"><strong><?=_('Remember me') ?></strong>
 <small><?=_("(don't use this on a public or shared computer)") ?></small>
 
 </li>
@@ -378,28 +378,28 @@ You don't have to set a password if you don't want to."));
 
 <ul>
 
-<form action="/login" name="loginNoPassword" class="login" method="POST" accept-charset="utf-8">
+<li><form action="/login" name="loginNoPassword" class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="<?=$q_h_stash?>">
 <input type="hidden" name="email" value="<?=$q_h_email?>">
 <input type="hidden" name="name" value="<?=$q_h_name?>">
-<li><?=_("No, I don't want to think of a password right now.") ?>
-<input type="submit" name="NoPassword" value="<?=_('Click here to continue') ?> &gt;&gt;">
+<?=_("No, I don't want to think of a password right now.") ?>
+ <input type="submit" name="NoPassword" value="<?=_('Click here to continue') ?> &gt;&gt;">
 <br><small><?=_('(you can set a password another time)') ?></small>
-</li></form>
+</form><p></p></li>
 
-<form action="/login" name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
+<li><form action="/login" name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
 <input type="hidden" name="stash" value="<?=$q_h_stash?>">
 <input type="hidden" name="email" value="<?=$q_h_email?>">
 <input type="hidden" name="name" value="<?=$q_h_name?>">
 <input type="hidden" name="SetPassword" value="1">
 
-<li><p><?=_("Yes, I'd like to set a password, so I don't have to keep going back to my email.") ?>
+<?=_("Yes, I'd like to set a password, so I don't have to keep going back to my email.") ?>
 <br>
     <strong><?=_('Password:') ?></strong> <input type="password" name="pw1" id="pw1" size="15">
     <strong><?=_('Password (again):') ?></strong> <input type="password" name="pw2" size="15">
     <input type="submit" name="SetPassword" value="<?=_('Set password') ?> &gt;&gt;">
-</li>
 </form>
+</li>
 
 </ul>
 

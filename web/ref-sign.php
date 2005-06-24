@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.16 2005-06-24 11:27:41 matthew Exp $
+// $Id: ref-sign.php,v 1.17 2005-06-24 16:48:21 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -61,7 +61,7 @@ function do_sign() {
         /* All OK, sign pledge. */
         db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($pledge->id(), $P->name(), $P->id(), $q_showname ? 't' : 'f'));
         db_commit();
-        print '<p class="noprint" id="loudmessage" align="center">' . _('Thanks for signing up to this pledge!') . '</p>';
+        print '<p class="noprint loudmessage" align="center">' . _('Thanks for signing up to this pledge!') . '</p>';
 
         /* Grab the row again so the check is current. */
         $pledge = new Pledge($q_ref);

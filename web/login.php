@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.46 2005-06-24 12:27:02 matthew Exp $
+ * $Id: login.php,v 1.47 2005-06-24 15:16:43 francis Exp $
  * 
  */
 
@@ -379,18 +379,18 @@ You don't have to set a password if you don't want to."));
 <ul>
 
 <form action="/login" name="loginNoPassword" class="login" method="POST" accept-charset="utf-8">
-<input type="hidden" name="stash" value="$q_h_stash">
-<input type="hidden" name="email" value="$q_h_email">
-<input type="hidden" name="name" value="$q_h_name">
+<input type="hidden" name="stash" value="<?=$q_h_stash?>">
+<input type="hidden" name="email" value="<?=$q_h_email?>">
+<input type="hidden" name="name" value="<?=$q_h_name?>">
 <li><?=_("No, I don't want to think of a password right now.") ?>
 <input type="submit" name="NoPassword" value="<?=_('Click here to continue') ?> &gt;&gt;">
 <br><small><?=_('(you can set a password another time)') ?></small>
 </li></form>
 
 <form action="/login" name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
-<input type="hidden" name="stash" value="$q_h_stash">
-<input type="hidden" name="email" value="$q_h_email">
-<input type="hidden" name="name" value="$q_h_name">
+<input type="hidden" name="stash" value="<?=$q_h_stash?>">
+<input type="hidden" name="email" value="<?=$q_h_email?>">
+<input type="hidden" name="name" value="<?=$q_h_name?>">
 <input type="hidden" name="SetPassword" value="1">
 
 <li><p><?=_("Yes, I'd like to set a password, so I don't have to keep going back to my email.") ?>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.74 2005-06-24 19:17:45 francis Exp $
+ * $Id: admin-pb.php,v 1.75 2005-06-24 19:34:39 francis Exp $
  * 
  */
 
@@ -175,15 +175,15 @@ class ADMIN_PAGE_PB_MAIN {
         print '<form method="post" action="'.$this->self_link.'">';
         print '<input type="hidden" name="update_prom" value="1">';
         print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
-        print '<td>Prominence: ';
+        print 'Prominence: ';
         if ($pdata['pin'])
             print "<b>private</b> ";
         print '<select name="prominence">';
         print '<option value="normal"' . ($pdata['prominence']=='normal'?' selected':'') . '>normal</option>';
         print '<option value="frontpage"' . ($pdata['prominence']=='frontpage'?' selected':'') . '>frontpage</option>';
         print '<option value="backpage"' . ($pdata['prominence']=='backpage'?' selected':'') . '>backpage</option>';
-        print '</select></td>';
-        print '<input name="update" type="submit" value="Update"></p></form>';
+        print '</select>';
+        print '<input name="update" type="submit" value="Update"></form>';
 
         // Signers
         print "<h2>Signers</h2>";
@@ -513,8 +513,10 @@ class ADMIN_PAGE_PB_LATEST {
                     $time[$r['epoch']][] = $r;
                 }
             }
-            $q = db_query('SELECT *, extract(epoch from whenposted) as commentposted
+            $q = db_query('SELECT comment.*, extract(epoch from whenposted) as commentposted,
+                                  person.email as author_email
                              FROM comment
+                             LEFT JOIN person ON person.id = comment.person_id
                          ORDER BY whenposted DESC');
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['pledge_id']) {
@@ -595,7 +597,10 @@ class ADMIN_PAGE_PB_LATEST {
                 print "SMS sent to $data[recipient], message
                     '$data[message]' status $data[lastsendstatus]";
             } elseif (array_key_exists('commentposted', $data)) {
-                print "$data[name] &lt;$data[email]&gt; commented on " .
+                $comment_email = $data['email'];
+                if (!$comment_email)
+                    $comment_email = $data['author_email'];
+                print "$data[name] &lt;$comment_email&gt; commented on " .
                     $this->pledge_link('id', $data['pledge_id']) . " saying
                 '$data[text]'";
             } else {

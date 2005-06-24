@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.99 2005-06-23 23:20:57 matthew Exp $
+ * $Id: pledge.php,v 1.100 2005-06-24 10:27:17 matthew Exp $
  * 
  */
 
@@ -191,13 +191,21 @@ class Pledge {
 <? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
 &quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
-<p>Deadline: <strong><?=$this->h_pretty_date()?></strong>.
+<p><?=_('Deadline:') ?> <strong><?=$this->h_pretty_date()?></strong>.
 <br>
-<? if ($this->signers() >= 0) { ?>
-<i><?=prettify($this->signers()) ?> <?=make_plural($this->signers(), 'person has', 'people have') ?> signed up<?=($this->left()<0?' ('.(-$this->left()).' over target)':', '.($this->left()).' more needed') ?></i>
-<? } ?>
-</p>
-<?
+<?      if ($this->signers() >= 0) {
+            print '<i>';
+            printf(ngettext('%s person has signed up', '%s people have signed up', $this->signers()), prettify($this->signers()));
+            if ($this->left() < 0) {
+                print ' ';
+                printf(_('(%d over target)'), -$this->left() );
+            } else {
+                print ', ';
+                printf(_('%d more needed'), $this->left() );
+            }
+            print '</i>';
+        }
+        print '</p>';
         if (array_key_exists('showdetails', $params) && $params['showdetails'] && isset($this->data['detail']) && $this->data['detail']) {
             $det = htmlspecialchars($this->data['detail']);
             $det = make_clickable($det, array('contract'=>true));

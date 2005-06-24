@@ -5,10 +5,13 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.40 2005-06-24 11:44:42 matthew Exp $
+// $Id: fns.php,v 1.41 2005-06-24 12:07:56 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
+
+function p($s) { return "<p>$s</p>\n"; }
+function h2($s) { return "<h2>$s</h2>\n"; }
 
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
@@ -183,9 +186,9 @@ function view_friends_form($p, $errors = array()) {
 ?>
 <form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
 <? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">';
-print '<h2>' . _('Email this pledge') . '</h2>';
-print '<p>' . _('Please enter these details so that we can send your message to your contacts.
-We will not give or sell either your or their email address to anyone else.'); ?></p>
+print h2(_('Email this pledge'));
+print p(_('Please enter these details so that we can send your message to your contacts.
+We will not give or sell either your or their email address to anyone else.')); ?>
 <p><strong><?=_('Other people\'s email addresses:') ?></strong></p>
 <div class="formrow"><input type="text" name="email1" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email2" value="" size="40"></div>

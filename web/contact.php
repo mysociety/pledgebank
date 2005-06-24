@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.21 2005-06-24 11:44:43 matthew Exp $
+// $Id: contact.php,v 1.22 2005-06-24 12:07:59 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -23,13 +23,13 @@ if (get_http_var('contactpost')) {
 page_footer();
 
 function contact_form($errors = array()) {
-    print '<h2>' . _('Contact Us') . '</h2>';
-    printf(_('<p>Was it useful?  How could it be better?
+    print h2(_('Contact Us'));
+    printf(p(_('Was it useful?  How could it be better?
 We make PledgeBank and thrive off feedback, good and bad.
 Use this form to contact us.
-If you prefer, you can email %s instead of using the form.</p>'), '<a href="mailto:' . OPTION_CONTACT_EMAIL . '">' . OPTION_CONTACT_EMAIL . '</a>');
-    print '<p>' . _('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.') . '</p>';
-    print '<p>' . _("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge: these messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator.") . '</p>';
+If you prefer, you can email %s instead of using the form.')), '<a href="mailto:' . OPTION_CONTACT_EMAIL . '">' . OPTION_CONTACT_EMAIL . '</a>');
+    print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
+    print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge: these messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator."));
     if (sizeof($errors)) {
         print '<ul id="errors"><li>';
         print join ('</li><li>', $errors);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.12 2005-06-24 09:51:10 matthew Exp $
+// $Id: faq.php,v 1.13 2005-06-24 12:07:59 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,7 +15,7 @@ page_header(_("Frequently Asked Questions"));
 function dt($s) { print "<dt>$s</dt>\n"; }
 function dd($s) { print "<dd>$s</dd>\n"; }
 
-print '<h2>' . _('Frequently Asked Questions') . "</h2>\n";
+print h2(_('Frequently Asked Questions'));
 print "<dl>\n";
 print dt(_('What is PledgeBank for?'));
 print dd(_("PledgeBank is a site to help people get things done, especially things

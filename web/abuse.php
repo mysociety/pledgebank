@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.13 2005-06-24 11:27:41 matthew Exp $
+// $Id: abuse.php,v 1.14 2005-06-24 12:07:59 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -46,7 +46,7 @@ function report_abusive_thing() {
     }
 
     if (is_null($pledge_id)) {
-        print '<h2>' . _('Report Abuse') . '</h2>';
+        print h2(_('Report Abuse'));
         printf(_("The %s couldn't be found.  It has probably been deleted already."), $w);
         return;
     }
@@ -74,8 +74,8 @@ as possible. </p>'), $w);
     $title = htmlspecialchars(db_getOne('select title from pledges where id = ?', $pledge_id));
 
     print '<form accept-charset="utf-8" action="abuse" method="post" name="abuse" class="pledge">';
-    printf(_('<h2>Report something wrong with a %s</h2>'), $w);
-    printf(_('<p>You are reporting the following %s as being abusive, suspicious or having something wrong with it.</p>'), $w);
+    printf(h2(_('Report something wrong with a %s')), $w);
+    printf(p(_('You are reporting the following %s as being abusive, suspicious or having something wrong with it.')), $w);
     print '<blockquote>';
     if ($q_what == 'pledge') {
         print $title;

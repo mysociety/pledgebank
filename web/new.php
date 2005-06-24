@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.43 2005-06-24 11:42:51 francis Exp $
+// $Id: new.php,v 1.44 2005-06-24 12:07:59 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -47,18 +47,18 @@ function pledge_form_one($data = array(), $errors = array()) {
 
 <li> <?=_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
 to do something when 5 would be enough? Every extra person makes your pledge
-harder to meet.</li>') ?>
+harder to meet.') ?></li>
 
 <li> <?=_("<strong>Think about how your pledge reads.</strong> How will it look to
 someone who picks up a flyer from their doormat? Read your pledge to the person
 next to you, or to your mother, and see if they understand what you're talking
-about. If they don't, you need to rewrite it.</li>") ?>
+about. If they don't, you need to rewrite it.") ?></li>
 
 <li> <?=_("<strong>Don't imagine that your pledge will sell itself.</strong> If
 you've created something, tell the world! Email your friends, print leaflets
 and stick them through your neighbours doors. Focus especially hard on breaking
 outside your circle of friends &mdash; ask your co-workers, put a flyer through
-the door of that neighbour whose name you've forgotten.</li>") ?>
+the door of that neighbour whose name you've forgotten.") ?></li>
 
 </ol>
 </div>
@@ -121,7 +121,7 @@ function pledge_form_target_warning($data, $errors) {
 		print '</li></ul></div>';
     }
 
-    print _('<p>Your pledge looks like this so far:</p>');
+    print '<p>' . _('Your pledge looks like this so far:') . '</p>';
     $isodate = $data['parseddate']['iso'];
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
@@ -131,22 +131,22 @@ function pledge_form_target_warning($data, $errors) {
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="tw">
 
-<?  print '<h2>' . _('Rethink your target') . '</h2>';
-    printf(_("<p>Hello - we've noticed that your pledge is aiming to recruit more than
-%d people.</p>"), OPTION_PB_TARGET_WARNING);
-    printf(_("<p>Recruiting more than %d people to a pledge is a
+<?  print h2(_('Rethink your target'));
+    printf(p(_("Hello - we've noticed that your pledge is aiming to recruit more than
+%d people.")), OPTION_PB_TARGET_WARNING);
+    printf(p(_("Recruiting more than %d people to a pledge is a
 lot of work, and many people who have set up pledges larger than this have not
 succeeded.  You should only set a large target if you are preprared to do some
-serious marketing of your pledge.</p>"), OPTION_PB_TARGET_WARNING);
-    print _('<p>Please take advantage of this box to change your target.  There is <a
-href="/faq#targets">more advice</a> about choosing a target in the FAQ.</p>');
+serious marketing of your pledge.")), OPTION_PB_TARGET_WARNING);
+    print p(_('Please take advantage of this box to change your target.  There is <a
+href="/faq#targets">more advice</a> about choosing a target in the FAQ.'));
 ?>
 <p><?=_('<strong>My target</strong> is ') ?>
 <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?='' /*(isset($data['target'])?htmlspecialchars($data['target']):'')*/ ?>">
 <strong><?=$data['type']?></strong></p>
 
-<?=_('<p>Remember, a small but successful pledge can be the perfect preparation
-for a larger and more ambitious one.</p>') ?>
+<p><?=_('Remember, a small but successful pledge can be the perfect preparation
+for a larger and more ambitious one.') ?></p>
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
@@ -183,7 +183,7 @@ function pledge_form_two($data, $errors = array()) {
     } else {
 ?>
 
-<?=_('<p>Your pledge looks like this so far:</p>') ?>
+<p><?=_('Your pledge looks like this so far:') ?></p>
 <?  }
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
@@ -501,7 +501,9 @@ function preview_pledge($data, $errors) {
         print '</li></ul></div>';
     } #    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
 
-    printf(_('<p>Your pledge, with short name <em>%s</em>, will look like this:</p>'), $data['ref']);
+    print '<p>';
+    printf(_('Your pledge, with short name <em>%s</em>, will look like this:'), $data['ref']);
+    print '</p>';
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
@@ -509,14 +511,13 @@ function preview_pledge($data, $errors) {
 ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
-<?  print '<h2>' . _('New Pledge &#8211; Step 3 of 3') . '</h2>';
-    print _('<p>Please check the details you have entered, both the pledge itself (see left)
+<?  print h2(_('New Pledge &#8211; Step 3 of 3'));
+    print p(_('Please check the details you have entered, both the pledge itself (see left)
 and other details below.  Click one of the two "Back" buttons if you would like
 to go back and edit your data.  
 <strong>Check carefully, as you cannot edit your pledge after you have
 created it.</strong>
-(<a href="/faq#editpledge">why not?</a>)
-</p>');
+(<a href="/faq#editpledge">why not?</a>)'));
 ?>
 <ul>
 
@@ -546,7 +547,7 @@ if ($v=='pin') print _('Only people to whom I give a PIN I have specified');
 </ul>
 
 <p><?
-    print '<h2>' . _('Terms and Conditions') . '</h2>';
+    print h2(_('Terms and Conditions'));
     print '<strong>' . _('Click "Create" to confirm that you wish PledgeBank.com to display the
 pledge at the top of this page in your name.') . '</strong>';
     if ($v == 'pin') { ?>

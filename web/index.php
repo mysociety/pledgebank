@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.191 2005-06-24 11:27:41 matthew Exp $
+// $Id: index.php,v 1.192 2005-06-24 12:07:59 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -85,7 +85,7 @@ function get_pledges_list($query) {
 }
 
 function list_newest_pledges() {
-    print '<h2>' . _('Sign up to one of our five newest pledges') . '</h2>';
+    print h2(_('Sign up to one of our five newest pledges'));
 
     $pledges = get_pledges_list("
                 SELECT *, date - pb_current_date() AS daysleft
@@ -123,7 +123,7 @@ function list_frontpage_pledges() {
 }
 
 function list_successful_pledges() {
-    print '<h2>' . _('Recent successful pledges') . '</h2>';
+    print h2(_('Recent successful pledges'));
     $pledges = get_pledges_list("
                 SELECT *, date - pb_current_date() AS daysleft
                 FROM pledges

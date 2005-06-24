@@ -1,9 +1,0 @@
-Subject: Comment on your pledge
-
-<?=$values['comment_author_name']?> has left a comment on your pledge, saying: 
-
-<?=$values['comment_text']?>
-
-View or reply to this comment: <?=$values['comment_url']?>
-
-<?=$values['signature']?>

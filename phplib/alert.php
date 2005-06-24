@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.6 2005-06-24 10:06:04 matthew Exp $
+// $Id: alert.php,v 1.7 2005-06-24 11:42:50 francis Exp $
 
 /* alert_signup PERSON_ID EVENT_CODE PARAMS
  * 
@@ -18,8 +18,12 @@
  */
 function alert_signup($person_id, $event_code, $params) {
     if ($event_code == "comments/ref") {
-        db_query("insert into alert (person_id, event_code, pledge_id)
-            values (?, ?, ?)", array($person_id, $event_code, $params['pledge_id']));
+        $already = db_getOne("select id from alert where person_id = ? and event_code = ?
+            and pledge_id = ?", array($person_id, $event_code, $params['pledge_id']));
+        if (is_null($already)) {
+            db_query("insert into alert (person_id, event_code, pledge_id)
+                values (?, ?, ?)", array($person_id, $event_code, $params['pledge_id']));
+        }
     }
     else {
         err("Unknown alert event '$event_code'");

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.21 2005-06-24 11:27:41 matthew Exp $
+ * $Id: comment.php,v 1.22 2005-06-24 11:42:51 francis Exp $
  * 
  */
 
@@ -112,17 +112,7 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
         }
     }
     db_commit();
-    $values = $pledge->data;
-    $values['comment_text'] = $q_text;
-    $values['comment_url'] = $pledge->url_comments();
-    $values['comment_author_name'] = $q_author_name;
-    $values['comment_author_email'] = $q_author_email;
-    $values['comment_author_website'] = $q_author_website;
-    $success = pb_send_email_template($pledge->creator_email(), 'comment-creator', $values);
-    if (!$success) {
-        err(_("Problems sending message to pledge creator."));
-    }
-    print '<p>' . _("Thank you! Your comment has now been posted.");
+    print "<p>" . _("Thank you! Your comment has now been posted.");
     if ($q_comment_alert_signup)
         print ' ' . _("You will be emailed when anyone adds a comment to the pledge.");
     print "</p>";

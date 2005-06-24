@@ -84,15 +84,6 @@ Sent to each signer when a pledge succeeds.
 Sent to creator when admin gives them an announcement to signers.
   - url, the URL for confirmation.
 
-* comment-creator
-TODO: migrate this to alert-comment system
-Sent to creator when a comment is added to a pledge.
-  - comment_url, link to the comment
-  - comment_text, body text of the comment
-  - comment_author_name, name of commenter
-  - comment_author_email, email address of commenter
-  - comment_author_website, website of commenter
-
 * chivvy-creator
 Sent 2 days after creation of a new pledge if it doesn't have many signups.
 
@@ -112,7 +103,8 @@ Sent by someone to tell their friends about a pledge.
 
 * alert-comment
 Sent when a new comment is posted on a pledge, to people who are 
-subscribed for that notification.
+subscribed for that notification.  This includes the pledge creator
+by default.
   - comment_url, link to the comment
   - comment_text, body text of the comment
   - comment_author_name, name of commenter

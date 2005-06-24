@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.42 2005-06-24 11:27:41 matthew Exp $
+// $Id: new.php,v 1.43 2005-06-24 11:42:51 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -13,6 +13,7 @@ require_once '../phplib/person.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/auth.php';
 require_once '../phplib/comments.php';
+require_once '../phplib/alert.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/mapit.php';      # To test validity of postcodes
 
@@ -628,12 +629,20 @@ function create_new_pledge($P, $data) {
                 insert into pledge_category (pledge_id, category_id)
                 values (?, ?)',
                 array($data['id'], $data['category']));
+
     }
 
     db_commit();
+    $p = new Pledge($data['ref']); // Reselect full data set from DB
+
+    // Comment alerts are no longer sent specially to pledge creators, so we
+    // add them in for alerts explicitly here.
+    alert_signup($P->id(), "comments/ref", array('pledge_id' => $p->id()));
+    db_commit();
+    // To migrate existing creators to new system use this:
+    // insert into alert (person_id, event_code, pledge_id) select person_id, 'comments/ref', id from pledges;
 
     page_header(_('Pledge created'));
-    $p = new Pledge($data['ref']); // Reselect full data set from DB
     $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($p->data['ref']));
 ?>
     <p class="noprint" id="loudmessage"><?=_('Thank you for creating your pledge.') ?></p>

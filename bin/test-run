@@ -30,7 +30,7 @@
 #   more complex prominence stuff
 #   Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.103 2005-06-23 20:51:01 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.104 2005-06-24 11:42:50 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -504,7 +504,8 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Your comment has now been posted");
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("Do I have to be a computer to take part?");
-    $wth->email_get_containing('%To: '.email_n(0).  '%has left a comment on your pledge%');
+    call_sendalerts();
+    $wth->email_get_containing('%To: '.email_n(0).  '%This is a great pledge%');
     # Add another comment so its email goes
     $wth->browser_get($base_url . "/$pledge_ref");
     $wth->browser_submit_form(form_name => 'commentform',
@@ -520,12 +521,12 @@ sub do_public_succeeding_pledge {
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("This is a second comment");
     call_sendalerts();
-    $wth->email_get_containing('%To: '.email_n(0).  '%has left a comment on your pledge%');
+    $wth->email_get_containing('%To: '.email_n(0).  '%This is a second comment%');
     my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%This is a second comment%');
     $wth->email_check_none_left();
-    die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\s($base_url/L/.*$)#m);
+    die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\b($base_url/L/.*)\b#m);
     my $comment_unsubscribe_url = $1;
-    $wth->get($comment_unsubscribe_url);
+    $wth->browser_get($comment_unsubscribe_url);
     $wth->browser_check_contents("You won't receive more email");
     # Send third comment, check don't get alert
     $wth->browser_get($base_url . "/$pledge_ref");
@@ -542,7 +543,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("This is a third comment");
     call_sendalerts();
-    $wth->email_get_containing('%To: '.email_n(0).  '%has left a comment on your pledge%');
+    $wth->email_get_containing('%To: '.email_n(0).  '%This is a third comment%');
     $wth->email_check_none_left();
 
     # Mail pledge to friends

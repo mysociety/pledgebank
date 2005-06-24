@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.10 2005-06-23 23:32:32 matthew Exp $
+// $Id: ref-email.php,v 1.11 2005-06-24 11:27:41 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -40,7 +40,7 @@ for ($i = 1; $i <= 5; $i++) {
 }
 $errors = array();
 if (!$fromname) $errors[] = _("Please enter your name");
-if (!$fromemail) $errors[] = _("Please enter your email");
+if (!$fromemail) $errors[] = _("Please enter your email address");
 if (count($emails) < 1) $errors[] = _("Please enter the email addresses of the people you want to tell about the pledge");
 if (!$errors) {
     if (sizeof($emails)>5)

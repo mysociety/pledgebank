@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.19 2005-06-24 09:51:10 matthew Exp $
+// $Id: contact.php,v 1.20 2005-06-24 11:27:41 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -23,7 +23,7 @@ if (get_http_var('contactpost')) {
 page_footer();
 
 function contact_form($errors = array()) {
-    print _('<h2>Contact Us</h2>');
+    print '<h2>' . _('Contact Us') . '</h2>';
     print _('<p>Was it useful?  How could it be better?
 We make PledgeBank and thrive off feedback, good and bad.
 Use this form to contact us.
@@ -54,7 +54,7 @@ function contact_form_submitted() {
     $message = get_http_var('message');
     $errors = array();
 	if (!$name) $errors[] = _('Please enter your name');
-	if (!$email) $errors[] = _('Please enter your mail address');
+	if (!$email) $errors[] = _('Please enter your email address');
 	if (!$subject) $errors[] = _('Please enter a subject');
 	if (!$message) $errors[] = _('Please enter your message');
 	if (sizeof($errors)) {

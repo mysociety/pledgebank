@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: offline.php,v 1.11 2005-06-24 09:51:10 matthew Exp $
+// $Id: offline.php,v 1.12 2005-06-24 11:27:41 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -14,8 +14,8 @@ page_header(_("You never bump into your neighbours online"));
 
 ?>
 <div class="offline">
-<img src="monitor-neighbours-250px.jpg" class="l" style="margin-right: 20px;" title="<?=_('You never bump in to your neighbours online') ?>" width="245" height="250" alt="">
-<h2><?=_('You never bump in to your neighbours online') ?></h2>
+<img src="monitor-neighbours-250px.jpg" class="l" style="margin-right: 20px;" title="<?=_('You never bump into your neighbours online') ?>" width="245" height="250" alt="">
+<h2><?=_('You never bump into your neighbours online') ?></h2>
 <?
 print _("<p>Have you ever noticed that you never bump into your neighbours online?
 This means that most websites can't offer much help to people trying

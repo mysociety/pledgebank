@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.15 2005-06-24 08:49:38 matthew Exp $
+// $Id: ref-sign.php,v 1.16 2005-06-24 11:27:41 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -33,8 +33,8 @@ page_footer();
 function do_sign() {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
     $errors = importparams(
-                array('name',       '/^[a-z]/i',        _('Please give your name')),
-                array('email',      '/^[^@]+@.+/',      _('Please give your email')),
+                array('name',       '/^[a-z]/i',        _('Please enter your name')),
+                array('email',      '/^[^@]+@.+/',      _('Please enter your email address')),
                 array('ref',        '/^[a-z0-9-]+$/i',  ''),
                 array('showname',   '//',               _('Please enter showname'), 0),
                 array('pin',         '//',              '', null)
@@ -66,16 +66,18 @@ function do_sign() {
         /* Grab the row again so the check is current. */
         $pledge = new Pledge($q_ref);
         if (!$f1 && $pledge->succeeded())
-            print _("<p><strong>Your signature has made this pledge reach its target! Woohoo!</strong></p>");
+            print '<p><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
 
         post_confirm_advertise($pledge);
     } else if ($R == PLEDGE_SIGNED) {
         /* Either has already signer, or is creator. */
+        print '<p><strong>';
         if ($P->id() == $pledge->creator_id()) {
-            print _('<p><strong>You cannot sign your own pledge!</strong></p>');
+            print _('You cannot sign your own pledge!');
         } else {
-            print _('<p><strong>You\'ve already signed this pledge!</strong></p>');
+            print _('You\'ve already signed this pledge!');
         }
+        print '</strong></p>';
     } else {
         /* Something else has gone wrong. */
         print '<p><strong>' . _("Sorry &mdash; it wasn't possible to sign that pledge.") . ' '

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.12 2005-06-24 09:51:10 matthew Exp $
+// $Id: alert.php,v 1.13 2005-06-24 11:27:41 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -32,12 +32,14 @@ if (get_http_var('subscribe_alert')) {
     if (!$P) 
         err(_('Unexpectedly not signed on after following unsubscribe link'));
     $desc = alert_h_description($alert_id);
+    print '<p>';
     if ($desc) {
         alert_unsubscribe($P->id(), $alert_id);
-        printf(_("<p>Thanks!  You won't receive more email about %s.</p>"), $desc);
+        printf(_("Thanks!  You won't receive more email about %s."), $desc);
     } else {
-        print _("<p>Thanks!  You are already unsubscribed from that alert.</p>");
+        print _("Thanks!  You are already unsubscribed from that alert.");
     }
+    print '</p>';
 } else {
     local_alert_subscribe_box();
 }
@@ -46,7 +48,7 @@ page_footer();
 function do_local_alert_subscribe() {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
     $errors = importparams(
-                array('email',      '/^[^@]+@.+/',      _('Please give your email')),
+                array('email',      '/^[^@]+@.+/',      _('Please enter your email address')),
                 array('postcode',      "importparams_validate_postcode")
             );
     if (!is_null($errors))
@@ -80,8 +82,8 @@ function local_alert_subscribe_box() {
 ?>
 <form accept-charset="utf-8" class="pledge" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_alert" value="1">
-<?=_('<h2>Get emails about local pledges (UK)</h2>') ?>
-<?=_("<p>Fill in the form, and we'll email you when someone creates a new pledge near you.</p>") ?>
+<h2><?=_('Get emails about local pledges (UK)') ?></h2>
+<p><?=_("Fill in the form, and we'll email you when someone creates a new pledge near you.") ?></p>
 <p>
 <label for="email"><strong><?=_('Email:') ?></strong></label> 
 <input type="text" size="20" name="email" id="email" value="<?=htmlspecialchars($email) ?>">

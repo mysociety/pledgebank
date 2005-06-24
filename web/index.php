@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.190 2005-06-23 23:32:32 matthew Exp $
+// $Id: index.php,v 1.191 2005-06-24 11:27:41 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -55,7 +55,7 @@ Or <a href="/explain">read a full transcript') ?></a>.</p>
 <p><?=_('Pledgebank is free and easy to use. Once you\'ve thought of something you\'d like
 to do, just <a href="/new">create a pledge</a> which says "I\'ll do this, but
 only if 5 other people will do the same".') ?>
-<p id="start"><a href="./new"><?=_('Start your own pledge&nbsp;&raquo;') ?></a></p>
+<p id="start"><a href="./new"><?=_('Start your own pledge') ?>&nbsp;&raquo;</a></p>
 </div>
 
 <div id="currentpledges">

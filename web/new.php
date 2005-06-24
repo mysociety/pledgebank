@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.41 2005-06-24 10:12:13 matthew Exp $
+// $Id: new.php,v 1.42 2005-06-24 11:27:41 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -41,7 +41,7 @@ function pledge_form_one($data = array(), $errors = array()) {
 	} else {
 ?>
 <div id="tips">
-<?=_('<h2>Top Tips for Successful Pledges</h2>') ?>
+<h2><?=_('Top Tips for Successful Pledges') ?></h2>
 <ol>
 
 <li> <?=_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
@@ -74,7 +74,7 @@ the door of that neighbour whose name you've forgotten.</li>") ?>
 ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="1">
-<?=_('<h2>New Pledge &#8211; Step 1 of 3</h2>') ?>
+<h2><?=_('New Pledge &#8211; Step 1 of 3') ?></h2>
 <div class="c">
 <p><strong>I will</strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
@@ -130,7 +130,7 @@ function pledge_form_target_warning($data, $errors) {
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="tw">
 
-<?  print _('<h2>Rethink your target</h2>');
+<?  print '<h2>' . _('Rethink your target') . '</h2>';
     printf(_("<p>Hello - we've noticed that your pledge is aiming to recruit more than
 %d people.</p>"), OPTION_PB_TARGET_WARNING);
     printf(_("<p>Recruiting more than %d people to a pledge is a
@@ -190,7 +190,7 @@ function pledge_form_two($data, $errors = array()) {
 ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="2">
-<?=_('<h2>New Pledge &#8211; Step 2 of 3</h2>') ?>
+<h2><?=_('New Pledge &#8211; Step 2 of 3') ?></h2>
 
 <input type="hidden" name="comparison" value="atleast">
 <? /* <p>Should the pledge stop accepting new subscribers when it
@@ -508,7 +508,7 @@ function preview_pledge($data, $errors) {
 ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
-<?  print _('<h2>New Pledge &#8211; Step 3 of 3</h2>');
+<?  print '<h2>' . _('New Pledge &#8211; Step 3 of 3') . '</h2>';
     print _('<p>Please check the details you have entered, both the pledge itself (see left)
 and other details below.  Click one of the two "Back" buttons if you would like
 to go back and edit your data.  
@@ -545,9 +545,9 @@ if ($v=='pin') print _('Only people to whom I give a PIN I have specified');
 </ul>
 
 <p><?
-    print _('<h2>Terms and Conditions</h2>');
-    print _('<strong>Click "Create" to confirm that you wish PledgeBank.com to display the
-pledge at the top of this page in your name.</strong>');
+    print '<h2>' . _('Terms and Conditions') . '</h2>';
+    print '<strong>' . _('Click "Create" to confirm that you wish PledgeBank.com to display the
+pledge at the top of this page in your name.') . '</strong>';
     if ($v == 'pin') { ?>
 <!-- no special terms for private pledge -->
 <?  } else {

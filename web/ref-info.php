@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.16 2005-06-24 08:49:38 matthew Exp $
+ * $Id: ref-info.php,v 1.17 2005-06-24 11:27:41 matthew Exp $
  * 
  */
 
@@ -169,7 +169,7 @@ you:</em></p>');
 <strong><?=_('Email address') ?></strong>
 <input type="hidden" name="ref" value="<?=$q_h_ref?>">
 <input type="text" name="email" value="">
-<input type="submit" name="LetMeIn" value="<?=_('Let me in!') ?>">
+<input type="submit" name="LetMeIn" value="<?=_('Let me in') ?>">
 </p>
 </form>
 

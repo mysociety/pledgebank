@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.44 2005-06-24 10:03:20 matthew Exp $
+ * $Id: login.php,v 1.45 2005-06-24 11:27:41 matthew Exp $
  * 
  */
 
@@ -183,7 +183,7 @@ function login_page() {
     if ($q_LogIn) {
         /* User has tried to log in. */
         if (is_null($q_email)) {
-            login_form(array('email'=>_('Please enter your email address.')));
+            login_form(array('email'=>_('Please enter your email address')));
             exit();
         }
         global $q_password;
@@ -205,7 +205,7 @@ function login_page() {
     } else if ($q_SendEmail) {
         /* User has asked to be sent email. */
         if (is_null($q_email)) {
-            login_form(array('email'=>_('Please enter your email address.')));
+            login_form(array('email'=>_('Please enter your email address')));
             exit();
         }
         $token = auth_token_store('login', array(
@@ -223,7 +223,7 @@ function login_page() {
             array_key_exists('template', $template_data) 
                 ?  $template_data['template'] : 'generic-confirm', 
             $template_data);
-        page_header(_("Now check your email"));
+        page_header(_("Now check your email!"));
         /* XXX show message only for Hotmail users? Probably not worth it. */
     ?>
 <p id="loudmessage">

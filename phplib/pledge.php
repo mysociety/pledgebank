@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.100 2005-06-24 10:27:17 matthew Exp $
+ * $Id: pledge.php,v 1.101 2005-06-24 11:27:40 matthew Exp $
  * 
  */
 
@@ -466,8 +466,8 @@ function deal_with_pin($link, $ref, $actual) {
     if (get_http_var('pin')) {
         $html .= '<p class="finished">' . _('Incorrect PIN!') . '</p>';
     }
-    $html .= '<p><form class="pledge" name="pledge" action="'.$link.'" method="post">' .
-        _('<h2>PIN Protected Pledge</h2>') . _('<p>This pledge is protected.  Please enter the PIN to proceed.</p>');
+    $html .= '<p><form class="pledge" name="pledge" action="'.$link.'" method="post"><h2>' .
+        _('PIN Protected Pledge') . '</h2><p>' . _('This pledge is protected.  Please enter the PIN to proceed.');
     $html .= '<p><strong>PIN:</strong> <input type="pin" name="pin" value=""><input type="submit" name="submitpin" value="' . _('Submit') . '"></p>';
     $html .= '</form></p>';
     return $html;
@@ -537,10 +537,11 @@ function pledge_sign_box() {
 <input type="hidden" name="add_signatory" value="1">
 <input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
-<?  print _('<h2>Sign up now</h2>');
+<?  print '<h2>' . _('Sign up now') . '</h2>';
     if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">';
     $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
-    printf(_('<p><b>I, %s, sign up to the pledge.'), $namebox);
+    print '<p><b>';
+    printf(_('I, %s, sign up to the pledge.'), $namebox);
     print '<br>' . _('Your email') . ': <input type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"></b><br><small>';
     print _('(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)') . '</small>
 </p>

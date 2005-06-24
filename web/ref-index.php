@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.28 2005-06-24 09:51:10 matthew Exp $
+// $Id: ref-index.php,v 1.29 2005-06-24 11:27:41 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -44,7 +44,7 @@ function draw_status_plaque($p) {
 function draw_spreadword($p) {
     if (!$p->finished()) { ?>
     <div id="spreadword">
-    <?=_('<h2>Spread the word on and offline</h2>') ?>
+    <h2><?=_('Spread the word on and offline') ?></h2>
     <ul>
     <li> <? print_link_with_pin($p->url_email(), "", _("Email pledge to your friends")) ?></li>
 <!--    <li> <? print_link_with_pin($p->url_ical(), "", _("Add deadline to your calendar")) ?> </li> -->
@@ -69,7 +69,7 @@ function draw_spreadword($p) {
 function draw_signatories($p) {
     ?>
     <div id="signatories">
-<?  print _('<h2><a name="signers">Current signatories</a></h2>');
+<?  print '<h2><a name="signers">' . _('Current signatories') . '</a></h2>';
     $out = '<li>' . $p->h_name() . ' ' . _('(Pledge Creator)') . '</li>';
     $anon = 0;
     $unknownname = 0;

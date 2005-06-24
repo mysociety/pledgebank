@@ -30,7 +30,7 @@
 #   more complex prominence stuff
 #   Log in with wrong password
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.104 2005-06-24 11:42:50 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.105 2005-06-24 15:34:00 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -856,7 +856,7 @@ sub do_private_failing_pledge {
     $wth->email_check_none_left();
     # Try to send second failure, which is not allowed
     $wth->browser_get($base_url . "/$pledge_ref/announce");
-    $wth->browser_check_contents("You have already sent a failure announcement");
+    $wth->browser_check_contents("You have already sent 1 failure announcement");
 }
 
 #############################################################################

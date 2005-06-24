@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.20 2005-06-24 11:27:41 matthew Exp $
+// $Id: contact.php,v 1.21 2005-06-24 11:44:43 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -24,13 +24,12 @@ page_footer();
 
 function contact_form($errors = array()) {
     print '<h2>' . _('Contact Us') . '</h2>';
-    print _('<p>Was it useful?  How could it be better?
+    printf(_('<p>Was it useful?  How could it be better?
 We make PledgeBank and thrive off feedback, good and bad.
 Use this form to contact us.
-If you prefer, you can email <a href="mailto:<?=OPTION_CONTACT_EMAIL?>"><?=OPTION_CONTACT_EMAIL?></a> instead of using the form.</p>');
-    print _('<p><a href="/faq">Read the FAQ</a> first, it might be a quicker
-way to answer your question.</p>');
-    print _("<p>If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge: these messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator.</p>");
+If you prefer, you can email %s instead of using the form.</p>'), '<a href="mailto:' . OPTION_CONTACT_EMAIL . '">' . OPTION_CONTACT_EMAIL . '</a>');
+    print '<p>' . _('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.') . '</p>';
+    print '<p>' . _("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge: these messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator.") . '</p>';
     if (sizeof($errors)) {
         print '<ul id="errors"><li>';
         print join ('</li><li>', $errors);
@@ -41,8 +40,8 @@ way to answer your question.</p>');
 <div class="fr"><label for="email"><?=_('Your email') ?></label>: <input type="text" id="email" name="email" value="<?=htmlentities(get_http_var('email')) ?>" size="32"></div>
 <div class="fr"><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>
 <div><label for="message"><?=_('Message') ?></label>:<br><textarea rows="7" cols="60" name="message" id="message"><?=htmlentities(get_http_var('message')) ?></textarea></div>
-<?  print _('<p>Did you <a href="/faq">read the FAQ</a> first?
---&gt; <input type="submit" name="submit" value="Send"></p>');
+<?  print '<p>' . _('Did you <a href="/faq">read the FAQ</a> first?') . '
+--&gt; <input type="submit" name="submit" value="' . _('Send') . '"></p>');
     print '</form>';
 }
 

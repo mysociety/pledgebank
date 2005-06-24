@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.26 2005-06-23 22:41:07 matthew Exp $
+ * $Id: comments.php,v 1.27 2005-06-24 11:44:42 matthew Exp $
  * 
  */
 
@@ -80,7 +80,7 @@ function comments_show($pledge, $noabuse = false) {
     print '<div class="commentsbox">';
     
     if (db_getOne('select count(id) from comment where pledge_id = ?', $id) == 0)
-        print _('<p><em>No comments yet! Why not add one?</em></p>');
+        print '<p><em>' . _('No comments yet! Why not add one?') . '</em></p>';
     else {
         print '<ul class="commentslist">';
 
@@ -185,9 +185,8 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 <input type="hidden" name="comment_id" value="<?=$q_h_comment_id?>">
 <? } ?>
 <input type="hidden" name="n" value="<?=$nextn?>">
-
-<?=_('<p><small>Your name and web site, if given, will be shown on your comment,
-but your email address will not be.</small></p>') ?>
+<p><small><?=_('Your name and web site, if given, will be shown on your comment,
+but your email address will not be.') ?></small></p>
 <p><input type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ? "checked" : ""?>>
 <?=_('Email me any replies to my comment') ?></input></p>
 

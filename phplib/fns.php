@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.39 2005-06-24 10:06:04 matthew Exp $
+// $Id: fns.php,v 1.40 2005-06-24 11:44:42 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -183,9 +183,9 @@ function view_friends_form($p, $errors = array()) {
 ?>
 <form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
 <? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">';
-print _('<h2>Email this pledge</h2>');
-print _('<p>Please enter these details so that we can send your message to your contacts.
-We will not give or sell either your or their email address to anyone else.</p>'); ?>
+print '<h2>' . _('Email this pledge') . '</h2>';
+print '<p>' . _('Please enter these details so that we can send your message to your contacts.
+We will not give or sell either your or their email address to anyone else.'); ?></p>
 <p><strong><?=_('Other people\'s email addresses:') ?></strong></p>
 <div class="formrow"><input type="text" name="email1" value="" size="40"></div>
 <div class="formrow"><input type="text" name="email2" value="" size="40"></div>

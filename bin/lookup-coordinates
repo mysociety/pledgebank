@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: lookup-coordinates,v 1.1 2005-06-15 13:10:16 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: lookup-coordinates,v 1.2 2005-06-24 12:29:32 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -40,24 +40,7 @@ $s->execute();
 while (my ($id, $postcode) = $s->fetchrow_array()) {
     try {
         my $loc = mySociety::MaPit::get_location($postcode);
-        my ($grid, $E, $N) = @$loc;
-        my ($lat, $lon, $h) = (0, 0, 0);
-        my $d;
-        if ($grid eq 'G') {
-            my $p = new Geography::NationalGrid('GB', Easting => $E, Northing => $N);
-            $lat = $p->latitude();
-            $lon = $p->longitude();
-            $d = $airy1830;
-        } elsif ($grid eq 'I') {
-            my $p = new Geography::NationalGrid('IE', Easting => $E, Northing => $N);
-            $lat = $p->latitude();
-            $lon = $p->longitude();
-            $d = $airy1830m;
-        }
-
-        ($lat, $lon, $h) = Geo::HelmertTransform::convert_datum($d, $wgs84, $lat, $lon, $h);
-
-        dbh()->do('update pledges set latitude = ?, longitude = ? where id = ?', {}, $lat, $lon, $id);
+        dbh()->do('update pledges set latitude = ?, longitude = ? where id = ?', {}, $loc->{wgs84_lat}, $loc->{wgs84_lon}, $id);
     } catch RABX::Error with {
         my $e = shift;
         if ($e->value() == mySociety::MaPit::BAD_POSTCODE

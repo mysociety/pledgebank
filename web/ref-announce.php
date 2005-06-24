@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.26 2005-06-24 16:48:21 francis Exp $
+ * $Id: ref-announce.php,v 1.27 2005-06-24 19:17:46 francis Exp $
  * 
  */
 
@@ -255,21 +255,6 @@ which can be sent to anyone who has signed up to your pledge by SMS only.
 <strong>Include contact details, such as your phone number or email address.</strong>
 Otherwise people who signed up by text won\'t be able to contact you again.'));
 ?>
-<script type="text/javascript">
-<!--
-function count_sms_characters() {
-    n = document.getElementById("message_sms").value.length;
-    /* XXX should really use the DOM for that but that requires a little
-     * appendChild/removeChild dance that might not even work in old
-     * browsers. So do it lazily instead: */
-    if (n <= 160)
-        text = "You have used " + n + " characters; " + (160 - n) + " remain.";
-    else
-        text = "<b>You have used " + n + " characters, which is " + (n - 160) + " more than will fit in an SMS. Please make your message shorter.</b>";
-    document.getElementById("smslengthcounter").innerHTML = text;
-}
-//-->
-</script>
 <p><textarea
     name="message_sms"
     id="message_sms"

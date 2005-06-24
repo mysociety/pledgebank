@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.18 2005-06-24 12:27:02 matthew Exp $
+ * $Id: ref-info.php,v 1.19 2005-06-24 19:17:46 francis Exp $
  * 
  */
 
@@ -165,7 +165,7 @@ if ($priv & PRIV_SIGNER) {
 you have signed, please give your email address so that we can identify
 you:</em>'));
 ?>
-<form class="pledge" name="logIn" method="POST">
+<form class="pledge" name="logIn" method="POST" action="/<?=$q_h_ref?>/info">
 <strong><?=_('Email address') ?></strong>
 <input type="hidden" name="ref" value="<?=$q_h_ref?>">
 <input type="text" name="email" value="">

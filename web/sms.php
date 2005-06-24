@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.30 2005-06-24 12:27:02 matthew Exp $
+ * $Id: sms.php,v 1.31 2005-06-24 19:17:46 francis Exp $
  * 
  */
 
@@ -220,7 +220,7 @@ succeeds, rather than sending an SMS.'));
         $p->render_box(array('showdetails' => false));
     }
 
-    print '<form accept-charset="utf-8" id="pledgeaction" class="pledge" method="post" name="pledge">';
+    print '<form accept-charset="utf-8" id="pledgeaction" class="pledge" method="post" action="/sms" name="pledge">';
     print _('<h2>Get updates by email</h2>');
 ?>
 <input type="hidden" name="f" value="1">
@@ -231,6 +231,7 @@ succeeds, rather than sending an SMS.'));
 <?=_('Email:') ?> <input type="text" name="email" size="30" value="<?=$q_unchecked_h_email ?>"><br>
 <?=_('Show my name on this pledge') ?>: <input name="showname" value="1" checked="checked" type="checkbox"><br>
 <input type="submit" name="submit" value="<?=_('Submit') ?>">
+</form>
 <?
 }
 ?>

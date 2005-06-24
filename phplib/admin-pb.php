@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.73 2005-06-24 12:13:52 matthew Exp $
+ * $Id: admin-pb.php,v 1.74 2005-06-24 19:17:45 francis Exp $
  * 
  */
 
@@ -523,23 +523,13 @@ class ADMIN_PAGE_PB_LATEST {
             }
         }
         krsort($time);
+
         print '<a href="'.$this->self_link.'">Full log</a> | <a
-        href="'.$this->self_link.'&amp;onlysigners=1">Only
-        signatures</a>'; ?>
-<style type="text/css">
-dt {   
-    clear: left;
-    float: left;
-    font-weight: bold;
-}
-dd {
-    margin-left: 6em;
-}
-</style>
-<?
-        print '<dl>';
+            href="'.$this->self_link.'&amp;onlysigners=1">Only
+            signatures</a>'; 
         $date = ''; 
         $linecount = 0;
+        print "<div class=\"timeline\">";
         foreach ($time as $epoch => $datas) {
             $linecount++;
             if ($linecount > $this->linelimit) {
@@ -549,7 +539,9 @@ dd {
             }
             $curdate = date('l, jS F Y', $epoch);
             if ($date != $curdate) {
-                print '</dl> <h2>'. $curdate . '</h2> <dl>';
+                if ($date <> "")
+                    print '</dl>';
+                print '<h2>'. $curdate . '</h2> <dl>';
                 $date = $curdate;
             }
             print '<dt><b>' . date('H:i:s', $epoch) . ':</b></dt> <dd>';
@@ -613,7 +605,8 @@ dd {
             }
             print "</dd>\n";
         }
-        print '</ul>';
+        print '</dl>';
+        print "</div>";
     }
 
     function pledge_link($type, $data, $title='') {
@@ -676,18 +669,6 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
 
         }
 
-        
-        ?>
-<style type="text/css">
-table.abusereporttable th { background-color: black; color: white; font-weight: bold; }
-//table.abusereporttable { padding-left: 1.5em; }
-table.abusereporttable tr.thing { background-color: #eee; padding-left: 0em; }
-table.abusereporttable tr.thing table { width: 100%; }
-table.abusereporttable tr.thing th { background-color: #00b; text-align: right; vertical-align: top; }
-table.abusereporttable tr.break { border-top: 1px solid white; }
-</style>
-<?
-        
         $this->showlist($self_link);
     }
 
@@ -703,7 +684,7 @@ table.abusereporttable tr.break { border-top: 1px solid white; }
         $i = 0;
         foreach ($ww as $w) {
             if ($w != $q_what)
-                print "<a href=\"$self_link&what=$w\">";
+                print "<a href=\"$self_link&amp;what=$w\">";
             print "${w}s ("
                     . db_getOne('select count(id) from abusereport where what = ?', $w)
                     . ")";
@@ -719,7 +700,7 @@ table.abusereporttable tr.break { border-top: 1px solid white; }
 
     function do_one_list($self_link, $what) {
 
-        print '<form method="POST"><input type="hidden" name="prev_url" value="'
+        print '<form method="POST" action="'.$this->self_link.'"><input type="hidden" name="prev_url" value="'
                     . htmlspecialchars($self_link) . '">';
         print <<<EOF
 <p><input type="submit" name="discardReports" value="Discard selected abuse reports"></p>
@@ -734,7 +715,7 @@ EOF;
             
                 /* XXX should group by pledge and then by signer/comment, but
                  * can't be arsed... */
-                print '<tr class="thing"><td colspan="4">';
+                print '<tr style="background-color: #eee;"><td colspan="4">';
 
                 if ($what == 'pledge')
                     $pledge_id = $what_id;

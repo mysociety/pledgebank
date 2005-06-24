@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.11 2005-05-24 23:18:40 francis Exp $
+ * $Id: pb.js,v 1.12 2005-06-24 19:17:46 francis Exp $
  * 
  */
 
@@ -133,3 +133,17 @@ function grey_thing(t, e, focus) {
         }
     }
 }
+
+// Used in ref-announce.php
+function count_sms_characters() {
+    n = document.getElementById("message_sms").value.length;
+    /* XXX should really use the DOM for that but that requires a little
+     * appendChild/removeChild dance that might not even work in old
+     * browsers. So do it lazily instead: */
+    if (n <= 160)
+        text = "You have used " + n + " characters; " + (160 - n) + " remain.";
+    else
+        text = "<b>You have used " + n + " characters, which is " + (n - 160) + " more than will fit in an SMS. Please make your message shorter.</b>";
+    document.getElementById("smslengthcounter").innerHTML = text;
+}
+

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.17 2005-06-24 16:48:21 francis Exp $
+// $Id: ref-sign.php,v 1.18 2005-06-24 19:17:46 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -82,7 +82,7 @@ function do_sign() {
         /* Something else has gone wrong. */
         print '<p><strong>' . _("Sorry &mdash; it wasn't possible to sign that pledge.") . ' '
                 . htmlspecialchars(pledge_strerror($R))
-                . ".</p></strong>";
+                . ".</strong></p>";
     }
 }
 

@@ -5,70 +5,68 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: offline.php,v 1.10 2005-06-22 17:23:34 francis Exp $
+// $Id: offline.php,v 1.11 2005-06-24 09:51:10 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 
-page_header("You never bump into your neighbours online");
+page_header(_("You never bump into your neighbours online"));
 
 ?>
 <div class="offline">
-<img src="monitor-neighbours-250px.jpg" class="l" style="margin-right: 20px;" title="You never bump in to your neighbours online" width="245" height="250" alt="">
-<h2>You never bump in to your neighbours online</h2>
-<p>Have you ever noticed that you never bump into your neighbours online?
+<img src="monitor-neighbours-250px.jpg" class="l" style="margin-right: 20px;" title="<?=_('You never bump in to your neighbours online') ?>" width="245" height="250" alt="">
+<h2><?=_('You never bump in to your neighbours online') ?></h2>
+<?
+print _("<p>Have you ever noticed that you never bump into your neighbours online?
 This means that most websites can't offer much help to people trying
-to do things on their street or in their local community.</p>
-
-<p>PledgeBank is different. We've designed PledgeBank to make it easy to
+to do things on their street or in their local community.</p>");
+print _("<p>PledgeBank is different. We've designed PledgeBank to make it easy to
 get word of your pledges to your neighbours, and easy for them to get
-involved even if they never use the internet.</p>
+involved even if they never use the internet.</p>");
+?>
 </div>
 
 <div class="offline">
-<img src="flyer-example.png" class="r" style="margin-left: 20px;" title="Example PledgeBank flyer" width="298" height="211" alt="">
-<h2>Flyers</h2>
-
-<p>Every pledge created on PledgeBank comes with a set of automatically
-generated flyers.</p>
-
-<p>These flyers tell people what your pledge is and how to sign up.
+<img src="flyer-example.png" class="r" style="margin-left: 20px;" title="<?=_('Example PledgeBank flyer') ?>" width="298" height="211" alt="">
+<h2><?=_('Flyers') ?></h2>
+<?
+print _('<p>Every pledge created on PledgeBank comes with a set of automatically
+generated flyers.</p>');
+print _("<p>These flyers tell people what your pledge is and how to sign up.
 They're ideal for posting through doors, pinning on notice-boards,
 handing out at school gates - whatever you want. If you've created a
 pledge yourself, you can ask your signers to print and distribute
-leaflets themselves, spreading the word further.</p>
-
-<p>Each flyer tells people how to sign up either via the web, or via a
-simple two word text message.</p>
+leaflets themselves, spreading the word further.</p>");
+print _('<p>Each flyer tells people how to sign up either via the web, or via a
+simple two word text message.</p>');
+?>
 </div>
 
 <div class="offline">
 <img src="phone-200px.jpg" class="l" style="margin-right: 20px;" width="168" height="200" alt="">
-<h2>Mobile Phones</h2>
-<p>The ability to sign up via text message is powerful because it means
+<h2><?=('Mobile Phones') ?></h2>
+<?
+print _("<p>The ability to sign up via text message is powerful because it means
 that people who never use the Internet can sign up, and you can get
-someone to sign up even if they're nowhere near a computer.</p>
-
-<p>Anyone with a mobile can sign up to a pledge by texting the word
+someone to sign up even if they're nowhere near a computer.</p>");
+printf(_("<p>Anyone with a mobile can sign up to a pledge by texting the word
 <strong>pledge</strong> followed by the pledge reference to
-<strong><?=OPTION_PB_SMS_DISPLAY_NUMBER?></strong> (for the moment, this works only in the UK).</p>
-
-<p>Text messages cost whatever you normally pay for a normal SMS, and as
+<strong>%s</strong> (for the moment, this works only in the UK).</p>"), OPTION_PB_SMS_DISPLAY_NUMBER);
+print _("<p>Text messages cost whatever you normally pay for a normal SMS, and as
 a pledge creator you can write to your mobile signers when your pledge
-succeeds, letting them know what to do next.</p>
-
-<p>There are all types of other things you can do with text messages. You
+succeeds, letting them know what to do next.</p>");
+print _("<p>There are all types of other things you can do with text messages. You
 can include the details in your own campaign materials, include them
 in letters to newspapers, pin them in your window, tattoo them on your
-arms.</p>
-</div>
+arms.</p>");
 
-<p>So if you want to create a pledge, or if you have seen one on this
+print '</div>';
+
+print _("<p>So if you want to create a pledge, or if you have seen one on this
 site that you really endorse, fire up the printer, memorize the text
-message details, and take your message out into the big wide world.</p>
+message details, and take your message out into the big wide world.</p>");
 
-<p><a href="/">To PledgeBank front page</a></p>
-<?
+print '<p><a href="/">' . _('To PledgeBank front page') . '</a></p>';
 
 page_footer();
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.27 2005-06-18 15:06:27 francis Exp $
+// $Id: ref-index.php,v 1.28 2005-06-24 09:51:10 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -18,7 +18,7 @@ $p  = new Pledge(get_http_var('ref'));
 
 $pin_box = deal_with_pin($p->url_main(), $p->ref(), $p->pin());
 if ($pin_box) {
-    page_header("Enter PIN"); 
+    page_header(_("Enter PIN"));
     print $pin_box;
     page_footer();
     exit;
@@ -26,15 +26,15 @@ if ($pin_box) {
 
 function draw_status_plaque($p) {
     if (!$p->open()) {
-        print '<p class="finished">This pledge is now closed, as its deadline has passed.</p>';
+        print '<p class="finished">' . _('This pledge is now closed, as its deadline has passed.') . '</p>';
     }
     if ($p->left() <= 0) {
         if ($p->exactly()) {
-            print '<p class="finished">This pledge is now closed, as its target has been reached.</p>';
+            print '<p class="finished">' . _('This pledge is now closed, as its target has been reached.') . '</p>';
         } else {
-            print '<p class="success">This pledge has been successful!';
+            print '<p class="success">' . _('This pledge has been successful!');
             if (!$p->finished()) {
-                print '<br><strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.';
+                print '<br>' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');
             }
             print '</p>';
         }
@@ -44,13 +44,20 @@ function draw_status_plaque($p) {
 function draw_spreadword($p) {
     if (!$p->finished()) { ?>
     <div id="spreadword">
-    <h2>Spread the word on and offline</h2>
+    <?=_('<h2>Spread the word on and offline</h2>') ?>
     <ul>
-    <li> <? print_link_with_pin($p->url_email(), "", "Email pledge to your friends") ?></li>
-<!--    <li> <? print_link_with_pin($p->url_ical(), "", "Add deadline to your calendar") ?> </li> -->
-    <li> <? print_link_with_pin($p->url_flyers(), "Stick them places!", "Print out customised flyers") ?>
-    <li> <a href="<?=$p->url_announce()?>" title="Only if you made this pledge">Send message to signers</a> (creator only)
-    <li> <a href="<?=$p->url_picture()?>" title="Only if you made this pledge"><? if ($p->has_picture()) { ?>Change the pledge picture<? } else { ?>Add a picture to your pledge<? } ?></a> (creator only)
+    <li> <? print_link_with_pin($p->url_email(), "", _("Email pledge to your friends")) ?></li>
+<!--    <li> <? print_link_with_pin($p->url_ical(), "", _("Add deadline to your calendar")) ?> </li> -->
+    <li> <? print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers")) ?>
+    <li> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a> <?=_('(creator only)') ?>
+    <li> <?
+        print '<a href="' . $p->url_picture() . '" title="' . _('Only if you made this pledge') . '">';
+        if ($p->has_picture()) {
+            print _('Change the pledge picture');
+        } else {
+            print _('Add a picture to your pledge');
+        }
+        print '</a> ' . _('(creator only)'); ?>
     </li>
     </ul>
     <!--    <br clear="all"> -->
@@ -62,9 +69,8 @@ function draw_spreadword($p) {
 function draw_signatories($p) {
     ?>
     <div id="signatories">
-    <h2><a name="signers">Current signatories</a></h2><?
-
-    $out = '<li>' . $p->h_name() . ' (Pledge Creator)</li>';
+<?  print _('<h2><a name="signers">Current signatories</a></h2>');
+    $out = '<li>' . $p->h_name() . ' ' . _('(Pledge Creator)') . '</li>';
     $anon = 0;
     $unknownname = 0;
     $q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($p->id()));
@@ -87,27 +93,25 @@ function draw_signatories($p) {
     }
     print '<ul>'.$out;
     if ($anon || $unknownname) {
-        /* XXX i18n-a-go-go */
         $extra = '';
         if ($anon)
-            $extra .= "Plus $anon "
-                        . make_plural($anon, 'other')
-                        . ' who did not want to give their '
-                        . make_plural($anon, 'name');
-        if ($unknownname)
-            $extra .= ($anon ? ', and' : 'Plus')
-                        . " $unknownname "
-                        . make_plural($unknownname, 'other')
-                        . ' who signed up via mobile.';
+            $extra .= sprintf(ngettext('Plus %d other who did not want to give their name', 'Plus %d others who did not want to give their names', $anon), $anon);
+        if ($unknownname) {
+            if ($anon) {
+                $extra .= sprintf(ngettext(', and %d other who signed up via mobile.', ', and %d others who signed up via mobile.', $unknownname), $unknownname);
+            } else {
+                $extra .= sprintf(ngettext('Plus %d other who signed up via mobile.', 'Plus %d others who signed up via mobile', $unknownname), $unknownname);
+            }
+        }
         print "<li>$extra</li>";
     }
     print '</ul>';
-    print '<p><a href="' . $p->url_info() . '">View signup rate graph</a></p>';
+    print '<p><a href="' . $p->url_info() . '">' . _('View signup rate graph') . '</a></p>';
     print '</div>';
 }
 
 function draw_comments($p) {
-    print "\n\n" . '<div id="comments"><h2><a name="comments">Comments on this pledge</a></h2>';
+    print "\n\n" . '<div id="comments"><h2><a name="comments">' . _('Comments on this pledge') . '</a></h2>';
     comments_show($p->id()); 
     comments_form($p->id(), 1);
     print '</div>';
@@ -126,7 +130,7 @@ function draw_connections($p) {
     if (0 == db_num_rows($s))
         return;
 
-    print "\n\n" . '<div id="connections"><h2><a name="connections">People who signed this pledge also pledged to...</a></h2><ul>' . "\n\n";
+    print "\n\n" . '<div id="connections"><h2><a name="connections">' . _('People who signed this pledge also pledged to...') . '</a></h2><ul>' . "\n\n";
     while (list($a, $b, $strength) = db_fetch_row($s)) {
         $id = $a == $p->id() ? $b : $a;
         $p2 = new Pledge(intval($id));

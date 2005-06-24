@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.27 2005-06-17 10:42:13 francis Exp $
+ * $Id: sms.php,v 1.28 2005-06-24 08:49:38 matthew Exp $
  * 
  */
 
@@ -21,7 +21,7 @@ require_once "../../phplib/utility.php";
 
 
 $errs = importparams(
-                array('token',  '/^[0-9a-f]{4}-[0-9a-f]{4}$/',  "The code you've entered isn't valid")
+                array('token',  '/^[0-9a-f]{4}-[0-9a-f]{4}$/',  _("The code you've entered isn't valid"))
             );
 
 if (is_null($q_token))
@@ -43,7 +43,7 @@ elseif (!isset($r['signer_id'])) {
                 db_getOne('select smssubscription_sign(null, ?)', $q_token)
             );
     if ($res != PLEDGE_OK)
-        oops($res, "before our SMS to you was delivered");
+        oops($res, 'sms');
     else {
         /* We've now signed up, so just redirect to this script. */
         header("Location: " . invoked_url());
@@ -61,23 +61,21 @@ $pledge = new Pledge(intval($pledge_id));
 
 /* Don't allow conversion on private pledges. */
 if (!is_null(db_getOne('select pin from pledges where id = ?', $pledge_id)))
-    err('Permission denied');
+    err(_('Permission denied'));
 
 /* Have we already converted? If so just show the usual "thank you" page. */
 if (db_getOne('select person_id from signers where id = ?', $signer_id)) {
-    page_header('SMS');
-    ?>
-    <p><strong>Thanks for signing up to this pledge!</strong></p>
-    <?
+    page_header(_('SMS'));
+    print _('<p><strong>Thanks for signing up to this pledge!</strong></p>');
     post_confirm_advertise($pledge);
     page_footer();
     exit();
 }
 
 $errs = importparams(
-            array('phone',  '/[\d\s-+]$/',                  "Please enter your phone number"),
-            array('name',   '/[a-z]+/i',                    "Please enter your name"),
-            array('email',  '/^[^@]+@[^@]+$/',              "Please enter your email address"),
+            array('phone',  '/[\d\s-+]$/',                  _("Please enter your phone number")),
+            array('name',   '/[a-z]+/i',                    _("Please enter your name")),
+            array('email',  '/^[^@]+@[^@]+$/',              _("Please enter your email address")),
             array('showname',
                             '/^1$/',                        "", 0),
             array('f',      '/^1$/',                        "", 0)
@@ -88,16 +86,16 @@ $showform = true;
 $p = preg_replace("/[^\d]/", '', $q_phone);
 $phone = db_getOne('select mobile from signers where id = ?', $signer_id);
 if (!$phone)
-    err("No mobile number recorded for SMS signer $signer_id");
+    err(sprintf(_('No mobile number recorded for SMS signer %d'), $signer_id));
 else if (substr($p, -6) != substr($phone, -6)) {
     /* Compare last few characters of the phone numbers only, so that we avoid
      * having to know anything about their format. */
     if (!$errs)
         $errs = array();
-    $errs['phone'] = "That phone number doesn't match our records";
+    $errs['phone'] = _("That phone number doesn't match our records");
 }
 
-page_header('SMS');
+page_header(_('SMS'));
 
 if ($errs) {
     /* Form to supply info for the subscription */
@@ -108,7 +106,7 @@ if ($errs) {
 
 /* OK, they win. Make them sign on. */
 $data = db_getRow('select * from pledges where id = (select pledge_id from signers where signers.id = ?)', $signer_id);
-$data['reason_web'] = 'Next, we need to verify your email address.';
+$data['reason_web'] = _('Next, we need to verify your email address.');
 $data['template'] = 'sms-confirm';
 $P = person_signon($data, $q_email, $q_name);
 
@@ -132,9 +130,7 @@ if (!pledge_is_error($r)) {
     else {
         /* Creator trying to sign their own pledge. Need to remove the old
          * signer record. */
-        ?>
-        <p><strong>You cannot sign your own pledge!</strong></p>
-        <?
+        print _('<p><strong>You cannot sign your own pledge!</strong></p>');
         page_footer();
         exit();
     }
@@ -143,9 +139,7 @@ if (!pledge_is_error($r)) {
 
 db_commit();
 
-?>
-<p><strong>Thanks for signing up to this pledge!</strong></p>
-<?
+print _('<p><strong>Thanks for signing up to this pledge!</strong></p>');
 
 post_confirm_advertise($pledge);
 
@@ -156,44 +150,47 @@ page_footer();
 function bad_token($x) {
     page_header('SMS');
     if (is_null($x)) {
-        err("We couldn't recognise the link you've followed");
+        err(_("We couldn't recognise the link you've followed"));
     } else {
         $x = htmlspecialchars($x);
-        print <<<EOF
-            <p>
-        Sorry, we can't make sense of the code '$x'. Please
+        printf(_("<p>Sorry, we can't make sense of the code '%s'. Please
         could you re-check the address you typed in; the last part of it should
-        be two groups of four letters and numbers, joined by a hyphen ("-"),
-        something like "1234-abcd".
-            </p>
-EOF;
+        be two groups of four letters and numbers, joined by a hyphen (\"-\"),
+        something like \"1234-abcd\".</p>"), $x);
     }
     page_footer(array('nonav' => 1));
     exit();
 }
 
 /* oops RESULT [WHAT]
- * Given a RESULT (a PLEDGE_... constant) and WHAT, some descriptive blurb (see
- * function), print a paragraph of stuff about why the user couldn't be signed
+ * Given a RESULT (a PLEDGE_... constant) and WHAT, an id of some descriptive blurb
+ * (see function), print a paragraph of stuff about why the user couldn't be signed
  * up to the pledge. */
 function oops($r, $what = null) {
-    page_header('SMS');
-    print "<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>";
+    page_header(_('SMS'));
+    print _("<p><strong>Sorry, we couldn't sign you up to that pledge:</strong></p>");
     if ($r == PLEDGE_FULL || $r == PLEDGE_FINISHED) {
         /* Print a fuller explanation in this (common) case */
-        $how = ($r == PLEDGE_FULL ? /* XXX i18n */
-                    "somebody else beat you to the last place on that pledge"
-                    : "the pledge finished");
-        if (is_null($what))
-            $what = 'before we could subscribe you';
-        print <<<EOF
-<p>Unfortunately, $what, $how.
-We're very sorry &mdash; better luck next time!</p>
-EOF;
+        print '<p>';
+        if ($r == PLEDGE_FULL) {
+            if ($what == 'sms') {
+                print _('Unfortunately, before our SMS to you was delivered, somebody else beat you to the last place on that pledge.');
+            } elseif (is_null($what)) {
+                print _('Unfortunately, before we could subscribe you, somebody else beat you to the last place on that pledge.');
+            }
+        } else {
+            if ($what == 'sms') {
+                print _('Unfortunately, before our SMS to you was delivered, the pledge finished.');
+            } elseif (is_null($what)) {
+                print _('Unfortunately, before we could subscribe you, the pledge finished.');
+            }
+        }
+        print _("We're very sorry &mdash; better luck next time!");
+        print '</p>';
     } else {
         print "<p>" . htmlspecialchars(pledge_strerror($r)) . "</p>";
         if (!pledge_is_permanent_error($r))
-            print "<p><strong>Please try again a bit later.</strong></p>";
+            print _("<p><strong>Please try again a bit later.</strong></p>");
     }
     page_footer();
     exit();
@@ -204,13 +201,10 @@ EOF;
  * ERRORS is an array of errors to display for each field. */
 function conversion_form($errs, $pledge_id) {
     global $q_h_token, $q_unchecked_h_phone, $q_unchecked_h_email, $q_unchecked_h_name;
-    print <<<EOF
-<h2>Thanks for signing up!</h2>
-
-<p>On this page you can let us have your name and email address so that you can
+    print _('<h2>Thanks for signing up!</h2>');
+    print _('<p>On this page you can let us have your name and email address so that you can
 get email from the pledge creator.  We will also email you when the pledge
-succeeds, rather than sending an SMS.</p>
-EOF;
+succeeds, rather than sending an SMS.</p>');
     if ($errs) {
         print '<div id="errors"><ul>';
         if (array_key_exists('phone', $errs))
@@ -222,22 +216,21 @@ EOF;
         print '</ul></div>';
     } else {
         $p = new Pledge(intval($pledge_id));
-        if ($p->pin()) { err("No SMS for private pledges"); }
+        if ($p->pin()) { err(_("No SMS for private pledges")); }
         $p->render_box(array('showdetails' => false));
     }
 
-    print <<<EOF
-<form accept-charset="utf-8" id="pledgeaction" class="pledge" method="post" name="pledge">
-<h2>Get updates by email</h2>
+    print '<form accept-charset="utf-8" id="pledgeaction" class="pledge" method="post" name="pledge">';
+    print _('<h2>Get updates by email</h2>');
+?>
 <input type="hidden" name="f" value="1">
-<input type="hidden" name="token" value="$q_h_token">
+<input type="hidden" name="token" value="<?=$q_h_token ?>">
 <p>
-Phone number: <input type="text" name="phone" value="$q_unchecked_h_phone"><br/>
-Name: <input type="text" name="name" value="$q_unchecked_h_name"><br/>
-Email: <input type="text" name="email" size="30" value="$q_unchecked_h_email"><br/>
-Show my name on this pledge: <input name="showname" value="1" checked="checked" type="checkbox"><br/>
-<input type="submit" name="submit" value="Submit">
-EOF;
+<?=_('Phone number:') ?> <input type="text" name="phone" value="<?=$q_unchecked_h_phone ?>"><br>
+<?=_('Name:') ?> <input type="text" name="name" value="<?=$q_unchecked_h_name ?>"><br>
+<?=_('Email:') ?> <input type="text" name="email" size="30" value="<?=$q_unchecked_h_email ?>"><br>
+<?=_('Show my name on this pledge:') ?> <input name="showname" value="1" checked="checked" type="checkbox"><br>
+<input type="submit" name="submit" value="<?=_('Submit') ?>">
+<?
 }
-            
 ?>

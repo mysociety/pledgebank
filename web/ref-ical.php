@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-ical.php,v 1.3 2005-06-12 22:00:44 chris Exp $
+// $Id: ref-ical.php,v 1.4 2005-06-24 08:49:38 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -17,18 +17,18 @@ require_once '../../phplib/utility.php';
 if (!is_null(importparams(
             array('ref',     '/^[a-z0-9-]+$/i',  '')
         )))
-    err("A required parameter was missing");
+    err(_("A required parameter was missing"));
 
 page_check_ref($q_ref);
 
 $q = db_query('SELECT * FROM pledges WHERE confirmed AND ref ILIKE ?', array($q_ref));
 if (!db_num_rows($q))
-    err('Illegal PledgeBank reference!');
+    err(_('Illegal PledgeBank reference!'));
 
 $r = db_fetch_array($q);
 
 if (!check_pin($q_ref, $r['pin']))
-    err('Correct PIN required');
+    err(_('Correct PIN required'));
 
 header('Content-Type: text/calendar');
 output_ical($r);
@@ -45,7 +45,7 @@ CREATED:<?=$ct ?>
 DTSTAMP:<?=date('Ymd\THis\Z') ?>
 
 DTSTART:<?=date('Ymd', strtotime($r['date'])) ?>T235959Z
-SUMMARY:Deadline for pledge "<?=$r['title'] ?>"
+SUMMARY:<?=sprintf(_('Deadline for pledge "%s"'), $r['title']) ?>
 <? if ($r['detail']) print "DESCRIPTION:$r[detail]\r\n"; ?>
 GEO:LAT?;LON?
 LOCATION:?

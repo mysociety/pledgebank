@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.20 2005-06-20 22:32:25 francis Exp $
+ * $Id: ref-announce.php,v 1.21 2005-06-24 08:49:38 matthew Exp $
  * 
  */
 
@@ -23,7 +23,7 @@ $err = importparams(
             array('ref',   '/./',   '')
         );
 if (!is_null($err))
-    err("Missing pledge reference");
+    err(_("Missing pledge reference"));
 
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
@@ -34,26 +34,26 @@ $p->lock();
 $P = person_if_signed_on();
 if (!$P) {
     $P = person_signon(array(
-                    "reason_web" => "Before you can send a message to all the signers, we need to check that you created the pledge.",
-                    "reason_email" => "Then you will be able to send a message to everyone who has signed your pledge.",
-                    "reason_email_subject" => "Send a message to your pledge signers at PledgeBank.com")
+                    "reason_web" => _("Before you can send a message to all the signers, we need to check that you created the pledge."),
+                    "reason_email" => _("Then you will be able to send a message to everyone who has signed your pledge."),
+                    "reason_email_subject" => _("Send a message to your pledge signers at PledgeBank.com"))
 
                 );
 }
 if ($P->id() != $p->creator_id()) {
-    page_header("Pledge creator's page");
-    print "You must be the pledge creator to send a message to all signers.
-        Please <a href=\"/logout\">log out</a> and try again.";
+    page_header(_("Pledge creator's page"));
+    print _("You must be the pledge creator to send a message to all signers.
+        Please <a href=\"/logout\">log out</a> and try again.");
     page_footer();
     exit;
 }
 
 
 $descr = array(
-                'failure-announce' => 'failure announcement message',
-                'success-announce' => 'success announcement message',
-                'success-followup' => 'second or subsequent success message',
-                'general-announce' => 'general message'
+                'failure-announce' => _('failure announcement message'),
+                'success-announce' => _('success announcement message'),
+                'success-followup' => _('second or subsequent success message'),
+                'general-announce' => _('general message')
             );
 
 $has_sms = array(
@@ -65,14 +65,12 @@ $has_sms = array(
  * Page explaining that punter may not send another message of this type. */
 function refuse_announce($p, $c) {
     global $descr;
-    page_header("Send Announcement");
+    page_header(_("Send Announcement"));
     $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $c));
-    print "<strong>You have already sent ";
-    if ($n == 1)
-        print "a ${descr[$c]}";
-    else if ($n > 1)
-        print "$n ${descr[$c]}s";   /* XXX i18n */
-    print ", which is all that you're allowed.</strong> Think of your signers' poor inboxes, crumbling under the load of all the mail you want to send them.";
+    print "<strong>";
+    printf(ngettext('You have already sent %d %s, which is all that you\'re allowed.', 'You have already sent %d %s, which is all that you\'re allowed.', $n), $n, $descr[$c]);
+    print "</strong> ";
+    print _("Think of your signers' poor inboxes, crumbling under the load of all the mail you want to send them.");
     page_footer();
     exit();
 }
@@ -80,8 +78,8 @@ function refuse_announce($p, $c) {
 /* message_success
  * Page thanking punter for sending message. */
 function message_success() {
-    page_header("Announcement sent");
-    print "<p><strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge.</p>";
+    page_header(_("Announcement sent"));
+    print _("<p><strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge.</p>");
     page_footer();
     exit();
 }
@@ -104,7 +102,7 @@ if ($p->failed()) {
         refuse_announce($p, 'failure-announce');
     else {
         $circumstance = 'failure-announce';
-        $email_subject = "Sorry - pledge failed - '" . $p->title() . "'";
+        $email_subject = sprintf(_("Sorry - pledge failed - '%s'"), $p->title() );
     }
 } else if ($p->succeeded()) {
     $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $p->id());
@@ -112,72 +110,32 @@ if ($p->failed()) {
         $circumstance = 'success-announce'; /* also send SMS */
     else
         $circumstance = 'success-followup'; /* do not send SMS */
-    $email_subject = "Pledge success! - '" . $p->title() . "' at PledgeBank.com";
+    $email_subject = sprintf(_("Pledge success! - '%s' at PledgeBank.com"), $p->title() );
 } else {
     $circumstance = 'general-announce';
-    $email_subject = "Update on pledge - '" . $p->title() . "' at PledgeBank.com";
+    $email_subject = sprintf(_("Update on pledge - '%s' at PledgeBank.com"), $p->title() );
 }
 
 $circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $circumstance));
 
 $do_sms = array_key_exists($circumstance, $has_sms) ? true : false;
 
-$fill_in = "ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE, INCLUDING YOUR CONTACT INFO";
+$fill_in = _("ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE, INCLUDING YOUR CONTACT INFO");
 
 /* All OK. */
-page_header("Send ${descr[$circumstance]} to signers of '" . $p->title() . "'", array());
+page_header(sprintf(_("Send %s to signers of '%s'"), $descr[$circumstance], $p->title()), array());
 
 $sentence = $p->sentence();
 
 $name = $p->creator_name();
 if ($p->succeeded()) {
-    $default_message = <<<EOF
-
-Hello, and thank you for signing our successful pledge!
-
-'$sentence'
-
-<$fill_in>
-
-Yours sincerely,
-
-$name
-
-EOF;
-
-    $default_sms = "$name here. The " . $p->ref() . " pledge has been successful! <$fill_in>.";
+    $default_message = sprintf(_("\nHello, and thank you for signing our successful pledge!\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
+    $default_sms = sprintf(_("%s here. The %s pledge has been successful! <%s>."), $name, $p->ref(), $fill_in);
 } elseif ($p->failed()) {
-    $default_message = <<<EOF
-
-Hello, and sorry that our pledge has failed.
-
-'$sentence'
-
-<$fill_in>
-
-Yours sincerely,
-
-$name
-
-EOF;
-
-    $default_sms = "$name here. The " . $p->ref() . " pledge has failed. <$fill_in>.";
-
+    $default_message = sprintf(_("\nHello, and sorry that our pledge has failed.\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
+    $default_sms = sprintf(_("%s here. The %s pledge has failed. <%s>."), $name, $p_.ref(), $fill_in);
 } else {
-    $default_message = <<<EOF
-
-Hello,
-
-<$fill_in>
-
-Yours sincerely,
-
-$name
-
-Pledge says: '$sentence'
-
-EOF;
-
+    $default_message = sprintf(_("\nHello,\n\n<%s>\n\nYours sincerely,\n\n%s\n\nPledge says: '%s'\n\n"), $fill_in, $name, $sentence);
     $default_sms = null;
 }
 
@@ -193,11 +151,11 @@ if ($q_submit) {
     
     if ($do_sms) {
         if (trim(merge_spaces($q_message_sms)) == trim(merge_spaces($default_sms)))
-            array_push($errors, "Please edit the text of the SMS message");
+            array_push($errors, _("Please edit the text of the SMS message"));
         else if (stristr($q_message_sms, "$fill_in"))
-            array_push($errors, "Please add instructions for the pledge signers to the SMS message.");
+            array_push($errors, _("Please add instructions for the pledge signers to the SMS message."));
         if (mb_strlen($q_message_sms, "UTF-8") > 160) /* XXX */
-            array_push($errors, "Please shorten the text of the SMS message to 160 characters or fewer");
+            array_push($errors, _("Please shorten the text of the SMS message to 160 characters or fewer"));
 
         /* Now check that the text is representable in IA5. See the table in
          * perllib/PB/SMS.pm. */
@@ -207,23 +165,23 @@ if ($q_submit) {
         if (preg_match_all('/([^@\x{00a3}$\x{00a5}\x{00e8}\x{00e9}\x{00f9}\x{00ec}\x{00f2}\x{00c7}\x{000a}\x{00d8}\x{00f8}\x{000d}\x{00c5}\x{00e5}\x{0394}\x{005f}\x{03a6}\x{0393}\x{039b}\x{03a9}\x{03a0}\x{03a8}\x{03a3}\x{0398}\x{039e}\x{001b}\x{00c6}\x{00e6}\x{00df}\x{00c9} !"#\x{00a4}%&\'()*+,-.\/0123456789:;<=>?\x{00a1}ABCDEFGHIJKLMNOPQRSTUVWXYZ\x{00c4}\x{00d6}\x{00d1}\x{00dc}\x{00a7}\x{00bf}abcdefghijklmnopqrstuvwxyz\x{00e4}\x{00f6}\x{00f1}\x{00fc}\x{00e0}])/u', $q_message_sms, $m)) {
             $badchars = $m[1];
             if (sizeof($badchars) == 1) {
-                array_push($errors, "Unfortunately, we can't send the character '${badchars[0]}' in an SMS message; please rewrite your message without it");
+                array_push($errors, sprintf(_("Unfortunately, we can't send the character '%s' in an SMS message; please rewrite your message without it"), $badchars[0]));
             } else if (sizeof($badchars) > 1) {
                 $str = "'${badchars[0]}'";
                 for ($i = 1; $i < sizeof($badchars) - 1; ++$i)
                     $str .= ", '${badchars[$i]}'";
                 $str .= " and '${badchars[$i]}'";
-                array_push($errors, "Unfortunately, we can't send the characters $str in an SMS message; please rewrite your message without them");
+                array_push($errors, sprintf(_("Unfortunately, we can't send the characters %s in an SMS message; please rewrite your message without them"), $str));
             }
         }
     }
 
     if (trim(merge_spaces($q_message_body)) == trim(merge_spaces($default_message)))
-        array_push($errors, "Please edit the text of the email message.");
+        array_push($errors, _("Please edit the text of the email message."));
     else if (stristr($q_message_body, "$fill_in"))
-        array_push($errors, "Please add instructions for the pledge signers to the email message.");
+        array_push($errors, _("Please add instructions for the pledge signers to the email message."));
     if (strlen($q_message_body) < 50)
-        array_push($errors, "Please enter a longer message.");
+        array_push($errors, _("Please enter a longer message."));
 
 }
 
@@ -258,7 +216,7 @@ if (!sizeof($errors) && $q_submit) {
                 . join('</li><li>', array_map('htmlspecialchars', $errors))
                 . '</li></ul></div>';
     elseif ($p->succeeded())
-        print '<p class="success">Your pledge is successful!</p>';
+        print _('<p class="success">Your pledge is successful!</p>');
  
     $p->render_box(array('showdetails'=>false));
         
@@ -272,18 +230,18 @@ if (!sizeof($errors) && $q_submit) {
 <h2>Send <?=$descr[$circumstance]?></h2>
 <input type="hidden" name="message_id" value="<?=$q_h_message_id?>">
 <div class="c">
-<p>Write a message to the <?=$howmany?> <?=htmlspecialchars($p->type())?> who have signed your pledge.
-<? if ($p->succeeded()) { ?>
-This is to tell them what to do next.
-<? } ?>
+<?
+    printf(_('<p>Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
+    if ($p->succeeded()) {
+        print _('This is to tell them what to do next.');
+    } ?>
 </p>
 
-<h3>Email message</h3>
-
-<p>The message will be sent from your email address, so the people
+<?  print _('<h3>Email message</h3>');
+    print _('<p>The message will be sent from your email address, so the people
 who signed your pledge can reply directly to you. <strong>You may want to also
 give your phone number or website</strong>, so they can contact you in other
-ways.</p>
+ways.</p>'); ?>
 
 <p><textarea
     name="message_body"
@@ -291,16 +249,12 @@ ways.</p>
     cols="72"
     rows="20"><?=$q_h_message_body?></textarea></p>
 
-<? if ($do_sms) { ?>
-
-<h3>SMS message</h3>
-
-<p>Enter a short (160 or fewer characters) summary of your main message,
+<?  if ($do_sms) {
+        print _('<h3>SMS message</h3>');
+        print _('<p>Enter a short (160 or fewer characters) summary of your main message,
 which can be sent to anyone who has signed up to your pledge by SMS only.
 <strong>Include contact details, such as your phone number or email address.</strong>
-Otherwise people who signed up by text won't be able to contact you again.
-</p>
-
+Otherwise people who signed up by text won\'t be able to contact you again.</p>');
 
 <script type="text/javascript">
 <!--
@@ -334,16 +288,13 @@ function count_sms_characters() {
 count_sms_characters();
 //-->
 </script>
-<? } ?>
+<? }
 
-<h3>Send Announcement</h3>
-
-<p>(Remember, when you send this message <strong>your email address will be given to everyone who has signed up or will sign up</strong> to your pledge by email) <input type="submit" name="submit" value="Send &gt;&gt;"></p>
-
-</form>
-</div>
-<?
-
+    print _('<h3>Send Announcement</h3>');
+    print '<p>';
+    print _('(Remember, when you send this message <strong>your email address will be given to everyone who has signed up or will sign up</strong> to your pledge by email)');
+    print '<input type="submit" name="submit" value="' . _('Send') . ' &gt;&gt;"></p>';
+    print '</form></div>';
 }
 
 page_footer();

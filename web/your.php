@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.3 2005-06-23 20:51:02 francis Exp $
+// $Id: your.php,v 1.4 2005-06-24 08:49:38 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -13,12 +13,12 @@ require_once '../phplib/fns.php';
 require_once '../../phplib/importparams.php';
 
 $P = person_signon(array(
-                'reason_web' => "To view your pledges, we need to check your email address.",
-                'reason_email' => "Then you will be able to view your pledges.",
-                'reason_email_subject' => 'View your pledges at PledgeBank.com'
+                'reason_web' => _("To view your pledges, we need to check your email address."),
+                'reason_email' => _("Then you will be able to view your pledges."),
+                'reason_email_subject' => _('View your pledges at PledgeBank.com')
             ));
 
-page_header("Your Pledges", array('id'=>"yourpledges"));
+page_header(_("Your Pledges"), array('id'=>"yourpledges"));
 
 // Pledges you might like (people who signed pledges you created/signed also signed these...)
 $s = db_query('SELECT pledges.id, SUM(strength) AS sum, max(date) - pb_current_date() AS daysleft
@@ -42,8 +42,8 @@ $s = db_query('SELECT pledges.id, SUM(strength) AS sum, max(date) - pb_current_d
         ', 
         array($P->id(), $P->id(), $P->id(), $P->id(), $P->id(), $P->id()));
 if (0 != db_num_rows($s)) {
-    print "\n\n" . '<div id="yourconnections"><h2><a name="connections">Suggested Pledges</a></h2><ol>' . "\n\n";
-    print "<p>People who signed the pledges you created or signed also signed these...</p>";
+    print "\n\n" . '<div id="yourconnections"><h2><a name="connections">' . _('Suggested Pledges') . '</a></h2><ol>' . "\n\n";
+    print _("<p>People who signed the pledges you created or signed also signed these...</p>");
     while (list($id, $strength, $daysleft) = db_fetch_row($s)) {
         $p2 = new Pledge(intval($id));
         print '<li>';
@@ -66,7 +66,7 @@ $qrows = db_query("
                 AND pledges.person_id = ?
                 ORDER BY creationtime DESC
             ", $P->id());
-print "<h2>Pledges You Created</h2>";
+print _("<h2>Pledges You Created</h2>");
 if (db_num_rows($qrows) > 0) {
     while ($r = db_fetch_array($qrows)) {
         $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
@@ -74,7 +74,7 @@ if (db_num_rows($qrows) > 0) {
         $pledge->render_box(array('class' => 'pledge-yourcreated', 'href'=>$pledge->url_main()));
     }
 } else {
-    print '<p>You have created no pledges.</p>';
+    print _('<p>You have created no pledges.</p>');
 }
 
 // Pledges you have signed
@@ -87,7 +87,7 @@ $qrows = db_query("
                 ORDER BY signtime DESC
             ", $P->id());
 print '<div id="yoursignedpledges">';
-print "<h2>Pledges You Signed</h2>";
+print _("<h2>Pledges You Signed</h2>");
 $successful_ever = 0;
 if (db_num_rows($qrows) > 0) {
     print '<ol>';
@@ -102,10 +102,10 @@ if (db_num_rows($qrows) > 0) {
     }
     print '</ol>';
 } else {
-    print '<p>You have signed no pledges.</p>';
+    print _('<p>You have signed no pledges.</p>');
 }
 if ($successful_ever)
-    print "<p>Why not <a href=\"mailto:team@pledgebank.com\">send us photos</a> of yourself carrying out successful pledges?</p>";
+    print _("<p>Why not <a href=\"mailto:team@pledgebank.com\">send us photos</a> of yourself carrying out successful pledges?</p>");
 print '</div>';
 
 page_footer();

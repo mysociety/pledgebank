@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.15 2005-06-14 15:23:37 francis Exp $
+ * $Id: ref-info.php,v 1.16 2005-06-24 08:49:38 matthew Exp $
  * 
  */
 
@@ -26,14 +26,14 @@ $err = importparams(
         );
 
 if (!is_null($err))
-    err("Missing pledge reference");
+    err(_("Missing pledge reference"));
 
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
 
 $pin_box = deal_with_pin($p->url_info(), $p->ref(), $p->pin());
 if ($pin_box) {
-    page_header("Enter PIN"); 
+    page_header(_("Enter PIN"));
     print $pin_box;
     page_footer();
     exit;
@@ -44,9 +44,9 @@ if ($q_LetMeIn && !is_null($q_email)) {
     /* User wants to log in. Do the signon then redirect back to the normal
      * page, so that they always view it as a GET. */
     $P = person_signon(array(
-                    'reason_web' => 'To view announcement messages for a pledge, we need to check you have signed it.',
-                    'reason_email' => 'Then you will be able to view announcement messages.',
-                    'reason_email_subject' => 'View pledge announcements archive on PledgeBank.com',
+                    'reason_web' => _('To view announcement messages for a pledge, we need to check you have signed it.'),
+                    'reason_email' => _('Then you will be able to view announcement messages.'),
+                    'reason_email_subject' => _('View pledge announcements archive on PledgeBank.com'),
                 ), $q_email);
     if (!$pin_box) {
         header("Location: /$q_ref/info");
@@ -66,7 +66,7 @@ if (!is_null($P)) {
         $priv |= PRIV_CREATOR | PRIV_SIGNER;
 }
 
-page_header("More information: " . $p->h_title(), array('ref'=>$p->url_main()) );
+page_header(_("More information: ") . $p->h_title(), array('ref'=>$p->url_main()) );
 
 /* Brief table of info about the pledge. */
 $p->render_box();
@@ -74,40 +74,39 @@ $p->render_box();
 ?>
 
 <div id="pledgeaction">
-<h2>General pledge information</h2>
+<?=_('<h2>General pledge information</h2>') ?>
 <table border="0" cellpadding="3" cellspacing="0">
 <tr>
-    <th>Creator</th>
+    <th><?=_('Creator') ?></th>
     <td><?=$p->h_name_and_identity()?></td>
 </tr>
 <tr>
-    <th>Created</th>
+    <th><?=_('Created') ?></th>
     <td><?=prettify($p->creationdate())?></td>
 </tr>
 <tr>
-    <th><?= $p->open() ? 'Expires' : 'Expired' ?></th>
+    <th><?= $p->open() ? _('Expires') : _('Expired') ?></th>
     <td><?=prettify($p->date())?></td>
 </tr>
 <tr>
-    <th>Status</th>
+    <th><?=_('Status') ?></th>
     <td><?
     if ($p->open())
-        print 'open for signers; '
-                . ($p->succeeded() ? 'successful' : 'not yet successful');
+        print _('open for signers; ')
+                . ($p->succeeded() ? _('successful') : _('not yet successful'));
     else
-        print 'closed; '
-                . ($p->succeeded() ? 'successful' : 'failed');
+        print _('closed; ')
+                . ($p->succeeded() ? _('successful') : _('failed'));
     ?></td?
 </tr>
 <tr>
-    <th>Number of signers</th>
+    <th><?=_('Number of signers') ?></th>
     <td><?= $p->signers() ?> / <?= $p->target() ?>
-        (<?= sprintf('%.1f%%', 100. * $p->signers() / $p->target()) ?>
-        of target)
+        <?= sprintf('(%.1f%% of target)', 100. * $p->signers() / $p->target()) ?>
     </td>
 </tr>
 <tr>
-    <th>Categories</th>
+    <th><?=_('Categories') ?></th>
     <td><?
     $a = array_values($p->categories());
     if (sizeof($a) == 0)
@@ -124,15 +123,13 @@ $p->render_box();
 /* Pretty graph of pledge signup, and some notes about how quickly the pledge
  * is progressing. */
 ?>
-<h3 style="clear:both">Rate of signups</h3>
+<h3 style="clear:both"><?=_('Rate of signups') ?></h3>
 
-<img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="Graph of signers to this pledge" width="500" height="300"><br>
-<small>Graph updated once per day</small>
+<img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="<?=_('Graph of signers to this pledge') ?>" width="500" height="300"><br>
+<small><?=_('Graph updated once per day') ?></small>
 <?
 
-?>
-<h2>Messages sent by creator to signers</h2>
-<?
+print _('<h2>Messages sent by creator to signers</h2>');
 
 if ($priv & PRIV_SIGNER) {
     $q = db_query('select id, whencreated, fromaddress, emailsubject, emailbody from message where pledge_id = ? and sendtosigners and emailbody is not null', $p->id());
@@ -143,15 +140,15 @@ if ($priv & PRIV_SIGNER) {
         ?>
 <table>
     <tr>
-        <th>From</th>
+        <th><?=_('From') ?></th>
         <td><?= $p->h_name() ?> &lt;<?= htmlspecialchars($p->creator_email()) ?>&gt;<td>
     </tr>
     <tr>
-        <th>Subject</th>
+        <th><?=_('Subject') ?></th>
         <td><?= htmlspecialchars($subject) ?></td>
     </tr>
     <tr>
-        <th>Date</th>
+        <th><?=_('Date') ?></th>
         <td><?= prettify(substr($when, 0, 10)) ?></td>
     </tr>
 </table>
@@ -161,19 +158,18 @@ if ($priv & PRIV_SIGNER) {
         
     }
     if (!$n) {
-?><p>The pledge creator has not sent any announcements yet.</p><?
+        print _('<p>The pledge creator has not sent any announcements yet.</p>');
     }
 } else {
-    ?>
-<p><em>The messages can only be shown to people who have signed the pledge. If
+    print _('<p><em>The messages can only be shown to people who have signed the pledge. If
 you have signed, please give your email address so that we can identify
-you:</em></p>
-
+you:</em></p>');
+?>
 <form class="pledge" name="logIn" method="POST">
-<strong>Email address</strong>
+<strong><?=_('Email address') ?></strong>
 <input type="hidden" name="ref" value="<?=$q_h_ref?>">
 <input type="text" name="email" value="">
-<input type="submit" name="LetMeIn" value="Let me in!">
+<input type="submit" name="LetMeIn" value="<?=_('Let me in!') ?>">
 </p>
 </form>
 

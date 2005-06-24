@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.42 2005-06-24 12:27:01 matthew Exp $
+// $Id: fns.php,v 1.43 2005-06-24 13:39:18 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -92,19 +92,27 @@ function pb_send_email_internal($to, $spec) {
    Returns a nicer form of THING for things that it knows about, otherwise just returns the string.
  */
 function prettify($s, $html = true) {
+    global $lang;
+
     if (preg_match('#^(\d{4})-(\d\d)-(\d\d)$#',$s,$m)) {
         list(,$y,$m,$d) = $m;
         $e = mktime(12,0,0,$m,$d,$y);
-        if ($html)
-            return date('j<\sup>S</\sup> F Y', $e);
-        return date('jS F Y', $e);
+        if ($lang == 'en') {
+            if ($html)
+                return date('j<\sup>S</\sup> F Y', $e);
+            return date('jS F Y', $e);
+        }
+        return strftime('%e %B %Y', $e);
     }
     if (preg_match('#^(\d{4})-(\d\d)-(\d\d) (\d\d:\d\d:\d\d)$#',$s,$m)) {
         list(,$y,$m,$d,$tim) = $m;
         $e = mktime(12,0,0,$m,$d,$y);
-        if ($html)
-            return date('j<\sup>S</\sup> F Y', $e)." $tim";
-        return date('jS F Y', $e)." $tim";
+        if ($lang == 'en') {
+            if ($html)
+                return date('j<\sup>S</\sup> F Y', $e);
+            return date('jS F Y', $e);
+        }
+        return strftime('%e %B %Y', $e)." $tim";
     }
     if ($s>100000000) {
         # Assume it's an epoch
@@ -121,7 +129,8 @@ function prettify($s, $html = true) {
         return $tt;
     }
     if (ctype_digit($s)) {
-        return number_format($s);
+        $locale_info = localeconv();
+        return number_format($s, 0, $locale_info['decimal_point'], $locale_info['thousands_sep']);
     }
     return $s;
 }

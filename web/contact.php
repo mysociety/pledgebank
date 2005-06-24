@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.22 2005-06-24 12:07:59 matthew Exp $
+// $Id: contact.php,v 1.23 2005-06-24 13:39:19 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -41,7 +41,7 @@ If you prefer, you can email %s instead of using the form.')), '<a href="mailto:
 <div class="fr"><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>
 <div><label for="message"><?=_('Message') ?></label>:<br><textarea rows="7" cols="60" name="message" id="message"><?=htmlentities(get_http_var('message')) ?></textarea></div>
 <?  print '<p>' . _('Did you <a href="/faq">read the FAQ</a> first?') . '
---&gt; <input type="submit" name="submit" value="' . _('Send') . '"></p>');
+--&gt; <input type="submit" name="submit" value="' . _('Send') . '"></p>';
     print '</form>';
 }
 

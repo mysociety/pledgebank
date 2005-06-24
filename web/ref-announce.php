@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.23 2005-06-24 12:27:02 matthew Exp $
+ * $Id: ref-announce.php,v 1.24 2005-06-24 13:39:19 matthew Exp $
  * 
  */
 
@@ -224,14 +224,13 @@ if (!sizeof($errors) && $q_submit) {
     $howmany = $p->signers();
 
 ?>
-<p></p>
 
 <form action="announce" accept-charset="utf-8" class="pledge" name="pledge" id="pledgeaction" method="post">
 <h2>Send <?=$descr[$circumstance]?></h2>
 <input type="hidden" name="message_id" value="<?=$q_h_message_id?>">
 <div class="c">
-<?
-    printf(_('<p>Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
+<p><?
+    printf(_('Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
     if ($p->succeeded()) {
         print _('This is to tell them what to do next.');
     } ?>

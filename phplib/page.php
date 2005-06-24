@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.49 2005-06-24 12:39:38 matthew Exp $
+// $Id: page.php,v 1.50 2005-06-24 13:39:18 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -13,6 +13,8 @@
  * title and navigation are not displayed, or if PARAMS['noprint'] is true
  * then they are not there if the page is printed.  */
 function page_header($title, $params = array()) {
+    global $lang;
+
     static $header_outputted = 0;
     if ($header_outputted) {
         return;
@@ -28,7 +30,7 @@ function page_header($title, $params = array()) {
     if (!$lang) $lang = HTTP::negotiateLanguage($langs);
     if ($lang=='en-US' || !$lang) $lang = 'en'; # Default override
     putenv('LANG='.$langmap[$lang].'.ISO8859-1');
-    setlocale(LC_MESSAGES, $langmap[$lang].'.ISO8859-1');
+    setlocale(LC_ALL, $langmap[$lang].'.ISO8859-1');
     bindtextdomain('PledgeBank', '../../locale');
     textdomain('PledgeBank');
 

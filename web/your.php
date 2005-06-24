@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.5 2005-06-24 12:27:03 matthew Exp $
+// $Id: your.php,v 1.6 2005-06-24 13:39:19 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -43,7 +43,7 @@ $s = db_query('SELECT pledges.id, SUM(strength) AS sum, max(date) - pb_current_d
         array($P->id(), $P->id(), $P->id(), $P->id(), $P->id(), $P->id()));
 if (0 != db_num_rows($s)) {
     print "\n\n" . '<div id="yourconnections"><h2><a name="connections">' . _('Suggested Pledges') . '</a></h2><ol>' . "\n\n";
-    print _("<p>People who signed the pledges you created or signed also signed these...</p>");
+    print p(_("People who signed the pledges you created or signed also signed these..."));
     while (list($id, $strength, $daysleft) = db_fetch_row($s)) {
         $p2 = new Pledge(intval($id));
         print '<li>';

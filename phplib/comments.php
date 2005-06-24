@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.27 2005-06-24 11:44:42 matthew Exp $
+ * $Id: comments.php,v 1.28 2005-06-24 13:39:18 matthew Exp $
  * 
  */
 
@@ -113,7 +113,7 @@ function comment_summary($r) {
     if (strlen($text) > 20) $text = substr($text, 0, 20) . '...';
     $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . $text . '</a>';
     
-    return printf(_('%s by %s, on pledge %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
+    return sprintf(_('%s by %s, on pledge %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
 }
 
 function latest_comments() { ?>

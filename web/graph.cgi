@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.12 2005-06-17 15:04:04 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.13 2005-06-24 09:20:15 chris Exp $';
 
 use strict;
 
@@ -159,6 +159,9 @@ while (my $q = new CGI::Fast()) {
             $start_date = sprintf('%04d-%02d-%02d', Add_Delta_Days(split(/-/, $end_date), -7));
         }
 
+        # XXX should also incorporate number of signers or time of generating
+        # graph so that we can have a more prompt update on fast-growing
+        # pledges.
         my $gparam = join(',', $pledge_id, $start_date, $end_date);
         my $hash = Digest::SHA1::sha1_hex($gparam);
 
@@ -305,6 +308,11 @@ EOF
                     -uri => mySociety::Config::get('PB_GRAPH_URL') . "/$filename",
                     -status => 302
                 );
+
+        # We haven't done anything in the transaction, but we must close it
+        # because otherwise pb_current_time() will always return the time at
+        # the *start* of the transaction, and so graphs will be out of date.
+        dbh()->commit();
     } catch PB::Error with {
         my $E = shift;
         my $t = $E->text();

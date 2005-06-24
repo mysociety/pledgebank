@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.50 2005-06-24 13:39:18 matthew Exp $
+// $Id: page.php,v 1.51 2005-06-24 13:50:04 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -13,7 +13,7 @@
  * title and navigation are not displayed, or if PARAMS['noprint'] is true
  * then they are not there if the page is printed.  */
 function page_header($title, $params = array()) {
-    global $lang;
+    global $lang, $langhtml;
 
     static $header_outputted = 0;
     if ($header_outputted) {
@@ -21,18 +21,6 @@ function page_header($title, $params = array()) {
     }
     
     $P = person_if_signed_on(true); /* Don't renew any login cookie. */
-
-    require_once 'HTTP.php';
-    $langs = array('en'=>true); # Translations available of PledgeBank
-    $langmap = array('en'=>'en_GB'); # Map of lang to directory
-    $langhtml = array('en'=>'en'); # Map for <html> element
-    $lang = get_http_var('lang');
-    if (!$lang) $lang = HTTP::negotiateLanguage($langs);
-    if ($lang=='en-US' || !$lang) $lang = 'en'; # Default override
-    putenv('LANG='.$langmap[$lang].'.ISO8859-1');
-    setlocale(LC_ALL, $langmap[$lang].'.ISO8859-1');
-    bindtextdomain('PledgeBank', '../../locale');
-    textdomain('PledgeBank');
 
     $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

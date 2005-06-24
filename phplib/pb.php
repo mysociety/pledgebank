@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.14 2005-06-24 12:27:01 matthew Exp $
+ * $Id: pb.php,v 1.15 2005-06-24 13:50:04 matthew Exp $
  * 
  */
 
@@ -20,6 +20,19 @@ require_once '../phplib/person.php';
 require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
 require_once 'page.php';
+
+# Language stuff
+require_once 'HTTP.php';
+$langs = array('en'=>true); # Translations available of PledgeBank
+$langmap = array('en'=>'en_GB'); # Map of lang to directory
+$langhtml = array('en'=>'en'); # Map for <html> element
+$lang = get_http_var('lang');
+if (!$lang) $lang = HTTP::negotiateLanguage($langs);
+if ($lang=='en-US' || !$lang) $lang = 'en'; # Default override
+putenv('LANG='.$langmap[$lang].'.ISO8859-1');
+setlocale(LC_ALL, $langmap[$lang].'.ISO8859-1');
+bindtextdomain('PledgeBank', '../../locale');
+textdomain('PledgeBank');
 
 /* POST redirects */
 stash_check_for_post_redirect();

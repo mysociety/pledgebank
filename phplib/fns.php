@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.43 2005-06-24 13:39:18 matthew Exp $
+// $Id: fns.php,v 1.44 2005-06-24 13:50:04 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -16,6 +16,8 @@ function strong($s) { return "<strong>$s</strong>"; }
 
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
+    global $lang;
+
     if (array_key_exists('id', $values)) {
         $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
         $values['sentence_third'] = pledge_sentence($values['id'], array('firstperson' => false));
@@ -45,7 +47,11 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         
     $values['signature'] = _("-- the PledgeBank.com team");
 
-    $template = file_get_contents("../templates/emails/$template_name");
+    if (is_file("../templates/emails/$lang/$template_name"))
+        $template = file_get_contents("../templates/emails/$lang/$template_name");
+    else
+        $template = file_get_contents("../templates/emails/$template_name");
+
     $spec = array(
         '_template_' => $template,
         '_parameters_' => $values

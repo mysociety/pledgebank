@@ -1,7 +1,7 @@
 Subject: Your pledge is doing well but it needs a boost! - '<?=$values['title']?>' at PledgeBank.com
 
 Hello, we've noticed that the pledge you created on pledgebank
-<?=$values['pledge_url']?> isn't growing fast enough to succeed.  
+<?=$values['pledge_url']?> isn't growing fast enough to succeed.
 
 At the rate of growth you've had over the last week we only expect you to get
 <?=$values['probable_will_reach']?> signers, when you need

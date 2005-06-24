@@ -3,7 +3,7 @@ Subject: Signing up to '<?=$values['title']?>' at PledgeBank.com
 <?=$values['user_name']?>,
 
 Please click on the link below to confirm your signature on the
-pledge at the bottom of this email. 
+pledge at the bottom of this email.
 
 <?=$values['url']?>
 

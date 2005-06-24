@@ -1,6 +1,6 @@
 Subject: <?=$values['reason_email_subject']?>
 
-Please click on the link below to confirm your email address.  
+Please click on the link below to confirm your email address.
 <?=$values['reason_email']?>
 
 <?=$values['url']?>

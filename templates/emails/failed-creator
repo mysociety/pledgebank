@@ -1,4 +1,4 @@
-Subject: Sorry, your pledge failed - '<?=$values['title']?>' at PledgeBank.com. 
+Subject: Sorry, your pledge failed - '<?=$values['title']?>' at PledgeBank.com.
 
 We are sorry to have to tell you that your pledge did not meet its target in
 the required time.  You required <?=$values['target']?> <?=$values['type']?>,

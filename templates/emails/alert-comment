@@ -1,6 +1,6 @@
 Subject: New comment on pledge - '<?=$values['title']?>' at PledgeBank.com
 
-<?=$values['comment_author_name']?> has left a comment saying: 
+<?=$values['comment_author_name']?> has left a comment saying:
 
 '<?=$values['comment_text']?>'
 

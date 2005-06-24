@@ -1,6 +1,6 @@
 Subject: Pledge successful - '<?=$values['title']?>' at PledgeBank.com
 
-Congratulations! 
+Congratulations!
 
 We are pleased to tell you that the pledge you signed up to
 <?=$values['exceeded_or_met']?> its target in the required time.

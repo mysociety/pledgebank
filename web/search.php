@@ -5,23 +5,27 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.11 2005-06-24 12:27:02 matthew Exp $
+// $Id: search.php,v 1.12 2005-06-25 07:30:10 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/comments.php';
+require_once '../../phplib/mapit.php';
 
 page_header(_("Search Results"));
 print search();
 page_footer();
 
 function search() {
-    $pledge_select = 'SELECT *, pb_current_date() <= date as open,
+    $search = trim(get_http_var('q'));
+    $out = ''; 
+    $success = 0;
+
+    // Exact pledge reference match
+    $pledge_select = 'SELECT pledges.*, pb_current_date() <= pledges.date as open,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 date - pb_current_date() AS daysleft';
 
-    $out = ''; $success = 0;
-    $search = get_http_var('q');
     $q = db_query("$pledge_select FROM pledges WHERE pin is NULL AND ref ILIKE ?", $search);
     if (db_num_rows($q)) {
         $success = 1;
@@ -32,6 +36,34 @@ function search() {
         $out .= '</li></ul>';
     }
 
+    // Postcodes
+    if (validate_postcode($search))  {
+        $location = mapit_get_location($search);
+        if (mapit_get_error($location)) {
+            print "<p>We couldn't find that postcode, please check it again.</p>";
+        } else {
+            print_r($location); 
+            $q = db_query($pledge_select . ' 
+                        FROM pledges
+                        WHERE 
+                            pin IS NULL AND
+                            id in (select id from pledge_find_nearby(?,?,?))
+                        ORDER BY date DESC', array($location['wgs84_lat'], $location['wgs84_lon'], 50)); // 50 miles
+            $closed = ''; $open = '';
+            if (db_num_rows($q)) {
+                $out .= sprintf(p(_('Results for pledges near <strong>%s</strong>:')), htmlspecialchars($search) );
+                $success = 1;
+                while ($r = db_fetch_array($q)) {
+                    $out .= '<li>';
+                    $out .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+                    $out .= '</li>';
+                }
+            }
+
+        }
+    }
+ 
+    // Searching for similar pledge references, or text in pledges
     $q = db_query($pledge_select . ' FROM pledges 
                 WHERE pin IS NULL 
                     AND (title ILIKE \'%\' || ? || \'%\' OR 
@@ -89,6 +121,7 @@ function search() {
         $out .= '</ul>';
     }
 
+    // Signers and creators (NOT people, as we only search for publically visible names)
     $people = array();
     $q = db_query('SELECT ref, title, name FROM pledges WHERE confirmed AND pin IS NULL AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
     while ($r = db_fetch_array($q)) {

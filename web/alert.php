@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.14 2005-06-24 16:48:21 francis Exp $
+// $Id: alert.php,v 1.15 2005-06-25 07:07:56 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -46,7 +46,7 @@ if (get_http_var('subscribe_alert')) {
 page_footer();
 
 function do_local_alert_subscribe() {
-    global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
+    global $q_email, $q_name, $q_showname, $q_ref, $q_pin, $q_postcode;
     $errors = importparams(
                 array('email',      '/^[^@]+@.+/',      _('Please enter your email address')),
                 array('postcode',      "importparams_validate_postcode")
@@ -61,7 +61,7 @@ function do_local_alert_subscribe() {
     $r['reason_email_subject'] = _("Subscribe to local pledge alerts at PledgeBank.com");
     $person = person_signon($r, $q_email);
 
-    db_query('insert into local_alert (person_id, postcode) values (?, ?)', array($person->id(), $q_email));
+    db_query('insert into local_alert (person_id, postcode) values (?, ?)', array($person->id(), $q_postcode));
     db_commit();
         ?>
 <p class="loudmessage" align="center"><?=_("Thanks for subscribing!  When this is finished, you'll get emailed when there are new pledges in your area.") ?> <a href="/"><?=_('PledgeBank home page') ?></a></p>

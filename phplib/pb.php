@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.15 2005-06-24 13:50:04 matthew Exp $
+ * $Id: pb.php,v 1.16 2005-06-25 23:22:51 matthew Exp $
  * 
  */
 
@@ -29,8 +29,8 @@ $langhtml = array('en'=>'en'); # Map for <html> element
 $lang = get_http_var('lang');
 if (!$lang) $lang = HTTP::negotiateLanguage($langs);
 if ($lang=='en-US' || !$lang) $lang = 'en'; # Default override
-putenv('LANG='.$langmap[$lang].'.ISO8859-1');
-setlocale(LC_ALL, $langmap[$lang].'.ISO8859-1');
+putenv('LANG='.$langmap[$lang].'.UTF-8');
+setlocale(LC_ALL, $langmap[$lang].'.UTF-8');
 bindtextdomain('PledgeBank', '../../locale');
 textdomain('PledgeBank');
 
@@ -73,7 +73,7 @@ err_set_handler_display('pb_handle_error');
 /* pb_show_error MESSAGE
  * General purpose eror display. */
 function pb_show_error($message) {
-    page_header(_("Sorry! Something's gone wrong."));
+    page_header(_("Sorry! Something's gone wrong."), array('override'=>true));
     print _('<h2>Sorry!  Something\'s gone wrong.</h2>') .
         "\n<p>" . $message . '</p>';
     page_footer();

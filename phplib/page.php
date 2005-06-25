@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.53 2005-06-24 22:13:54 matthew Exp $
+// $Id: page.php,v 1.54 2005-06-25 23:22:51 matthew Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -16,7 +16,7 @@ function page_header($title, $params = array()) {
     global $lang, $langhtml;
 
     static $header_outputted = 0;
-    if ($header_outputted) {
+    if ($header_outputted && !array_key_exists('override', $params)) {
         return;
     }
     

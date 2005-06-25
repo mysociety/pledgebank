@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.12 2005-06-25 07:30:10 francis Exp $
+// $Id: search.php,v 1.13 2005-06-25 10:10:39 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -47,8 +47,8 @@ function search() {
                         FROM pledges
                         WHERE 
                             pin IS NULL AND
-                            id in (select id from pledge_find_nearby(?,?,?))
-                        ORDER BY date DESC', array($location['wgs84_lat'], $location['wgs84_lon'], 50)); // 50 miles
+                            id in (select pledge_id from pledge_find_nearby(?,?,?))
+                        ORDER BY date DESC', array($location[1], $location[2], 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon; ordered by distance?
             $closed = ''; $open = '';
             if (db_num_rows($q)) {
                 $out .= sprintf(p(_('Results for pledges near <strong>%s</strong>:')), htmlspecialchars($search) );

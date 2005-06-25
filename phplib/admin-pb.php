@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.76 2005-06-24 20:45:34 francis Exp $
+ * $Id: admin-pb.php,v 1.77 2005-06-25 11:44:51 matthew Exp $
  * 
  */
 
@@ -526,9 +526,12 @@ class ADMIN_PAGE_PB_LATEST {
         }
         krsort($time);
 
-        print '<a href="'.$this->self_link.'">Full log</a> | <a
-            href="'.$this->self_link.'&amp;onlysigners=1">Only
-            signatures</a>'; 
+        print '<a href="'.$this->self_link.'">Full log</a>';
+        if ($this->ref) {
+            print ' | <em>Viewing only pledge "'.$this->pledgeref[$this->ref].'"</em> (<a href="?page=pb&amp;ref='.$this->pledgeref[$this->ref].'">admin</a>)';
+        } else {
+            print ' | <a href="'.$this->self_link.'&amp;onlysigners=1">Only signatures</a>';
+        }
         $date = ''; 
         $linecount = 0;
         print "<div class=\"timeline\">";
@@ -625,11 +628,11 @@ class ADMIN_PAGE_PB_LATEST {
             $ref = $data;
         if (!$title) 
             $title = $ref;
-        return '<a href="' . OPTION_BASE_URL . '/' . $ref . '">' .
-            htmlspecialchars($title) . '</a>'.
-            ' (<a href="?page=pb&amp;pledge='.$ref.'">admin</a> | '.
-            ' <a href="?page=pblatest&amp;ref='.$ref.'">timeline</a>)';
-        ;
+        $str = '<a href="' . OPTION_BASE_URL . '/' . $ref . '">' .
+            htmlspecialchars($title) . '</a>';
+        if (!$this->ref)
+            $str .= ' (<a href="?page=pb&amp;pledge='.$ref.'">admin</a>' .  ' | ' . ' <a href="?page=pblatest&amp;ref='.$ref.'">timeline</a>'. ')';
+        return $str;
     }
 
     function display($self_link) {

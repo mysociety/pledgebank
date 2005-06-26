@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.77 2005-06-25 11:44:51 matthew Exp $
+ * $Id: admin-pb.php,v 1.78 2005-06-26 21:37:06 matthew Exp $
  * 
  */
 
@@ -430,6 +430,10 @@ class ADMIN_PAGE_PB_LATEST {
         if ($ref = get_http_var('ref')) {
             $this->ref = db_getOne('select id from pledges where ref=?', $ref);
         }
+        $this->ignore = null;
+        if ($ignore = get_http_var('ignore')) {
+            $this->ignore = db_getOne('select id from pledges where ref=?', $ignore);
+        }
     }
 
     # pledges use creationtime
@@ -528,7 +532,9 @@ class ADMIN_PAGE_PB_LATEST {
 
         print '<a href="'.$this->self_link.'">Full log</a>';
         if ($this->ref) {
-            print ' | <em>Viewing only pledge "'.$this->pledgeref[$this->ref].'"</em> (<a href="?page=pb&amp;ref='.$this->pledgeref[$this->ref].'">admin</a>)';
+            print ' | <em>Viewing only pledge "'.$this->pledgeref[$this->ref].'"</em> (<a href="?page=pb&amp;pledge='.$this->pledgeref[$this->ref].'">admin</a>)';
+        } elseif ($this->ignore) {
+            print ' | <em>Ignoring pledge "'.$this->pledgeref[$this->ignore].'"</em> (<a href="?page=pb&amp;pledge='.$this->pledgeref[$this->ignore].'">admin</a>)';
         } else {
             print ' | <a href="'.$this->self_link.'&amp;onlysigners=1">Only signatures</a>';
         }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.12 2005-06-24 12:27:02 matthew Exp $
+// $Id: ref-email.php,v 1.13 2005-06-26 21:37:08 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -60,7 +60,8 @@ if (!$errors) {
     if ($success) {
         print p(_('Your message has been sent.  Thanks very much for spreading the word of this pledge.'));
     } else {
-        print p(_('Unfortunately, something went wrong when trying to send the emails.'));
+        $errors[] = _('Unfortunately, something went wrong when trying to send the emails. Please check that all the email addresses are correct.');
+        view_friends_form($p, $errors);
     }
 } else {
     view_friends_form($p, $errors);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.44 2005-06-24 13:50:04 matthew Exp $
+// $Id: fns.php,v 1.45 2005-06-26 21:37:06 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -206,18 +206,18 @@ print h2(_('Email this pledge'));
 print p(_('Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.')); ?>
 <p><strong><?=_('Other people\'s email addresses:') ?></strong></p>
-<div class="formrow"><input type="text" name="email1" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email2" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email3" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email4" value="" size="40"></div>
-<div class="formrow"><input type="text" name="email5" value="" size="40"></div>
+<div class="formrow"><input type="text" name="email1" value="<? if (get_http_var('email1')) print htmlentities(get_http_var('email1'));?>" size="40"></div>
+<div class="formrow"><input type="text" name="email2" value="<? if (get_http_var('email2')) print htmlentities(get_http_var('email2'));?>" size="40"></div>
+<div class="formrow"><input type="text" name="email3" value="<? if (get_http_var('email3')) print htmlentities(get_http_var('email3'));?>" size="40"></div>
+<div class="formrow"><input type="text" name="email4" value="<? if (get_http_var('email4')) print htmlentities(get_http_var('email4'));?>" size="40"></div>
+<div class="formrow"><input type="text" name="email5" value="<? if (get_http_var('email5')) print htmlentities(get_http_var('email5'));?>" size="40"></div>
 
 <p><strong><?=_('Add a message, if you want:') ?></strong></p>
 <div class="formrow"><textarea name="frommessage" rows="8" cols="40"></textarea></div>
 
 <p>
-<div class="formrow"><strong><?=_('Your name:') ?></strong> <input type="text" name="fromname" value="" size="18">
-<br><strong><?=_('Email:') ?></strong> <input type="text" name="fromemail" value="" size="26"></div>
+<div class="formrow"><strong><?=_('Your name:') ?></strong> <input type="text" name="fromname" value="<? if (get_http_var('fromname')) print htmlentities(get_http_var('fromname')); ?>" size="18">
+<br><strong><?=_('Email:') ?></strong> <input type="text" name="fromemail" value="<? if (get_http_var('fromemail')) print htmlentities(get_http_var('fromemail')); ?>" size="26"></div>
 
 <p><input name="submit" type="submit" value="<?=_('Send message') ?>"></p>
 

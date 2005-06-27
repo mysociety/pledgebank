@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.79 2005-06-27 16:20:55 matthew Exp $
+ * $Id: admin-pb.php,v 1.80 2005-06-27 23:25:09 francis Exp $
  * 
  */
 
@@ -169,6 +169,11 @@ class ADMIN_PAGE_PB_MAIN {
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
+        print '<br>Country: <b>' . $pdata['country'] . "</b>";
+        if ($pdata['postcode'])
+            print ' Postcode: <b>' . $pdata['postcode'].'</b>';
+        if ($pdata['longitude'])
+            print ' Longitude/Latitude WGS84: <b>' . round($pdata['longitude'],2).'E ' . round($pdata['latitude'],2).'N</b>';
         print "</p>";
 
         // Prominence

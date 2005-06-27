@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.32 2005-06-27 12:16:50 chris Exp $
+// $Id: ref-index.php,v 1.33 2005-06-27 12:21:42 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -88,6 +88,9 @@ function draw_signatories($p) {
 
     $npage = $nsigners - $offset > MAX_PAGE_SIGNERS ? MAX_PAGE_SIGNERS : $nsigners - $offset;
 
+    /* XXX need to do something about layout here -- it breaks badly when the
+     * height of the comments column is greater than that of the signers
+     * column. */
     if ($nsigners > MAX_PAGE_SIGNERS) {
         print "<p>";
         if ($npage < MAX_PAGE_SIGNERS)
@@ -110,7 +113,7 @@ function draw_signatories($p) {
                     . "</a>",
                     htmlspecialchars($p->ref()),
                     $offset + MAX_PAGE_SIGNERS);
-        
+        print "</p>";
     }
    
     $out = '';

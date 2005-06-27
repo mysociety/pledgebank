@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.78 2005-06-26 21:37:06 matthew Exp $
+ * $Id: admin-pb.php,v 1.79 2005-06-27 16:20:55 matthew Exp $
  * 
  */
 
@@ -114,8 +114,8 @@ class ADMIN_PAGE_PB_MAIN {
         if ($sort=='o') {
             function sort_by_percent($a, $b) {
                 global $open;
-                preg_match('#<td>([\d\.]+)%</td>#', $open[$a], $m); $aa = $m[1];
-                preg_match('#<td>([\d\.]+)%</td>#', $open[$b], $m); $bb = $m[1];
+                preg_match('#<td>([\d\.,]+)%</td>#', $open[$a], $m); $aa = str_replace(',','',$m[1]);
+                preg_match('#<td>([\d\.,]+)%</td>#', $open[$b], $m); $bb = str_replace(',','',$m[1]);
                 if ($aa==$bb) return 0;
                 return ($aa<$bb) ? 1 : -1;
             }

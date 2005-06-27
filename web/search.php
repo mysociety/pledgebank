@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.14 2005-06-27 22:28:45 francis Exp $
+// $Id: search.php,v 1.15 2005-06-27 23:14:32 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -42,23 +42,25 @@ function search() {
         if (mapit_get_error($location)) {
             print "<p>We couldn't find that postcode, please check it again.</p>";
         } else {
-            print_r($location); 
-            $q = db_query($pledge_select . ' 
-                        FROM pledges
+            $q = db_query($pledge_select . ', distance
+                        FROM pledge_find_nearby(?,?,?) AS nearby 
+                        LEFT JOIN pledges ON nearby.pledge_id = pledges.id
                         WHERE 
                             pin IS NULL AND
-                            pledges.prominence <> \'backpage\' AND
-                            id in (select pledge_id from pledge_find_nearby(?,?,?))
-                        ORDER BY date DESC', array($location['wgs84_lat'], $location['wgs84_lon'], 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon; ordered by distance?
+                            pledges.prominence <> \'backpage\'
+                        ORDER BY distance', array($location['wgs84_lat'], $location['wgs84_lon'], 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon; ordered by distance?
             $closed = ''; $open = '';
             if (db_num_rows($q)) {
-                $out .= sprintf(p(_('Results for pledges near <strong>%s</strong>:')), htmlspecialchars($search) );
+                $out .= sprintf(p(_('Results for pledges near UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );
                 $success = 1;
+                $out .= '<ul>';
                 while ($r = db_fetch_array($q)) {
                     $out .= '<li>';
+                    $out .= '<strong>' . round($r['distance'],1) . " km</strong> away: ";
                     $out .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
                     $out .= '</li>';
                 }
+                $out .= '</ul>';
             }
 
         }

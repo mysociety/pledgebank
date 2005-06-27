@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.45 2005-06-26 21:37:06 matthew Exp $
+// $Id: fns.php,v 1.46 2005-06-27 20:26:23 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -191,6 +191,17 @@ function parse_date($date) {
 }
 
 function view_friends_form($p, $errors = array()) {
+
+    $name = get_http_var('fromname');
+    $email = get_http_var('fromemail');
+    $P = person_if_signed_on();
+    if (!is_null($P)) {
+        if (is_null($name) || !$name)
+            $name = $P->name_or_blank();
+        if (is_null($email) || !$email)
+            $email = $P->email();
+    }
+    
     if (sizeof($errors) && get_http_var('submit')) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
@@ -216,8 +227,8 @@ We will not give or sell either your or their email address to anyone else.')); 
 <div class="formrow"><textarea name="frommessage" rows="8" cols="40"></textarea></div>
 
 <p>
-<div class="formrow"><strong><?=_('Your name:') ?></strong> <input type="text" name="fromname" value="<? if (get_http_var('fromname')) print htmlentities(get_http_var('fromname')); ?>" size="18">
-<br><strong><?=_('Email:') ?></strong> <input type="text" name="fromemail" value="<? if (get_http_var('fromemail')) print htmlentities(get_http_var('fromemail')); ?>" size="26"></div>
+<div class="formrow"><strong><?=_('Your name:') ?></strong> <input type="text" name="fromname" value="<?=htmlspecialchars($name) ?>" size="18">
+<br><strong><?=_('Email:') ?></strong> <input type="text" name="fromemail" value="<?=htmlspecialchars($email) ?>" size="26"></div>
 
 <p><input name="submit" type="submit" value="<?=_('Send message') ?>"></p>
 

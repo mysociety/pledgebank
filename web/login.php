@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.48 2005-06-24 16:48:21 francis Exp $
+ * $Id: login.php,v 1.49 2005-06-27 20:32:02 matthew Exp $
  * 
  */
 
@@ -344,12 +344,14 @@ function change_password_page($P) {
     if ($q_SetPassword) {
         global $q_pw1, $q_pw2;
         importparams(
-                array('pw1',        '/[^\s]{5,}/',      '', null),
-                array('pw2',        '/[^\s]{5,}/',      '', null)
+                array('pw1',        '/[^\s]+/',      '', null),
+                array('pw2',        '/[^\s]+/',      '', null)
             );
         if (is_null($q_pw1) || is_null($q_pw2))
             $error = _("Please type your new password twice");
-        else if ($q_pw1 != $q_pw2)
+        elseif (strlen($q_pw1)<5 || strlen($q_pw2)<5)
+            $error = _('Your password must be at least 5 characters long');
+        elseif ($q_pw1 != $q_pw2)
             $error = _("Please type the same password twice");
         else {
             $P->password($q_pw1);

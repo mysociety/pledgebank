@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.30 2005-06-24 16:48:21 francis Exp $
+// $Id: ref-index.php,v 1.31 2005-06-27 11:20:33 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -118,15 +118,15 @@ function draw_comments($p) {
 }
 
 function draw_connections($p) {
-    $s = db_query('SELECT a_pledge_id, b_pledge_id, strength 
+    $s = db_query("SELECT a_pledge_id, b_pledge_id, strength 
         FROM pledge_connection 
             LEFT JOIN pledges AS a_pledges ON a_pledge_id = a_pledges.id
             LEFT JOIN pledges AS b_pledges ON b_pledge_id = b_pledges.id
         WHERE 
-            (a_pledge_id = ? AND b_pledges.date >= pb_current_date() AND pb_pledge_prominence(b_pledges.id) <> \'backpage\') OR
-            (b_pledge_id = ? AND a_pledges.date >= pb_current_date() AND pb_pledge_prominence(a_pledges.id) <> \'backpage\')
+            (a_pledge_id = ? AND b_pledges.date >= pb_current_date()) or
+            (b_pledge_id = ? AND a_pledges.date >= pb_current_date())
         ORDER BY STRENGTH DESC 
-        LIMIT 8', array($p->id(), $p->id()));
+        LIMIT 8", array($p->id(), $p->id()));
     if (0 == db_num_rows($s))
         return;
 

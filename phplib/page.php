@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.54 2005-06-25 23:22:51 matthew Exp $
+// $Id: page.php,v 1.55 2005-06-27 23:25:49 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -118,7 +118,7 @@ function page_footer($params = array()) {
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
-<p><label for="s"><?=_('Search') ?>:</label>
+<p><label for="s"><?=_('Search (word or postcode)') ?>:</label>
 <input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="<?=_('Go') ?>"></p>
 </form>
 <!-- remove all extraneous whitespace to avoid IE bug -->

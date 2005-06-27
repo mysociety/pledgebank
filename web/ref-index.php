@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.31 2005-06-27 11:20:33 chris Exp $
+// $Id: ref-index.php,v 1.32 2005-06-27 12:16:50 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -66,14 +66,62 @@ function draw_spreadword($p) {
     }
 }
 
+define('MAX_PAGE_SIGNERS', '500');
+
 function draw_signatories($p) {
+    $nsigners = db_getOne('select count(id) from signers where pledge_id = ?', $p->id());
+    $offset = 0;
+    if ($nsigners > MAX_PAGE_SIGNERS) {
+        $offset = get_http_var('signers_offset');
+        if (!preg_match('/^(0|[1-9]\d*)$/', $offset))
+            $offset = MAX_PAGE_SIGNERS * (int)(($nsigners - 1) / MAX_PAGE_SIGNERS);
+        else {
+            $offset = MAX_PAGE_SIGNERS * (int)($offset / MAX_PAGE_SIGNERS);
+            if ($offset > $nsigners - 1)
+                $offset = MAX_PAGE_SIGNERS * (int)(($nsigners - 1) / MAX_PAGE_SIGNERS);
+        }
+    }
     ?>
     <div id="signatories">
-<?  print '<h2><a name="signers">' . _('Current signatories') . '</a></h2>';
-    $out = '<li>' . $p->h_name() . ' ' . _('(Pledge Creator)') . '</li>';
+<?
+    print '<h2><a name="signers">' . _('Current signatories') . '</a></h2>';
+
+    $npage = $nsigners - $offset > MAX_PAGE_SIGNERS ? MAX_PAGE_SIGNERS : $nsigners - $offset;
+
+    if ($nsigners > MAX_PAGE_SIGNERS) {
+        print "<p>";
+        if ($npage < MAX_PAGE_SIGNERS)
+            printf(_("Because there are so many signers, only the most recent %d are shown on this page."), $npage);
+        else
+            printf("<p>" . _("Because there are so many signers, only %d are shown on this page"), $npage);
+        print "</p>";
+
+        print "<p>";
+        if ($offset > 0)
+            printf("<a href=\"/%s/?signers_offset=%d\">"
+                    . htmlspecialchars(_("<<< Earlier signers"))
+                    . "</a>",
+                    htmlspecialchars($p->ref()),
+                    $offset - MAX_PAGE_SIGNERS);
+        print " ";
+        if ($offset + MAX_PAGE_SIGNERS < $nsigners - 1)
+            printf("<a href=\"/%s/?signers_offset=%d\">"
+                    . htmlspecialchars(_("Later signers >>>"))
+                    . "</a>",
+                    htmlspecialchars($p->ref()),
+                    $offset + MAX_PAGE_SIGNERS);
+        
+    }
+   
+    $out = '';
+   
+    if ($offset == 0)
+        $out = '<li>' . $p->h_name() . ' ' . _('(Pledge Creator)') . '</li>';
+
     $anon = 0;
     $unknownname = 0;
-    $q = db_query('SELECT * FROM signers WHERE pledge_id=? ORDER BY id', array($p->id()));
+    
+    $q = db_query("SELECT * FROM signers WHERE pledge_id = ? ORDER BY id LIMIT " . MAX_PAGE_SIGNERS . " OFFSET $offset", $p->id());
     while ($r = db_fetch_array($q)) {
         $showname = ($r['showname'] == 't');
         if ($showname) {

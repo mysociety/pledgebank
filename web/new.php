@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.45 2005-06-24 16:48:21 francis Exp $
+// $Id: new.php,v 1.46 2005-06-27 18:51:22 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -142,7 +142,7 @@ serious marketing of your pledge.")), OPTION_PB_TARGET_WARNING);
 href="/faq#targets">more advice</a> about choosing a target in the FAQ.'));
 ?>
 <p><?=_('<strong>My target</strong> is ') ?>
-<input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?='' /*(isset($data['target'])?htmlspecialchars($data['target']):'')*/ ?>">
+<input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="10">
 <strong><?=$data['type']?></strong></p>
 
 <p><?=_('Remember, a small but successful pledge can be the perfect preparation
@@ -355,7 +355,7 @@ function target_warning_error_check($data) {
     global $pb_today;
 
     $errors = array();
-    if (!$data['target']) 
+    if (!$data['target'] || !ctype_digit($data['target']))
         $errors['target'] = _('Please enter a target');
     elseif ($data['target'] > OPTION_PB_TARGET_CAP) {
         $errors['target'] = sprintf(_('We have imposed a cap of
@@ -521,8 +521,8 @@ created it.</strong>
 ?>
 <ul>
 
-<li><?=_('Which country does your pledge apply to?') ?>
-<em><?=htmlspecialchars($data['country']) ?></em>
+<li><?=_('Which country does your pledge apply to?') ?> <em><?=
+htmlspecialchars($data['country']) ?></em>
 </li>
 
 <? if ($data['country'] == "UK") { ?>
@@ -531,8 +531,7 @@ $local ? _('Yes') . ' (' . htmlspecialchars($data['postcode']) . ')' : _('No') ?
 </li>
 <? } ?>
 
-<li><?=_('Does your pledge fit into a specific topic or category?') ?>
-<em><?=
+<li><?=_('Does your pledge fit into a specific topic or category?') ?> <em><?=
     $data['category'] == -1
         ? _('No')
         : _('Yes') . ': "'
@@ -560,6 +559,7 @@ pledge at the top of this page in your name.') . '</strong> ';
         print '.';
         print _('The purpose of this is simply to give your pledge
 greater publicity and a greater chance of succeeding.');
+        print ' ';
     }
     print _("Rest assured that we won't ever give or sell anyone your email address."); ?>
 <br><input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions"><?=_('Tick this box to confirm you have read this paragraph') ?>.</label>

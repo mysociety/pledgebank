@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.33 2005-06-27 12:21:42 chris Exp $
+// $Id: ref-index.php,v 1.34 2005-06-27 12:42:52 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -96,7 +96,7 @@ function draw_signatories($p) {
         if ($npage < MAX_PAGE_SIGNERS)
             printf(_("Because there are so many signers, only the most recent %d are shown on this page."), $npage);
         else
-            printf("<p>" . _("Because there are so many signers, only %d are shown on this page"), $npage);
+            printf(_("Because there are so many signers, only %d are shown on this page."), $npage);
         print "</p>";
 
         print "<p>";

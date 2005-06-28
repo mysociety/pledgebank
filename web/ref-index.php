@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.35 2005-06-27 19:05:44 matthew Exp $
+// $Id: ref-index.php,v 1.36 2005-06-28 08:02:54 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -25,6 +25,10 @@ if ($pin_box) {
 }
 
 function draw_status_plaque($p) {
+    if ($p->is_cancelled()) {
+        print '<p class="cancelled">' . comments_text_to_html($p->data['cancelled']) . '</p>';
+        return;
+    }
     if (!$p->open()) {
         print '<p class="finished">' . _('This pledge is now closed, as its deadline has passed.') . '</p>';
     }

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.119 2005-06-24 11:42:50 francis Exp $
+-- $Id: schema.sql,v 1.120 2005-06-28 08:02:54 francis Exp $
 --
 
 -- secret
@@ -152,12 +152,16 @@ create table pledges (
 
     -- Record when a pledge succeeded.
     whensucceeded timestamp,
+    -- Cancelled by creator, takes no more signers.  Text (in same format as a 
+    -- comment) is displayed at the top of the pledge page, and the pledge 
+    -- counts as "finished".
+    cancelled text,
 
-    -- categorisation
+    -- Which lists of pledges this one is shown in
     prominence text not null default 'normal' check (
         prominence = 'normal' or        -- default
         prominence = 'frontpage' or     -- pledge appears on front page
-        prominence = 'backpage'         -- pledge isn't in "all pledges" list
+        prominence = 'backpage'         -- pledge doesn't appear in "all pledges" list, RSS etc.
     ),
 
     check ((latitude is null and longitude is null)
@@ -410,7 +414,7 @@ create function pledge_is_valid_to_sign(integer, text, text)
             end if;
         end if;
 
-        if p.date < pb_current_date() then
+        if p.date < pb_current_date() or p.cancelled is not null then
             return ''finished'';
         end if;
         

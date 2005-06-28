@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.105 2005-06-24 22:13:54 matthew Exp $
+ * $Id: pledge.php,v 1.106 2005-06-28 08:02:54 francis Exp $
  * 
  */
 
@@ -83,6 +83,7 @@ class Pledge {
         if (!array_key_exists('signers', $this->data)) $this->data['signers'] = -1;
         if (!array_key_exists('confirmed', $this->data)) $this->data['confirmed'] = 'f';
         if (!array_key_exists('open', $this->data)) $this->data['open'] = 't';
+        if (!array_key_exists('cancelled', $this->data)) $this->data['cancelled'] = null;
 
         // Some calculations 
         $this->data['left'] = $this->data['target'] - $this->data['signers'];
@@ -97,6 +98,8 @@ class Pledge {
         if ($this->left() <= 0)
             if ($this->exactly())
                 $finished = true;
+        if ($this->is_cancelled())
+            $finished = true;
         $this->data['finished'] = $finished;
     }
 
@@ -115,6 +118,7 @@ class Pledge {
     
     function exactly() { return ($this->data['comparison'] == 'exactly'); }
     function has_details() { return $this->data['detail'] ? true : false; }
+    function is_cancelled() { return $this->data['cancelled'] ? true : false; }
 
     function target() { return $this->data['target']; }
     function signers() { return $this->data['signers']; }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.2 2005-06-28 10:54:41 francis Exp $
+// $Id: list.php,v 1.3 2005-06-28 14:56:09 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -88,27 +88,26 @@ foreach ($viewsarray as $s => $desc) {
     if ($s != 'failed') $views .= ' | ';
 }
 
+$sort = ($q_sort) ? '&amp;sort=' . $q_sort : '';
+$off = ($q_offset) ? '&amp;offset=' . $q_offset : '';
+$prev = '<span class="greyed">&laquo; '._('Previous page').'</span>'; $next = '<span class="greyed">'._('Next page').' &raquo;</span>';
+if ($q_offset > 0) {
+    $n = $q_offset - PAGE_SIZE;
+    if ($n < 0) $n = 0;
+    $prev = "<a href=\"all?offset=$n$sort\">&laquo; "._('Previous page')."</a>";
+}
+if ($q_offset + PAGE_SIZE < $ntotal) {
+    $n = $q_offset + PAGE_SIZE;
+    $next = "<a href=\"all?offset=$n$sort\">"._('Next page')." &raquo;</a>";
+}
+$navlinks = '<p align="center">' . $views . "</p>\n";
 if ($ntotal > 0) {
-    
-    $sort = ($q_sort) ? '&amp;sort=' . $q_sort : '';
-    $off = ($q_offset) ? '&amp;offset=' . $q_offset : '';
-    $prev = '<span class="greyed">&laquo; '._('Previous page').'</span>'; $next = '<span class="greyed">'._('Next page').' &raquo;</span>';
-    if ($q_offset > 0) {
-        $n = $q_offset - PAGE_SIZE;
-        if ($n < 0) $n = 0;
-        $prev = "<a href=\"all?offset=$n$sort\">&laquo; "._('Previous page')."</a>";
-    }
-    if ($q_offset + PAGE_SIZE < $ntotal) {
-        $n = $q_offset + PAGE_SIZE;
-        $next = "<a href=\"all?offset=$n$sort\">"._('Next page')." &raquo;</a>";
-    }
-    $navlinks = '<p align="center">' . $views . "</p>\n";
     $navlinks .= '<p align="center" style="font-size: 89%">' . _('Sort by'). ': ';
     $arr = array(
-                 'creationtime'=>_('Creation date'), 
+                 'creationtime'=>_('Start date'), 
                  /* 'target'=>_('Target'), */
                  'date'=>_('Deadline'), 
-                 'percentcomplete' => _('Percent complete'), 
+                 'percentcomplete' => _('Percent signed'), 
                  );
     # Removed as not useful (search is better for these): 'ref'=>'Short name',
     # 'title'=>'Title', 'name'=>'Creator'
@@ -116,13 +115,16 @@ if ($ntotal > 0) {
         if ($q_sort != $s) $navlinks .= "<a href=\"?sort=$s$off\">$desc</a>"; else $navlinks .= $desc;
         if ($s != 'percentcomplete') $navlinks .= ' | ';
     }
-    $navlinks .= '</p> <p align="center">';
+    $navlinks .= '</p>';
+    $navlinks .= '<p align="center">';
     $navlinks .= $prev . ' | '._('Pledges'). ' ' . ($q_offset + 1) . ' &ndash; ' . 
         ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
         $ntotal . ' | ' . $next;
     $navlinks .= '</p>';
-    print $navlinks;
+}
+print $navlinks;
 
+if ($ntotal > 0) {
     $c = 0;
     while (list($id) = db_fetch_row($qrows)) {
         $pledge = new Pledge(intval($id));

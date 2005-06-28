@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.55 2005-06-27 23:25:49 francis Exp $
+// $Id: page.php,v 1.56 2005-06-28 16:40:21 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -20,6 +20,13 @@ function page_header($title, $params = array()) {
         return;
     }
     
+    // The http-equiv in the HTML below doesn't always seem to override HTTP
+    // header, so we say that we are UTF-8 in the HTTP header as well (Case
+    // where this was required: On my laptop, Apache wasn't setting UTF-8 in
+    // header by default as on live server, and FireFox was defaulting to
+    // latin-1 -- Francis)
+    header('Content-Type: text/html; charset=utf-8');
+
     $P = person_if_signed_on(true); /* Don't renew any login cookie. */
 
     $header_outputted = 1;

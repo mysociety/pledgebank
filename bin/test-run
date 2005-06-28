@@ -33,7 +33,7 @@
 #   Fuzzy pledge ref match
 #   backpage pledges
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.108 2005-06-27 22:28:45 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.109 2005-06-28 16:40:21 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -515,7 +515,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_submit_form(form_name => 'commentform',
         fields => {
             author_name => name_n(91), author_email => email_n(91),
-            text => "This is a second comment, which should be sent by email to first commenter."
+            text => "This is a second comment, which should be sent by email to first commenter.  It cost £0 to make and was mainly done in a café.  There are some unicode characters unwittily placed within."
         },
         button => 'preview');
     $wth->browser_check_contents("This is a second comment");
@@ -523,10 +523,10 @@ sub do_public_succeeding_pledge {
     perform_login_action(91, {action=>"viaemail"}, "comment will then be displayed");
     $wth->browser_check_contents("Your comment has now been posted");
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
-    $wth->browser_check_contents("This is a second comment");
+    $wth->browser_check_contents("It cost £0 to make and was mainly done in a café");
     call_sendalerts();
-    $wth->email_get_containing('%To: '.email_n(0).  '%This is a second comment%');
-    my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%This is a second comment%');
+    $wth->email_get_containing('%To: '.email_n(0).  '%It cost £0 to make and was mainly done in a café%');
+    my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%It cost £0 to make and was mainly done in a café%');
     $wth->email_check_none_left();
     die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\b($base_url/L/.*)\b#m);
     my $comment_unsubscribe_url = $1;

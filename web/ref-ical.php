@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-ical.php,v 1.4 2005-06-24 08:49:38 matthew Exp $
+// $Id: ref-ical.php,v 1.5 2005-06-28 16:40:21 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/db.php';
@@ -30,7 +30,7 @@ $r = db_fetch_array($q);
 if (!check_pin($q_ref, $r['pin']))
     err(_('Correct PIN required'));
 
-header('Content-Type: text/calendar');
+header('Content-Type: text/calendar; charset=utf-8');
 output_ical($r);
 
 function output_ical($r) {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.1 2005-06-24 22:13:55 matthew Exp $
+// $Id: list.php,v 1.2 2005-06-28 10:54:41 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -16,8 +16,8 @@ define('PAGE_SIZE', 50);
 
 $err = importparams(
             array('offset', '/^(0|[1-9]\d*)$/', '', 0),
-            array('sort', '/^(title|target|date|name|ref|creationtime)$/', '', 'date'),
-            array('type', '/^[a-z_]*$/', '', '')
+            array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete)$/', '', 'default'),
+            array('type', '/^[a-z_]*$/', '', 'open')
         );
 if ($err) {
     err(_('Illegal offset or sort parameter passed'));
@@ -27,12 +27,16 @@ page_header(_("All Pledges"), array('id'=>'all'));
 
 if ($q_type == 'failed') {
     $open = '<'; $succeeded = '<';
+    if ($q_sort == "default") $q_sort = "creationtime";
 } elseif ($q_type == 'succeeded_closed') {
     $open = '<'; $succeeded = '>=';
+    if ($q_sort == "default") $q_sort = "creationtime";
 } elseif ($q_type == 'succeeded_open') {
     $open = '>='; $succeeded = '>=';
+    if ($q_sort == "default") $q_sort = "date";
 } else {
     $open = '>='; $succeeded = '<';
+    if ($q_sort == "default") $q_sort = "percentcomplete";
 }
 
 $ntotal = db_getOne("
@@ -47,8 +51,13 @@ if ($ntotal < $q_offset)
     $q_offset = $ntotal - PAGE_SIZE;
 
 $sort_phrase = $q_sort;
-if ($q_sort == 'creationtime') {
+if ($q_sort == 'creationtime' || $q_sort == 'created') {
     $sort_phrase .= " DESC";
+}
+if ($q_sort == 'percentcomplete') {
+    $sort_phrase = "( 
+                (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id)::numeric
+                / target) DESC";
 }
 $qrows = db_query("
         SELECT *, (SELECT count(*) FROM signers
@@ -62,43 +71,53 @@ $qrows = db_query("
             ORDER BY $sort_phrase LIMIT ? OFFSET $q_offset", PAGE_SIZE);
 /* PG bug: mustn't quote parameter of offset */
 
-if ($q_type == 'succeeded_open') {
-    print h2(_("Successful pledges which are still open"));
-    $views = '<a href="/list">Open pledges</a> | <strong>Successful open pledges</strong> | <a href="/list/succeeded_closed">Successful closed pledges</a> | <a href="/list/failed">Failed pledges</a>';
+if ($q_type == 'open') {
+    print h2(_("Pledges which need signers"));
+} elseif ($q_type == 'succeeded_open') {
+    print h2(_("Successful pledges, open to new signers"));
 } elseif ($q_type == 'succeeded_closed') {
-    print h2(_("Successful, closed pledges"));
-    $views = '<a href="/list">Open pledges</a> | <a href="/list/succeeded_open">Successful open pledges</a> | <strong>Successful closed pledges</strong> | <a href="/list/failed">Failed pledges</a>';
+    print h2(_("Successful pledges, closed to new signers"));
 } elseif ($q_type == 'failed') {
     print h2(_("Failed pledges"));
-    $views = '<a href="/list">Open pledges</a> | <a href="/list/succeeded_open">Successful open pledges</a> | <a href="/list/succeeded_closed">Successful closed pledges</a> | <strong>Failed pledges</strong>';
-} else {
-    print h2(_("Pledges which still need signers <small>(to which at least a few people have signed up)</small>"));
-    $views = '<strong>Open pledges</strong> | <a href="/list/succeeded_open">Successful open pledges</a> | <a href="/list/succeeded_closed">Successful closed pledges</a> | <a href="/list/failed">Failed pledges</a>';
+} 
+$viewsarray = array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
+    'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
+$views = "";
+foreach ($viewsarray as $s => $desc) {
+    if ($q_type != $s) $views .= "<a href=\"/list/$s\">$desc</a>"; else $views .= $desc;
+    if ($s != 'failed') $views .= ' | ';
 }
 
 if ($ntotal > 0) {
     
     $sort = ($q_sort) ? '&amp;sort=' . $q_sort : '';
     $off = ($q_offset) ? '&amp;offset=' . $q_offset : '';
-    $prev = '<span class="greyed">&laquo; Previous page</span>'; $next = '<span class="greyed">Next page &raquo;</span>';
+    $prev = '<span class="greyed">&laquo; '._('Previous page').'</span>'; $next = '<span class="greyed">'._('Next page').' &raquo;</span>';
     if ($q_offset > 0) {
         $n = $q_offset - PAGE_SIZE;
         if ($n < 0) $n = 0;
-        $prev = "<a href=\"all?offset=$n$sort\">&laquo; Previous page</a>";
+        $prev = "<a href=\"all?offset=$n$sort\">&laquo; "._('Previous page')."</a>";
     }
     if ($q_offset + PAGE_SIZE < $ntotal) {
         $n = $q_offset + PAGE_SIZE;
-        $next = "<a href=\"all?offset=$n$sort\">Next page &raquo;</a>";
+        $next = "<a href=\"all?offset=$n$sort\">"._('Next page')." &raquo;</a>";
     }
     $navlinks = '<p align="center">' . $views . "</p>\n";
-    $navlinks .= '<p align="center" style="font-size: 89%">Sort by: ';
-    $arr = array('creationtime'=>'Created', 'title'=>'Title', 'target'=>'Target', 'date'=>'Deadline', 'name'=>'Creator', 'ref'=>'Short name');
+    $navlinks .= '<p align="center" style="font-size: 89%">' . _('Sort by'). ': ';
+    $arr = array(
+                 'creationtime'=>_('Creation date'), 
+                 /* 'target'=>_('Target'), */
+                 'date'=>_('Deadline'), 
+                 'percentcomplete' => _('Percent complete'), 
+                 );
+    # Removed as not useful (search is better for these): 'ref'=>'Short name',
+    # 'title'=>'Title', 'name'=>'Creator'
     foreach ($arr as $s => $desc) {
         if ($q_sort != $s) $navlinks .= "<a href=\"?sort=$s$off\">$desc</a>"; else $navlinks .= $desc;
-        if ($s != 'ref') $navlinks .= ' | ';
+        if ($s != 'percentcomplete') $navlinks .= ' | ';
     }
     $navlinks .= '</p> <p align="center">';
-    $navlinks .= $prev . ' | Pledges ' . ($q_offset + 1) . ' &ndash; ' . 
+    $navlinks .= $prev . ' | '._('Pledges'). ' ' . ($q_offset + 1) . ' &ndash; ' . 
         ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
         $ntotal . ' | ' . $next;
     $navlinks .= '</p>';

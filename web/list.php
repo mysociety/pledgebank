@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.3 2005-06-28 14:56:09 francis Exp $
+// $Id: list.php,v 1.4 2005-06-28 22:31:05 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -115,8 +115,7 @@ if ($ntotal > 0) {
         if ($q_sort != $s) $navlinks .= "<a href=\"?sort=$s$off\">$desc</a>"; else $navlinks .= $desc;
         if ($s != 'percentcomplete') $navlinks .= ' | ';
     }
-    $navlinks .= '</p>';
-    $navlinks .= '<p align="center">';
+    $navlinks .= '</p> <p align="center">';
     $navlinks .= $prev . ' | '._('Pledges'). ' ' . ($q_offset + 1) . ' &ndash; ' . 
         ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
         $ntotal . ' | ' . $next;

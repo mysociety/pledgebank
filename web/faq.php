@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.14 2005-06-24 22:13:55 matthew Exp $
+// $Id: faq.php,v 1.15 2005-06-29 11:18:28 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -115,12 +115,22 @@ print dd(_("In order to focus people's minds on highly achievable pledges, we ha
 set this cap of maximum subscribers. We can raise the cap for individuals and
 organisations who ask - just contact us if you want to launch a bigger pledge."));
 
-print dt(_('<a name="editpledge">Why can\'t I edit my pledge after I\'ve made it?</a>'));
+print dt(_('Why does my new pledge not appear on the All Pledges page?'));
+
+print dd(_("New pledges have just their own page, and are not shown elsewhere
+on the site, until a few people have signed up to them.  This is to make sure
+we only show good quality pledges, which have an active creator and some support
+behind them.  So get out there and tell your friends and neighbours about your
+pledge!"));
+
+print dt(_('<a name="editpledge">Why can\'t I modify my pledge after I\'ve made it?</a>'));
 
 print dd(_("People who sign up to a pledge are signing up to the specific wording of
 the pledge.  If you change the wording, then their signatures would no longer
 be valid.  You can <a href=\"/contact\">contact us</a> if there is a cosmetic
-change that you need to make."));
+change that you need to make.  For larger changes, you can create a new pledge,
+and ask your subscribers if they want to move across.  There's a link to do
+this from the 'Spread The Word' section of your pledge page."));
 
 print dt(_('Who gets to see my email address?'));
 
@@ -149,24 +159,22 @@ Please <a href="/contact">contact us</a> if you want to get in touch.'));
 
 print dt(_('Can I put up pledges in languages other than English?'));
 
-print dd(_("You can try! Fully internationalised versions are more than possible,
-but we can't do them without speakers of other languages. If you are
-interested in volunteering to help translate the site, please contact
-us."));
+print dd(_("You can try! Fully internationalised versions of PledgeBank are
+more than possible, but we can't do them without speakers of other languages.
+If you are interested in volunteering to help translate the site, please
+<a href=\"/contact\">contact us</a> or <a
+href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
+email list</a>."));
 
-print dt(_('Do I have to be British to use this service?'));
+print dt(_('Do I have to have a UK postcode to use this service?'));
 
 print dd(_("No, although you get some extra, handy features if you are in the UK,
 such as the ability to search for pledges close to your location.
-Again, we'd be happy to talk to anyone who could help us extend these
-overseas - do contact us."));
-
-print dt(_('Can I modify a pledge once people have signed up to it?'));
-
-print dd(_("No, because you'd be changing the nature of what they'd agreed to.
-What you can do is create a new pledge, and ask your subscribers if
-they want to move across. As a pledge creator this means just sending
-a mail to your subscribers using the link that you were sent by email."));
+Again, we'd be happy to talk to anyone who could help us extend these overseas
+- please <a
+href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
+email list</a> to help us out.
+"));
 
 print "</dl>\n";
 

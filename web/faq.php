@@ -5,18 +5,18 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.16 2005-06-29 11:34:50 francis Exp $
+// $Id: faq.php,v 1.17 2005-06-29 12:02:11 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 
 page_header(_("Frequently Asked Questions"));
 
-function dt($s) { print "<dt>$s</dt>\n"; }
-function dd($s) { print "<dd>$s</dd>\n"; }
+############################################################################
 
 print h2(_('Frequently Asked Questions'));
 print "<dl>\n";
+
 print dt(_('What is PledgeBank for?'));
 print dd(_("PledgeBank is a site to help people get things done, especially things
 that require several people. We think that the world needs such a
@@ -70,6 +70,13 @@ is run by a charitable organisation, though, so if you want to run an
 especially big pledge, and feel like making a contribution, please contact us.
 SMS messages to PledgeBank cost your normal text fee."));
 
+print "</dl>\n";
+
+############################################################################
+
+print h2(_('Organisation Questions'));
+print "<dl>\n";
+
 print dt(_('Who built PledgeBank?'));
 
 print dd(_('This site was built by <a href="http://www.mysociety.org">mySociety</a>. 
@@ -88,6 +95,18 @@ of a combination of paid core developers and unpaid volunteers. The
 core developers were paid for by the 
 <acronym title="Office of the Deputy Prime Minister">ODPM</acronym>\'s 
 e-innovations fund in partnership with West Sussex County Council.'));
+
+print dt(_('Do you need any help with the project?'));
+
+print dd(_('Yes, we can use help in all sorts of ways, technical or non-technical.
+Please <a href="/contact">contact us</a> if you want to get in touch.'));
+
+print "</dl>\n";
+
+############################################################################
+
+print h2(_('Pledge Creators\' Questions'));
+print "<dl>\n";
 
 print dt(_('What sort of pledges work and what sort of pledges languish in obscurity?'));
 
@@ -130,12 +149,56 @@ the pledge.  If you change the wording, then their signatures would no longer
 be valid.  You can <a href=\"/contact\">contact us</a> if there is a cosmetic
 change that you need to make.  For larger changes, you can create a new pledge,
 and ask your subscribers if they want to move across.  There's a link to do
-this from the 'Spread The Word' section of your pledge page."));
+this from the 'Spread the word' section of your pledge page."));
+
+print dt(_('Can I contact the people who have signed my pledge?'));
+
+print dd(_("At any time, you can send a message to your signers so far.  Go 
+to your pledge's page, and follow the link under 'Spread the word'.  For cost
+reasons, this will not go to SMS signers.  If your pledge succeeds you will be
+given a link to send a message to all your signers, including those who
+signed up by text message.  You should give your contact details, and ask for
+theirs, so you can stay in touch as you carry out your pledge.  If anybody
+signs your pledge later, all your messages will be automatically forwarded to
+them."));
+
+print "</dl>\n";
+
+############################################################################
+
+print h2(_('International Questions'));
+print "<dl>\n";
+
+print dt(_('Can I put up pledges in languages other than English?'));
+
+print dd(_("You can try! Fully internationalised versions of PledgeBank are
+more than possible, but we can't do them without speakers of other languages.
+If you are interested in volunteering to help translate the site, please
+<a href=\"/contact\">contact us</a> or <a
+href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
+email list</a>."));
+
+print dt(_('Do I have to have a UK postcode to use this service?'));
+
+print dd(_("No, although you get some extra, handy features if you are in the UK,
+such as the ability to search for pledges close to your location.
+Again, we'd be happy to talk to anyone who could help us extend these overseas
+- please <a
+href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
+email list</a> to help us out.
+"));
+
+print "</dl>\n";
+
+############################################################################
+
+print h2(_('Privacy Questions'));
+print "<dl>\n";
 
 print dt(_("I don't want my name visible to everyone when I sign a pledge!"));
 
 print dd(_("You can add yourself secretly to a pledge by unchecking the 'Show
-my name on this pledge' box when you sign up.  Alternatively, you can
+my name on this pledge' box when you sign up.  Alternatively, you can sign
 up by SMS.  If you are about to make a sensitive pledge, you may want to 
 make it private, which means only people with a PIN you give them can
 view the pledge page."));
@@ -160,30 +223,8 @@ support. Thereafter you'll never be emailed again. And it goes without
 saying that we'd never give or sell your email addresses to anyone
 else."));
 
-print dt(_('Do you need any help with the project?'));
-
-print dd(_('Yes, we can use help in all sorts of ways, technical or non-technical.
-Please <a href="/contact">contact us</a> if you want to get in touch.'));
-
-print dt(_('Can I put up pledges in languages other than English?'));
-
-print dd(_("You can try! Fully internationalised versions of PledgeBank are
-more than possible, but we can't do them without speakers of other languages.
-If you are interested in volunteering to help translate the site, please
-<a href=\"/contact\">contact us</a> or <a
-href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
-email list</a>."));
-
-print dt(_('Do I have to have a UK postcode to use this service?'));
-
-print dd(_("No, although you get some extra, handy features if you are in the UK,
-such as the ability to search for pledges close to your location.
-Again, we'd be happy to talk to anyone who could help us extend these overseas
-- please <a
-href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
-email list</a> to help us out.
-"));
-
 print "</dl>\n";
+
+############################################################################
 
 page_footer();

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.19 2005-06-24 19:17:46 francis Exp $
+ * $Id: ref-info.php,v 1.20 2005-06-29 10:41:53 francis Exp $
  * 
  */
 
@@ -123,11 +123,16 @@ $p->render_box();
 /* Pretty graph of pledge signup, and some notes about how quickly the pledge
  * is progressing. */
 ?>
-<h3 style="clear:both"><?=_('Rate of signups') ?></h3>
+<h2 style="clear:both"><?=_('Rate of signups') ?></h3>
 
-<img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="<?=_('Graph of signers to this pledge') ?>" width="500" height="300"><br>
+<? if ($p->pin()) {
+        print p(_('Signup graph not available for private pledges.'));
+} else { ?>
+<p><img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="<?=_('Graph of signers to this pledge') ?>" width="500" height="300"><br>
 <small><?=_('Graph updated once per day') ?></small>
+</p>
 <?
+}
 
 print _('<h2>Messages sent by creator to signers</h2>');
 

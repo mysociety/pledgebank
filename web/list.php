@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.4 2005-06-28 22:31:05 matthew Exp $
+// $Id: list.php,v 1.5 2005-06-29 08:51:51 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -43,7 +43,6 @@ $ntotal = db_getOne("
                 select count(id)
                 from pledges
                 where pin is null
-                    and confirmed
                     and date $open pb_current_date()
                     AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target
                     and pb_pledge_prominence(id) <> 'backpage'");
@@ -63,8 +62,7 @@ $qrows = db_query("
         SELECT *, (SELECT count(*) FROM signers
                     WHERE signers.pledge_id = pledges.id) AS signers
             FROM pledges 
-            WHERE confirmed 
-            AND date $open pb_current_date() 
+            WHERE date $open pb_current_date() 
             AND pin IS NULL
             AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target 
             AND pb_pledge_prominence(id) <> 'backpage'

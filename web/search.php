@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.15 2005-06-27 23:14:32 francis Exp $
+// $Id: search.php,v 1.16 2005-06-29 08:51:51 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -127,7 +127,7 @@ function search() {
 
     // Signers and creators (NOT people, as we only search for publically visible names)
     $people = array();
-    $q = db_query('SELECT ref, title, name FROM pledges WHERE confirmed AND pin IS NULL AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    $q = db_query('SELECT ref, title, name FROM pledges WHERE pin IS NULL AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
     while ($r = db_fetch_array($q)) {
         $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
     }

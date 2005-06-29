@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.48 2005-06-28 07:18:16 matthew Exp $
+// $Id: new.php,v 1.49 2005-06-29 08:51:51 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -589,7 +589,6 @@ greater publicity and a greater chance of succeeding.');
 # Someone has submitted a new pledge
 function create_new_pledge($P, $data) {
     $isodate = $data['parseddate']['iso'];
-    $token = auth_random_token();
     if ($data['visibility'] == 'all')
         $data['pin'] = null;
 
@@ -606,8 +605,7 @@ function create_new_pledge($P, $data) {
                 insert into pledges (
                     id, title, target,
                     type, signup, date, datetext,
-                    person_id, name, ref, token,
-                    confirmed,
+                    person_id, name, ref, 
                     creationtime,
                     detail,
                     comparison,
@@ -616,8 +614,7 @@ function create_new_pledge($P, $data) {
                 ) values (
                     ?, ?, ?,
                     ?, ?, ?, ?,
-                    ?, ?, ?, ?,
-                    true,
+                    ?, ?, ?, 
                     pb_current_timestamp(),
                     ?,
                     ?,
@@ -626,7 +623,7 @@ function create_new_pledge($P, $data) {
                 )', array(
                     $data['id'], $data['title'], $data['target'],
                     $data['type'], $data['signup'], $isodate, $data['date'],
-                    $P->id(), $data['name'], $data['ref'], $token,
+                    $P->id(), $data['name'], $data['ref'], 
                     $data['detail'],
                     $data['comparison'],
                     $data['country'], $data['postcode'],
@@ -655,8 +652,8 @@ function create_new_pledge($P, $data) {
     $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($p->data['ref']));
 ?>
     <p class="noprint loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
-    <p class="noprint loudmessage" align="center"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<strong><a href="'.$url.'">'.$url.'</a></strong>') ?></p>
-    <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not</strong> be publicised elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
+    <p class="noprint loudmessage" align="center"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
+    <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not be publicised</strong> elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
 <?  post_confirm_advertise($p);
 }
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.80 2005-06-27 23:25:09 francis Exp $
+ * $Id: admin-pb.php,v 1.81 2005-06-29 08:51:50 francis Exp $
  * 
  */
 
@@ -83,11 +83,7 @@ class ADMIN_PAGE_PB_MAIN {
                 '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">admin</a> |
                 <a href="?page=pblatest&amp;ref='.$r['ref'].'">timeline</a>';
             $row .= '</td>';
-            $row .= '<td>'.  $r['title'];
-            if ($r['confirmed'] == 'f') {
-                $row .= "<br><b>not confirmed</b>";
-            }
-            $row .= '</td>';
+            $row .= '<td>'.$r['title'].'</td>';
             $row .= '<td>'.$r['target'].' '.$r['type'].'</td>';
             $row .= '<td>'.$r['signers'].'</td>';
             $row .= '<td>'.prettify($r['date']).'</td>';
@@ -161,10 +157,6 @@ class ADMIN_PAGE_PB_MAIN {
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
         print " &mdash; " .  $pdata['title'] . "</h2>";
 
-        if ($pdata['confirmed'] == 'f') {
-            print '<p><em>' . _("Pledge creator's email address not confirmed") . '</em></p>';
-        }
-        
         print "<p>Set by: <b>" . $pdata['name'] . " &lt;" .  $pdata['email'] . "&gt;</b>";
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
@@ -572,11 +564,7 @@ class ADMIN_PAGE_PB_LATEST {
                 if ($data['mobile']) print ' (' . $data['mobile'] . ')';
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, ";
-                if ($data['confirmed']=='f') {
-                    print '<em>' . htmlspecialchars($data['title']) . '</em> created (unconfirmed)';
-                } else {
-                    print $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (confirmed)';
-                }
+                print $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (confirmed)';
                 print " by $data[name] &lt;$data[email]&gt;";
             } elseif (array_key_exists('whenreceived', $data)) {
                 print "Incoming SMS from $data[sender] received, sent

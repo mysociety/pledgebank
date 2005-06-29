@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.6 2005-06-24 13:39:19 matthew Exp $
+// $Id: your.php,v 1.7 2005-06-29 08:51:51 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -62,8 +62,7 @@ if (0 != db_num_rows($s)) {
 $qrows = db_query("
                 SELECT pledges.*, date - pb_current_date() AS daysleft
                 FROM pledges
-                WHERE confirmed
-                AND pledges.person_id = ?
+                WHERE pledges.person_id = ?
                 ORDER BY creationtime DESC
             ", $P->id());
 print _("<h2>Pledges You Created</h2>");
@@ -81,8 +80,7 @@ if (db_num_rows($qrows) > 0) {
 $qrows = db_query("
                 SELECT pledges.*, date - pb_current_date() AS daysleft
                 FROM pledges, signers
-                WHERE confirmed
-                AND pledges.id = signers.pledge_id
+                WHERE pledges.id = signers.pledge_id
                 AND signers.person_id = ?
                 ORDER BY signtime DESC
             ", $P->id());

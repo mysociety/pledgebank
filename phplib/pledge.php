@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.106 2005-06-28 08:02:54 francis Exp $
+ * $Id: pledge.php,v 1.107 2005-06-29 08:51:50 francis Exp $
  * 
  */
 
@@ -34,16 +34,15 @@ class Pledge {
                                     signers.pledge_id = pledges.id) AS signers,
                                person.email AS email
                            FROM pledges
-                           LEFT JOIN person ON person.id = pledges.person_id
-                           WHERE confirmed ";
+                           LEFT JOIN person ON person.id = pledges.person_id ";
         if (gettype($ref) == "string") {
-            $q = db_query("$main_query_part AND ref ILIKE ?", array($ref));
+            $q = db_query("$main_query_part WHERE ref ILIKE ?", array($ref));
             if (!db_num_rows($q)) {
                 err(_('We couldn\'t find that pledge.  Please check the URL again carefully.  Alternatively, try the search at the top right.'));
             }
             $this->data = db_fetch_array($q);
         } elseif (gettype($ref) == "integer") {
-            $q = db_query("$main_query_part AND pledges.id = ?", array($ref));
+            $q = db_query("$main_query_part WHERE pledges.id = ?", array($ref));
             if (!db_num_rows($q))
                 err(_('PledgeBank reference not known'));
             $this->data = db_fetch_array($q);
@@ -81,13 +80,11 @@ class Pledge {
     function _calc() {
         // Fill in partial pledges (ones being made still)
         if (!array_key_exists('signers', $this->data)) $this->data['signers'] = -1;
-        if (!array_key_exists('confirmed', $this->data)) $this->data['confirmed'] = 'f';
         if (!array_key_exists('open', $this->data)) $this->data['open'] = 't';
         if (!array_key_exists('cancelled', $this->data)) $this->data['cancelled'] = null;
 
         // Some calculations 
         $this->data['left'] = $this->data['target'] - $this->data['signers'];
-        $this->data['confirmed'] = ($this->data['confirmed'] == 't');
         $this->data['open'] = ($this->data['open'] == 't');
         $this->h_ref = htmlspecialchars($this->data['ref']);
 
@@ -417,27 +414,6 @@ function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null) {
                 db_getOne('select pledge_is_valid_to_sign(?, ?, ?)',
                     array($pledge_id, $email, $mobile))
             );
-}
-
-/* pledge_confirm TOKEN
- * If TOKEN confirms any outstanding pledge, confirm that pledge and return
- * its ID. */
-function pledge_confirm($token) {
-    $pledge_id = db_getOne('
-                        select id from pledges
-                        where token = ?', $token);
-                    /* NB do not need "for update" because this function is
-                     * idempotent. */
-    if (!isset($pledge_id))
-        return PLEDGE_NONE;
-    else {
-        db_query('
-                update pledges
-                set confirmed = true, creationtime = pb_current_timestamp()
-                where id = ? and not confirmed',
-                    $pledge_id);
-        return $pledge_id;
-    }
 }
 
 /* check_pin REF ACTUAL_PIN

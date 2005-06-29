@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.38 2005-06-23 20:51:01 francis Exp $
+ * $Id: frequentupdate,v 1.39 2005-06-29 08:51:50 francis Exp $
  *
  */
 
@@ -63,8 +63,7 @@ function mark_pledges_successful() {
     verbose("finding newly successful pledges");
     $q = db_query('
             select * from pledges
-            where confirmed
-                and whensucceeded is null
+            where whensucceeded is null
                 and pb_current_date() < date
                 and (select count(id) from signers
                     where pledge_id = pledges.id) >= target
@@ -115,8 +114,7 @@ function send_pledge_success_reminder() {
     verbose("finding pledges with no announcement messages for reminder");
     $q = db_query("
                 select * from pledges
-                where confirmed
-                    and whensucceeded is not null
+                where whensucceeded is not null
                     and pb_current_timestamp() > whensucceeded + '3 day'::interval
                     and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
                     and (select id from message where pledge_id = pledges.id
@@ -155,8 +153,7 @@ function send_automatic_failure_messages() {
     verbose("finding newly failed pledges");
     $q = db_query("
                 select * from pledges
-                where confirmed
-                    and whensucceeded is null
+                where whensucceeded is null
                     and pb_current_date() > date
                     and (select id
                         from message
@@ -216,8 +213,7 @@ function chivvy_creators_early() {
     verbose("finding young pledges with few signups");
     $q = db_query("
                 select * from pledges
-                where confirmed
-                    and (select count(*) from signers where signers.pledge_id = pledges.id) < 4
+                where (select count(*) from signers where signers.pledge_id = pledges.id) < 4
                     and target >= 8
                     and pb_current_date() <= date
                     and whensucceeded is null
@@ -270,8 +266,7 @@ function chivvy_creators_lowrate() {
     global $chivvy_probable_will_reach_clause;
     $q = db_query("
                 select * from pledges
-                where confirmed
-                    and target >= 8
+                where target >= 8
                     and pb_current_date() <= date
                     and whensucceeded is null
                     and pb_current_timestamp() > creationtime + '8 day'::interval

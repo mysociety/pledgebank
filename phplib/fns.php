@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.46 2005-06-27 20:26:23 matthew Exp $
+// $Id: fns.php,v 1.47 2005-06-29 08:51:50 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -227,8 +227,8 @@ We will not give or sell either your or their email address to anyone else.')); 
 <div class="formrow"><textarea name="frommessage" rows="8" cols="40"></textarea></div>
 
 <p>
-<div class="formrow"><strong><?=_('Your name:') ?></strong> <input type="text" name="fromname" value="<?=htmlspecialchars($name) ?>" size="18">
-<br><strong><?=_('Email:') ?></strong> <input type="text" name="fromemail" value="<?=htmlspecialchars($email) ?>" size="26"></div>
+<div class="formrow"><strong><?=_('Your name:') ?></strong> <input type="text" name="fromname" value="<?=htmlspecialchars($name) ?>" size="20">
+<br><strong><?=_('Email:') ?></strong> <input type="text" name="fromemail" value="<?=htmlspecialchars($email) ?>" size="30"></div>
 
 <p><input name="submit" type="submit" value="<?=_('Send message') ?>"></p>
 

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.120 2005-06-28 08:02:54 francis Exp $
+-- $Id: schema.sql,v 1.121 2005-06-29 08:51:50 francis Exp $
 --
 
 -- secret
@@ -107,8 +107,8 @@ create table pledges (
     -- XXX now unused because of login mechanism, but there may still be
     -- unconfirmed pledges floating about so it has to remain for a decent
     -- interval.
-    token text not null,
-    confirmed boolean not null default false,
+    token text,
+    confirmed boolean not null default true,
 
     -- PIN for private pledges
     pin text check (pin <> ''),
@@ -257,9 +257,8 @@ create function index_pledge_ref_parts(integer)
         o integer;
     begin
         t_pledge_id = $1;
-        -- do not index private pledges or unconfirmed pledges
-        if (select pin from pledges where id = t_pledge_id) is not null
-            or not (select confirmed from pledges where id = t_pledge_id) then
+        -- do not index private pledges 
+        if (select pin from pledges where id = t_pledge_id) is not null then
             return;
         end if;
         select into t_ref lower(ref) from pledges where id = t_pledge_id;
@@ -381,7 +380,7 @@ create function pledge_is_valid_to_sign(integer, text, text)
     begin
         select into p *
             from pledges
-            where pledges.id = $1 and confirmed
+            where pledges.id = $1 
             for update;
         select into creator_email email
             from person

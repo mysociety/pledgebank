@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.27 2005-06-24 19:17:46 francis Exp $
+ * $Id: ref-announce.php,v 1.28 2005-06-29 10:30:45 francis Exp $
  * 
  */
 
@@ -125,7 +125,7 @@ $fill_in = _("ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE, INCLUDING YOUR CONTACT I
 /* All OK. */
 page_header(sprintf(_("Send %s to signers of '%s'"), $descr[$circumstance], $p->title()), array());
 
-$sentence = $p->sentence();
+$sentence = $p->sentence(array('firstperson'=>'includename'));
 
 $name = $p->creator_name();
 if ($p->succeeded()) {

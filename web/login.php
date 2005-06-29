@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.49 2005-06-27 20:32:02 matthew Exp $
+ * $Id: login.php,v 1.50 2005-06-29 23:25:41 matthew Exp $
  * 
  */
 
@@ -97,7 +97,7 @@ if ($q_name=='<Enter your name>') {
 /* General purpose login, asks for email also. */
 if (get_http_var("now")) {
     $P = person_signon(array(
-                    'reason_web' => _("To log into Pledge Bank, we need to check your email address."),
+                    'reason_web' => _("To log into PledgeBank, we need to check your email address."),
                     'reason_email' => _("Then you will be logged into PledgeBank, and can set or change your password."),
                     'reason_email_subject' => _('Log into PledgeBank.com')
 
@@ -309,7 +309,7 @@ function login_form($errors = array()) {
 <input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
 <input type="submit" name="LogIn" value="<?=_('Let me in') ?> &gt;&gt;"></p>
 
-<input type="checkbox" name="rememberme" id="rememberme" value="1"><strong><?=_('Remember me') ?></strong>
+<input type="checkbox" name="rememberme" id="rememberme" value="1"><strong><label for="rememberme"><?=_('Remember me') ?></label></strong>
 <small><?=_("(don't use this on a public or shared computer)") ?></small>
 
 </li>

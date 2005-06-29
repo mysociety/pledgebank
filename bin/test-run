@@ -33,7 +33,7 @@
 #   Fuzzy pledge ref match
 #   backpage pledges
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.109 2005-06-28 16:40:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.110 2005-06-29 10:54:21 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1010,7 +1010,7 @@ sub do_sms_pledge {
     $wth->browser_check_contents("Send Announcement");
     $wth->browser_submit_form(form_name => 'pledge',
                 fields => { message_body => "It all worked, hurrah! Things are good when they work, especially messages to people when a pledge has been completed. Blah blah blah blah blah blah. " . name_n(100),
-                            message_sms => "Yippee! " . (split(m/ /,name_n(100)))[0]. " x"},
+                            message_sms => "Yippee! All the £ are yours!" . (split(m/ /,name_n(100)))[0]. " x"},
         button => 'submit') or die "Failed to submit SMS/email announce form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
     $wth->log_watcher_check();
@@ -1018,7 +1018,8 @@ sub do_sms_pledge {
     call_smsd();
     # Check they all arrived
     $wth->email_get_containing( '%To: '.email_n(102).'%hurrah!%');
-    my $sms_text = sms_get_containing(mobile_n(101), '%Yippee!%', 0);
+    # ... the input unicode pound sign should come out as HTML entity
+    my $sms_text = sms_get_containing(mobile_n(101), '%Yippee! All the &#x00a3; are yours!%', 0);
     print "SMS text: $sms_text\n" if $verbose > 1;
 
     # Check nothing left

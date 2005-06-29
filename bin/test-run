@@ -33,7 +33,7 @@
 #   Fuzzy pledge ref match
 #   backpage pledges
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.110 2005-06-29 10:54:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.111 2005-06-29 15:00:06 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -813,7 +813,7 @@ sub do_private_failing_pledge {
     $wth->log_watcher_check();
 
     # Provoke chivvy too few signers email
-    set_pb_date('1980-12-06');
+    set_pb_date('1980-12-07');
     call_frequentupdate();
     $wth->email_get_containing('%Subject: Helping your pledge%To: '.email_n(0).  '%');
     $wth->email_check_none_left();

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.39 2005-06-29 08:51:50 francis Exp $
+ * $Id: frequentupdate,v 1.40 2005-06-29 15:00:06 francis Exp $
  *
  */
 
@@ -205,7 +205,7 @@ function send_automatic_failure_messages() {
  * - has target of at least 8
  * - has not passed the deadline yet
  * - has not succeeded yet
- * - at least 2 days have passed since the pledge was created
+ * - at least 4 days have passed since the pledge was created
  * - and not marked by admin as backpage (it will obviously be backpage in the
  *   pb_pledge_prominence algorithm)
  */
@@ -217,7 +217,7 @@ function chivvy_creators_early() {
                     and target >= 8
                     and pb_current_date() <= date
                     and whensucceeded is null
-                    and pb_current_timestamp() > creationtime + '2 day'::interval
+                    and pb_current_timestamp() > creationtime + '4 day'::interval
                     and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
                     and (select id
                         from message

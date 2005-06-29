@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.38 2005-06-29 12:52:20 francis Exp $
+// $Id: ref-index.php,v 1.39 2005-06-29 18:28:25 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -75,61 +75,44 @@ define('MAX_PAGE_SIGNERS', '500');
 
 function draw_signatories($p) {
     $nsigners = db_getOne('select count(id) from signers where pledge_id = ?', $p->id());
-    $offset = 0;
-    if ($nsigners > MAX_PAGE_SIGNERS) {
-        $offset = get_http_var('signers_offset');
-        if (!preg_match('/^(0|[1-9]\d*)$/', $offset))
-            $offset = MAX_PAGE_SIGNERS * (int)(($nsigners - 1) / MAX_PAGE_SIGNERS);
-        else {
-            $offset = MAX_PAGE_SIGNERS * (int)($offset / MAX_PAGE_SIGNERS);
-            if ($offset > $nsigners - 1)
-                $offset = MAX_PAGE_SIGNERS * (int)(($nsigners - 1) / MAX_PAGE_SIGNERS);
-        }
-    }
     ?>
     <div id="signatories">
 <?
     print '<h2><a name="signers">' . _('Current signatories') . '</a></h2>';
 
-    $npage = $nsigners - $offset > MAX_PAGE_SIGNERS ? MAX_PAGE_SIGNERS : $nsigners - $offset;
-
     /* XXX need to do something about layout here -- it breaks badly when the
      * height of the comments column is greater than that of the signers
      * column. */
+    $limit = 0;
+    $showall_para = '';
+    $showall_nav = '';
     if ($nsigners > MAX_PAGE_SIGNERS) {
-        print "<p>";
-        if ($npage < MAX_PAGE_SIGNERS)
-            printf(_("Because there are so many signers, only the most recent %d are shown on this page."), $npage);
-        else
-            printf(_("Because there are so many signers, only %d are shown on this page."), $npage);
-        print "</p>";
+        if (!get_http_var('showall')) {
+            $showall_para = sprintf(_("Because there are so many signers, only the most recent %d are shown on this page."), MAX_PAGE_SIGNERS);
 
-        print "<p>";
-        if ($offset > 0)
-            printf("<a href=\"/%s/?signers_offset=%d\">"
-                    . htmlspecialchars(_("<<< Earlier signers"))
+            $showall_nav = sprintf("<a href=\"/%s/?showall=1\">&gt;&gt; "
+                    . htmlspecialchars(_("Show all signers"))
                     . "</a>",
-                    htmlspecialchars($p->ref()),
-                    $offset - MAX_PAGE_SIGNERS);
-        print " ";
-        if ($offset + MAX_PAGE_SIGNERS < $nsigners - 1)
-            printf("<a href=\"/%s/?signers_offset=%d\">"
-                    . htmlspecialchars(_("Later signers >>>"))
-                    . "</a>",
-                    htmlspecialchars($p->ref()),
-                    $offset + MAX_PAGE_SIGNERS);
-        print "</p>";
+                    htmlspecialchars($p->ref()));
+            $limit = 1;
+
+            print p($showall_para);
+        }
     }
    
     $out = '';
    
-    if ($offset == 0)
+    if (!$limit)
         $out = '<li>' . $p->h_name() . ' ' . _('(Pledge Creator)') . '</li>';
 
     $anon = 0;
     $unknownname = 0;
-    
-    $q = db_query("SELECT * FROM signers WHERE pledge_id = ? ORDER BY id LIMIT " . MAX_PAGE_SIGNERS . " OFFSET $offset", $p->id());
+
+    $query = "SELECT * FROM signers WHERE pledge_id = ? ORDER BY id";
+    if ($limit) {
+        $query .= " LIMIT " . MAX_PAGE_SIGNERS . " OFFSET " . ($nsigners - MAX_PAGE_SIGNERS);
+    }
+    $q = db_query($query, $p->id());
     while ($r = db_fetch_array($q)) {
         $showname = ($r['showname'] == 't');
         if ($showname) {
@@ -162,13 +145,48 @@ function draw_signatories($p) {
         print "<li>$extra</li>";
     }
     print '</ul>';
-    print '<p>'; print_link_with_pin($p->url_info(), "", _("View signup rate graph"));
+    if ($showall_para) {
+        print p($showall_nav);
+        print p($showall_para);
+    }
+    print '<p>';
+    print_link_with_pin($p->url_info(), "", _("View signup rate graph"));
     print '</div>';
 }
 
+define('MAX_PAGE_COMMENTS', '25');
 function draw_comments($p) {
     print "\n\n" . '<div class="comments"><h2><a name="comments">' . _('Comments on this pledge') . '</a></h2>';
-    comments_show($p->id()); 
+
+    $limit = 0;
+    $showall_para = '';
+    $showall_nav = '';
+    $ncomments = comments_count($p->id());
+    if ($ncomments > MAX_PAGE_COMMENTS) {
+        if (!get_http_var('showall')) {
+            $showall_para = sprintf(_("Because there are so many comments, only the most recent %d are shown on this page."), MAX_PAGE_COMMENTS);
+
+            $showall_nav = sprintf("<a href=\"/%s/?showall=1\">&gt;&gt; "
+                    . htmlspecialchars(_("Show all comments"))
+                    . "</a>",
+                    htmlspecialchars($p->ref()));
+            $limit = 1;
+
+            print "<p>".$showall_para."</p>";
+            print "<p class=\"toomany\">".$showall_nav."</p>";
+        }
+    }
+
+    if ($limit)
+        comments_show($p->id(), false, MAX_PAGE_COMMENTS); 
+    else 
+        comments_show($p->id(), false); 
+
+    /*if ($showall_para) {
+        print p($showall_nav);
+        print p($showall_para);
+    }*/
+
     comments_form($p->id(), 1);
     print '</div>';
 }

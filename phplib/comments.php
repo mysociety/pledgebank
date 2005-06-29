@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.29 2005-06-24 16:48:20 francis Exp $
+ * $Id: comments.php,v 1.30 2005-06-29 18:28:25 francis Exp $
  * 
  */
 
@@ -65,10 +65,18 @@ function comments_show_one($comment, $noabuse = false) {
     print '</small></div>';
 }
 
-/* comments_show PLEDGE [NOABUSE]
+/* comments_count PLEDGE
+ * Returns how many comments pledge has. */
+function comments_count($pledge) {
+    $id = $pledge;
+    return db_getOne('select count(id) from comment where pledge_id = ?', $id);
+}
+
+/* comments_show PLEDGE [NOABUSE] [LIMIT]
  * Show the comments for the given PLEDGE (id or reference). If NOABUSE is
- * true, don't show the link for reporting an abusive comment. */
-function comments_show($pledge, $noabuse = false) {
+ * true, don't show the link for reporting an abusive comment.  If LIMIT
+ * is present only show the last LIMIT comments. */
+function comments_show($pledge, $noabuse = false, $limit = 0) {
     $id = $pledge;
 
     if (is_null($id))
@@ -79,18 +87,23 @@ function comments_show($pledge, $noabuse = false) {
 
     print '<div class="commentsbox">';
     
-    if (db_getOne('select count(id) from comment where pledge_id = ?', $id) == 0)
+    $count = db_getOne('select count(id) from comment where pledge_id = ?', $id);
+    if ($count == 0)
         print '<p><em>' . _('No comments yet! Why not add one?') . '</em></p>';
     else {
         print '<ul class="commentslist">';
 
-        $q = db_query('
+        $query = '
                     select id, extract(epoch from whenposted) as whenposted,
                         text, name, website
                     from comment
                     where comment.pledge_id = ?
                         and not ishidden
-                    order by whenposted', $id);
+                    order by whenposted';
+        if ($limit) {
+            $query .= " LIMIT " . $limit . " OFFSET " . ($count - $limit);
+        }
+        $q = db_query($query , $id);
 
         while ($r = db_fetch_array($q)) {
             print '<li class="comment" id="comment_' . $r['id'] . '">';

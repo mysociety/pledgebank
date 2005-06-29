@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.15 2005-06-29 11:18:28 francis Exp $
+// $Id: faq.php,v 1.16 2005-06-29 11:34:50 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -131,6 +131,14 @@ be valid.  You can <a href=\"/contact\">contact us</a> if there is a cosmetic
 change that you need to make.  For larger changes, you can create a new pledge,
 and ask your subscribers if they want to move across.  There's a link to do
 this from the 'Spread The Word' section of your pledge page."));
+
+print dt(_("I don't want my name visible to everyone when I sign a pledge!"));
+
+print dd(_("You can add yourself secretly to a pledge by unchecking the 'Show
+my name on this pledge' box when you sign up.  Alternatively, you can
+up by SMS.  If you are about to make a sensitive pledge, you may want to 
+make it private, which means only people with a PIN you give them can
+view the pledge page."));
 
 print dt(_('Who gets to see my email address?'));
 

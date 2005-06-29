@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.23 2005-06-24 13:39:19 matthew Exp $
+// $Id: contact.php,v 1.24 2005-06-29 11:26:12 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -23,21 +23,32 @@ if (get_http_var('contactpost')) {
 page_footer();
 
 function contact_form($errors = array()) {
+    $name = get_http_var('fromname');
+    $email = get_http_var('fromemail');
+    $P = person_if_signed_on();
+    if (!is_null($P)) {
+        if (is_null($name) || !$name)
+            $name = $P->name_or_blank();
+        if (is_null($email) || !$email)
+            $email = $P->email();
+    }
+ 
     print h2(_('Contact Us'));
     printf(p(_('Was it useful?  How could it be better?
 We make PledgeBank and thrive off feedback, good and bad.
 Use this form to contact us.
 If you prefer, you can email %s instead of using the form.')), '<a href="mailto:' . OPTION_CONTACT_EMAIL . '">' . OPTION_CONTACT_EMAIL . '</a>');
+    print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge.  These messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator."));
     print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
-    print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge: these messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator."));
     if (sizeof($errors)) {
         print '<ul id="errors"><li>';
         print join ('</li><li>', $errors);
         print '</li></ul>';
     } ?>
 <form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1">
-<div class="fr"><label for="name"><?=_('Your name') ?></label>: <input type="text" id="name" name="name" value="<?=htmlentities(get_http_var('name')) ?>" size="32" onblur="fadeout(this)" onfocus="fadein(this)" ></div>
-<div class="fr"><label for="email"><?=_('Your email') ?></label>: <input type="text" id="email" name="email" value="<?=htmlentities(get_http_var('email')) ?>" size="32"></div>
+<div class="fr"><?=("Message to")?>: <strong><?=_("PledgeBank Team")?></strong></div>
+<div class="fr"><label for="name"><?=_('Your name') ?></label>: <input type="text" id="name" name="name" value="<?=htmlentities($name) ?>" size="32"></div>
+<div class="fr"><label for="email"><?=_('Your email') ?></label>: <input type="text" id="email" name="email" value="<?=htmlentities($email) ?>" size="32"></div>
 <div class="fr"><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>
 <div><label for="message"><?=_('Message') ?></label>:<br><textarea rows="7" cols="60" name="message" id="message"><?=htmlentities(get_http_var('message')) ?></textarea></div>
 <?  print '<p>' . _('Did you <a href="/faq">read the FAQ</a> first?') . '

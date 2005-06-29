@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.37 2005-06-29 10:41:52 francis Exp $
+// $Id: ref-index.php,v 1.38 2005-06-29 12:52:20 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -162,9 +162,7 @@ function draw_signatories($p) {
         print "<li>$extra</li>";
     }
     print '</ul>';
-    print '<p>';
-    print_link_with_pin($p->url_info(), "", _("View signup rate graph"));
-    print '</p>';
+    print '<p>'; print_link_with_pin($p->url_info(), "", _("View signup rate graph"));
     print '</div>';
 }
 

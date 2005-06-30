@@ -1,0 +1,119 @@
+<?
+// translate.php:
+// Main code for PledgeBank website.
+//
+// Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+// Email: matthew@mysociety.org. WWW: http://www.mysociety.org
+//
+// $Id: translate.php,v 1.1 2005-06-30 00:05:16 matthew Exp $
+
+require_once "../phplib/pb.php";
+require_once '../phplib/fns.php';
+require_once '../../phplib/utility.php';
+
+page_header('Translate PledgeBank into your own language'); ?>
+
+<style type="text/css">
+pre {
+    margin: 0 2em;
+    background-color: #eeeeee;
+    padding: 3px;
+}
+</style>
+
+<h2>Translating PledgeBank</h2>
+<p>So you want to have PledgeBank in your own language?
+We've hopefully made it relatively straightforward.</p>
+
+<p>Firstly, do <a href="/contact">contact us</a> so we
+can keep track of things, and perhaps put you in touch
+with other people translating into the same language.
+Also, <a href="http://www.mysociety.org/mailman/listinfo/mysociety-i18n">sign up to our mailing list</a> to discuss translations.
+
+<p>Do let us know if there's anything below
+that is hard to understand. The instructions assume you're running
+Windows, apologies for that &ndash; users of other operating
+systems should be able to work out what similar steps to take.
+
+<ol>
+
+<li><strong>Getting the original file:</strong>
+Save the following link to somewhere on your computer
+(normally by right-clicking on the link and selecting
+"Save Target As..." or "Save Link As..."):
+<a href="https://secure.mysociety.org/cvstrac/getfile/mysociety/locale/PledgeBank.po">Translation file</a>.
+(If you left click on the link, you can File-&gt;Save As... and then click Back to get back here.)
+
+<li><strong>Opening the file:</strong>
+Open Notepad (Start-&gt;Programs-&gt;Accessories-&gt;Notepad), go to File-&gt;Open and open up the file you have just downloaded.
+<em>Don't be worried by the size of this file!</em>
+You do not have to translate every line before sending
+us what you have done &ndash; the site will simply default
+to English for anything yet to be translated.
+
+<li><strong>Changing the header:</strong>
+Edit the following lines as follows &ndash; change the
+PO-Revision-Date line to be the current date and time,
+the Last-Translator line to be your name and email address, 
+and the Language-Team line to your language.
+
+<li><strong>Basic translation:</strong>
+A line beginning with a <kbd>#</kbd> is a comment and can safely be ignored.
+For normal sentences, translation is as follows. A line that
+begins with "<kbd>msgid</kbd>" is the English text to be translated.
+The line following that (beginning "<kbd>msgstr</kbd>") should contain the translation,
+within the double quotes (").
+<p>For example, in French:
+<pre>msgid "The cat is black."
+msgstr "Le chat est noir."</pre>
+<p>If the translated line needs to include a double quote, you put a slash before it. For example, in German:
+<pre>msgid "He said \"I like cheese.\""
+msgstr "Er sagte \"Ich liebe K&auml;se.\""</pre>
+
+<li><strong>Filename comments:</strong>
+The comment line before the "msgid" line is the file or files
+that contain that text. So anything with the comment line
+":# pb/web/faq.php" is from the FAQ page. This might be useful in
+providing context for the text.
+
+<li><p><strong>% placeholders:</strong>
+Sadly, there are a couple of things that makes things a bit
+more complicated. The first are %&nbsp;placeholders.
+These appear within text and stand for something missing &ndash; %d
+means a number, %s means some more text. For example, a sentence to
+give the colour of a cat and its size, in Spanish:
+
+<pre>msgid "The cat is %s and %d centimetres long."
+msgstr "El gato tiene %s y %d cent&iacute;metros de largo."</pre>
+
+<p>The colours would be translated separately elsewhere in the file.
+If a situation arises where you need to refer to the % placeholders
+in a different order from the English, you need to specify which
+placeholder goes where. Here's an example, but ask if this comes up
+in your translation (hopefully it won't :) ) :
+
+<pre>msgid "I have %s the %s."                 (I have <em style="color: #ff0000">read</em> the <em style="color: #00ff00">book</em>.)
+msgstr "Ich habe das %2\$s %1\$s."        (Ich habe das <em style="color: #00ff00">Buch</em> <em style="color: #ff0000">gelesen</em>.)
+</pre>
+
+<li><p><strong>Plurals:</strong> These are the other more complicated thing.
+These use % placeholders to give different results depending on the value
+of a number. It's probably easiest if I just give an example, in Portuguese:
+<pre>msgid "I have %d dog."
+msgid_plural "I have %d dogs."
+msgstr[0] "Eu tenho %d c&atilde;o."
+msgstr[1] "Eu tenho %d c&atilde;es."</pre>
+<p>Some languages have three plurals &ndash; simply add a msgstr[2] line for the third, and I can sort out making sure it uses the right one.
+
+<li>Email me with as much or as little as you have done, and I will get it up and running as soon as possible. :-)
+
+<li>Oh, one other thing that needs translating are the emails we send out. <a href="https://secure.mysociety.org/cvstrac/dir?d=mysociety/pb/templates/emails">These are available</a>, and are free-standing translations. Ask for more information about this.
+
+<li>Any problems or questions, <a href="/contact">contact us</a> or ask on the mailing list.
+</ol>
+
+<p align="right">Matthew Somerville<br>30<sup>th</sup> June 2005</p>
+
+<?
+page_footer();
+?>

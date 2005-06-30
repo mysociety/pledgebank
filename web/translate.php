@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: translate.php,v 1.1 2005-06-30 00:05:16 matthew Exp $
+// $Id: translate.php,v 1.2 2005-06-30 00:15:34 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -69,6 +69,18 @@ msgstr "Le chat est noir."</pre>
 <p>If the translated line needs to include a double quote, you put a slash before it. For example, in German:
 <pre>msgid "He said \"I like cheese.\""
 msgstr "Er sagte \"Ich liebe K&auml;se.\""</pre>
+<p>If it is a large block to be translated, it will be on more than one line. To show this, the first line
+is the empty string "", with the original or translated text on further lines; "\n" is used to mean a new
+line. For example, in Italian:</p>
+<pre>msgid ""
+"I have 2 dogs, 1 cat, 1 guinea pig and a giraffe.\n"
+"The giraffe has a long neck, and the two dogs are"
+"called Bill and Ben."
+msgstr ""
+"Ho 2 cani, 1 gatto, 1 cavia e un giraffe.\n"
+"Il giraffe ha un collo lungo ed i due cani sono"
+"denominati Bill e Ben."
+</pre>
 
 <li><strong>Filename comments:</strong>
 The comment line before the "msgid" line is the file or files

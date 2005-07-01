@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.48 2005-06-29 12:02:11 francis Exp $
+// $Id: fns.php,v 1.49 2005-07-01 22:35:18 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once "pledge.php";
@@ -221,18 +221,18 @@ print h2(_('Email this pledge'));
 print p(_('Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.')); ?>
 <p><strong><?=_('Other people\'s email addresses:') ?></strong></p>
-<div class="formrow"><input type="text" name="email1" value="<? if (get_http_var('email1')) print htmlentities(get_http_var('email1'));?>" size="40"></div>
-<div class="formrow"><input type="text" name="email2" value="<? if (get_http_var('email2')) print htmlentities(get_http_var('email2'));?>" size="40"></div>
-<div class="formrow"><input type="text" name="email3" value="<? if (get_http_var('email3')) print htmlentities(get_http_var('email3'));?>" size="40"></div>
-<div class="formrow"><input type="text" name="email4" value="<? if (get_http_var('email4')) print htmlentities(get_http_var('email4'));?>" size="40"></div>
-<div class="formrow"><input type="text" name="email5" value="<? if (get_http_var('email5')) print htmlentities(get_http_var('email5'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('email1', $errors)) print ' class="error"' ?> type="text" name="email1" value="<? if (get_http_var('email1')) print htmlentities(get_http_var('email1'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('email2', $errors)) print ' class="error"' ?> type="text" name="email2" value="<? if (get_http_var('email2')) print htmlentities(get_http_var('email2'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('email3', $errors)) print ' class="error"' ?> type="text" name="email3" value="<? if (get_http_var('email3')) print htmlentities(get_http_var('email3'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('email4', $errors)) print ' class="error"' ?> type="text" name="email4" value="<? if (get_http_var('email4')) print htmlentities(get_http_var('email4'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('email5', $errors)) print ' class="error"' ?> type="text" name="email5" value="<? if (get_http_var('email5')) print htmlentities(get_http_var('email5'));?>" size="40"></div>
 
 <p><strong><?=_('Add a message, if you want:') ?></strong></p>
-<div class="formrow"><textarea name="frommessage" rows="8" cols="40"></textarea></div>
+<div class="formrow"><textarea <? if (array_key_exists('frommessage', $errors)) print ' class="error"' ?> name="frommessage" rows="8" cols="40"></textarea></div>
 
 <p>
-<div class="formrow"><strong><?=_('Your name:') ?></strong> <input type="text" name="fromname" value="<?=htmlspecialchars($name) ?>" size="20">
-<br><strong><?=_('Email:') ?></strong> <input type="text" name="fromemail" value="<?=htmlspecialchars($email) ?>" size="30"></div>
+<div class="formrow"><strong><?=_('Your name:') ?></strong> <input <? if (array_key_exists('fromname', $errors)) print ' class="error"' ?> type="text" name="fromname" value="<?=htmlspecialchars($name) ?>" size="20">
+<br><strong><?=_('Email:') ?></strong> <input <? if (array_key_exists('fromemail', $errors)) print ' class="error"' ?> type="text" name="fromemail" value="<?=htmlspecialchars($email) ?>" size="30"></div>
 
 <p><input name="submit" type="submit" value="<?=_('Send message') ?>"></p>
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.39 2005-06-29 18:28:25 francis Exp $
+// $Id: ref-index.php,v 1.40 2005-07-01 10:49:43 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -45,16 +45,22 @@ function draw_status_plaque($p) {
     }
 }
 
-function draw_spreadword($p) {
-    if (!$p->finished()) { ?>
+function draw_spreadword($p) { ?>
     <div id="spreadword">
-    <h2><?=_('Spread the word on and offline') ?></h2>
-    <ul>
+<?  if (!$p->finished()) {
+        print '<h2>' . _('Spread the word on and offline') . '</h2>';
+    } else {
+        print '<h2>' . _('Things to do with this pledge') . '</h2>';
+    }
+    print '<ul>';
+    if (!$p->finished()) { ?>
     <li> <? print_link_with_pin($p->url_email(), "", _("Email pledge to your friends")) ?></li>
 <!--    <li> <? print_link_with_pin($p->url_ical(), "", _("Add deadline to your calendar")) ?> </li> -->
-    <li> <? print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers")) ?>
+    <li> <? print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers"));
+    } ?>
     <li><a href="/new/local/<?=$p->ref() ?>">Create a local version of this pledge</a></li>
-    <li> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a> <?=_('(creator only)') ?>
+    <li> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a> <?=_('(creator only)');
+    if (!$p->finished()) { ?>
     <li> <?
         print '<a href="' . $p->url_picture() . '" title="' . _('Only if you made this pledge') . '">';
         if ($p->has_picture()) {
@@ -64,11 +70,9 @@ function draw_spreadword($p) {
         }
         print '</a> ' . _('(creator only)'); ?>
     </li>
-    </ul>
-    <!--    <br clear="all"> -->
-    </div>
-    <?
-    }
+<?  }
+    print '</ul>';
+    print '</div>';
 }
 
 define('MAX_PAGE_SIGNERS', '500');
@@ -219,7 +223,7 @@ page_header("'I will " . $p->h_title() . "'", array('ref'=>$p->url_main(), 'nore
 draw_status_plaque($p);
 $p->render_box(array('showdetails' => true, 'reportlink' => true));
 if (!$p->finished()) { pledge_sign_box(); } 
-if (!$p->finished()) { draw_spreadword($p); }
+draw_spreadword($p);
 draw_comments($p);
 draw_signatories($p);
 draw_connections($p);

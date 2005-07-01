@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.50 2005-06-29 23:25:41 matthew Exp $
+ * $Id: login.php,v 1.51 2005-07-01 22:06:53 francis Exp $
  * 
  */
 
@@ -72,7 +72,7 @@ try again'));
 /* Get all the parameters which we might use. */
 importparams(
         array('stash',          '/^[0-9a-f]+$/',    '', null),
-        array('email',          '/^[^@]+@[^@]+$/',  '', null),
+        array('email',          '/./',              '', null),
         array('name',           '//',               '', null),
         array('password',       '/[^\s]/',          '', null),
         array('t',              '/^.+$/',           '', null),
@@ -91,7 +91,6 @@ importparams(
     );
 if ($q_name=='<Enter your name>') {
     $q_name=null;
-    $q_h_email=null;
 }
 
 /* General purpose login, asks for email also. */
@@ -186,7 +185,11 @@ function login_page() {
             login_form(array('email'=>_('Please enter your email address')));
             exit();
         }
-        global $q_password;
+        if (!validate_email($q_email)) {
+            login_form(array('email'=>_('Please enter a valid email address')));
+            exit();
+        }
+         global $q_password;
         $P = person_get($q_email);
         if (is_null($P) || !$P->check_password($q_password)) {
             login_form(array('badpass'=>_('Either your email or password weren\'t recognised.  Please try again.')));
@@ -206,6 +209,10 @@ function login_page() {
         /* User has asked to be sent email. */
         if (is_null($q_email)) {
             login_form(array('email'=>_('Please enter your email address')));
+            exit();
+        }
+        if (!validate_email($q_email)) {
+            login_form(array('email'=>_('Please enter a valid email address')));
             exit();
         }
         $token = auth_token_store('login', array(

@@ -5,14 +5,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.23 2005-06-24 16:48:21 francis Exp $
+ * $Id: comment.php,v 1.24 2005-07-01 22:06:53 francis Exp $
  * 
  */
 
 require_once('../phplib/pb.php');
 
 require_once('../../phplib/importparams.php');
-require_once('../../phplib/emailaddress.php');
 
 require_once('../phplib/pledge.php');
 require_once('../phplib/comments.php');
@@ -70,7 +69,7 @@ $q_text = trim($q_text);
 
 if (!$q_author_email)
     array_push($err, _("Please enter your email address"));
-elseif (!emailaddress_is_valid($q_author_email))
+elseif (!validate_email($q_author_email))
     array_push($err, sprintf(_("'%s' is not a valid email address; please check it carefully"), htmlspecialchars($q_author_email)));
 
 if (strlen($q_author_name) == 0)

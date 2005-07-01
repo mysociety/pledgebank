@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.21 2005-06-29 22:57:10 matthew Exp $
+ * $Id: ref-info.php,v 1.22 2005-07-01 22:06:54 francis Exp $
  * 
  */
 
@@ -22,11 +22,11 @@ require_once '../../phplib/importparams.php';
 $err = importparams(
             array('ref',        '/./',              ''),
             array('LetMeIn',    '/./',              '', false),
-            array('email',      '/^[^@]+@[^@]+$/',  '', null)
+            array('email',      'importparams_validate_email', null)
         );
 
 if (!is_null($err))
-    err(_("Missing pledge reference"));
+    err(_("Invalid parameters, please try again"));
 
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);

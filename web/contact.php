@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.24 2005-06-29 11:26:12 francis Exp $
+// $Id: contact.php,v 1.25 2005-07-01 22:06:53 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -23,8 +23,8 @@ if (get_http_var('contactpost')) {
 page_footer();
 
 function contact_form($errors = array()) {
-    $name = get_http_var('fromname');
-    $email = get_http_var('fromemail');
+    $name = get_http_var('name');
+    $email = get_http_var('email');
     $P = person_if_signed_on();
     if (!is_null($P)) {
         if (is_null($name) || !$name)
@@ -47,7 +47,7 @@ If you prefer, you can email %s instead of using the form.')), '<a href="mailto:
     } ?>
 <form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1">
 <div class="fr"><?=("Message to")?>: <strong><?=_("PledgeBank Team")?></strong></div>
-<div class="fr"><label for="name"><?=_('Your name') ?></label>: <input type="text" id="name" name="name" value="<?=htmlentities($name) ?>" size="32"></div>
+<div class="fr"><label for="name"><?=_('Your name') ?></label>: <input type="text" id="name" name="name" onblur="fadeout(this)" onfocus="fadein(this)" value="<?=htmlentities($name) ?>" size="32"></div>
 <div class="fr"><label for="email"><?=_('Your email') ?></label>: <input type="text" id="email" name="email" value="<?=htmlentities($email) ?>" size="32"></div>
 <div class="fr"><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>
 <div><label for="message"><?=_('Message') ?></label>:<br><textarea rows="7" cols="60" name="message" id="message"><?=htmlentities(get_http_var('message')) ?></textarea></div>
@@ -65,6 +65,7 @@ function contact_form_submitted() {
     $errors = array();
 	if (!$name) $errors[] = _('Please enter your name');
 	if (!$email) $errors[] = _('Please enter your email address');
+	if (!validate_email($email)) $errors[] = _('Please enter a valid email address');
 	if (!$subject) $errors[] = _('Please enter a subject');
 	if (!$message) $errors[] = _('Please enter your message');
 	if (sizeof($errors)) {

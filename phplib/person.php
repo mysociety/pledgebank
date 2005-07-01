@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: person.php,v 1.26 2005-06-23 23:20:57 matthew Exp $
+ * $Id: person.php,v 1.27 2005-07-01 22:06:53 francis Exp $
  * 
  */
 
@@ -252,7 +252,7 @@ function person_if_signed_on($norenew = false) {
  * and included it in the call to this function.
  */
 function person_signon($template_data, $email = null, $name = null) {
-    if (!is_null($email) && !preg_match('/^[^@]+@[^@]+$/', $email))
+    if (!is_null($email) && !validate_email($email))
         err("'$email' is not a valid email address");
 
     $P = person_if_signed_on();

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.31 2005-06-24 19:17:46 francis Exp $
+ * $Id: sms.php,v 1.32 2005-07-01 22:06:54 francis Exp $
  * 
  */
 
@@ -75,7 +75,7 @@ if (db_getOne('select person_id from signers where id = ?', $signer_id)) {
 $errs = importparams(
             array('phone',  '/[\d\s-+]$/',                  _("Please enter your phone number")),
             array('name',   '/[a-z]+/i',                    _("Please enter your name")),
-            array('email',  '/^[^@]+@[^@]+$/',              _("Please enter your email address")),
+            array('email',  'importparams_validate_email'),
             array('showname',
                             '/^1$/',                        "", 0),
             array('f',      '/^1$/',                        "", 0)

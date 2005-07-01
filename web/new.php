@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.50 2005-06-30 00:05:16 matthew Exp $
+// $Id: new.php,v 1.51 2005-07-01 22:06:53 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -356,6 +356,8 @@ function step1_error_check($data) {
 
     if (!$data['name']) $errors['name'] = _('Please enter your name');
     if (!$data['email']) $errors['email'] = _('Please enter your email address');
+    if (!validate_email($data['email'])) $errors['email'] = _('Please enter a valid email address');
+
     return $errors;
 }
 

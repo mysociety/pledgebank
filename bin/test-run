@@ -27,13 +27,13 @@
 #   Info page graph
 #   Info page announcement archive
 #   Admin:  Test delete signer, and delete pledge.
-#   more complex prominence stuff
+#   test algorithmic prominence stuff
 #   Log in with wrong password
 #   Search
 #   Fuzzy pledge ref match
 #   backpage pledges
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.112 2005-07-01 16:11:38 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.113 2005-07-01 22:19:42 francis Exp $';
 
 use strict;
 require 5.8.0;

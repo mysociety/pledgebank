@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.121 2005-06-29 08:51:50 francis Exp $
+-- $Id: schema.sql,v 1.122 2005-07-01 22:19:42 francis Exp $
 --
 
 -- secret
@@ -1071,6 +1071,9 @@ create function pb_delete_pledge(integer)
         delete from pledge_ref_part where pledge_id = $1;
         -- categories
         delete from pledge_category where pledge_id = $1;
+        -- alerts
+        delete from alert_sent where pledge_id = $1;
+        delete from alert where pledge_id = $1;
         -- the pledge itself
         delete from pledges where id = $1;
         return;
@@ -1083,6 +1086,7 @@ create function pb_delete_signer(integer)
         delete from abusereport where what_id = $1 and what = ''signer'';
         delete from message_signer_recipient where signer_id = $1;
         delete from smssubscription where signer_id = $1;
+        delete from alert_sent where signer_id = $1;
         delete from signers where id = $1;
         return;
     end
@@ -1092,6 +1096,7 @@ create function pb_delete_comment(integer)
     returns void as '
     begin
         delete from abusereport where what_id = $1 and what = ''comment'';
+        delete from alert_sent where comment_id = $1;
         delete from comment where id = $1;
         return;
     end

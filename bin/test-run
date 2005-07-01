@@ -33,7 +33,7 @@
 #   Fuzzy pledge ref match
 #   backpage pledges
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.111 2005-06-29 15:00:06 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.112 2005-07-01 16:11:38 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -946,16 +946,19 @@ sub do_sms_pledge {
         { action => "viaemail" }
     );
 
-    # A basic SMS signup
-    sms_fake_to_pledgebank(101, "pledge smsspoof");
-    die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
-    $wth->log_watcher_check();
-    call_smsd();
-    my $conversion_sms = sms_get_containing(mobile_n(101), "%You are the 1st person to pledge%", 0);
-    print "SMS text: $conversion_sms\n" if $verbose > 1;
+    # Three basic SMS signups
+    for (my $who = 101; $who <= 103; ++$who) {
+        sms_fake_to_pledgebank($who, "pledge smsspoof");
+        die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
+        $wth->log_watcher_check();
+        call_smsd();
+        # All first person, as sign up simultaneously
+        my $conversion_sms = sms_get_containing(mobile_n($who), "%You are the 1st person to pledge%", 0);
+        print "SMS text: $conversion_sms\n" if $verbose > 1;
+    }
     # Check not got signup yet
     $wth->browser_get($base_url . "/$pledge_ref");
-    $wth->browser_check_no_contents("<i>1 person has signed up");
+    $wth->browser_check_contents("<i>0 people have signed up");
     # Wait for delivery notification, which confirms signature
     set_pb_date('1982-03-02');
     call_smsd();  # delivery notification
@@ -963,14 +966,14 @@ sub do_sms_pledge {
     $wth->log_watcher_check();
     # Check signup now appears
     $wth->browser_get($base_url . "/$pledge_ref");
-    $wth->browser_check_contents("<i>1 person has signed up");
+    $wth->browser_check_contents("<i>3 people have signed up");
 
     # SMS signup with conversion
-    sms_fake_to_pledgebank(102, "pledge smsspoof");
+    sms_fake_to_pledgebank(105, "pledge smsspoof");
     die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
     $wth->log_watcher_check();
     call_smsd();
-    $conversion_sms = sms_get_containing(mobile_n(102), "%You are the 2nd person to pledge%", 0);
+    my $conversion_sms = sms_get_containing(mobile_n(105), "%You are the 4th person to pledge%", 0);
     print "SMS text: $conversion_sms\n" if $verbose > 1;
     my $base_url_without_http = $base_url; $base_url_without_http =~ s#http://##;
     die "Conversion link not found in SMS '$conversion_sms'\n" if ($conversion_sms !~ m#\b($base_url_without_http[^\s]*)\b#m);
@@ -981,21 +984,21 @@ sub do_sms_pledge {
     $wth->browser_check_contents("rather than sending an SMS");
     $wth->browser_submit_form(form_name => 'pledge',
         fields => { 
-            phone => mobile_n(102), name => name_n(102), email => email_n(102), showname => 1
+            phone => mobile_n(105), name => name_n(105), email => email_n(105), showname => 1
             },
         button => 'submit') or die "Failed to submit SMS conversion form";
-    perform_login_action(102, {action=>"viaemail"}, "to confirm your signature");
+    perform_login_action(105, {action=>"viaemail"}, "to confirm your signature");
     $wth->browser_check_contents("Thanks for signing up");
     # Check signup now appears
     $wth->browser_get($base_url . "/$pledge_ref");
-    $wth->browser_check_contents(name_n(102));
+    $wth->browser_check_contents(name_n(105));
     # Wait for delivery notification, which shouldn't harm anything
     set_pb_date('1982-03-03');
     call_smsd();  # delivery notification
     call_smsd();  # cull done with message
     # Check signup still appears
     $wth->browser_get($base_url . "/$pledge_ref");
-    $wth->browser_check_contents(name_n(102));
+    $wth->browser_check_contents(name_n(105));
 
     # Let pledge succeed
     set_pb_date('1982-03-09');
@@ -1004,7 +1007,7 @@ sub do_sms_pledge {
     die "Announce link not found\n" if ($success_email !~ m#^($base_url.*$)#m);
     my $announce_link = $1;
     display_url("Announce URL", $announce_link);
-    $wth->email_get_containing( '%To: '.email_n(102).'%Congratulations%');
+    $wth->email_get_containing( '%To: '.email_n(105).'%Congratulations%');
     # Send announce message
     $wth->browser_get($announce_link);
     $wth->browser_check_contents("Send Announcement");
@@ -1017,10 +1020,12 @@ sub do_sms_pledge {
     call_frequentupdate();
     call_smsd();
     # Check they all arrived
-    $wth->email_get_containing( '%To: '.email_n(102).'%hurrah!%');
+    $wth->email_get_containing( '%To: '.email_n(105).'%hurrah!%');
     # ... the input unicode pound sign should come out as HTML entity
-    my $sms_text = sms_get_containing(mobile_n(101), '%Yippee! All the &#x00a3; are yours!%', 0);
-    print "SMS text: $sms_text\n" if $verbose > 1;
+    for (my $who = 101; $who <= 103; ++$who) {
+        my $sms_text = sms_get_containing(mobile_n($who), '%Yippee! All the &#x00a3; are yours!%', 0);
+        print "SMS text: $sms_text\n" if $verbose > 1;
+    }
 
     # Check nothing left
     set_pb_date('1982-03-10');

@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: deploy,v 1.2 2005-03-12 00:50:15 francis Exp $
+# $Id: deploy,v 1.3 2005-07-01 16:56:56 francis Exp $
 #
 
 set -e
@@ -21,10 +21,23 @@ check_who_where very.unfortu.net root
 # User to load test schema
 PSQL_SCHEMATEST_USER=pgsql
 
-# Which virtual server to update
-PB_VHOST=$1
-[ x$PB_VHOST = x ] && die "specify target vhost directory as single argument"
-[ ! -d $PB_VHOST ] && die "specify target vhost directory as single argument"
+# Load in parameters
+[ x$1 = x ] && die "specify staging.pledgebank.com or www.pledgebank.com as parameter"
+if [ "$1" = "www.pledgebank.com" ]
+then
+    PB_VHOST=/data/vhost/www.pledgebank.com
+    PB_SMSD=pbsmsd
+elif [ "$1" = "staging.pledgebank.com" ]
+then
+    PB_VHOST=/data/vhost/staging.pledgebank.com
+    PB_SMSD=pbstagingsmsd
+else 
+    die "specify staging.pledgebank.com or www.pledgebank.com as parameter"
+fi
+
+# Check virtual server directory
+[ ! -d $PB_VHOST ] && die "virtual host directory $PB_VHOST not found"
+echo "Virtual host directory $PB_VHOST"
 
 # Pledge Bank
 PB_NAME="PledgeBank.com"
@@ -56,6 +69,7 @@ read_conf $PB_DEPLOYSPACE/mysociety/pb/conf/general
 check_pgsql_schema $PB_DB_UNIX_USER $PB_DEPLOYSPACE/mysociety/pb/db/schema.sql $OPTION_PB_DB_NAME $OPTION_PB_DB_USER $OPTION_PB_DB_PASS 
 
 warn "Stopping services..."
+daemon_stop $PB_SMSD
 down_notice $PB_VHOST $PB_NAME
 
 warn "Rsyncing new data files..."
@@ -64,3 +78,5 @@ rsync_across $PB_DEPLOYSPACE $PB_VHOST
 warn "Starting services..."
 apachectl graceful
 up_notice $PB_VHOST
+daemon_start $PB_SMSD
+

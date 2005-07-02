@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.15 2005-06-24 12:27:02 matthew Exp $
+// $Id: abuse.php,v 1.16 2005-07-02 00:11:02 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -29,8 +29,10 @@ function report_abusive_thing() {
                 array('id',         '/^[1-9]\d*$/',                 ''),
                 array('reason',     '//',                           '', null)
             );
-    if (!is_null($errors))
-        err(_("A required parameter was missing.") . ' ' . join(" ",$errors));
+    if (!is_null($errors)) {
+        print p(_("A required parameter was missing.") . ' ' . join(" ",$errors));
+        return;
+    }
 
     /* Find information about the associated pledge. */
     $w = $q_what;

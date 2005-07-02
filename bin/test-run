@@ -32,8 +32,9 @@
 #   Search
 #   Fuzzy pledge ref match
 #   backpage pledges
+#   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.113 2005-07-01 22:19:42 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.114 2005-07-02 02:46:58 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -607,6 +608,9 @@ sub do_public_succeeding_pledge {
     # Sign it once more, this tipping balance
     print "Signing the pledge once more...\n" if $verbose > 1;
     find_and_sign_pledge($pledge_action_completion, 3, 1, {action=>"viaemail"}, "reached");
+    # Check for late mid-pledge announce message
+    call_frequentupdate();
+    $wth->email_get_containing( '%To: '.email_n(3).  '%From: '.name_n(0).  '%You signed this pledge after this message%Love and kisses%');
 
     # Try to sign the pledge a second time as the same person
     find_and_sign_pledge($pledge_action_completion, 2, 1, {action=>"viaemail"}, "already");
@@ -643,7 +647,7 @@ sub do_public_succeeding_pledge {
     die "Success email link not found\n" if ($success_email !~ m#^\s*($base_url.*$)#m);
     $announce_link = $1;
 
-    # Send message using announcements page, from creator to signers.
+    # Send success message using announcements page, from creator to signers.
     die "Failed to find announcements link" if !$announce_link;
     display_url("Announce URL", $announce_link);
     $wth->browser_get($announce_link);
@@ -672,19 +676,22 @@ sub do_public_succeeding_pledge {
     # (a day later, so it contains new extra header)
     set_pb_date('1982-02-05');
     find_and_sign_pledge($pledge_action_completion, 4, undef, {action=>"resume"}, "signed");
-    # Check the late signer (number 4) also recieves the announcement message.
+    # Check the late signer (number 4) also recieves the success announcement message.
+    # They won't get the earlier success announcement message, instead a URL...
     call_frequentupdate();
-    $wth->email_get_containing( '%To: '.email_n(4).'%You signed this pledge after this message was%By merely partaking%');
-
-    # Check for late mid-pledge announce message
-    $wth->email_get_containing( '%To: '.email_n(3).  '%From: '.name_n(0).  '%Love and kisses%');
-    $wth->email_get_containing( '%To: '.email_n(4).  '%From: '.name_n(0).  '%Love and kisses%');
+    my $late_success_announce_email = $wth->email_get_containing( '%To: '.email_n(4).'%You signed this pledge after this message was%By merely partaking%');
+    die $late_success_announce_email . "\n\nUnsubscribe link not found" if ($late_success_announce_email !~ m#\b($base_url/L/.*)\b#m);
+    my $announce_archive_link = $1;
+    # ... follow it to get other messages
+    $wth->browser_get($announce_archive_link);
+    $wth->browser_check_contents("Love and kisses");
+    $wth->browser_check_contents("By merely partaking");
 
     # (commented out as not very important, but hard to auto test without copying
     # lots of code from last find_and_sign_pledge for the last one)
     ## Stash test for expired tokens
     #find_and_sign_pledge($pledge_action_completion, 5, 1, {action=>"suspend"}, "signed");
-    #set_pb_date('1982-02-10');
+    #set_pb_date('1982-02-');
     ## ... this as side effect provokes deletion of 7 day old stashes
     #find_and_sign_pledge($pledge_action_completion, 6, 1, {action=>"abandon"}, "signed");
     ## ... and check what error we get

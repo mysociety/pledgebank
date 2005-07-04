@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.51 2005-07-01 22:06:53 francis Exp $
+// $Id: new.php,v 1.52 2005-07-04 11:16:11 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -17,8 +17,9 @@ require_once '../phplib/alert.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/mapit.php';      # To test validity of postcodes
 
-page_header(_('Create a New Pledge'));
-
+$page_title = _('Create a New Pledge');
+$page_params = array();
+ob_start();
 if (get_http_var('newpost')==1) {
     pledge_form_one_submitted();
 } elseif (get_http_var('newpost')=='tw') {
@@ -30,7 +31,10 @@ if (get_http_var('newpost')==1) {
 } else {
     pledge_form_one();
 }
-
+$contents = ob_get_contents();
+ob_end_clean();
+page_header($page_title, $page_params);
+print $contents;
 page_footer();
 
 function pledge_form_one($data = array(), $errors = array()) {
@@ -572,7 +576,7 @@ greater publicity and a greater chance of succeeding.');
         print ' ';
     }
     print _("Rest assured that we won't ever give or sell anyone your email address."); ?>
-<br><input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions"><?=_('Tick this box to confirm you have read this paragraph') ?>.</label>
+<br><input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions"><?=_('Tick this box to confirm you have read the Terms and Conditions') ?>.</label>
 </p>
 
 
@@ -603,6 +607,17 @@ function create_new_pledge($P, $data) {
         if ($data['postcode'] == '') {
             $data['postcode'] = null;
         }
+        $latitude = null;
+        $longitude = null;
+        if ($data['postcode']) {
+            $location = mapit_get_location($data['postcode']);
+            if (mapit_get_error($location)) {
+                /* This error should never happen, as earlier postcode validation in form will stop it */
+                err('Invalid postcode while setting alert, please check and try again.');
+            }
+            $latitude = $location['wgs84_lat'];
+            $longitude = $location['wgs84_lon'];
+        }
         db_query('
                 insert into pledges (
                     id, title, target,
@@ -611,7 +626,7 @@ function create_new_pledge($P, $data) {
                     creationtime,
                     detail,
                     comparison,
-                    country, postcode,
+                    country, postcode, latitude, longitude,
                     pin, identity
                 ) values (
                     ?, ?, ?,
@@ -620,7 +635,7 @@ function create_new_pledge($P, $data) {
                     pb_current_timestamp(),
                     ?,
                     ?,
-                    ?, ?,
+                    ?, ?, ?, ?,
                     ?, ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
@@ -628,7 +643,7 @@ function create_new_pledge($P, $data) {
                     $P->id(), $data['name'], $data['ref'], 
                     $data['detail'],
                     $data['comparison'],
-                    $data['country'], $data['postcode'],
+                    $data['country'], $data['postcode'], $latitude, $longitude,
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity']
                 ));
 
@@ -650,7 +665,10 @@ function create_new_pledge($P, $data) {
     // To migrate existing creators to new system use this:
     // insert into alert (person_id, event_code, pledge_id) select person_id, 'comments/ref', id from pledges;
 
-    page_header(_('Pledge created'));
+    global $page_title, $page_params;
+    $page_title = _('Pledge Created');
+    $page_params['noprint'] = true;
+
     $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($p->data['ref']));
 ?>
     <p class="noprint loudmessage"><?=_('Thank you for creating your pledge.') ?></p>

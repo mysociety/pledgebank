@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.76 2005-07-02 02:46:58 francis Exp $
+ * $Id: pb.css,v 1.77 2005-07-04 11:16:11 francis Exp $
  * 
  */
 
@@ -420,6 +420,12 @@ ul#nav li {
 .loudmessage strong {
     font-size: 125%;
     font-weight: bolder; 
+}
+/* ... not quite as loud */
+.noisymessage {
+    font-size: 125%; 
+    font-weight: bold; 
+    text-align: center;
 }
 
 /* All pledges page */

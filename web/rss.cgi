@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.7 2005-06-29 08:51:51 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.8 2005-07-04 11:16:11 francis Exp $';
 
 use strict;
 use warnings;
@@ -59,12 +59,18 @@ sub run {
         $description .= "\n\n$$pledge{detail}" if $$pledge{detail};
 
         # Add then to the rss.
-        $rss->add_item(
+        my $params = {
             title       => $title,
             link        => $CONF{base_url} . $$pledge{ref},
             description => $description,
-        );
-
+        };
+        if ($$pledge{latitude} && $$pledge{longitude}) {
+            $params->{geo} = {
+                lat => $$pledge{latitude},
+                lon => $$pledge{longitude},
+            }
+        }
+       $rss->add_item(%$params);
     }
 
     # Return the RSS.
@@ -82,7 +88,7 @@ sub get_pledges {
     my $query =
       dbh()
       ->prepare( 
-"select id, ref, title, target, date, name, detail
+"select id, ref, title, target, date, name, detail, latitude, longitude
    from pledges
    where pin IS NULL 
    AND pb_pledge_prominence(id) <> 'backpage'
@@ -105,7 +111,9 @@ limit $CONF{number_of_pledges}"
 sub new_rss_object {
 
     # Create the rss object.
-    my $rss = XML::RSS->new( version => '2.0' );
+    # Using 1.0, because geo tags didn't appear when using XML::RSS to make a 2.0 file.
+    my $rss = XML::RSS->new( version => '1.0' );
+    $rss->add_module(prefix=>'geo', uri=>'http://www.w3.org/2003/01/geo/wgs84_pos#');
 
     # Fill in the details needed.
     $rss->channel(

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.123 2005-07-04 09:11:29 chris Exp $
+-- $Id: schema.sql,v 1.124 2005-07-04 11:16:11 francis Exp $
 --
 
 -- secret
@@ -137,8 +137,8 @@ create table pledges (
     -- Geographical coordinates for pledges where we know them. Use lat/lon in
     -- the WGS84 system so that this still works when we make it possible to
     -- locate pledges in other countries.
-    longitude double precision,     -- east-positive, degrees
     latitude double precision,      -- north-positive, degrees
+    longitude double precision,     -- east-positive, degrees
         -- NB use double precision not real since real has probably only six
         -- digits of accuracy or about ~30m over the whole globe. If we're
         -- going to have missile coordinates, let's have *proper* missile
@@ -951,7 +951,7 @@ create index comment_pledge_id_whenposted_idx on comment(pledge_id, whenposted);
 
 -- Alerts and notifications
 
--- get emailed when there is a new pledge in your area
+-- OBSOLETE old place for local alerts
 create table local_alert (
     person_id integer references person(id), 
     postcode text not null 
@@ -966,11 +966,20 @@ create table alert (
     event_code text not null,
 
     -- ref indicates a pledge reference
-    check (event_code = 'comments/ref' or
-           event_code = 'pledges/local/GB'),
+    check (
+            event_code = 'comments/ref' or    -- new comments on a particular pledge
+            event_code = 'pledges/local/GB'   -- new pledge near a particular area
+    ),
 
-    -- specific pledge for "ref/" event codes
-    pledge_id integer references pledges(id),
+    -- extra parameters for different types of alert
+    pledge_id integer references pledges(id), -- specific pledge for "/ref" event codes
+    postcode text, -- postcode for /local/GB event codes
+
+    -- specific location for /local/ event codes, should always keep raw data (e.g.
+    -- postcode or city) above in table, these fields are just a cache,
+    -- generated and regeneratable from that
+    latitude double precision,      -- north-positive, degrees
+    longitude double precision,     -- east-positive, degrees
 
     whensubscribed timestamp not null default pb_current_timestamp()
 );
@@ -978,7 +987,7 @@ create table alert (
 create index alert_person_id_idx on alert(person_id);
 create index alert_event_code_idx on alert(event_code);
 create index alert_pledge_id_idx on alert(pledge_id);
-create unique index alert_unique_idx on alert(person_id, event_code, pledge_id);
+create unique index alert_unique_idx on alert(person_id, event_code, pledge_id, postcode);
 
 create table alert_sent (
     alert_id integer not null references alert(id),

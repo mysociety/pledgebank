@@ -7,7 +7,10 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: lookup-coordinates,v 1.2 2005-06-24 12:29:32 chris Exp $';
+# OBSOLETE - this is now done in web/new.php at creation of new pledges.  After
+# next deploy we need to run this script one last time, then remove from CVS.
+
+my $rcsid = ''; $rcsid .= '$Id: lookup-coordinates,v 1.3 2005-07-04 11:16:10 francis Exp $';
 
 use strict;
 require 5.8.0;

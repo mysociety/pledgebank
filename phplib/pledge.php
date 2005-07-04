@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.109 2005-07-02 02:46:58 francis Exp $
+ * $Id: pledge.php,v 1.110 2005-07-04 11:16:11 francis Exp $
  * 
  */
 
@@ -554,11 +554,11 @@ function post_confirm_advertise($pledge) {
 function post_confirm_advertise_flyers($r) {
     $png_flyers8_url = new_url("/flyers/{$r['ref']}_A4_flyers8.png", false);
 ?>
-<p class="noprint" align="center"><big><strong>
+<p class="noprint noisymessage" align="center">
 <?
     print _('You will massively increase the chance of this pledge succeeding if you ');
     if (!$r['pin']) {
-        print_this_link(_("print this page out"), "");
+        print print_this_link(_("print this page out"), "");
         $flyerurl = '<a href="/' . htmlspecialchars($r['ref']) . '/flyers">' . _('these more attractive PDF and RTF (Word) versions') . '</a>';
         printf(_('(or use %s), cut up the flyers and stick them through your neighbours\' letterboxes.'), $flyerurl);
    } else {
@@ -568,9 +568,9 @@ function post_confirm_advertise_flyers($r) {
         print_link_with_pin("/".htmlspecialchars($r['ref'])."/flyers", "", _("print these pages out"));
         print _(", cut up the flyers and stick them through your neighbours' letterboxes.");
    }
+    print ' ';
     print _('We cannot emphasise this enough &mdash; print them NOW and post them next time you
-go out to the shops or your pledge is unlikely to succeed.') . '</strong></big>
-</p>';
+go out to the shops or your pledge is unlikely to succeed.');
     // Show inline graphics only for PINless pledges (as PNG doesn't
     // work for the PIN protected ones, you can't POST a PIN
     // into an IMG SRC= link)

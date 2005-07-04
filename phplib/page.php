@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.56 2005-06-28 16:40:21 francis Exp $
+// $Id: page.php,v 1.57 2005-07-04 11:16:11 francis Exp $
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -58,42 +58,50 @@ function page_header($title, $params = array()) {
 </head>
 <body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
 <?
+    // On the "print flyers from in-page image" page, these top parts are hidden from printing
+    if (array_key_exists('noprint', $params) and $params['noprint'])
+        print '<div class="noprint">';
+
     // Display title bar
     if (!array_key_exists('nonav', $params) or !$params['nonav']) {
-        if (array_key_exists('noprint', $params) and $params['noprint'])
-            print '<div class="noprint">';
 ?>
 <h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a> <span id="beta">Beta</span></h1>
 <hr class="v"><?
-        if (array_key_exists('noprint', $params) and $params['noprint'])
-            print '</div> <!-- noprint -->';
     }
 
-        if (array_key_exists('ref', $params)) {
-            $url = $params['ref'];
-            print '<p id="reference">';
-            print _('This pledge\'s permanent location: ');
-            if (!array_key_exists('noreflink', $params))
-                print '<a href="' . $url . '">';
-            print '<strong>'. str_replace('http://', '', $url) . '</strong>';
-            if (!array_key_exists('noreflink', $params))
-                print '</a>';
+    // Display link to main pledge page
+    if (array_key_exists('ref', $params)) {
+        $url = $params['ref'];
+        print '<p id="reference">';
+        print _('This pledge\'s permanent location: ');
+        if (!array_key_exists('noreflink', $params))
+            print '<a href="' . $url . '">';
+        print '<strong>'. str_replace('http://', '', $url) . '</strong>';
+        if (!array_key_exists('noreflink', $params))
+            print '</a>';
 /*            if ($category) {
-                print '<br>This pledge is in the <strong>' . $category . '</strong> category';
-            } */
-            print '</p>';
-        }
-        if ($P) {
-            print '<p id="signedon">';
-            print _('Hello, ');
-            if ($P->has_name())
-                print htmlspecialchars($P->name);
-            else 
-                print htmlspecialchars($P->email);
-            print ' <small>(<a href="/logout">';
-            print _('this isn\'t you?  click here');
-            print '</a>)</small></p>';
-        }
+            print '<br>This pledge is in the <strong>' . $category . '</strong> category';
+        } */
+        print '</p>';
+    }
+
+    // Start flyers-printing again
+    if (array_key_exists('noprint', $params) and $params['noprint'])
+        print '</div> <!-- noprint -->';
+
+    // Display who is logged in 
+    if ($P) {
+        print '<p id="signedon" class="noprint">';
+        print _('Hello, ');
+        if ($P->has_name())
+            print htmlspecialchars($P->name);
+        else 
+            print htmlspecialchars($P->email);
+        print ' <small>(<a href="/logout">';
+        print _('this isn\'t you?  click here');
+        print '</a>)</small></p>';
+    }
+
 ?>
 <div id="content"><?    
 
@@ -146,14 +154,14 @@ function page_footer($params = array()) {
 <?  }
 
 function print_this_link($link_text, $after_text) {
-?>
+    return <<<EOF
 <script type="text/javascript">
-    document.write('<a href="javascript:window.print();"><?=$link_text?><\/a><?=$after_text?>');
+    document.write('<a href="javascript:window.print();">$link_text<\/a>$after_text');
 </script>
 <noscript>
-<?=$link_text?><?=$after_text?>
+$link_text$after_text
 </noscript> 
-<?
+EOF;
 }
 
 /* page_check_ref REFERENCE

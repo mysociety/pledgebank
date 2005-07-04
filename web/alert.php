@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.16 2005-07-01 22:06:53 francis Exp $
+// $Id: alert.php,v 1.17 2005-07-04 11:16:11 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -17,13 +17,13 @@ require_once '../../phplib/importparams.php';
 
 $title = _('New pledge alerts');
 page_header($title);
-if (get_http_var('subscribe_alert')) {
-    $errors = do_local_alert_subscribe();
+if (get_http_var('subscribe_local_uk_alert')) {
+    $errors = do_local_uk_alert_subscribe();
     if (is_array($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
-        local_alert_subscribe_box();
+        local_uk_alert_subscribe_box();
     }
 } elseif (get_http_var('direct_unsubscribe')) {
     // Clicked from email to unsubscribe
@@ -41,11 +41,11 @@ if (get_http_var('subscribe_alert')) {
     }
     print '</p>';
 } else {
-    local_alert_subscribe_box();
+    local_uk_alert_subscribe_box();
 }
 page_footer();
 
-function do_local_alert_subscribe() {
+function do_local_uk_alert_subscribe() {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pin, $q_postcode;
     $errors = importparams(
                 array('email',      "importparams_validate_email"),
@@ -69,7 +69,7 @@ function do_local_alert_subscribe() {
 }
 
 /* Display form for email alert sign up. */
-function local_alert_subscribe_box() {
+function local_uk_alert_subscribe_box() {
     $email = get_http_var('email');
     $postcode = get_http_var('postcode');
 

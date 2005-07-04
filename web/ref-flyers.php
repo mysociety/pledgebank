@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.11 2005-06-24 12:27:02 matthew Exp $
+// $Id: ref-flyers.php,v 1.12 2005-07-04 11:16:11 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -24,7 +24,7 @@ if ($pin_box) {
 }
 
 $title = _("Flyers");
-page_header($title, array('ref' => $p->url_main()) );
+page_header($title, array('ref' => $p->url_main(), 'noprint' => true));
 
 $pdf_flyers8_url = $p->url_flyer("A4_flyers8.pdf");
 $pdf_flyers1_url = $p->url_flyer("A4_flyers1.pdf");

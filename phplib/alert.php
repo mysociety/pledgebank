@@ -5,7 +5,9 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.8 2005-07-01 00:42:05 matthew Exp $
+// $Id: alert.php,v 1.9 2005-07-04 11:16:11 francis Exp $
+
+require_once '../../phplib/mapit.php';
 
 /* alert_signup PERSON_ID EVENT_CODE PARAMS
  * 
@@ -18,14 +20,40 @@
  */
 function alert_signup($person_id, $event_code, $params) {
     if ($event_code == "comments/ref") {
+        /* Alert when a comment is added to a particular pledge */
+
         $already = db_getOne("select id from alert where person_id = ? and event_code = ?
             and pledge_id = ?", array($person_id, $event_code, $params['pledge_id']));
         if (is_null($already)) {
             db_query("insert into alert (person_id, event_code, pledge_id)
                 values (?, ?, ?)", array($person_id, $event_code, $params['pledge_id']));
         }
-    }
-    else {
+    } elseif ($event_code == "pledges/local/GB") {
+        /* Alert when a new pledge appears near a particular area in country GB (the UK) */
+
+        /* Canonicalise postcode form, so more likely to detect it is already in the table */
+        $params['postcode'] = str_replace(' ', '', $params['postcode']);
+        $params['postcode'] = strtoupper(trim($params['postcode']));
+
+        /* Find out where on earth it is */
+        $location = mapit_get_location($params['postcode']);
+        if (mapit_get_error($location)) {
+            /* This error should never happen, as earlier postcode validation in form will stop it */
+            err('Invalid postcode while setting alert, please check and try again.');
+        }
+        $already = db_getOne("select id from alert where person_id = ? and event_code = ?
+            and postcode = ?", array($person_id, $event_code, $params['postcode']));
+        if (is_null($already)) {
+            db_query("insert into alert (
+                        person_id, event_code, 
+                        latitude, longitude, postcode
+                    )
+                    values (?, ?, ?)", array(
+                        $person_id, $event_code, 
+                        $location['wgs84_lat'], $location['wgs84_lon'], $params['postcode']
+                    ));
+        }
+    } else {
         err("Unknown alert event '$event_code'");
     }
 
@@ -77,7 +105,7 @@ function alert_unsubscribe_link($alert_id, $email) {
 }
 
 /* Returns true if the signed on user is already subscribed */
-function local_alert_subscribed() {
+function local_uk_alert_subscribed() {
     $P = person_if_signed_on();
     if (!$P)
         return false;

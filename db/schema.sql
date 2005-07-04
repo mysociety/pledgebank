@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.122 2005-07-01 22:19:42 francis Exp $
+-- $Id: schema.sql,v 1.123 2005-07-04 09:11:29 chris Exp $
 --
 
 -- secret
@@ -167,7 +167,7 @@ create table pledges (
     check ((latitude is null and longitude is null)
             or (latitude is not null and longitude is not null)),
     check (latitude is null or (latitude >= -90 and latitude <= +90)),
-    check (longitude is null or (longitude >= -180 and latitude < 180))
+    check (longitude is null or (longitude >= -180 and longitude < 180))
 );
 
 -- Make connections-finding faster.

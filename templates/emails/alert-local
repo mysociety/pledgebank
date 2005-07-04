@@ -1,0 +1,13 @@
+Subject: New pledge near you - '<?=$values['title']?>' at PledgeBank.com
+
+There's a new pledge <?=$values['distance']?>km from you (postcode
+<?=$values['postcode']?>).  <?=$values['creator_name']?> made the pledge, and
+it says:
+
+'<?=$values['sentence_first']?>'
+
+Sign up to this pledge: <?=$values['pledge_url']?>
+
+<?=$values['signature']?>
+
+To stop receiving emails when there are new comments on this pledge, click this link: <?=$values['unsubscribe_url']?>

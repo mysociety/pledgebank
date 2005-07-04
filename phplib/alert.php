@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.9 2005-07-04 11:16:11 francis Exp $
+// $Id: alert.php,v 1.10 2005-07-04 22:24:56 francis Exp $
 
 require_once '../../phplib/mapit.php';
 
@@ -16,6 +16,7 @@ require_once '../../phplib/mapit.php';
  * 
  * EVENT_CODE can be any of:
  * comments/ref - comments on a pledge, 'pledge_id' must be in PARAMS.
+ * pledges/local/GB - new pledges near a location in the UK, 'postcode' must be in PARAMS.
  *
  */
 function alert_signup($person_id, $event_code, $params) {
@@ -32,8 +33,7 @@ function alert_signup($person_id, $event_code, $params) {
         /* Alert when a new pledge appears near a particular area in country GB (the UK) */
 
         /* Canonicalise postcode form, so more likely to detect it is already in the table */
-        $params['postcode'] = str_replace(' ', '', $params['postcode']);
-        $params['postcode'] = strtoupper(trim($params['postcode']));
+        $params['postcode'] = canonicalise_postcode($params['postcode']);
 
         /* Find out where on earth it is */
         $location = mapit_get_location($params['postcode']);
@@ -48,7 +48,7 @@ function alert_signup($person_id, $event_code, $params) {
                         person_id, event_code, 
                         latitude, longitude, postcode
                     )
-                    values (?, ?, ?)", array(
+                    values (?, ?, ?, ?, ?)", array(
                         $person_id, $event_code, 
                         $location['wgs84_lat'], $location['wgs84_lon'], $params['postcode']
                     ));
@@ -87,8 +87,9 @@ function alert_h_description($alert_id) {
     if ($row['event_code'] == "comments/ref") { 
         $pledge = new Pledge(intval($row['pledge_id']));
         return sprintf(_("new comments on the pledge '%s'"), $pledge->ref() );
-    }
-    else {
+    } elseif ($row['event_code'] == "pledges/local/GB") { 
+        return sprintf(_("new UK pledges near postcode %s"), $row['postcode'] );
+    } else {
         err(sprintf(_("Unknown event code '%s'"), $row['event_code']));
     }
 }
@@ -110,7 +111,8 @@ function local_uk_alert_subscribed() {
     if (!$P)
         return false;
     
-    $already_signed = db_getOne("select count(*) from local_alert where person_id = ?", array($P->id()));
+    $already_signed = db_getOne("select count(*) from alert where event_code = 'pledges/local/GB' 
+            and person_id = ?", array($P->id()));
     if ($already_signed == 0)
         return false;
     elseif ($already_signed == 1)
@@ -118,6 +120,7 @@ function local_uk_alert_subscribed() {
     else
         err("already_signed $already_signed times");
 }
+
 
 /* Stuff to loop through / display all of someone's alerts
 // not used yet

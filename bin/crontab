@@ -4,9 +4,13 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab,v 1.5 2005-06-24 11:42:50 francis Exp $
+# $Id: crontab,v 1.6 2005-07-04 22:24:56 francis Exp $
 
+# Frequently
 0-59/2 * * * * /data/vhost/www.pledgebank.com/mysociety/pb/bin/frequentupdate
-0-59/15 * * * * /data/vhost/www.pledgebank.com/mysociety/pb/bin/sendalerts
+0-59/15 * * * * /data/vhost/www.pledgebank.com/mysociety/pb/bin/send-comment-alerts
+
+# Once an hour
 33 * * * * /data/vhost/www.pledgebank.com/mysociety/pb/bin/find-pledge-connections
+40 * * * * /data/vhost/www.pledgebank.com/mysociety/pb/bin/send-local-alerts
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.52 2005-07-04 11:16:11 francis Exp $
+// $Id: new.php,v 1.53 2005-07-04 22:24:56 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -662,8 +662,6 @@ function create_new_pledge($P, $data) {
     // add them in for alerts explicitly here.
     alert_signup($P->id(), "comments/ref", array('pledge_id' => $p->id()));
     db_commit();
-    // To migrate existing creators to new system use this:
-    // insert into alert (person_id, event_code, pledge_id) select person_id, 'comments/ref', id from pledges;
 
     global $page_title, $page_params;
     $page_title = _('Pledge Created');

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.124 2005-07-04 11:16:11 francis Exp $
+-- $Id: schema.sql,v 1.125 2005-07-04 22:24:56 francis Exp $
 --
 
 -- secret
@@ -993,7 +993,7 @@ create table alert_sent (
     alert_id integer not null references alert(id),
     
     -- which pledge for event codes "pledges/"
-    pledge_id integer references comment(id),
+    pledge_id integer references pledges(id),
     -- which comment for event code "/comments"
     comment_id integer references comment(id),
 

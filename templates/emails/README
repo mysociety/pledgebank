@@ -111,4 +111,10 @@ by default.
   - comment_author_website, website of commenter
   - unsubscribe_url, link to unsubscribe from these alerts
 
+* alert-local
+Sent when a new pledge near to someone has been made.
+  - postcode, the postcode which the new pledge is near to
+  - distance, of the new pledge from the postcode in km
+  - unsubscribe_url, link to unsubscribe from these alerts
+
 *************************************************************************

@@ -34,7 +34,7 @@
 #   backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.115 2005-07-04 11:16:11 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.116 2005-07-04 22:24:56 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -184,7 +184,7 @@ if ($action_all) {
 
 # Check for any unhandled mails or errors
 call_frequentupdate();
-call_sendalerts();
+call_send_alerts();
 $wth->email_check_none_left();
 sms_check_none_left();
 $wth->log_watcher_check();
@@ -429,9 +429,11 @@ sub call_frequentupdate {
 }
 
 # Call sendalerts cron job
-sub call_sendalerts {
-    system("php", "sendalerts", $verbose > 1 ? qw(--verbose) : ()) 
-        and die "Failed to call sendalerts";
+sub call_send_alerts {
+    system("php", "send-comment-alerts", $verbose > 1 ? qw(--verbose) : ()) 
+        and die "Failed to call send-comment-alerts";
+    system("php", "send-local-alerts", $verbose > 1 ? qw(--verbose) : ()) 
+        and die "Failed to call send-local-alerts";
 }
 
 # Call find-pledge-connections cron job
@@ -474,7 +476,7 @@ sub do_public_succeeding_pledge {
         fields => {
             email => email_n(11),  # use same signer as one below, to test conversion from 
                                    # nameless to named person in the person table.
-            postcode => 'CB23QJ',  # The Guildhall, Cambridge
+            postcode => 'cb23qj',  # The Guildhall, Cambridge
         },
         button => 'submit');
     perform_login_action(11, {action=>"viaemail"}, "emailed whenever a new");
@@ -492,6 +494,9 @@ sub do_public_succeeding_pledge {
         { country => 'UK', 'local' => 1, postcode => 'CB7 4DL' }, # Ely Cathedral
         { action => "viaemail" }
     );
+    # Check local alert works
+    call_send_alerts();
+    $wth->email_get_containing('%To: '.email_n(11).  '%new pledge%'.$pledge_action_completion.'%');
 
     # Add a comment, which will subscribe user 90 to comment alerts
     # (TODO: put these three comment posts in a local function)
@@ -509,7 +514,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Your comment has now been posted");
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("Do I have to be a computer to take part?");
-    call_sendalerts();
+    call_send_alerts();
     $wth->email_get_containing('%To: '.email_n(0).  '%This is a great pledge%');
     # Add another comment so its email goes
     $wth->browser_get($base_url . "/$pledge_ref");
@@ -525,7 +530,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Your comment has now been posted");
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("It cost £0 to make and was mainly done in a café");
-    call_sendalerts();
+    call_send_alerts();
     $wth->email_get_containing('%To: '.email_n(0).  '%It cost £0 to make and was mainly done in a café%');
     my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%It cost £0 to make and was mainly done in a café%');
     $wth->email_check_none_left();
@@ -547,7 +552,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Your comment has now been posted");
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("This is a third comment");
-    call_sendalerts();
+    call_send_alerts();
     $wth->email_get_containing('%To: '.email_n(0).  '%This is a third comment%');
     $wth->email_check_none_left();
 

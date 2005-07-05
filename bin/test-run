@@ -34,7 +34,7 @@
 #   backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.116 2005-07-04 22:24:56 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.117 2005-07-05 00:36:37 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1049,6 +1049,17 @@ sub do_sms_pledge {
 
 #############################################################################
 sub do_login_tests {
+    # Sign up to local alert
+    $wth->browser_get($base_url);
+    $wth->browser_submit_form(form_name => 'localalert',
+        fields => {
+            email => email_n(250),  
+            postcode => 'SN81rF',  # Red Lion pub, Avebury
+        },
+        button => 'submit');
+    perform_login_action(250, {action=>"viaemail"}, "emailed whenever a new");
+    $wth->browser_check_contents("Thanks for subscribing!");
+
     # Make the pledge
     set_pb_date('1983-06-06');
     my $pledge_action_login_1 = 'make multiple pledges using the magic of login';
@@ -1065,7 +1076,7 @@ sub do_login_tests {
         { title => $pledge_action_login_1, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_1 },
-        { country => 'Global' },
+        { country => 'UK', 'local' => 1, postcode => '  SN8  1AA' }, # Waitrose, Marlborough
         { action => "viaemail", setpassword => 1 }
     );
     # Checked logged in, and then logout
@@ -1081,7 +1092,7 @@ sub do_login_tests {
         { title => $pledge_action_login_2, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_2 },
-        { country => 'Global' },
+        { country => 'UK', 'local' => 1, postcode => 'SN8 1PA' }, # Marlborough College
         { action => "viaemail", setpassword => 1 }
     );
     # Log out again
@@ -1120,9 +1131,14 @@ sub do_login_tests {
         { title => $pledge_action_login_4, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_4 },
-        { country => 'Global' },
+        { country => 'UK', 'local' => 0 },
         { action => "loggedin" }
     );
+
+    # Check local alert for two pledges at once works
+    call_send_alerts();
+    $wth->email_get_containing('%To: '.email_n(250).  '%There are 2 new pledge%login2%login1%');
+    $wth->email_check_none_left();
 
     # Sign all the pledges as another user
     $wth->browser_follow_link(text_regex => qr/Logout/);

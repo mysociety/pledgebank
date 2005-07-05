@@ -1,0 +1,154 @@
+#!/usr/local/bin/php -q
+<?php
+/* 
+ * send-local-alerts:
+ * Run from cron regularly to send new pledge local alerts.
+ *
+ * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: send-local-alerts,v 1.1 2005-07-05 00:36:37 francis Exp $
+ *
+ */
+
+require_once "../conf/general";
+require_once '../phplib/db.php';
+require_once '../phplib/fns.php';
+require_once "../phplib/auth.php";
+require_once "../phplib/person.php";
+require_once "../phplib/alert.php";
+require_once '../../phplib/utility.php';
+
+function verbose($str) {
+    global $verbose;
+    if ($verbose) 
+        fwrite(STDERR, "send-local-alerts: $str\n");
+}
+function error($str) {
+    fwrite(STDERR, "send-local-alerts: ERROR: $str\n");
+}
+
+$short_opts = '';
+$long_opts = array('verbose','help');
+require_once 'phpcgi';
+
+$switches = $options[0];
+$args = $options[1];
+$verbose = 0; 
+foreach ($switches as $switch) {
+    if ($switch[0]=='--verbose') $verbose = 1;
+    if ($switch[0]=='--help') {
+?>
+
+PledgeBank local alert sending script.
+
+Usage: send-local-alerts [--verbose]
+
+--help      Display this help message
+--verbose   Display more information
+
+<?
+        exit;
+    }
+}
+
+// Main code at end.
+
+// send_local_alerts sends alerts for new pledges near people
+function send_local_alerts() {
+    verbose("sending local alerts");
+
+    // Grab all relevant alerts
+    $p = db_query("select alert.id as alert_id,
+                          latitude as alert_latitude, longitude as alert_longitude, 
+                          postcode as alert_postcode,
+                          alerted.name as alerted_name,
+                          alerted.email as alerted_email,
+                          alerted.id as alerted_person_id
+                from alert left join person as alerted on alert.person_id = alerted.id
+                where event_code = 'pledges/local/GB'");
+
+    $consolidated = array();
+    while ($alert = db_fetch_array($p)) {
+        // Search for pledges matching alert
+        $q = db_query("
+                select pledges.*, pledges.id as pledge_id, distance
+                from pledge_find_nearby(?,?,?) as nearby 
+                left join pledges on nearby.pledge_id = pledges.id
+                where
+                    pledges.pin is null and
+                    pb_current_date() <= pledges.date and
+                    pledges.prominence <> 'backpage' and " . /* deliberately NOT pb_pledge_prominence */
+                    "(select id from signers where 
+                        signers.person_id = ? and signers.pledge_id = pledges.id) is null and
+                    (select whenqueued from alert_sent where
+                        alert_sent.alert_id = ? and
+                        alert_sent.pledge_id = pledges.id) is null 
+                order by distance
+            ", array($alert['alert_latitude'], $alert['alert_longitude'], 50.0, 
+                    $alert['alerted_person_id'],
+                    $alert['alert_id']
+                ));
+
+        if (db_num_rows($q) == 0) {
+            continue;
+        } 
+    
+        $count = 0; # how many pledges in this alert
+        $text = ""; # description and link to each
+        $lastrow = array();
+        while ($row = db_fetch_array($q)) {
+            verbose("person #${alert['alerted_person_id']} (${alert['alerted_email']}) has alert #${alert['alert_id']} on new local pledge ${row['ref']} which is ".round($row['distance'],1)."km from ${alert['alert_postcode']}");
+
+            # Grab a lock
+            db_getOne('select id from alert where id = ? for update', $alert['alert_id']);
+
+            # Store that alert has been sent
+            db_query("
+                    insert into alert_sent (
+                        alert_id, pledge_id
+                    ) values (
+                        ?, ?
+                    )", array($alert['alert_id'], $row['pledge_id']));
+
+            $pledge = new Pledge($row);
+            $row['pledge_url'] = $pledge->url_main();
+            $row['distance'] = round($row['distance'], 1);
+            $lastrow = $row;
+           
+            # Construct repeating text
+            $text .= $row['distance'] . " km away: '" . $pledge->sentence(array('firstperson'=>true)) . "'";
+            $text .=" Click for more info: " . $row['pledge_url'];
+            $text .= "\n\n";
+
+            # Record how many we have
+            $count++;
+        }
+
+        # Send email
+        $alert['unsubscribe_url'] = alert_unsubscribe_link($alert['alert_id'], $alert['alerted_email']);
+        $alert['pledges_count'] = $count;
+        $alert['pledges_text'] = $text;
+        if ($count > 1) {
+            $f = pb_send_email_template($alert['alerted_email'], 'alert-local-multiple', $alert, array());
+        } else {
+            $params = array_merge($alert, $lastrow);
+            $f = pb_send_email_template($alert['alerted_email'], 'alert-local-single', $params, array());
+        }
+        verbose("sent $count new pledge alerts in one mail to " . $alert["alerted_email"]);
+        if (!$f) {
+            # Revert record that it has been sent
+            db_rollback();
+            error("Failed to send new local pledge alert to " . $alert['alerted_email'] . " alert #" . $alert['alert_id'] . " $count pledges");
+        } else {
+            # Commit that it has been sent
+            db_commit();
+        }
+    }
+
+    verbose("finished sending local alerts");
+}
+
+db_connect();
+send_local_alerts();
+

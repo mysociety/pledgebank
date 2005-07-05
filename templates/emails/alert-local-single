@@ -1,0 +1,13 @@
+Subject: New pledge near you! - '<?=$values['title']?>' at PledgeBank.com
+
+There's a new pledge near your postcode <?=$values['alert_postcode']?>.
+
+<?=$values['distance']?> km away: '<?=$values['sentence_first']?>' 
+
+Click for more info or to sign the pledge: <?=$values['pledge_url']?>
+
+<?=$values['signature']?>
+
+To stop receiving emails when there are new pledges near
+<?=$values['alert_postcode']?>, click this link:
+<?=$values['unsubscribe_url']?>

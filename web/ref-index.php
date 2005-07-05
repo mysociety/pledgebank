@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.40 2005-07-01 10:49:43 matthew Exp $
+// $Id: ref-index.php,v 1.41 2005-07-05 16:10:13 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -106,9 +106,6 @@ function draw_signatories($p) {
    
     $out = '';
    
-    if (!$limit)
-        $out = '<li>' . $p->h_name() . ' ' . _('(Pledge Creator)') . '</li>';
-
     $anon = 0;
     $unknownname = 0;
 

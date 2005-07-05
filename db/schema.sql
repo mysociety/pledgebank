@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.126 2005-07-05 01:07:43 francis Exp $
+-- $Id: schema.sql,v 1.127 2005-07-05 16:01:45 francis Exp $
 --
 
 -- secret
@@ -993,6 +993,7 @@ create table alert_sent (
 create index alert_sent_alert_id_idx on alert_sent(alert_id);
 create index alert_sent_pledge_id_idx on alert_sent(pledge_id);
 create index alert_sent_comment_id_idx on alert_sent(comment_id);
+create unique index alert_sent_unique_idx on alert_sent(alert_id, pledge_id, comment_id);
 
 -- table of abuse reports on comments, pledges and signers.
 create table abusereport (

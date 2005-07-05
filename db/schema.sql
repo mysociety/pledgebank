@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.125 2005-07-04 22:24:56 francis Exp $
+-- $Id: schema.sql,v 1.126 2005-07-05 01:07:43 francis Exp $
 --
 
 -- secret
@@ -103,13 +103,6 @@ create table pledges (
     -- metadata
     creationtime timestamp not null,
 
-    -- confirmation stuff
-    -- XXX now unused because of login mechanism, but there may still be
-    -- unconfirmed pledges floating about so it has to remain for a decent
-    -- interval.
-    token text,
-    confirmed boolean not null default true,
-
     -- PIN for private pledges
     pin text check (pin <> ''),
 
@@ -175,9 +168,6 @@ create index pledges_person_id_idx on pledges(person_id);
 
 -- Make finding recently successful pledges faster.
 create index pledges_whensucceeded_idx on pledges(whensucceeded);
-
--- Speculative that this will help, as we often look up confirmed
-create index pledges_confirmed_idx on pledges(confirmed);
 
 -- 
 -- Geographical stuff

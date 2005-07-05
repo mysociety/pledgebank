@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.41 2005-07-05 16:10:13 chris Exp $
+// $Id: ref-index.php,v 1.42 2005-07-05 16:29:41 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -84,6 +84,13 @@ function draw_signatories($p) {
 <?
     print '<h2><a name="signers">' . _('Current signatories') . '</a></h2>';
 
+    if ($nsigners == 0) {
+        print '<p>'
+                . htmlspecialchars(sprintf(_('So far, only %s, the Pledge Creator, has signed this pledge.'), $p->name()))
+                . '</p></div>';
+        return;
+    }
+
     /* XXX need to do something about layout here -- it breaks badly when the
      * height of the comments column is greater than that of the signers
      * column. */
@@ -105,7 +112,14 @@ function draw_signatories($p) {
     }
    
     $out = '';
-   
+
+    if (!$limit)
+        $out = '<p>'
+                htmlspecialchars(sprintf(_('%s, the Pledge Creator, joined by:'), $p->name()))
+                . '</p>';
+
+    $out .= "<ul>";
+  
     $anon = 0;
     $unknownname = 0;
 
@@ -131,16 +145,18 @@ function draw_signatories($p) {
             $anon++;
         }
     }
-    print '<ul>'.$out;
+    print $out;
     if ($anon || $unknownname) {
         $extra = '';
         if ($anon)
-            $extra .= sprintf(ngettext('Plus %d other who did not want to give their name', 'Plus %d others who did not want to give their names', $anon), $anon);
+            $extra .= sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon);
         if ($unknownname) {
             if ($anon) {
-                $extra .= sprintf(ngettext(', and %d other who signed up via mobile.', ', and %d others who signed up via mobile.', $unknownname), $unknownname);
+                /* XXX shouldn't assume we can split sentences like this --
+                 * make it two bullet points? */
+                $extra .= sprintf(ngettext(', and %d who signed up via mobile', ', and %d who signed up via mobile', $unknownname), $unknownname);
             } else {
-                $extra .= sprintf(ngettext('Plus %d other who signed up via mobile.', 'Plus %d others who signed up via mobile', $unknownname), $unknownname);
+                $extra .= sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $unknownname), $unknownname);
             }
         }
         print "<li>$extra</li>";

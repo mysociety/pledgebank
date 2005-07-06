@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: stash.php,v 1.8 2005-06-23 23:20:57 matthew Exp $
+ * $Id: stash.php,v 1.9 2005-07-06 02:01:06 francis Exp $
  * 
  */
 
@@ -29,7 +29,6 @@ function stash_request($extra = null) {
     if ($_SERVER['REQUEST_METHOD'] == 'POST')
         $v = $_POST;
     return stash_new_request($_SERVER['REQUEST_METHOD'], $url, $v, $extra);
-    return $key;
 }
 
 /* stash_new_request METHOD URL PARAMS [EXTRA]

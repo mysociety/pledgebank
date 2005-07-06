@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: stash.php,v 1.9 2005-07-06 02:01:06 francis Exp $
+ * $Id: stash.php,v 1.10 2005-07-06 15:21:57 chris Exp $
  * 
  */
 
@@ -65,8 +65,12 @@ function stash_new_request($method, $url, $params, $extra = null) {
     } else
         err("Cannot stash request for method '$method'");
 
-    /* Also take this opportunity to remove old stashed state from the db. */
-    db_query("delete from requeststash where whensaved < pb_current_timestamp() - '7 days'::interval");
+    /* Also take this opportunity to remove old stashed state from the db. We
+     * do this as two queries, one to produce the threshold time and another to
+     * actually do the delete because PG isn't smart enough (in 7.3.x, anyway)
+     * to use the index for the query if the RHS of the < is nonconstant. */
+    $t = db_getOne("select pb_current_timestamp() - '7 days'::interval");
+    db_query("delete from requeststash where whensaved < ?", $t);
 
     return $key;
 }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.17 2005-06-29 12:02:11 francis Exp $
+// $Id: faq.php,v 1.18 2005-07-06 17:23:05 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -174,9 +174,7 @@ print dt(_('Can I put up pledges in languages other than English?'));
 print dd(_("You can try! Fully internationalised versions of PledgeBank are
 more than possible, but we can't do them without speakers of other languages.
 If you are interested in volunteering to help translate the site, please
-<a href=\"/contact\">contact us</a> or <a
-href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
-email list</a>."));
+<a href=\"/translate\">read our translation help page</a>."));
 
 print dt(_('Do I have to have a UK postcode to use this service?'));
 

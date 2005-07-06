@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.14 2005-07-05 19:12:34 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.15 2005-07-06 07:28:51 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -54,7 +54,7 @@ my $s = dbh()->prepare("
                     and pledges.pin is null
                     and signers.showname
                     and pb_pledge_prominence(pledge_id) <> 'backpage'
-                    and (select count(*) from signers where signers.pledge_id = pledges.id) < pledges.target
+                    and whensucceeded is null
                 order by signers.person_id");
 $s->execute();
 
@@ -78,7 +78,7 @@ $s = dbh()->prepare("
                 from pledges
                 where pin is null
                     and pb_pledge_prominence(id) <> 'backpage'
-                    and (select count(*) from signers where signers.pledge_id = pledges.id) < target
+                    and whensucceeded is null
                 order by person_id");
 $s->execute();
 $last_person_id = undef;

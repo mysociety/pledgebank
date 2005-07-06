@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.18 2005-07-04 22:24:56 francis Exp $
+// $Id: alert.php,v 1.19 2005-07-06 23:45:14 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -63,7 +63,7 @@ function do_local_uk_alert_subscribe() {
     alert_signup($person->id(), "pledges/local/GB", array('postcode' => $q_postcode));
     db_commit();
         ?>
-<p class="loudmessage" align="center"><?=_("Thanks for subscribing!  When this is finished, you'll get emailed when there are new pledges in your area.") ?> <a href="/"><?=_('PledgeBank home page') ?></a></p>
+<p class="loudmessage" align="center"><?=_("Thanks for subscribing!  You'll now get emailed once a day when there are new pledges in your area.") ?> <a href="/"><?=_('PledgeBank home page') ?></a></p>
 <?
 }
 

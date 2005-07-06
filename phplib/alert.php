@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.10 2005-07-04 22:24:56 francis Exp $
+// $Id: alert.php,v 1.11 2005-07-06 01:57:08 francis Exp $
 
 require_once '../../phplib/mapit.php';
 
@@ -24,7 +24,7 @@ function alert_signup($person_id, $event_code, $params) {
         /* Alert when a comment is added to a particular pledge */
 
         $already = db_getOne("select id from alert where person_id = ? and event_code = ?
-            and pledge_id = ?", array($person_id, $event_code, $params['pledge_id']));
+            and pledge_id = ? for update", array($person_id, $event_code, $params['pledge_id']));
         if (is_null($already)) {
             db_query("insert into alert (person_id, event_code, pledge_id)
                 values (?, ?, ?)", array($person_id, $event_code, $params['pledge_id']));
@@ -42,7 +42,7 @@ function alert_signup($person_id, $event_code, $params) {
             err('Invalid postcode while setting alert, please check and try again.');
         }
         $already = db_getOne("select id from alert where person_id = ? and event_code = ?
-            and postcode = ?", array($person_id, $event_code, $params['postcode']));
+            and postcode = ? for update", array($person_id, $event_code, $params['postcode']));
         if (is_null($already)) {
             db_query("insert into alert (
                         person_id, event_code, 
@@ -71,6 +71,7 @@ function alert_unsubscribe($person_id, $alert_id) {
     if ($person_id != $row['person_id'])   
         err(sprintf(_("Alert %d does not belong to person %d"), intval($alert_id), intval($person_id)));
 
+    db_getOne('select id from alert where id = ? for update', $alert_id);
     db_query("delete from alert_sent where alert_id = ?", $alert_id);
     db_query("delete from alert where id = ?", $alert_id);
     db_commit();

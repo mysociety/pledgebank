@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-comment-alerts,v 1.1 2005-07-04 22:24:56 francis Exp $
+ * $Id: send-comment-alerts,v 1.2 2005-07-06 01:57:08 francis Exp $
  *
  */
 
@@ -84,16 +84,18 @@ function send_comment_alerts() {
     while ($row = db_fetch_array($q)) {
         verbose("person #${row['person_id']} (${row['alerted_email']}) has alert on pledge ${row['ref']} for comment #${row['comment_id']} (by ${row['comment_author_name']})");
 
-        # Grab a lock
-        db_getOne('select id from alert where id = ? for update', $row['alert_id']);
+        # Grab a lock, making sure alert hasn't been deleted meanwhile
+        $stillthere = db_getOne('select id from alert where id = ? for update', $row['alert_id']);
+        if (!$stillthere) continue;
+
+        # Check to see if the alert has been sent meanwhile
+        $alreadysent = db_getOne('select alert_id from alert_sent where alert_id = ? and comment_id = ?', 
+                 array($row['alert_id'], $row['comment_id']));
+        if ($alreadysent) continue;
 
         # Store that alert has been sent
-        db_query("
-                insert into alert_sent (
-                    alert_id, comment_id
-                ) values (
-                    ?, ?
-                )", array($row['alert_id'], $row['comment_id']));
+        db_query("insert into alert_sent (alert_id, comment_id) values (?, ?)", 
+                 array($row['alert_id'], $row['comment_id']));
 
         # Send email
         $pledge = new Pledge($row);

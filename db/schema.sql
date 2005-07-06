@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.128 2005-07-06 01:57:08 francis Exp $
+-- $Id: schema.sql,v 1.129 2005-07-06 02:07:59 francis Exp $
 --
 
 -- secret
@@ -1049,6 +1049,9 @@ create table requeststash (
         ),
     extra text
 );
+
+-- make expiring old requests quite quick
+create index requeststash_whensaved_idx on requeststash(whensaved);
 
 create function pb_delete_pledge(integer)
     returns void as '

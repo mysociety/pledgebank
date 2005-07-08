@@ -4,7 +4,7 @@
 # Test harness for PledgeBank.  Makes sure we haven't broken the code.
 # 
 # Requires:
-# * ../general/conf file set up for PledgeBank, and matching the below requirements
+# * ../conf/general file set up for PledgeBank, and matching the below requirements
 # * apache configured to serve ../web on OPTION_BASE_URL
 # * a database with name ending "_testharness"; this script will drop and remake the
 #   database, so make sure it is never used for anything important
@@ -34,7 +34,7 @@
 #   backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.117 2005-07-05 00:36:37 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.118 2005-07-08 11:32:46 matthew Exp $';
 
 use strict;
 require 5.8.0;

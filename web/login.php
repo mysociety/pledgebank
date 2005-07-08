@@ -36,17 +36,17 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.52 2005-07-08 00:50:13 francis Exp $
+ * $Id: login.php,v 1.53 2005-07-08 11:32:59 matthew Exp $
  * 
  */
 
 require_once '../phplib/pb.php';
 
-require_once '../phplib/auth.php';
+require_once '../../phplib/auth.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/page.php';
 require_once '../phplib/person.php';
-require_once '../phplib/stash.php';
+require_once '../../phplib/stash.php';
 
 require_once '../../phplib/importparams.php';
 

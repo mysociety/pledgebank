@@ -6,14 +6,14 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.30 2005-06-29 18:28:25 francis Exp $
+ * $Id: comments.php,v 1.31 2005-07-08 11:32:51 matthew Exp $
  * 
  */
 
 require_once('pb.php');
 require_once('person.php');
 require_once('fns.php');
-require_once('db.php');
+require_once('../../phplib/db.php');
 
 /* comments_text_to_html TEXT
  * Convert TEXT to HTML. To start with we just turn line-feeds into <br>s and

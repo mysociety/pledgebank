@@ -7,14 +7,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: migrate-local-alerts,v 1.1 2005-07-04 22:24:56 francis Exp $
+ * $Id: migrate-local-alerts,v 1.2 2005-07-08 11:32:46 matthew Exp $
  *
  */
 
 require_once "../conf/general";
-require_once '../phplib/db.php';
+require_once '../../phplib/db.php';
 require_once '../phplib/fns.php';
-require_once "../phplib/auth.php";
 require_once "../phplib/person.php";
 require_once "../phplib/alert.php";
 require_once '../../phplib/utility.php';

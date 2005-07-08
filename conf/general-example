@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.23 2005-06-17 16:01:08 francis Exp $
+ * $Id: general-example,v 1.24 2005-07-08 11:32:49 matthew Exp $
  * 
  */
 
@@ -27,6 +27,7 @@ define('OPTION_PB_DB_PORT', '5432');
 define('OPTION_PB_DB_NAME', 'pb');
 define('OPTION_PB_DB_USER', 'pb');
 define('OPTION_PB_DB_PASS', '');
+define('OPTION_PHP_MAINDB', 'PB');
 
 // Base domain of the website. This is used to distinguish internal from
 // external referrers, for instance.

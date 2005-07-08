@@ -6,15 +6,14 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.32 2005-07-01 22:06:54 francis Exp $
+ * $Id: sms.php,v 1.33 2005-07-08 11:32:59 matthew Exp $
  * 
  */
 
 require_once "../phplib/pb.php";
-require_once "../phplib/db.php";
+require_once "../../phplib/db.php";
 require_once "../phplib/fns.php";
 require_once "../phplib/pledge.php";
-require_once "../phplib/auth.php";
 
 require_once "../../phplib/importparams.php";
 require_once "../../phplib/utility.php";

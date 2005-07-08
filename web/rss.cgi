@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.8 2005-07-04 11:16:11 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.9 2005-07-08 10:45:15 francis Exp $';
 
 use strict;
 use warnings;
@@ -64,12 +64,16 @@ sub run {
             link        => $CONF{base_url} . $$pledge{ref},
             description => $description,
         };
+        # This adds geocoding, which would be cool but we need to safely
+        # obfuscate the exact latitude/longitude so it isn't a privacy leak.
+=comment
         if ($$pledge{latitude} && $$pledge{longitude}) {
             $params->{geo} = {
                 lat => $$pledge{latitude},
                 lon => $$pledge{longitude},
             }
         }
+=cut
        $rss->add_item(%$params);
     }
 
@@ -85,16 +89,14 @@ sub run {
 # Get the pledges
 sub get_pledges {
 
-    my $query =
-      dbh()
-      ->prepare( 
-"select id, ref, title, target, date, name, detail, latitude, longitude
-   from pledges
-   where pin IS NULL 
-   AND pb_pledge_prominence(id) <> 'backpage'
-   order by id desc 
-limit $CONF{number_of_pledges}"
-);
+    my $query = dbh()->prepare( 
+        "select id, ref, title, target, date, name, detail" . # , latitude, longitude
+           "from pledges
+           where pin IS NULL 
+           AND pb_pledge_prominence(id) <> 'backpage'
+           order by id desc 
+        limit $CONF{number_of_pledges}"
+    );
 
     $query->execute;
 

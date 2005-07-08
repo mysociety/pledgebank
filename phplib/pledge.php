@@ -6,13 +6,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.111 2005-07-08 11:32:51 matthew Exp $
+ * $Id: pledge.php,v 1.112 2005-07-08 12:01:36 matthew Exp $
  * 
  */
 
 require_once '../../phplib/db.php';
 require_once 'fns.php';
-require_once 'person.php';
+require_once '../../phplib/person.php';
 
 require_once '../../phplib/utility.php';
 require_once '../../phplib/rabx.php';

@@ -5,7 +5,9 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.58 2005-07-08 00:50:13 francis Exp $
+// $Id: page.php,v 1.59 2005-07-08 12:01:36 matthew Exp $
+
+require_once '../../phplib/person.php';
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the

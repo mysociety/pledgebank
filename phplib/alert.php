@@ -5,9 +5,10 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.11 2005-07-06 01:57:08 francis Exp $
+// $Id: alert.php,v 1.12 2005-07-08 12:01:36 matthew Exp $
 
 require_once '../../phplib/mapit.php';
+require_once '../../phplib/person.php';
 
 /* alert_signup PERSON_ID EVENT_CODE PARAMS
  * 

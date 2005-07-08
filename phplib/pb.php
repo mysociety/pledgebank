@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.18 2005-07-08 11:32:51 matthew Exp $
+ * $Id: pb.php,v 1.19 2005-07-08 12:01:36 matthew Exp $
  * 
  */
 
@@ -16,7 +16,6 @@ require_once "../conf/general";
 
 require_once '../../phplib/db.php';
 require_once '../../phplib/stash.php';
-require_once '../phplib/person.php';
 require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
 require_once 'page.php';

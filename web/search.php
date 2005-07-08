@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.16 2005-06-29 08:51:51 francis Exp $
+// $Id: search.php,v 1.17 2005-07-08 18:08:31 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -56,7 +56,10 @@ function search() {
                 $out .= '<ul>';
                 while ($r = db_fetch_array($q)) {
                     $out .= '<li>';
-                    $out .= '<strong>' . round($r['distance'],1) . " km</strong> away: ";
+                    if (round($r['distance'],0) < 1) 
+                        $out .= '<strong>under 1 km</strong> away: ';
+                    else
+                        $out .= '<strong>' . round($r['distance'],0) . " km</strong> away: ";
                     $out .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
                     $out .= '</li>';
                 }

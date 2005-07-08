@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.51 2005-07-01 22:06:53 francis Exp $
+ * $Id: login.php,v 1.52 2005-07-08 00:50:13 francis Exp $
  * 
  */
 
@@ -260,7 +260,7 @@ function login_form($errors = array()) {
     /* Just render the form. */
     global $q_h_stash, $q_h_email, $q_h_name, $q_stash, $q_email, $q_name;
 
-    page_header(_('Checking your email address'));
+    page_header(_('Checking Your Email Address'));
 
     if (is_null($q_name))
         $q_name = $q_h_name = '';   /* shouldn't happen */

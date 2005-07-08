@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.43 2005-07-06 17:02:15 matthew Exp $
+// $Id: ref-index.php,v 1.44 2005-07-08 16:53:12 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -85,8 +85,9 @@ function draw_signatories($p) {
     print '<h2><a name="signers">' . _('Current signatories') . '</a></h2>';
 
     if ($nsigners == 0) {
+
         print '<p>'
-                . htmlspecialchars(sprintf(_('So far, only %s, the Pledge Creator, has signed this pledge.'), $p->name()))
+                . htmlspecialchars(sprintf(_('So far, only %s, the Pledge Creator, has signed this pledge.'), $p->creator_name()))
                 . '</p></div>';
         return;
     }
@@ -115,7 +116,7 @@ function draw_signatories($p) {
 
     if (!$limit)
         $out = '<p>'
-                htmlspecialchars(sprintf(_('%s, the Pledge Creator, joined by:'), $p->name()))
+                . htmlspecialchars(sprintf(_('%s, the Pledge Creator, joined by:'), $p->creator_name()))
                 . '</p>';
 
     $out .= "<ul>";

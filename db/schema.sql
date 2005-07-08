@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.129 2005-07-06 02:07:59 francis Exp $
+-- $Id: schema.sql,v 1.130 2005-07-08 16:53:12 francis Exp $
 --
 
 -- secret
@@ -1036,7 +1036,7 @@ create trigger abusereport_insert_trigger before insert on abusereport
     for each row execute procedure abusereport_id_check();
 
 create table requeststash (
-    key char(8) not null primary key,
+    key varchar(16) not null primary key check (length(key) = 8 or length(key) = 16),
     whensaved timestamp not null default pb_current_timestamp(),
     method text not null default 'GET' check (
             method = 'GET' or method = 'POST'

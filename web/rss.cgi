@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.9 2005-07-08 10:45:15 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.10 2005-07-08 16:53:12 francis Exp $';
 
 use strict;
 use warnings;
@@ -90,7 +90,7 @@ sub run {
 sub get_pledges {
 
     my $query = dbh()->prepare( 
-        "select id, ref, title, target, date, name, detail" . # , latitude, longitude
+        "select id, ref, title, target, date, name, detail " . # , latitude, longitude
            "from pledges
            where pin IS NULL 
            AND pb_pledge_prominence(id) <> 'backpage'

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.195 2005-07-08 12:01:37 matthew Exp $
+// $Id: index.php,v 1.196 2005-07-09 11:16:57 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -21,12 +21,12 @@ front_page();
 page_footer();
 
 function front_page() {
-    if (!local_uk_alert_subscribed()) {
-        $email = '';
-        $P = person_if_signed_on();
-        if (!is_null($P)) {
-            $email = $P->email();
-        } ?>
+    $email = '';
+    $P = person_if_signed_on();
+    if (!is_null($P)) {
+        $email = $P->email();
+    } 
+?>
 <form accept-charset="utf-8" id="localsignup" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_uk_alert" value="1">
 <p><strong><?=_('Get emails about local pledges') ?> &mdash;</strong>
@@ -35,7 +35,6 @@ function front_page() {
 
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
-<?  } ?>
 
 <div id="tellworld">
 <h2><?=_('Tell the world &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;') ?></h2>

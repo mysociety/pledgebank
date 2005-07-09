@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.12 2005-07-08 12:01:36 matthew Exp $
+// $Id: alert.php,v 1.13 2005-07-09 11:16:57 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -115,12 +115,8 @@ function local_uk_alert_subscribed() {
     
     $already_signed = db_getOne("select count(*) from alert where event_code = 'pledges/local/GB' 
             and person_id = ?", array($P->id()));
-    if ($already_signed == 0)
-        return false;
-    elseif ($already_signed == 1)
-        return true;
-    else
-        err("already_signed $already_signed times");
+
+    return ($already_signed > 0);
 }
 
 

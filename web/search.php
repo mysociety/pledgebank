@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.17 2005-07-08 18:08:31 francis Exp $
+// $Id: search.php,v 1.18 2005-07-10 01:12:16 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -13,12 +13,11 @@ require_once '../phplib/comments.php';
 require_once '../../phplib/mapit.php';
 
 page_header(_("Search Results"));
-print search();
+search();
 page_footer();
 
 function search() {
     $search = trim(get_http_var('q'));
-    $out = ''; 
     $success = 0;
 
     // Exact pledge reference match
@@ -30,10 +29,10 @@ function search() {
     if (db_num_rows($q)) {
         $success = 1;
         $r = db_fetch_array($q);
-        $out .= sprintf(p(_('Result <strong>exactly matching</strong> pledge <strong>%s</strong>:')), htmlspecialchars($search) );
-        $out .= '<ul><li>';
-        $out .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
-        $out .= '</li></ul>';
+        print sprintf(p(_('Result <strong>exactly matching</strong> pledge <strong>%s</strong>:')), htmlspecialchars($search) );
+        print '<ul><li>';
+        print pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+        print '</li></ul>';
     }
 
     // Postcodes
@@ -51,21 +50,20 @@ function search() {
                         ORDER BY distance', array($location['wgs84_lat'], $location['wgs84_lon'], 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon; ordered by distance?
             $closed = ''; $open = '';
             if (db_num_rows($q)) {
-                $out .= sprintf(p(_('Results for pledges near UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );
+                print sprintf(p(_('Results for pledges near UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );
                 $success = 1;
-                $out .= '<ul>';
+                print '<ul>';
                 while ($r = db_fetch_array($q)) {
-                    $out .= '<li>';
+                    print '<li>';
                     if (round($r['distance'],0) < 1) 
-                        $out .= '<strong>under 1 km</strong> away: ';
+                        print '<strong>under 1 km</strong> away: ';
                     else
-                        $out .= '<strong>' . round($r['distance'],0) . " km</strong> away: ";
-                    $out .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
-                    $out .= '</li>';
+                        print '<strong>' . round($r['distance'],0) . " km</strong> away: ";
+                    print pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+                    print '</li>';
                 }
-                $out .= '</ul>';
+                print '</ul>';
             }
-
         }
     }
  
@@ -96,13 +94,13 @@ function search() {
     }
 
     if ($open) {
-        $out .= sprintf(p(_('Results for <strong>open pledges</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
-        $out .= '<ul>' . $open . '</ul>';
+        print sprintf(p(_('Results for <strong>open pledges</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
+        print '<ul>' . $open . '</ul>';
     }
 
     if ($closed) {
-        $out .= sprintf(p(_('Results for <strong>closed pledges</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
-        $out .= '<ul>' . $closed . '</ul>';
+        print sprintf(p(_('Results for <strong>closed pledges</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
+        print '<ul>' . $closed . '</ul>';
     }
 
     // Comments
@@ -118,14 +116,14 @@ function search() {
                    ORDER BY whenposted DESC', array($search));
     if (db_num_rows($q)) {
         $success = 1;
-        $out .= sprintf(p(_("Results for <strong>comments</strong> matching <strong>%s</strong>:")), htmlspecialchars($search) );
-        $out .= '<ul>';
+        print sprintf(p(_("Results for <strong>comments</strong> matching <strong>%s</strong>:")), htmlspecialchars($search) );
+        print '<ul>';
         while($r = db_fetch_array($q)) {
-            $out .= '<li>';
-            $out .= comment_summary($r);
-            $out .= '</li>';
+            print '<li>';
+            print comment_summary($r);
+            print '</li>';
         }
-        $out .= '</ul>';
+        print '</ul>';
     }
 
     // Signers and creators (NOT people, as we only search for publically visible names)
@@ -140,24 +138,40 @@ function search() {
     }
     if (sizeof($people)) {
         $success = 1;
-        $out .= sprintf(p(_('Results for <strong>people</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
-        $out .= '<dl>';
+        print sprintf(p(_('Results for <strong>people</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
+        print '<dl>';
         ksort($people);
         foreach ($people as $name => $array) {
-            $out .= '<dt><b>'.htmlspecialchars($name). '</b></dt> <dd>';
+            print '<dt><b>'.htmlspecialchars($name). '</b></dt> <dd>';
             foreach ($array as $item) {
-                $out .= '<dd>';
-                $out .= '<a href="' . $item[0] . '">' . $item[1] . '</a>';
-                if ($item[2] == 'creator') $out .= _(" (creator)");
-                $out .= '</dd>';
+                print '<dd>';
+                print '<a href="' . $item[0] . '">' . $item[1] . '</a>';
+                if ($item[2] == 'creator') print _(" (creator)");
+                print '</dd>';
             }
         }
-        $out .= '</dl>';
+        print '</dl>';
     }
 
     if (!$success) {
-        $out .= sprintf(p(_('Sorry, we could find nothing that matched "%s".')), htmlspecialchars($search) );
+        print sprintf(p(_('Sorry, we could find nothing that matched "%s".')), htmlspecialchars($search) );
     }
-    return $out;
+
+    if (validate_postcode($search)) {
+        $email = '';
+        $P = person_if_signed_on();
+        if (!is_null($P)) {
+            $email = $P->email();
+        } 
+?>
+<form accept-charset="utf-8" id="localsignupsearch" name="localalert" action="/alert" method="post">
+<input type="hidden" name="subscribe_local_uk_alert" value="1">
+<p><strong><?=_('Get daily email about new local pledges') ?> &mdash;</strong>
+<label for="email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
+<label for="postcode"><?=_('UK Postcode:') ?></label><input type="text" size="12" name="postcode" id="postcode" value="<?=htmlspecialchars($search)?>">
+<input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
+</form>
+<?
+    }
 }
 

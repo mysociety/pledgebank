@@ -34,7 +34,7 @@
 #   backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.120 2005-07-10 00:40:23 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.121 2005-07-10 10:40:46 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -641,7 +641,7 @@ sub do_public_succeeding_pledge {
             $wth->browser_check_contents(name_n($i));
         }
         # Check got success emails
-        my $success_email = $wth->email_get_containing( '%To: '.email_n($i).'%Congratulations%');
+        my $success_email = $wth->email_get_containing( '%To: '.email_n($i).'%We are pleased to tell you%');
     }
     $wth->log_watcher_check();
 
@@ -1015,11 +1015,11 @@ sub do_sms_pledge {
     # Let pledge succeed
     set_pb_date('1982-03-09');
     call_frequentupdate();
-    my $success_email = $wth->email_get_containing( '%To: '.email_n(100).'%Congratulations%');
+    my $success_email = $wth->email_get_containing( '%To: '.email_n(100).'%We are pleased to tell you%');
     die "Announce link not found\n" if ($success_email !~ m#^($base_url.*$)#m);
     my $announce_link = $1;
     display_url("Announce URL", $announce_link);
-    $wth->email_get_containing( '%To: '.email_n(105).'%Congratulations%');
+    $wth->email_get_containing( '%To: '.email_n(105).'%We are pleased to tell you%');
     # Send announce message
     $wth->browser_get($announce_link);
     $wth->browser_check_contents("Send Announcement");

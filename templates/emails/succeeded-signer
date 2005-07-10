@@ -7,13 +7,12 @@ We are pleased to tell you that the pledge you signed up to
 The pledge, created by <?=$values['creator_name']?>, reads:
 '<?=$values['sentence_first']?>'
 
-Now it is your turn to do what you pledged.  <?=$values['creator_name']?> will
-email you soon to give you any further information you need.
-
-To see who else signed up, please follow this link:
-<?=$values['pledge_url']?>
+Now it is your turn to do what you pledged.
+<?=$values['creator_name']?> will email you soon to give you any
+further information you need.  Why not take some photos of yourself
+carrying out your pledge?  We love to see PledgeBank in action.
 
 <?=$values['signature']?>
 
-P.S. Why not take some photos of yourself carrying out your pledge?  We love to
-see PledgeBank in action.
+P.S. If you enjoyed this pledge, you can get email about *new* pledges in your
+area.  Click here and enter your postcode: <?=$values['local_alert_url']?>

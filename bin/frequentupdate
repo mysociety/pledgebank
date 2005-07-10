@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.44 2005-07-08 12:01:35 matthew Exp $
+ * $Id: frequentupdate,v 1.45 2005-07-10 10:40:46 francis Exp $
  *
  */
 
@@ -453,9 +453,15 @@ function send_pending_messages() {
                     array($r['signer_mobile'], $r['sms'], time()));
             $f = true;
         } elseif (isset($r['emailtemplatename'])) {
+            /* Local alert signup link */
+            $data = $pledge;
+            if ($r['emailtemplatename'] == 'succeeded-signer') {
+                $data['local_alert_url'] = person_make_signon_url(null, $r['signer_email'], "GET", OPTION_BASE_URL . "/alert", array());
+            }
+
             /* Send email template. */
             verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
-            $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $pledge, $headers);
+            $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $data, $headers);
         } else {
             /* Send raw mail. */
             $emailbody = $r['emailbody'];

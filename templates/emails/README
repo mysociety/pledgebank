@@ -77,6 +77,7 @@ Sent to each signer when a pledge succeeds.
   - execeeded_or_met, either the word "met" or "exceeded" according to whether
     pledge went over target or not.
   - signer_name, name of the signer this email is going to.
+  - local_alert_url, for signup to local email alerts
 
 ***************************************************************************
 

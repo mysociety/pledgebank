@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.56 2005-07-10 00:40:23 francis Exp $
+// $Id: new.php,v 1.57 2005-07-10 10:40:46 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -72,7 +72,24 @@ the door of that neighbour whose name you've forgotten.") ?></li>
         $p = new Pledge($ref);
         $data['title'] = $p->title();
         $data['target'] = 5;
-        $data['type'] = 'people in my street';
+        $data['type'] = _('people in my street');
+    }
+
+    if (get_http_var('streetparty')) {
+        # Remember to change the error handling code down below if you change <MY STREET>
+        $data['title'] = _("organise a street party for <MY STREET>");
+        $data['target'] = 3;
+        $data['type'] = _('other people on <MY STREET>');
+        $data['signup'] = _('help organise it');
+        $data['identity'] = _('resident of <MY STREET>');
+    }
+
+    if (get_http_var('picnic')) {
+        $data['title'] = _("organise a picnic this summer");
+        $data['target'] = 5;
+        $data['type'] = _('friends');
+        $data['signup'] = _('pledge to come along and bring food or drink');
+        $data['identity'] = _('picnic lover');
     }
 
     global $pb_time;
@@ -91,7 +108,7 @@ the door of that neighbour whose name you've forgotten.") ?></li>
 <p><strong>I will</strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
 <p><strong>but only if</strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="Target number of people" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
-<input type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):'other local people') ?>"></p>
+<input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):'other local people') ?>"></p>
 
 <p><strong>will</strong> <input type="text" id="signup" name="signup"
 size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'do the same') ?>">.</p>
@@ -109,7 +126,7 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 
 <p><?=_('On flyers and elsewhere, after your name, how would you like to be described? (optional)') ?>
 <br><small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
-<input type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
+<input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
 
 <p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically spotted, no markup needed)') ?></small>
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
@@ -361,6 +378,11 @@ function step1_error_check($data) {
     if (!$data['name']) $errors['name'] = _('Please enter your name');
     if (!$data['email']) $errors['email'] = _('Please enter your email address');
     if (!validate_email($data['email'])) $errors['email'] = _('Please enter a valid email address');
+
+    $mystreetmessage = htmlspecialchars(_('Please change <MY STREET> to the name of your street'));
+    if (stristr($data['title'], "<MY STREET>")) $errors['title'] = $mystreetmessage;
+    if (stristr($data['type'], "<MY STREET>")) $errors['type'] = $mystreetmessage;
+    if (stristr($data['identity'], "<MY STREET>")) $errors['identity'] = $mystreetmessage;
 
     return $errors;
 }

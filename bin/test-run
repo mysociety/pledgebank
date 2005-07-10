@@ -34,7 +34,7 @@
 #   backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.119 2005-07-08 16:53:12 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.120 2005-07-10 00:40:23 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1092,7 +1092,7 @@ sub do_login_tests {
         { title => $pledge_action_login_2, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_2 },
-        { country => 'UK', 'local' => 1, postcode => 'SN8 1PA' }, # Marlborough College
+        { country => 'UK', 'local' => 1, postcode => 'SN8' }, # Somewhere near Marlborough
         { action => "viaemail", setpassword => 1 }
     );
     # Log out again
@@ -1137,7 +1137,7 @@ sub do_login_tests {
 
     # Check local alert for two pledges at once works
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(250).  '%There are 2 new pledge%login2%login1%');
+    $wth->email_get_containing('%To: '.email_n(250).  '%There are 2 new pledge%login1%login2%');
     $wth->email_check_none_left();
 
     # Sign all the pledges as another user

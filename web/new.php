@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.55 2005-07-08 12:01:37 matthew Exp $
+// $Id: new.php,v 1.56 2005-07-10 00:40:23 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -228,7 +228,8 @@ is fulfilled?
 <!-- If yes, enter your postcode so that local people can find your pledge: -->
 <?=_('If yes, enter any postcode that is in the local area:') ?>
 <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
-<small><?=_('(This will be used so people who live nearby can find your pledge)') ?></small>
+<small><?=_('(This will be used so people who live nearby can find your pledge.  You can enter
+just the start of the postcode, such as WC1, if you like.)') ?></small>
 </span>
 </p>
 
@@ -396,11 +397,11 @@ function step2_error_check($data) {
             $errors['local'] = _('Please choose whether the pledge is local or not');
         if ($data['local']) {
             if (!$data['postcode']) 
-                $errors['postcode'] = _('For local pledges, please enter a postcode');
-            else if (!validate_postcode($data['postcode'])) 
-                $errors['postcode'] = _('Please enter a valid postcode, such as OX1 3DR');
-            else if (mapit_get_error(mapit_get_location($data['postcode'])))
-                $errors['postcode'] = _("We couldn't recognise that postcode; please re-check it");
+                $errors['postcode'] = _('For local pledges, please enter a postcode or the first part of a postcode');
+            else if (!validate_postcode($data['postcode']) && !validate_partial_postcode($data['postcode'])) 
+                $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode.  For example OX1 3DR or WC1.');
+            else if (mapit_get_error(mapit_get_location($data['postcode'], 1)))
+                $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
         }
     }
     if ($data['visibility'] == 'pin' && !$data['pin']) 
@@ -609,7 +610,7 @@ function create_new_pledge($P, $data) {
         $latitude = null;
         $longitude = null;
         if ($data['postcode']) {
-            $location = mapit_get_location($data['postcode']);
+            $location = mapit_get_location($data['postcode'], 1);
             if (mapit_get_error($location)) {
                 /* This error should never happen, as earlier postcode validation in form will stop it */
                 err('Invalid postcode while setting alert, please check and try again.');

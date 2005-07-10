@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.130 2005-07-08 16:53:12 francis Exp $
+-- $Id: schema.sql,v 1.131 2005-07-10 12:12:30 chris Exp $
 --
 
 -- secret
@@ -225,6 +225,12 @@ create function pledge_find_nearby(double precision, double precision, double pr
             and (abs(radians($1)) + ($3 / R_e()) > pi() / 2     -- case where search pt is near pole
                     or angle_between(radians(longitude), radians($2))
                             < $3 / (R_e() * cos(radians($1 + $3 / R_e()))))
+            -- ugly -- unable to use attribute name "distance" here, sadly
+            and R_e() * acos(
+                sin(radians($1)) * sin(radians(latitude))
+                + cos(radians($1)) * cos(radians(latitude))
+                    * cos(radians($2 - longitude))
+                ) < $3
         order by distance desc
 ' language sql;
 

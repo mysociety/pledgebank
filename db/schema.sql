@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.131 2005-07-10 12:12:30 chris Exp $
+-- $Id: schema.sql,v 1.132 2005-07-11 12:40:34 francis Exp $
 --
 
 -- secret
@@ -946,14 +946,6 @@ create index comment_pledge_id_idx on comment(pledge_id);
 create index comment_pledge_id_whenposted_idx on comment(pledge_id, whenposted);
 
 -- Alerts and notifications
-
--- OBSOLETE old place for local alerts
-create table local_alert (
-    person_id integer references person(id), 
-    postcode text not null 
-);
-
-create unique index local_alert_person_id_idx on local_alert(person_id);
 
 -- get emailed when various events happen
 create table alert (

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.82 2005-07-08 11:32:51 matthew Exp $
+ * $Id: admin-pb.php,v 1.83 2005-07-11 15:02:19 francis Exp $
  * 
  */
 
@@ -169,7 +169,7 @@ class ADMIN_PAGE_PB_MAIN {
         print "</p>";
 
         // Prominence
-        print '<form method="post" action="'.$this->self_link.'">';
+        print '<form name="prominenceform" method="post" action="'.$this->self_link.'">';
         print '<input type="hidden" name="update_prom" value="1">';
         print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
         print 'Prominence: ';
@@ -208,7 +208,7 @@ class ADMIN_PAGE_PB_MAIN {
             $out[$e] = '<td>'.$e.'</td>';
             $out[$e] .= '<td>'.prettify($r['signtime']).'</td>';
 
-            $out[$e] .= '<td><form method="post" action="'.$this->self_link.'"><input type="hidden" name="showname_signer_id" value="' . $r['signid'] . '">';
+            $out[$e] .= '<td><form name="shownameform" method="post" action="'.$this->self_link.'"><input type="hidden" name="showname_signer_id" value="' . $r['signid'] . '">';
             $out[$e] .= '<select name="showname">';
             $out[$e] .=  '<option value="1"' . ($r['showname'] == 't'?' selected':'') . '>Yes</option>';
             $out[$e] .=  '<option value="0"' . ($r['showname'] == 'f'?' selected':'') . '>No</option>';
@@ -217,7 +217,7 @@ class ADMIN_PAGE_PB_MAIN {
             $out[$e] .= '</form></td>';
 
             $out[$e] .= '<td>';
-            $out[$e] .= '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_signer_id" value="' . $r['signid'] . '"><input type="submit" name="remove_signer" value="Remove signer permanently"></form>';
+            $out[$e] .= '<form name="removesignerform" method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_signer_id" value="' . $r['signid'] . '"><input type="submit" name="remove_signer" value="Remove signer permanently"></form>';
             $out[$e] .= '</td>';
         }
         if ($sort == 'e') {
@@ -301,7 +301,7 @@ class ADMIN_PAGE_PB_MAIN {
         while ($r = db_fetch_array($q)) {
             $cats[$r['category_id']] = 1;
         }
-        print '<form method="post" action="'.$this->self_link.'">
+        print '<form name="categoriesform" method="post" action="'.$this->self_link.'">
             <input type="hidden" name="pledge_id" value="'.$pdata['id'].'">
             <input type="hidden" name="update_cats" value="1">
             <h2>Categories</h2>
@@ -320,9 +320,9 @@ class ADMIN_PAGE_PB_MAIN {
         print '</select> <input type="submit" value="Update"></p></form>';
 
         print '<h2>Actions</h2>';
-        print '<form method="post" action="'.$this->self_link.'"><input type="hidden" name="send_announce_token_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="send_announce_token" value="Send announce URL to creator"></form>';
+        print '<form name="sendannounceform" method="post" action="'.$this->self_link.'"><input type="hidden" name="send_announce_token_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="send_announce_token" value="Send announce URL to creator"></form>';
 
-print '<form method="post" action="'.$this->self_link.'"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
+print '<form name="removepledgepermanentlyform" method="post" action="'.$this->self_link.'"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
 
     }
 
@@ -712,7 +712,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
 
         if (db_num_rows($q) > 0) {
 
-            print '<form method="POST" action="'.$this->self_link.'"><input type="hidden" name="prev_url" value="'
+            print '<form name="discardreportsform" method="POST" action="'.$this->self_link.'"><input type="hidden" name="prev_url" value="'
                         . htmlspecialchars($self_link) . '">';
             print '
     <p><input type="submit" name="discardReports" value="Discard selected abuse reports"></p>

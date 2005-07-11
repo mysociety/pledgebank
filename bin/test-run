@@ -34,7 +34,7 @@
 #   backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.121 2005-07-10 10:40:46 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.122 2005-07-11 15:02:19 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -133,6 +133,7 @@ our $login_count; # reference to hash of person number => how many times they've
 # Configure test harness class
 print "Set up web test harness...\n" if $verbose > 0;
 our $wth = new mySociety::WebTestHarness({db_option_prefix => 'PB_'});
+
 $wth->log_watcher_setup($httpd_error_log);
 $wth->database_drop_reload('../db/schema.sql');
 $wth->database_load_schema('../db/ican-categories.sql');
@@ -1216,6 +1217,34 @@ sub do_admin_tests {
     $wth->browser_check_contents(qr/$name/);
     $wth->browser_check_contents(qr/Discard selected abuse reports/);
 
+    # Delete a signer
+    $wth->browser_get($admin_url . "/?page=pb&pledge=smsspoof");
+    $wth->browser_check_contents("pretend to be an SMS aggregating service");
+    $wth->browser_check_contents(mobile_n(102));
+    $wth->browser_follow_link(text_regex => qr/Pledges and Signers/);
+    $wth->browser_submit_form(form_number => 3,
+            fields => { }, button => 'remove_signer') or die "Failed to remove signer";
+    $wth->browser_check_contents("signer has been successfully removed");
+    $wth->browser_check_contents("pretend to be an SMS aggregating service");
+    $wth->browser_check_no_contents(mobile_n(102));
+    # ... and another
+    $wth->browser_check_contents("pretend to be an SMS aggregating service");
+    $wth->browser_check_contents(mobile_n(105));
+    $wth->browser_check_contents(name_n(105));
+    $wth->browser_submit_form(form_number => 7,
+            fields => { }, button => 'remove_signer') or die "Failed to remove signer";
+    $wth->browser_check_contents("signer has been successfully removed");
+    $wth->browser_check_contents("pretend to be an SMS aggregating service");
+    $wth->browser_check_no_contents(mobile_n(105));
+    $wth->browser_check_no_contents(email_n(105));
+
+    # Delete a pledge
+    $wth->browser_get($admin_url . "/?page=pb&pledge=smsspoof");
+    $wth->browser_submit_form(form_name => 'removepledgepermanentlyform',
+            fields => { }, button => 'remove_pledge') or die "Failed to remove pledge";
+    $wth->browser_check_contents("pledge has been successfully removed");
+    $wth->browser_check_no_contents("smsspoof");
+
     # Check there were no errors
     $wth->log_watcher_check();
 }
@@ -1224,8 +1253,9 @@ sub do_admin_tests {
 sub do_final_checks {
     # Check RSS works and has correct entries
     $wth->browser_get($base_url . "/rss");
-    $wth->browser_check_contents(qr/pretend to be an SMS aggregating service \(target 2, deadline 1982-03-10\)/);
+    $wth->browser_check_contents(qr/carry on making even more pledges forever and ever and ever (target 3, deadline 1983-06-07)/);
     $wth->browser_check_contents(qr/make sure a pledge can be completed \(target 3, deadline 1982-02-10\)/);
+    $wth->browser_check_no_contents(qr/pretend to be an SMS aggregating service \(target 2, deadline 1982-03-10\)/); # has been deleted earlier
     $wth->browser_check_no_contents("privatepledge");
 
     # Check there were no errors

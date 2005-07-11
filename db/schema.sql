@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.132 2005-07-11 12:40:34 francis Exp $
+-- $Id: schema.sql,v 1.133 2005-07-11 15:02:19 francis Exp $
 --
 
 -- secret
@@ -1088,7 +1088,6 @@ create function pb_delete_signer(integer)
         delete from abusereport where what_id = $1 and what = ''signer'';
         delete from message_signer_recipient where signer_id = $1;
         delete from smssubscription where signer_id = $1;
-        delete from alert_sent where signer_id = $1;
         delete from signers where id = $1;
         return;
     end

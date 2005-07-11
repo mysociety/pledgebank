@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.83 2005-07-11 15:02:19 francis Exp $
+ * $Id: admin-pb.php,v 1.84 2005-07-11 16:55:02 francis Exp $
  * 
  */
 
@@ -190,7 +190,8 @@ class ADMIN_PAGE_PB_MAIN {
                          showname, signers.id AS signid 
                    FROM signers 
                    LEFT JOIN person ON person.id = signers.person_id
-                   WHERE pledge_id=?';
+                   WHERE pledge_id=?
+                   ORDER by signers.id';
         if ($sort=='t') $query .= ' ORDER BY signtime DESC';
         elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
         $q = db_query($query, $pdata['id']);

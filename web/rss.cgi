@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.10 2005-07-08 16:53:12 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.11 2005-07-11 16:55:03 francis Exp $';
 
 use strict;
 use warnings;
@@ -22,6 +22,7 @@ BEGIN {
     mySociety::Config::set_file("$FindBin::Bin/../conf/general");
 }
 use mySociety::DBHandle qw(dbh);
+use mySociety::WatchUpdate;
 use PB;
 
 # Hardcoded variables - should be in central conf file.
@@ -31,12 +32,14 @@ my %CONF = ( number_of_pledges => 20,
 
 # Other modules we need.
 use XML::RSS;
-use CGI;
-use FCGI;
+use CGI::Carp;
+use CGI::Fast qw(-no_xhtml);
 
 # Run as a FCGI.
-my $request = FCGI::Request();
-while ( $request->Accept() >= 0 ) {
+my $W = new mySociety::WatchUpdate();
+our $request;
+while ( $request = new CGI::Fast() ) {
+    $W->exit_if_changed();
     run();
 }
 
@@ -48,7 +51,7 @@ sub run {
     my $rss = new_rss_object();
 
     # Get the data from the database.
-    my $pledges = get_pledges();
+    my $pledges = get_pledges($request->param('type'));
 
     # Add the pledges to the RSS.
     foreach my $pledge (@$pledges) {
@@ -64,16 +67,14 @@ sub run {
             link        => $CONF{base_url} . $$pledge{ref},
             description => $description,
         };
-        # This adds geocoding, which would be cool but we need to safely
-        # obfuscate the exact latitude/longitude so it isn't a privacy leak.
-=comment
+        # Add geocoding (not a privacy leak to give exact coordinates, as they
+        # are mean coordinates of a whole partial postcode area)
         if ($$pledge{latitude} && $$pledge{longitude}) {
             $params->{geo} = {
                 lat => $$pledge{latitude},
                 lon => $$pledge{longitude},
             }
         }
-=cut
        $rss->add_item(%$params);
     }
 
@@ -88,15 +89,21 @@ sub run {
 
 # Get the pledges
 sub get_pledges {
+    my $type = shift;
 
-    my $query = dbh()->prepare( 
-        "select id, ref, title, target, date, name, detail " . # , latitude, longitude
-           "from pledges
+    my $query_text = "select id, ref, title, target, date, name, detail, latitude, longitude
+           from pledges
            where pin IS NULL 
-           AND pb_pledge_prominence(id) <> 'backpage'
-           order by id desc 
-        limit $CONF{number_of_pledges}"
-    );
+           AND pb_pledge_prominence(id) <> 'backpage' ";
+
+    if ($type && $type eq 'all') {
+        $query_text .= " order by id desc ";
+    } else {
+        $query_text .= " order by id desc 
+               limit $CONF{number_of_pledges}";
+    }
+
+    my $query = dbh()->prepare($query_text);
 
     $query->execute;
 

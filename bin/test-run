@@ -15,9 +15,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 
 # TODO, add test code for:
-#   Nameless signups
 #   "identity" column
-#   UK postcoded pledges
 #   categories
 #   PDF and RTF stuff from poster.cgi
 #   SMS on failure
@@ -25,16 +23,14 @@
 #   Remember Me button (how do we test Cookie expirty with WWW::Mechanize?)
 #   Picture uploading
 #   Info page graph
-#   Info page announcement archive
-#   Admin:  Test delete signer, and delete pledge.
 #   test algorithmic prominence stuff
 #   Log in with wrong password
 #   Search
 #   Fuzzy pledge ref match
-#   backpage pledges
+#   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.122 2005-07-11 15:02:19 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.123 2005-07-11 16:55:01 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1222,7 +1218,7 @@ sub do_admin_tests {
     $wth->browser_check_contents("pretend to be an SMS aggregating service");
     $wth->browser_check_contents(mobile_n(102));
     $wth->browser_follow_link(text_regex => qr/Pledges and Signers/);
-    $wth->browser_submit_form(form_number => 3,
+    $wth->browser_submit_form(form_number => 5,
             fields => { }, button => 'remove_signer') or die "Failed to remove signer";
     $wth->browser_check_contents("signer has been successfully removed");
     $wth->browser_check_contents("pretend to be an SMS aggregating service");
@@ -1253,7 +1249,7 @@ sub do_admin_tests {
 sub do_final_checks {
     # Check RSS works and has correct entries
     $wth->browser_get($base_url . "/rss");
-    $wth->browser_check_contents(qr/carry on making even more pledges forever and ever and ever (target 3, deadline 1983-06-07)/);
+    $wth->browser_check_contents(qr/carry on making even more pledges forever and ever and ever \(target 3, deadline 1983-06-07\)/);
     $wth->browser_check_contents(qr/make sure a pledge can be completed \(target 3, deadline 1982-02-10\)/);
     $wth->browser_check_no_contents(qr/pretend to be an SMS aggregating service \(target 2, deadline 1982-03-10\)/); # has been deleted earlier
     $wth->browser_check_no_contents("privatepledge");

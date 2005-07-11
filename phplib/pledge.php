@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.112 2005-07-08 12:01:36 matthew Exp $
+ * $Id: pledge.php,v 1.113 2005-07-11 12:09:39 francis Exp $
  * 
  */
 
@@ -193,7 +193,7 @@ class Pledge {
 <? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
 &quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
-<p><?=_('Deadline:') ?> <strong><?=$this->h_pretty_date()?></strong>.
+<p><?=_('Deadline to sign up by:') ?> <strong><?=$this->h_pretty_date()?></strong>.
 <br>
 <?      if ($this->signers() >= 0) {
             print '<i>';

@@ -8,8 +8,11 @@ Values which are available in all emails are:
   - ref, pledge reference;
   - title, many body text of the pledge saying what pledge setter will do;
   - target, how many people are needed for the pledge to succeed;
+  - signers, how many people have signed up so far;
   - type, description of the people, e.g. "residents of Eglwysbach";
   - signup, description of what pledge signers will do;
+
+  - signers_ordinal, signers as an ordinal 1st, 2nd, 3rd;
 
   - creator_name, name of pledge creator
   - creator_email, email of pledge creator (don't leak this where it shouldn't be)

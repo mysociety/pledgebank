@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.50 2005-07-08 12:01:36 matthew Exp $
+// $Id: fns.php,v 1.51 2005-07-11 12:09:39 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once '../../phplib/person.php';
@@ -47,6 +47,9 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
     if (array_key_exists('email', $values)) {
         $values['creator_email'] = $values['email'];
         $values['email'] = null;
+    }
+    if (array_key_exists('signers', $values)) {
+        $values['signers_ordinal'] = english_ordinal($values['signers']);
     }
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
         

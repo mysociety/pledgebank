@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.123 2005-07-11 16:55:01 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.124 2005-07-11 17:09:55 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1216,18 +1216,9 @@ sub do_admin_tests {
     # Delete a signer
     $wth->browser_get($admin_url . "/?page=pb&pledge=smsspoof");
     $wth->browser_check_contents("pretend to be an SMS aggregating service");
-    $wth->browser_check_contents(mobile_n(102));
-    $wth->browser_follow_link(text_regex => qr/Pledges and Signers/);
-    $wth->browser_submit_form(form_number => 5,
-            fields => { }, button => 'remove_signer') or die "Failed to remove signer";
-    $wth->browser_check_contents("signer has been successfully removed");
-    $wth->browser_check_contents("pretend to be an SMS aggregating service");
-    $wth->browser_check_no_contents(mobile_n(102));
-    # ... and another
-    $wth->browser_check_contents("pretend to be an SMS aggregating service");
     $wth->browser_check_contents(mobile_n(105));
     $wth->browser_check_contents(name_n(105));
-    $wth->browser_submit_form(form_number => 7,
+    $wth->browser_submit_form(form_number => 9,
             fields => { }, button => 'remove_signer') or die "Failed to remove signer";
     $wth->browser_check_contents("signer has been successfully removed");
     $wth->browser_check_contents("pretend to be an SMS aggregating service");

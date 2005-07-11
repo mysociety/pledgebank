@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.16 2005-07-02 00:11:02 francis Exp $
+// $Id: abuse.php,v 1.17 2005-07-11 20:45:45 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -36,15 +36,23 @@ function report_abusive_thing() {
 
     /* Find information about the associated pledge. */
     $w = $q_what;
+    $more = '';
     if ($q_what == 'pledge') {
         $w = _('pledge');
         $pledge_id = db_getOne('select id from pledges where id = ?', $q_id);
+        $P = new Pledge(int($q_id));
+        $more = "Pledge ref: " . $P->ref()
+                . "\nPledge: " . $P->title() . "\n";
     } elseif ($q_what == 'comment') {
         $w = _('comment');
         $pledge_id = db_getOne('select pledge_id from comment where id = ?', $q_id);
+        $more = "Pledge ref: " . db_getOne('select ref from pledges where id = ?', $pledge_id)
+                . "\nAuthor: " . db_getOne('select name from comment where id = ?', $q_id)
+                . "\nText: " . db_getOne('select text from comment where id = ?', $q_id); /* XXX */
     } elseif ($q_what == 'signer') {
         $w = _('signature');
         $pledge_id = db_getOne('select pledge_id from signers where id = ?', $q_id);
+        $more = "Signer: " . db_getOne('select name from signers where id = ?', $q_id) . "\n";
     }
 
     if (is_null($pledge_id)) {
@@ -61,6 +69,8 @@ function report_abusive_thing() {
         $admin_url = OPTION_ADMIN_URL . "/?page=pbabusereports&what=" . $q_what;
         pb_send_email(OPTION_CONTACT_EMAIL, _("PledgeBank abuse report"), _(<<<EOF
 New abuse report for $q_what id $q_id from IP $ip.
+
+$more
 
 $admin_url
 

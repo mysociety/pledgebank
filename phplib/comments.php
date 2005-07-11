@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.32 2005-07-08 12:01:36 matthew Exp $
+ * $Id: comments.php,v 1.33 2005-07-11 20:50:59 chris Exp $
  * 
  */
 
@@ -118,10 +118,9 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
     print "</div>";
 }
 
-/* comment_summary COMMENT 
- * Display comment for index, such as front page or search results.
- */
-function comment_summary($r) {
+/* comments_summary COMMENT 
+ * Display comment for index, such as front page or search results. */
+function comments_summary($r) {
     $text = $r['text'];
     if (strlen($text) > 20) $text = substr($text, 0, 20) . '...';
     $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . $text . '</a>';
@@ -129,8 +128,9 @@ function comment_summary($r) {
     return sprintf(_('%s by %s, on pledge %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
 }
 
-function latest_comments() { 
-    $comments_to_show = 10;
+/* comments_show_latest [NUM]
+ * Show a brief summary of the NUM (default 10) most recent comments. */
+function comments_show_latest($comments_to_show = 10) { 
     $q = db_query("
                 SELECT comment.id,
                     extract(epoch from whenposted) as whenposted, text,
@@ -147,7 +147,7 @@ function latest_comments() {
         print '<ul>';
         while($r = db_fetch_array($q)) {
             print '<li>';
-            print comment_summary($r);
+            print comments_summary($r);
             #        comments_show_one($r, true);
             print '</li>';
         }
@@ -155,6 +155,11 @@ function latest_comments() {
     }
 }
 
+/* comments_form PLEDGE N [ALLOWPOST]
+ * Show a form for entering a comment on the given PLEDGE. N is a number which
+ * should be increased each time the form is shown; unless ALLOWPOST is set,
+ * the form displays only a button to preview the comment, rather than to
+ * finally post it. */
 function comments_form($pledge_id, $nextn, $allow_post = false) {
     global $q_h_comment_id;
     global $q_h_author_name, $q_h_author_email, $q_h_author_website, $q_comment_alert_signup;

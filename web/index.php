@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.197 2005-07-10 01:12:16 francis Exp $
+// $Id: index.php,v 1.198 2005-07-11 20:50:59 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -65,7 +65,7 @@ only if 5 other people will do the same".') ?>
 <div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-text-275px.jpg" alt="<?=_('How scissors, a phone and some printouts
 can make your pledge succeed &raquo;') ?>"></a></div>
 
-<?  latest_comments();
+<?  comments_show_latest();
 
     //list_newest_pledges();
 }

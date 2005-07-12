@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.5 2005-06-29 08:51:51 francis Exp $
+// $Id: list.php,v 1.6 2005-07-12 19:08:10 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -16,7 +16,7 @@ define('PAGE_SIZE', 50);
 
 $err = importparams(
             array('offset', '/^(0|[1-9]\d*)$/', '', 0),
-            array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete)$/', '', 'default'),
+            array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete|category)$/', '', 'default'),
             array('type', '/^[a-z_]*$/', '', 'open')
         );
 if ($err) {
@@ -57,6 +57,11 @@ if ($q_sort == 'percentcomplete') {
     $sort_phrase = "( 
                 (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id)::numeric
                 / target) DESC";
+}
+if ($q_sort == 'category') {
+    $sort_phrase = "(SELECT name FROM pledge_category, category WHERE 
+            pledge_category.category_id = category.id AND parent_category_id IS NULL AND 
+            pledge_category.pledge_id = pledges.id LIMIT 1)";
 }
 $qrows = db_query("
         SELECT *, (SELECT count(*) FROM signers
@@ -106,12 +111,13 @@ if ($ntotal > 0) {
                  /* 'target'=>_('Target'), */
                  'date'=>_('Deadline'), 
                  'percentcomplete' => _('Percent signed'), 
+                 'category' => _('Category'), 
                  );
     # Removed as not useful (search is better for these): 'ref'=>'Short name',
     # 'title'=>'Title', 'name'=>'Creator'
     foreach ($arr as $s => $desc) {
         if ($q_sort != $s) $navlinks .= "<a href=\"?sort=$s$off\">$desc</a>"; else $navlinks .= $desc;
-        if ($s != 'percentcomplete') $navlinks .= ' | ';
+        if ($s != 'category') $navlinks .= ' | ';
     }
     $navlinks .= '</p> <p align="center">';
     $navlinks .= $prev . ' | '._('Pledges'). ' ' . ($q_offset + 1) . ' &ndash; ' . 
@@ -123,8 +129,18 @@ print $navlinks;
 
 if ($ntotal > 0) {
     $c = 0;
+    $lastcategory = '';
     while (list($id) = db_fetch_row($qrows)) {
         $pledge = new Pledge(intval($id));
+        if ($q_sort == "category") {
+            $categories = $pledge->categories();
+            $thiscategory = array_pop($categories);
+            if ($lastcategory <> $thiscategory) {
+                print "<h2 style=\"clear:both\">$thiscategory</h2>";
+                $c = 0;
+                $lastcategory = $thiscategory;
+            }
+        }
         $arr = array('class'=>"pledge-".$c%2, 'href' => $pledge->url_main() );
         if ($q_type == 'succeeded_closed' || $q_type == 'failed') $arr['closed'] = true;
         $pledge->render_box($arr);

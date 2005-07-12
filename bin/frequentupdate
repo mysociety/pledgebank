@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.46 2005-07-11 12:09:39 francis Exp $
+ * $Id: frequentupdate,v 1.47 2005-07-12 23:34:20 francis Exp $
  *
  */
 
@@ -200,7 +200,7 @@ function send_automatic_failure_messages() {
 /* chivvy_creators_early
  * Send message to pledge creators who haven't managed to get many signers.
  * This message is sent once to any pledge which:
- * - has fewer than 4 signers (or whatever number pb_pledge_prominence() uses).
+ * - has fewer than 4 signers (which is more than number pb_pledge_prominence() uses).
  * - has target of at least 8
  * - has not passed the deadline yet
  * - has not succeeded yet

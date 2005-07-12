@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.6 2005-07-12 19:08:10 francis Exp $
+// $Id: list.php,v 1.7 2005-07-12 19:10:41 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -129,12 +129,14 @@ print $navlinks;
 
 if ($ntotal > 0) {
     $c = 0;
-    $lastcategory = '';
+    $lastcategory = 'none';
     while (list($id) = db_fetch_row($qrows)) {
         $pledge = new Pledge(intval($id));
         if ($q_sort == "category") {
             $categories = $pledge->categories();
             $thiscategory = array_pop($categories);
+            if ($thiscategory == null) 
+                $thiscategory = "Miscellaneous";
             if ($lastcategory <> $thiscategory) {
                 print "<h2 style=\"clear:both\">$thiscategory</h2>";
                 $c = 0;

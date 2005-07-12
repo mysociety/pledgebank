@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.19 2005-07-12 18:08:12 francis Exp $
+// $Id: faq.php,v 1.20 2005-07-12 23:54:08 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -223,12 +223,11 @@ view the pledge page."));
 print dt(_('Who gets to see my email address?'));
 
 print dd(_("We will never disclose your email address to anyone, including the
-creator of your pledge. We do let the pledge creators send a certain,
-fixed number of emails to pledge subscribers to explain what's going
-on, to motivate them etc. However, we don't show the pledge creator
-the addresses of the subscribers getting his email. If you reply to an
-email from the pledge creator yourself, you will give them your email
-address - please be aware!"));
+creator of your pledge. We do let the pledge creators send emails to pledge
+subscribers to explain what's going on, to motivate them etc. However, we don't
+show the pledge creator the addresses of the subscribers getting his email. If
+you reply to an email from the pledge creator yourself, you will give them your
+email address - please be aware!"));
 
 print dt(_('Will you send nasty, brutish spam to my email address?'));
 

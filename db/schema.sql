@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.135 2005-07-12 18:38:50 francis Exp $
+-- $Id: schema.sql,v 1.136 2005-07-12 18:47:49 francis Exp $
 --
 
 -- secret
@@ -858,11 +858,7 @@ select case
     when (select prominence from pledges where id = $1) = ''normal''
         then ''normal''
     else
-        pb_pledge_prominence(
-            (select prominence from pledges where id = $1), 
-            (select count(id) from signers where pledge_id = $1)::integer,
-            (select longitude from pledges where id = $1) is not null
-        )
+        pb_pledge_prominence( (select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer, (select longitude from pledges where id = $1) is not null )
     end;
 ' language sql;
 

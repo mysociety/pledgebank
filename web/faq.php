@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.20 2005-07-12 23:54:08 francis Exp $
+// $Id: faq.php,v 1.21 2005-07-12 23:56:49 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -231,13 +231,11 @@ email address - please be aware!"));
 
 print dt(_('Will you send nasty, brutish spam to my email address?'));
 
-print dd(_("Nope. When you sign up to a pledge we will tell you a specific maximum
-number of emails you'll ever be sent in relation to your pledge. These
-will be a mixture of status emails from PledgeBank itself, and
-missives from the pledge creator, trying to chivvy you into greater
-support. Thereafter you'll never be emailed again. And it goes without
-saying that we'd never give or sell your email addresses to anyone
-else."));
+print dd(_("Nope. After you sign up to a pledge we will send you emails in
+relation to your pledge. These will be a mixture of status emails from
+PledgeBank itself, and missives from the pledge creator, trying to chivvy you
+into greater support.  It goes without saying that we'd never give or sell your
+email addresses to anyone else."));
 
 print "</dl>\n";
 

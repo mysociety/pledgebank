@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.85 2005-07-12 12:15:30 francis Exp $
+ * $Id: admin-pb.php,v 1.86 2005-07-12 17:08:25 matthew Exp $
  * 
  */
 
@@ -815,7 +815,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
                             . ' from '
                             . $ipaddr
                         . '</td><td><b>Reason: </b>'
-                            . $reason
+                            . htmlspecialchars($reason)
                         . '</td></tr>';
             }
 

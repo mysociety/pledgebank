@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.134 2005-07-12 12:15:30 francis Exp $
+-- $Id: schema.sql,v 1.135 2005-07-12 18:38:50 francis Exp $
 --
 
 -- secret
@@ -814,25 +814,30 @@ create function smssubscription_sign(integer, text)
 -- Prominence of pledges
 -- 
 
--- pb_pledge_prominence PROMINENCE SIGNERS
--- Return the effective prominence of a pledge having assigned PROMINENCE and
--- the given number of SIGNERS, as follows:
+-- pb_pledge_prominence PROMINENCE SIGNERS LOCAL
+-- Return the effective prominence of a pledge having assigned PROMINENCE,
+-- the given number of SIGNERS and a LOCAL co-ordinate as follows:
 --
 --  assigned    number of   effective
---  prominence  signers     prominence
---  ----------- ----------- -----------
---  frontpage   n/a         frontpage
---  backpage    n/a         backpage
---  normal      n/a         normal
---  calculated  < 4         backpage
---  calculated  >= 4        normal
-create function pb_pledge_prominence(text, integer)
+--  prominence  signers     local       prominence 
+--  ----------- ----------- ----------- -----------
+--  frontpage   n/a         n/a         frontpage
+--  backpage    n/a         n/a         backpage
+--  normal      n/a         n/a         normal
+--  calculated  < 3         false       backpage
+--  calculated  >= 3        false       normal
+--  calculated  < 1         true        backpage
+--  calculated  >= 1        true        normal
+create function pb_pledge_prominence(text, integer, boolean)
     returns text as '
 select case
     when $1 = ''frontpage'' then ''frontpage''
     when $1 = ''backpage'' then ''backpage''
     when $1 = ''normal'' then ''normal''
-    when $2 < 4 then ''backpage''
+    when (not $3) and $2 < 3 then ''backpage''
+    when (not $3) and $2 >= 3 then ''normal''
+    when $3 and $2 < 1 then ''backpage''
+    when $3 and $2 >= 1 then ''normal''
     else ''normal''
     end;
 ' language sql;
@@ -853,7 +858,11 @@ select case
     when (select prominence from pledges where id = $1) = ''normal''
         then ''normal''
     else
-        pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer)
+        pb_pledge_prominence(
+            (select prominence from pledges where id = $1), 
+            (select count(id) from signers where pledge_id = $1)::integer,
+            (select longitude from pledges where id = $1) is not null
+        )
     end;
 ' language sql;
 

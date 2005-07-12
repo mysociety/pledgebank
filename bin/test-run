@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.124 2005-07-11 17:09:55 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.125 2005-07-12 18:38:50 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -342,10 +342,6 @@ sub create_pledge {
     perform_login_action($who, $login_options, "to confirm that you");
     return if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword");
     $wth->browser_check_contents("Thank you for creating your pledge");
-
-    # Add all to front page
-    dbh()->do("update pledges set prominence = 'frontpage'");
-    dbh()->commit();
 }
 
 # sign_pledge WHO SHOW_SIGNATURE LOGIN_ACTION EXPECTED
@@ -393,16 +389,32 @@ sub sign_pledge {
     }
 }
 
-# find_and_sign_pledge ACTION WHO SHOW_SIGNATURE LOGIN_ACTION EXPECTED
-# Finds a public pledge from the front page use text ACTION, then calls
+# find_and_sign_pledge FIND_TYPE FIND_STRING WHO SHOW_SIGNATURE LOGIN_ACTION EXPECTED
+# Finds a public pledge depending on FIND_TYPE
+#   'frontpage' - find listing via string FIND_STRING on front page
+#   'list_open' - find listing via string FIND_STRING on all pledges page
+#   'list_succeeded_open' - find listing via string FIND_STRING on all pledges page
+#   'ref' - go directly to ref which is in FIND_STRING
+# se text FIND_STRING.  Then calls
 # sign_pledge.
 sub find_and_sign_pledge {
-    my ($action, $who, $show_signature, $login_options, $expected) = @_;
+    my ($find_type, $find_string, $who, $show_signature, $login_options, $expected) = @_;
     my $login_action = $login_options->{'action'};
+    die "Find type '$find_type' not known" if $find_type ne 'frontpage' && $find_type ne 'list_open' && $find_type ne 'list_succeeded_open' && $find_type ne 'ref';
 
     if ($login_action ne "resume") {
-        $wth->browser_get($base_url);
-        $wth->browser_follow_link(text_regex => qr/$action/);
+        if ($find_type eq 'ref') {
+            $wth->browser_get($base_url . "/" . $find_string);
+        } else {
+            $wth->browser_get($base_url);
+            if ($find_type eq 'list_open' || $find_type eq 'list_succeeded_open') {
+                $wth->browser_follow_link(text_regex => qr/All Pledges/) or die "Failed to find 'All Pledges' link";
+            }
+            if ($find_type eq 'list_succeeded_open') {
+                $wth->browser_follow_link(text_regex => qr/Successful open/) or die "Failed to find 'Successful open' link";
+            }
+            $wth->browser_follow_link(text_regex => qr/$find_string/) or die "Failed to find '$find_string' link";
+        }
     }
     sign_pledge($who, $show_signature, $login_options, $expected);
 }
@@ -416,6 +428,14 @@ sub set_pb_date {
     } else {
         dbh()->do('delete from debugdate;');
     }
+    dbh()->commit();
+}
+
+# set_pledge_prominence REF PROMINENCE
+# Change pledge REF to have prominence PROMINENCE
+sub set_pledge_prominence {
+    my ($ref, $prominence) = @_;
+    dbh()->do('update pledges set prominence = ? where ref = ?', {}, $prominence, $ref);
     dbh()->commit();
 }
 
@@ -580,8 +600,8 @@ sub do_public_succeeding_pledge {
 
     # Sign it twice
     print "Signing the pledge twice...\n" if $verbose > 1;
-    find_and_sign_pledge($pledge_action_completion, 1, 1, {action=>"viaemail"}, "signed");
-    find_and_sign_pledge($pledge_action_completion, 2, undef, {action=>"viaemail"}, "signed");
+    find_and_sign_pledge("ref", $pledge_ref, 1, 1, {action=>"viaemail"}, "signed");
+    find_and_sign_pledge("list_open", $pledge_action_completion, 2, undef, {action=>"viaemail"}, "signed");
 
     # Check can't get to announce page as a mere signer
     $wth->browser_get($base_url . "/$pledge_ref");
@@ -607,20 +627,17 @@ sub do_public_succeeding_pledge {
     call_frequentupdate();
     $wth->email_check_none_left();
 
+    # Try to sign the pledge a second time as the same person
+    find_and_sign_pledge("list_open", $pledge_action_completion, 2, 1, {action=>"viaemail"}, "already");
+    # and as the creator, which also isn't allowed
+    find_and_sign_pledge("list_open", $pledge_action_completion, 0, 1, {action=>"viaemail"}, "ownpledge");
+
     # Sign it once more, this tipping balance
     print "Signing the pledge once more...\n" if $verbose > 1;
-    find_and_sign_pledge($pledge_action_completion, 3, 1, {action=>"viaemail"}, "reached");
-    # Check for late mid-pledge announce message
-    call_frequentupdate();
-    $wth->email_get_containing( '%To: '.email_n(3).  '%From: '.name_n(0).  '%You signed this pledge after this message%Love and kisses%');
-
-    # Try to sign the pledge a second time as the same person
-    find_and_sign_pledge($pledge_action_completion, 2, 1, {action=>"viaemail"}, "already");
-    # and as the creator, which also isn't allowed
-    find_and_sign_pledge($pledge_action_completion, 0, 1, {action=>"viaemail"}, "ownpledge");
+    find_and_sign_pledge("list_open", $pledge_action_completion, 3, 1, {action=>"viaemail"}, "reached");
 
     # Partially sign pledge before completion state change...
-    find_and_sign_pledge($pledge_action_completion, 4, 1, {action=>"suspend"}, "signed");
+    find_and_sign_pledge("list_succeeded_open", $pledge_action_completion, 4, 1, {action=>"suspend"}, "signed");
 
     # Check pledge has completed
     call_frequentupdate();
@@ -629,9 +646,11 @@ sub do_public_succeeding_pledge {
     $wth->browser_follow_link(text_regex => qr/$pledge_action_completion/);
     $wth->browser_check_contents("This pledge has been successful!");
     $wth->browser_check_contents("1 person who did not want to give their name");
+    # Check for late mid-pledge announce message
+    $wth->email_get_containing( '%To: '.email_n(3).  '%From: '.name_n(0).  '%You signed this pledge after this message%Love and kisses%');
+    # Check email there or not there
     my $announce_link = undef;
     for (my $i = 0; $i <= 3; ++$i) {
-        # Check email there or not there
         if ($i == 2) {
             $wth->browser_check_no_contents(name_n($i));
         } else {
@@ -677,7 +696,7 @@ sub do_public_succeeding_pledge {
     # ... now complete partial signature
     # (a day later, so it contains new extra header)
     set_pb_date('1982-02-05');
-    find_and_sign_pledge($pledge_action_completion, 4, undef, {action=>"resume"}, "signed");
+    find_and_sign_pledge("list_succeeded_open", $pledge_action_completion, 4, undef, {action=>"resume"}, "signed");
     # Check the late signer (number 4) also recieves the success announcement message.
     # They won't get the earlier success announcement message, instead a URL...
     call_frequentupdate();
@@ -723,6 +742,8 @@ sub do_private_failing_pledge {
         { country => 'Global', visibility => 'pin', pin => $private_pin },
         { action => "viaemail" }
     );
+    # Make frontpage, to be sure that doesn't make it show
+    set_pledge_prominence($pledge_ref, 'frontpage');
 
     # Go to private pledge page, and submit PIN to access it
     my $goto_private_pledge_page = sub {
@@ -1140,20 +1161,20 @@ sub do_login_tests {
     # Sign all the pledges as another user
     $wth->browser_follow_link(text_regex => qr/Logout/);
     $wth->browser_check_contents("now logged out");
-    find_and_sign_pledge($pledge_action_login_1, 201, 1, {action=>"viaemail",setpassword=>1}, "signed");
+    find_and_sign_pledge("ref", $pledge_ref_1, 201, 1, {action=>"viaemail",setpassword=>1}, "signed");
     $wth->browser_follow_link(text_regex => qr/Logout/);
     $wth->browser_check_contents("now logged out");
     # ... takes a second go to get the set password form
-    find_and_sign_pledge($pledge_action_login_2, 201, 1, {action=>"viaemail",setpassword=>1}, "signed");
+    find_and_sign_pledge("ref", $pledge_ref_2, 201, 1, {action=>"viaemail",setpassword=>1}, "signed");
     # Now we can sign as already logged in
-    find_and_sign_pledge($pledge_action_login_3, 201, 1, {action=>"loggedin"}, "signed");
+    find_and_sign_pledge("ref", $pledge_ref_3, 201, 1, {action=>"loggedin"}, "signed");
     # Logout again (in order to log in with password)
     $wth->browser_follow_link(text_regex => qr/Logout/);
     $wth->browser_check_contents("now logged out");
     # ... try with wrong password
-    find_and_sign_pledge($pledge_action_login_4, 201, 1, {action=>"wrongpassword"}, "signed");
+    find_and_sign_pledge("ref", $pledge_ref_4, 201, 1, {action=>"wrongpassword"}, "signed");
     # ... then with the right one
-    find_and_sign_pledge($pledge_action_login_4, 201, 1, {action=>"password"}, "signed");
+    find_and_sign_pledge("ref", $pledge_ref_4, 201, 1, {action=>"password"}, "signed");
 
 }
 
@@ -1240,7 +1261,6 @@ sub do_admin_tests {
 sub do_final_checks {
     # Check RSS works and has correct entries
     $wth->browser_get($base_url . "/rss");
-    $wth->browser_check_contents(qr/carry on making even more pledges forever and ever and ever \(target 3, deadline 1983-06-07\)/);
     $wth->browser_check_contents(qr/make sure a pledge can be completed \(target 3, deadline 1982-02-10\)/);
     $wth->browser_check_no_contents(qr/pretend to be an SMS aggregating service \(target 2, deadline 1982-03-10\)/); # has been deleted earlier
     $wth->browser_check_no_contents("privatepledge");

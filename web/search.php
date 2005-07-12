@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.19 2005-07-12 12:52:37 francis Exp $
+// $Id: search.php,v 1.20 2005-07-12 18:38:50 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -47,7 +47,7 @@ function search() {
                         WHERE 
                             pin IS NULL AND
                             pledges.prominence <> \'backpage\'
-                        ORDER BY distance', array($location['wgs84_lat'], $location['wgs84_lon'], 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon; ordered by distance?
+                        ORDER BY distance', array($location['wgs84_lat'], $location['wgs84_lon'], 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon
             $closed = ''; $open = '';
             if (db_num_rows($q)) {
                 print sprintf(p(_('Results for pledges near UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.18 2005-07-06 17:23:05 matthew Exp $
+// $Id: faq.php,v 1.19 2005-07-12 18:08:12 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -136,11 +136,20 @@ organisations who ask - just contact us if you want to launch a bigger pledge.")
 
 print dt(_('Why does my new pledge not appear on the All Pledges page?'));
 
-print dd(_("New pledges have just their own page, and are not shown elsewhere
-on the site, until a few people have signed up to them.  This is to make sure
-we only show good quality pledges, which have an active creator and some support
-behind them.  So get out there and tell your friends and neighbours about your
-pledge!"));
+print dd(_("New pledges have just their own page, and are not shown elsewhere on
+the site, until a few people have signed up to them. This is to make
+sure we only show good quality pledges, which have an active creator
+and some support behind them.  So get out there and tell your friends and
+neighbours about your pledge!"));
+
+print dt(_('Do you remove silly or illegal pledges?'));
+
+print dd(_("PledgeBank reserves the right to 'backpage' any pledge which we
+consider to be inappropriate. This means that your pledge will work, but will
+not show up on the all page, or in the search. We will normally backpage
+pledges which are really nothing more than advertising or propoganda, or which
+are entirely frivolous. We will also delete pledges which promote or incite
+illegal behaviour."));
 
 print dt(_('<a name="editpledge">Why can\'t I modify my pledge after I\'ve made it?</a>'));
 
@@ -161,6 +170,16 @@ signed up by text message.  You should give your contact details, and ask for
 theirs, so you can stay in touch as you carry out your pledge.  If anybody
 signs your pledge later, all your messages will be automatically forwarded to
 them."));
+
+print dt(_('How do I tell people to sign up by SMS?'));
+
+print dd(sprintf(_("This is described on the flyers for your pledge, so the
+easiest thing to do is print some out and carry them with you.  You can find
+the flyers from the 'Spread the word' section on your pledge's page.  Otherwise
+tell people to text <strong>pledge REFERENCE</strong> to
+<strong>%s</strong>.  Here REFERENCE is the short reference for your pledge
+which you chose when you made it, and which appears at the end of its
+address."), OPTION_PB_SMS_DISPLAY_NUMBER));
 
 print "</dl>\n";
 

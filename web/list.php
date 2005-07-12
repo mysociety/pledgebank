@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.7 2005-07-12 19:10:41 francis Exp $
+// $Id: list.php,v 1.8 2005-07-12 19:44:27 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -59,9 +59,9 @@ if ($q_sort == 'percentcomplete') {
                 / target) DESC";
 }
 if ($q_sort == 'category') {
-    $sort_phrase = "(SELECT name FROM pledge_category, category WHERE 
+    $sort_phrase = "coalesce ((SELECT name FROM pledge_category, category WHERE 
             pledge_category.category_id = category.id AND parent_category_id IS NULL AND 
-            pledge_category.pledge_id = pledges.id LIMIT 1)";
+            pledge_category.pledge_id = pledges.id LIMIT 1), 'Miscellaneous')";
 }
 $qrows = db_query("
         SELECT *, (SELECT count(*) FROM signers
@@ -71,7 +71,7 @@ $qrows = db_query("
             AND pin IS NULL
             AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target 
             AND pb_pledge_prominence(id) <> 'backpage'
-            ORDER BY $sort_phrase LIMIT ? OFFSET $q_offset", PAGE_SIZE);
+            ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", PAGE_SIZE);
 /* PG bug: mustn't quote parameter of offset */
 
 if ($q_type == 'open') {

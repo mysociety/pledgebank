@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.114 2005-07-12 19:18:15 chris Exp $
+ * $Id: pledge.php,v 1.115 2005-07-12 19:44:27 francis Exp $
  * 
  */
 
@@ -35,7 +35,7 @@ class Pledge {
                                person.email AS email
                            FROM pledges
                            LEFT JOIN person ON person.id = pledges.person_id ";
-        if (gettype($ref) == "integer" or preg_match('/^[1-9]\d*$/', $ref)) {
+        if (gettype($ref) == "integer" or (gettype($ref) == "string" and preg_match('/^[1-9]\d*$/', $ref))) {
             $q = db_query("$main_query_part WHERE pledges.id = ?", array($ref));
             if (!db_num_rows($q))
                 err(_('PledgeBank reference not known'));

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.113 2005-07-11 12:09:39 francis Exp $
+ * $Id: pledge.php,v 1.114 2005-07-12 19:18:15 chris Exp $
  * 
  */
 
@@ -35,16 +35,16 @@ class Pledge {
                                person.email AS email
                            FROM pledges
                            LEFT JOIN person ON person.id = pledges.person_id ";
-        if (gettype($ref) == "string") {
+        if (gettype($ref) == "integer" or preg_match('/^[1-9]\d*$/', $ref)) {
+            $q = db_query("$main_query_part WHERE pledges.id = ?", array($ref));
+            if (!db_num_rows($q))
+                err(_('PledgeBank reference not known'));
+            $this->data = db_fetch_array($q);
+        } elseif (gettype($ref) == "string") {
             $q = db_query("$main_query_part WHERE ref ILIKE ?", array($ref));
             if (!db_num_rows($q)) {
                 err(_('We couldn\'t find that pledge.  Please check the URL again carefully.  Alternatively, try the search at the top right.'));
             }
-            $this->data = db_fetch_array($q);
-        } elseif (gettype($ref) == "integer") {
-            $q = db_query("$main_query_part WHERE pledges.id = ?", array($ref));
-            if (!db_num_rows($q))
-                err(_('PledgeBank reference not known'));
             $this->data = db_fetch_array($q);
         } elseif (gettype($ref) == "array") {
             $this->data = $ref;

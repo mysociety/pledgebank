@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.133 2005-07-11 15:02:19 francis Exp $
+-- $Id: schema.sql,v 1.134 2005-07-12 12:15:30 francis Exp $
 --
 
 -- secret
@@ -150,11 +150,13 @@ create table pledges (
     -- counts as "finished".
     cancelled text,
 
-    -- Which lists of pledges this one is shown in
-    prominence text not null default 'normal' check (
-        prominence = 'normal' or        -- default
+    -- Which lists of pledges this one is shown in.  This value is set by
+    -- the administrator, and tested only via pb_pledge_prominence().
+    prominence text not null default 'calculated' check (
+        prominence = 'calculated' or    -- based on number of signers, see pb_pledge_prominence
+        prominence = 'normal' or        -- normal, appears in "all pledges" list
         prominence = 'frontpage' or     -- pledge appears on front page
-        prominence = 'backpage'         -- pledge doesn't appear in "all pledges" list, RSS etc.
+        prominence = 'backpage'         -- pledge doesn't appear on any index page
     ),
 
     check ((latitude is null and longitude is null)
@@ -821,13 +823,15 @@ create function smssubscription_sign(integer, text)
 --  ----------- ----------- -----------
 --  frontpage   n/a         frontpage
 --  backpage    n/a         backpage
---  normal      < 4         backpage
---  normal      >= 4        normal
+--  normal      n/a         normal
+--  calculated  < 4         backpage
+--  calculated  >= 4        normal
 create function pb_pledge_prominence(text, integer)
     returns text as '
 select case
     when $1 = ''frontpage'' then ''frontpage''
     when $1 = ''backpage'' then ''backpage''
+    when $1 = ''normal'' then ''normal''
     when $2 < 4 then ''backpage''
     else ''normal''
     end;
@@ -838,7 +842,7 @@ select case
 create function pb_pledge_prominence(integer)
     -- Point of the short-circuiting design is to avoid doing the expensive
     -- select count ... when we can. As time goes on (i.e. when the majority
-    -- of pledges have prominence 'normal') this will start to suck a bit more
+    -- of pledges have prominence 'calculated') this will start to suck a bit more
     -- and we'll have to look in to setting a flag explicitly.
     returns text as '
 select case
@@ -846,6 +850,8 @@ select case
         then ''backpage''
     when (select prominence from pledges where id = $1) = ''frontpage''
         then ''frontpage''
+    when (select prominence from pledges where id = $1) = ''normal''
+        then ''normal''
     else
         pb_pledge_prominence((select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer)
     end;

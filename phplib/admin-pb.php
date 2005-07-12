@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.84 2005-07-11 16:55:02 francis Exp $
+ * $Id: admin-pb.php,v 1.85 2005-07-12 12:15:30 francis Exp $
  * 
  */
 
@@ -69,7 +69,8 @@ class ADMIN_PAGE_PB_MAIN {
                 date_trunc('second',whensucceeded) as whensucceeded, 
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                pb_current_date() <= date AS open
+                pb_current_date() <= date AS open,
+                pb_pledge_prominence(pledges.id) as calculated_prominence
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id" .
             ($order ? ' ORDER BY ' . $order : '') );
@@ -89,6 +90,8 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '<td>'.prettify($r['date']).'</td>';
 
             $row .= '<td>'.$r['prominence'];
+            if ($r['calculated_prominence'] <> $r['prominence'])
+                $row .= '<br>('.$r['calculated_prominence'].')';
             if ($r['pin']) 
                 $row .= '<br><b>private</b> ';
             $row .= '</td>';
@@ -149,7 +152,9 @@ class ADMIN_PAGE_PB_MAIN {
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 'e';
 
-        $q = db_query('SELECT pledges.*, person.email FROM pledges 
+        $q = db_query('SELECT pledges.*, person.email,
+                pb_pledge_prominence(pledges.id) as calculated_prominence
+            FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id WHERE ref ILIKE ?', $pledge);
         $pdata = db_fetch_array($q);
 
@@ -176,11 +181,16 @@ class ADMIN_PAGE_PB_MAIN {
         if ($pdata['pin'])
             print "<b>private</b> ";
         print '<select name="prominence">';
+        print '<option value="calculated"' . ($pdata['prominence']=='calculated'?' selected':'') . '>calculated</option>';
         print '<option value="normal"' . ($pdata['prominence']=='normal'?' selected':'') . '>normal</option>';
         print '<option value="frontpage"' . ($pdata['prominence']=='frontpage'?' selected':'') . '>frontpage</option>';
         print '<option value="backpage"' . ($pdata['prominence']=='backpage'?' selected':'') . '>backpage</option>';
         print '</select>';
-        print '<input name="update" type="submit" value="Update"></form>';
+        print '<input name="update" type="submit" value="Update">';
+        if ($pdata['calculated_prominence'] <> $pdata['prominence']) {
+            print " calculated to: ". $pdata['calculated_prominence'];
+        }
+        print '</form>';
 
         // Signers
         print "<h2>Signers</h2>";

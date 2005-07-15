@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.11 2005-07-11 16:55:03 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.12 2005-07-15 20:09:41 francis Exp $';
 
 use strict;
 use warnings;
@@ -57,9 +57,14 @@ sub run {
     foreach my $pledge (@$pledges) {
 
         # Put together the title and description.
-        my $title     = "$$pledge{title} (target $$pledge{target}, deadline $$pledge{date})";
-        my $description = "Pledge by $$pledge{name}";
-        $description .= "\n\n$$pledge{detail}" if $$pledge{detail};
+        my $title     = "$$pledge{title}";
+        my $description = sprintf("'I will %s but only if %s %s will %s.'", 
+                $$pledge{title}, 
+                $$pledge{target}, $$pledge{type}, $$pledge{signup});
+        $description .= " -- " . $$pledge{name};
+        if ($$pledge{identity}) {
+            $description .= ", " . $$pledge{identity};
+        }
 
         # Add then to the rss.
         my $params = {
@@ -91,7 +96,7 @@ sub run {
 sub get_pledges {
     my $type = shift;
 
-    my $query_text = "select id, ref, title, target, date, name, detail, latitude, longitude
+    my $query_text = "select *
            from pledges
            where pin IS NULL 
            AND pb_pledge_prominence(id) <> 'backpage' ";

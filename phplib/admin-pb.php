@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.86 2005-07-12 17:08:25 matthew Exp $
+ * $Id: admin-pb.php,v 1.87 2005-07-16 15:47:53 francis Exp $
  * 
  */
 
@@ -535,7 +535,21 @@ class ADMIN_PAGE_PB_LATEST {
                     $time[$r['commentposted']][] = $r;
                 }
             }
-        }
+            $q = db_query('SELECT alert.postcode as alertpostcode, 
+                                    extract(epoch from whenqueued) as whenqueued,
+                                  person.email as email, person.name as name,
+                                  pledges.ref as ref, pledges.id as pledge_id
+                             FROM alert_sent
+                             LEFT JOIN alert ON alert.id = alert_sent.alert_id
+                             LEFT JOIN person ON person.id = alert.person_id
+                             LEFT JOIN pledges ON alert_sent.pledge_id = pledges.id
+                         ORDER BY whenqueued DESC');
+            while ($r = db_fetch_array($q)) {
+                if (!$this->ref || $this->ref==$r['pledge_id']) {
+                    $time[$r['whenqueued']][] = $r;
+                }
+            }
+         }
         krsort($time);
 
         print '<a href="'.$this->self_link.'">Full log</a>';
@@ -616,6 +630,10 @@ class ADMIN_PAGE_PB_LATEST {
                 print "$data[name] &lt;$comment_email&gt; commented on " .
                     $this->pledge_link('id', $data['pledge_id']) . " saying
                 '$data[text]'";
+            } elseif (array_key_exists('whenqueued', $data)) {
+                print "Local alert to ". htmlspecialchars($data['email']) .
+                  " " . htmlspecialchars($data['alertpostcode']) . " " .
+                  " for pledge " . $this->pledge_link('id', $data['pledge_id']);
             } else {
                 print_r($data);
             }

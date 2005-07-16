@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.126 2005-07-16 11:26:33 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.127 2005-07-16 15:47:53 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1138,7 +1138,7 @@ sub do_login_tests {
     $wth->browser_follow_link(text_regex => qr/Login/);
     perform_login_action(200, {action=>"password", giveemail=>1}, undef);
     # ... check gone to Your Pledges page correctly
-    $wth->browser_check_contents("Pledges You Created");
+    $wth->browser_check_contents("Pledges you created");
     $wth->browser_check_contents($pledge_action_login_1);
     $wth->browser_check_contents($pledge_action_login_2);
     $wth->browser_check_contents($pledge_action_login_3);

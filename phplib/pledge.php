@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.115 2005-07-12 19:44:27 francis Exp $
+ * $Id: pledge.php,v 1.116 2005-07-16 12:29:58 matthew Exp $
  * 
  */
 
@@ -451,7 +451,7 @@ function deal_with_pin($link, $ref, $actual) {
 
     $html = "";
     if (get_http_var('pin')) {
-        $html .= '<p class="finished">' . _('Incorrect PIN!') . '</p>';
+        $html .= '<p id="error">' . _('Incorrect PIN!') . '</p>';
     }
     $html .= '<form class="pledge" name="pledge" action="'.$link.'" method="post">' .
         h2(_('PIN Protected Pledge')) . '<p>' . _('This pledge is protected.  Please enter the PIN to proceed.') . '</p>';

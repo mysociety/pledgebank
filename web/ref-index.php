@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.44 2005-07-08 16:53:12 francis Exp $
+// $Id: ref-index.php,v 1.45 2005-07-16 12:30:00 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -30,13 +30,13 @@ function draw_status_plaque($p) {
         return;
     }
     if (!$p->open()) {
-        print '<p class="finished">' . _('This pledge is now closed, as its deadline has passed.') . '</p>';
+        print '<p id="finished">' . _('This pledge is now closed, as its deadline has passed.') . '</p>';
     }
     if ($p->left() <= 0) {
         if ($p->exactly()) {
-            print '<p class="finished">' . _('This pledge is now closed, as its target has been reached.') . '</p>';
+            print '<p id="finished">' . _('This pledge is now closed, as its target has been reached.') . '</p>';
         } else {
-            print '<p class="success">' . _('This pledge has been successful!');
+            print '<p id="success">' . _('This pledge has been successful!');
             if (!$p->finished()) {
                 print '<br>' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');
             }

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.79 2005-07-10 01:12:16 francis Exp $
+ * $Id: pb.css,v 1.80 2005-07-16 12:30:00 matthew Exp $
  * 
  */
 
@@ -126,13 +126,36 @@ h1 span#beta {
     margin-bottom: 2px;
 }
 
-#errors {
-    margin: 0 auto 1em;
+#error {
+    width: 50%;
+}
+#error, #errors, #finished {
     color: #ff0000;
     background-color: #ffcccc;
     border: solid 2px #990000;
-    padding-top: 3px;
-    padding-bottom: 3px;
+    padding: 3px;
+}
+#success, #finished {
+    margin: 1em auto 0;
+    width: 80%;
+    padding: 10px;
+    text-align: center;
+}
+#success {
+    background-color: #ccffcc;
+    border: solid 2px #009900;
+}
+#yourpledges #success {
+    margin: 1em 0;
+    padding: 3px;
+    width: 50%;
+    text-align: left;
+}
+#finished {
+    color: #000000;
+}
+#errors {
+    margin: 0 auto 1em;
 }
 #errors ul {
     padding: 0;
@@ -348,23 +371,6 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     margin-bottom: 2px;
 }
 
-.success {
-    margin: 1em auto 0;
-    width: 80%;
-    padding: 10px;
-    text-align: center;
-    background-color: #ccffcc;
-    border: solid 2px #009900;
-}
-
-.finished {
-    margin: 1em auto 0;
-    width: 80%;
-    padding: 10px;
-    text-align: center;
-    background-color: #ffcccc;
-    border: solid 2px #990000;
-}
 .cancelled {
     margin: 1em auto 0;
     width: 80%;

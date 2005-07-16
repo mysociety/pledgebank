@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.9 2005-07-12 12:15:30 francis Exp $
+// $Id: your.php,v 1.10 2005-07-16 12:30:00 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -41,7 +41,7 @@ $s = db_query('SELECT pledges.id, SUM(strength) AS sum, max(date) - pb_current_d
         ', 
         array($P->id(), $P->id(), $P->id(), $P->id(), $P->id(), $P->id()));
 if (0 != db_num_rows($s)) {
-    print "\n\n" . '<div id="yourconnections"><h2><a name="connections">' . _('Suggested Pledges') . '</a></h2><ol>' . "\n\n";
+    print "\n\n" . '<div id="yourconnections"><h2><a name="connections">' . _('Suggested pledges') . '</a></h2><ol>' . "\n\n";
     print p(_("People who signed the pledges you created or signed also signed these..."));
     while (list($id, $strength, $daysleft) = db_fetch_row($s)) {
         $p2 = new Pledge(intval($id));
@@ -51,11 +51,50 @@ if (0 != db_num_rows($s)) {
         $data['daysleft' ] = $daysleft;
         print pledge_summary($data, array('html'=>true, 'href'=>$p2->url_main()));
         print '</li>';
-        print "<!-- strength $strength\n -->";
+        print "<!-- strength $strength -->\n";
     }
     print "\n\n";
     print '</ol></div>';
 }
+
+# Change/update your personal details
+?>
+<form action="/your" method="post"><input type="hidden" name="UpdateDetails" value="1">
+<h2>Update your details</h2>
+<?
+
+importparams(
+#        array('email',          '/./',          '', null),
+        array('pw1',            '/[^\s]+/',     '', null),
+        array('pw2',            '/[^\s]+/',     '', null),
+        array('UpdateDetails',  '/^.+$/',       '', false)
+);
+
+$error = null;
+if ($q_UpdateDetails) {
+    if (is_null($q_pw1) || is_null($q_pw2))
+        $error = _("Please type your new password twice");
+    elseif (strlen($q_pw1)<5 || strlen($q_pw2)<5)
+        $error = _('Your password must be at least 5 characters long');
+    elseif ($q_pw1 != $q_pw2)
+        $error = _("Please type the same password twice");
+    else {
+        $P->password($q_pw1);
+        db_commit();
+        print '<p id="success">Password successfully updated</p>';
+    }
+}
+if (!is_null($error))
+    print "<p id=\"error\">$error</p>";
+?>
+<p>If you wish to change your password, you can do so here.</p>
+<p>
+<?=_('New password:') ?> <input type="password" name="pw1" id="pw1" size="15">
+<?=_('New password (again):') ?> <input type="password" name="pw2" id="pw2" size="15">
+<input type="submit" value="Submit"></p>
+</form>
+
+<?
 
 // Pledges you made
 $qrows = db_query("
@@ -64,7 +103,7 @@ $qrows = db_query("
                 WHERE pledges.person_id = ?
                 ORDER BY creationtime DESC
             ", $P->id());
-print _("<h2>Pledges You Created</h2>");
+print _("<h2>Pledges you created</h2>");
 if (db_num_rows($qrows) > 0) {
     while ($r = db_fetch_array($qrows)) {
         $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
@@ -84,7 +123,7 @@ $qrows = db_query("
                 ORDER BY signtime DESC
             ", $P->id());
 print '<div id="yoursignedpledges">';
-print _("<h2>Pledges You Signed</h2>");
+print _("<h2>Pledges you signed</h2>");
 $successful_ever = 0;
 if (db_num_rows($qrows) > 0) {
     print '<ol>';

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.87 2005-07-16 15:47:53 francis Exp $
+ * $Id: admin-pb.php,v 1.88 2005-07-16 15:57:43 francis Exp $
  * 
  */
 
@@ -543,6 +543,7 @@ class ADMIN_PAGE_PB_LATEST {
                              LEFT JOIN alert ON alert.id = alert_sent.alert_id
                              LEFT JOIN person ON person.id = alert.person_id
                              LEFT JOIN pledges ON alert_sent.pledge_id = pledges.id
+                             WHERE event_code = \'pledges/local/GB\'
                          ORDER BY whenqueued DESC');
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['pledge_id']) {

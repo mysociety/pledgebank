@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.125 2005-07-12 18:38:50 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.126 2005-07-16 11:26:33 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1261,8 +1261,8 @@ sub do_admin_tests {
 sub do_final_checks {
     # Check RSS works and has correct entries
     $wth->browser_get($base_url . "/rss");
-    $wth->browser_check_contents(qr/make sure a pledge can be completed \(target 3, deadline 1982-02-10\)/);
-    $wth->browser_check_no_contents(qr/pretend to be an SMS aggregating service \(target 2, deadline 1982-03-10\)/); # has been deleted earlier
+    $wth->browser_check_contents(qr/make sure a pledge can be completed/);
+    $wth->browser_check_no_contents(qr/pretend to be an SMS aggregating service/); # has been deleted earlier
     $wth->browser_check_no_contents("privatepledge");
 
     # Check there were no errors

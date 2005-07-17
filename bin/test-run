@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.127 2005-07-16 15:47:53 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.128 2005-07-17 22:52:14 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -39,10 +39,6 @@ use Data::Dumper;
 use Storable;
 use FindBin;
 use Getopt::Long;
-
-# Enable stack backtraces upon "die"
-use Carp qw(confess verbose);
-$SIG{__DIE__} = sub { confess @_ };
 
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');

@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.128 2005-07-17 22:52:14 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.129 2005-07-18 13:31:38 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -124,9 +124,10 @@ our $login_count; # reference to hash of person number => how many times they've
 
 # Configure test harness class
 print "Set up web test harness...\n" if $verbose > 0;
-our $wth = new mySociety::WebTestHarness({db_option_prefix => 'PB_'});
-
+our $wth = new mySociety::WebTestHarness();
 $wth->log_watcher_setup($httpd_error_log);
+
+$wth->database_connect('PB_');
 $wth->database_drop_reload('../db/schema.sql');
 $wth->database_load_schema('../db/ican-categories.sql');
 $wth->database_cycle_sequences(200);

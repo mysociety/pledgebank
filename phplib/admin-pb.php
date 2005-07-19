@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.88 2005-07-16 15:57:43 francis Exp $
+ * $Id: admin-pb.php,v 1.89 2005-07-19 13:59:09 matthew Exp $
  * 
  */
 
@@ -17,6 +17,24 @@ require_once "fns.php";
 require_once "../../phplib/db.php";
 require_once "../../phplib/utility.php";
 require_once "../../phplib/importparams.php";
+
+class ADMIN_PAGE_PB_SUMMARY {
+    function ADMIN_PAGE_PB_SUMMARY() {
+        $this->id = 'summary';
+    }
+    function display() {
+        $pledges = db_getOne('SELECT COUNT(*) FROM pledges');
+        $nonbackpage = db_getOne('SELECT COUNT(*) FROM pledges WHERE pb_pledge_prominence(id) != \'backpage\'');
+        $successful = db_getOne('SELECT COUNT(*) FROM pledges WHERE whensucceeded IS NOT NULL');
+        $failed = db_getOne('SELECT COUNT(*) FROM pledges WHERE pb_current_date() > date AND whensucceeded IS NULL');
+        $open = db_getOne('SELECT COUNT(*) FROM pledges WHERE pb_current_date() <= date AND whensucceeded IS NULL');
+        $signatures = db_getOne('SELECT COUNT(*) FROM signers');
+        $signers = db_getOne('SELECT COUNT(DISTINCT person_id) FROM signers');
+        $local = db_getOne('SELECT COUNT(*) FROM pledges WHERE country != \'Global\'');
+        
+        print "Pledges: $pledges<br>$nonbackpage non-backpaged<br>$successful successful, $failed failed, $open open<br>$signatures signatures, $signers signers<br>$local non-global";
+    }
+}
 
 class ADMIN_PAGE_PB_MAIN {
     function ADMIN_PAGE_PB_MAIN () {

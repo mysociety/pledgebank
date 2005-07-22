@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.116 2005-07-16 12:29:58 matthew Exp $
+ * $Id: pledge.php,v 1.117 2005-07-22 11:08:50 francis Exp $
  * 
  */
 
@@ -82,6 +82,7 @@ class Pledge {
         if (!array_key_exists('signers', $this->data)) $this->data['signers'] = -1;
         if (!array_key_exists('open', $this->data)) $this->data['open'] = 't';
         if (!array_key_exists('cancelled', $this->data)) $this->data['cancelled'] = null;
+        if (!array_key_exists('notice', $this->data)) $this->data['notice'] = null;
 
         // Some calculations 
         $this->data['left'] = $this->data['target'] - $this->data['signers'];

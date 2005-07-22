@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.136 2005-07-12 18:47:49 francis Exp $
+-- $Id: schema.sql,v 1.137 2005-07-22 11:08:49 francis Exp $
 --
 
 -- secret
@@ -149,6 +149,9 @@ create table pledges (
     -- comment) is displayed at the top of the pledge page, and the pledge 
     -- counts as "finished".
     cancelled text,
+    -- Notice puts an extra text banner at the top of the pledge (like cancelled
+    -- but without stopping signups)
+    notice text,
 
     -- Which lists of pledges this one is shown in.  This value is set by
     -- the administrator, and tested only via pb_pledge_prominence().

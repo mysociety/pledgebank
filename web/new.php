@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.60 2005-07-22 13:57:39 francis Exp $
+// $Id: new.php,v 1.61 2005-07-22 14:14:35 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -432,7 +432,7 @@ function target_warning_error_check($data) {
 }
  
 function step2_error_check($data) {
-    global $countries_name_to_code;
+    global $countries_code_to_name;
 
     $errors = array();
     if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
@@ -453,7 +453,7 @@ function step2_error_check($data) {
         }
     } elseif ($data['country'] == 'Global') {
         // OK
-    } elseif (array_key_exists($data['country'], $countries_name_to_code)) {
+    } elseif (array_key_exists($data['country'], $countries_code_to_name)) {
         // OK
     } else {
         $errors['country'] = _('Please choose a country, or \'Global\' if your pledge applies across the world');

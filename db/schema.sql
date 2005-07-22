@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.138 2005-07-22 13:57:39 francis Exp $
+-- $Id: schema.sql,v 1.139 2005-07-22 14:14:35 francis Exp $
 --
 
 -- secret
@@ -118,7 +118,7 @@ create table pledges (
     -- XXX perhaps use NULL for global?
     -- XXX what about, e.g., pledges which anyone in the EU can sign?
     -- Anyone in London? Add regions too? Lists of countries?
-    country text not null check(country = 'GB' or country = 'Global'),
+    country text not null check(length(country) = 2 or country = 'Global'),
     -- Postcode or ZIP-code or whatever. Later we will want to check this for
     -- validity wrt the pledge's specific country.
     postcode text check(postcode is null or postcode <> ''),

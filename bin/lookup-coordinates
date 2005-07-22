@@ -10,7 +10,7 @@
 # OBSOLETE - this is now done in web/new.php at creation of new pledges.  After
 # next deploy we need to run this script one last time, then remove from CVS.
 
-my $rcsid = ''; $rcsid .= '$Id: lookup-coordinates,v 1.5 2005-07-10 00:40:23 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: lookup-coordinates,v 1.6 2005-07-22 13:57:39 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -38,7 +38,7 @@ my $airy1830 = Geo::HelmertTransform::datum('Airy1830');
 my $airy1830m = Geo::HelmertTransform::datum('Airy1830Modified');
 my $wgs84 = Geo::HelmertTransform::datum('WGS84');
 
-my $s = dbh()->prepare("select id, postcode from pledges where country = 'UK' and postcode is not null");
+my $s = dbh()->prepare("select id, postcode from pledges where country = 'GB' and postcode is not null");
 $s->execute();
 while (my ($id, $postcode) = $s->fetchrow_array()) {
     try {

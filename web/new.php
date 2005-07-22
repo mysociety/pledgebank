@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.59 2005-07-21 22:37:15 matthew Exp $
+// $Id: new.php,v 1.60 2005-07-22 13:57:39 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -15,6 +15,8 @@ require_once '../phplib/comments.php';
 require_once '../phplib/alert.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/mapit.php';      # To test validity of postcodes
+require_once '../../phplib/countries.php';
+require_once '../../phplib/gaze.php';
 
 $page_title = _('Create a New Pledge');
 $page_params = array();
@@ -189,6 +191,8 @@ for a larger and more ambitious one.') ?></p>
 
 
 function pledge_form_two($data, $errors = array()) {
+    global $countries_name_to_code, $countries_code_to_name;
+
     $v = 'all';
     if (isset($data['visibility'])) {
         $v = $data['visibility']; if ($v!='pin') $v = 'all';
@@ -201,7 +205,10 @@ function pledge_form_two($data, $errors = array()) {
     else
         $comparison = $data['comparison'];
 
-    $country = '';
+    $country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
+    # $country = gaze_get_country_from_ip(""); # Ukraine: "194.44.201.2" # France: "213.228.0.42"
+
+    if (!$country) $country = '';
     if (isset($data['country'])) $country = $data['country'];
 
     if (sizeof($errors)) {
@@ -232,8 +239,24 @@ is fulfilled?
 <select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_postcode_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
   <!-- needs explicit values for IE Javascript -->
-  <option value="UK" <? if ($country=='UK') print ' selected'; ?> >UK</option>
+<?
+    if ($country and array_key_exists($country, $countries_code_to_name)) {
+        print "<option value=\"$country\" >";
+        print $countries_code_to_name[$country];
+        print "</option>";
+    }
+?>
   <option value="Global" <? if ($country=='Global') print ' selected'; ?> ><?=_('Global') ?></option>
+  <option value="(seperator)"><?=_('---------------------------------------------------') ?></option>
+<?
+    foreach ($countries_name_to_code as $opt_country => $opt_code) {
+        print "<option value=\"$opt_code\" ";
+        if ($opt_country == $opt_code) 
+            print ' selected'; 
+        print ">";
+        print "$opt_country</option>";
+    }
+?>
 </select>
 </p>
 
@@ -409,13 +432,15 @@ function target_warning_error_check($data) {
 }
  
 function step2_error_check($data) {
+    global $countries_name_to_code;
+
     $errors = array();
     if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
         $errors[] = _('Please select either "at least" or "exactly" number of people');
     }
     if ($data['country'] == "(choose one)") 
         $errors['country'] = _('Please choose which country your pledge applies to');
-    elseif ($data['country'] == 'UK') { 
+    elseif ($data['country'] == 'GB') { 
         if ($data['local'] != '1' && $data['local'] != '0')
             $errors['local'] = _('Please choose whether the pledge is local or not');
         if ($data['local']) {
@@ -426,6 +451,12 @@ function step2_error_check($data) {
             else if (mapit_get_error(mapit_get_location($data['postcode'], 1)))
                 $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
         }
+    } elseif ($data['country'] == 'Global') {
+        // OK
+    } elseif (array_key_exists($data['country'], $countries_name_to_code)) {
+        // OK
+    } else {
+        $errors['country'] = _('Please choose a country, or \'Global\' if your pledge applies across the world');
     }
     if ($data['visibility'] == 'pin' && !$data['pin']) 
         $errors['pin'] = _('Please enter a pin');
@@ -454,7 +485,7 @@ function pledge_form_two_submitted() {
     $data = array_merge($step1data, $data);
 
     if (!$data['local']) $data['postcode'] = '';
-    if ($data['country'] != 'UK') {
+    if ($data['country'] != 'GB') {
         $data['local'] = ''; $data['postcode'] = '';
     }
     if ($data['visibility'] != 'pin') { $data['visibility'] = 'all'; $data['pin'] = ''; }
@@ -562,7 +593,7 @@ created it.</strong>
 htmlspecialchars($data['country']) ?></em>
 </li>
 
-<? if ($data['country'] == "UK") { ?>
+<? if ($data['country'] == "GB") { ?>
 <li><?=_('Within the UK, is your pledge specific to a local area?') ?> <em><?=
 $local ? _('Yes') . ' (' . htmlspecialchars($data['postcode']) . ')' : _('No') ?></em>
 </li>
@@ -590,7 +621,7 @@ pledge at the top of this page in your name.') . '</strong> ';
 <!-- no special terms for private pledge -->
 <?  } else {
         print _('You also consent to the syndication of your pledge to other sites &mdash; this means that they will be able to display your pledge and your name');
-        if ($data['country'] == "UK" && $local) {
+        if ($data['country'] == "GB" && $local) {
             print _(', and <strong>use (but not display) your postcode</strong> to locate your pledge in the right geographic area');
         }
         print '.';

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.117 2005-07-22 11:08:50 francis Exp $
+ * $Id: pledge.php,v 1.118 2005-07-22 13:57:39 francis Exp $
  * 
  */
 
@@ -622,7 +622,7 @@ function pledge_delete_comment($id) {
  * Given pledge data, returns true if local pledge (where flyers
  * are useful), or false if it isn't. */
 function pledge_is_local($r) {
-    return $r['country'] == 'UK' && $r['postcode'];
+    return $r['country'] == 'GB' && $r['postcode'];
 }
 
 ?>

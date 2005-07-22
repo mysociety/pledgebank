@@ -6,13 +6,14 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-progress.js.php,v 1.2 2005-06-12 22:00:44 chris Exp $
+ * $Id: ref-progress.js.php,v 1.3 2005-07-22 11:48:59 matthew Exp $
  * 
  */
 
 require_once '../phplib/pb.php';
 
 require_once '../phplib/pledge.php';
+require_once '../../phplib/utility.php';
 
 page_check_ref(get_http_var('ref'));
 $p  = new Pledge(get_http_var('ref'));

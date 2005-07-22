@@ -5,10 +5,9 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: translate.php,v 1.2 2005-06-30 00:15:34 matthew Exp $
+// $Id: translate.php,v 1.3 2005-07-22 11:48:59 matthew Exp $
 
 require_once "../phplib/pb.php";
-require_once '../phplib/fns.php';
 require_once '../../phplib/utility.php';
 
 page_header('Translate PledgeBank into your own language'); ?>

@@ -5,10 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.51 2005-07-11 12:09:39 francis Exp $
+// $Id: fns.php,v 1.52 2005-07-22 11:48:59 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once '../../phplib/person.php';
+require_once '../../phplib/utility.php';
 require_once "pledge.php";
 
 // HTML shortcuts
@@ -100,53 +101,6 @@ function pb_send_email_internal($to, $spec) {
     $success = $error ? FALSE : TRUE;
 
     return $success;
-}
-
-/* prettify THING [HTML]
-   Returns a nicer form of THING for things that it knows about, otherwise just returns the string.
- */
-function prettify($s, $html = true) {
-    global $lang;
-
-    if (preg_match('#^(\d{4})-(\d\d)-(\d\d)$#',$s,$m)) {
-        list(,$y,$m,$d) = $m;
-        $e = mktime(12,0,0,$m,$d,$y);
-        if ($lang == 'en') {
-            if ($html)
-                return date('j<\sup>S</\sup> F Y', $e);
-            return date('jS F Y', $e);
-        }
-        return strftime('%e %B %Y', $e);
-    }
-    if (preg_match('#^(\d{4})-(\d\d)-(\d\d) (\d\d:\d\d:\d\d)$#',$s,$m)) {
-        list(,$y,$m,$d,$tim) = $m;
-        $e = mktime(12,0,0,$m,$d,$y);
-        if ($lang == 'en') {
-            if ($html)
-                return date('j<\sup>S</\sup> F Y', $e);
-            return date('jS F Y', $e);
-        }
-        return strftime('%e %B %Y', $e)." $tim";
-    }
-    if ($s>100000000) {
-        # Assume it's an epoch
-        $tt = strftime('%H:%M', $s);
-        $t = time();
-        if (strftime('%Y%m%d', $s) == strftime('%Y%m%d', $t))
-            $tt = "$tt today";
-        elseif (strftime('%U', $s) == strftime('%U', $t))
-            $tt = "$tt, " . strftime('%A', $s);
-        elseif (strftime('%Y', $s) == strftime('%Y', $t))
-            $tt = "$tt, " . strftime('%A&nbsp;%e&nbsp;%B', $s);
-        else
-            $tt = "$tt, " . strftime('%a&nbsp;%e&nbsp;%B&nbsp;%Y', $s);
-        return $tt;
-    }
-    if (ctype_digit($s)) {
-        $locale_info = localeconv();
-        return number_format($s, 0, $locale_info['decimal_point'], $locale_info['thousands_sep']);
-    }
-    return $s;
 }
 
 # Stolen from my railway script

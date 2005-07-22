@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.59 2005-07-08 12:01:36 matthew Exp $
+// $Id: page.php,v 1.60 2005-07-22 22:26:00 matthew Exp $
 
 require_once '../../phplib/person.php';
 
@@ -15,7 +15,7 @@ require_once '../../phplib/person.php';
  * title and navigation are not displayed, or if PARAMS['noprint'] is true
  * then they are not there if the page is printed.  */
 function page_header($title, $params = array()) {
-    global $lang, $langhtml;
+    global $lang;
 
     static $header_outputted = 0;
     if ($header_outputted && !array_key_exists('override', $params)) {
@@ -33,7 +33,7 @@ function page_header($title, $params = array()) {
 
     $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="<?=$langhtml[$lang] ?>">
+<html lang="<?=$lang ?>">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><?
@@ -128,6 +128,7 @@ function page_header($title, $params = array()) {
  * Print bottom of HTML page. This closes the "content" <div>.  If
  * PARAMS['nonav'] is true then the footer navigation is not displayed. */
 function page_footer($params = array()) {
+    global $lang, $langs;
 ?></div><? # id="content"
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
@@ -148,7 +149,21 @@ function page_footer($params = array()) {
         }
 ?></ul>
 <hr class="v">
-<div id="footer"><a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
+<div id="footer"><?
+    print _('Available in');
+    $out = array();
+    foreach ($langs as $l => $pretty) {
+        if ($l == $lang) $o = '<strong>';
+        else $o = '<a href="http://' . OPTION_WEB_PREFIX . '-' . $l . OPTION_WEB_DOMAIN . $_SERVER['REQUEST_URI'] . '">';
+        $o .= $pretty;
+        if ($l == $lang) $o .= '</strong>';
+        else $o .= '</a>';
+        $out[] = $o;
+    }
+    $first = array_splice($out, 0, -2);
+    if (count($first)) print join(', ', $first) . ',';
+    print ' ' . $out[count($out)-2] . ' and ' . $out[count($out)-1];
+?>. &nbsp; <a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
 <?
     }
 ?>

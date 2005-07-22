@@ -7,13 +7,12 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.19 2005-07-08 12:01:36 matthew Exp $
+ * $Id: pb.php,v 1.20 2005-07-22 22:26:00 matthew Exp $
  * 
  */
 
 // Load configuration file
 require_once "../conf/general";
-
 require_once '../../phplib/db.php';
 require_once '../../phplib/stash.php';
 require_once "../../phplib/error.php";
@@ -21,13 +20,18 @@ require_once "../../phplib/utility.php";
 require_once 'page.php';
 
 # Language stuff
-require_once 'HTTP.php';
-$langs = array('en'=>true); # Translations available of PledgeBank
-$langmap = array('en'=>'en_GB'); # Map of lang to directory
-$langhtml = array('en'=>'en'); # Map for <html> element
-$lang = get_http_var('lang');
-if (!$lang) $lang = HTTP::negotiateLanguage($langs);
-if ($lang=='en-US' || !$lang || !array_key_exists($lang, $langmap)) $lang = 'en'; # Default override
+# require_once 'HTTP.php';
+# Translations available of PledgeBank
+$langs = array('en'=>'English', 'pt-br'=>'Portugu&ecirc;s (Brazil)');
+# Map of lang to directory
+$langmap = array('en'=>'en_GB', 'pt-br'=>'pt_BR');
+if (preg_match('#^'.OPTION_WEB_PREFIX.'-(.*?)\.#', strtolower($_SERVER['HTTP_HOST']), $m) && array_key_exists($m[1], $langs))
+    $lang = $m[1];
+else {
+    $lang = negotiateLanguage($langs);
+    if ($lang=='en-US' || !$lang || !array_key_exists($lang, $langmap)) $lang = 'en'; # Default override
+}
+
 putenv('LANG='.$langmap[$lang].'.UTF-8');
 setlocale(LC_ALL, $langmap[$lang].'.UTF-8');
 bindtextdomain('PledgeBank', '../../locale');
@@ -76,6 +80,45 @@ function pb_show_error($message) {
     print _('<h2>Sorry!  Something\'s gone wrong.</h2>') .
         "\n<p>" . $message . '</p>';
     page_footer();
+}
+
+function negotiateLanguage(&$supported) {
+    $supported = array_change_key_case($supported, CASE_LOWER);
+    if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        $accepted = preg_split('/\s*,\s*/', strtolower(trim($_SERVER['HTTP_ACCEPT_LANGUAGE'])));
+        for ($i = 0; $i < count($accepted); $i++) {
+            if (preg_match('/^([a-z_-]+);\s*q=([\d\.]+)/', $accepted[$i], $arr)) {
+                $q = (double)$arr[2];
+                $l = $arr[1];
+            } else {
+                $q = 1;
+                $l = $accepted[$i];
+            }
+            if ($q > 0.0) {
+                if (!empty($supported[$l])) {
+                    if ($q == 1) {
+                        return $l;
+                    }
+                    $candidates[$l] = $q;
+                } else {
+                    foreach (array_keys($supported) as $value) {
+                        if (preg_match("/^$l-/",$value)) {
+                            if ($q == 1) {
+                                return $value;
+                            }
+                            $candidates[$value] = $q;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (isset($candidates)) {
+            arsort($candidates);
+            reset($candidates);
+            return key($candidates);
+        }
+    }
 }
 
 ?>

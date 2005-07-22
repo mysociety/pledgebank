@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.51 2005-06-22 12:29:25 francis Exp $
+# $Id: poster.cgi,v 1.52 2005-07-22 22:26:02 matthew Exp $
 #
 
 import os
@@ -207,7 +207,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
     p_smallprint = PyRTF.ParagraphStyle('smallprint', text_style.Copy(), PyRTF.ParagraphPS(alignment=1, space_before=10, space_after=0) )
     ss.ParagraphStyles.append(p_smallprint)
 
-    webdomain_text = PyRTF.TEXT('%s/%s' % (mysociety.config.get('WEB_DOMAIN'), ref), size=int(small_writing+6), bold=True, colour=ss.Colours.pb)
+    webdomain_text = PyRTF.TEXT('%s%s/%s' % (mysociety.config.get('WEB_PREFIX'), mysociety.config.get('WEB_DOMAIN'), ref), size=int(small_writing+6), bold=True, colour=ss.Colours.pb)
 
     # Draw text
     identity = ''
@@ -334,7 +334,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
     # Check web domain fits, as that is long word that doesn't fit on
     # (and platypus/reportlab doesn't raise an error in that case)
-    webdomain_text = '''<font size="+3" color="#522994"><b>%s/%s</b></font>''' % (mysociety.config.get('WEB_DOMAIN'), ref)
+    webdomain_text = '''<font size="+3" color="#522994"><b>%s%s/%s</b></font>''' % (mysociety.config.get('WEB_PREFIX'), mysociety.config.get('WEB_DOMAIN'), ref)
     webdomain_para = Paragraph(webdomain_text, p_normal)
     webdomain_allowed_width = w - dots_body_gap * 2
     webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.48 2005-07-20 18:56:19 francis Exp $
+ * $Id: frequentupdate,v 1.49 2005-07-24 23:15:06 chris Exp $
  *
  */
 
@@ -332,7 +332,7 @@ function send_pending_messages() {
     
         $pledge = new Pledge(intval($msg['pledge_id']));
         $data = $pledge->data;
-        verbose("message #${msg['id']} is for pledge #".$pledge->id()." (".$pledge->ref()."); circumstance '${msg['circumstance']}'");
+        verbose("message #${msg['id']} is for pledge #" . $pledge->id() . " (" . $pledge->ref() . "); circumstance '${msg['circumstance']}'");
 
         /* XXX we also need a URL containing a token which is sent on
          * success to the signer. For now just generate this here, but
@@ -373,7 +373,7 @@ function send_pending_messages() {
                         (message_id, pledge_id)
                     values (?, ?)', array($msg['id'], $pledge->id()));
         else
-            error("failed to send message #${msg['id']} to creator of pledge #${pledge['id']} (${pledge['ref']})");
+            error("failed to send message #${msg['id']} to creator of pledge #" . $pledge->id() . " (" . $pledge->ref() . ")");
 
         db_commit();
     }

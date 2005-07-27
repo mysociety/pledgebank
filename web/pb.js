@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.13 2005-07-22 13:57:39 francis Exp $
+ * $Id: pb.js,v 1.14 2005-07-27 21:43:28 matthew Exp $
  * 
  */
 
@@ -15,6 +15,7 @@ var greyed = [
     ['name', '<Enter your name>']
     ]
 
+// http://www.scottandrew.com/weblog/articles/cbs-events
 function addEvent(obj, evType, fn){ 
     if (obj.addEventListener){ 
         obj.addEventListener(evType, fn, true); 

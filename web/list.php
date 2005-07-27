@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.8 2005-07-12 19:44:27 francis Exp $
+// $Id: list.php,v 1.9 2005-07-27 21:52:26 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -22,8 +22,6 @@ $err = importparams(
 if ($err) {
     err(_('Illegal offset or sort parameter passed'));
 }
-
-page_header(_("All Pledges"), array('id'=>'all'));
 
 if ($q_type == 'failed') {
     $open = '<'; $succeeded = '<';
@@ -75,14 +73,17 @@ $qrows = db_query("
 /* PG bug: mustn't quote parameter of offset */
 
 if ($q_type == 'open') {
-    print h2(_("Pledges which need signers"));
+    $heading = _("Pledges which need signers");
 } elseif ($q_type == 'succeeded_open') {
-    print h2(_("Successful pledges, open to new signers"));
+    $heading = _("Successful pledges, open to new signers");
 } elseif ($q_type == 'succeeded_closed') {
-    print h2(_("Successful pledges, closed to new signers"));
+    $heading = _("Successful pledges, closed to new signers");
 } elseif ($q_type == 'failed') {
-    print h2(_("Failed pledges"));
+    $heading = _("Failed pledges");
 } 
+page_header($heading, array('id'=>'all'));
+print h2($heading);
+
 $viewsarray = array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
     'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
 $views = "";

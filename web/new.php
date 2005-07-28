@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.62 2005-07-28 11:30:40 chris Exp $
+// $Id: new.php,v 1.63 2005-07-28 14:55:34 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -247,7 +247,7 @@ is fulfilled?
     }
 ?>
   <option value="Global" <? if ($country=='Global') print ' selected'; ?> ><?=_('Global') ?></option>
-  <option value="(separator)"><?=_('---------------------------------------------------') ?></option>
+  <option value="(separator)">---------------------------------------------------</option>
 <?
     foreach ($countries_name_to_code as $opt_country => $opt_code) {
         print "<option value=\"$opt_code\" ";
@@ -283,8 +283,9 @@ just the start of the postcode, such as WC1, if you like.)') ?></small>
         order by id');
     while ($a = db_fetch_row($s)) {
         list($id, $parent_id, $name) = $a;
-        printf("<option value=\"%s\">%s%s</option>",
+        printf("<option value=\"%s\"%s>%s%s</option>",
                     $id,
+                    (array_key_exists('category', $data) && $id == $data['category'] ? ' selected' : ''),
                     (is_null($parent_id) ? '' : '&nbsp;-&nbsp;'),
                     htmlspecialchars($name));
     }

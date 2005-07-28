@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.26 2005-07-22 22:25:58 matthew Exp $
+ * $Id: general-example,v 1.27 2005-07-28 14:38:20 chris Exp $
  * 
  */
 
@@ -29,10 +29,9 @@ define('OPTION_PB_DB_USER', 'pb');
 define('OPTION_PB_DB_PASS', '');
 define('OPTION_PHP_MAINDB', 'PB');
 
-// Base domain of the website. This is used to distinguish internal from
-// external referrers, for instance.
-define('OPTION_WEB_PREFIX', 'www');
-define('OPTION_WEB_DOMAIN', '.pledgebank.com');
+// Default hostname and domain name for the website.
+define('OPTION_WEB_HOST', 'www');
+define('OPTION_WEB_DOMAIN', 'pledgebank.com');
 
 // Top-level URL of current website
 define('OPTION_BASE_URL', 'http://sometesthost.pledgebank.com/');

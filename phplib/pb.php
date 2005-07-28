@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.20 2005-07-22 22:26:00 matthew Exp $
+ * $Id: pb.php,v 1.21 2005-07-28 14:38:22 chris Exp $
  * 
  */
 
@@ -25,7 +25,7 @@ require_once 'page.php';
 $langs = array('en'=>'English', 'pt-br'=>'Portugu&ecirc;s (Brazil)');
 # Map of lang to directory
 $langmap = array('en'=>'en_GB', 'pt-br'=>'pt_BR');
-if (preg_match('#^'.OPTION_WEB_PREFIX.'-(.*?)\.#', strtolower($_SERVER['HTTP_HOST']), $m) && array_key_exists($m[1], $langs))
+if (preg_match('#^'.OPTION_WEB_HOST.'-(.*?)\.#', strtolower($_SERVER['HTTP_HOST']), $m) && array_key_exists($m[1], $langs))
     $lang = $m[1];
 else {
     $lang = negotiateLanguage($langs);

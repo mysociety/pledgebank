@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.56 2005-07-28 14:38:24 chris Exp $
+ * $Id: login.php,v 1.57 2005-07-28 14:40:03 chris Exp $
  * 
  */
 
@@ -423,7 +423,7 @@ You don't have to set a password if you don't want to."));
  * will be set for the cookie to expire; otherwise, a session cookie is set. */
 function set_login_cookie($P, $duration = null) {
     // error_log('set cookie');
-    setcookie('pb_person_id', person_cookie_token($P->id(), $duration), is_null($duration) ? null : time() + $duration, '/', OPTION_WEB_HOST . '.' . OPTION_WEB_DOMAIN, false);
+    setcookie('pb_person_id', person_cookie_token($P->id(), $duration), is_null($duration) ? null : time() + $duration, '/', OPTION_WEB_HOST . '.' . OPTION_WEB_DOMAIN, false); /* XXX shouldn't this set the cookie to be in the whole domain, rather than for a specific host, as in person.php? */
 }
 
 ?>

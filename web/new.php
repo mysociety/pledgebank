@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.61 2005-07-22 14:14:35 francis Exp $
+// $Id: new.php,v 1.62 2005-07-28 11:30:40 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -247,7 +247,7 @@ is fulfilled?
     }
 ?>
   <option value="Global" <? if ($country=='Global') print ' selected'; ?> ><?=_('Global') ?></option>
-  <option value="(seperator)"><?=_('---------------------------------------------------') ?></option>
+  <option value="(separator)"><?=_('---------------------------------------------------') ?></option>
 <?
     foreach ($countries_name_to_code as $opt_country => $opt_code) {
         print "<option value=\"$opt_code\" ";

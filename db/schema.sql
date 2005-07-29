@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.139 2005-07-22 14:14:35 francis Exp $
+-- $Id: schema.sql,v 1.140 2005-07-29 17:26:55 chris Exp $
 --
 
 -- secret
@@ -61,6 +61,37 @@ create table category (
 
 create unique index category_ican_id_idx on category(ican_id);
 
+-- locations of pledges, centers of local alerts, etc., abstracted out so that
+-- we can use a variety of location services.
+create table location (
+    id serial not null primary key,
+    -- Information which was presented by the user to identify the location.
+    country char(2) not null,       -- ISO country code
+    state char(2),                  -- US state
+    method text not null check (method in ('MaPit', 'Gaze')),
+    input text not null,    -- whatever the user gave, whether a postcode or
+                            -- a placename or whatever
+
+    -- Geographical coordinates in WGS84.
+    latitude double precision,      -- north-positive, degrees
+    longitude double precision,     -- east-positive, degrees
+        -- NB use double precision not real since real has probably only six
+        -- digits of accuracy or about ~30m over the whole globe. If we're
+        -- going to have missile coordinates, let's have *proper* missile
+        -- coordinates!
+
+    -- Textual description of the location which we can show back to the user.
+    description text not null,
+
+    check ((latitude is null and longitude is null)
+            or (latitude is not null and longitude is not null)),
+    check (latitude is null or (latitude >= -90 and latitude <= +90)),
+    check (longitude is null or (longitude >= -180 and longitude < 180))
+);
+
+create index location_latitude_idx on location(latitude);
+create index location_longitude_idx on location(longitude);
+
 -- users, but call the table person rather than user so we don't have to quote
 -- its name in every statement....
 create table person (
@@ -114,27 +145,8 @@ create table pledges (
             -- or comparison = 'exactly' -- exactly is disabled for now, as not clear we need it
         ),
 
-    -- Country.  This is an ISO country code or the text 'Global'.
-    -- XXX perhaps use NULL for global?
-    -- XXX what about, e.g., pledges which anyone in the EU can sign?
-    -- Anyone in London? Add regions too? Lists of countries?
-    country text not null check(length(country) = 2 or country = 'Global'),
-    -- Postcode or ZIP-code or whatever. Later we will want to check this for
-    -- validity wrt the pledge's specific country.
-    postcode text check(postcode is null or postcode <> ''),
-    -- XXX add place field looked up in hierarchical gazeteer of
-    -- countries+cities, for countries where we can't do postcode->coordinates
-    -- translation.
-
-    -- Geographical coordinates for pledges where we know them. Use lat/lon in
-    -- the WGS84 system so that this still works when we make it possible to
-    -- locate pledges in other countries.
-    latitude double precision,      -- north-positive, degrees
-    longitude double precision,     -- east-positive, degrees
-        -- NB use double precision not real since real has probably only six
-        -- digits of accuracy or about ~30m over the whole globe. If we're
-        -- going to have missile coordinates, let's have *proper* missile
-        -- coordinates!
+    -- Where the pledge is. Null means that it is not in any specific location.
+    location_id integer references location(id),
 
     -- It's possible (hopefully rare) for subscribers to be removed from a
     -- pledge after it's been marked as successful. But once a pledge has
@@ -159,12 +171,7 @@ create table pledges (
         prominence = 'normal' or        -- normal, appears in "all pledges" list
         prominence = 'frontpage' or     -- pledge appears on front page
         prominence = 'backpage'         -- pledge doesn't appear on any index page
-    ),
-
-    check ((latitude is null and longitude is null)
-            or (latitude is not null and longitude is not null)),
-    check (latitude is null or (latitude >= -90 and latitude <= +90)),
-    check (longitude is null or (longitude >= -180 and longitude < 180))
+    )
 );
 
 -- Make connections-finding faster.
@@ -176,8 +183,6 @@ create index pledges_whensucceeded_idx on pledges(whensucceeded);
 -- 
 -- Geographical stuff
 -- 
-create index pledges_latitude_idx on pledges(latitude);
-create index pledges_longitude_idx on pledges(longitude);
 
 -- angle_between A1 A2
 -- Given two angles A1 and A2 on a circle expressed in radians, return the
@@ -215,15 +220,16 @@ create function pledge_find_nearby(double precision, double precision, double pr
     -- within a wedge of side about 2 * DISTANCE. That cuts down substantially
     -- on the amount of work we have to do.
 '
-    select id,
+    select pledges.id,
             R_e() * acos(
                 sin(radians($1)) * sin(radians(latitude))
                 + cos(radians($1)) * cos(radians(latitude))
                     * cos(radians($2 - longitude))
             ) as distance
-        from pledges
+        from pledges, location
         where
-            latitude is not null
+            location.id = pledges.location_id
+            and latitude is not null
             and radians(latitude) > radians($1) - ($3 / R_e())
             and radians(latitude) < radians($1) + ($3 / R_e())
             and (abs(radians($1)) + ($3 / R_e()) > pi() / 2     -- case where search pt is near pole
@@ -849,8 +855,8 @@ select case
 create function pb_pledge_prominence(integer)
     -- Point of the short-circuiting design is to avoid doing the expensive
     -- select count ... when we can. As time goes on (i.e. when the majority
-    -- of pledges have prominence 'calculated') this will start to suck a bit more
-    -- and we'll have to look in to setting a flag explicitly.
+    -- of pledges have prominence 'calculated') this will start to suck a bit
+    -- more and we'll have to look in to setting a flag explicitly.
     returns text as '
 select case
     when (select prominence from pledges where id = $1) = ''backpage''

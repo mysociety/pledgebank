@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.63 2005-07-28 14:55:34 matthew Exp $
+// $Id: new.php,v 1.64 2005-07-29 17:26:55 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -191,7 +191,7 @@ for a larger and more ambitious one.') ?></p>
 
 
 function pledge_form_two($data, $errors = array()) {
-    global $countries_name_to_code, $countries_code_to_name;
+    global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name;
 
     $v = 'all';
     if (isset($data['visibility'])) {
@@ -206,10 +206,23 @@ function pledge_form_two($data, $errors = array()) {
         $comparison = $data['comparison'];
 
     $country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
+    if (rabx_is_error($country) || !$country)
+        $country = null;
     # $country = gaze_get_country_from_ip(""); # Ukraine: "194.44.201.2" # France: "213.228.0.42"
 
-    if (!$country) $country = '';
-    if (isset($data['country'])) $country = $data['country'];
+    /* The 'country' parameter may give a (country, state) pair. */
+    $state = null;
+    if (isset($data['country'])) {
+        $a = array();
+        if (preg_match('/^([A-Z]{2}),(.+)$/', $data['country'], $a))
+            list($x, $country, $state) = $a;
+        else
+            $country = $data['country'];
+    }
+
+    $place = null;
+    if (array_key_exists('place', $data))
+        $place = $data['place'];
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -235,41 +248,102 @@ is fulfilled?
 <input type="radio" name="comparison" value="atleast"<?=($comparison == 'atleast') ? ' checked' : '' ?>> No
 </p> */?>
 
+<?
+/* Save previous value of country, so that we can detect if it's changed after
+ * one of a list of placenames is selected. */
+if (array_key_exists('country', $data))
+    printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($data['country']));
+?>
+
 <p><?=_('Which country does your pledge apply to?') ?>
 <select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_postcode_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
   <!-- needs explicit values for IE Javascript -->
 <?
     if ($country and array_key_exists($country, $countries_code_to_name)) {
-        print "<option value=\"$country\" >";
-        print $countries_code_to_name[$country];
-        print "</option>";
+        print "<option value=\"$country\"";
+        if (!$state)
+            print "selected";
+        print ">"
+                . htmlspecialchars($countries_code_to_name[$country])
+                . "</option>";
+
+        if (array_key_exists($country, $countries_statecode_to_name)) {
+            foreach ($countries_statecode_to_name[$country] as $opt_statecode => $opt_statename) {
+                print "<option value=\"$country,$opt_statecode\"";
+                if ($state && "$opt_statecode" == $state)
+                    print ' selected';
+                print "> &raquo; "
+                        . htmlspecialchars($opt_statename)
+                        . "</option>";
+                
+            }
+        }
     }
 ?>
-  <option value="Global" <? if ($country=='Global') print ' selected'; ?> ><?=_('Global') ?></option>
-  <option value="(separator)">---------------------------------------------------</option>
+  <option value="Global" <? if ($country=='Global') print ' selected'; ?> ><?=_('None &mdash; applies anywhere') ?></option>
+  <option value="(separator)"><?=_('---------------------------------------------------') ?></option>
 <?
     foreach ($countries_name_to_code as $opt_country => $opt_code) {
-        print "<option value=\"$opt_code\" ";
-        if ($opt_country == $opt_code) 
-            print ' selected'; 
-        print ">";
-        print "$opt_country</option>";
+        print "<option value=\"$opt_code\">"
+                . htmlspecialchars($opt_country)
+                . "</option>";
+        if (array_key_exists($opt_code, $countries_statecode_to_name)) {
+            foreach ($countries_statecode_to_name[$opt_code] as $opt_statecode => $opt_statename) {
+                print "<option value=\"$opt_code,$opt_statecode\">"
+                        . "&raquo; "
+                        . htmlspecialchars($opt_statename)
+                        . "</option>";
+            }
+        }
     }
 ?>
 </select>
 </p>
 
-<p><span id="local_line"><?=_('Within the UK, is your pledge specific to a local area?') ?></span>
-<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <?=_('Yes') ?>
-<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <?=_('No') ?>
+<p><span id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?></span>
+
+<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local1"><?=_('Yes') ?></label>
+<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local0"><?=_('No') ?></label></span>
+<br>
+<span id="place_line"><?=_('If yes, type the name of the place:') ?>
+<input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($data['place'])) print htmlspecialchars($data['place']) ?>">
+<?
+
+/* Save previous value of 'place' so we can show a new selection list in the
+ * case where the user types a different place name after clicking on one of
+ * the selections. */
+if (array_key_exists('place', $data))
+    printf("<input type=\"hidden\" name=\"prev_place\" value=\"%s\">", htmlspecialchars($data['place']));
+
+/* If the user has already typed a place name, then we need to grab the
+ * possible places from Gaze. */
+if (!$place || array_key_exists('place', $errors)) {
+    ?>
+<small><?=_('(This will be used to let people who live nearby find your pledge.)') ?></small>
+    <?
+} else {
+    print "<br><strong>" . _("There are several possible places which match that name. Please choose one:") . "</strong><br>";
+    $places = gaze_find_places($country, $state, $place, 10);
+    if (rabx_is_error($places))
+        err($places->text);
+    foreach ($places as $p) {
+        list($name, $in, $near, $lat, $lon) = $p;
+        $desc = $name;
+        if ($in) $desc .= ", $in";
+        if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
+        $t = htmlspecialchars("$lat,$lon,$desc");
+        print "<input type=\"radio\" name=\"gaze_place\" value=\"$t\" id=\"$t\"><label for=\"$t\">$desc</label><br>";
+    }
+}
+
+?>
+</span>
 <br>
 <span id="postcode_line">
-<!-- If yes, enter your postcode so that local people can find your pledge: -->
-<?=_('If yes, enter any postcode that is in the local area:') ?>
+<?=_('In Britain, you can give a postcode instead:') ?>
 <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
-<small><?=_('(This will be used so people who live nearby can find your pledge.  You can enter
-just the start of the postcode, such as WC1, if you like.)') ?></small>
+<small><?=_('(You can enter just the start of the postcode, such as WC1, if you like.)') ?></small>
 </span>
 </p>
 
@@ -433,31 +507,48 @@ function target_warning_error_check($data) {
 }
  
 function step2_error_check($data) {
-    global $countries_code_to_name;
+    global $countries_code_to_name, $countries_statecode_to_name;
 
     $errors = array();
-    if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly') {
+    if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly')
         $errors[] = _('Please select either "at least" or "exactly" number of people');
-    }
-    if ($data['country'] == "(choose one)") 
+    if (!$data['country'] || $data['country'] == "(choose one)") 
         $errors['country'] = _('Please choose which country your pledge applies to');
-    elseif ($data['country'] == 'GB') { 
-        if ($data['local'] != '1' && $data['local'] != '0')
-            $errors['local'] = _('Please choose whether the pledge is local or not');
-        if ($data['local']) {
-            if (!$data['postcode']) 
-                $errors['postcode'] = _('For local pledges, please enter a postcode or the first part of a postcode');
-            else if (!validate_postcode($data['postcode']) && !validate_partial_postcode($data['postcode'])) 
-                $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode.  For example OX1 3DR or WC1.');
-            else if (mapit_get_error(mapit_get_location($data['postcode'], 1)))
-                $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
+    elseif ($data['country'] != 'Global') {
+        $a = array();
+        $country = $data['country'];
+        $state = null;
+        if (preg_match('/^([A-Z]{2}),(.+)$/', $data['country'], $a))
+            list($x, $country, $state) = $a;
+
+        /* Validate country and/or state. */
+        if (!array_key_exists($country, $countries_code_to_name))
+            $errors['country'] = _('Please choose a country, or "none" if your pledge applies anywhere');
+        else if ($state && !array_key_exists($state, $countries_statecode_to_name[$country]))
+            $errors['country'] = _('Please choose a valid state within that country, or the country name itself');
+        else {
+            /* Can only check local stuff if a valid country is selected. */
+            if ($data['local'] != '1' && $data['local'] != '0')
+                $errors['local'] = _('Please choose whether the pledge is local or not');
+            else if ($data['local']) {
+                if ($data['postcode'] && $data['place'])
+                    $errors['place'] = _("Please enter either a postcode or a place name, but not both");
+                else if ($data['postcode']) {
+                    if (!validate_postcode($data['postcode']) && !validate_partial_postcode($data['postcode']))
+                        $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode; for example, OX1 3DR or WC1.');
+                    else if (mapit_get_error(mapit_get_location($data['postcode'], 1)))
+                        $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
+                } else if (($data['place'] && $data['prev_place'] == $data['place'] && $data['prev_country'] == $data['country'] && !$data['gaze_place'])
+                            || !preg_match('/^-?(0|[1-9]\d*)(\.\d*|),-?(0|[1-9]\d*)(\.\d*|),.+$/', $data['gaze_place']))
+                    $errors['gaze_place'] = _("Please select one of the possible places; if none of them is right, please type the name of another nearby place");
+                else if (!$data['postcode'] && !$data['place'])
+                    $errors['place'] = ($data['country'] == 'GB'
+                                        ? _("For a local pledge, please type a postcode or place name")
+                                        : _("Please type a place name for your local pledge"));
+                if ($data['postcode'] && $data['country'] != 'GB')
+                    $errors['postcode'] = _("You can only enter a postcode if your pledge applies to Britain");
+            }
         }
-    } elseif ($data['country'] == 'Global') {
-        // OK
-    } elseif (array_key_exists($data['country'], $countries_code_to_name)) {
-        // OK
-    } else {
-        $errors['country'] = _('Please choose a country, or \'Global\' if your pledge applies across the world');
     }
     if ($data['visibility'] == 'pin' && !$data['pin']) 
         $errors['pin'] = _('Please enter a pin');
@@ -475,7 +566,7 @@ function step3_error_check($data) {
 function pledge_form_two_submitted() {
     $errors = array();
     $data = array();
-    $fields = array('comparison', 'category', 'country', 'local', 'postcode', 'visibility', 'pin', 'data');
+    $fields = array('comparison', 'category', 'country', 'prev_country', 'local', 'postcode', 'place', 'prev_place', 'gaze_place', 'visibility', 'pin', 'data');
     foreach ($fields as $field) {
         $data[$field] = trim(get_http_var($field));
     }
@@ -485,10 +576,12 @@ function pledge_form_two_submitted() {
     unset($data['data']);
     $data = array_merge($step1data, $data);
 
-    if (!$data['local']) $data['postcode'] = '';
-    if ($data['country'] != 'GB') {
-        $data['local'] = ''; $data['postcode'] = '';
+    if (!$data['local']) {
+        $data['postcode'] = '';
+        $data['place'] = '';
     }
+    if ($data['country'] != 'GB')
+        $data['postcode'] = '';
     if ($data['visibility'] != 'pin') { $data['visibility'] = 'all'; $data['pin'] = ''; }
 
     $errors = step1_error_check($data);
@@ -502,7 +595,7 @@ function pledge_form_two_submitted() {
         return;
     }
     $errors = step2_error_check($data);
-    if (sizeof($errors)) {
+    if (sizeof($errors) || $data['prev_country'] != $data['country'] || $data['prev_place'] != $data['place']) {
         pledge_form_two($data, $errors);
         return;
     }
@@ -553,6 +646,8 @@ function pledge_form_three_submitted() {
 }
 
 function preview_pledge($data, $errors) {
+    global $countries_code_to_name, $countries_statecode_to_name;
+
     $v = 'all';
     if (isset($data['visibility'])) {
         $v = $data['visibility']; if ($v!='pin') $v = 'all';
@@ -581,7 +676,7 @@ function preview_pledge($data, $errors) {
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
 <?  print h2(_('New Pledge &#8211; Step 3 of 3'));
-    print p(_('Please check the details you have entered, both the pledge itself (see left)
+    print p(_('Please check the details you have entered, both the pledge itself (see left) 
 and other details below.  Click one of the two "Back" buttons if you would like
 to go back and edit your data.  
 <strong>Check carefully, as you cannot edit your pledge after you have
@@ -590,15 +685,36 @@ created it.</strong>
 ?>
 <ul>
 
-<li><?=_('Which country does your pledge apply to?') ?> <em><?=
-htmlspecialchars($data['country']) ?></em>
+<li><?=_('Which country or state does your pledge apply to?') ?> <em><?
+
+$a = array();
+if ($data['country'] == 'Global')
+    print _("None &mdash; anywhere in the world");
+else if (preg_match('/^([A-Z]{2}),(.+)$/', $data['country'], $a)) {
+    list($x, $country, $state) = $a;
+    print htmlspecialchars($countries_statecode_to_name[$country][$state] . ", $countries_code_to_name[$country]");
+} else
+    print htmlspecialchars($countries_code_to_name[$data['country']]);
+?></em>
 </li>
 
-<? if ($data['country'] == "GB") { ?>
-<li><?=_('Within the UK, is your pledge specific to a local area?') ?> <em><?=
-$local ? _('Yes') . ' (' . htmlspecialchars($data['postcode']) . ')' : _('No') ?></em>
-</li>
-<? } ?>
+<?
+
+if ($data['country'] != 'Global') {
+    print "<li>"
+            . _('Within that country, is your pledge specific to a local area?')
+            . " <em>";
+
+    if ($data['country'] == 'GB' && $data['postcode'])
+        print htmlspecialchars($data['postcode']);
+    else {
+        list($lat, $lon, $desc) = explode(',', $data['gaze_place'], 3);
+        print htmlspecialchars($desc);
+    }
+    print "</em></li>";
+}
+
+?>
 
 <li><?=_('Does your pledge fit into a specific topic or category?') ?> <em><?=
     $data['category'] == -1
@@ -659,19 +775,25 @@ function create_new_pledge($P, $data) {
          * insert on the table. */
     if (is_null(db_getOne('select id from pledges where ref = ?', $data['ref']))) {
         $data['id'] = db_getOne("select nextval('pledges_id_seq')");
-        if ($data['postcode'] == '') {
-            $data['postcode'] = null;
-        }
-        $latitude = null;
-        $longitude = null;
+
+        /* Optionally add a pledge location. */
+        $location_id = null;
         if ($data['postcode']) {
             $location = mapit_get_location($data['postcode'], 1);
-            if (mapit_get_error($location)) {
+            if (mapit_get_error($location))
                 /* This error should never happen, as earlier postcode validation in form will stop it */
-                err('Invalid postcode while setting alert, please check and try again.');
-            }
-            $latitude = $location['wgs84_lat'];
-            $longitude = $location['wgs84_lon'];
+                err('Invalid postcode while creating pledge; please check and try again.');
+            $location_id = db_getOne("select nextval('location_id_seq')");
+            db_query("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", array($location_id, $data['postcode'], $location['wgs84_lat'], $location['wgs84_lon'], $data['postcode']));
+        } else if ($data['gaze_place']) {
+            list($lat, $lon, $desc) = explode(',', $data['gaze_place'], 3);
+            $location_id = db_getOne("select nextval('location_id_seq')");
+            $a = array();
+            $country = $data['country'];
+            $state = null;
+            if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
+                list($x, $country, $state) = $a;
+            db_query("insert into location (id, country, state, method, input, latitude, longitude, description) values (?, ?, ?, 'Gaze', ?, ?, ?, ?)", array($location_id, $country, $state, $data['place'], $lat, $lon, $desc));
         }
         db_query('
                 insert into pledges (
@@ -681,7 +803,7 @@ function create_new_pledge($P, $data) {
                     creationtime,
                     detail,
                     comparison,
-                    country, postcode, latitude, longitude,
+                    location_id,
                     pin, identity
                 ) values (
                     ?, ?, ?,
@@ -690,7 +812,7 @@ function create_new_pledge($P, $data) {
                     pb_current_timestamp(),
                     ?,
                     ?,
-                    ?, ?, ?, ?,
+                    ?,
                     ?, ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
@@ -698,7 +820,7 @@ function create_new_pledge($P, $data) {
                     $P->id(), $data['name'], $data['ref'], 
                     $data['detail'],
                     $data['comparison'],
-                    $data['country'], $data['postcode'], $latitude, $longitude,
+                    $location_id,
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity']
                 ));
 

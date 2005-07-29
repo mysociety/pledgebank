@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.22 2005-07-29 13:18:19 matthew Exp $
+ * $Id: pb.php,v 1.23 2005-07-29 14:54:08 matthew Exp $
  * 
  */
 
@@ -29,7 +29,7 @@ if (preg_match('#^'.OPTION_WEB_HOST.'-(.*?)\.#', strtolower($_SERVER['HTTP_HOST'
     $lang = $m[1];
 else {
     $lang = negotiateLanguage($langs);
-    if ($lang=='en-US' || !$lang || !array_key_exists($lang, $langmap)) $lang = 'en'; # Default override
+    if ($lang=='en-US' || !$lang || !array_key_exists($lang, $langmap)) $lang = 'en-gb'; # Default override
 }
 
 putenv('LANG='.$langmap[$lang].'.UTF-8');

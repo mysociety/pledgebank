@@ -5,22 +5,25 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.13 2005-07-09 11:16:57 francis Exp $
+// $Id: alert.php,v 1.14 2005-07-29 17:36:27 chris Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
 
-/* alert_signup PERSON_ID EVENT_CODE PARAMS
- * 
- * Signs person PERSON_ID up to receive alerts to an event.  PARAMS contains
- * extra info as described for each EVENT_CODE below.  
- * 
- * EVENT_CODE can be any of:
- * comments/ref - comments on a pledge, 'pledge_id' must be in PARAMS.
- * pledges/local/GB - new pledges near a location in the UK, 'postcode' must be in PARAMS.
+/* alert_signup PERSON EVENT PARAMS
+ * Signs PERSON up to receive alerts to an event. EVENT may be:
  *
- */
+ *  - comments/ref for alerts when a new comment is posted on a pledge; PARAMS
+ *    must contain pledge_id, the ID of the pledge concerned; or
+ *
+ *  - pledges/local/GB for alerts when new pledges are created near a location
+ *    in the UK; PARAMS must contain 'postcode', the postcode for that location.
+ *
+ * The contents of PARAMS must be verified before calling this function; if
+ * not, it will abort by calling err(). */
 function alert_signup($person_id, $event_code, $params) {
+    if (is_object($person_id))
+        $person_id = $person_id->id();
     if ($event_code == "comments/ref") {
         /* Alert when a comment is added to a particular pledge */
 
@@ -32,6 +35,7 @@ function alert_signup($person_id, $event_code, $params) {
         }
     } elseif ($event_code == "pledges/local/GB") {
         /* Alert when a new pledge appears near a particular area in country GB (the UK) */
+        /* XXX extend this for worldwide alerts. */
 
         /* Canonicalise postcode form, so more likely to detect it is already in the table */
         $params['postcode'] = canonicalise_postcode($params['postcode']);
@@ -42,28 +46,35 @@ function alert_signup($person_id, $event_code, $params) {
             /* This error should never happen, as earlier postcode validation in form will stop it */
             err('Invalid postcode while setting alert, please check and try again.');
         }
-        $already = db_getOne("select id from alert where person_id = ? and event_code = ?
-            and postcode = ? for update", array($person_id, $event_code, $params['postcode']));
+        /* Guard against double-insertion. */
+        get_query('lock table alert in share mode');
+        $already = db_getOne("select id from alert where person_id = ? and event_code = ?  and postcode = ?", array($person_id, $event_code, $params['postcode']));
         if (is_null($already)) {
-            db_query("insert into alert (
-                        person_id, event_code, 
-                        latitude, longitude, postcode
-                    )
+            $location_id = db_getOne("select nextval('location_id_seq')");
+            db_query("
+                    insert into location
+                        (id, country, method, input, latitude, longitude, description)
+                    values (?, 'GB', 'MaPit', ?, ?, ?, ?)", array(
+                        $location_id,
+                        $params['postcode'],
+                        $location['wgs84_lat'], $location['wgs84_lon'],
+                        $params['postcode']
+                    ));
+            db_query("
+                    insert into alert
+                        (person_id, event_code, location_id)
                     values (?, ?, ?, ?, ?)", array(
-                        $person_id, $event_code, 
-                        $location['wgs84_lat'], $location['wgs84_lon'], $params['postcode']
+                        $person_id, $event_code, $location_id
                     ));
         }
     } else {
         err("Unknown alert event '$event_code'");
     }
-
 }
 
 /* alert_unsubscribe PERSON_ID ALERT_ID
  * Remove the subscription to the alert, checks the alert is owned
- * by the given person.
- */
+ * by the given person. */
 function alert_unsubscribe($person_id, $alert_id) {
     $row = db_getRow("select * from alert where id = ?", $alert_id);
     if (!$row) 

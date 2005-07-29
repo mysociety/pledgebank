@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.9 2005-07-26 17:42:56 francis Exp $
+ * $Id: send-local-alerts,v 1.10 2005-07-29 17:59:34 chris Exp $
  *
  */
 
@@ -57,37 +57,42 @@ function send_local_alerts() {
     verbose("sending local alerts");
 
     // Grab all relevant alerts
-    $p = db_query("select alert.id as alert_id,
-                          latitude as alert_latitude, longitude as alert_longitude, 
-                          postcode as alert_postcode,
-                          alerted.name as alerted_name,
-                          alerted.email as alerted_email,
-                          alerted.id as alerted_person_id
-                from alert left join person as alerted on alert.person_id = alerted.id
+    $p = db_query("
+                select alert.id as alert_id,
+                    latitude as alert_latitude, longitude as alert_longitude, 
+                    description as alert_location_description,
+                    alerted.name as alerted_name,
+                    alerted.email as alerted_email,
+                    alerted.id as alerted_person_id
+                from alert left join person as alerted
+                        on alert.person_id = alerted.id
+                    left join location on alert.location_id = location.id
                 where event_code = 'pledges/local/GB'");
 
     $consolidated = array();
     while ($alert = db_fetch_array($p)) {
         // Search for pledges matching alert
-        $local_alert_radius = 5.0; // km
+        $local_alert_radius = 5.0; /* km; XXX should adjust by population density */
         $q = db_query("
                 select pledges.*, pledges.id as pledge_id, distance
-                from pledge_find_nearby(?,?,?) as nearby 
-                left join pledges on nearby.pledge_id = pledges.id
+                from pledge_find_nearby(?, ?, ?) as nearby
+                    left join pledges on nearby.pledge_id = pledges.id
                 where
                     pledges.pin is null and
                     pb_current_date() <= pledges.date and
                     pb_pledge_prominence(pledges.id) <> 'backpage' and
-                    (select id from signers where 
-                        signers.person_id = ? and signers.pledge_id = pledges.id) is null and
+                    (select id from signers
+                    where signers.person_id = ?
+                        and signers.pledge_id = pledges.id) is null and
                     (select whenqueued from alert_sent where
                         alert_sent.alert_id = ? and
                         alert_sent.pledge_id = pledges.id) is null 
                 order by distance
-            ", array($alert['alert_latitude'], $alert['alert_longitude'], $local_alert_radius, 
-                    $alert['alerted_person_id'],
-                    $alert['alert_id']
-                ));
+            ", array(
+                $alert['alert_latitude'], $alert['alert_longitude'], $local_alert_radius,
+                $alert['alerted_person_id'],
+                $alert['alert_id']
+            ));
 
         if (db_num_rows($q) == 0) {
             continue;
@@ -101,7 +106,7 @@ function send_local_alerts() {
         $text = ""; # description and link to each
         $lastrow = array();
         while ($row = db_fetch_array($q)) {
-            verbose("person #${alert['alerted_person_id']} (${alert['alerted_email']}) has alert #${alert['alert_id']} on new local pledge ${row['ref']} which is ".round($row['distance'],1)."km from ${alert['alert_postcode']}");
+            verbose("person #${alert['alerted_person_id']} (${alert['alerted_email']}) has alert #${alert['alert_id']} on new local pledge ${row['ref']} which is ".round($row['distance'],1)."km from ${alert['alert_description']}");
 
             # Check to see if the alert has been sent meanwhile
             $alreadysent = db_getOne('select alert_id from alert_sent where alert_id = ? and pledge_id = ?', 

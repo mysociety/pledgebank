@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+#
+# migrate-to-location-table:
+# Update the old pledges and alert tables (with postcodes, latitudes and
+# longitudes) to the new model where those are stored in the location table
+# and linked to the other tables.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: migrate-to-location-table,v 1.1 2005-07-29 16:31:55 chris Exp $';
+
+use strict;
+require 5.8.0;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+
+use PB;
+
+# Add the columns.
+print STDERR "Adding pledge(location_id) column... ";
+dbh()->do('alter table pledges add column location_id integer references location(id)');
+print STDERR "done.\n";
+
+my $s;
+
+print STDERR "Grabbing location-specific pledges... ";
+$s = dbh()->prepare('select id, postcode, latitude, longitude from pledges where postcode is not null');
+$s->execute();
+print STDERR "done.\n";
+print STDERR "Moving location data from pledges to location table...";
+while (my ($pledge_id, $pc, $lat, $lon) = $s->fetchrow_array()) {
+    my $location_id = dbh()->selectrow_array("select nextval('location_id_seq')");
+    dbh()->do("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", {}, $location_id, $pc, $lat, $lon, $pc);
+    dbh()->do('update pledges set location_id = ? where id = ?', {}, $location_id, $pledge_id);
+    print STDERR " $pledge_id";
+}
+print STDERR "done.\n";
+
+print STDERR "Dropping other geographical from pledges table columns... ";
+dbh()->do('alter table pledges drop column postcode cascade');
+dbh()->do('alter table pledges drop column latitude cascade');
+dbh()->do('alter table pledges drop column longitude cascade');
+print STDERR "done.\n";
+
+print STDERR "Adding alert(location_id) column... ";
+dbh()->do('alter table alert add column location_id integer references location(id)');
+print STDERR "done.\n";
+
+print STDERR "Grabbing local alerts... ";
+$s = dbh()->prepare('select id, postcode, latitude, longitude from alert where postcode is not null');
+$s->execute();
+print STDERR "done.\n";
+print STDERR "Moving location data from alert to location table...";
+while (my ($alert_id, $pc, $lat, $lon) = $s->fetchrow_array()) {
+    my $location_id = dbh()->selectrow_array("select nextval('location_id_seq')");
+    dbh()->do("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", {}, $location_id, $pc, $lat, $lon, $pc);
+    dbh()->do('update alert set location_id = ? where id = ?', {}, $location_id, $alert_id);
+    print STDERR " $alert_id";
+}
+print STDERR "done.\n";
+
+dbh()->rollback();

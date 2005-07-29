@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.21 2005-07-28 14:38:22 chris Exp $
+ * $Id: pb.php,v 1.22 2005-07-29 13:18:19 matthew Exp $
  * 
  */
 
@@ -22,9 +22,9 @@ require_once 'page.php';
 # Language stuff
 # require_once 'HTTP.php';
 # Translations available of PledgeBank
-$langs = array('en'=>'English', 'pt-br'=>'Portugu&ecirc;s (Brazil)');
+$langs = array('en-gb'=>'English', 'pt-br'=>'Portugu&ecirc;s (Brazil)');
 # Map of lang to directory
-$langmap = array('en'=>'en_GB', 'pt-br'=>'pt_BR');
+$langmap = array('en-gb'=>'en_GB', 'pt-br'=>'pt_BR');
 if (preg_match('#^'.OPTION_WEB_HOST.'-(.*?)\.#', strtolower($_SERVER['HTTP_HOST']), $m) && array_key_exists($m[1], $langs))
     $lang = $m[1];
 else {

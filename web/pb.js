@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.14 2005-07-27 21:43:28 matthew Exp $
+ * $Id: pb.js,v 1.15 2005-07-29 10:37:14 chris Exp $
  * 
  */
 
@@ -90,13 +90,16 @@ function checklength(thi) {
 
 // optionclick is "true" if user just clicked, or "false" during page load
 function update_postcode_local(item, optionclick) {
-    var d = item.form
-    var e = d.elements['country']
-    isuk = e.options[e.selectedIndex].value == "GB"
-    islocal = d.elements['local1'].checked
-    grey_local(!isuk)
-    grey_postcode(!islocal || !isuk, optionclick)
+    var d = item.form;
+    var e = d.elements['country'];
+    iscountry = (e.options[e.selectedIndex.value] != "Global");
+    isuk = (e.options[e.selectedIndex].value == "GB");
+    islocal = (d.elements['local1'].checked);
+    grey_local(!iscountry);
+    grey_place(!islocal || !iscountry, optionclick);
+    grey_postcode(!islocal || !isuk, optionclick);
 }
+
 function grey_postcode(t, optionclick) {
     if (t) {
         document.getElementById('postcode_line').style.color = '#999999'
@@ -105,11 +108,23 @@ function grey_postcode(t, optionclick) {
     }
     grey_thing(t, 'postcode', optionclick)
 }
+
+function grey_place(t, optionclick) {
+    if (t) {
+        document.getElementById('place_line').style.color = '#999999'
+    } else {
+        document.getElementById('place_line').style.color = '#000000'
+    }
+    grey_thing(t, 'place', optionclick)
+}
+
 function grey_local(t) {
     if (t) {
         document.getElementById('local_line').style.color = '#999999'
+        document.getElementById('place_line').style.color = '#999999'
     } else {
         document.getElementById('local_line').style.color = '#000000'
+        document.getElementById('place_line').style.color = '#000000'
     }
     grey_thing(t, 'local0', false)
     grey_thing(t, 'local1', false)

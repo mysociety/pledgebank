@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.18 2005-07-12 12:52:37 francis Exp $
+// $Id: abuse.php,v 1.19 2005-07-31 22:29:48 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -95,7 +95,7 @@ as possible.')), $w);
         $name = htmlspecialchars(db_getOne('select name from signers where id = ?', $q_id));
         print $name;
     } elseif ($q_what == 'comment') {
-        comments_show_one(db_getRow('select * from comment where id = ?', $q_id), true);
+        comments_show_one(db_getRow('select *,extract(epoch from whenposted) as whenposted from comment where id = ?', $q_id), true);
     }
     print '</blockquote>';
     if ($q_what != 'pledge') {

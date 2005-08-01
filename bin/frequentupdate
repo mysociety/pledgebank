@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.49 2005-07-24 23:15:06 chris Exp $
+ * $Id: frequentupdate,v 1.50 2005-08-01 23:10:08 francis Exp $
  *
  */
 
@@ -63,7 +63,7 @@ function mark_pledges_successful() {
     $q = db_query('
             select * from pledges
             where whensucceeded is null
-                and pb_current_date() < date
+                and pb_current_date() <= date
                 and (select count(id) from signers
                     where pledge_id = pledges.id) >= target
             for update');

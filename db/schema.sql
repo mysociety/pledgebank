@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.140 2005-07-29 17:26:55 chris Exp $
+-- $Id: schema.sql,v 1.141 2005-08-01 10:15:46 chris Exp $
 --
 
 -- secret
@@ -68,9 +68,9 @@ create table location (
     -- Information which was presented by the user to identify the location.
     country char(2) not null,       -- ISO country code
     state char(2),                  -- US state
-    method text not null check (method in ('MaPit', 'Gaze')),
-    input text not null,    -- whatever the user gave, whether a postcode or
-                            -- a placename or whatever
+    method text check (method in ('MaPit', 'Gaze')),
+    input text,     -- whatever the user gave, whether a postcode or a
+                    -- placename or whatever
 
     -- Geographical coordinates in WGS84.
     latitude double precision,      -- north-positive, degrees
@@ -83,8 +83,13 @@ create table location (
     -- Textual description of the location which we can show back to the user.
     description text not null,
 
-    check ((latitude is null and longitude is null)
-            or (latitude is not null and longitude is not null)),
+    -- A location can represent either a point or a whole country.
+    check ((method is null and input is null
+                and latitude is null and longitude is null)
+            or (method is not null and input is not null
+                and latitude is not null and longitude is not null),
+
+    -- If coordinates are given they must be valid.
     check (latitude is null or (latitude >= -90 and latitude <= +90)),
     check (longitude is null or (longitude >= -180 and longitude < 180))
 );

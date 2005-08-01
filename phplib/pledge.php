@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.118 2005-07-22 13:57:39 francis Exp $
+ * $Id: pledge.php,v 1.119 2005-08-01 22:54:59 francis Exp $
  * 
  */
 
@@ -16,6 +16,7 @@ require_once '../../phplib/person.php';
 
 require_once '../../phplib/utility.php';
 require_once '../../phplib/rabx.php';
+require_once '../../phplib/countries.php';
 
 class Pledge {
     // Associative array of parameters about the pledge, taken from database
@@ -32,9 +33,11 @@ class Pledge {
                                pb_current_date() <= pledges.date AS open,
                                (SELECT count(*) FROM signers WHERE 
                                     signers.pledge_id = pledges.id) AS signers,
-                               person.email AS email
+                               person.email AS email,
+                               country, description as local_place, method as location_method
                            FROM pledges
-                           LEFT JOIN person ON person.id = pledges.person_id ";
+                           LEFT JOIN person ON person.id = pledges.person_id 
+                           LEFT JOIN location ON location.id = pledges.location_id";
         if (gettype($ref) == "integer" or (gettype($ref) == "string" and preg_match('/^[1-9]\d*$/', $ref))) {
             $q = db_query("$main_query_part WHERE pledges.id = ?", array($ref));
             if (!db_num_rows($q))
@@ -83,6 +86,14 @@ class Pledge {
         if (!array_key_exists('open', $this->data)) $this->data['open'] = 't';
         if (!array_key_exists('cancelled', $this->data)) $this->data['cancelled'] = null;
         if (!array_key_exists('notice', $this->data)) $this->data['notice'] = null;
+        if ($this->data['country'] == 'GB' && $this->data['postcode']) {
+            $this->data['local_place'] = $this->data['postcode'];
+            $this->data['location_method'] = 'MaPit';
+        } elseif (array_key_exists('gaze_place', $this->data)) {
+            list($lat, $lon, $desc) = explode(',', $this->data['gaze_place'], 3);
+            $this->data['local_place'] = $desc;
+            $this->data['location_method'] = 'Gaze';
+        }
 
         // Some calculations 
         $this->data['left'] = $this->data['target'] - $this->data['signers'];
@@ -158,6 +169,32 @@ class Pledge {
     }
     function h_pretty_date() { return prettify(htmlspecialchars($this->data['date'])); }
 
+    function is_global() { return !isset($this->data['country']); }
+    function h_country() { 
+        global $countries_code_to_name;
+        if (isset($this->data['country']))
+            return htmlspecialchars($countries_code_to_name[$this->data['country']]); 
+        else
+            return 'Global';
+    }
+
+    function is_local() { return isset($this->data['local_place']); }
+    function h_local_type() { 
+        if ($this->data['location_method'] == 'Gaze') {
+            return _("Place");
+        } elseif ($this->data['location_method'] == 'MaPit') {
+            return _("Postcode");
+        } else {
+            err('Unknown location_method');
+        }
+    }
+    function h_local_place() { 
+        if (isset($this->data['local_place']))
+            return htmlspecialchars($this->data['local_place']);
+        else 
+            return 'Whole country';
+    }
+
     // Links.  The semantics here is that the URLs are all escaped, but didn't
     // need escaping.  They can safely be used in HTML or plain text.
     function url_main() { return OPTION_BASE_URL . "/" . $this->h_ref; }
@@ -194,7 +231,14 @@ class Pledge {
 <? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
 &quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
-<p><?=_('Deadline to sign up by:') ?> <strong><?=$this->h_pretty_date()?></strong>.
+<p>
+<?=_('Deadline to sign up by:') ?> <strong><?=$this->h_pretty_date()?></strong>
+<? if (!$this->is_global()) { ?>
+    <br> <?=_('Country:') ?> <strong><?=$this->h_country()?></strong>
+<? } ?>
+<? if ($this->is_local()) { ?>
+    <?=$this->h_local_type()?>: <strong><?=$this->h_local_place()?></strong>
+<? } ?>
 <br>
 <?      if ($this->signers() >= 0) {
             print '<i>';

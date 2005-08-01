@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.23 2005-07-29 14:54:08 matthew Exp $
+ * $Id: pb.php,v 1.24 2005-08-01 22:54:59 francis Exp $
  * 
  */
 
@@ -19,8 +19,8 @@ require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
 require_once 'page.php';
 
-# Language stuff
-# require_once 'HTTP.php';
+# Language negotiation
+# require_once 'HTTP.php'; # PHP's own negotiateLanguage, broken in old versions
 # Translations available of PledgeBank
 $langs = array('en-gb'=>'English', 'pt-br'=>'Portugu&ecirc;s (Brazil)');
 # Map of lang to directory
@@ -57,12 +57,17 @@ ob_start();
  * Display a PHP error message to the user. */
 function pb_handle_error($num, $message, $file, $line, $context) {
     if (OPTION_PB_STAGING) {
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         page_header(_("Sorry! Something's gone wrong."));
         print("<strong>$message</strong> in $file:$line");
         page_footer();
     } else {
         /* Nuke any existing page output to display the error message. */
-        ob_clean();
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
         /* Message will be in log file, don't display it for cleanliness */
         $err = p(_('Please try again later, or <a href="mailto:team@pledgebank.com">email us</a> for help resolving the problem.'));
         if ($num & E_USER_ERROR) {

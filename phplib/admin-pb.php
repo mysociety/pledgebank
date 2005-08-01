@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.89 2005-07-19 13:59:09 matthew Exp $
+ * $Id: admin-pb.php,v 1.90 2005-08-01 22:54:59 francis Exp $
  * 
  */
 
@@ -30,7 +30,7 @@ class ADMIN_PAGE_PB_SUMMARY {
         $open = db_getOne('SELECT COUNT(*) FROM pledges WHERE pb_current_date() <= date AND whensucceeded IS NULL');
         $signatures = db_getOne('SELECT COUNT(*) FROM signers');
         $signers = db_getOne('SELECT COUNT(DISTINCT person_id) FROM signers');
-        $local = db_getOne('SELECT COUNT(*) FROM pledges WHERE country != \'Global\'');
+        $local = db_getOne('SELECT COUNT(*) FROM pledges WHERE location_id is not null');
         
         print "Pledges: $pledges<br>$nonbackpage non-backpaged<br>$successful successful, $failed failed, $open open<br>$signatures signatures, $signers signers<br>$local non-global";
     }
@@ -171,9 +171,13 @@ class ADMIN_PAGE_PB_MAIN {
         if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 'e';
 
         $q = db_query('SELECT pledges.*, person.email,
-                pb_pledge_prominence(pledges.id) as calculated_prominence
+                pb_pledge_prominence(pledges.id) as calculated_prominence,
+                location.country, location.description,
+                location.longitude, location.latitude
             FROM pledges 
-            LEFT JOIN person ON person.id = pledges.person_id WHERE ref ILIKE ?', $pledge);
+            LEFT JOIN person ON person.id = pledges.person_id 
+            LEFT JOIN location ON location.id = pledges.location_id
+            WHERE ref ILIKE ?', $pledge);
         $pdata = db_fetch_array($q);
 
         print "<h2>Pledge '<a href=\"".OPTION_BASE_URL.'/'.$pdata['ref']."\">" . $pdata['ref'] . "</a>'";
@@ -184,9 +188,11 @@ class ADMIN_PAGE_PB_MAIN {
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
-        print '<br>Country: <b>' . $pdata['country'] . "</b>";
-        if ($pdata['postcode'])
-            print ' Postcode: <b>' . $pdata['postcode'].'</b>';
+        print '<br>';
+        if (array_key_exists('country', $pdata))
+            print 'Country: <b>' . $pdata['country'] . "</b>";
+        if (array_key_exists('description', $pdata))
+            print ' Place: <b>' . $pdata['description'].'</b>';
         if ($pdata['longitude'])
             print ' Longitude/Latitude WGS84: <b>' . round($pdata['longitude'],2).'E ' . round($pdata['latitude'],2).'N</b>';
         print "</p>";

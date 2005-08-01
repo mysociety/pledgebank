@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.141 2005-08-01 10:15:46 chris Exp $
+-- $Id: schema.sql,v 1.142 2005-08-01 22:54:59 francis Exp $
 --
 
 -- secret
@@ -62,15 +62,20 @@ create table category (
 create unique index category_ican_id_idx on category(ican_id);
 
 -- locations of pledges, centers of local alerts, etc., abstracted out so that
--- we can use a variety of location services.
+-- we can use a variety of location services.  A location can be either:
+-- * A country, with no specific place in that country
+-- * A country, with a specific point in that country
+-- For specific points a 'latitude', 'longitude' and 'description' are always
+-- available.  These are made via 'method' and 'input'; either a postcode or
+-- gazetter lookup.
 create table location (
     id serial not null primary key,
     -- Information which was presented by the user to identify the location.
     country char(2) not null,       -- ISO country code
     state char(2),                  -- US state
-    method text check (method in ('MaPit', 'Gaze')),
-    input text,     -- whatever the user gave, whether a postcode or a
-                    -- placename or whatever
+    method text check (method in ('MaPit', 'Gaze')), -- NULL means whole country
+    input text,     -- whatever the user gave, whether a postcode or
+                    -- a placename or whatever
 
     -- Geographical coordinates in WGS84.
     latitude double precision,      -- north-positive, degrees
@@ -234,7 +239,7 @@ create function pledge_find_nearby(double precision, double precision, double pr
         from pledges, location
         where
             location.id = pledges.location_id
-            and latitude is not null
+            and longitude is not null and latitude is not null
             and radians(latitude) > radians($1) - ($3 / R_e())
             and radians(latitude) < radians($1) + ($3 / R_e())
             and (abs(radians($1)) + ($3 / R_e()) > pi() / 2     -- case where search pt is near pole
@@ -871,7 +876,12 @@ select case
     when (select prominence from pledges where id = $1) = ''normal''
         then ''normal''
     else
-        pb_pledge_prominence( (select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer, (select longitude from pledges where id = $1) is not null )
+        pb_pledge_prominence( 
+            (select prominence from pledges where id = $1), 
+            (select count(id) from signers where pledge_id = $1)::integer, 
+            (select longitude from pledges, location 
+             where pledges.location_id = location.id and pledges.id = $1) is not null 
+        )
     end;
 ' language sql;
 

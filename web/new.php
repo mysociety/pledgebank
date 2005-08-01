@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.64 2005-07-29 17:26:55 chris Exp $
+// $Id: new.php,v 1.65 2005-08-01 22:54:59 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -304,10 +304,10 @@ if (array_key_exists('country', $data))
 <p><span id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?></span>
 
 <br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local1"><?=_('Yes') ?></label>
-<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local0"><?=_('No') ?></label></span>
+<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local0"><?=_('No') ?></label>
 <br>
-<span id="place_line"><?=_('If yes, type the name of the place:') ?>
-<input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($data['place'])) print htmlspecialchars($data['place']) ?>">
+
+<p><span id="place_line">
 <?
 
 /* Save previous value of 'place' so we can show a new selection list in the
@@ -321,9 +321,10 @@ if (array_key_exists('place', $data))
 if (!$place || array_key_exists('place', $errors)) {
     ?>
 <small><?=_('(This will be used to let people who live nearby find your pledge.)') ?></small>
+       <?=_('If yes, type the name of the place:') ?>
     <?
 } else {
-    print "<br><strong>" . _("There are several possible places which match that name. Please choose one:") . "</strong><br>";
+    print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
     $places = gaze_find_places($country, $state, $place, 10);
     if (rabx_is_error($places))
         err($places->text);
@@ -335,9 +336,11 @@ if (!$place || array_key_exists('place', $errors)) {
         $t = htmlspecialchars("$lat,$lon,$desc");
         print "<input type=\"radio\" name=\"gaze_place\" value=\"$t\" id=\"$t\"><label for=\"$t\">$desc</label><br>";
     }
+    print "<strong>"._("If it isn't any of those, try a different spelling, or the name of another nearby town:")."</strong>";
 }
 
 ?>
+<input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($data['place'])) print htmlspecialchars($data['place']) ?>">
 </span>
 <br>
 <span id="postcode_line">
@@ -506,7 +509,7 @@ function target_warning_error_check($data) {
     return $errors;
 }
  
-function step2_error_check($data) {
+function step2_error_check(&$data) {
     global $countries_code_to_name, $countries_statecode_to_name;
 
     $errors = array();
@@ -538,6 +541,7 @@ function step2_error_check($data) {
                         $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode; for example, OX1 3DR or WC1.');
                     else if (mapit_get_error(mapit_get_location($data['postcode'], 1)))
                         $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
+                    $data['postcode'] = canonicalise_partial_postcode($data['postcode']);
                 } else if (($data['place'] && $data['prev_place'] == $data['place'] && $data['prev_country'] == $data['country'] && !$data['gaze_place'])
                             || !preg_match('/^-?(0|[1-9]\d*)(\.\d*|),-?(0|[1-9]\d*)(\.\d*|),.+$/', $data['gaze_place']))
                     $errors['gaze_place'] = _("Please select one of the possible places; if none of them is right, please type the name of another nearby place");

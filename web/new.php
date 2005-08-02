@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.65 2005-08-01 22:54:59 francis Exp $
+// $Id: new.php,v 1.66 2005-08-02 14:25:59 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -21,14 +21,8 @@ require_once '../../phplib/gaze.php';
 $page_title = _('Create a New Pledge');
 $page_params = array();
 ob_start();
-if (get_http_var('newpost')==1) {
-    pledge_form_one_submitted();
-} elseif (get_http_var('newpost')=='tw') {
-    pledge_form_target_warning_submitted();
-} elseif (get_http_var('newpost')==2) {
-    pledge_form_two_submitted();
-} elseif (get_http_var('newpost')==3) {
-    pledge_form_three_submitted();
+if (get_http_var('tostep1') || get_http_var('totargetwarning') || get_http_var('tostep2') || get_http_var('tostep3') || get_http_var('topreview') || get_http_var('tocreate')) {
+    pledge_form_submitted();
 } else {
     pledge_form_one();
 }
@@ -104,8 +98,8 @@ the door of that neighbour whose name you've forgotten.") ?></li>
     }
 ?>
 
-<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="1">
-<h2><?=_('New Pledge &#8211; Step 1 of 3') ?></h2>
+<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
+<h2><?=_('New Pledge &#8211; Step 1 of 4') ?></h2>
 <div class="c">
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="Pledge" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
@@ -134,11 +128,12 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
 </div>
-<p style="text-align: right">
-<?=_("Did you read the tips at the top of the page? They'll help you make a successful pledge") ?> <input type="submit" name="submit" value="<?=_('Next') ?> &gt;&gt;"></p>
 <? if (sizeof($data)) {
     print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
 } ?>
+<p style="text-align: right">
+<?=_("Did you read the tips at the top of the page? They'll help you make a successful pledge") ?> 
+<input type="submit" name="totargetwarning" value="<?=_('Next') ?> &gt;&gt;"></p>
 </form>
 <? 
 }
@@ -159,7 +154,7 @@ function pledge_form_target_warning($data, $errors) {
     
 ?>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="tw">
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
 
 <?  print h2(_('Rethink your target'));
     printf(p(_("Hello - we've noticed that your pledge is aiming to recruit more than
@@ -180,8 +175,9 @@ for a larger and more ambitious one.') ?></p>
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input type="submit" name="newback" value="&lt;&lt; <?=_('Back to step 1') ?>">
-<input type="submit" name="submit" value="<?=_('Next') ?> &gt;&gt;">
+
+<input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
+<input type="submit" name="tostep2" value="<?=_('Next') ?> &gt;&gt;">
 </p>
 
 </form>
@@ -193,10 +189,6 @@ for a larger and more ambitious one.') ?></p>
 function pledge_form_two($data, $errors = array()) {
     global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name;
 
-    $v = 'all';
-    if (isset($data['visibility'])) {
-        $v = $data['visibility']; if ($v!='pin') $v = 'all';
-    }
     $local = (array_key_exists('local', $data)) && $data['local'] == '1';
     $notlocal = (array_key_exists('local', $data)) && $data['local'] == '0';
     $isodate = $data['parseddate']['iso'];
@@ -238,8 +230,8 @@ function pledge_form_two($data, $errors = array()) {
     $partial_pledge->render_box(array('showdetails' => true));
 ?>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="2">
-<h2><?=_('New Pledge &#8211; Step 2 of 3') ?></h2>
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
+<h2><?=_('New Pledge &#8211; Step 2 of 4') ?></h2>
 
 <input type="hidden" name="comparison" value="atleast">
 <? /* <p>Should the pledge stop accepting new subscribers when it
@@ -301,7 +293,9 @@ if (array_key_exists('country', $data))
 </select>
 </p>
 
-<p><span id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?></span>
+<p><span id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?>
+        <?=_('If so, we will help people who live nearby find your pledge.') ?>
+</span>
 
 <br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local1"><?=_('Yes') ?></label>
 <input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local0"><?=_('No') ?></label>
@@ -320,7 +314,6 @@ if (array_key_exists('place', $data))
  * possible places from Gaze. */
 if (!$place || array_key_exists('place', $errors)) {
     ?>
-<small><?=_('(This will be used to let people who live nearby find your pledge.)') ?></small>
        <?=_('If yes, type the name of the place:') ?>
     <?
 } else {
@@ -344,12 +337,44 @@ if (!$place || array_key_exists('place', $errors)) {
 </span>
 <br>
 <span id="postcode_line">
-<?=_('In Britain, you can give a postcode instead:') ?>
+<?=_('In the UK, you can give a postcode area instead:') ?>
 <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
-<small><?=_('(You can enter just the start of the postcode, such as WC1, if you like.)') ?></small>
+<br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
 </span>
 </p>
+<p style="text-align: right;">
+<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
+<input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
+<input type="submit" name="tostep3" value="<?=_('Next') ?> &gt;&gt;">
+</p>
 
+</form>
+<?
+}
+
+function pledge_form_three($data, $errors = array()) {
+    $v = 'all';
+    if (isset($data['visibility'])) {
+        $v = $data['visibility']; if ($v!='pin') $v = 'all';
+    }
+    $isodate = $data['parseddate']['iso'];
+
+    if (sizeof($errors)) {
+        print '<div id="errors"><ul><li>';
+        print join ('</li><li>', $errors);
+        print '</li></ul></div>';
+    } else {
+?>
+
+<p><?=_('Your pledge looks like this so far:') ?></p>
+<?  }
+    $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
+    $partial_pledge = new Pledge($row);
+    $partial_pledge->render_box(array('showdetails' => true));
+?>
+
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
+<h2><?=_('New Pledge &#8211; Step 3 of 4') ?></h2>
 <p><?=_('Which category does your pledge best fit into?') ?>
 <select name="category">
 <option value="-1"><?=_('(choose one)') ?></option>
@@ -380,8 +405,8 @@ if (!$place || array_key_exists('place', $errors)) {
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input type="submit" name="newback" value="&lt;&lt; <?=_('Back to step 1') ?>">
-<input type="submit" name="submit" value="<?=_('Preview') ?> &gt;&gt;">
+<input type="submit" name="tostep2" value="&lt;&lt; <?=_('Back to step 2') ?>">
+<input type="submit" name="topreview" value="<?=_('Preview') ?> &gt;&gt;">
 </p>
 
 </form>
@@ -389,60 +414,100 @@ if (!$place || array_key_exists('place', $errors)) {
 <?
 }
 
-function pledge_form_one_submitted() {
+function pledge_form_submitted() {
+    $errors = array();
     $data = array();
-    $fields = array('title', 'target', 'name', 'email', 'ref', 'type', 'date', 'signup', 'data','identity','detail');
-    foreach ($fields as $field) {
+    foreach (array_keys($_POST) as $field) {
         $data[$field] = get_http_var($field);
     }
+    
+    if (array_key_exists('data', $data)) {
+        $alldata = unserialize(base64_decode($data['data']));
+        if (!$alldata) $errors[] = _('Transferring the data from previous page failed :(');
+        unset($data['data']);
+        $data = array_merge($alldata, $data);
+    }
+
+    # Step 1 fixes
     if ($data['title']=='<Enter your pledge>') $data['title'] = '';
     if (!$data['type']) $data['type'] = 'other local people';
     $data['parseddate'] = parse_date($data['date']);
     if (!$data['signup']) $data['signup'] = 'sign up';
     $data['signup'] = preg_replace('#\.$#', '', $data['signup']);
+    # Step 2 fixes
+    if (!$data['local']) { $data['postcode'] = ''; $data['place'] = ''; }
+    if (array_key_exists('country', $data) && $data['country'] != 'GB') $data['postcode'] = '';
+    if (!array_key_exists('gaze_place', $data)) $data['gaze_place'] = '';
+    # Preview fixes
+    if (!array_key_exists('confirmconditions', $data)) $data['confirmconditions'] = 0;
 
-    $stepdata = unserialize(base64_decode($data['data']));
-    if ($stepdata && !is_array($stepdata)) $errors[] = _('Transferring the data between steps failed!');
-    unset($data['data']);
-    if ($stepdata)
-        $data = array_merge($stepdata, $data);
-
+    # Step 1, main pledge details
+    if (get_http_var('tostep1')) {
+        pledge_form_one($data, $errors);
+        return;
+    }
     $errors = step1_error_check($data);
     if (sizeof($errors)) {
         pledge_form_one($data, $errors);
         return;
-    } 
-    $errors = target_warning_error_check($data);
-    if (sizeof($errors) || $data['target'] > OPTION_PB_TARGET_WARNING) {
+    }
+
+    # Target warning
+    if ($data['target'] > OPTION_PB_TARGET_WARNING && get_http_var('totargetwarning')) {
         pledge_form_target_warning($data, $errors);
         return;
     }
-    pledge_form_two($data);
-}
-
-function pledge_form_target_warning_submitted() {
-    $data = array();
-    $fields = array('data','target');
-    foreach ($fields as $field) {
-        $data[$field] = get_http_var($field);
-    }
-    $steptwdata = unserialize(base64_decode($data['data']));
-    if (!$steptwdata) $errors[] = _('Transferring the data from target warning failed!');
-    unset($data['data']);
-    $data = array_merge($steptwdata, $data);
-
     $errors = target_warning_error_check($data);
-    if (sizeof($errors) && !get_http_var('newback')) {
+    if (sizeof($errors)) {
         pledge_form_target_warning($data, $errors);
         return;
     }
-
-    $errors = step1_error_check($data);
-    if (sizeof($errors) || get_http_var('newback')) {
-        pledge_form_one($data, $errors);
-    } else {
-        pledge_form_two($data);
+    
+    # Step 2, location
+    if (get_http_var('tostep2') || get_http_var('totargetwarning')) {
+        pledge_form_two($data, $errors);
+        return;
     }
+    $errors = step2_error_check($data);
+    if (sizeof($errors) || $data['prev_country'] != $data['country'] || $data['prev_place'] != $data['place']) {
+        pledge_form_two($data, $errors);
+        return;
+    }
+
+    # Step 3, category, privacy
+    if (get_http_var('tostep3')) {
+        pledge_form_three($data, $errors);
+        return;
+    }
+    if ($data['visibility'] != 'pin') { 
+        $data['visibility'] = 'all'; 
+        $data['pin'] = ''; 
+    }
+    $errors = step3_error_check($data);
+    if (sizeof($errors)) {
+        pledge_form_three($data, $errors);
+        return;
+    }
+
+    # Step 4, preview
+    if (get_http_var('topreview')) {
+        # we want to force checking of this every time get to this page
+        $data['confirmconditions'] = 0;
+        preview_pledge($data, $errors);
+        return;
+    }
+    $errors = preview_error_check($data);
+    if (sizeof($errors)) {
+        preview_pledge($data, $errors);
+        return;
+    }
+ 
+    /* User must have an account to do this. */
+    $data['reason_web'] = _('Before creating your new pledge, we need to check that your email is working.');
+    $data['template'] = 'pledge-confirm';
+    $P = person_signon($data, $data['email'], $data['name']);
+
+    create_new_pledge($P, $data);
 }
 
 function step1_error_check($data) {
@@ -542,111 +607,38 @@ function step2_error_check(&$data) {
                     else if (mapit_get_error(mapit_get_location($data['postcode'], 1)))
                         $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
                     $data['postcode'] = canonicalise_partial_postcode($data['postcode']);
-                } else if (($data['place'] && $data['prev_place'] == $data['place'] && $data['prev_country'] == $data['country'] && !$data['gaze_place'])
-                            || !preg_match('/^-?(0|[1-9]\d*)(\.\d*|),-?(0|[1-9]\d*)(\.\d*|),.+$/', $data['gaze_place']))
+                } else if (($data['place'] && 
+                            $data['prev_place'] == $data['place'] && 
+                            $data['prev_country'] == $data['country'] && 
+                            !$data['gaze_place'])
+                           || !preg_match('/^-?(0|[1-9]\d*)(\.\d*|),-?(0|[1-9]\d*)(\.\d*|),.+$/', $data['gaze_place'])) {
                     $errors['gaze_place'] = _("Please select one of the possible places; if none of them is right, please type the name of another nearby place");
-                else if (!$data['postcode'] && !$data['place'])
+                } else if (!$data['postcode'] && !$data['place']) {
                     $errors['place'] = ($data['country'] == 'GB'
                                         ? _("For a local pledge, please type a postcode or place name")
                                         : _("Please type a place name for your local pledge"));
+                }
                 if ($data['postcode'] && $data['country'] != 'GB')
                     $errors['postcode'] = _("You can only enter a postcode if your pledge applies to Britain");
             }
         }
     }
+    return $errors;
+}
+
+function step3_error_check(&$data) {
+    $errors = array();
     if ($data['visibility'] == 'pin' && !$data['pin']) 
         $errors['pin'] = _('Please enter a pin');
     return $errors;
 }
 
-function step3_error_check($data) {
+function preview_error_check($data) {
     $errors = array();
     if (!$data['confirmconditions']) {
         $errors['confirmconditions'] = _('Please read the terms and conditions paragraph, and check the box to confirm that you have');
     }
     return $errors;
-}
-
-function pledge_form_two_submitted() {
-    $errors = array();
-    $data = array();
-    $fields = array('comparison', 'category', 'country', 'prev_country', 'local', 'postcode', 'place', 'prev_place', 'gaze_place', 'visibility', 'pin', 'data');
-    foreach ($fields as $field) {
-        $data[$field] = trim(get_http_var($field));
-    }
-
-    $step1data = unserialize(base64_decode($data['data']));
-    if (!$step1data) $errors[] = _('Transferring the data from Step 1 to Step 2 failed :(');
-    unset($data['data']);
-    $data = array_merge($step1data, $data);
-
-    if (!$data['local']) {
-        $data['postcode'] = '';
-        $data['place'] = '';
-    }
-    if ($data['country'] != 'GB')
-        $data['postcode'] = '';
-    if ($data['visibility'] != 'pin') { $data['visibility'] = 'all'; $data['pin'] = ''; }
-
-    $errors = step1_error_check($data);
-    if (sizeof($errors) || get_http_var('newback')) {
-        pledge_form_one($data, $errors);
-        return;
-    }
-    $errors = target_warning_error_check($data);
-    if (sizeof($errors)) {
-        pledge_form_target_warning($data, $errors);
-        return;
-    }
-    $errors = step2_error_check($data);
-    if (sizeof($errors) || $data['prev_country'] != $data['country'] || $data['prev_place'] != $data['place']) {
-        pledge_form_two($data, $errors);
-        return;
-    }
-
-    preview_pledge($data, $errors);
-}
-
-function pledge_form_three_submitted() {
-    $errors = array();
-    $data = array();
-    $fields = array('data', 'confirmconditions');
-    foreach ($fields as $field) {
-        $data[$field] = get_http_var($field);
-    }
-    
-    $alldata = unserialize(base64_decode($data['data']));
-    if (!$alldata) $errors[] = _('Transferring the data from Preview page failed :(');
-    unset($data['data']);
-    $data = array_merge($alldata, $data);
-
-    $errors = step1_error_check($data);
-    if (sizeof($errors) || get_http_var('newback1')) {
-        pledge_form_one($data, $errors);
-        return;
-    }
-    $errors = target_warning_error_check($data);
-    if (sizeof($errors)) {
-        pledge_form_target_warning($data, $errors);
-        return;
-    }
-    $errors = step2_error_check($data);
-    if (sizeof($errors) || get_http_var('newback2')) {
-        pledge_form_two($data, $errors);
-        return;
-    }
-    $errors = step3_error_check($data);
-    if (sizeof($errors)) {
-        preview_pledge($data, $errors);
-        return;
-    }
- 
-    /* User must have an account to do this. */
-    $data['reason_web'] = _('Before creating your new pledge, we need to check that your email is working.');
-    $data['template'] = 'pledge-confirm';
-    $P = person_signon($data, $data['email'], $data['name']);
-
-    create_new_pledge($P, $data);
 }
 
 function preview_pledge($data, $errors) {
@@ -678,8 +670,8 @@ function preview_pledge($data, $errors) {
     /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ 
 ?>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new"><input type="hidden" name="newpost" value="3">
-<?  print h2(_('New Pledge &#8211; Step 3 of 3'));
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
+<?  print h2(_('New Pledge &#8211; Step 4 of 4'));
     print p(_('Please check the details you have entered, both the pledge itself (see left) 
 and other details below.  Click one of the two "Back" buttons if you would like
 to go back and edit your data.  
@@ -757,9 +749,10 @@ greater publicity and a greater chance of succeeding.');
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input type="submit" name="newback1" value="&lt;&lt; <?=_('Back to step 1') ?>">
-<input type="submit" name="newback2" value="&lt;&lt; <?=_('Back to step 2') ?>">
-<input type="submit" name="submit" value="<?=_('Create') ?> &gt;&gt;">
+<input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
+<input type="submit" name="tostep2" value="&lt;&lt; <?=_('Back to step 2') ?>">
+<input type="submit" name="tostep3" value="&lt;&lt; <?=_('Back to step 3') ?>">
+<input type="submit" name="tocreate" value="<?=_('Create') ?> &gt;&gt;">
 </p>
 
 </form>

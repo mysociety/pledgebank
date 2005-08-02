@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.119 2005-08-01 22:54:59 francis Exp $
+ * $Id: pledge.php,v 1.120 2005-08-02 14:25:59 francis Exp $
  * 
  */
 
@@ -86,13 +86,17 @@ class Pledge {
         if (!array_key_exists('open', $this->data)) $this->data['open'] = 't';
         if (!array_key_exists('cancelled', $this->data)) $this->data['cancelled'] = null;
         if (!array_key_exists('notice', $this->data)) $this->data['notice'] = null;
-        if ($this->data['country'] == 'GB' && $this->data['postcode']) {
-            $this->data['local_place'] = $this->data['postcode'];
-            $this->data['location_method'] = 'MaPit';
-        } elseif (array_key_exists('gaze_place', $this->data)) {
-            list($lat, $lon, $desc) = explode(',', $this->data['gaze_place'], 3);
-            $this->data['local_place'] = $desc;
-            $this->data['location_method'] = 'Gaze';
+        if (array_key_exists('country', $this->data)) {
+            if ($this->data['country'] == 'GB' && array_key_exists('postcode', $this->data) && $this->data['postcode']) {
+                $this->data['local_place'] = $this->data['postcode'];
+                $this->data['location_method'] = 'MaPit';
+            } elseif (array_key_exists('gaze_place', $this->data) && $this->data['gaze_place']) {
+                list($lat, $lon, $desc) = explode(',', $this->data['gaze_place'], 3);
+                $this->data['local_place'] = $desc;
+                $this->data['location_method'] = 'Gaze';
+            } elseif ($this->data['country'] == 'Global') {
+                $this->data['country'] = null;
+            }
         }
 
         // Some calculations 
@@ -172,7 +176,7 @@ class Pledge {
     function is_global() { return !isset($this->data['country']); }
     function h_country() { 
         global $countries_code_to_name;
-        if (isset($this->data['country']))
+        if (isset($this->data['country']) && $this->data['country'] != '(choose one)')
             return htmlspecialchars($countries_code_to_name[$this->data['country']]); 
         else
             return 'Global';
@@ -183,7 +187,7 @@ class Pledge {
         if ($this->data['location_method'] == 'Gaze') {
             return _("Place");
         } elseif ($this->data['location_method'] == 'MaPit') {
-            return _("Postcode");
+            return _("Postcode area");
         } else {
             err('Unknown location_method');
         }
@@ -233,12 +237,6 @@ class Pledge {
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
 <p>
 <?=_('Deadline to sign up by:') ?> <strong><?=$this->h_pretty_date()?></strong>
-<? if (!$this->is_global()) { ?>
-    <br> <?=_('Country:') ?> <strong><?=$this->h_country()?></strong>
-<? } ?>
-<? if ($this->is_local()) { ?>
-    <?=$this->h_local_type()?>: <strong><?=$this->h_local_place()?></strong>
-<? } ?>
 <br>
 <?      if ($this->signers() >= 0) {
             print '<i>';
@@ -258,6 +256,20 @@ class Pledge {
             }
             print '</i>';
         }
+?>
+<? if ($this->is_global()) { ?>
+    <!-- global -->
+<? } else { ?>
+    <? if ($this->is_local()) { ?>
+        <p> <?=$this->h_local_type()?>:
+        <strong><?=$this->h_local_place()?></strong>,
+        <strong><?=$this->h_country()?></strong>
+    <? } else { ?>
+        <p> <?=_('Country:')?>
+        <strong><?=$this->h_country()?></strong>
+    <? } ?>
+<? } ?>
+<?
         print '</p>';
         if (array_key_exists('showdetails', $params) && $params['showdetails'] && isset($this->data['detail']) && $this->data['detail']) {
             $det = htmlspecialchars($this->data['detail']);
@@ -666,7 +678,7 @@ function pledge_delete_comment($id) {
  * Given pledge data, returns true if local pledge (where flyers
  * are useful), or false if it isn't. */
 function pledge_is_local($r) {
-    return $r['country'] == 'GB' && $r['postcode'];
+    return isset($r['local_place']); 
 }
 
 ?>

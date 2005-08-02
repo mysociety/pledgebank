@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.120 2005-08-02 14:25:59 francis Exp $
+ * $Id: pledge.php,v 1.121 2005-08-02 15:00:18 francis Exp $
  * 
  */
 
@@ -90,11 +90,14 @@ class Pledge {
             if ($this->data['country'] == 'GB' && array_key_exists('postcode', $this->data) && $this->data['postcode']) {
                 $this->data['local_place'] = $this->data['postcode'];
                 $this->data['location_method'] = 'MaPit';
-            } elseif (array_key_exists('gaze_place', $this->data) && $this->data['gaze_place']) {
+            } 
+            if (array_key_exists('gaze_place', $this->data) && $this->data['gaze_place']) {
                 list($lat, $lon, $desc) = explode(',', $this->data['gaze_place'], 3);
                 $this->data['local_place'] = $desc;
                 $this->data['location_method'] = 'Gaze';
-            } elseif ($this->data['country'] == 'Global') {
+            }
+            if ($this->data['country'] == 'Global') {
+                print "nulled";
                 $this->data['country'] = null;
             }
         }
@@ -176,9 +179,13 @@ class Pledge {
     function is_global() { return !isset($this->data['country']); }
     function h_country() { 
         global $countries_code_to_name;
-        if (isset($this->data['country']) && $this->data['country'] != '(choose one)')
-            return htmlspecialchars($countries_code_to_name[$this->data['country']]); 
-        else
+        if (isset($this->data['country'])) {
+            $country = $this->data['country'];
+            $a = array();
+            if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
+                list($x, $country, $state) = $a;
+            return htmlspecialchars($countries_code_to_name[$country]); 
+        } else
             return 'Global';
     }
 

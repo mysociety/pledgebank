@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.66 2005-08-02 14:25:59 francis Exp $
+// $Id: new.php,v 1.67 2005-08-02 15:00:18 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -437,6 +437,7 @@ function pledge_form_submitted() {
     # Step 2 fixes
     if (!$data['local']) { $data['postcode'] = ''; $data['place'] = ''; }
     if (array_key_exists('country', $data) && $data['country'] != 'GB') $data['postcode'] = '';
+    if (array_key_exists('country', $data) && $data['country'] == '(choose one)') unset($data['country']);
     if (!array_key_exists('gaze_place', $data)) $data['gaze_place'] = '';
     # Preview fixes
     if (!array_key_exists('confirmconditions', $data)) $data['confirmconditions'] = 0;
@@ -696,16 +697,20 @@ else if (preg_match('/^([A-Z]{2}),(.+)$/', $data['country'], $a)) {
 
 <?
 
-if ($data['country'] != 'Global') {
+if ($data['country']) {
     print "<li>"
             . _('Within that country, is your pledge specific to a local area?')
             . " <em>";
 
-    if ($data['country'] == 'GB' && $data['postcode'])
-        print htmlspecialchars($data['postcode']);
-    else {
-        list($lat, $lon, $desc) = explode(',', $data['gaze_place'], 3);
-        print htmlspecialchars($desc);
+    if ($data['local']) {
+        if ($data['country'] == 'GB' && $data['postcode'])
+            print htmlspecialchars($data['postcode']);
+        else {
+            list($lat, $lon, $desc) = explode(',', $data['gaze_place'], 3);
+            print htmlspecialchars($desc);
+        }
+    } else {
+        print "No";
     }
     print "</em></li>";
 }

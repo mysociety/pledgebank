@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.70 2005-08-03 17:29:43 matthew Exp $
+// $Id: new.php,v 1.71 2005-08-03 18:15:22 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -21,7 +21,7 @@ require_once '../../phplib/gaze.php';
 $page_title = _('Create a New Pledge');
 $page_params = array();
 ob_start();
-if (get_http_var('tostep1') || get_http_var('totargetwarning') || get_http_var('tostep2') || get_http_var('tostep3') || get_http_var('topreview') || get_http_var('tocreate')) {
+if (get_http_var('tostep1') || get_http_var('tostep2') || get_http_var('tostep3') || get_http_var('topreview') || get_http_var('tocreate') || get_http_var('donetargetwarning')) {
     pledge_form_submitted();
 } else {
     pledge_form_one();
@@ -133,7 +133,7 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 } ?>
 <p style="text-align: right">
 <?=_("Did you read the tips at the top of the page? They'll help you make a successful pledge") ?> 
-<input type="submit" name="totargetwarning" value="<?=_('Next') ?> &gt;&gt;"></p>
+<input type="submit" name="tostep2" value="<?=_('Next') ?> &gt;&gt;"></p>
 </form>
 <? 
 }
@@ -177,7 +177,7 @@ for a larger and more ambitious one.') ?></p>
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 
 <input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
-<input type="submit" name="tostep2" value="<?=_('Next') ?> &gt;&gt;">
+<input type="submit" name="donetargetwarning" value="<?=_('Next') ?> &gt;&gt;">
 </p>
 
 </form>
@@ -452,7 +452,11 @@ function pledge_form_submitted() {
     if (!$data['signup']) $data['signup'] = 'sign up';
     $data['signup'] = preg_replace('#\.$#', '', $data['signup']);
     # Step 2 fixes
-    if (array_key_exists('local', $data) && !$data['local']) { $data['postcode'] = ''; $data['place'] = ''; }
+    if (array_key_exists('local', $data) && !$data['local']) { 
+        $data['gaze_place'] = ''; 
+        $data['postcode'] = ''; 
+        $data['place'] = ''; 
+    }
     if (array_key_exists('country', $data) && $data['country'] != 'GB') $data['postcode'] = '';
     if (array_key_exists('country', $data) && $data['country'] == '(choose one)') unset($data['country']);
     if (!array_key_exists('gaze_place', $data)) $data['gaze_place'] = '';
@@ -472,7 +476,10 @@ function pledge_form_submitted() {
     }
 
     # Target warning
-    if ($data['target'] > OPTION_PB_TARGET_WARNING && get_http_var('totargetwarning')) {
+    if (get_http_var('donetargetwarning')) {
+        $data['skiptargetwarning'] = 1;
+    }
+    if ($data['target'] > OPTION_PB_TARGET_WARNING && !array_key_exists('skiptargetwarning',$data)) {
         pledge_form_target_warning($data, $errors);
         return;
     }
@@ -483,19 +490,20 @@ function pledge_form_submitted() {
     }
     
     # Step 2, location
-    if (get_http_var('tostep2') || get_http_var('totargetwarning')) {
+    if (get_http_var('tostep2') || get_http_var('donetargetwarning')) {
         pledge_form_two($data, $errors);
         return;
     }
     $errors = step2_error_check($data);
-    if (sizeof($errors) || 
-            ($data['local'] == 1 &&
-                ( (array_key_exists('prev_country', $data) && $data['prev_country'] != $data['country']) ||
-                  (array_key_exists('prev_place', $data) && $data['prev_place'] != $data['place']) 
-                )
-            )
-       )
-    {
+    if (sizeof($errors)) {
+        pledge_form_two($data, $errors);
+        return;
+    }
+    if ($data['local'] == 1 && $data['country'] != 'Global' &&
+             ((array_key_exists('prev_country', $data) && $data['prev_country'] != $data['country']) ||
+              (array_key_exists('prev_place', $data) && $data['prev_place'] != $data['place']))
+         ) {
+        $data['gaze_place'] = ''; 
         pledge_form_two($data, $errors);
         return;
     }
@@ -632,7 +640,8 @@ function step2_error_check(&$data) {
                         $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode; for example, OX1 3DR or WC1.');
                     else if (mapit_get_error(mapit_get_location($data['postcode'], 1)))
                         $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
-                    $data['postcode'] = canonicalise_partial_postcode($data['postcode']);
+                    else
+                        $data['postcode'] = canonicalise_partial_postcode($data['postcode']);
                 } else if (($data['place'] && 
                             array_key_exists('prev_place', $data) && $data['prev_place'] == $data['place'] && 
                             array_key_exists('prev_country', $data) && $data['prev_country'] == $data['country'] && 
@@ -813,6 +822,7 @@ function create_new_pledge($P, $data) {
             if (mapit_get_error($location))
                 /* This error should never happen, as earlier postcode validation in form will stop it */
                 err('Invalid postcode while creating pledge; please check and try again.');
+            $data['postcode'] = canonicalise_partial_postcode($data['postcode']);
             $location_id = db_getOne("select nextval('location_id_seq')");
             db_query("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", array($location_id, $data['postcode'], $location['wgs84_lat'], $location['wgs84_lon'], $data['postcode']));
         } else if ($data['gaze_place']) {

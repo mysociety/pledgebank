@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.16 2005-07-29 13:33:35 chris Exp $
+ * $Id: pb.js,v 1.17 2005-08-03 17:29:44 matthew Exp $
  * 
  */
 
@@ -92,8 +92,9 @@ function checklength(thi) {
 function update_postcode_local(item, optionclick) {
     var d = item.form;
     var e = d.elements['country'];
-    iscountry = (e.options[e.selectedIndex].value != "Global");
-    isuk = (e.options[e.selectedIndex].value == "GB");
+    countryPicked = e.options[e.selectedIndex].value
+    iscountry = (countryPicked != "Global" && countryPicked != "(separator)" && countryPicked != "(choose one)");
+    isuk = (countryPicked == "GB");
     islocal = (d.elements['local1'].checked);
     grey_local(!iscountry);
     grey_place(!islocal || !iscountry, optionclick);

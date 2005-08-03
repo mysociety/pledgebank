@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.69 2005-08-03 15:48:38 francis Exp $
+// $Id: new.php,v 1.70 2005-08-03 17:29:43 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -116,7 +116,7 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'d
 <br><small><?=_('This gives your pledge an easy web address. e.g. www.pledgebank.com/tidyupthepark') ?></small>
 </p>
 
-<p style="margin-bottom: 1em;"><strong><?=_('Your name:') ?></strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> type="text" size="20" name="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+<p style="margin-bottom: 1em;"><strong><?=_('Your name:') ?></strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 <strong><?=_('Email:') ?></strong> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
 
@@ -270,7 +270,7 @@ if (array_key_exists('country', $data))
     if ($country and array_key_exists($country, $countries_code_to_name)) {
         print "<option value=\"$country\"";
         if (!$state)
-            print "selected";
+            print " selected";
         print ">"
                 . htmlspecialchars($countries_code_to_name[$country])
                 . "</option>";
@@ -288,7 +288,7 @@ if (array_key_exists('country', $data))
         }
     }
 ?>
-  <option value="Global" <? if ($country=='Global') print ' selected'; ?> ><?=_('None &mdash; applies anywhere') ?></option>
+  <option value="Global"<? if ($country=='Global') print ' selected'; ?>><?=_('None &mdash; applies anywhere') ?></option>
   <option value="(separator)"><?=_('---------------------------------------------------') ?></option>
 <?
     foreach ($countries_name_to_code as $opt_country => $opt_code) {
@@ -308,17 +308,15 @@ if (array_key_exists('country', $data))
 </select>
 </p>
 
-<p><span id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?>
+<p id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?>
         <?=_('If so, we will help people who live nearby find your pledge.') ?>
-</span>
-
-<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local1"><?=_('Yes') ?></label>
-<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local0"><?=_('No') ?></label>
-<br>
+<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <label onclick="this.form.elements['local1'].click()" for="local1"><?=_('Yes') ?></label>
+<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="this.form.elements['local0'].click()" for="local0"><?=_('No') ?></label>
+</p>
 
 <p>If yes, choose where.
 <ul>
-<li><p><span id="place_line">
+<li><p id="place_line">
 <?
 
 /* Save previous value of 'place' so we can show a new selection list in the
@@ -354,11 +352,11 @@ if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
  <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($data['place'])) print htmlspecialchars($data['place']) ?>">
 </span>
 </p></li>
-<li><p><span id="postcode_line">
+<li><p id="postcode_line">
 <?=_('Or, UK only, you can give a postcode area:') ?>
 <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
 <br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
-</span></li>
+</p></li>
 </ul>
 </p>
 <p style="text-align: right;">

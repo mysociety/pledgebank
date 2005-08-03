@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.68 2005-08-03 01:10:14 francis Exp $
+// $Id: new.php,v 1.69 2005-08-03 15:48:38 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -215,6 +215,21 @@ function pledge_form_two($data, $errors = array()) {
     $place = null;
     if (array_key_exists('place', $data))
         $place = $data['place'];
+    if ($place) {
+        $places = gaze_find_places($country, $state, $place, 10);
+        if (rabx_is_error($places))
+            err($places->text);
+        if (array_key_exists('gaze_place', $errors)) {
+            if (count($places) > 0) {
+                print '<div id="formnote"><ul><li>';
+                print 'Please select one of the possible places; if none of them is right, please type the name of another nearby place';
+                print '</li></ul></div>';
+            } else {
+                $errors['place'] = "Unfortunately, we couldn't find anywhere with a name like '".htmlspecialchars($place)."'.  Please try a different spelling, or another nearby village, town or city.";
+            }
+            unset($errors['gaze_place']); # remove NOTICE
+        }
+    }
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -301,7 +316,9 @@ if (array_key_exists('country', $data))
 <input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="update_postcode_local(this, true)" for="local0"><?=_('No') ?></label>
 <br>
 
-<p><span id="place_line">
+<p>If yes, choose where.
+<ul>
+<li><p><span id="place_line">
 <?
 
 /* Save previous value of 'place' so we can show a new selection list in the
@@ -312,35 +329,37 @@ if (array_key_exists('place', $data))
 
 /* If the user has already typed a place name, then we need to grab the
  * possible places from Gaze. */
-if (!$place || array_key_exists('place', $errors)) {
+if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
     ?>
-       <?=_('If yes, type the name of the place:') ?>
+       <?=_('Place name:') ?>
     <?
 } else {
     print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
-    $places = gaze_find_places($country, $state, $place, 10);
-    if (rabx_is_error($places))
-        err($places->text);
     foreach ($places as $p) {
         list($name, $in, $near, $lat, $lon) = $p;
         $desc = $name;
         if ($in) $desc .= ", $in";
         if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
         $t = htmlspecialchars("$lat,$lon,$desc");
-        print "<input type=\"radio\" name=\"gaze_place\" value=\"$t\" id=\"$t\"><label for=\"$t\">$desc</label><br>";
+        $checked = '';
+        if ($t == $data['gaze_place']) {
+            $checked = 'checked';
+        }
+        print "<input type=\"radio\" name=\"gaze_place\" value=\"$t\" id=\"$t\" $checked><label for=\"$t\">$desc</label><br>";
     }
     print "<strong>"._("If it isn't any of those, try a different spelling, or the name of another nearby town:")."</strong>";
 }
 
 ?>
-<input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($data['place'])) print htmlspecialchars($data['place']) ?>">
+ <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($data['place'])) print htmlspecialchars($data['place']) ?>">
 </span>
-<br>
-<span id="postcode_line">
-<?=_('In the UK, you can give a postcode area instead:') ?>
+</p></li>
+<li><p><span id="postcode_line">
+<?=_('Or, UK only, you can give a postcode area:') ?>
 <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
 <br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
-</span>
+</span></li>
+</ul>
 </p>
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
@@ -439,6 +458,7 @@ function pledge_form_submitted() {
     if (array_key_exists('country', $data) && $data['country'] != 'GB') $data['postcode'] = '';
     if (array_key_exists('country', $data) && $data['country'] == '(choose one)') unset($data['country']);
     if (!array_key_exists('gaze_place', $data)) $data['gaze_place'] = '';
+    if (!array_key_exists('local', $data)) $data['local'] = '';
     # Preview fixes
     if (!array_key_exists('confirmconditions', $data)) $data['confirmconditions'] = 0;
 
@@ -616,11 +636,14 @@ function step2_error_check(&$data) {
                         $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
                     $data['postcode'] = canonicalise_partial_postcode($data['postcode']);
                 } else if (($data['place'] && 
-                            $data['prev_place'] == $data['place'] && 
-                            $data['prev_country'] == $data['country'] && 
+                            array_key_exists('prev_place', $data) && $data['prev_place'] == $data['place'] && 
+                            array_key_exists('prev_country', $data) && $data['prev_country'] == $data['country'] && 
                             !$data['gaze_place'])
                            || !preg_match('/^-?(0|[1-9]\d*)(\.\d*|),-?(0|[1-9]\d*)(\.\d*|),.+$/', $data['gaze_place'])) {
-                    $errors['gaze_place'] = _("Please select one of the possible places; if none of them is right, please type the name of another nearby place");
+                    if (!$data['place'])
+                        $errors['place'] = _("Please enter a place name");
+                    else 
+                        $errors['gaze_place'] = "NOTICE"; # here to make it an error, overriden in form display code
                 } else if (!$data['postcode'] && !$data['place']) {
                     $errors['place'] = ($data['country'] == 'GB'
                                         ? _("For a local pledge, please type a postcode or place name")

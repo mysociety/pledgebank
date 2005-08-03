@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.82 2005-07-22 11:26:38 matthew Exp $
+ * $Id: pb.css,v 1.83 2005-08-03 15:48:38 francis Exp $
  * 
  */
 
@@ -154,10 +154,22 @@ h1 span#beta {
 #finished {
     color: #000000;
 }
+/* errors is for form errors */
 #errors {
     margin: 0 auto 1em;
 }
 #errors ul {
+    padding: 0;
+    margin: 0 0 0 1.5em;
+}
+/* formnote is for non-negative notes at top of page about form filling in */
+#formnote {
+    margin: 0 auto 1em;
+    background-color: #ccffcc;
+    border: solid 2px #009900;
+    padding: 3px;
+}
+#formnote ul {
     padding: 0;
     margin: 0 0 0 1.5em;
 }

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.121 2005-08-02 15:00:18 francis Exp $
+ * $Id: pledge.php,v 1.122 2005-08-03 01:10:14 francis Exp $
  * 
  */
 
@@ -97,7 +97,6 @@ class Pledge {
                 $this->data['location_method'] = 'Gaze';
             }
             if ($this->data['country'] == 'Global') {
-                print "nulled";
                 $this->data['country'] = null;
             }
         }

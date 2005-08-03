@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.67 2005-08-02 15:00:18 francis Exp $
+// $Id: new.php,v 1.68 2005-08-03 01:10:14 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -435,7 +435,7 @@ function pledge_form_submitted() {
     if (!$data['signup']) $data['signup'] = 'sign up';
     $data['signup'] = preg_replace('#\.$#', '', $data['signup']);
     # Step 2 fixes
-    if (!$data['local']) { $data['postcode'] = ''; $data['place'] = ''; }
+    if (array_key_exists('local', $data) && !$data['local']) { $data['postcode'] = ''; $data['place'] = ''; }
     if (array_key_exists('country', $data) && $data['country'] != 'GB') $data['postcode'] = '';
     if (array_key_exists('country', $data) && $data['country'] == '(choose one)') unset($data['country']);
     if (!array_key_exists('gaze_place', $data)) $data['gaze_place'] = '';
@@ -470,7 +470,14 @@ function pledge_form_submitted() {
         return;
     }
     $errors = step2_error_check($data);
-    if (sizeof($errors) || $data['prev_country'] != $data['country'] || $data['prev_place'] != $data['place']) {
+    if (sizeof($errors) || 
+            ($data['local'] == 1 &&
+                ( (array_key_exists('prev_country', $data) && $data['prev_country'] != $data['country']) ||
+                  (array_key_exists('prev_place', $data) && $data['prev_place'] != $data['place']) 
+                )
+            )
+       )
+    {
         pledge_form_two($data, $errors);
         return;
     }
@@ -581,7 +588,7 @@ function step2_error_check(&$data) {
     $errors = array();
     if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly')
         $errors[] = _('Please select either "at least" or "exactly" number of people');
-    if (!$data['country'] || $data['country'] == "(choose one)") 
+    if (!array_key_exists('country', $data) || !$data['country']) 
         $errors['country'] = _('Please choose which country your pledge applies to');
     elseif ($data['country'] != 'Global') {
         $a = array();
@@ -597,7 +604,7 @@ function step2_error_check(&$data) {
             $errors['country'] = _('Please choose a valid state within that country, or the country name itself');
         else {
             /* Can only check local stuff if a valid country is selected. */
-            if ($data['local'] != '1' && $data['local'] != '0')
+            if (!array_key_exists('local', $data) || ($data['local'] != '1' && $data['local'] != '0'))
                 $errors['local'] = _('Please choose whether the pledge is local or not');
             else if ($data['local']) {
                 if ($data['postcode'] && $data['place'])

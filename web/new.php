@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.71 2005-08-03 18:15:22 francis Exp $
+// $Id: new.php,v 1.72 2005-08-04 23:33:36 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -570,11 +570,11 @@ function step1_error_check($data) {
     if ($data['parseddate']['iso'] < $pb_today) $errors['date'] = _('The deadline must be in the future');
     if ($data['parseddate']['error']) $errors['date'] = _('Please enter a valid date');
     if ($deadline_limit < $data['parseddate']['iso'])
-        $errors['date'] = _('We have imposed a limit of two months for pledges. This is
-        not a hard limit, just a way of encouraging people to aim at smaller, more
-        achievable targets. If you want a longer pledge, we\'d be glad to set it
-        up for you. Just drop us a quick email to <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>
-        letting us know who you are and what you are aiming to do.');
+        $errors['date'] = _('Please change your deadline so it is less than 2 months into the
+        future. You must change the deadline in order to proceed with creating
+        your pledge. If you want a longer deadline, please create your pledge
+        with a short deadline, and drop us an email to <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>
+        asking for an alteration.');
 
     if (!$data['name']) $errors['name'] = _('Please enter your name');
     if (!$data['email']) $errors['email'] = _('Please enter your email address');

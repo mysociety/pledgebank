@@ -7,4 +7,5 @@ pledges or to sign up to them.
 <?=$values['pledges_text']?><?=$values['signature']?>
 
 To stop receiving emails when there are new pledges near
-<?=$values['alert_postcode']?>, click this link: <?=$values['unsubscribe_url']?>
+<?=$values['alert_postcode']?>, click this link:
+<?=$values['unsubscribe_url']?>

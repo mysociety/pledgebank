@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.75 2005-08-09 15:55:41 francis Exp $
+// $Id: new.php,v 1.76 2005-08-09 16:07:37 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -202,12 +202,13 @@ function pledge_form_two($data, $errors = array()) {
     else
         $comparison = $data['comparison'];
 
-    $country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
-    if (rabx_is_error($country) || !$country)
-        $country = null;
-    # $country = gaze_get_country_from_ip(""); # Ukraine: "194.44.201.2" # France: "213.228.0.42"
+    $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
+    # $ip_country = gaze_get_country_from_ip("213.228.0.42"); # Ukraine: "194.44.201.2" # France: "213.228.0.42"
+    if (rabx_is_error($ip_country) || !$ip_country)
+        $ip_country = null;
 
     /* The 'country' parameter may give a (country, state) pair. */
+    $country = null;
     $state = null;
     if (isset($data['country'])) {
         $a = array();
@@ -271,6 +272,7 @@ if (array_key_exists('country', $data))
 <p><?=_('Which country does your pledge apply to?') ?>
 <select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_place_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
+  <option value="Global"<? if ($country=='Global') print ' selected'; ?>><?=_('None &mdash; applies anywhere') ?></option>
   <!-- needs explicit values for IE Javascript -->
 <?
     if ($country and array_key_exists($country, $countries_code_to_name)) {
@@ -293,8 +295,14 @@ if (array_key_exists('country', $data))
             }
         }
     }
+    if ($country != $ip_country) {
+        print "<option value=\"$ip_country\">";
+        print htmlspecialchars($countries_code_to_name[$ip_country]);
+        print "</option>";
+    }
+
+
 ?>
-  <option value="Global"<? if ($country=='Global') print ' selected'; ?>><?=_('None &mdash; applies anywhere') ?></option>
   <option value="(separator)"><?=_('---------------------------------------------------') ?></option>
 <?
     foreach ($countries_name_to_code as $opt_country => $opt_code) {

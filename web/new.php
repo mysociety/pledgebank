@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.74 2005-08-09 13:00:55 francis Exp $
+// $Id: new.php,v 1.75 2005-08-09 15:55:41 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -19,7 +19,7 @@ require_once '../../phplib/countries.php';
 require_once '../../phplib/gaze.php';
 
 $page_title = _('Create a New Pledge');
-$page_params = array();
+$page_params = array("gazejs" => true);
 ob_start();
 if (get_http_var('tostep1') || get_http_var('tostep2') || get_http_var('tostep3') || get_http_var('topreview') || get_http_var('tocreate') || get_http_var('donetargetwarning')) {
     pledge_form_submitted();
@@ -221,19 +221,20 @@ function pledge_form_two($data, $errors = array()) {
     if (array_key_exists('place', $data))
         $place = $data['place'];
     if ($place) {
+        # Look up nearby places
         $places = gaze_find_places($country, $state, $place, 10);
-        if (rabx_is_error($places))
-            err($places->text);
+        gaze_check_error($places);
         if (array_key_exists('gaze_place', $errors)) {
             if (count($places) > 0) {
                 print '<div id="formnote"><ul><li>';
-                print 'Please select one of the possible places; if none of them is right, please type the name of another nearby place';
+                print _('Please select one of the possible places; if none of them is right, please type the name of another nearby place');
                 print '</li></ul></div>';
             } else {
-                $errors['place'] = "Unfortunately, we couldn't find anywhere with a name like '".htmlspecialchars($place)."'.  Please try a different spelling, or another nearby village, town or city.";
+                $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
+                htmlspecialchars($place));
             }
             unset($errors['gaze_place']); # remove NOTICE
-        }
+        } 
     }
 
     if (sizeof($errors)) {
@@ -268,7 +269,7 @@ if (array_key_exists('country', $data))
 ?>
 
 <p><?=_('Which country does your pledge apply to?') ?>
-<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_postcode_local(this, true)">
+<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_place_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
   <!-- needs explicit values for IE Javascript -->
 <?
@@ -315,8 +316,8 @@ if (array_key_exists('country', $data))
 
 <p id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?>
         <?=_('If so, we will help people who live nearby find your pledge.') ?>
-<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <label onclick="this.form.elements['local1'].click()" for="local1"><?=_('Yes') ?></label>
-<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="this.form.elements['local0'].click()" for="local0"><?=_('No') ?></label>
+<br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_place_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <label onclick="this.form.elements['local1'].click()" for="local1"><?=_('Yes') ?></label>
+<input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_place_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="this.form.elements['local0'].click()" for="local0"><?=_('No') ?></label>
 </p>
 
 <p id="ifyes_line">If yes, choose where.
@@ -632,6 +633,13 @@ function step2_error_check(&$data) {
         else if ($state && !array_key_exists($state, $countries_statecode_to_name[$country]))
             $errors['country'] = _('Please choose a valid state within that country, or the country name itself');
         else {
+            # Check gaze has this country
+            $countries_with_gazetteer = gaze_get_find_places_countries();
+            gaze_check_error($countries_with_gazetteer);
+            if (!in_array($country, $countries_with_gazetteer)) {
+                $data['local'] = 0;
+            }
+
             /* Can only check local stuff if a valid country is selected. */
             if (!array_key_exists('local', $data) || ($data['local'] != '1' && $data['local'] != '0'))
                 $errors['local'] = _('Please choose whether the pledge is local or not');

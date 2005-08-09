@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.64 2005-08-08 17:56:45 matthew Exp $
+// $Id: page.php,v 1.65 2005-08-09 15:55:41 francis Exp $
 
 require_once '../../phplib/person.php';
 
@@ -57,6 +57,9 @@ function page_header($title, $params = array()) {
         print '<link rel="alternate" type="application/rss+xml" title="' . _('New Pledges at PledgeBank.com') . '" href="/rss">';
 ?>
 <script type="text/javascript" src="/pb.js"></script>
+<?  if (array_key_exists('gazejs', $params)) { ?>
+<script type="text/javascript" src="/gaze.js"></script>
+<? } ?>
 </head>
 <body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
 <?

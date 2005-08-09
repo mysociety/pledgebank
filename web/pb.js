@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.18 2005-08-09 13:00:55 francis Exp $
+ * $Id: pb.js,v 1.19 2005-08-09 15:55:41 francis Exp $
  * 
  */
 
@@ -78,7 +78,7 @@ function greyOutInputs() {
     d = document.forms.pledge
     if (d) {
         if (d.visibility) grey_pin(d.visibility[0].checked)
-        if (d.local) update_postcode_local(d.local[0],false)
+        if (d.local) update_place_local(d.local[0],false)
     }
 }
 
@@ -89,17 +89,18 @@ function checklength(thi) {
 }
 
 // optionclick is "true" if user just clicked, or "false" during page load
-function update_postcode_local(item, optionclick) {
+function update_place_local(item, optionclick) {
     var d = item.form;
     var e = d.elements['country'];
     countryPicked = e.options[e.selectedIndex].value
     iscountry = (countryPicked != "Global" && countryPicked != "(separator)" && countryPicked != "(choose one)");
     isuk = (countryPicked == "GB");
     islocal = (d.elements['local1'].checked);
-    grey_local(!iscountry);
-    grey_ifyes(!islocal || !iscountry);
-    grey_place(!islocal || !iscountry, optionclick);
-    grey_postcode(!islocal || !isuk, optionclick);
+    hasgazetteer = (gaze_countries[countryPicked] == 1);
+    grey_local(!iscountry || !hasgazetteer); 
+    grey_ifyes(!islocal || !iscountry || !hasgazetteer);
+    grey_place(!islocal || !iscountry || !hasgazetteer, optionclick);
+    grey_postcode(!islocal || !isuk || !hasgazetteer, optionclick);
 }
 
 function grey_postcode(t, optionclick) {
@@ -108,7 +109,7 @@ function grey_postcode(t, optionclick) {
     } else {
         document.getElementById('postcode_line').style.color = '#000000'
     }
-    grey_thing(t, 'postcode', optionclick)
+    //grey_thing(t, 'postcode', optionclick)
 }
 
 function grey_place(t, optionclick) {

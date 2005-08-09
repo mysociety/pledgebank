@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.76 2005-08-09 16:07:37 francis Exp $
+// $Id: new.php,v 1.77 2005-08-09 16:12:10 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -471,6 +471,7 @@ function pledge_form_submitted() {
     }
     if (array_key_exists('country', $data) && $data['country'] != 'GB') $data['postcode'] = '';
     if (array_key_exists('country', $data) && $data['country'] == '(choose one)') unset($data['country']);
+    if (array_key_exists('country', $data) && $data['country'] == '(separator)') unset($data['country']);
     if (!array_key_exists('gaze_place', $data)) $data['gaze_place'] = '';
     if (!array_key_exists('local', $data)) $data['local'] = '';
     # Preview fixes

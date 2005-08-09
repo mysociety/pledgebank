@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.73 2005-08-08 18:20:05 matthew Exp $
+// $Id: new.php,v 1.74 2005-08-09 13:00:55 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -319,7 +319,7 @@ if (array_key_exists('country', $data))
 <input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_postcode_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="this.form.elements['local0'].click()" for="local0"><?=_('No') ?></label>
 </p>
 
-<p>If yes, choose where.
+<p id="ifyes_line">If yes, choose where.
 <ul>
 <li><p id="place_line">
 <?
@@ -355,7 +355,6 @@ if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
 
 ?>
  <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($data['place'])) print htmlspecialchars($data['place']) ?>">
-</span>
 </p></li>
 <li><p id="postcode_line">
 <?=_('Or, UK only, you can give a postcode area:') ?>
@@ -363,7 +362,6 @@ if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
 <br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
 </p></li>
 </ul>
-</p>
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 <input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">

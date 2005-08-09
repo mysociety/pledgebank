@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.130 2005-07-22 13:57:39 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.131 2005-08-09 13:00:55 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -303,37 +303,48 @@ sub perform_login_action {
 }
 
 # create_pledge WHO PAGE1 PAGE2 LOGIN_ACTION
-# Creates a new pledge, setter is person number WHO.  PAGE1
-# and PAGE2 contain parameters for each page of the sign-up form.
+# Creates a new pledge, setter is person number WHO.  PAGE1,
+# PAGE2 and PAGE3 contain parameters for each page of the sign-up form.
 # LOGIN_ACTION is passed on to perform_login_action.
 sub create_pledge {
-    my ($who, $page1, $page2, $login_options) = @_;
+    my ($who, $page1, $page2, $page3, $login_options) = @_;
     my $login_action = $login_options->{'action'};
 
     $page1->{name} = name_n($who); 
     $page1->{email} = email_n($who);
     die "'resume' not supported for pledges yet" if ($login_action eq "resume");
 
-    # Make new pledge
+    # Make new pledge, step 1
     $wth->browser_get($base_url);
     $wth->browser_follow_link(text_regex => qr/Start your own pledge/);
     $wth->browser_check_contents("New Pledge");
     $wth->browser_submit_form(form_name => 'pledge', fields => $page1,
-        button => 'submit') or die "Failed to submit creating form stage 1";
+        button => 'tostep2') or die "Failed to submit creating form step 1";
     if ($page1->{target} >= 20) {
         $wth->browser_check_contents("Rethink your target");
         $wth->browser_submit_form(form_name => 'pledge', fields => { target => $page1->{target} },
-            button => 'submit') or die "Failed to submit target warning";
+            button => 'donetargetwarning') or die "Failed to submit target warning";
     }
+
+    # Step 2
     $wth->browser_check_contents("Step 2");
     $wth->log_watcher_check();
     $wth->browser_submit_form(form_name => 'pledge',
         fields => $page2,
-        button => 'submit') or die "Failed to submit creating form stage 2";
-    $wth->browser_check_contents("will look like this");
+        button => 'tostep3') or die "Failed to submit creating form step 2";
+
+    # Step 3
+    $wth->browser_check_contents("Step 3");
+    $wth->log_watcher_check();
+    $wth->browser_submit_form(form_name => 'pledge',
+        fields => $page3,
+        button => 'topreview') or die "Failed to submit creating form step 3";
+
+    # Preview
+    $wth->browser_check_contents("Step 4");
     $wth->browser_submit_form(form_name => 'pledge',
         fields => {confirmconditions => 1},
-        button => 'submit') or die "Failed to submit creating form stage 3";
+        button => 'tocreate') or die "Failed to submit creating form step 4";
 
     # Requires authentication
     perform_login_action($who, $login_options, "to confirm that you");
@@ -474,6 +485,7 @@ sub do_unconfirmed_pledge {
             date => 'next thursday', ref => $pledge_ref,
         },
         { country => 'Global' },
+        { },
         { action => "abandon" }
     );
 
@@ -505,12 +517,13 @@ sub do_public_succeeding_pledge {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => '10th February', ref => $pledge_ref,
             detail => "This pledge has just one purpose.  And that is as part of an automated test suite which ensures PledgeBank always works.  It is really quite good, in our humblest opinion.  It would save the planet, if only it was more comprehensive, and updated in a timely manner.\n\nAnd this bit is the start of a brand new shiny paragraph.  It should be formatted below on posters in the correct manner." },
-        { country => 'GB', 'local' => 1, postcode => 'CB7 4DL' }, # Ely Cathedral
+        { country => 'GB', 'local' => 1, postcode => 'CB1' }, # somewhere in Cambridge
+        { },
         { action => "viaemail" }
     );
-    # Check local alert works
+    # Check no local alert yet (pledge has no signers, so will be backpage)
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(11).  '%new pledge%'.$pledge_action_completion.'%');
+    $wth->email_check_none_left();
 
     # Add a comment, which will subscribe user 90 to comment alerts
     # (TODO: put these three comment posts in a local function)
@@ -599,6 +612,10 @@ sub do_public_succeeding_pledge {
     print "Signing the pledge twice...\n" if $verbose > 1;
     find_and_sign_pledge("ref", $pledge_ref, 1, 1, {action=>"viaemail"}, "signed");
     find_and_sign_pledge("list_open", $pledge_action_completion, 2, undef, {action=>"viaemail"}, "signed");
+
+    # Now we have a signer, will get local alert
+    call_send_alerts();
+    $wth->email_get_containing('%To: '.email_n(11).  '%new pledge%'.$pledge_action_completion.'%');
 
     # Check can't get to announce page as a mere signer
     $wth->browser_get($base_url . "/$pledge_ref");
@@ -736,7 +753,8 @@ sub do_private_failing_pledge {
         { title => $pledge_action_private, 
             target => '10', date => 'Dec 31st', ref => $pledge_ref
         },
-        { country => 'Global', visibility => 'pin', pin => $private_pin },
+        { country => 'Global' },
+        { visibility => 'pin', pin => $private_pin },
         { action => "viaemail" }
     );
     # Make frontpage, to be sure that doesn't make it show
@@ -970,6 +988,7 @@ sub do_sms_pledge {
             date => '10th March', ref => $pledge_ref,
             detail => "Not sure what SMS is?  Find out here! www.wikipedia.org/wiki/Short_message_service Fab.  For more information, please visit www.ewb-uk.org/placements/2005/suriname. For more information about Engineers Without Borders UK, please visit www.ewb-uk.org, or email enquiries\@ewb-uk.org. For information regarding the project in Suriname, email suriname2005\@ewb-uk.org." },
         { country => 'Global' },
+        { },
         { action => "viaemail" }
     );
 
@@ -1092,6 +1111,7 @@ sub do_login_tests {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_1 },
         { country => 'GB', 'local' => 1, postcode => '  SN8  1AA' }, # Waitrose, Marlborough
+        { },
         { action => "viaemail", setpassword => 1 }
     );
     # Checked logged in, and then logout
@@ -1108,6 +1128,7 @@ sub do_login_tests {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_2 },
         { country => 'GB', 'local' => 1, postcode => 'SN8' }, # Somewhere near Marlborough
+        { },
         { action => "viaemail", setpassword => 1 }
     );
     # Log out again
@@ -1121,6 +1142,7 @@ sub do_login_tests {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_3 },
         { country => 'Global' },
+        { },
         { action => "password" }
     );
     # Log out again
@@ -1147,12 +1169,12 @@ sub do_login_tests {
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_4 },
         { country => 'GB', 'local' => 0 },
+        { },
         { action => "loggedin" }
     );
-
-    # Check local alert for two pledges at once works
+    
+    # Check no alerts until we get one signer
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(250).  '%There are 2 new pledge%login1%login2%');
     $wth->email_check_none_left();
 
     # Sign all the pledges as another user
@@ -1172,6 +1194,11 @@ sub do_login_tests {
     find_and_sign_pledge("ref", $pledge_ref_4, 201, 1, {action=>"wrongpassword"}, "signed");
     # ... then with the right one
     find_and_sign_pledge("ref", $pledge_ref_4, 201, 1, {action=>"password"}, "signed");
+
+    # Check local alert for two pledges at once works
+    call_send_alerts();
+    $wth->email_get_containing('%To: '.email_n(250).  '%There are 2 new pledge%login1%login2%');
+    $wth->email_check_none_left();
 
 }
 

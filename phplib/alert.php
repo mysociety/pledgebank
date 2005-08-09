@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.14 2005-07-29 17:36:27 chris Exp $
+// $Id: alert.php,v 1.15 2005-08-09 13:00:55 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -47,8 +47,10 @@ function alert_signup($person_id, $event_code, $params) {
             err('Invalid postcode while setting alert, please check and try again.');
         }
         /* Guard against double-insertion. */
-        get_query('lock table alert in share mode');
-        $already = db_getOne("select id from alert where person_id = ? and event_code = ?  and postcode = ?", array($person_id, $event_code, $params['postcode']));
+        db_query('lock table alert in share mode');
+        $already = db_getOne("select alert.id from alert left join location on location.id = alert.location_id
+                where person_id = ? and event_code = ? and method = 'MaPit' and input = ?", 
+                array($person_id, $event_code, $params['postcode']));
         if (is_null($already)) {
             $location_id = db_getOne("select nextval('location_id_seq')");
             db_query("
@@ -63,7 +65,7 @@ function alert_signup($person_id, $event_code, $params) {
             db_query("
                     insert into alert
                         (person_id, event_code, location_id)
-                    values (?, ?, ?, ?, ?)", array(
+                    values (?, ?, ?)", array(
                         $person_id, $event_code, $location_id
                     ));
         }
@@ -93,7 +95,8 @@ function alert_unsubscribe($person_id, $alert_id) {
  * Returns a textual description of an alert.
  */
 function alert_h_description($alert_id) {
-    $row = db_getRow("select * from alert where id = ?", $alert_id);
+    $row = db_getRow("select * from alert left join location on location.id = alert.location_id
+             where alert.id = ?", $alert_id);
     if (!$row) 
         return false;
 
@@ -101,7 +104,10 @@ function alert_h_description($alert_id) {
         $pledge = new Pledge(intval($row['pledge_id']));
         return sprintf(_("new comments on the pledge '%s'"), $pledge->ref() );
     } elseif ($row['event_code'] == "pledges/local/GB") { 
-        return sprintf(_("new UK pledges near postcode %s"), $row['postcode'] );
+        if ($row['method'] == 'MaPit') 
+            return sprintf(_("new UK pledges near postcode %s"), $row['description'] );
+        else 
+            return sprintf(_("new pledges near %s"), $row['description'] );
     } else {
         err(sprintf(_("Unknown event code '%s'"), $row['event_code']));
     }
@@ -133,7 +139,8 @@ function local_uk_alert_subscribed() {
 
 /* Stuff to loop through / display all of someone's alerts
 // not used yet
-$s = db_query('SELECT alert.* from alert where person_id = ?', $P->id());
+$s = db_query('SELECT alert.* from alert left join location on location.ild = alert.location_id
+                      where person_id = ?', $P->id());
 print "<h2>Alerts</h2>";
 if (0 != db_num_rows($s)) {
     print "<p>People who signed the pledges you created or signed also signed these...</p>";

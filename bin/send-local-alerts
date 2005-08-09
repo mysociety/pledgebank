@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.10 2005-07-29 17:59:34 chris Exp $
+ * $Id: send-local-alerts,v 1.11 2005-08-09 13:00:55 francis Exp $
  *
  */
 
@@ -60,19 +60,21 @@ function send_local_alerts() {
     $p = db_query("
                 select alert.id as alert_id,
                     latitude as alert_latitude, longitude as alert_longitude, 
-                    description as alert_location_description,
+                    location.description as alert_description,
                     alerted.name as alerted_name,
                     alerted.email as alerted_email,
                     alerted.id as alerted_person_id
-                from alert left join person as alerted
-                        on alert.person_id = alerted.id
+                from alert 
+                    left join person as alerted on alert.person_id = alerted.id
                     left join location on alert.location_id = location.id
                 where event_code = 'pledges/local/GB'");
 
     $consolidated = array();
     while ($alert = db_fetch_array($p)) {
+        # verbose("checking local alert for " . $alert["alerted_email"]) . " " . $alert["alert_description"];
+
         // Search for pledges matching alert
-        $local_alert_radius = 5.0; /* km; XXX should adjust by population density */
+        $local_alert_radius = 20.0; /* km; XXX should adjust by population density */
         $q = db_query("
                 select pledges.*, pledges.id as pledge_id, distance
                 from pledge_find_nearby(?, ?, ?) as nearby

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.17 2005-08-03 17:29:44 matthew Exp $
+ * $Id: pb.js,v 1.18 2005-08-09 13:00:55 francis Exp $
  * 
  */
 
@@ -97,6 +97,7 @@ function update_postcode_local(item, optionclick) {
     isuk = (countryPicked == "GB");
     islocal = (d.elements['local1'].checked);
     grey_local(!iscountry);
+    grey_ifyes(!islocal || !iscountry);
     grey_place(!islocal || !iscountry, optionclick);
     grey_postcode(!islocal || !isuk, optionclick);
 }
@@ -127,6 +128,14 @@ function grey_local(t) {
     }
     grey_thing(t, 'local0', false)
     grey_thing(t, 'local1', false)
+}
+
+function grey_ifyes(t) {
+    if (t) {
+        document.getElementById('ifyes_line').style.color = '#999999'
+    } else {
+        document.getElementById('ifyes_line').style.color = '#000000'
+    }
 }
 
 function grey_pin(t) {

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.142 2005-08-01 22:54:59 francis Exp $
+-- $Id: schema.sql,v 1.143 2005-08-09 13:00:55 francis Exp $
 --
 
 -- secret
@@ -89,10 +89,12 @@ create table location (
     description text not null,
 
     -- A location can represent either a point or a whole country.
-    check ((method is null and input is null
+    check (
+            (method is null and input is null
                 and latitude is null and longitude is null)
             or (method is not null and input is not null
-                and latitude is not null and longitude is not null),
+                and latitude is not null and longitude is not null)
+          ),
 
     -- If coordinates are given they must be valid.
     check (latitude is null or (latitude >= -90 and latitude <= +90)),
@@ -994,14 +996,8 @@ create table alert (
     ),
 
     -- extra parameters for different types of alert
-    pledge_id integer references pledges(id), -- specific pledge for "/ref" event codes
-    postcode text, -- postcode for /local/GB event codes
-
-    -- specific location for /local/ event codes, should always keep raw data (e.g.
-    -- postcode or city) above in table, these fields are just a cache,
-    -- generated and regeneratable from that
-    latitude double precision,      -- north-positive, degrees
-    longitude double precision,     -- east-positive, degrees
+    pledge_id integer references pledges(id), -- specific pledge for ".../ref" event codes
+    location_id integer references location(id), -- specific location for "/pledges/local/..." event codes
 
     whensubscribed timestamp not null default pb_current_timestamp()
 );
@@ -1009,7 +1005,7 @@ create table alert (
 create index alert_person_id_idx on alert(person_id);
 create index alert_event_code_idx on alert(event_code);
 create index alert_pledge_id_idx on alert(pledge_id);
-create unique index alert_unique_idx on alert(person_id, event_code, pledge_id, postcode);
+create unique index alert_unique_idx on alert(person_id, event_code, pledge_id, location_id);
 
 create table alert_sent (
     alert_id integer not null references alert(id),

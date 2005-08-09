@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.24 2005-08-01 22:54:59 francis Exp $
+ * $Id: pb.php,v 1.25 2005-08-09 13:00:55 francis Exp $
  * 
  */
 
@@ -60,7 +60,7 @@ function pb_handle_error($num, $message, $file, $line, $context) {
         while (ob_get_level()) {
             ob_end_clean();
         }
-        page_header(_("Sorry! Something's gone wrong."));
+        page_header(_("Sorry! Something's gone wrong."), array('override'=>true));
         print("<strong>$message</strong> in $file:$line");
         page_footer();
     } else {

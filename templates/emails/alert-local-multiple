@@ -1,11 +1,11 @@
-Subject: <?=$values['pledges_count']?> new pledges near you! <?=$values['alert_postcode']?> at PledgeBank.com
+Subject: <?=$values['pledges_count']?> new pledges near you! <?=$values['alert_description']?> at PledgeBank.com
 
-There are <?=$values['pledges_count']?> new pledges near your postcode
-<?=$values['alert_postcode']?>.  Follow the links to find out more about the
+There are <?=$values['pledges_count']?> new pledges near
+<?=$values['alert_description']?>.  Follow the links to find out more about the
 pledges or to sign up to them.
 
 <?=$values['pledges_text']?><?=$values['signature']?>
 
 To stop receiving emails when there are new pledges near
-<?=$values['alert_postcode']?>, click this link:
+<?=$values['alert_description']?>, click this link:
 <?=$values['unsubscribe_url']?>

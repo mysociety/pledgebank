@@ -1,4 +1,4 @@
-Subject: <?=$values['pledges_count']?> new pledges near you! <?=$values['alert_description']?> at PledgeBank.com
+Subject: <?=$values['pledges_count']?> new pledges near you! - <?=$values['alert_description']?> - PledgeBank.com
 
 There are <?=$values['pledges_count']?> new pledges near
 <?=$values['alert_description']?>.  Follow the links to find out more about the

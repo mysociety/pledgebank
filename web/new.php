@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.77 2005-08-09 16:12:10 francis Exp $
+// $Id: new.php,v 1.78 2005-08-10 15:52:18 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -295,7 +295,7 @@ if (array_key_exists('country', $data))
             }
         }
     }
-    if ($country != $ip_country) {
+    if ($country != $ip_country && $ip_country) {
         print "<option value=\"$ip_country\">";
         print htmlspecialchars($countries_code_to_name[$ip_country]);
         print "</option>";

@@ -5,9 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.65 2005-08-09 15:55:41 francis Exp $
+// $Id: page.php,v 1.66 2005-08-11 18:40:47 matthew Exp $
 
 require_once '../../phplib/person.php';
+require_once '../../phplib/db.php';
+require_once 'pledge.php';
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -195,40 +197,38 @@ function page_check_ref($ref) {
     page_header(_("We couldn't find that pledge"));
     $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);
     if (db_num_rows($s) == 0) {
-        print "<p>We couldn't find any pledge with a reference like \"" . htmlspecialchars($ref) . "\". ";
-        print "Try the following: </p>";
+        printf(p(_("We couldn't find any pledge with a reference like \"%s\". Try the following: ")), htmlspecialchars($ref) );
     } else {
-        print "<p>We couldn't find the pledge with reference \"" . htmlspecialchars($ref) . "\". ";
-        print "Did you mean one of these pledges?</p><dl>";
+        printf(p(_("We couldn't find the pledge with reference \"%s\". Did you mean one of these pledges?")), htmlspecialchars($ref) );
+        print '<dl>';
         while ($r = db_fetch_array($s)) {
             $p = new Pledge((int)$r['pledge_id']);
-            print "<dt><a href=\"/"
+            print '<dt><a href="/'
                         /* XXX for the moment, just link to pledge index page,
                          * but we should figure out which page the user
                          * actually wanted and link to that instead. */
-                        . htmlspecialchars($p->ref()) . "\">"
-                        . htmlspecialchars($p->ref()) . "</a>"
-                    . "</dt><dd>"
+                        . htmlspecialchars($p->ref()) . '">'
+                        . htmlspecialchars($p->ref()) . '</a>'
+                    . '</dt><dd>'
                     . $p->h_sentence()
-                    . "</dd>";
+                    . '</dd>';
         }
-        print "</dl>";
-        print p(_("If none of those look like what you want, try the following:"));
+        print '</dl>';
+        print p(_('If none of those look like what you want, try the following:'));
     }
 
-    print "<p> <ul>
-        <li>" . _('If you typed in the location, check it carefully and try typing it again.') . '</li>
-        <li>' . _('Look for the pledge on <a href=\"/all\">the list of all pledges</a>.') . '</li>
-        <li>' . _('Search for the pledge you want by entering words below.') . '</ul></p>';
+    print '<ul>
+        <li>' . _('If you typed in the location, check it carefully and try typing it again.') . '</li>
+        <li>' . _('Look for the pledge on <a href="/all">the list of all pledges</a>.') . '</li>
+        <li>' . _('Search for the pledge you want by entering words below.') . '</ul>';
     ?>
 <form accept-charset="utf-8" action="/search" method="get" class="pledge">
 <label for="s"><?=_('Search for a pledge') ?>:</label>
-<input type="text" id="s" name="q" size="15" value=""> <input type="submit" value="Go"></p>
+<input type="text" id="s" name="q" size="15" value=""> <input type="submit" value=<?=_('Go') ?>></p>
 </form>
 <?
     
     page_footer();
-
     exit();
 }
 

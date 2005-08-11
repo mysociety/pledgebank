@@ -5,11 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze.js.php,v 1.1 2005-08-09 15:55:41 francis Exp $
+// $Id: gaze.js.php,v 1.2 2005-08-11 22:49:33 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../../phplib/gaze.php';
 
+header('Content-Type: text/javascript');
 
 ?>
 // gaze.js

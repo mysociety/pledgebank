@@ -9,7 +9,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: migrate-to-location-table,v 1.3 2005-07-29 17:49:52 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: migrate-to-location-table,v 1.4 2005-08-11 09:32:14 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -47,7 +47,21 @@ while (my ($pledge_id, $pc, $lat, $lon) = $s->fetchrow_array()) {
 }
 print STDERR "done.\n";
 
+print STDERR "Grabbing UK-specific pledges... ";
+$s = dbh()->prepare('select id, postcode, latitude, longitude from pledges where country = \'UK\' and postcode is not null');
+$s->execute();
+print STDERR "done.\n";
+print STDERR "Moving country data from pledges to location table...";
+while (my ($pledge_id, $pc, $lat, $lon) = $s->fetchrow_array()) {
+    my $location_id = dbh()->selectrow_array("select nextval('location_id_seq')");
+    dbh()->do("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', NULL, NULL, NULL, NULL, NULL)", {}, $location_id);
+    dbh()->do('update pledges set location_id = ? where id = ?', {}, $location_id, $pledge_id);
+    print STDERR " $pledge_id";
+}
+print STDERR "done.\n";
+
 print STDERR "Dropping other geographical from pledges table columns... ";
+dbh()->do('alter table pledges drop column country cascade');
 dbh()->do('alter table pledges drop column postcode cascade');
 dbh()->do('alter table pledges drop column latitude cascade');
 dbh()->do('alter table pledges drop column longitude cascade');
@@ -70,11 +84,11 @@ while (my ($alert_id, $pc, $lat, $lon) = $s->fetchrow_array()) {
 }
 print STDERR "done.\n";
 
-print STDERR "Dropping other geographical from pledges table columns... ";
+print STDERR "Dropping other geographical from alert table columns... ";
 dbh()->do('alter table alert drop column postcode cascade');
 dbh()->do('alter table alert drop column latitude cascade');
 dbh()->do('alter table alert drop column longitude cascade');
 print STDERR "done.\n";
 
-dbh()->rollback();
-#dbh()->commit();
+#dbh()->rollback();
+dbh()->commit();

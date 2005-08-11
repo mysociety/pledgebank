@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.79 2005-08-11 08:57:00 francis Exp $
+// $Id: new.php,v 1.80 2005-08-11 09:32:14 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -868,6 +868,14 @@ function create_new_pledge($P, $data) {
             if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
                 list($x, $country, $state) = $a;
             db_query("insert into location (id, country, state, method, input, latitude, longitude, description) values (?, ?, ?, 'Gaze', ?, ?, ?, ?)", array($location_id, $country, $state, $data['place'], $lat, $lon, $desc));
+        } else if ($data['country']) {
+            $location_id = db_getOne("select nextval('location_id_seq')");
+            $a = array();
+            $country = $data['country'];
+            $state = null;
+            if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
+                list($x, $country, $state) = $a;
+            db_query("insert into location (id, country, state) values (?, ?, ?)", array($location_id, $country, $state));
         }
         db_query('
                 insert into pledges (

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.78 2005-08-10 15:52:18 francis Exp $
+// $Id: new.php,v 1.79 2005-08-11 08:57:00 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -347,17 +347,20 @@ if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
     <?
 } else {
     print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
+    $nn = 0;
     foreach ($places as $p) {
-        list($name, $in, $near, $lat, $lon) = $p;
+        list($name, $in, $near, $lat, $lon, $st) = $p;
         $desc = $name;
         if ($in) $desc .= ", $in";
+        if ($st) $desc .= ", $st";
         if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
         $t = htmlspecialchars("$lat,$lon,$desc");
         $checked = '';
         if ($t == $data['gaze_place']) {
             $checked = 'checked';
         }
-        print "<input type=\"radio\" name=\"gaze_place\" value=\"$t\" id=\"$t\" $checked><label for=\"$t\">$desc</label><br>";
+        $nn++;
+        print "<input type=\"radio\" name=\"gaze_place\" value=\"$t\" id=\"gaze_place_$nn\" $checked>\n<label for=\"gaze_place_$nn\">$desc</label><br>\n";
     }
     print "<strong>"._("If it isn't any of those, try a different spelling, or the name of another nearby town:")."</strong>";
 }
@@ -675,6 +678,17 @@ function step2_error_check(&$data) {
                     $errors['place'] = ($data['country'] == 'GB'
                                         ? _("For a local pledge, please type a postcode or place name")
                                         : _("Please type a place name for your local pledge"));
+                } else {
+                    // Have gaze_place
+                    if (array_key_exists($data['country'], $countries_statecode_to_name)) {
+                        // Split out state in case where they picked US from dropdown, but place with state from gaze
+                        $a = array();
+                        if (preg_match('/^(.+), ([^,]+)$/', $data['gaze_place'], $a)) {
+                            list($x, $data['gaze_place'], $state) = $a;
+                            $data['country'] .= ",$state";
+                        }
+                        $data['prev_country'] = $data['country'];
+                    }
                 }
                 if ($data['postcode'] && $data['country'] != 'GB')
                     $errors['postcode'] = _("You can only enter a postcode if your pledge applies to Britain");

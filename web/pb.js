@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.19 2005-08-09 15:55:41 francis Exp $
+ * $Id: pb.js,v 1.20 2005-08-11 08:57:00 francis Exp $
  * 
  */
 
@@ -92,11 +92,20 @@ function checklength(thi) {
 function update_place_local(item, optionclick) {
     var d = item.form;
     var e = d.elements['country'];
+
+    // Find country/state
     countryPicked = e.options[e.selectedIndex].value
+    var arr = countryPicked.split(',')
+    countryPicked = arr[0]
+    state = arr[1]
+
+    // Work out our situation
     iscountry = (countryPicked != "Global" && countryPicked != "(separator)" && countryPicked != "(choose one)");
     isuk = (countryPicked == "GB");
     islocal = (d.elements['local1'].checked);
     hasgazetteer = (gaze_countries[countryPicked] == 1);
+
+    // Ghost things appropriately
     grey_local(!iscountry || !hasgazetteer); 
     grey_ifyes(!islocal || !iscountry || !hasgazetteer);
     grey_place(!islocal || !iscountry || !hasgazetteer, optionclick);

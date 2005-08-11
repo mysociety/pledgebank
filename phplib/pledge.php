@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.122 2005-08-03 01:10:14 francis Exp $
+ * $Id: pledge.php,v 1.123 2005-08-11 08:56:59 francis Exp $
  * 
  */
 
@@ -34,7 +34,7 @@ class Pledge {
                                (SELECT count(*) FROM signers WHERE 
                                     signers.pledge_id = pledges.id) AS signers,
                                person.email AS email,
-                               country, description as local_place, method as location_method
+                               country, state, description as local_place, method as location_method
                            FROM pledges
                            LEFT JOIN person ON person.id = pledges.person_id 
                            LEFT JOIN location ON location.id = pledges.location_id";
@@ -180,10 +180,17 @@ class Pledge {
         global $countries_code_to_name;
         if (isset($this->data['country'])) {
             $country = $this->data['country'];
+            if (array_key_exists('state', $this->data))
+                $state = $this->data['state'];
+            else
+                $state = null;
             $a = array();
             if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
                 list($x, $country, $state) = $a;
-            return htmlspecialchars($countries_code_to_name[$country]); 
+            $ret = htmlspecialchars($countries_code_to_name[$country]); 
+            if ($state)
+                $ret .= ", " . htmlspecialchars($state);
+            return $ret;
         } else
             return 'Global';
     }
@@ -268,7 +275,8 @@ class Pledge {
 <? } else { ?>
     <? if ($this->is_local()) { ?>
         <p> <?=$this->h_local_type()?>:
-        <strong><?=$this->h_local_place()?></strong>,
+        <strong><?=$this->h_local_place()?></strong>
+        <br><?=_('Country:')?>
         <strong><?=$this->h_country()?></strong>
     <? } else { ?>
         <p> <?=_('Country:')?>

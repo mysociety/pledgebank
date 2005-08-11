@@ -9,7 +9,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: migrate-to-location-table,v 1.5 2005-08-11 10:30:33 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: migrate-to-location-table,v 1.6 2005-08-11 10:59:22 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -40,11 +40,9 @@ $s->execute();
 print STDERR "done.\n";
 print STDERR "Moving location data from pledges to location table...";
 while (my ($pledge_id, $pc, $lat, $lon) = $s->fetchrow_array()) {
-    print $pc . " ";
     $pc = uc($pc);
     $pc =~ s/\s//g;
-    $pc =~ s/(\d[A-Z]{2}$)/;
-    print "$pc\n";
+    $pc =~ s/(\d[A-Z]{2}$)//;
     my $location_id = dbh()->selectrow_array("select nextval('location_id_seq')");
     dbh()->do("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", {}, $location_id, $pc, $lat, $lon, $pc);
     dbh()->do('update pledges set location_id = ? where id = ?', {}, $location_id, $pledge_id);
@@ -95,5 +93,5 @@ dbh()->do('alter table alert drop column latitude cascade');
 dbh()->do('alter table alert drop column longitude cascade');
 print STDERR "done.\n";
 
-dbh()->rollback();
-#dbh()->commit();
+#dbh()->rollback();
+dbh()->commit();

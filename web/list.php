@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.9 2005-07-27 21:52:26 matthew Exp $
+// $Id: list.php,v 1.10 2005-08-12 13:23:00 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -72,6 +72,7 @@ $qrows = db_query("
             ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", PAGE_SIZE);
 /* PG bug: mustn't quote parameter of offset */
 
+$heading = 'All Pledges';
 if ($q_type == 'open') {
     $heading = _("Pledges which need signers");
 } elseif ($q_type == 'succeeded_open') {

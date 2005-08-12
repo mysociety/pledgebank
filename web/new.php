@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.82 2005-08-11 20:31:01 matthew Exp $
+// $Id: new.php,v 1.83 2005-08-12 15:58:01 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -376,8 +376,8 @@ if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
 </ul>
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
-<input type="submit" name="tostep3" value="<?=_('Next') ?> &gt;&gt;">
+<input class="topbutton" type="submit" name="tostep3" value="<?=_('Next') ?> &gt;&gt;">
+<br><input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
 </p>
 
 </form>
@@ -437,8 +437,8 @@ function pledge_form_three($data, $errors = array()) {
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input type="submit" name="tostep2" value="&lt;&lt; <?=_('Back to step 2') ?>">
-<input type="submit" name="topreview" value="<?=_('Preview') ?> &gt;&gt;">
+<input class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?> &gt;&gt;">
+<br><input type="submit" name="tostep2" value="&lt;&lt; <?=_('Back to step 2') ?>">
 </p>
 
 </form>

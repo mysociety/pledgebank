@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.146 2005-08-12 13:17:21 francis Exp $
+-- $Id: schema.sql,v 1.147 2005-08-12 16:17:42 matthew Exp $
 --
 
 -- secret
@@ -279,6 +279,9 @@ create function index_pledge_ref_parts(integer)
         t_pledge_id = $1;
         -- do not index private pledges 
         if (select pin from pledges where id = t_pledge_id) is not null then
+            return;
+        end if;
+        if (select prominence from pledges where id = t_pledge_id) = ''backpage'' then
             return;
         end if;
         select into t_ref lower(ref) from pledges where id = t_pledge_id;

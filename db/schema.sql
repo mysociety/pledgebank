@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.145 2005-08-11 11:20:28 francis Exp $
+-- $Id: schema.sql,v 1.146 2005-08-12 13:17:21 francis Exp $
 --
 
 -- secret
@@ -241,10 +241,9 @@ create function pledge_find_nearby(double precision, double precision, double pr
                 + cos(radians($1)) * cos(radians(latitude))
                     * cos(radians($2 - longitude))
             ) as distance
-        from pledges, location
+        from pledges left join location on location.id = pledges.location_id
         where
-            location.id = pledges.location_id
-            and longitude is not null and latitude is not null
+            longitude is not null and latitude is not null
             and radians(latitude) > radians($1) - ($3 / R_e())
             and radians(latitude) < radians($1) + ($3 / R_e())
             and (abs(radians($1)) + ($3 / R_e()) > pi() / 2     -- case where search pt is near pole

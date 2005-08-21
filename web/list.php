@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.10 2005-08-12 13:23:00 matthew Exp $
+// $Id: list.php,v 1.11 2005-08-21 21:59:30 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -99,11 +99,11 @@ $prev = '<span class="greyed">&laquo; '._('Previous page').'</span>'; $next = '<
 if ($q_offset > 0) {
     $n = $q_offset - PAGE_SIZE;
     if ($n < 0) $n = 0;
-    $prev = "<a href=\"all?offset=$n$sort\">&laquo; "._('Previous page')."</a>";
+    $prev = "<a href=\"?offset=$n$sort\">&laquo; "._('Previous page')."</a>";
 }
 if ($q_offset + PAGE_SIZE < $ntotal) {
     $n = $q_offset + PAGE_SIZE;
-    $next = "<a href=\"all?offset=$n$sort\">"._('Next page')." &raquo;</a>";
+    $next = "<a href=\"?offset=$n$sort\">"._('Next page')." &raquo;</a>";
 }
 $navlinks = '<p align="center">' . $views . "</p>\n";
 if ($ntotal > 0) {

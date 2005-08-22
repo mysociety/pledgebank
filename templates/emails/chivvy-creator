@@ -1,4 +1,4 @@
-Subject: Helping your pledge along its way - '<?=$values['title']?>' at PledgeBank.com
+Subject: You MUST publicise your pledge to make it succeed - '<?=$values['title']?>' at PledgeBank.com
 
 Hello, we've noticed that the pledge you set up hasn't been, erm, growing very
 quickly.  Just to remind you, we're talking about '<?=$values['sentence_first']?>'

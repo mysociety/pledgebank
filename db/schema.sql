@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.147 2005-08-12 16:17:42 matthew Exp $
+-- $Id: schema.sql,v 1.148 2005-08-22 09:51:22 francis Exp $
 --
 
 -- secret
@@ -281,6 +281,7 @@ create function index_pledge_ref_parts(integer)
         if (select pin from pledges where id = t_pledge_id) is not null then
             return;
         end if;
+        -- deliberately NOT pb_pledge_prominence, so mistyped calculated backpage pledges can be found easily
         if (select prominence from pledges where id = t_pledge_id) = ''backpage'' then
             return;
         end if;

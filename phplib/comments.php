@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.34 2005-07-22 11:48:59 matthew Exp $
+ * $Id: comments.php,v 1.35 2005-08-22 14:02:38 francis Exp $
  * 
  */
 
@@ -122,10 +122,10 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
  * Display comment for index, such as front page or search results. */
 function comments_summary($r) {
     $text = $r['text'];
-    if (strlen($text) > 20) $text = substr($text, 0, 20) . '...';
+    if (strlen($text) > 20) $text = trim_characters($text, 0, 30);
     $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . $text . '</a>';
     
-    return sprintf(_('%s by %s, on pledge %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
+    return sprintf(_('%s by %s, on %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
 }
 
 /* comments_show_latest [NUM]

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.11 2005-08-21 21:59:30 matthew Exp $
+// $Id: list.php,v 1.12 2005-08-22 18:39:51 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -62,13 +62,16 @@ if ($q_sort == 'category') {
             pledge_category.pledge_id = pledges.id LIMIT 1), 'Miscellaneous')";
 }
 $qrows = db_query("
-        SELECT *, (SELECT count(*) FROM signers
-                    WHERE signers.pledge_id = pledges.id) AS signers
+        SELECT pledges.*, pb_current_date() <= pledges.date AS open,
+            (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
+            person.email AS email, country, state, description as local_place, method as location_method
             FROM pledges 
+            LEFT JOIN person ON person.id = pledges.person_id
+            LEFT JOIN location ON location.id = pledges.location_id
             WHERE date $open pb_current_date() 
             AND pin IS NULL
             AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target 
-            AND pb_pledge_prominence(id) <> 'backpage'
+            AND pb_pledge_prominence(pledges.id) <> 'backpage'
             ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", PAGE_SIZE);
 /* PG bug: mustn't quote parameter of offset */
 
@@ -132,8 +135,8 @@ print $navlinks;
 if ($ntotal > 0) {
     $c = 0;
     $lastcategory = 'none';
-    while (list($id) = db_fetch_row($qrows)) {
-        $pledge = new Pledge(intval($id));
+    while ($row = db_fetch_array($qrows)) {
+        $pledge = new Pledge($row);
         if ($q_sort == "category") {
             $categories = $pledge->categories();
             $thiscategory = array_pop($categories);

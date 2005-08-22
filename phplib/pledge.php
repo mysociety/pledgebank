@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.123 2005-08-11 08:56:59 francis Exp $
+ * $Id: pledge.php,v 1.124 2005-08-22 16:35:07 matthew Exp $
  * 
  */
 
@@ -259,13 +259,13 @@ class Pledge {
                 printf(ngettext('%s person has signed up', '%s people have signed up', $this->signers()), prettify($this->signers()));
             if ($this->left() < 0) {
                 print ' ';
-                printf(_('(%d over target)'), -$this->left() );
+                printf(_('(%d over target)'), prettify(-$this->left()) );
             } elseif ($this->left() > 0) {
                 print ', ';
                 if (array_key_exists('closed', $params))
-                    printf(ngettext('%d more was needed', '%d more were needed', $this->left()), $this->left() );
+                    printf(ngettext('%d more was needed', '%d more were needed', $this->left()), prettify($this->left()) );
                 else
-                    printf(_('%d more needed'), $this->left() );
+                    printf(_('%d more needed'), prettify($this->left()) );
             }
             print '</i>';
         }

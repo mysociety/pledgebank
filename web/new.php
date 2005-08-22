@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.84 2005-08-22 11:10:38 francis Exp $
+// $Id: new.php,v 1.85 2005-08-22 15:36:11 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -168,7 +168,7 @@ function pledge_form_target_warning($data, $errors) {
 lot of work, and many people who have set up pledges larger than this have not
 succeeded.  You should only set a large target if you are preprared to do some
 serious marketing of your pledge.")), OPTION_PB_TARGET_WARNING);
-    print p(_('Please take advantage of this box to change your target.  There is <a
+    print p(_('We\'ve set your target to 10 for now. Please take advantage of this box to change it.  There is <a
 href="/faq#targets">more advice</a> about choosing a target in the FAQ.'));
 ?>
 <p><?=_('<strong>My target</strong> is ') ?>
@@ -181,8 +181,8 @@ for a larger and more ambitious one.') ?></p>
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 
-<input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
-<input type="submit" name="donetargetwarning" value="<?=_('Next') ?> &gt;&gt;">
+<input class="topbutton" type="submit" name="donetargetwarning" value="<?=_('Next') ?> &gt;&gt;">
+<br><input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
 </p>
 
 </form>

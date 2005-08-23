@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.52 2005-07-22 11:48:59 matthew Exp $
+// $Id: fns.php,v 1.53 2005-08-23 22:29:20 matthew Exp $
 
 require_once "../../phplib/evel.php";
 require_once '../../phplib/person.php';
@@ -164,7 +164,7 @@ function view_friends_form($p, $errors = array()) {
             $email = $P->email();
     }
     
-    if (sizeof($errors) && get_http_var('submit')) {
+    if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';

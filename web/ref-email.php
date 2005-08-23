@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.17 2005-07-08 11:32:59 matthew Exp $
+// $Id: ref-email.php,v 1.18 2005-08-23 22:29:21 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -34,40 +34,43 @@ $fromemail = trim(get_http_var('fromemail'));
 $frommessage = get_http_var('frommessage');
 $errors = array();
 $emails = array();
-for ($i = 1; $i <= 5; $i++) {
-    if (get_http_var("email$i")) {
-        $email = trim(get_http_var("email$i"));
-        $emails[] = $email;
-        if (!validate_email($email)) {
-            $errors['email'.$i] = _("Please correct the email address '".htmlspecialchars($email)."', which is not a valid address.");
+
+if (get_http_var('submit')) {
+    for ($i = 1; $i <= 5; $i++) {
+        if (get_http_var("email$i")) {
+            $email = trim(get_http_var("email$i"));
+            $emails[] = $email;
+            if (!validate_email($email)) {
+                $errors['email'.$i] = _("Please correct the email address '".htmlspecialchars($email)."', which is not a valid address.");
+            }
         }
     }
-}
-if (count($emails) < 1) $errors['email1'] = _("Please enter the email addresses of the people you want to tell about the pledge");
-if (!$fromname) $errors['fromname'] = _("Please enter your name");
-if (!$fromemail) $errors['fromemail'] = _("Please enter your email address");
-if (!validate_email($fromemail)) $errors['fromemail'] = _("Please enter a valid address for your email");
+    if (count($emails) < 1) $errors['email1'] = _("Please enter the email addresses of the people you want to tell about the pledge");
+    if (!$fromname) $errors['fromname'] = _("Please enter your name");
+    if (!$fromemail) $errors['fromemail'] = _("Please enter your email address");
+    if (!validate_email($fromemail)) $errors['fromemail'] = _("Please enter a valid address for your email");
 
-if (!$errors) {
-    if (sizeof($emails)>5)
-        err(_("Trying to use us for SPAMMING!?!?!"));
-    $success = 1;
-    foreach ($emails as $email) {
-        if (!$email)
-            continue;
-        $success &= pb_send_email_template($email, 'email-friends',
-            array_merge($p->data, array(
-                'from_name'=>$fromname, 
-                'from_email' => $fromemail, 
-                'from_message' => $frommessage ? _('They added this message:') . " \"$frommessage\"\n\n" : "",
-            )), array('From'=>'"' . str_replace(array('\\','"'), array('\\\\','\"'), $fromname) . '" <' . $fromemail . '>')
-        );
-    }
-    if ($success) {
-        print p(_('Your message has been sent.  Thanks very much for spreading the word of this pledge.'));
-    } else {
-        $errors[] = _('Unfortunately, something went wrong when trying to send the emails. Please check that all the email addresses are correct.');
-        view_friends_form($p, $errors);
+    if (!$errors) {
+        if (sizeof($emails)>5)
+            err(_("Trying to use us for SPAMMING!?!?!"));
+        $success = 1;
+        foreach ($emails as $email) {
+            if (!$email)
+                continue;
+            $success &= pb_send_email_template($email, 'email-friends',
+                array_merge($p->data, array(
+                    'from_name'=>$fromname, 
+                    'from_email' => $fromemail, 
+                    'from_message' => $frommessage ? _('They added this message:') . " \"$frommessage\"\n\n" : "",
+                )), array('From'=>'"' . str_replace(array('\\','"'), array('\\\\','\"'), $fromname) . '" <' . $fromemail . '>')
+            );
+        }
+        if ($success) {
+            print p(_('Your message has been sent.  Thanks very much for spreading the word of this pledge.'));
+        } else {
+            $errors[] = _('Unfortunately, something went wrong when trying to send the emails. Please check that all the email addresses are correct.');
+            view_friends_form($p, $errors);
+        }
     }
 } else {
     view_friends_form($p, $errors);

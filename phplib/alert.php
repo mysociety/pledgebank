@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.16 2005-08-25 17:10:49 francis Exp $
+// $Id: alert.php,v 1.17 2005-08-25 17:13:06 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -37,8 +37,8 @@ function alert_signup($person_id, $event_code, $params) {
             db_query("insert into alert (person_id, event_code, pledge_id)
                 values (?, ?, ?)", array($person_id, $event_code, $params['pledge_id']));
         }
-    } elseif ($event_code == "pledges/local/GB") {
-        /* Alert when a new pledge appears near a particular area in country GB (the UK) */
+    } elseif ($event_code == "pledges/local") {
+        /* Alert when a new pledge appears near a particular area */
         /* XXX extend this for worldwide alerts. */
 
         if ($params['postcode']) {
@@ -127,7 +127,7 @@ function alert_h_description($alert_id) {
     if ($row['event_code'] == "comments/ref") { 
         $pledge = new Pledge(intval($row['pledge_id']));
         return sprintf(_("new comments on the pledge '%s'"), $pledge->ref() );
-    } elseif ($row['event_code'] == "pledges/local/GB") { 
+    } elseif ($row['event_code'] == "pledges/local") { 
         if ($row['method'] == 'MaPit') 
             return sprintf(_("new UK pledges near postcode %s"), $row['description'] );
         else 
@@ -147,19 +147,6 @@ function alert_unsubscribe_link($alert_id, $email) {
                 "POST", OPTION_BASE_URL . "/alert", array('direct_unsubscribe'=>$alert_id));
     return $url;
 }
-
-/* Returns true if the signed on user is already subscribed */
-function local_uk_alert_subscribed() {
-    $P = person_if_signed_on();
-    if (!$P)
-        return false;
-    
-    $already_signed = db_getOne("select count(*) from alert where event_code = 'pledges/local/GB' 
-            and person_id = ?", array($P->id()));
-
-    return ($already_signed > 0);
-}
-
 
 /* Stuff to loop through / display all of someone's alerts
 // not used yet

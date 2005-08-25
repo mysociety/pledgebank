@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.148 2005-08-22 09:51:22 francis Exp $
+-- $Id: schema.sql,v 1.149 2005-08-25 17:13:05 francis Exp $
 --
 
 -- secret
@@ -993,7 +993,7 @@ create table alert (
     -- ref indicates a pledge reference
     check (
             event_code = 'comments/ref' or    -- new comments on a particular pledge
-            event_code = 'pledges/local/GB'   -- new pledge near a particular area
+            event_code = 'pledges/local'   -- new pledge near a particular area
     ),
 
     -- extra parameters for different types of alert

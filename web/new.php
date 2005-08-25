@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.87 2005-08-25 10:53:02 francis Exp $
+// $Id: new.php,v 1.88 2005-08-25 17:10:49 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -632,7 +632,7 @@ function step2_error_check(&$data) {
                     }
                 }
                 if ($data['postcode'] && $data['country'] != 'GB')
-                    $errors['postcode'] = _("You can only enter a postcode if your pledge applies to Britain");
+                    $errors['postcode'] = _("You can only enter a postcode if your pledge applies to the UK");
             }
         }
     }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.15 2005-08-09 13:00:55 francis Exp $
+// $Id: alert.php,v 1.16 2005-08-25 17:10:49 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -16,8 +16,12 @@ require_once '../../phplib/person.php';
  *  - comments/ref for alerts when a new comment is posted on a pledge; PARAMS
  *    must contain pledge_id, the ID of the pledge concerned; or
  *
- *  - pledges/local/GB for alerts when new pledges are created near a location
- *    in the UK; PARAMS must contain 'postcode', the postcode for that location.
+ *  - pledges/localfor alerts when new pledges are created near a location.
+ *    'country' - two letter country code (compulsory)
+ *    'state' - two letter region-within-country code (optional)
+ *    either 'place' and 'gaze_place' - input place name, and selected place triple of 
+ *                                      "latitude, longitude, input" in a string
+ *    or 'postcode' - UK postcode
  *
  * The contents of PARAMS must be verified before calling this function; if
  * not, it will abort by calling err(). */
@@ -37,15 +41,34 @@ function alert_signup($person_id, $event_code, $params) {
         /* Alert when a new pledge appears near a particular area in country GB (the UK) */
         /* XXX extend this for worldwide alerts. */
 
-        /* Canonicalise postcode form, so more likely to detect it is already in the table */
-        $params['postcode'] = canonicalise_postcode($params['postcode']);
+        if ($params['postcode']) {
+            if ($country != "GB")
+                err("Postcode only available for the UK");
 
-        /* Find out where on earth it is */
-        $location = mapit_get_location($params['postcode']);
-        if (mapit_get_error($location)) {
-            /* This error should never happen, as earlier postcode validation in form will stop it */
-            err('Invalid postcode while setting alert, please check and try again.');
+            /* Canonicalise postcode form, so more likely to detect it is already in the table */
+            $params['postcode'] = canonicalise_postcode($params['postcode']);
+
+            /* Find out where on earth it is */
+            $location = mapit_get_location($params['postcode']);
+            if (mapit_get_error($location)) {
+                /* This error should never happen, as earlier postcode validation in form will stop it */
+                err('Invalid postcode while setting alert, please check and try again.');
+            }
+            $location['input'] = $params['postcode'];
+            $location['description'] = $params['postcode'];
+            $location['method'] = "MaPit";
+        } elseif ($params['gaze_place']) {
+            $location = array();    
+            list($lat, $lon, $desc) = explode(',', $params['gaze_place'], 3);
+            $location['wgs84_lat'] = $lat;
+            $location['wgs84_lon'] = $lon;
+            $location['description'] = $desc;
+            $location['input'] = $params['place'];
+            $location['method'] = "Gaze";
+        } else {
+            err('Please choose place');
         }
+
         /* Guard against double-insertion. */
         db_query('lock table alert in share mode');
         $already = db_getOne("select alert.id from alert left join location on location.id = alert.location_id
@@ -55,12 +78,13 @@ function alert_signup($person_id, $event_code, $params) {
             $location_id = db_getOne("select nextval('location_id_seq')");
             db_query("
                     insert into location
-                        (id, country, method, input, latitude, longitude, description)
-                    values (?, 'GB', 'MaPit', ?, ?, ?, ?)", array(
+                        (id, country, state, method, input, latitude, longitude, description)
+                    values (?, ?, ?, ?, ?, ?, ?, ?)", array(
                         $location_id,
-                        $params['postcode'],
+                        $params['country'], $params['state'],
+                        $location['method'], $location['input'],
                         $location['wgs84_lat'], $location['wgs84_lon'],
-                        $params['postcode']
+                        $location['description']
                     ));
             db_query("
                     insert into alert

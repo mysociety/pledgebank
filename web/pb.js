@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.21 2005-08-12 14:12:13 matthew Exp $
+ * $Id: pb.js,v 1.22 2005-08-25 17:10:49 francis Exp $
  * 
  */
 
@@ -78,7 +78,7 @@ function greyOutInputs() {
     d = document.forms.pledge
     if (d) {
         if (d.visibility) grey_pin(d.visibility[0].checked)
-        if (d.local) update_place_local(d.local[0],false)
+        if (d.place) update_place_local(d.place,false)
     }
 }
 
@@ -102,8 +102,11 @@ function update_place_local(item, optionclick) {
     // Work out our situation
     iscountry = (countryPicked != "Global" && countryPicked != "(separator)" && countryPicked != "(choose one)");
     isuk = (countryPicked == "GB");
-    islocal = (d.elements['local1'].checked);
-    hasgazetteer = (gaze_countries[countryPicked] == 1);
+    if (d.elements['local1'])
+        islocal = d.elements['local1'].checked
+    else
+        islocal = true // Happens in alert.php
+    hasgazetteer = (gaze_countries[countryPicked] == 1)
 
     // Ghost things appropriately
     grey_local(!iscountry || !hasgazetteer); 
@@ -131,6 +134,11 @@ function grey_place(t, optionclick) {
 }
 
 function grey_local(t) {
+    if (!document.getElementById('local_line')) {
+        // On alert.php, there is no local_line
+        return
+    }
+
     if (t) {
         document.getElementById('local_line').style.color = '#999999'
     } else {

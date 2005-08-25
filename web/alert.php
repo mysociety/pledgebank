@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.25 2005-07-29 17:28:04 chris Exp $
+// $Id: alert.php,v 1.26 2005-08-25 17:10:49 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -13,16 +13,41 @@ require_once '../phplib/alert.php';
 require_once '../../phplib/person.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/importparams.php';
+require_once '../../phplib/gaze.php';
 
+// Get any inputs and process a bit
+$email = get_http_var('email');
+$country = get_http_var('country');
+$state = null;
+if ($country) {
+    $a = array();
+    if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
+        list($x, $country, $state) = $a;
+}
+$place = get_http_var('place');
+if ($country && $country == 'Global')
+    $place = null;
+else {
+    # Check gaze has this country
+    $countries_with_gazetteer = gaze_get_find_places_countries();
+    gaze_check_error($countries_with_gazetteer);
+    if (!in_array($country, $countries_with_gazetteer)) {
+        $place = null;
+    }
+}
+$gaze_place = get_http_var('gaze_place');
+$postcode = get_http_var('postcode');
+if ($country && $country != 'GB') $postcode = '';
+if ($country && $country == '(choose one)') $country = null;
+if ($country && $country == '(separator)') $country = null;
+ 
+// Display page
 $title = _('New pledge alerts');
-page_header($title);
-if (get_http_var('subscribe_local_uk_alert')) {
-    $errors = do_local_uk_alert_subscribe();
+page_header($title, array("gazejs" => true));
+if (get_http_var('subscribe_local_alert')) {
+    $errors = do_local_alert_subscribe();
     if (is_array($errors)) {
-        print '<div id="errors"><ul><li>';
-        print join ('</li><li>', $errors);
-        print '</li></ul></div>';
-        local_uk_alert_subscribe_box();
+        local_alert_subscribe_box($errors);
     }
 } elseif (get_http_var('direct_unsubscribe')) {
     // Clicked from email to unsubscribe
@@ -40,17 +65,32 @@ if (get_http_var('subscribe_local_uk_alert')) {
     }
     print '</p>';
 } else {
-    local_uk_alert_subscribe_box();
+    local_alert_subscribe_box();
 }
 page_footer();
 
-function do_local_uk_alert_subscribe() {
-    global $q_email, $q_name, $q_showname, $q_ref, $q_pin, $q_postcode;
-    $errors = importparams(
-                array('email',      "importparams_validate_email"),
-                array('postcode',   "importparams_validate_postcode")
-            );
-    if (!is_null($errors))
+function do_local_alert_subscribe() {
+    global $email, $country, $state, $place, $gaze_place, $postcode;
+    $errors = array();
+    if (!$email) $errors['email'] = _("Please enter your email address");
+    if (!validate_email($email)) $errors['email'] = _("Please enter a valid email address");
+    if (!$country) $errors['country'] = _("Please choose a country");
+    if ($postcode && $place)
+        $errors['place'] = _("Please enter either a postcode or a place name, but not both");
+    if ($postcode && $country != 'GB')
+        $errors['postcode'] = _("You can only enter a postcode if your pledge applies to the UK");
+    if ($postcode) {
+        if (!validate_postcode($postcode))
+            $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode; for example, OX1 3DR or WC1.');
+        else if (mapit_get_error(mapit_get_location($postcode, 1)))
+            $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
+        else
+            $postcode = canonicalise_postcode($postcode);
+    } elseif ($place) {
+    } else {
+        $errors['place'] = _("Please enter either a postcode or a place name");
+    }
+    if (count($errors))
         return $errors;
 
     /* Get the user to log in. */
@@ -58,8 +98,14 @@ function do_local_uk_alert_subscribe() {
     $r['reason_web'] = _('Before subscribing you to local pledge email alerts, we need to confirm your email address.');
     $r['reason_email'] = _("You'll then be emailed whenever a new pledge appears in your area.");
     $r['reason_email_subject'] = _("Subscribe to local pledge alerts at PledgeBank.com");
-    $person = person_signon($r, $q_email);
-    alert_signup($person->id(), "pledges/local/GB", array('postcode' => $q_postcode));
+    $person = person_signon($r, $email);
+    $params = array();
+    $params['country'] = $country;
+    $params['state'] = $state;
+    $params['place'] = $place;
+    $params['gaze_place'] = $gaze_place;
+    $params['postcode'] = $postcode;
+    alert_signup($person->id(), "pledges/local/GB", $params);
     db_commit();
         ?>
 <p class="loudmessage" align="center"><?=_("Thanks for subscribing!  You'll now get emailed once a day when there are new pledges in your area.") ?> </p>
@@ -71,9 +117,25 @@ Or <a href="<?=OPTION_BASE_URL."/new/picnic"?>"><?=_("a picnic")?></a>?
 }
 
 /* Display form for email alert sign up. */
-function local_uk_alert_subscribe_box() {
-    $email = get_http_var('email');
-    $postcode = get_http_var('postcode');
+function local_alert_subscribe_box($errors = array()) {
+    global $email, $country, $state, $place, $gaze_place, $postcode;
+
+    if ($place) {
+        # Look up nearby places
+        $places = gaze_find_places($country, $state, $place, 10);
+        gaze_check_error($places);
+    //    if (array_key_exists('gaze_place', $errors)) {
+            if (count($places) > 0) {
+                print '<div id="formnote"><ul><li>';
+                print _('Please select one of the possible places; if none of them is right, please type the name of another nearby place');
+                print '</li></ul></div>';
+            } else {
+                $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
+                htmlspecialchars($place));
+            }
+    //      unset($errors['gaze_place']); # remove NOTICE
+     //   } 
+    }
 
     $P = person_if_signed_on();
     if (!is_null($P)) {
@@ -81,18 +143,76 @@ function local_uk_alert_subscribe_box() {
             $email = $P->email();
     }
 
-?>
-<form accept-charset="utf-8" class="pledge" name="localalert" action="/alert" method="post">
-<input type="hidden" name="subscribe_local_uk_alert" value="1">
-<h2><?=_('Get emails about local pledges (UK)') ?></h2>
-<p><?=_("Fill in the form, and we'll email you when someone creates a new pledge near you.") ?></p>
-<p>
-<label for="email"><strong><?=_('Email:') ?></strong></label> 
-<input type="text" size="20" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
-<label for="postcode"><strong><?=_('UK Postcode:') ?></strong></label> 
+    if (count($errors)) {
+        print '<div id="errors"><ul><li>';
+        print join ('</li><li>', $errors);
+        print '</li></ul></div>';
+    }
+    
+ ?>
+<!--<label for="postcode"><strong><?=_('UK Postcode:') ?></strong></label> 
 <input type="text" size="15" name="postcode" id="postcode" value="<?=htmlspecialchars($postcode) ?>">
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>">
 </p>
+</form>-->
+
+<!--<form accept-charset="utf-8" class="pledge" name="pledge" action="/alert" method="post">-->
+<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/alert">
+<input type="hidden" name="subscribe_local_alert" value="1">
+<h2><?=_('Get emails about local pledges') ?></h2>
+<p><?=_("Fill in the form, and we'll email you when someone creates a new pledge near you.") ?></p>
+<p>
+
+<?
+/* Save previous value of country, so that we can detect if it's changed after
+ * one of a list of placenames is selected. */
+/*if (array_key_exists('country', $data))
+    printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($data['country']));*/
+?>
+
+<p>
+<label for="email"><strong><?=_('Email:') ?></strong></label> 
+<input <? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="20" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
+</p>
+
+<p><strong><?=_('Country:') ?></strong>
+<? pb_view_gaze_country_choice($country, $state, $errors); ?>
+</p>
+
+<p id="ifyes_line">
+<strong><?=_("Where in that country?")?></strong>
+<ul>
+<li><p id="place_line">
+<?
+
+/* Save previous value of 'place' so we can show a new selection list in the
+ * case where the user types a different place name after clicking on one of
+ * the selections. */
+/*if (array_key_exists('place', $data))
+    printf("<input type=\"hidden\" name=\"prev_place\" value=\"%s\">", htmlspecialchars($data['place']));*/
+
+/* If the user has already typed a place name, then we need to grab the
+ * possible places from Gaze. */
+if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
+    ?>
+       <?=_('Place name:') ?>
+    <?
+} else {
+    pb_view_gaze_places_choice($places, $place, get_http_var('gaze_place'));
+}
+
+?>
+ <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($place)) print htmlspecialchars($place) ?>">
+</p></li>
+<li><p id="postcode_line">
+<?=_('Or, UK only, you can give a postcode:') ?>
+<input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($postcode)) print htmlspecialchars($postcode) ?>">
+</p></li>
+</ul>
+
+<p><input type="submit" name="submit" value="<?=_('Subscribe') ?>">
+</p>
+
 </form>
 
 <? 

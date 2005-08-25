@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.53 2005-08-23 22:29:20 matthew Exp $
+// $Id: fns.php,v 1.54 2005-08-25 10:09:14 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once '../../phplib/person.php';
@@ -199,5 +199,85 @@ We will not give or sell either your or their email address to anyone else.')); 
 <?
 }
 
+// Prints HTML for radio buttons to select a list of places drawn from Gaze
+function pb_view_gaze_places_choice($places, $place, $selected_gaze_place) {
+    print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
+    $nn = 0;
+    foreach ($places as $p) {
+        list($name, $in, $near, $lat, $lon, $st) = $p;
+        $desc = $name;
+        if ($in) $desc .= ", $in";
+        if ($st) $desc .= ", $st";
+        if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
+        $t = htmlspecialchars("$lat,$lon,$desc");
+        $checked = '';
+        if ($t == $selected_gaze_place) {
+            $checked = 'checked';
+        }
+        $nn++;
+        print "<input type=\"radio\" name=\"gaze_place\" value=\"$t\" id=\"gaze_place_$nn\" $checked>\n<label for=\"gaze_place_$nn\">$desc</label><br>\n";
+    }
+    print "<strong>"._("If it isn't any of those, try a different spelling, or the name of another nearby town:")."</strong>";
+}
+
+function pb_view_gaze_country_choice($selected_country, $selected_state, $errors) {
+    global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name;
+
+    /* Find country for this IP address, to show at top of choices */
+    $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
+    # $ip_country = gaze_get_country_from_ip("213.228.0.42"); # Ukraine: "194.44.201.2" # France: "213.228.0.42"
+    if (rabx_is_error($ip_country) || !$ip_country)
+        $ip_country = null;
 
 ?>
+<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_place_local(this, true)">
+  <option value="(choose one)"><?=_('(choose one)') ?></option>
+  <option value="Global"<? if ($selected_country=='Global') print ' selected'; ?>><?=_('None &mdash; applies anywhere') ?></option>
+  <!-- needs explicit values for IE Javascript -->
+<?
+    if ($selected_country and array_key_exists($selected_country, $countries_code_to_name)) {
+        print "<option value=\"$selected_country\"";
+        if (!$selected_state) {
+            print " selected";
+        }
+        print ">"
+                . htmlspecialchars($countries_code_to_name[$selected_country])
+                . "</option>";
+
+        if (array_key_exists($selected_country, $countries_statecode_to_name)) {
+            foreach ($countries_statecode_to_name[$selected_country] as $opt_statecode => $opt_statename) {
+                print "<option value=\"$selected_country,$opt_statecode\"";
+                if ($selected_state && "$opt_statecode" == $selected_state)
+                    print ' selected';
+                print "> &raquo; "
+                        . htmlspecialchars($opt_statename)
+                        . "</option>";
+                
+            }
+        }
+    }
+    if ($selected_country != $ip_country && $ip_country) {
+        print "<option value=\"$ip_country\">";
+        print htmlspecialchars($countries_code_to_name[$ip_country]);
+        print "</option>";
+    }
+?>
+  <option value="(separator)"><?=_('---------------------------------------------------') ?></option>
+<?
+    foreach ($countries_name_to_code as $opt_country => $opt_code) {
+        print "<option value=\"$opt_code\">"
+                . htmlspecialchars($opt_country)
+                . "</option>";
+        if (array_key_exists($opt_code, $countries_statecode_to_name)) {
+            foreach ($countries_statecode_to_name[$opt_code] as $opt_statecode => $opt_statename) {
+                print "<option value=\"$opt_code,$opt_statecode\">"
+                        . "&raquo; "
+                        . htmlspecialchars($opt_statename)
+                        . "</option>";
+            }
+        }
+    }
+?>
+</select>
+<?
+}

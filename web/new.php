@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.85 2005-08-22 15:36:11 francis Exp $
+// $Id: new.php,v 1.86 2005-08-25 10:09:14 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -192,8 +192,6 @@ for a larger and more ambitious one.') ?></p>
 
 
 function pledge_form_two($data, $errors = array()) {
-    global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name;
-
     $local = (array_key_exists('local', $data)) && $data['local'] == '1';
     $notlocal = (array_key_exists('local', $data)) && $data['local'] == '0';
     $isodate = $data['parseddate']['iso'];
@@ -201,11 +199,6 @@ function pledge_form_two($data, $errors = array()) {
         $comparison = "atleast";
     else
         $comparison = $data['comparison'];
-
-    $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
-    # $ip_country = gaze_get_country_from_ip("213.228.0.42"); # Ukraine: "194.44.201.2" # France: "213.228.0.42"
-    if (rabx_is_error($ip_country) || !$ip_country)
-        $ip_country = null;
 
     /* The 'country' parameter may give a (country, state) pair. */
     $country = null;
@@ -221,9 +214,21 @@ function pledge_form_two($data, $errors = array()) {
     $place = null;
     if (array_key_exists('place', $data))
         $place = $data['place'];
+    if ($country && $country == 'Global')
+        $place = null;
+    else {
+        # Check gaze has this country
+        $countries_with_gazetteer = gaze_get_find_places_countries();
+        gaze_check_error($countries_with_gazetteer);
+        if (!in_array($country, $countries_with_gazetteer)) {
+            $place = null;
+        }
+    }
     if ($place) {
         # Look up nearby places
         $places = gaze_find_places($country, $state, $place, 10);
+        print_r($places);
+        exit;
         gaze_check_error($places);
         if (array_key_exists('gaze_place', $errors)) {
             if (count($places) > 0) {
@@ -270,56 +275,7 @@ if (array_key_exists('country', $data))
 ?>
 
 <p><?=_('Which country does your pledge apply to?') ?>
-<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_place_local(this, true)">
-  <option value="(choose one)"><?=_('(choose one)') ?></option>
-  <option value="Global"<? if ($country=='Global') print ' selected'; ?>><?=_('None &mdash; applies anywhere') ?></option>
-  <!-- needs explicit values for IE Javascript -->
-<?
-    if ($country and array_key_exists($country, $countries_code_to_name)) {
-        print "<option value=\"$country\"";
-        if (!$state)
-            print " selected";
-        print ">"
-                . htmlspecialchars($countries_code_to_name[$country])
-                . "</option>";
-
-        if (array_key_exists($country, $countries_statecode_to_name)) {
-            foreach ($countries_statecode_to_name[$country] as $opt_statecode => $opt_statename) {
-                print "<option value=\"$country,$opt_statecode\"";
-                if ($state && "$opt_statecode" == $state)
-                    print ' selected';
-                print "> &raquo; "
-                        . htmlspecialchars($opt_statename)
-                        . "</option>";
-                
-            }
-        }
-    }
-    if ($country != $ip_country && $ip_country) {
-        print "<option value=\"$ip_country\">";
-        print htmlspecialchars($countries_code_to_name[$ip_country]);
-        print "</option>";
-    }
-
-
-?>
-  <option value="(separator)"><?=_('---------------------------------------------------') ?></option>
-<?
-    foreach ($countries_name_to_code as $opt_country => $opt_code) {
-        print "<option value=\"$opt_code\">"
-                . htmlspecialchars($opt_country)
-                . "</option>";
-        if (array_key_exists($opt_code, $countries_statecode_to_name)) {
-            foreach ($countries_statecode_to_name[$opt_code] as $opt_statecode => $opt_statename) {
-                print "<option value=\"$opt_code,$opt_statecode\">"
-                        . "&raquo; "
-                        . htmlspecialchars($opt_statename)
-                        . "</option>";
-            }
-        }
-    }
-?>
-</select>
+<? pb_view_gaze_country_choice($country, $state, $errors); ?>
 </p>
 
 <p id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?>
@@ -346,23 +302,7 @@ if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
        <?=_('Place name:') ?>
     <?
 } else {
-    print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
-    $nn = 0;
-    foreach ($places as $p) {
-        list($name, $in, $near, $lat, $lon, $st) = $p;
-        $desc = $name;
-        if ($in) $desc .= ", $in";
-        if ($st) $desc .= ", $st";
-        if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
-        $t = htmlspecialchars("$lat,$lon,$desc");
-        $checked = '';
-        if ($t == $data['gaze_place']) {
-            $checked = 'checked';
-        }
-        $nn++;
-        print "<input type=\"radio\" name=\"gaze_place\" value=\"$t\" id=\"gaze_place_$nn\" $checked>\n<label for=\"gaze_place_$nn\">$desc</label><br>\n";
-    }
-    print "<strong>"._("If it isn't any of those, try a different spelling, or the name of another nearby town:")."</strong>";
+    pb_view_gaze_places_choice($places, $place, $data['gaze_place']);
 }
 
 ?>
@@ -374,6 +314,7 @@ if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
 <br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
 </p></li>
 </ul>
+
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 <input class="topbutton" type="submit" name="tostep3" value="<?=_('Next') ?> &gt;&gt;">

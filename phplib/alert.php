@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.17 2005-08-25 17:13:06 francis Exp $
+// $Id: alert.php,v 1.18 2005-08-26 14:08:54 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -42,7 +42,7 @@ function alert_signup($person_id, $event_code, $params) {
         /* XXX extend this for worldwide alerts. */
 
         if ($params['postcode']) {
-            if ($country != "GB")
+            if ($params['country'] != "GB")
                 err("Postcode only available for the UK");
 
             /* Canonicalise postcode form, so more likely to detect it is already in the table */

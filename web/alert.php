@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.28 2005-08-26 12:20:51 francis Exp $
+// $Id: alert.php,v 1.29 2005-08-26 14:08:54 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -75,10 +75,13 @@ function do_local_alert_subscribe() {
     if (!$email) $errors['email'] = _("Please enter your email address");
     if (!validate_email($email)) $errors['email'] = _("Please enter a valid email address");
     if (!$country) $errors['country'] = _("Please choose a country");
-    if ($postcode && $place)
-        $errors['place'] = _("Please enter either a postcode or a place name, but not both");
-    if ($postcode && $country != 'GB')
-        $errors['postcode'] = _("You can only enter a postcode if your pledge applies to the UK");
+    if ($country == 'GB') {
+        if ($postcode && $place)
+            $errors['place'] = _("Please enter either a place name or a postcode, but not both");
+    } else {
+        if ($postcode)
+            $errors['postcode'] = _("You can only enter a postcode if your pledge applies to the UK");
+    }
     if ($postcode) {
         if (!validate_postcode($postcode))
             $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode; for example, OX1 3DR or WC1.');
@@ -91,7 +94,11 @@ function do_local_alert_subscribe() {
             $errors['gaze_place'] = "NOTICE";
         }
     } else {
-        $errors['place'] = _("Please enter either a postcode or a place name");
+        if ($country == 'GB') {
+            $errors['place'] = _("Please enter either a place name or a postcode");
+        } else {
+            $errors['place'] = _("Please enter a place name");
+        }
     }
     if ($place && ($country != get_http_var('prev_country') || $place != get_http_var('prev_place'))) {
         $errors['gaze_place'] = "NOTICE";

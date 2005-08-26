@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.22 2005-08-25 17:10:49 francis Exp $
+ * $Id: pb.js,v 1.23 2005-08-26 17:19:08 francis Exp $
  * 
  */
 
@@ -113,9 +113,23 @@ function update_place_local(item, optionclick) {
     grey_ifyes(!islocal || !iscountry || !hasgazetteer);
     grey_place(!islocal || !iscountry || !hasgazetteer, optionclick);
     grey_postcode(!islocal || !isuk || !hasgazetteer, optionclick);
+
+    // Front page text
+    var place_postcode_label = document.getElementById('place_postcode_label')
+    if (place_postcode_label) {
+        var current = place_postcode_label.childNodes[0].nodeValue
+        if (current == 'Town:' && countryPicked == 'GB') {
+            place_postcode_label.childNodes[0].nodeValue = 'Postcode or town:'
+        } else if (current == 'Postcode area or town:' && countryPicked != 'GB') {
+            place_postcode_label.childNodes[0].nodeValue = 'Town:'
+        }
+    }
 }
 
 function grey_postcode(t, optionclick) {
+    if (!document.getElementById('postcode_line'))
+        return
+
     if (t) {
         document.getElementById('postcode_line').style.color = '#999999'
     } else {
@@ -125,6 +139,9 @@ function grey_postcode(t, optionclick) {
 }
 
 function grey_place(t, optionclick) {
+    if (!document.getElementById('place_line'))
+        return
+
     if (t) {
         document.getElementById('place_line').style.color = '#999999'
     } else {
@@ -134,10 +151,8 @@ function grey_place(t, optionclick) {
 }
 
 function grey_local(t) {
-    if (!document.getElementById('local_line')) {
-        // On alert.php, there is no local_line
+    if (!document.getElementById('local_line'))
         return
-    }
 
     if (t) {
         document.getElementById('local_line').style.color = '#999999'
@@ -149,6 +164,9 @@ function grey_local(t) {
 }
 
 function grey_ifyes(t) {
+    if (!document.getElementById('ifyes_line')) 
+        return
+
     if (t) {
         document.getElementById('ifyes_line').style.color = '#999999'
     } else {

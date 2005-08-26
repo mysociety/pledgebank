@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.31 2005-08-26 16:52:53 matthew Exp $
+// $Id: alert.php,v 1.32 2005-08-26 17:19:08 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -40,6 +40,11 @@ $postcode = get_http_var('postcode');
 if ($country && $country != 'GB') $postcode = '';
 if ($country && $country == '(choose one)') $country = null;
 if ($country && $country == '(separator)') $country = null;
+
+if ($place && (validate_partial_postcode($place) || validate_postcode($place))) {
+    $postcode = $place;
+    $place = null;
+}
  
 // Display page
 $title = _('New pledge alerts');
@@ -83,10 +88,10 @@ function do_local_alert_subscribe() {
             $errors['postcode'] = _("You can only enter a postcode area if your pledge applies to the UK");
     }
     if ($postcode) {
-        if (!validate_partial_postcode($postcode))
-            $errors['postcode'] = _('Please enter the first part of a postcode; for example, OX2 or WC1.');
+        if (!validate_partial_postcode($postcode) && !validate_postcode($postcode))
+            $errors['postcode'] = _('Please enter a postcode, or just its first part; for example, OX1 3DR or WC1.');
         else if (mapit_get_error(mapit_get_location($postcode, 1)))
-            $errors['postcode'] = _("We couldn't recognise that part of a postcode; please re-check it");
+            $errors['postcode'] = _("We couldn't recognise that postcode; please re-check it");
         else
             $postcode = canonicalise_partial_postcode($postcode);
     } elseif ($place) {

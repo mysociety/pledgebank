@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.30 2005-08-26 16:45:01 francis Exp $
+// $Id: alert.php,v 1.31 2005-08-26 16:52:53 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -158,7 +158,7 @@ function local_alert_subscribe_box($errors = array()) {
 
     if (get_http_var('from_frontpage') && array_key_exists('place', $errors)) {
         print '<div id="formnote"><ul><li>';
-        print $errors['place'];
+        print str_replace('Please', 'Now please', $errors['place']);
         print '</li></ul></div>';
         unset($errors['place']);
     } elseif (count($errors)) {

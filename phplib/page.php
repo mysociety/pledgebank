@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.67 2005-08-12 23:29:00 matthew Exp $
+// $Id: page.php,v 1.68 2005-08-26 15:34:56 matthew Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -170,7 +170,7 @@ function page_footer($params = array()) {
         $out[] = $o;
     }
     $first = array_splice($out, 0, -2);
-    if (count($first)) print join(', ', $first) . ',';
+    if (count($first)) print ' ' . join(', ', $first) . ',';
     print ' ' . $out[count($out)-2] . ' and ' . $out[count($out)-1];
 ?>. <br> <a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
 <?

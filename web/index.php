@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.198 2005-07-11 20:50:59 chris Exp $
+// $Id: index.php,v 1.199 2005-08-26 12:20:51 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,6 +15,7 @@ require_once '../phplib/alert.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/person.php';
+require_once '../../phplib/gaze.php';
 
 page_header(null, array('rss'=>1, 'id'=>'front'));
 front_page();
@@ -28,10 +29,11 @@ function front_page() {
     } 
 ?>
 <form accept-charset="utf-8" id="localsignup" name="localalert" action="/alert" method="post">
-<input type="hidden" name="subscribe_local_uk_alert" value="1">
+<input type="hidden" name="subscribe_local_alert" value="1">
 <p><strong><?=_('Get emails about local pledges') ?> &mdash;</strong>
 <label for="email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
-<label for="postcode"><?=_('UK Postcode:') ?></label><input type="text" size="12" name="postcode" id="postcode" value="">
+<strong><?=_('Country:') ?></strong> <? pb_view_gaze_country_choice(null, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?>
+<!--<label for="postcode"><?=_('UK Postcode:') ?></label><input type="text" size="12" name="postcode" id="postcode" value="">-->
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 

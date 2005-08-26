@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.88 2005-08-25 17:10:49 francis Exp $
+// $Id: new.php,v 1.89 2005-08-26 12:20:51 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -224,6 +224,7 @@ function pledge_form_two($data, $errors = array()) {
             $place = null;
         }
     }
+    $places = null;
     if ($place) {
         # Look up nearby places
         $places = gaze_find_places($country, $state, $place, 10);
@@ -265,13 +266,6 @@ is fulfilled?
 <input type="radio" name="comparison" value="atleast"<?=($comparison == 'atleast') ? ' checked' : '' ?>> No
 </p> */?>
 
-<?
-/* Save previous value of country, so that we can detect if it's changed after
- * one of a list of placenames is selected. */
-if (array_key_exists('country', $data))
-    printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($data['country']));
-?>
-
 <p><?=_('Which country does your pledge apply to?') ?>
 <? pb_view_gaze_country_choice($country, $state, $errors); ?>
 </p>
@@ -283,35 +277,7 @@ if (array_key_exists('country', $data))
 </p>
 
 <p id="ifyes_line">If yes, choose where.
-<ul>
-<li><p id="place_line">
-<?
-
-/* Save previous value of 'place' so we can show a new selection list in the
- * case where the user types a different place name after clicking on one of
- * the selections. */
-if (array_key_exists('place', $data))
-    printf("<input type=\"hidden\" name=\"prev_place\" value=\"%s\">", htmlspecialchars($data['place']));
-
-/* If the user has already typed a place name, then we need to grab the
- * possible places from Gaze. */
-if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
-    ?>
-       <?=_('Place name:') ?>
-    <?
-} else {
-    pb_view_gaze_places_choice($places, $place, $data['gaze_place']);
-}
-
-?>
- <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($data['place'])) print htmlspecialchars($data['place']) ?>">
-</p></li>
-<li><p id="postcode_line">
-<?=_('Or, UK only, you can give a postcode area:') ?>
-<input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
-<br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
-</p></li>
-</ul>
+<? pb_view_gaze_place_choice($place, $data['gaze_place'], $places, $errors); ?>
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">

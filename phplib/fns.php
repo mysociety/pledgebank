@@ -1,11 +1,10 @@
-<?
-// fns.php:
+<?  // fns.php:
 // General functions for PledgeBank
 //
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.54 2005-08-25 10:09:14 francis Exp $
+// $Id: fns.php,v 1.55 2005-08-26 12:20:51 francis Exp $
 
 require_once "../../phplib/evel.php";
 require_once '../../phplib/person.php';
@@ -220,8 +219,25 @@ function pb_view_gaze_places_choice($places, $place, $selected_gaze_place) {
     print "<strong>"._("If it isn't any of those, try a different spelling, or the name of another nearby town:")."</strong>";
 }
 
-function pb_view_gaze_country_choice($selected_country, $selected_state, $errors) {
+function country_sort($a, $b) {
+    global $countries_code_to_name;
+    return strcmp($countries_code_to_name[$a], $countries_code_to_name[$b]);
+}
+
+/* pb_view_gaze_country_choice
+ * Draws a drop down box for choice of country. $selected_country and $selected_state are
+ * which items to select by default. $errors array is used to highlight in red
+ * if countains key 'country'.  params can contain
+ *      'noglobal' - don't offer "any country" choice
+ *      'gazeonly' - only list countries for which we have local gaze place
+ */
+function pb_view_gaze_country_choice($selected_country, $selected_state, $errors, $params = array()) {
     global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name;
+
+    /* Save previous value of country, so that we can detect if it's changed after
+     * one of a list of placenames is selected. */
+    if ($selected_country)
+        printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($selected_country));
 
     /* Find country for this IP address, to show at top of choices */
     $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
@@ -232,7 +248,9 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
 ?>
 <select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_place_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
+<? if (!array_key_exists('noglobal', $params)) { ?>
   <option value="Global"<? if ($selected_country=='Global') print ' selected'; ?>><?=_('None &mdash; applies anywhere') ?></option>
+<? } ?>
   <!-- needs explicit values for IE Javascript -->
 <?
     if ($selected_country and array_key_exists($selected_country, $countries_code_to_name)) {
@@ -264,7 +282,16 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
 ?>
   <option value="(separator)"><?=_('---------------------------------------------------') ?></option>
 <?
-    foreach ($countries_name_to_code as $opt_country => $opt_code) {
+    if (array_key_exists('gazeonly', $params)) {
+        $countries_list = gaze_get_find_places_countries();
+        gaze_check_error($countries_list);
+        usort($countries_list, "country_sort");
+    } else {
+        $countries_list = array_values($countries_name_to_code);
+    }
+
+    foreach ($countries_list as $opt_code) {
+        $opt_country = $countries_code_to_name[$opt_code];
         print "<option value=\"$opt_code\">"
                 . htmlspecialchars($opt_country)
                 . "</option>";
@@ -281,3 +308,40 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
 </select>
 <?
 }
+
+/* pb_view_gaze_place_choice
+ * Display options for choosing a local place
+ */
+function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $places, $errors) {
+    ?> <ul>
+    <li><p id="place_line"> <?
+
+    /* Save previous value of 'place' so we can show a new selection list in the
+     * case where the user types a different place name after clicking on one of
+     * the selections. */
+    if ($selected_place)
+        printf("<input type=\"hidden\" name=\"prev_place\" value=\"%s\">", htmlspecialchars($selected_place));
+
+    /* If the user has already typed a place name, then we need to grab the
+     * possible places from Gaze. */
+    if (!$selected_place || array_key_exists('place', $errors) || count($places) == 0) {
+        ?>
+           <?=_('Place name:') ?>
+        <?
+    } else {
+        pb_view_gaze_places_choice($places, $selected_place, $selected_gaze_place);
+    }
+
+    ?>
+    <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if ($selected_place) print htmlspecialchars($selected_place) ?>">
+</p></li>
+
+    <li><p id="postcode_line">
+    <?=_('Or, UK only, you can give a postcode area:') ?>
+    <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
+    <br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
+    </p></li>
+    </ul>
+    <?
+}
+

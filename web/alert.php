@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.27 2005-08-25 17:13:06 francis Exp $
+// $Id: alert.php,v 1.28 2005-08-26 12:20:51 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -87,8 +87,14 @@ function do_local_alert_subscribe() {
         else
             $postcode = canonicalise_postcode($postcode);
     } elseif ($place) {
+        if (!$gaze_place) {
+            $errors['gaze_place'] = "NOTICE";
+        }
     } else {
         $errors['place'] = _("Please enter either a postcode or a place name");
+    }
+    if ($place && ($country != get_http_var('prev_country') || $place != get_http_var('prev_place'))) {
+        $errors['gaze_place'] = "NOTICE";
     }
     if (count($errors))
         return $errors;
@@ -120,11 +126,12 @@ Or <a href="<?=OPTION_BASE_URL."/new/picnic"?>"><?=_("a picnic")?></a>?
 function local_alert_subscribe_box($errors = array()) {
     global $email, $country, $state, $place, $gaze_place, $postcode;
 
+    $places = null;
     if ($place) {
         # Look up nearby places
         $places = gaze_find_places($country, $state, $place, 10);
         gaze_check_error($places);
-    //    if (array_key_exists('gaze_place', $errors)) {
+        if (array_key_exists('gaze_place', $errors)) {
             if (count($places) > 0) {
                 print '<div id="formnote"><ul><li>';
                 print _('Please select one of the possible places; if none of them is right, please type the name of another nearby place');
@@ -133,8 +140,8 @@ function local_alert_subscribe_box($errors = array()) {
                 $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
                 htmlspecialchars($place));
             }
-    //      unset($errors['gaze_place']); # remove NOTICE
-     //   } 
+          unset($errors['gaze_place']); # remove NOTICE
+        } 
     }
 
     $P = person_if_signed_on();
@@ -150,25 +157,12 @@ function local_alert_subscribe_box($errors = array()) {
     }
     
  ?>
-<!--<label for="postcode"><strong><?=_('UK Postcode:') ?></strong></label> 
-<input type="text" size="15" name="postcode" id="postcode" value="<?=htmlspecialchars($postcode) ?>">
-<input type="submit" name="submit" value="<?=_('Subscribe') ?>">
-</p>
-</form>-->
 
-<!--<form accept-charset="utf-8" class="pledge" name="pledge" action="/alert" method="post">-->
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/alert">
 <input type="hidden" name="subscribe_local_alert" value="1">
 <h2><?=_('Get emails about local pledges') ?></h2>
 <p><?=_("Fill in the form, and we'll email you when someone creates a new pledge near you.") ?></p>
 <p>
-
-<?
-/* Save previous value of country, so that we can detect if it's changed after
- * one of a list of placenames is selected. */
-/*if (array_key_exists('country', $data))
-    printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($data['country']));*/
-?>
 
 <p>
 <label for="email"><strong><?=_('Email:') ?></strong></label> 
@@ -176,47 +170,18 @@ function local_alert_subscribe_box($errors = array()) {
 </p>
 
 <p><strong><?=_('Country:') ?></strong>
-<? pb_view_gaze_country_choice($country, $state, $errors); ?>
+<? pb_view_gaze_country_choice($country, $state, $errors, array('noglobal'=>true, 'gazeonly'=>true)); ?>
 </p>
 
 <p id="ifyes_line">
 <strong><?=_("Where in that country?")?></strong>
-<ul>
-<li><p id="place_line">
-<?
+<? pb_view_gaze_place_choice($place, $gaze_place, $places, $errors); ?>
 
-/* Save previous value of 'place' so we can show a new selection list in the
- * case where the user types a different place name after clicking on one of
- * the selections. */
-/*if (array_key_exists('place', $data))
-    printf("<input type=\"hidden\" name=\"prev_place\" value=\"%s\">", htmlspecialchars($data['place']));*/
-
-/* If the user has already typed a place name, then we need to grab the
- * possible places from Gaze. */
-if (!$place || array_key_exists('place', $errors) || count($places) == 0) {
-    ?>
-       <?=_('Place name:') ?>
-    <?
-} else {
-    pb_view_gaze_places_choice($places, $place, get_http_var('gaze_place'));
-}
-
-?>
- <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if (isset($place)) print htmlspecialchars($place) ?>">
-</p></li>
-<li><p id="postcode_line">
-<?=_('Or, UK only, you can give a postcode:') ?>
-<input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($postcode)) print htmlspecialchars($postcode) ?>">
-</p></li>
-</ul>
-
-<p><input type="submit" name="submit" value="<?=_('Subscribe') ?>">
-</p>
+<p><input type="submit" name="submit" value="<?=_('Subscribe') ?>"></p>
 
 </form>
 
 <? 
-
 }
 
 ?>

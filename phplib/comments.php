@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.35 2005-08-22 14:02:38 francis Exp $
+ * $Id: comments.php,v 1.36 2005-08-26 16:19:05 francis Exp $
  * 
  */
 
@@ -208,7 +208,7 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
 <p><small><?=_('Your name and web site, if given, will be shown on your comment,
 but your email address will not be.') ?></small></p>
 <p><input type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ? "checked" : ""?>>
-<?=_('Email me any replies to my comment') ?></p>
+<?=_(' Email me future comments on this pledge') ?></p>
 
 <p><input type="submit" name="preview" value="<?=_('Preview') ?>">
 <? if ($allow_post) { ?>

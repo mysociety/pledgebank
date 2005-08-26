@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.23 2005-08-26 17:19:08 francis Exp $
+ * $Id: pb.js,v 1.24 2005-08-26 17:31:45 matthew Exp $
  * 
  */
 
@@ -120,58 +120,42 @@ function update_place_local(item, optionclick) {
         var current = place_postcode_label.childNodes[0].nodeValue
         if (current == 'Town:' && countryPicked == 'GB') {
             place_postcode_label.childNodes[0].nodeValue = 'Postcode or town:'
-        } else if (current == 'Postcode area or town:' && countryPicked != 'GB') {
+        } else if (current == 'Postcode or town:' && countryPicked != 'GB') {
             place_postcode_label.childNodes[0].nodeValue = 'Town:'
         }
     }
 }
 
 function grey_postcode(t, optionclick) {
-    if (!document.getElementById('postcode_line'))
-        return
-
-    if (t) {
-        document.getElementById('postcode_line').style.color = '#999999'
-    } else {
-        document.getElementById('postcode_line').style.color = '#000000'
-    }
+    if (!document || !document.getElementById) return
+    d = document.getElementById('postcode_line')
+    if (!d) return
+    d.style.color = t ? '#999999' : '#000000'
     grey_thing(t, 'postcode', optionclick)
 }
 
 function grey_place(t, optionclick) {
-    if (!document.getElementById('place_line'))
-        return
-
-    if (t) {
-        document.getElementById('place_line').style.color = '#999999'
-    } else {
-        document.getElementById('place_line').style.color = '#000000'
-    }
+    if (!document || !document.getElementById) return
+    d = document.getElementById('place_line')
+    if (!d) return
+    d.style.color = t ? '#999999' : '#000000'
     grey_thing(t, 'place', optionclick)
 }
 
 function grey_local(t) {
-    if (!document.getElementById('local_line'))
-        return
-
-    if (t) {
-        document.getElementById('local_line').style.color = '#999999'
-    } else {
-        document.getElementById('local_line').style.color = '#000000'
-    }
+    if (!document || !document.getElementById) return
+    d = document.getElementById('local_line')
+    if (!d) return
+    d.style.color = t ? '#999999' : '#000000'
     grey_thing(t, 'local0', false)
     grey_thing(t, 'local1', false)
 }
 
 function grey_ifyes(t) {
-    if (!document.getElementById('ifyes_line')) 
-        return
-
-    if (t) {
-        document.getElementById('ifyes_line').style.color = '#999999'
-    } else {
-        document.getElementById('ifyes_line').style.color = '#000000'
-    }
+    if (!document || !document.getElementById) return
+    d = document.getElementById('ifyes_line')
+    if (!d) return
+    d.style.color = t ? '#999999' : '#000000'
 }
 
 function grey_pin(t) {

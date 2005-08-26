@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.201 2005-08-26 17:19:08 francis Exp $
+// $Id: index.php,v 1.202 2005-08-26 17:37:37 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -31,7 +31,7 @@ function front_page() {
 <form accept-charset="utf-8" id="localsignup" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
-<p><strong><?=_('Sign up for emails about new pledges where you live!') ?> </strong>
+<p><strong><?=_('Sign up for emails when people make pledges in your local area &mdash; NEW! Now works in any country') ?> </strong>
 <br><label for="email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
 <?=_('Country:') ?><? pb_view_gaze_country_choice(null, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?>
 <label for="place"><span id="place_postcode_label"><?=_('Town:')?></span></label> <input type="text" size="12" name="place" id="place" value="">

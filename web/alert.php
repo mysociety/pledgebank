@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.29 2005-08-26 14:08:54 francis Exp $
+// $Id: alert.php,v 1.30 2005-08-26 16:45:01 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -77,25 +77,25 @@ function do_local_alert_subscribe() {
     if (!$country) $errors['country'] = _("Please choose a country");
     if ($country == 'GB') {
         if ($postcode && $place)
-            $errors['place'] = _("Please enter either a place name or a postcode, but not both");
+            $errors['place'] = _("Please enter either a place name or a postcode area, but not both");
     } else {
         if ($postcode)
-            $errors['postcode'] = _("You can only enter a postcode if your pledge applies to the UK");
+            $errors['postcode'] = _("You can only enter a postcode area if your pledge applies to the UK");
     }
     if ($postcode) {
-        if (!validate_postcode($postcode))
-            $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode; for example, OX1 3DR or WC1.');
+        if (!validate_partial_postcode($postcode))
+            $errors['postcode'] = _('Please enter the first part of a postcode; for example, OX2 or WC1.');
         else if (mapit_get_error(mapit_get_location($postcode, 1)))
-            $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
+            $errors['postcode'] = _("We couldn't recognise that part of a postcode; please re-check it");
         else
-            $postcode = canonicalise_postcode($postcode);
+            $postcode = canonicalise_partial_postcode($postcode);
     } elseif ($place) {
         if (!$gaze_place) {
             $errors['gaze_place'] = "NOTICE";
         }
     } else {
         if ($country == 'GB') {
-            $errors['place'] = _("Please enter either a place name or a postcode");
+            $errors['place'] = _("Please enter either a place name or a postcode area");
         } else {
             $errors['place'] = _("Please enter a place name");
         }
@@ -150,14 +150,18 @@ function local_alert_subscribe_box($errors = array()) {
           unset($errors['gaze_place']); # remove NOTICE
         } 
     }
-
     $P = person_if_signed_on();
     if (!is_null($P)) {
         if (is_null($email) || !$email)
             $email = $P->email();
     }
 
-    if (count($errors)) {
+    if (get_http_var('from_frontpage') && array_key_exists('place', $errors)) {
+        print '<div id="formnote"><ul><li>';
+        print $errors['place'];
+        print '</li></ul></div>';
+        unset($errors['place']);
+    } elseif (count($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';

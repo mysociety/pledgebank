@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.18 2005-08-26 14:08:54 francis Exp $
+// $Id: alert.php,v 1.19 2005-08-29 10:48:53 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -72,8 +72,14 @@ function alert_signup($person_id, $event_code, $params) {
         /* Guard against double-insertion. */
         db_query('lock table alert in share mode');
         $already = db_getOne("select alert.id from alert left join location on location.id = alert.location_id
-                where person_id = ? and event_code = ? and method = 'MaPit' and input = ?", 
-                array($person_id, $event_code, $params['postcode']));
+                where person_id = ? and event_code = ?
+                and country = ? 
+                and method = ? and input = ? and latitude = ? and longitude = ?",
+                array($person_id, $event_code, 
+                $params['country'], /* deliberately no state, as can be null */
+                $location['method'], $location['input'],
+                $location['wgs84_lat'], $location['wgs84_lon'],
+                ));
         if (is_null($already)) {
             $location_id = db_getOne("select nextval('location_id_seq')");
             db_query("

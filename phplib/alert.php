@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.19 2005-08-29 10:48:53 francis Exp $
+// $Id: alert.php,v 1.20 2005-08-29 18:30:36 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -46,10 +46,10 @@ function alert_signup($person_id, $event_code, $params) {
                 err("Postcode only available for the UK");
 
             /* Canonicalise postcode form, so more likely to detect it is already in the table */
-            $params['postcode'] = canonicalise_postcode($params['postcode']);
+            $params['postcode'] = canonicalise_partial_postcode($params['postcode']);
 
             /* Find out where on earth it is */
-            $location = mapit_get_location($params['postcode']);
+            $location = mapit_get_location($params['postcode'], 1);
             if (mapit_get_error($location)) {
                 /* This error should never happen, as earlier postcode validation in form will stop it */
                 err('Invalid postcode while setting alert, please check and try again.');

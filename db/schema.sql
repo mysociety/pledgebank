@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.149 2005-08-25 17:13:05 francis Exp $
+-- $Id: schema.sql,v 1.150 2005-08-30 14:31:39 francis Exp $
 --
 
 -- secret
@@ -998,7 +998,7 @@ create table alert (
 
     -- extra parameters for different types of alert
     pledge_id integer references pledges(id), -- specific pledge for ".../ref" event codes
-    location_id integer references location(id), -- specific location for "/pledges/local/..." event codes
+    location_id integer references location(id), -- specific location for ".../local" event codes
 
     whensubscribed timestamp not null default pb_current_timestamp()
 );

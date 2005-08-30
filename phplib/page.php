@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.68 2005-08-26 15:34:56 matthew Exp $
+// $Id: page.php,v 1.69 2005-08-30 15:46:42 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -153,6 +153,7 @@ function page_footer($params = array()) {
 ?><li><a href="/login"><?=_('Login') ?></a></li><?
         }
 ?></ul>
+<? pb_view_local_alert_quick_signup("localsignupeverypage"); ?>
 <hr class="v">
 <div id="footer"><?
     print _('Available in');

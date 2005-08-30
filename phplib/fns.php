@@ -4,11 +4,13 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.55 2005-08-26 12:20:51 francis Exp $
+// $Id: fns.php,v 1.56 2005-08-30 15:46:41 francis Exp $
 
+require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
 require_once '../../phplib/person.php';
 require_once '../../phplib/utility.php';
+require_once '../../phplib/gaze.php';
 require_once "pledge.php";
 
 // HTML shortcuts
@@ -343,5 +345,24 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
     </p></li>
     </ul>
     <?
+}
+
+function pb_view_local_alert_quick_signup($class) {
+    $email = '';
+    $P = person_if_signed_on();
+    if (!is_null($P)) {
+        $email = $P->email();
+    } 
+?>
+<form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
+<input type="hidden" name="subscribe_local_alert" value="1">
+<input type="hidden" name="from_frontpage" value="1">
+<p><strong><?=_('Sign up for emails when people make pledges in your local area &mdash; NEW! Now works in any country') ?> </strong>
+<br><label for="email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
+<?=_('Country:') ?><? pb_view_gaze_country_choice(null, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?>
+<label for="place"><span id="place_postcode_label"><?=_('Town:')?></span></label> <input type="text" size="12" name="place" id="place" value="">
+<input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
+</form>
+<?
 }
 

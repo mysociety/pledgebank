@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.56 2005-08-30 15:46:41 francis Exp $
+// $Id: fns.php,v 1.57 2005-08-31 17:29:28 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -234,18 +234,12 @@ function country_sort($a, $b) {
  *      'gazeonly' - only list countries for which we have local gaze place
  */
 function pb_view_gaze_country_choice($selected_country, $selected_state, $errors, $params = array()) {
-    global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name;
+    global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name, $ip_country, $site_country;
 
     /* Save previous value of country, so that we can detect if it's changed after
      * one of a list of placenames is selected. */
     if ($selected_country)
         printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($selected_country));
-
-    /* Find country for this IP address, to show at top of choices */
-    $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
-    # $ip_country = gaze_get_country_from_ip("213.228.0.42"); # Ukraine: "194.44.201.2" # France: "213.228.0.42"
-    if (rabx_is_error($ip_country) || !$ip_country)
-        $ip_country = null;
 
 ?>
 <select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_place_local(this, true)">
@@ -276,7 +270,12 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
             }
         }
     }
-    if ($selected_country != $ip_country && $ip_country) {
+    if ($selected_country != $site_country && $site_country) {
+        print "<option value=\"$site_country\">";
+        print htmlspecialchars($countries_code_to_name[$site_country]);
+        print "</option>";
+    }
+    if ($selected_country != $ip_country && $ip_country && $ip_country != $site_country) {
         print "<option value=\"$ip_country\">";
         print htmlspecialchars($countries_code_to_name[$ip_country]);
         print "</option>";
@@ -357,9 +356,9 @@ function pb_view_local_alert_quick_signup($class) {
 <form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
-<p><strong><?=_('Sign up for emails when people make pledges in your local area &mdash; NEW! Now works in any country') ?> </strong>
+<p><strong><?=_('Sign up for emails when people make pledges in your local area')?> &mdash; <?=_('NEW! Now works in any country') ?> </strong>
 <br><label for="email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
-<?=_('Country:') ?><? pb_view_gaze_country_choice(null, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?>
+<?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?>
 <label for="place"><span id="place_postcode_label"><?=_('Town:')?></span></label> <input type="text" size="12" name="place" id="place" value="">
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>

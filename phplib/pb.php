@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.26 2005-08-12 23:29:00 matthew Exp $
+ * $Id: pb.php,v 1.27 2005-08-31 17:29:28 francis Exp $
  * 
  */
 
@@ -17,23 +17,54 @@ require_once '../../phplib/db.php';
 require_once '../../phplib/stash.php';
 require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
+require_once "../../phplib/gaze.php";
 require_once 'page.php';
 
+# Extract language and country from URL.
+# We assume all languages are xx-xx form, and countries just xx. Also that
+# country is first, then language. Both are optional.
+$domain_lang = null;
+$domain_country = null;
+if (OPTION_WEB_HOST == 'www')
+    if (preg_match('#^(?:..\.)?(..\-..)\.#', strtolower($_SERVER['HTTP_HOST']), $m)) {
+        $domain_lang = $m[1];
+    }
+else
+    if (preg_match('#^'.OPTION_WEB_HOST.'-(?:..\.)?(..\-..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+        $domain_lang = $m[1];
+if (OPTION_WEB_HOST == 'www')
+    if (preg_match('#^(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m)) {
+        $domain_country = strtoupper($m[1]);
+    }
+else
+    if (preg_match('#^'.OPTION_WEB_HOST.'-(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+        $domain_country = strtoupper($m[1]);
+
+
 # Language negotiation
-# require_once 'HTTP.php'; # PHP's own negotiateLanguage, broken in old versions
 # Translations available of PledgeBank
 $langs = array('en-gb'=>'English', 'pt-br'=>'Portugu&ecirc;s (Brazil)');
 # Map of lang to directory
 $langmap = array('en-gb'=>'en_GB', 'pt-br'=>'pt_BR');
-if (OPTION_WEB_HOST == 'www' && preg_match('#^(.*?)\.#', strtolower($_SERVER['HTTP_HOST']), $m) && array_key_exists($m[1], $langs))
-    $lang = $m[1];
-elseif (preg_match('#^'.OPTION_WEB_HOST.'-(.*?)\.#', strtolower($_SERVER['HTTP_HOST']), $m) && array_key_exists($m[1], $langs))
-    $lang = $m[1];
+if ($domain_lang && array_key_exists($domain_lang, $langs))
+    $lang = $domain_lang;
 else {
-    $lang = negotiateLanguage($langs);
+    $lang = negotiateLanguage($langs); # local copy, see further down this file
     if ($lang=='en-US' || !$lang || !array_key_exists($lang, $langmap)) $lang = 'en-gb'; # Default override
 }
 
+# Country negotiation
+# Find country for this IP address
+$ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
+if (rabx_is_error($ip_country) || !$ip_country)
+    $ip_country = null;
+$site_country = $domain_country;
+if (!$domain_country) 
+    $site_country = $ip_country;
+
+/* Note: To get a language working from PHP on Unix, you also need
+to install the system locale for that language. In Debian this is done
+using "dpkg-reconfigure locales". You may need to restart Apache also. */
 putenv('LANG='.$langmap[$lang].'.UTF-8');
 setlocale(LC_ALL, $langmap[$lang].'.UTF-8');
 bindtextdomain('PledgeBank', '../../locale');
@@ -89,6 +120,7 @@ function pb_show_error($message) {
     page_footer();
 }
 
+# PHP's own negotiateLanguage in HTTP.php is broken in old versions, so we use a copy
 function negotiateLanguage(&$supported) {
     $supported = array_change_key_case($supported, CASE_LOWER);
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
@@ -126,6 +158,38 @@ function negotiateLanguage(&$supported) {
             return key($candidates);
         }
     }
+}
+
+# pb_domain_url returns current URL with country and language in it.
+# Defaults to keeping country country or language, unless param contains:
+#   'lang' - language to change to
+#   'country' - country to change to
+#   'toplevel' - if true, link to index page instead of current page
+function pb_domain_url($params = array()) {
+    global $domain_lang, $domain_country;
+
+    $l = $domain_lang;
+    if (array_key_exists('lang', $params))
+        $l = $params['lang'];
+    $c = $domain_country;
+    if (array_key_exists('country', $params))
+        $c = $params['country'];
+     
+    $url = 'http://';
+    if (OPTION_WEB_HOST != 'www')
+        $url .= OPTION_WEB_HOST . '-';
+    if ($c)
+        $url .= "$c.";
+    if ($l)
+        $url .= "$l.";
+    if (!$c && !$l && OPTION_WEB_HOST == 'www')
+        $url .= "www.";
+    $url .= OPTION_WEB_DOMAIN;
+    if (array_key_exists('toplevel', $params) && $params['toplevel'])
+        $url .= "/";
+    else
+        $url .= htmlspecialchars($_SERVER['REQUEST_URI']);
+    return $url;
 }
 
 ?>

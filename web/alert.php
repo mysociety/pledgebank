@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.34 2005-08-31 10:24:19 francis Exp $
+// $Id: alert.php,v 1.35 2005-08-31 17:29:28 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -23,6 +23,8 @@ if ($country) {
     $a = array();
     if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
         list($x, $country, $state) = $a;
+} else {
+    $country = $site_country;
 }
 $place = get_http_var('place');
 if ($country && $country == 'Global')

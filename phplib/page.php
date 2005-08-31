@@ -5,10 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.69 2005-08-30 15:46:42 francis Exp $
+// $Id: page.php,v 1.70 2005-08-31 17:29:28 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
+require_once '../../phplib/countries.php';
 require_once 'pledge.php';
 
 /* page_header TITLE [PARAMS]
@@ -72,7 +73,7 @@ function page_header($title, $params = array()) {
     // Display title bar
     if (!array_key_exists('nonav', $params) or !$params['nonav']) {
 ?>
-<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a> <span id="beta">Beta</span></h1>
+<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a> <span id="countrytitle"><?  global $countries_code_to_name, $site_country; print $site_country ? $countries_code_to_name[$site_country] : 'Global' ?><!--<a href="/where">(click to change country)</a>--></span> <span id="beta">Beta</span></h1>
 <hr class="v"><?
     }
 
@@ -141,7 +142,7 @@ function page_footer($params = array()) {
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
-<p><label for="s"><?=_('Search (word or postcode)') ?>:</label>
+<p><label for="s"><?=_('Search') ?>:</label>
 <input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="<?=_('Go') ?>"></p>
 </form>
 <!-- remove all extraneous whitespace to avoid IE bug -->
@@ -159,10 +160,7 @@ function page_footer($params = array()) {
     print _('Available in');
     $out = array();
     foreach ($langs as $l => $pretty) {
-        $url = 'http://';
-        if (OPTION_WEB_HOST != 'www')
-            $url .= OPTION_WEB_HOST . '-';
-        $url .= "$l." . OPTION_WEB_DOMAIN . htmlspecialchars($_SERVER['REQUEST_URI']);
+        $url = pb_domain_url(array('lang'=>$l));
         if ($l == $lang) $o = '<strong>';
         else $o = '<a href="'.$url.'">';
         $o .= $pretty;

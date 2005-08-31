@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.203 2005-08-30 15:46:42 francis Exp $
+// $Id: index.php,v 1.204 2005-08-31 18:28:38 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -53,75 +53,119 @@ only if 5 other people will do the same".') ?>
 can make your pledge succeed &raquo;') ?>"></a></div>
 
 <?  comments_show_latest();
-
-    //list_newest_pledges();
 }
 
-function get_pledges_list($query) {
-    $q = db_query($query);
-    $pledges = '';
+# params must have:
+# 'global' - true or false, whether global pledges to be included
+# 'sitecountry' - true or false, whether site country pledges to be included
+function get_pledges_list($where, $params) {
+    global $site_country;
+    $query = "SELECT pledges.*, pledges.ref, pledges.date - pb_current_date() AS daysleft
+            FROM pledges LEFT JOIN location ON location.id = pledges.location_id
+            WHERE ";
+    $sql_params = array();
+    if ($site_country && $params['sitecountry']) {
+        $query .= "(country = ?";
+        if ($params['global'])
+            $query .= " or country IS NULL";
+        $query .= ") AND ";
+        $sql_params[] = $site_country;
+    } else {
+        if ($params['global'])
+            $query .= "country IS NULL AND ";
+        else
+            $query .= "country IS NOT NULL AND ";
+    }
+    $query .= $where;
+    $q = db_query($query, $sql_params);
+    $pledges = array();
     while ($r = db_fetch_array($q)) {
         $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
-        $pledges .= '<li>';
-        $pledges .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+        $pstring = '<li>';
+        $pstring .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
         
-        $pledges .= '</li>';
+        $pstring .= '</li>';
+        $pledges[] = $pstring;
     }
     return $pledges;
 }
 
-function list_newest_pledges() {
-    print h2(_('Sign up to one of our five newest pledges'));
+function print_change_country_link() {
+    global $site_country;
+    print '<p>'.sprintf(_('%s pledges listed'), pb_site_country_name()).', <a href="/where">';
+    if ($site_country)
+        print _("change country");
+    else
+        print _("choose country");
+    print '</a></p>';
+}
 
-    $pledges = get_pledges_list("
-                SELECT *, date - pb_current_date() AS daysleft
-                FROM pledges
-                WHERE date >= pb_current_date() AND 
-                pin is NULL 
-                ORDER BY id DESC
-                DESC LIMIT 5");
-    if (!$pledges) {
-        print '<p>' . _('There are no new pledges at the moment.') . '</p>';
-    } else {
-        print '<ol>'.$pledges.'</ol>';
-    }
+function print_no_featured_link() {
+    global $site_country;
+    print '<p>' . sprintf(_('There are no featured pledges for %s at the moment.'),pb_site_country_name());
+    print ' <a href="/where">';
+    if ($site_country)
+        print _("Change country");
+    else
+        print _("Choose country");
+    print '</a>.</p>';
 }
 
 function list_frontpage_pledges() {
 ?><a href="/rss"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of newest pledges') ?>"></a>
 <h2><?=_('Why not sign a live pledge?') ?></h2><?
-
     $pledges = get_pledges_list("
-                SELECT *, date - pb_current_date() AS daysleft
-                FROM pledges
-                WHERE 
-                pb_pledge_prominence(id) = 'frontpage' AND
+                pb_pledge_prominence(pledges.id) = 'frontpage' AND
                 date >= pb_current_date() AND 
                 pin is NULL AND 
                 whensucceeded IS NULL
-                ORDER BY RANDOM()");
+                ORDER BY RANDOM()", array('global'=>true,'sitecountry'=>true));
+    if (count($pledges) < 3) {
+        // If too few frontpage, show a few of the normal pledges
+        $normal_pledges = get_pledges_list("
+                    pb_pledge_prominence(pledges.id) = 'normal' AND
+                    date >= pb_current_date() AND 
+                    pin is NULL AND 
+                    whensucceeded IS NULL
+                    ORDER BY RANDOM()
+                    LIMIT 3", array('global'=>false,'sitecountry'=>true));
+        $pledges = array_merge($pledges, $normal_pledges);
+    }
     if (!$pledges) {
-        print '<p>' . _('There are no featured pledges at the moment.') . '</p>';
+        print_no_featured_link();
     } else {
-        print '<ol>' . $pledges . '</ol>';
+        print_change_country_link();
+        print '<ol>' . join("",$pledges) . '</ol>';
+    }
+
+    if (count($pledges) < 3) {
+        $pledges = get_pledges_list("
+                    pb_pledge_prominence(pledges.id) = 'frontpage' AND
+                    date >= pb_current_date() AND 
+                    pin is NULL AND 
+                    whensucceeded IS NULL
+                    ORDER BY RANDOM()
+                    LIMIT 5", array('global'=>false,'sitecountry'=>false));
+        if ($pledges) {
+            print p(_("Interesting pledges from other countries"));
+            print '<ol>' . join("",$pledges) . '</ol>';
+        }
     }
 }
 
 function list_successful_pledges() {
     print h2(_('Recent successful pledges'));
     $pledges = get_pledges_list("
-                SELECT *, date - pb_current_date() AS daysleft
-                FROM pledges
-                WHERE 
-                pb_pledge_prominence(id) <> 'backpage' AND
+                pb_pledge_prominence(pledges.id) <> 'backpage' AND
                 pin IS NULL AND 
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC
-                LIMIT 10");
+                LIMIT 10", array('global'=>true, 'sitecountry'=>true));
     if (!$pledges) {
-        print '<p>' . _('There are no featured pledges at the moment.') . '</p>';
+        print_no_featured_link();
     } else {
-        print '<ol>'.$pledges.'</ol>';
+        print_change_country_link();
+        print '<ol>'.join("",$pledges).'</ol>';
     }
 }
 

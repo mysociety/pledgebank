@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.27 2005-08-31 17:29:28 francis Exp $
+ * $Id: pb.php,v 1.28 2005-08-31 18:28:38 francis Exp $
  * 
  */
 
@@ -192,4 +192,7 @@ function pb_domain_url($params = array()) {
     return $url;
 }
 
-?>
+function pb_site_country_name() {
+    global $countries_code_to_name, $site_country; 
+    return $site_country ? $countries_code_to_name[$site_country] : 'Global';
+}

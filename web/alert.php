@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.33 2005-08-29 10:48:53 francis Exp $
+// $Id: alert.php,v 1.34 2005-08-31 10:24:19 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -152,7 +152,7 @@ function local_alert_subscribe_box($errors = array()) {
         if (array_key_exists('gaze_place', $errors)) {
             if (count($places) > 0) {
                 print '<div id="formnote"><ul><li>';
-                print _('Please select one of the possible places; if none of them is right, please type the name of another nearby place');
+                print _('Now please select one of the possible places; if none of them is right, please type the name of another nearby place');
                 print '</li></ul></div>';
             } else {
                 $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
@@ -167,12 +167,7 @@ function local_alert_subscribe_box($errors = array()) {
             $email = $P->email();
     }
 
-    if (get_http_var('from_frontpage') && array_key_exists('place', $errors)) {
-        print '<div id="formnote"><ul><li>';
-        print str_replace('Please', 'Now please', $errors['place']);
-        print '</li></ul></div>';
-        unset($errors['place']);
-    } elseif (count($errors)) {
+    if (count($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';

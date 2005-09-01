@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.136 2005-08-29 18:30:36 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.137 2005-09-01 21:22:49 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -674,6 +674,8 @@ sub do_public_succeeding_pledge {
     # Check pledge has completed
     call_frequentupdate();
     $wth->browser_get($base_url);
+    $wth->browser_follow_link(text_regex => qr/Choose country/, n => 1);
+    $wth->browser_follow_link(text => "United States");
     $wth->browser_check_contents("Target met, pledge still open for 9 days");
     $wth->browser_follow_link(text_regex => qr/$pledge_action_completion/);
     $wth->browser_check_contents("This pledge has been successful!");

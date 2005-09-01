@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.29 2005-09-01 16:32:28 francis Exp $
+ * $Id: pb.php,v 1.30 2005-09-01 21:22:49 francis Exp $
  * 
  */
 
@@ -95,7 +95,7 @@ function pb_handle_error($num, $message, $file, $line, $context) {
         }
         page_header(_("Sorry! Something's gone wrong."), array('override'=>true));
         print("<strong>$message</strong> in $file:$line");
-        page_footer();
+        page_footer(array('nolocalsignup'=>true));
     } else {
         /* Nuke any existing page output to display the error message. */
         while (ob_get_level()) {
@@ -117,7 +117,7 @@ function pb_show_error($message) {
     page_header(_("Sorry! Something's gone wrong."), array('override'=>true));
     print _('<h2>Sorry!  Something\'s gone wrong.</h2>') .
         "\n<p>" . $message . '</p>';
-    page_footer();
+    page_footer(array('nolocalsignup'=>true));
 }
 
 # PHP's own negotiateLanguage in HTTP.php is broken in old versions, so we use a copy

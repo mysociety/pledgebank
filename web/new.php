@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.89 2005-08-26 12:20:51 francis Exp $
+// $Id: new.php,v 1.90 2005-09-01 16:32:28 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -30,7 +30,7 @@ $contents = ob_get_contents();
 ob_end_clean();
 page_header($page_title, $page_params);
 print $contents;
-page_footer();
+page_footer(array('nolocalsignup'=>true));
 
 function pledge_form_one($data = array(), $errors = array()) {
     global $lang;
@@ -833,7 +833,7 @@ function create_new_pledge($P, $data) {
     $page_title = _('Pledge Created');
     $page_params['noprint'] = true;
 
-    $url = htmlspecialchars(OPTION_BASE_URL . "/" . urlencode($p->data['ref']));
+    $url = htmlspecialchars(pb_domain_url() . urlencode($p->data['ref']));
 ?>
     <p class="noprint loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
     <p class="noprint loudmessage" align="center"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>

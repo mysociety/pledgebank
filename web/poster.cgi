@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.54 2005-08-03 01:10:14 francis Exp $
+# $Id: poster.cgi,v 1.55 2005-09-01 16:32:28 francis Exp $
 #
 
 import os
@@ -99,9 +99,19 @@ def ordinal(day):
     return 'th'
 
 def has_sms(pledge):
+    # Private pledges have no SMS for now
     if pledge['pin']:
         return False
+    # Global pledges, we do show SMS (but will flag UK only)
+    if not pledge['country']:
+        return True
+    # Non-UK countries have no SMS
+    if pledge['country'] != 'GB':
+        return False
+    # UK countries have SMS
     return True
+
+sms_countries_description = 'UK'
 
 
 ############################################################################
@@ -243,7 +253,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
                     PyRTF.TEXT('pledge %s' % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
                     ' to ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
-                    ' or pledge at ', webdomain_text)
+                    ' (%s only) or pledge at ' % sms_countries_description, webdomain_text)
         sms_smallprint = boilerplate_sms_smallprint
 
     story.extend([ text_para, 
@@ -379,7 +389,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         pin_text = ""
         sms_to_text = """<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
-            or """ % (ref, sms_number)
+            (%s only) or """ % (ref, sms_number, sms_countries_description)
         sms_smallprint = boilerplate_sms_smallprint
 
     story.extend([
@@ -530,8 +540,8 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail FROM pledges WHERE ref ILIKE %s', ref)
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail']) = q.fetchone()
+        q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail, country FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE ref ILIKE %s', ref)
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country']) = q.fetchone()
         q.close()
         day = date.day
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))

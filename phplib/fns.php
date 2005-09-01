@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.59 2005-09-01 11:57:44 francis Exp $
+// $Id: fns.php,v 1.60 2005-09-01 16:32:28 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -20,6 +20,38 @@ function h3($s) { return "<h3>$s</h3>\n"; }
 function strong($s) { return "<strong>$s</strong>"; }
 function dt($s) { print "<dt>$s</dt>\n"; }
 function dd($s) { print "<dd>$s</dd>\n"; }
+
+# pb_domain_url returns current URL with country and language in it.
+# Defaults to keeping country country or language, unless param contains:
+#   'lang' - language to change to
+#   'country' - country to change to
+#   'toplevel' - if true, link to index page instead of current page
+function pb_domain_url($params = array('toplevel'=>true)) {
+    global $domain_lang, $domain_country;
+
+    $l = $domain_lang;
+    if (array_key_exists('lang', $params))
+        $l = $params['lang'];
+    $c = $domain_country;
+    if (array_key_exists('country', $params))
+        $c = $params['country'];
+     
+    $url = 'http://';
+    if (OPTION_WEB_HOST != 'www')
+        $url .= OPTION_WEB_HOST . '-';
+    if ($c)
+        $url .= strtolower("$c.");
+    if ($l)
+        $url .= "$l.";
+    if (!$c && !$l && OPTION_WEB_HOST == 'www')
+        $url .= "www.";
+    $url .= OPTION_WEB_DOMAIN;
+    if (array_key_exists('toplevel', $params) && $params['toplevel'])
+        $url .= "/";
+    else
+        $url .= htmlspecialchars($_SERVER['REQUEST_URI']);
+    return $url;
+}
 
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
@@ -357,9 +389,9 @@ function pb_view_local_alert_quick_signup($class) {
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
 <p><strong><?=_('Sign up for emails when people make pledges in your local area')?> &mdash; <?=_('NEW! Now works in any country') ?> </strong>
-<br><label for="email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
+<br><label for="localquick_email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="localquick_email" value="<?=htmlspecialchars($email) ?>">
 <?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?>
-<label for="place"><span id="place_postcode_label"><?=_('Town:')?></span></label> <input type="text" size="12" name="place" id="place" value="">
+<label for="localquick_place"><span id="place_postcode_label"><?=_('Town:')?></span></label> <input type="text" size="12" name="place" id="localquick_place" value="">
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 <?

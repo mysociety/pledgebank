@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.28 2005-08-31 18:28:38 francis Exp $
+ * $Id: pb.php,v 1.29 2005-09-01 16:32:28 francis Exp $
  * 
  */
 
@@ -158,38 +158,6 @@ function negotiateLanguage(&$supported) {
             return key($candidates);
         }
     }
-}
-
-# pb_domain_url returns current URL with country and language in it.
-# Defaults to keeping country country or language, unless param contains:
-#   'lang' - language to change to
-#   'country' - country to change to
-#   'toplevel' - if true, link to index page instead of current page
-function pb_domain_url($params = array()) {
-    global $domain_lang, $domain_country;
-
-    $l = $domain_lang;
-    if (array_key_exists('lang', $params))
-        $l = $params['lang'];
-    $c = $domain_country;
-    if (array_key_exists('country', $params))
-        $c = $params['country'];
-     
-    $url = 'http://';
-    if (OPTION_WEB_HOST != 'www')
-        $url .= OPTION_WEB_HOST . '-';
-    if ($c)
-        $url .= "$c.";
-    if ($l)
-        $url .= "$l.";
-    if (!$c && !$l && OPTION_WEB_HOST == 'www')
-        $url .= "www.";
-    $url .= OPTION_WEB_DOMAIN;
-    if (array_key_exists('toplevel', $params) && $params['toplevel'])
-        $url .= "/";
-    else
-        $url .= htmlspecialchars($_SERVER['REQUEST_URI']);
-    return $url;
 }
 
 function pb_site_country_name() {

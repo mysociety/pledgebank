@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.71 2005-08-31 18:28:38 francis Exp $
+// $Id: page.php,v 1.72 2005-09-01 16:32:28 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -131,8 +131,10 @@ function page_header($title, $params = array()) {
 }
 
 /* page_footer PARAMS
- * Print bottom of HTML page. This closes the "content" <div>.  If
- * PARAMS['nonav'] is true then the footer navigation is not displayed. */
+ * Print bottom of HTML page. This closes the "content" <div>.  
+ * If PARAMS['nonav'] is true then the footer navigation is not displayed. 
+ * If PARAMS['nolocalsignup'] is true then no local signup form is showed.
+ */
 function page_footer($params = array()) {
     global $lang, $langs;
 ?></div><? # id="content"
@@ -154,7 +156,8 @@ function page_footer($params = array()) {
 ?><li><a href="/login"><?=_('Login') ?></a></li><?
         }
 ?></ul>
-<? pb_view_local_alert_quick_signup("localsignupeverypage"); ?>
+<?  if (!array_key_exists('nolocalsignup', $params) or !$params['nolocalsignup']) 
+        pb_view_local_alert_quick_signup("localsignupeverypage"); ?>
 <hr class="v">
 <div id="footer"><?
     print _('Available in');

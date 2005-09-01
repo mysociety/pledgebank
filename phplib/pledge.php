@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.126 2005-09-01 10:28:36 francis Exp $
+ * $Id: pledge.php,v 1.127 2005-09-01 16:32:28 francis Exp $
  * 
  */
 
@@ -212,18 +212,19 @@ class Pledge {
             return 'Whole country';
     }
 
-    // Links.  The semantics here is that the URLs are all escaped, but didn't
-    // need escaping.  They can safely be used in HTML or plain text.
+    // Links. The semantics here is that the URLs are all escaped, but didn't
+    // need escaping. They can safely be used in HTML or plain text. We
+    // use OPTION_BASE_URL for the main case to create a shorter URL.
     function url_main() { return OPTION_BASE_URL . "/" . $this->h_ref; }
-    function url_email() { return OPTION_BASE_URL . "/" . $this->h_ref . "/email"; }
-    function url_ical() { return OPTION_BASE_URL . "/" . $this->h_ref . "/ical"; }
-    function url_flyers() { return OPTION_BASE_URL . "/" . $this->h_ref . "/flyers"; }
-    function url_flyer($type) { return OPTION_BASE_URL . "/flyers/" . $this->h_ref . "_$type"; }
-    function url_comments() { return OPTION_BASE_URL . "/" . $this->h_ref . "#comments"; }
-    function url_picture() { return OPTION_BASE_URL . "/" . $this->h_ref . "/picture"; }
-    function url_announce() { return OPTION_BASE_URL . "/" . $this->h_ref . "/announce"; }
-    function url_info() { return OPTION_BASE_URL . "/" . $this->h_ref . "/info"; }
-    function url_announce_archive() { return OPTION_BASE_URL . "/" . $this->h_ref . "/announcearchive"; }
+    function url_email() { return pb_domain_url() . $this->h_ref . "/email"; }
+    function url_ical() { return pb_domain_url() . $this->h_ref . "/ical"; }
+    function url_flyers() { return pb_domain_url() . $this->h_ref . "/flyers"; }
+    function url_flyer($type) { return pb_domain_url() . "flyers/" . $this->h_ref . "_$type"; }
+    function url_comments() { return pb_domain_url() . $this->h_ref . "#comments"; }
+    function url_picture() { return pb_domain_url() . $this->h_ref . "/picture"; }
+    function url_announce() { return pb_domain_url() . $this->h_ref . "/announce"; }
+    function url_info() { return pb_domain_url() . $this->h_ref . "/info"; }
+    function url_announce_archive() { return pb_domain_url() . $this->h_ref . "/announcearchive"; }
 
     // Rendering the pledge in various ways
 

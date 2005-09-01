@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.21 2005-07-12 23:56:49 francis Exp $
+// $Id: faq.php,v 1.22 2005-09-01 11:10:59 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -65,10 +65,10 @@ improved chance of achieving whatever change it is you want."));
 
 print dt(_('Is it free?'));
 
-print dd(_("The site is free to use, no matter how big a pledge you create. PledgeBank
+print dd(sprintf(_("The site is free to use, no matter how big a pledge you create. PledgeBank
 is run by a charitable organisation, though, so if you want to run an
 especially big pledge, and feel like making a contribution, please contact us.
-SMS messages to PledgeBank cost your normal text fee."));
+SMS messages to PledgeBank (available in %s only) cost your normal text fee."), sms_countries_description()));
 
 print "</dl>\n";
 
@@ -171,15 +171,17 @@ theirs, so you can stay in touch as you carry out your pledge.  If anybody
 signs your pledge later, all your messages will be automatically forwarded to
 them."));
 
-print dt(_('How do I tell people to sign up by SMS?'));
+print dt(_('Can people to sign up by SMS (text message), and if so how?'));
 
-print dd(sprintf(_("This is described on the flyers for your pledge, so the
-easiest thing to do is print some out and carry them with you.  You can find
-the flyers from the 'Spread the word' section on your pledge's page.  Otherwise
-tell people to text <strong>pledge REFERENCE</strong> to
-<strong>%s</strong>.  Here REFERENCE is the short reference for your pledge
-which you chose when you made it, and which appears at the end of its
-address."), OPTION_PB_SMS_DISPLAY_NUMBER));
+print dd(sprintf(_("Yes, although only in %s. If you'd like to help us organise
+SMS for other countries, please contact us. The flyers for your pledge
+describe how to sign up by SMS. So the easiest way to remember is to print some
+out and carry them with you.  You can find the flyers from the 'Spread the
+word' section on your pledge's page.  Otherwise tell people to text
+<strong>pledge REFERENCE</strong> to <strong>%s</strong>.  Here REFERENCE is
+the short reference for your pledge which you chose when you made it, and which
+appears at the end of its address."), sms_countries_description(),
+OPTION_PB_SMS_DISPLAY_NUMBER));
 
 print "</dl>\n";
 
@@ -214,11 +216,11 @@ print "<dl>\n";
 
 print dt(_("I don't want my name visible to everyone when I sign a pledge!"));
 
-print dd(_("You can add yourself secretly to a pledge by unchecking the 'Show
+print dd(sprintf(_("You can add yourself secretly to a pledge by unchecking the 'Show
 my name on this pledge' box when you sign up.  Alternatively, you can sign
-up by SMS.  If you are about to make a sensitive pledge, you may want to 
+up by SMS (in %s only).  If you are about to make a sensitive pledge, you may want to 
 make it private, which means only people with a PIN you give them can
-view the pledge page."));
+view the pledge page."), sms_countries_description()));
 
 print dt(_('Who gets to see my email address?'));
 

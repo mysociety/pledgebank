@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: offline.php,v 1.13 2005-06-24 12:07:59 matthew Exp $
+// $Id: offline.php,v 1.14 2005-09-01 11:57:44 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -44,14 +44,16 @@ simple two word text message.'));
 
 <div class="offline">
 <img src="phone-200px.jpg" class="l" style="margin-right: 20px;" width="168" height="200" alt="">
-<h2><?=('Mobile Phones') ?></h2>
+<h2><?=_('Mobile Phones') ?></h2>
 <?
 print p(_("The ability to sign up via text message is powerful because it means
 that people who never use the Internet can sign up, and you can get
 someone to sign up even if they're nowhere near a computer."));
 printf(p(_("Anyone with a mobile can sign up to a pledge by texting the word
 <strong>pledge</strong> followed by the pledge reference to
-<strong>%s</strong> (for the moment, this works only in the UK).")), OPTION_PB_SMS_DISPLAY_NUMBER);
+<strong>%s</strong>. For the moment, this works only in %s.
+Contact us if you can help with SMS for other countries.")), 
+OPTION_PB_SMS_DISPLAY_NUMBER, sms_countries_description());
 print p(_("Text messages cost whatever you normally pay for a normal SMS, and as
 a pledge creator you can write to your mobile signers when your pledge
 succeeds, letting them know what to do next."));

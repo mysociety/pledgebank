@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.125 2005-08-22 17:20:55 francis Exp $
+ * $Id: pledge.php,v 1.126 2005-09-01 10:28:36 francis Exp $
  * 
  */
 
@@ -414,10 +414,16 @@ function pledge_sentence($r, $params = array()) {
 /* pledge_summary PLEDGE PARAMS
  * Return pledge text in a format suitable for a (long) summary on a list of
  * pledges, such as the front page.  PLEDGE is an array of info about the
- * pledge.  PARAMS are passed to pledge_sentence.
+ * pledge.  PARAMS are passed to pledge_sentence, and also:
+ * 'showcountry' - display country as well
  */
 function pledge_summary($r, $params) {
-    $text = pledge_sentence($r, $params) . ' ';
+    $text = '';
+    if (array_key_exists('showcountry', $params) && $params['showcountry'] && $r['country']) {
+        global $countries_code_to_name;
+        $text .= $countries_code_to_name[$r['country']] . ": ";
+    }
+    $text .= pledge_sentence($r, $params) . ' ';
     if ($r['target'] - $r['signers'] <= 0) {
         if ($r['daysleft'] == 0)
             $text .= _('Target met, pledge open until midnight tonight, London time.');

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.204 2005-08-31 18:28:38 francis Exp $
+// $Id: index.php,v 1.205 2005-09-01 10:28:36 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -57,32 +57,39 @@ can make your pledge succeed &raquo;') ?>"></a></div>
 
 # params must have:
 # 'global' - true or false, whether global pledges to be included
-# 'sitecountry' - true or false, whether site country pledges to be included
+# 'sitecountry' - specifies which country pledges to include:
+#                 true include only site country pledges, 
+#                 false include only pledges from other countries (or all countries if no site country)
+# 'showcountry' - whether to display country name in summary
 function get_pledges_list($where, $params) {
     global $site_country;
-    $query = "SELECT pledges.*, pledges.ref, pledges.date - pb_current_date() AS daysleft
+    $query = "SELECT pledges.*, pledges.ref, pledges.date - pb_current_date() AS daysleft,
+                     country
             FROM pledges LEFT JOIN location ON location.id = pledges.location_id
             WHERE ";
     $sql_params = array();
-    if ($site_country && $params['sitecountry']) {
-        $query .= "(country = ?";
-        if ($params['global'])
-            $query .= " or country IS NULL";
-        $query .= ") AND ";
+    $query .= "(";
+    if ($params['sitecountry']) {
+        $query .= "country = ?";
         $sql_params[] = $site_country;
     } else {
-        if ($params['global'])
-            $query .= "country IS NULL AND ";
-        else
-            $query .= "country IS NOT NULL AND ";
+        if ($site_country) {
+            $query .= "country <> ?"; 
+            $sql_params[] = $site_country;
+        } else {
+            $query .= "country IS NOT NULL"; 
+        }
     }
+    if ($params['global'])
+        $query .= " or country IS NULL";
+    $query .= ") AND ";
     $query .= $where;
     $q = db_query($query, $sql_params);
     $pledges = array();
     while ($r = db_fetch_array($q)) {
         $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
         $pstring = '<li>';
-        $pstring .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+        $pstring .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref'], 'showcountry'=>$params['showcountry']));
         
         $pstring .= '</li>';
         $pledges[] = $pstring;
@@ -92,12 +99,17 @@ function get_pledges_list($where, $params) {
 
 function print_change_country_link() {
     global $site_country;
-    print '<p>'.sprintf(_('%s pledges listed'), pb_site_country_name()).', <a href="/where">';
+    $change = '<a href="/where">';
     if ($site_country)
-        print _("change country");
+        $change .= _("change country");
     else
-        print _("choose country");
-    print '</a></p>';
+        $change .= _("choose country");
+    $change .= '</a>';
+    if ($site_country)
+        print '<p>'.sprintf(_('%s (%s) and global pledges listed'), pb_site_country_name(), $change);
+    else
+        print '<p>'.sprintf(_('%s (%s) pledges only listed'), pb_site_country_name(), $change);
+    $change .= '</p>';
 }
 
 function print_no_featured_link() {
@@ -119,7 +131,7 @@ function list_frontpage_pledges() {
                 date >= pb_current_date() AND 
                 pin is NULL AND 
                 whensucceeded IS NULL
-                ORDER BY RANDOM()", array('global'=>true,'sitecountry'=>true));
+                ORDER BY RANDOM()", array('global'=>true,'sitecountry'=>true,'showcountry'=>false));
     if (count($pledges) < 3) {
         // If too few frontpage, show a few of the normal pledges
         $normal_pledges = get_pledges_list("
@@ -128,7 +140,7 @@ function list_frontpage_pledges() {
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
-                    LIMIT 3", array('global'=>false,'sitecountry'=>true));
+                    LIMIT 3", array('global'=>false,'sitecountry'=>true,'showcountry'=>false));
         $pledges = array_merge($pledges, $normal_pledges);
     }
     if (!$pledges) {
@@ -145,7 +157,7 @@ function list_frontpage_pledges() {
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
-                    LIMIT 5", array('global'=>false,'sitecountry'=>false));
+                    LIMIT 5", array('global'=>false,'sitecountry'=>false,'showcountry'=>true));
         if ($pledges) {
             print p(_("Interesting pledges from other countries"));
             print '<ol>' . join("",$pledges) . '</ol>';
@@ -160,7 +172,7 @@ function list_successful_pledges() {
                 pin IS NULL AND 
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC
-                LIMIT 10", array('global'=>true, 'sitecountry'=>true));
+                LIMIT 10", array('global'=>true, 'sitecountry'=>true,'showcountry'=>false));
     if (!$pledges) {
         print_no_featured_link();
     } else {

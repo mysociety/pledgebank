@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.206 2005-09-01 11:57:44 francis Exp $
+// $Id: index.php,v 1.207 2005-09-01 12:12:16 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -31,9 +31,15 @@ alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid
 can\'t really change the things that we want to change.  PledgeBank is
 about beating that feeling..."') ?>
 </blockquote>
+
+<? global $lang; if ($lang == 'en-gb') { ?>
 <p><a href="tom-on-pledgebank-vbr.mp3"><?=_('Listen to how PledgeBank
 works</a>, as explained by mySociety\'s director Tom Steinberg.
 Or <a href="/explain">read a full transcript') ?></a>.</p>
+<? } else { ?>
+<p><a href="/explain"><?=_('Find out how PledgeBank
+works</a>, as explained by mySociety\'s director Tom Steinberg.')?></a></p>
+<? } ?>
 </div>
 
 <div id="startblurb">

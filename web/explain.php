@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.5 2005-06-24 12:07:59 matthew Exp $
+// $Id: explain.php,v 1.6 2005-09-01 12:12:16 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -14,7 +14,14 @@ page_header(_("What is PledgeBank?"));
 
 print h2(_("Tell the world \"I'll do it, but only if you'll help me do it\""));
 
-print p(_('You can <a href="tom-on-pledgebank-vbr.mp3">listen to an MP3</a> of this instead.'));
+global $lang; 
+if ($lang == 'en-gb') {
+    print p(_('You can <a href="tom-on-pledgebank-vbr.mp3">listen to an MP3</a> of this instead.'));
+} else {
+    print p(_('You can <a href="tom-on-pledgebank-vbr.mp3">listen to an MP3 (English only)</a> of this instead.'));
+}
+
+
 ?>
 <blockquote><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
 alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0"></a>
@@ -50,10 +57,10 @@ buckets in their own gardens to make homes for endangered stag beatles.
 And a member of an online community said he'd organise a 5th birthday
 party and now has 30 members of that community saying they'll come
 along."));
-print p(_("PledgeBank isn't just limited to people who use the internet a lot.
-You can sign up to any pledge with a simple two word text message.
+print p(sprintf(_("PledgeBank isn't just limited to people who use the internet a lot.
+You can sign up to any pledge with a simple two word text message (in %s only).
 Ideal for getting your friends in the pub involved, people in your street
-and so on."));
+and so on."), sms_countries_description()));
 print p(_("PledgeBank is free, easy to use, and needs your involvement
 before we can launch.  So if there's something you'd like to achieve in
 your community, in your place of employment, your university, amongst

@@ -8,7 +8,8 @@ The pledge, created by <?=$values['creator_name']?>, read:
 '<?=$values['sentence_first']?>'
 
 This means you don't have to do your part of the pledge.  Instead, why not
-return to www.pledgebank.com and have a look for other pledges?  Or perhaps
-make your own pledge.
+sign up to local alerts at http://www.pledgebank.com/alert to find out
+when someone creates a new pledge near you, browse the pledges at
+http://www.pledgebank.com/list or perhaps make your own pledge.
 
 <?=$values['signature']?>

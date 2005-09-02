@@ -2,7 +2,7 @@ Subject: New pledge near you! - '<?=$values['title']?>' at PledgeBank.com
 
 There's a new pledge near <?=$values['alert_description']?>.
 
-<?=$values['distance']?> km away: '<?=$values['sentence_first']?>' 
+<?=$values['distance']?> km away: '<?=$values['sentence_first']?>' -- <?=$values['creator_name']?>
 
 Click for more info or to sign the pledge: <?=$values['pledge_url']?>
 

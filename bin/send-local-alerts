@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.12 2005-08-25 17:13:05 francis Exp $
+ * $Id: send-local-alerts,v 1.13 2005-09-02 12:56:38 francis Exp $
  *
  */
 
@@ -76,9 +76,10 @@ function send_local_alerts() {
         // Search for pledges matching alert
         $local_alert_radius = 20.0; /* km; XXX should adjust by population density */
         $q = db_query("
-                select pledges.*, pledges.id as pledge_id, distance
+                select pledges.*, pledges.id as pledge_id, distance, person.name as creator_name
                 from pledge_find_nearby(?, ?, ?) as nearby
                     left join pledges on nearby.pledge_id = pledges.id
+                    left join person on pledges.person_id = person.id
                 where
                     pledges.pin is null and
                     pb_current_date() <= pledges.date and
@@ -129,6 +130,7 @@ function send_local_alerts() {
            
             # Construct repeating text
             $text .= $row['distance'] . " km away: '" . $pledge->sentence(array('firstperson'=>true)) . "'";
+            $text .= " -- " . $row['creator_name'] . ".";
             $text .=" Click for more info: " . $row['pledge_url'];
             $text .= "\n\n";
 

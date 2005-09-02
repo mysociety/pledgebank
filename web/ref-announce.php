@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.31 2005-07-16 12:30:00 matthew Exp $
+ * $Id: ref-announce.php,v 1.32 2005-09-02 14:35:09 francis Exp $
  * 
  */
 
@@ -229,11 +229,17 @@ if (!sizeof($errors) && $q_submit) {
 <h2>Send <?=$descr[$circumstance]?></h2>
 <input type="hidden" name="message_id" value="<?=$q_h_message_id?>">
 <div class="c">
-<p><?
-    printf(_('Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
+<p>
+<?
     if ($p->succeeded()) {
-        print _('This is to tell them what to do next.');
-    } ?>
+        printf(_('Write a message to tell the %d %s who have signed your pledge what to do next.'), $howmany, htmlspecialchars($p->type()));
+    } else {
+        printf(_('Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
+    }
+    if ($p->open()) {
+        printf(' '._('A copy of your message will also be sent to anybody who signs your pledge later.'));
+    }
+?>
 </p>
 
 <?  print _('<h3>Email message</h3>');
@@ -276,7 +282,7 @@ count_sms_characters();
 
     print _('<h3>Send Announcement</h3>');
     print '<p>';
-    print _('(Remember, when you send this message <strong>your email address will be given to everyone who has signed up or will sign up</strong> to your pledge by email)');
+    print _('(Remember, when you send this message <strong>your email address will be given to everyone</strong> who has already, or who will in the future, sign up to your pledge by email)');
     print ' <input type="submit" name="submit" value="' . _('Send') . ' &gt;&gt;"></p>';
     print '</div></form>';
 }

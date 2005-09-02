@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.60 2005-09-01 16:32:28 francis Exp $
+// $Id: fns.php,v 1.61 2005-09-02 10:27:46 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -25,8 +25,8 @@ function dd($s) { print "<dd>$s</dd>\n"; }
 # Defaults to keeping country country or language, unless param contains:
 #   'lang' - language to change to
 #   'country' - country to change to
-#   'toplevel' - if true, link to index page instead of current page
-function pb_domain_url($params = array('toplevel'=>true)) {
+#   'path' - path component, if not present uses request URI
+function pb_domain_url($params = array('path'=>true)) {
     global $domain_lang, $domain_country;
 
     $l = $domain_lang;
@@ -46,8 +46,8 @@ function pb_domain_url($params = array('toplevel'=>true)) {
     if (!$c && !$l && OPTION_WEB_HOST == 'www')
         $url .= "www.";
     $url .= OPTION_WEB_DOMAIN;
-    if (array_key_exists('toplevel', $params) && $params['toplevel'])
-        $url .= "/";
+    if (array_key_exists('path', $params) && $params['path'])
+        $url .= htmlspecialchars($params['path']);
     else
         $url .= htmlspecialchars($_SERVER['REQUEST_URI']);
     return $url;
@@ -395,6 +395,21 @@ function pb_view_local_alert_quick_signup($class) {
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 <?
+}
+
+function pb_print_change_country_link($attrs = "") {
+    global $site_country;
+    $change = '<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">';
+    if ($site_country)
+        $change .= _("change country");
+    else
+        $change .= _("choose country");
+    $change .= '</a>';
+    if ($site_country)
+        print "<p $attrs>".sprintf(_('%s (%s) and global pledges listed'), pb_site_country_name(), $change);
+    else
+        print "<p $attrs>".sprintf(_('%s (%s) pledges only listed'), pb_site_country_name(), $change);
+    $change .= '</p>';
 }
 
 // Return array of country codes for countries which have SMS

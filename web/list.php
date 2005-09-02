@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.12 2005-08-22 18:39:51 matthew Exp $
+// $Id: list.php,v 1.13 2005-09-02 10:27:46 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -37,13 +37,24 @@ if ($q_type == 'failed') {
     if ($q_sort == "default") $q_sort = "percentcomplete";
 }
 
+$sql_params = array();
+$locale_clause = "(";
+if ($site_country) {
+    $locale_clause .= "country = ?";
+    $sql_params[] = $site_country;
+} else {
+    $locale_clause .= "1 = 0";
+}
+$locale_clause .= " OR country IS NULL)";
+
 $ntotal = db_getOne("
-                select count(id)
-                from pledges
-                where pin is null
-                    and date $open pb_current_date()
+                SELECT count(pledges.id)
+                FROM pledges LEFT JOIN location ON location.id = pledges.location_id
+                WHERE $locale_clause AND
+                    pin IS NULL
+                    AND date $open pb_current_date()
                     AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target
-                    and pb_pledge_prominence(id) <> 'backpage'");
+                    AND pb_pledge_prominence(pledges.id) <> 'backpage'", $sql_params);
 if ($ntotal < $q_offset) 
     $q_offset = $ntotal - PAGE_SIZE;
 
@@ -61,6 +72,7 @@ if ($q_sort == 'category') {
             pledge_category.category_id = category.id AND parent_category_id IS NULL AND 
             pledge_category.pledge_id = pledges.id LIMIT 1), 'Miscellaneous')";
 }
+$sql_params[] = PAGE_SIZE;
 $qrows = db_query("
         SELECT pledges.*, pb_current_date() <= pledges.date AS open,
             (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
@@ -68,11 +80,12 @@ $qrows = db_query("
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
-            WHERE date $open pb_current_date() 
+            WHERE $locale_clause
+            AND date $open pb_current_date() 
             AND pin IS NULL
             AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target 
             AND pb_pledge_prominence(pledges.id) <> 'backpage'
-            ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", PAGE_SIZE);
+            ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", $sql_params);
 /* PG bug: mustn't quote parameter of offset */
 
 $heading = 'All Pledges';
@@ -87,6 +100,8 @@ if ($q_type == 'open') {
 } 
 page_header($heading, array('id'=>'all'));
 print h2($heading);
+
+pb_print_change_country_link('align="center"');
 
 $viewsarray = array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
     'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));

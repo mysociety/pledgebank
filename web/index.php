@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.208 2005-09-01 16:32:28 francis Exp $
+// $Id: index.php,v 1.209 2005-09-02 10:27:46 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -109,21 +109,6 @@ function get_pledges_list($where, $params) {
     return $pledges;
 }
 
-function print_change_country_link() {
-    global $site_country;
-    $change = '<a href="/where">';
-    if ($site_country)
-        $change .= _("change country");
-    else
-        $change .= _("choose country");
-    $change .= '</a>';
-    if ($site_country)
-        print '<p>'.sprintf(_('%s (%s) and global pledges listed'), pb_site_country_name(), $change);
-    else
-        print '<p>'.sprintf(_('%s (%s) pledges only listed'), pb_site_country_name(), $change);
-    $change .= '</p>';
-}
-
 function print_no_featured_link() {
     global $site_country;
     print '<p>' . sprintf(_('There are no featured pledges for %s at the moment.'),pb_site_country_name());
@@ -158,7 +143,7 @@ function list_frontpage_pledges() {
     if (!$pledges) {
         print_no_featured_link();
     } else {
-        print_change_country_link();
+        pb_print_change_country_link("");
         print '<ol>' . join("",$pledges) . '</ol>';
     }
 
@@ -188,7 +173,7 @@ function list_successful_pledges() {
     if (!$pledges) {
         print_no_featured_link();
     } else {
-        print_change_country_link();
+        pb_print_change_country_link();
         print '<ol>'.join("",$pledges).'</ol>';
     }
 }

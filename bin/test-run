@@ -30,7 +30,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.137 2005-09-01 21:22:49 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.138 2005-09-02 12:26:23 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -126,6 +126,9 @@ our $login_count; # reference to hash of person number => how many times they've
 print "Set up web test harness...\n" if $verbose > 0;
 our $wth = new mySociety::WebTestHarness();
 $wth->log_watcher_setup($httpd_error_log);
+
+our $locale_url = $base_url;
+sub lock_locale_url { $wth->browser_uri() =~ m#(http://.*)/#; $locale_url = $1; }
 
 $wth->database_connect('PB_');
 $wth->database_drop_reload('../db/schema.sql');
@@ -315,7 +318,7 @@ sub create_pledge {
     die "'resume' not supported for pledges yet" if ($login_action eq "resume");
 
     # Make new pledge, step 1
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     $wth->browser_follow_link(text_regex => qr/Start your own pledge/);
     $wth->browser_check_contents("New Pledge");
     $wth->browser_submit_form(form_name => 'pledge', fields => $page1,
@@ -424,9 +427,9 @@ sub find_and_sign_pledge {
 
     if ($login_action ne "resume") {
         if ($find_type eq 'ref') {
-            $wth->browser_get($base_url . "/" . $find_string);
+            $wth->browser_get($locale_url . "/" . $find_string);
         } else {
-            $wth->browser_get($base_url);
+            $wth->browser_get($locale_url);
             if ($find_type eq 'list_open' || $find_type eq 'list_succeeded_open') {
                 $wth->browser_follow_link(text_regex => qr/All Pledges/) or die "Failed to find 'All Pledges' link";
             }
@@ -502,14 +505,20 @@ sub do_unconfirmed_pledge {
     );
 
     # Check not on front page
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     $wth->browser_check_no_contents($pledge_action_unconfirmed);
 }
 
 #############################################################################
 sub do_public_succeeding_pledge {
-    # Sign up to local alert
+    # Change to US
     $wth->browser_get($base_url);
+    $wth->browser_follow_link(text_regex => qr/Choose country/, n => 1);
+    $wth->browser_follow_link(text => "United States");
+    lock_locale_url();
+
+    # Sign up to local alert
+    $wth->browser_get($locale_url);
     $wth->browser_submit_form(form_name => 'localalert',
         fields => {
             email => email_n(11),  # use same signer as one below, to test conversion from 
@@ -545,7 +554,7 @@ sub do_public_succeeding_pledge {
 
     # Add a comment, which will subscribe user 90 to comment alerts
     # (TODO: put these three comment posts in a local function)
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_submit_form(form_name => 'commentform',
         fields => {
             author_name => name_n(90), author_email => email_n(90),
@@ -562,7 +571,7 @@ sub do_public_succeeding_pledge {
     call_send_alerts();
     $wth->email_get_containing('%To: '.email_n(0).  '%This is a great pledge%');
     # Add another comment so its email goes
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_submit_form(form_name => 'commentform',
         fields => {
             author_name => name_n(91), author_email => email_n(91),
@@ -584,7 +593,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_get($comment_unsubscribe_url);
     $wth->browser_check_contents("You won't receive more email");
     # Send third comment, check don't get alert
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_submit_form(form_name => 'commentform',
         fields => {
             author_name => name_n(91), author_email => email_n(91),
@@ -602,7 +611,7 @@ sub do_public_succeeding_pledge {
     $wth->email_check_none_left();
 
     # Mail pledge to friends
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_follow_link(text_regex => qr/Email pledge/);
     $wth->browser_check_contents("Email this pledge");
     my $friend_message = "Hello you!";
@@ -636,12 +645,12 @@ sub do_public_succeeding_pledge {
     $wth->email_get_containing('%To: '.email_n(11).  '%new pledge%'.$pledge_action_completion.'%');
 
     # Check can't get to announce page as a mere signer
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_follow_link(text_regex => qr/message to signers/);
     $wth->browser_check_contents("must be the pledge creator");
     $wth->browser_follow_link(text_regex => qr/log out/);
     # Send mid-pledge announcement, to encourage signers to do more to help
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_follow_link(text_regex => qr/message to signers/);
     perform_login_action(0, {action=>"viaemail", giveemail=>1}, "send a message to everyone who has signed your pledge");
     $wth->browser_check_contents("Send Announcement");
@@ -673,9 +682,7 @@ sub do_public_succeeding_pledge {
 
     # Check pledge has completed
     call_frequentupdate();
-    $wth->browser_get($base_url);
-    $wth->browser_follow_link(text_regex => qr/Choose country/, n => 1);
-    $wth->browser_follow_link(text => "United States");
+    $wth->browser_get($locale_url);
     $wth->browser_check_contents("Target met, pledge still open for 9 days");
     $wth->browser_follow_link(text_regex => qr/$pledge_action_completion/);
     $wth->browser_check_contents("This pledge has been successful!");
@@ -755,12 +762,16 @@ sub do_public_succeeding_pledge {
     # Check what happens when the pledge expires
     set_pb_date('1982-02-11');
     # Pledge should say the right things
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_check_contents("This pledge is now closed");
     $wth->browser_check_no_contents("Sign up now");
     $wth->browser_check_contents("This pledge has been successful!");
     $wth->browser_check_contents(name_n(4));
     $wth->browser_check_no_contents(name_n(5));
+
+    # Change back to global
+    $wth->browser_get($base_url);
+    lock_locale_url();
 }
 
 #############################################################################
@@ -782,7 +793,7 @@ sub do_private_failing_pledge {
 
     # Go to private pledge page, and submit PIN to access it
     my $goto_private_pledge_page = sub {
-        $wth->browser_get("$base_url/$pledge_ref");
+        $wth->browser_get("$locale_url/$pledge_ref");
         $wth->browser_check_contents("PIN Protected Pledge");
         $wth->browser_check_no_contents("Incorrect PIN!");
         $wth->browser_check_no_contents($pledge_action_private);
@@ -836,41 +847,41 @@ sub do_private_failing_pledge {
 
     # Check pledge really is private on lists of pledges
     # ... index page, all pledges
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     $wth->browser_check_no_contents($pledge_ref);
     $wth->browser_check_no_contents($pledge_action_private);
     # ... all pledges page
-    $wth->browser_get($base_url . "/all");
+    $wth->browser_get($locale_url . "/all");
     $wth->browser_check_no_contents($pledge_ref);
     $wth->browser_check_no_contents($pledge_action_private);
     # ... RSS
-    $wth->browser_get($base_url . "/rss");
+    $wth->browser_get($locale_url . "/rss");
     $wth->browser_check_no_contents($pledge_ref);
     $wth->browser_check_no_contents($pledge_action_private);
     $wth->log_watcher_check();
 
     # And all its pages require PIN to get to
     # ... email friends page
-    $wth->browser_get("$base_url/$pledge_ref/email");
+    $wth->browser_get("$locale_url/$pledge_ref/email");
     $wth->browser_check_contents("PIN Protected Pledge");
     $wth->browser_check_no_contents($pledge_action_private);
         # ... flyers index
-    $wth->browser_get("$base_url/$pledge_ref/flyers");
+    $wth->browser_get("$locale_url/$pledge_ref/flyers");
     $wth->browser_check_contents("PIN Protected Pledge");
     $wth->browser_check_no_contents($pledge_action_private);
     # ... individual poster
-    $wth->browser_get("$base_url/flyers/${pledge_ref}_A4_flyers8.pdf");
+    $wth->browser_get("$locale_url/flyers/${pledge_ref}_A4_flyers8.pdf");
     $wth->browser_check_contents("Correct PIN needed");
     $wth->log_watcher_check();
 
     # ... ical calendar entry
-    $wth->browser_get("$base_url/$pledge_ref/ical");
+    $wth->browser_get("$locale_url/$pledge_ref/ical");
     $wth->browser_check_contents("Correct PIN required");
     $wth->browser_check_no_contents($pledge_action_private);
     my $errors = $wth->log_watcher_get_errors();
     die if ($errors !~ m/Correct PIN required/);
     # ... sign page
-    $wth->browser_get("$base_url/$pledge_ref/sign");
+    $wth->browser_get("$locale_url/$pledge_ref/sign");
     $wth->browser_check_contents("Permission denied");
     $wth->browser_check_no_contents($pledge_action_private);
     my $errors = $wth->log_watcher_get_errors();
@@ -924,7 +935,7 @@ sub do_private_failing_pledge {
     my $success_email = $wth->email_get_containing('%To: '.email_n(1).  '%From: '.name_n(0).  '%What a hassle%');
     $wth->email_check_none_left();
     # Try to send second failure, which is not allowed
-    $wth->browser_get($base_url . "/$pledge_ref/announce");
+    $wth->browser_get($locale_url . "/$pledge_ref/announce");
     $wth->browser_check_contents("You have already sent 1 failure announcement");
 }
 
@@ -1023,7 +1034,7 @@ sub do_sms_pledge {
         print "SMS text: $conversion_sms\n" if $verbose > 1;
     }
     # Check not got signup yet
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_check_contents("<i>0 people have signed up");
     # Wait for delivery notification, which confirms signature
     set_pb_date('1982-03-02');
@@ -1031,7 +1042,7 @@ sub do_sms_pledge {
     call_smsd();  # cull done with message
     $wth->log_watcher_check();
     # Check signup now appears
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_check_contents("<i>3 people have signed up");
 
     # SMS signup with conversion
@@ -1056,14 +1067,14 @@ sub do_sms_pledge {
     perform_login_action(105, {action=>"viaemail"}, "to confirm your signature");
     $wth->browser_check_contents("Thanks for signing up");
     # Check signup now appears
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_check_contents(name_n(105));
     # Wait for delivery notification, which shouldn't harm anything
     set_pb_date('1982-03-03');
     call_smsd();  # delivery notification
     call_smsd();  # cull done with message
     # Check signup still appears
-    $wth->browser_get($base_url . "/$pledge_ref");
+    $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_check_contents(name_n(105));
 
     # Let pledge succeed
@@ -1104,7 +1115,7 @@ sub do_sms_pledge {
 #############################################################################
 sub do_login_tests {
     # Sign up to local alert
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     $wth->browser_submit_form(form_name => 'localalert',
         fields => {
             email => email_n(250),  
@@ -1140,7 +1151,7 @@ sub do_login_tests {
         { action => "viaemail", setpassword => 1 }
     );
     # Checked logged in, and then logout
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     $wth->browser_check_contents("Hello, " . name_n(200));
     $wth->browser_check_no_contents("Login");
     $wth->browser_follow_link(text_regex => qr/Logout/);
@@ -1157,7 +1168,7 @@ sub do_login_tests {
         { action => "viaemail", setpassword => 1 }
     );
     # Log out again
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     $wth->browser_follow_link(text_regex => qr/Logout/);
     $wth->browser_check_contents("now logged out");
 
@@ -1171,12 +1182,12 @@ sub do_login_tests {
         { action => "password" }
     );
     # Log out again
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     $wth->browser_follow_link(text_regex => qr/Logout/);
     $wth->browser_check_contents("now logged out");
 
     # Log in explicitly with "login" link
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     # ... first update pledge connections (to test that a bit on your pledges page)
     call_findpledgeconnections();
     $wth->browser_follow_link(text_regex => qr/Login/);
@@ -1230,7 +1241,7 @@ sub do_login_tests {
 #############################################################################
 sub do_admin_tests {
     # Send contact message
-    $wth->browser_get($base_url);
+    $wth->browser_get($locale_url);
     $wth->browser_follow_link(text_regex => qr/Contact/);
     $wth->browser_check_contents("Was it useful?");
     $wth->browser_submit_form(form_name => 'contact',
@@ -1247,7 +1258,7 @@ sub do_admin_tests {
             '%From: "'. name_n(1000) . '"%rules!%');
 
     # Submit abusive comment report
-    $wth->browser_get($base_url . "/automatedtest");
+    $wth->browser_get($locale_url . "/automatedtest");
     $wth->browser_follow_link(text_regex => qr/Abusive/, n => 1);
     $wth->browser_check_contents("Report something wrong with a comment");
     $wth->browser_submit_form(form_name => 'abuse',
@@ -1309,7 +1320,7 @@ sub do_admin_tests {
 #############################################################################
 sub do_final_checks {
     # Check RSS works and has correct entries
-    $wth->browser_get($base_url . "/rss");
+    $wth->browser_get($locale_url . "/rss");
     $wth->browser_check_contents(qr/make sure a pledge can be completed/);
     $wth->browser_check_no_contents(qr/pretend to be an SMS aggregating service/); # has been deleted earlier
     $wth->browser_check_no_contents("privatepledge");

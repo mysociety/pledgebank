@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.61 2005-09-02 10:27:46 francis Exp $
+// $Id: fns.php,v 1.62 2005-09-02 12:26:23 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -26,7 +26,7 @@ function dd($s) { print "<dd>$s</dd>\n"; }
 #   'lang' - language to change to
 #   'country' - country to change to
 #   'path' - path component, if not present uses request URI
-function pb_domain_url($params = array('path'=>true)) {
+function pb_domain_url($params = array('path'=>'/')) {
     global $domain_lang, $domain_country;
 
     $l = $domain_lang;

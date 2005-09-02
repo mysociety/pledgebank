@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.30 2005-09-01 21:22:49 francis Exp $
+ * $Id: pb.php,v 1.31 2005-09-02 13:56:18 matthew Exp $
  * 
  */
 
@@ -21,31 +21,36 @@ require_once "../../phplib/gaze.php";
 require_once 'page.php';
 
 # Extract language and country from URL.
-# We assume all languages are xx-xx form, and countries just xx. Also that
+# We assume languages are xx or xx-xx form, and countries just xx. Also that
 # country is first, then language. Both are optional.
 $domain_lang = null;
 $domain_country = null;
-if (OPTION_WEB_HOST == 'www')
-    if (preg_match('#^(?:..\.)?(..\-..)\.#', strtolower($_SERVER['HTTP_HOST']), $m)) {
+if (OPTION_WEB_HOST == 'www') {
+    if (preg_match('#^(?:..\.)?(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_lang = $m[1];
-    }
-else
-    if (preg_match('#^'.OPTION_WEB_HOST.'-(?:..\.)?(..\-..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+} else {
+    if (preg_match('#^'.OPTION_WEB_HOST.'-(?:..\.)?(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_lang = $m[1];
-if (OPTION_WEB_HOST == 'www')
-    if (preg_match('#^(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m)) {
+}
+
+if (OPTION_WEB_HOST == 'www') {
+    if (preg_match('#^(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_country = strtoupper($m[1]);
-    }
-else
+} else {
     if (preg_match('#^'.OPTION_WEB_HOST.'-(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_country = strtoupper($m[1]);
-
+}
 
 # Language negotiation
 # Translations available of PledgeBank
-$langs = array('en-gb'=>'English', 'pt-br'=>'Portugu&ecirc;s (Brazil)');
-# Map of lang to directory
-$langmap = array('en-gb'=>'en_GB', 'pt-br'=>'pt_BR');
+$pb_langs = explode('|', OPTION_PB_LANGUAGES);
+$langs = array(); $langmap = array();
+foreach ($pb_langs as $pb_lang) {
+    list($code, $verbose, $locale) = explode(',', $pb_lang);
+    $langs[$code] = $verbose;
+    $langmap[$code] = $locale;
+}
+
 if ($domain_lang && array_key_exists($domain_lang, $langs))
     $lang = $domain_lang;
 else {
@@ -69,6 +74,7 @@ putenv('LANG='.$langmap[$lang].'.UTF-8');
 setlocale(LC_ALL, $langmap[$lang].'.UTF-8');
 bindtextdomain('PledgeBank', '../../locale');
 textdomain('PledgeBank');
+bind_textdomain_codeset('PledgeBank', 'UTF-8');
 
 /* POST redirects */
 stash_check_for_post_redirect();

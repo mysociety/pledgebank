@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.28 2005-07-28 14:44:55 chris Exp $
+ * $Id: general-example,v 1.29 2005-09-02 13:56:09 matthew Exp $
  * 
  */
 
@@ -95,5 +95,8 @@ define('OPTION_GAZE_URL', 'http://services.mysociety.org/gaze');
 // Limit on new pledges
 define('OPTION_PB_TARGET_WARNING', '20');
 define('OPTION_PB_TARGET_CAP', '50');
+
+// i18n
+define('OPTION_PB_LANGUAGES', 'en-gb,English,en_GB|pt-br,Portugu&ecirc;s (Brasil),pt_BR');
 
 ?>

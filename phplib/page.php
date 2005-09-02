@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.72 2005-09-01 16:32:28 francis Exp $
+// $Id: page.php,v 1.73 2005-09-02 16:19:20 matthew Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -165,7 +165,7 @@ function page_footer($params = array()) {
     foreach ($langs as $l => $pretty) {
         $url = pb_domain_url(array('lang'=>$l));
         if ($l == $lang) $o = '<strong>';
-        else $o = '<a href="'.$url.'">';
+        else $o = '<a href="'.$url.'" lang="' . $l . '" hreflang="' . $l . '">';
         $o .= $pretty;
         if ($l == $lang) $o .= '</strong>';
         else $o .= '</a>';

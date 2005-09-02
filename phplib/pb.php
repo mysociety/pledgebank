@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.31 2005-09-02 13:56:18 matthew Exp $
+ * $Id: pb.php,v 1.32 2005-09-02 16:19:20 matthew Exp $
  * 
  */
 
@@ -21,15 +21,16 @@ require_once "../../phplib/gaze.php";
 require_once 'page.php';
 
 # Extract language and country from URL.
-# We assume languages are xx or xx-xx form, and countries just xx. Also that
-# country is first, then language. Both are optional.
+# OPTION_WEB_HOST . OPTION_WEB_DOMAIN - default
+# xx . OPTION_WEB_DOMAIN - xx is an ISO 639-1 country code
+# xx . yy . OPTION_WEB_DOMAIN - xx is a country code, yy a language code (either aa or aa-bb)
 $domain_lang = null;
 $domain_country = null;
 if (OPTION_WEB_HOST == 'www') {
-    if (preg_match('#^(?:..\.)?(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+    if (preg_match('#^..\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_lang = $m[1];
 } else {
-    if (preg_match('#^'.OPTION_WEB_HOST.'-(?:..\.)?(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+    if (preg_match('#^'.OPTION_WEB_HOST.'-..\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_lang = $m[1];
 }
 
@@ -42,7 +43,6 @@ if (OPTION_WEB_HOST == 'www') {
 }
 
 # Language negotiation
-# Translations available of PledgeBank
 $pb_langs = explode('|', OPTION_PB_LANGUAGES);
 $langs = array(); $langmap = array();
 foreach ($pb_langs as $pb_lang) {
@@ -50,7 +50,6 @@ foreach ($pb_langs as $pb_lang) {
     $langs[$code] = $verbose;
     $langmap[$code] = $locale;
 }
-
 if ($domain_lang && array_key_exists($domain_lang, $langs))
     $lang = $domain_lang;
 else {

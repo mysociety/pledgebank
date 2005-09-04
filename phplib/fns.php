@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.62 2005-09-02 12:26:23 francis Exp $
+// $Id: fns.php,v 1.63 2005-09-04 13:35:49 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -37,14 +37,18 @@ function pb_domain_url($params = array('path'=>'/')) {
         $c = $params['country'];
      
     $url = 'http://';
-    if (OPTION_WEB_HOST != 'www')
-        $url .= OPTION_WEB_HOST . '-';
+
+    if (OPTION_WEB_HOST == 'www') {
+        if (!$c)
+            $url .= 'www.';
+    } else {
+        $url .= OPTION_WEB_HOST;
+        $url .= ($c) ? '-' : '.';
+    }
     if ($c)
         $url .= strtolower("$c.");
     if ($l)
         $url .= "$l.";
-    if (!$c && !$l && OPTION_WEB_HOST == 'www')
-        $url .= "www.";
     $url .= OPTION_WEB_DOMAIN;
     if (array_key_exists('path', $params) && $params['path'])
         $url .= htmlspecialchars($params['path']);

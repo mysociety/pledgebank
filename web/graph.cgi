@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.13 2005-06-24 09:20:15 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.14 2005-09-04 14:08:40 matthew Exp $';
 
 use strict;
 
@@ -268,12 +268,12 @@ set nolabel
 set nozeroaxis
 set nokey
 set xtics nomirror
-set ytics nomirror
+set ytics nomirror tc lt 2
 set y2tics
 set y2label "total number of signers"
 set tics out
 set format x '$datefmt'
-set ylabel 'signups per $bucket'
+set ylabel 'signups per $bucket' tc lt 1
 plot "$signuprate_file" using 1:2 with impulses lt 1 lw 15, "$signers_file" using 1:2 axes x1y2 with steps lt -1 lw 1
 show output
 system "mv $graphfile.new $graphfile"

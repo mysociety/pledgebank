@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.32 2005-09-02 16:19:20 matthew Exp $
+ * $Id: pb.php,v 1.33 2005-09-05 12:23:35 francis Exp $
  * 
  */
 
@@ -19,6 +19,39 @@ require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
 require_once "../../phplib/gaze.php";
 require_once 'page.php';
+
+/* Output buffering: PHP's output buffering is broken, because it does not
+ * affect headers. However, it's worth using it anyway, because in the common
+ * case of outputting an HTML page, it allows us to clear any output and
+ * display a clean error page when something goes wrong. Obviously if we're
+ * displaying an error, a redirect, an image or anything else this will break
+ * horribly.*/
+ob_start();
+
+/* pb_handle_error NUMBER MESSAGE
+ * Display a PHP error message to the user. */
+function pb_handle_error($num, $message, $file, $line, $context) {
+    if (OPTION_PB_STAGING) {
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        page_header(_("Sorry! Something's gone wrong."), array('override'=>true));
+        print("<strong>$message</strong> in $file:$line");
+        page_footer(array('nolocalsignup'=>true));
+    } else {
+        /* Nuke any existing page output to display the error message. */
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        /* Message will be in log file, don't display it for cleanliness */
+        $err = p(_('Please try again later, or <a href="mailto:team@pledgebank.com">email us</a> for help resolving the problem.'));
+        if ($num & E_USER_ERROR) {
+            $err = "<p><em>$message</em></p> $err";
+        }
+        pb_show_error($err);
+    }
+}
+err_set_handler_display('pb_handle_error');
 
 # Extract language and country from URL.
 # OPTION_WEB_HOST . OPTION_WEB_DOMAIN - default
@@ -82,39 +115,6 @@ stash_check_for_post_redirect();
 $pb_today = db_getOne('select pb_current_date()');
 $pb_timestamp = substr(db_getOne('select pb_current_timestamp()'), 0, 19);
 $pb_time = strtotime($pb_timestamp);
-
-/* Output buffering: PHP's output buffering is broken, because it does not
- * affect headers. However, it's worth using it anyway, because in the common
- * case of outputting an HTML page, it allows us to clear any output and
- * display a clean error page when something goes wrong. Obviously if we're
- * displaying an error, a redirect, an image or anything else this will break
- * horribly.*/
-ob_start();
-
-/* pb_handle_error NUMBER MESSAGE
- * Display a PHP error message to the user. */
-function pb_handle_error($num, $message, $file, $line, $context) {
-    if (OPTION_PB_STAGING) {
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        page_header(_("Sorry! Something's gone wrong."), array('override'=>true));
-        print("<strong>$message</strong> in $file:$line");
-        page_footer(array('nolocalsignup'=>true));
-    } else {
-        /* Nuke any existing page output to display the error message. */
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        /* Message will be in log file, don't display it for cleanliness */
-        $err = p(_('Please try again later, or <a href="mailto:team@pledgebank.com">email us</a> for help resolving the problem.'));
-        if ($num & E_USER_ERROR) {
-            $err = "<p><em>$message</em></p> $err";
-        }
-        pb_show_error($err);
-    }
-}
-err_set_handler_display('pb_handle_error');
 
 /* pb_show_error MESSAGE
  * General purpose eror display. */

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.32 2005-09-02 14:35:09 francis Exp $
+ * $Id: ref-announce.php,v 1.33 2005-09-05 12:23:35 francis Exp $
  * 
  */
 
@@ -119,6 +119,12 @@ if ($p->failed()) {
 $circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $circumstance));
 
 $do_sms = array_key_exists($circumstance, $has_sms) ? true : false;
+if ($do_sms) {
+    if ($p->is_global()) 
+        $country_has_sms = true;
+    else
+        $country_has_sms = in_array($p->country_code(), sms_countries());
+}
 
 $fill_in = _("ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE, INCLUDING YOUR CONTACT INFO");
 
@@ -255,12 +261,13 @@ ways.')); ?>
     rows="20"><?=$q_h_message_body?></textarea></p>
 
 <?  if ($do_sms) {
-        print _('<h3>SMS message</h3>');
-        print p(_('Enter a short (160 or fewer characters) summary of your main message,
-which can be sent to anyone who has signed up to your pledge by SMS only.
-<strong>Include contact details, such as your phone number or email address.</strong>
-Otherwise people who signed up by text won\'t be able to contact you again.'));
-?>
+        if ($country_has_sms) {
+            print _('<h3>SMS message</h3>');
+            print p(_('Enter a short (160 or fewer characters) summary of your main message,
+    which can be sent to anyone who has signed up to your pledge by SMS only.
+    <strong>Include contact details, such as your phone number or email address.</strong>
+    Otherwise people who signed up by text won\'t be able to contact you again.'));
+    ?>
 <p><textarea
     name="message_sms"
     id="message_sms"
@@ -278,7 +285,14 @@ Otherwise people who signed up by text won\'t be able to contact you again.'));
 count_sms_characters();
 //-->
 </script>
-<? }
+<?      } else {
+            // Country is not an SMS one, would be annoying to request SMS text
+            // of them just for rare case when a foreigner may have signed up
+            // by SMS. So we set a default message. (Keep it short too)
+            $foreign_sms_case = sprintf(_("Pledge %s success! Email %s for more"), $p->ref(), $p->creator_email());
+            print '<input type="hidden" name="message_sms" value="'.htmlspecialchars($foreign_sms_case).'">';
+        }
+    }
 
     print _('<h3>Send Announcement</h3>');
     print '<p>';

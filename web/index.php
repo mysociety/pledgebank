@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.209 2005-09-02 10:27:46 francis Exp $
+// $Id: index.php,v 1.210 2005-09-05 12:23:35 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -111,13 +111,14 @@ function get_pledges_list($where, $params) {
 
 function print_no_featured_link() {
     global $site_country;
-    print '<p>' . sprintf(_('There are no featured pledges for %s at the moment.'),pb_site_country_name());
-    print ' <a href="/where">';
+    $change = '<a href="/where">';
     if ($site_country)
-        print _("Change country");
+        $change .= _("change country");
     else
-        print _("Choose country");
-    print '</a>.</p>';
+        $change .= _("choose country");
+    $change .= '</a>';
+    print '<p>' . sprintf(_('There are no featured pledges for %s (%s) at the moment.'),pb_site_country_name(), $change);
+    print '</p>';
 }
 
 function list_frontpage_pledges() {

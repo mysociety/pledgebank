@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.92 2005-08-25 17:13:06 francis Exp $
+ * $Id: admin-pb.php,v 1.93 2005-09-05 10:11:38 francis Exp $
  * 
  */
 
@@ -179,6 +179,10 @@ class ADMIN_PAGE_PB_MAIN {
             LEFT JOIN location ON location.id = pledges.location_id
             WHERE ref ILIKE ?', $pledge);
         $pdata = db_fetch_array($q);
+        if (!$pdata) {
+            print sprintf("Pledge '%s' not found", htmlspecialchars($pledge));
+            return;
+        }
 
         print "<h2>Pledge '<a href=\"".OPTION_BASE_URL.'/'.$pdata['ref']."\">" . $pdata['ref'] . "</a>'";
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
@@ -471,6 +475,8 @@ class ADMIN_PAGE_PB_LATEST {
     # pledges use creationtime
     # signers use signtime
     function show_latest_changes() {
+        $time = array();
+
         $q = db_query('SELECT signers.name, signer_person.email,
                               signers.mobile, signtime, showname, pledges.title,
                               pledges.ref, pledges.id,
@@ -575,7 +581,11 @@ class ADMIN_PAGE_PB_LATEST {
                     $time[$r['whenqueued']][] = $r;
                 }
             }
-         }
+        }
+        if (count($time) < 1) {
+            print(_(p('No events have happened yet')));
+            return;
+        }
         krsort($time);
 
         print '<a href="'.$this->self_link.'">Full log</a>';

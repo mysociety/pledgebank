@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.13 2005-09-02 10:27:46 francis Exp $
+// $Id: list.php,v 1.14 2005-09-05 16:37:21 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -55,8 +55,11 @@ $ntotal = db_getOne("
                     AND date $open pb_current_date()
                     AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target
                     AND pb_pledge_prominence(pledges.id) <> 'backpage'", $sql_params);
-if ($ntotal < $q_offset) 
+if ($ntotal < $q_offset) {
     $q_offset = $ntotal - PAGE_SIZE;
+    if ($q_offset < 0)
+        $q_offset = 0;
+}
 
 $sort_phrase = $q_sort;
 if ($q_sort == 'creationtime' || $q_sort == 'created') {

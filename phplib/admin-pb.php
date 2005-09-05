@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.94 2005-09-05 23:21:27 francis Exp $
+ * $Id: admin-pb.php,v 1.95 2005-09-05 23:42:23 francis Exp $
  * 
  */
 
@@ -910,6 +910,41 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
         } else {
             print '<p>No abuse reports of this type.</p>';
         }
+    }
+}
+
+class ADMIN_PAGE_PB_STATS {
+    function ADMIN_PAGE_PB_STATS() {
+        $this->id = 'pbstats';
+        $this->navname = _('Alert statistics');
+    }
+
+    function display($self_link) {
+        db_connect();
+
+        print h2(_("Local alert signups"));
+        $q = db_query('select date(whensubscribed) as date, event_code, whensubscribed, country,
+                ref, person.name as name, email
+            from alert 
+                left join location on location.id = alert.location_id 
+                left join person on person.id = alert.person_id 
+                left join pledges on pledges.id = alert.pledge_id 
+            where event_code = \'pledges/local\' order by whensubscribed desc');
+
+        print '<table border="1" cellpadding="3" cellspacing="0">';
+        print '<tr><th>When</th><th>Who</th><th>Country</th></tr>';
+        $n = 0;
+        while ($r = db_fetch_array($q)) {
+            if ($n++%2)
+                print '<tr>';
+            else 
+                print '<tr class="v">';
+            print '<td>'.htmlspecialchars($r['whensubscribed']) . '</td>';
+            print '<td>'.htmlspecialchars($r['name']) . ' ' . htmlspecialchars($r['email']) . ' </td>';
+            print '<td>'.htmlspecialchars($r['country']) . '</td>';
+            print "</tr>\n";
+        }
+        print '</table>';
     }
 }
 

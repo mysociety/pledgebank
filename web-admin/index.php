@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: index.php,v 1.10 2005-07-19 13:59:13 matthew Exp $
+ * $Id: index.php,v 1.11 2005-09-05 23:42:24 francis Exp $
  * 
  */
 
@@ -24,6 +24,7 @@ $pages = array(
     new ADMIN_PAGE_PB_LATEST,
     new ADMIN_PAGE_PB_MAIN,
     new ADMIN_PAGE_PB_ABUSEREPORTS,
+    new ADMIN_PAGE_PB_STATS,
     # new ADMIN_PAGE_EMBED('pbwebstats', 'Log Analysis', OPTION_ blah ),
     null, // space separator on menu
     new ADMIN_PAGE_SERVERINFO,

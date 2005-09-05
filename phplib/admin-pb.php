@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.93 2005-09-05 10:11:38 francis Exp $
+ * $Id: admin-pb.php,v 1.94 2005-09-05 23:21:27 francis Exp $
  * 
  */
 
@@ -17,6 +17,7 @@ require_once "fns.php";
 require_once "../../phplib/db.php";
 require_once "../../phplib/utility.php";
 require_once "../../phplib/importparams.php";
+require_once "../../phplib/gaze.php";
 
 class ADMIN_PAGE_PB_SUMMARY {
     function ADMIN_PAGE_PB_SUMMARY() {
@@ -172,7 +173,7 @@ class ADMIN_PAGE_PB_MAIN {
 
         $q = db_query('SELECT pledges.*, person.email,
                 pb_pledge_prominence(pledges.id) as calculated_prominence,
-                location.country, location.description,
+                location.country, location.state, location.description,
                 location.longitude, location.latitude
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id 
@@ -193,13 +194,19 @@ class ADMIN_PAGE_PB_MAIN {
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
         print '<br>';
-        if (array_key_exists('country', $pdata))
-            print 'Country: <b>' . $pdata['country'] . "</b>";
-        if (array_key_exists('description', $pdata))
-            print ' Place: <b>' . $pdata['description'].'</b>';
-        if ($pdata['longitude'])
-            print ' Longitude/Latitude WGS84: <b>' . round($pdata['longitude'],2).'E ' . round($pdata['latitude'],2).'N</b>';
-        print "</p>";
+        if (array_key_exists('country', $pdata)) {
+            print '<form name="countryform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="update_country" value="1">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            print _('Country:') . ' ';
+            pb_view_gaze_country_choice($pdata['country'], $pdata['state'], array(), array());
+            print '<input name="update" type="submit" value="Update">';
+            if (array_key_exists('description', $pdata) && $pdata['description'])
+                print '<br>Place: <b>' . $pdata['description'].'</b>';
+            if ($pdata['longitude'])
+                print ' Longitude/Latitude WGS84: <b>' . round($pdata['longitude'],2).'E ' . round($pdata['latitude'],2).'N</b>';
+            print '</form>';
+        }
 
         // Prominence
         print '<form name="prominenceform" method="post" action="'.$this->self_link.'">';
@@ -387,7 +394,29 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
     function update_prominence($pledge_id) {
         db_query('UPDATE pledges set prominence = ? where id = ?', array(get_http_var('prominence'), $pledge_id));
         db_commit();
-        print p(_("<em>Changes to pledge prominence saved</em>"));
+        print p(_("<em>Change to pledge prominence saved</em>"));
+    }
+
+    function update_country($pledge_id) {
+        $country = get_http_var('country');
+        $state = null;
+        if ($country) {
+            $a = array();
+            if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
+                list($x, $country, $state) = $a;
+        }
+        db_query("
+                insert into location
+                    (country, state, method, input, latitude, longitude, description)
+                values (?, ?, ?, ?, ?, ?, ?)", array(
+                    $country, $state,
+                    NULL, NULL,
+                    NULL, NULL,
+                    NULL
+                ));
+        db_query('UPDATE pledges set location_id = (select currval(\'location_id_seq\')) where id = ?', array($pledge_id));
+        db_commit();
+        print p(_("<em>Change to pledge country saved</em>"));
     }
 
     function update_categories($pledge_id) {
@@ -412,6 +441,9 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         if (get_http_var('update_prom')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_prominence($pledge_id);
+        } elseif (get_http_var('update_country')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_country($pledge_id);
         } elseif (get_http_var('remove_pledge_id')) {
             $remove_id = get_http_var('remove_pledge_id');
             if (ctype_digit($remove_id))
@@ -722,7 +754,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
                 if ($do_discard && preg_match('/^ar_([1-9]\d*)$/', $k, $a))
                     db_query('delete from abusereport where id = ?', $a[1]);
                 // Don't think delete pledge is safe as a button here
-                # if (preg_match('/^delete_(comment|pledge|signer)_([1-9]\d*)$/', $k, $a)) {
+                # if (preg_match('/^delete_(comment|pledge|signer)_([1-9]\d*)$/', $k, $a))
                 if (preg_match('/^delete_(comment)_([1-9]\d*)$/', $k, $a)) {
                     if ($a[1] == 'comment') {
                         pledge_delete_comment($a[2]);

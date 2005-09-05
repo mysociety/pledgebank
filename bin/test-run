@@ -32,7 +32,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.139 2005-09-05 12:23:34 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.140 2005-09-05 15:53:52 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -130,7 +130,12 @@ our $wth = new mySociety::WebTestHarness();
 $wth->log_watcher_setup($httpd_error_log);
 
 our $locale_url = $base_url;
-sub lock_locale_url { $wth->browser_uri() =~ m#(http://.*)/#; $locale_url = $1; }
+sub lock_locale_url { 
+    print "lock_locale_url browser URL is " . $wth->browser_uri() . "\n";
+    $wth->browser_uri() =~ m#^(http://[^/]+)/?#; 
+    $locale_url = $1;
+    print "lock_locale_url URL is " . $locale_url . "\n";
+}
 
 $wth->database_connect('PB_');
 $wth->database_drop_reload('../db/schema.sql');
@@ -321,6 +326,7 @@ sub create_pledge {
     die "'resume' not supported for pledges yet" if ($login_action eq "resume");
 
     # Make new pledge, step 1
+    print "Locale URL is $locale_url\n" if $verbose > 1;
     $wth->browser_get($locale_url);
     $wth->browser_follow_link(text_regex => qr/Start your own pledge/);
     $wth->browser_check_contents("New Pledge");

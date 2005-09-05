@@ -32,7 +32,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.140 2005-09-05 15:53:52 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.141 2005-09-05 23:22:02 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -131,10 +131,10 @@ $wth->log_watcher_setup($httpd_error_log);
 
 our $locale_url = $base_url;
 sub lock_locale_url { 
-    print "lock_locale_url browser URL is " . $wth->browser_uri() . "\n";
+    #print "lock_locale_url browser URL is " . $wth->browser_uri() . "\n" if $verbose > 1;
     $wth->browser_uri() =~ m#^(http://[^/]+)/?#; 
     $locale_url = $1;
-    print "lock_locale_url URL is " . $locale_url . "\n";
+    #print "lock_locale_url URL is " . $locale_url . "\n" if $verbose > 1;
 }
 
 $wth->database_connect('PB_');

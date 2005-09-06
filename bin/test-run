@@ -32,7 +32,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.143 2005-09-06 10:21:35 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.144 2005-09-06 11:35:48 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -326,7 +326,6 @@ sub create_pledge {
     die "'resume' not supported for pledges yet" if ($login_action eq "resume");
 
     # Make new pledge, step 1
-    print "Locale URL is $locale_url\n" if $verbose > 1;
     $wth->browser_get($locale_url);
     $wth->browser_follow_link(text_regex => qr/Start your own pledge/);
     $wth->browser_check_contents("New Pledge");
@@ -1310,12 +1309,10 @@ sub do_admin_tests {
 
     # Delete a signer
     $wth->browser_get($admin_url . "/?page=pb&pledge=smsspoof");
-print "Press RETURN to continue";
-readline(<STDIN>);
     $wth->browser_check_contents("pretend to be an SMS aggregating service");
     $wth->browser_check_contents(mobile_n(105));
     $wth->browser_check_contents(name_n(105));
-    $wth->browser_submit_form(form_number => 10,
+    $wth->browser_submit_form(form_number => 4,
             fields => { }, button => 'remove_signer') or die "Failed to remove signer";
     $wth->browser_check_contents("signer has been successfully removed");
     $wth->browser_check_contents("pretend to be an SMS aggregating service");

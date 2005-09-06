@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.10 2005-07-16 12:30:00 matthew Exp $
+// $Id: your.php,v 1.11 2005-09-06 10:37:40 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -35,9 +35,10 @@ $s = db_query('SELECT pledges.id, SUM(strength) AS sum, max(date) - pb_current_d
             )
             AND pledges.id NOT IN (SELECT pledge_id from signers where signers.person_id = ?)
             AND pledges.id NOT IN (SELECT id from pledges where pledges.person_id = ?)
+            AND pledges.date >= pb_current_date() 
         GROUP BY pledges.id
         ORDER BY sum DESC
-        LIMIT 100
+        LIMIT 50
         ', 
         array($P->id(), $P->id(), $P->id(), $P->id(), $P->id(), $P->id()));
 if (0 != db_num_rows($s)) {

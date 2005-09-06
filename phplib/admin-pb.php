@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.96 2005-09-06 01:37:05 francis Exp $
+ * $Id: admin-pb.php,v 1.97 2005-09-06 14:13:42 francis Exp $
  * 
  */
 
@@ -922,26 +922,50 @@ class ADMIN_PAGE_PB_STATS {
     function display($self_link) {
         db_connect();
 
-        print h2(_("Local alert signups"));
-        $q = db_query('select date(whensubscribed) as date, event_code, whensubscribed, country,
-                ref, person.name as name, email
+        print h2(_("Local alerts by country"));
+        $q = db_query('select country, count(*) as c, 
+            date(min(whensubscribed)) as t1, date(max(whensubscribed)) as t2
             from alert 
                 left join location on location.id = alert.location_id 
-                left join person on person.id = alert.person_id 
-                left join pledges on pledges.id = alert.pledge_id 
-            where event_code = \'pledges/local\' order by whensubscribed desc');
+            where event_code = \'pledges/local\' 
+            group by country
+            order by country
+            ');
 
         print '<table border="1" cellpadding="3" cellspacing="0">';
-        print '<tr><th>When</th><th>Who</th><th>Country</th></tr>';
+        print '<tr><th>Country</th><th>Local alert signups</th><th>Signup date range</th></tr>';
         $n = 0;
         while ($r = db_fetch_array($q)) {
             if ($n++%2)
                 print '<tr>';
             else 
                 print '<tr class="v">';
-            print '<td>'.htmlspecialchars($r['whensubscribed']) . '</td>';
-            print '<td>'.htmlspecialchars($r['name']) . ' ' . htmlspecialchars($r['email']) . ' </td>';
             print '<td>'.htmlspecialchars($r['country']) . '</td>';
+            print '<td>'.htmlspecialchars($r['c']) . '</td>';
+            print '<td>'.htmlspecialchars($r['t1']) . ' to '. htmlspecialchars($r['t2']) . '</td>';
+            print "</tr>\n";
+        }
+        print '</table>';
+
+        print h2(_("Local alert signups"));
+        $q = db_query('select date(whensubscribed) as date, count(*) as c
+            from alert 
+                left join location on location.id = alert.location_id 
+            where event_code = \'pledges/local\' 
+            group by date(whensubscribed)
+            order by date(whensubscribed) desc
+            ');
+
+        print '<table border="1" cellpadding="3" cellspacing="0">';
+        print '<tr><th>Day</th><th>Local alert signups</th></tr>';
+        $n = 0;
+        while ($r = db_fetch_array($q)) {
+            if ($n++%2)
+                print '<tr>';
+            else 
+                print '<tr class="v">';
+            print '<td>'.htmlspecialchars($r['date']) . '</td>';
+            print '<td>'.htmlspecialchars($r['c']) . '</td>';
             print "</tr>\n";
         }
         print '</table>';

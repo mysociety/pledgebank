@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.95 2005-09-05 23:42:23 francis Exp $
+ * $Id: admin-pb.php,v 1.96 2005-09-06 01:37:05 francis Exp $
  * 
  */
 
@@ -169,7 +169,7 @@ class ADMIN_PAGE_PB_MAIN {
         print '<p><a href="'.$this->self_link.'">' . _('List of all pledges') . '</a></p>';
 
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 'e';
+        if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 't';
 
         $q = db_query('SELECT pledges.*, person.email,
                 pb_pledge_prominence(pledges.id) as calculated_prominence,
@@ -235,10 +235,10 @@ class ADMIN_PAGE_PB_MAIN {
                          showname, signers.id AS signid 
                    FROM signers 
                    LEFT JOIN person ON person.id = signers.person_id
-                   WHERE pledge_id=?
-                   ORDER by signers.id';
+                   WHERE pledge_id=?';
         if ($sort=='t') $query .= ' ORDER BY signtime DESC';
         elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
+        else $query .= ' ORDER BY signname DESC';
         $q = db_query($query, $pdata['id']);
         $out = array();
         while ($r = db_fetch_array($q)) {

@@ -32,7 +32,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.141 2005-09-05 23:22:02 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.142 2005-09-06 01:37:05 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1313,7 +1313,7 @@ sub do_admin_tests {
     $wth->browser_check_contents("pretend to be an SMS aggregating service");
     $wth->browser_check_contents(mobile_n(105));
     $wth->browser_check_contents(name_n(105));
-    $wth->browser_submit_form(form_number => 9,
+    $wth->browser_submit_form(form_number => 10,
             fields => { }, button => 'remove_signer') or die "Failed to remove signer";
     $wth->browser_check_contents("signer has been successfully removed");
     $wth->browser_check_contents("pretend to be an SMS aggregating service");

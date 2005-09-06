@@ -32,7 +32,7 @@
 #   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.142 2005-09-06 01:37:05 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.143 2005-09-06 10:21:35 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1310,6 +1310,8 @@ sub do_admin_tests {
 
     # Delete a signer
     $wth->browser_get($admin_url . "/?page=pb&pledge=smsspoof");
+print "Press RETURN to continue";
+readline(<STDIN>);
     $wth->browser_check_contents("pretend to be an SMS aggregating service");
     $wth->browser_check_contents(mobile_n(105));
     $wth->browser_check_contents(name_n(105));

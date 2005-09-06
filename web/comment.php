@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.25 2005-07-08 12:01:37 matthew Exp $
+ * $Id: comment.php,v 1.26 2005-09-06 10:21:36 francis Exp $
  * 
  */
 
@@ -24,8 +24,10 @@ $err = importparams(
             array('comment_id',         '/^[1-9][0-9]*$/',      _("Missing comment id"),     null)
         );
 
-if (!is_null($err))
-    err(_("Sorry -- something seems to have gone wrong"));
+if (!is_null($err)) {
+    #  implode(". ", array_values($err))
+    err(_("Sorry -- something seems to have gone wrong. "));
+}
 
 /* Allocate a comment ID here to stop double-posting. */
 if (is_null($q_comment_id)) {

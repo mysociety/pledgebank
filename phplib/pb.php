@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.33 2005-09-05 12:23:35 francis Exp $
+ * $Id: pb.php,v 1.34 2005-09-06 10:21:36 francis Exp $
  * 
  */
 
@@ -98,6 +98,16 @@ if (rabx_is_error($ip_country) || !$ip_country)
 $site_country = $domain_country;
 if (!$domain_country) 
     $site_country = $ip_country;
+if ($site_country) {
+    if (array_key_exists('UK', $countries_code_to_name)) 
+        err('UK in countries_code_to_name');
+    if ($site_country == 'UK') {
+        $site_country = 'GB';
+    }
+    if (!array_key_exists($site_country, $countries_code_to_name)) {
+        $site_country = null;
+    }
+}
 
 /* Note: To get a language working from PHP on Unix, you also need
 to install the system locale for that language. In Debian this is done
@@ -169,3 +179,4 @@ function pb_site_country_name() {
     global $countries_code_to_name, $site_country; 
     return $site_country ? $countries_code_to_name[$site_country] : 'Global';
 }
+

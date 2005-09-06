@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.15 2005-07-08 12:01:37 matthew Exp $
+ * $Id: ref-picture.php,v 1.16 2005-09-06 01:01:56 francis Exp $
  * 
  */
 
@@ -19,7 +19,8 @@ require_once '../phplib/pledge.php';
 
 require_once '../../phplib/importparams.php';
 
-$picture_size_limit = 200; // kilobytes
+$picture_size_limit = 1000; // kilobytes
+$picture_dimension_limit = 250; // pixels, width and height limit
 
 $err = importparams(
             array('ref',   '/./',   '')
@@ -64,7 +65,7 @@ $picture_upload_allowed = is_null($pledge->pin());
 
 // Upload picture
 function upload_picture() {
-    global $picture_upload_allowed, $picture_size_limit, $pledge;
+    global $picture_upload_allowed, $picture_size_limit, $picture_dimension_limit, $pledge;
 
     if (get_http_var('removepicture')) {
         db_query("update pledges set picture = null where ref = ?",
@@ -110,6 +111,22 @@ function upload_picture() {
     } else {
         return _("Please upload pictures of type GIF, JPEG or PNG.  You can use a paint program to convert them before uploading.");
     }
+
+    list($width, $height) = getimagesize($tmp_name);
+    if ($width > $picture_dimension_limit
+       || $height > $picture_dimension_limit) {
+       // Calculate new sizes
+       $fraction = floatval($picture_dimension_limit) / floatval(max($width, $height));
+       $newwidth = $width * $fraction;
+       $newheight = $height * $fraction;
+       // Resize image
+       $dest = imagecreatetruecolor($newwidth, $newheight);
+       $source = imagecreatefromjpeg($tmp_name);
+       imagecopyresized($dest, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+       imagejpeg($dest, $tmp_name);
+       $ext = "jpeg";
+    } 
+    
     $base_name =  $pledge->ref() . "." . $ext;
     $upload_file = OPTION_PB_PICTURE_DIR . "/" . $base_name;
 
@@ -147,8 +164,9 @@ $pledge->render_box(array('showdetails' => true));
     } ?>
         <input type="hidden" name="MAX_FILE_SIZE" value="<?=$picture_size_limit*1024?>">
     <?  print p(_('Choose the photo, logo or drawing that you would like to display on
-        your pledge.  Keep it small so it fits well on the page.  You can use
-        an image saved as either GIF, JPEG or PNG type.')); ?>
+        your pledge.  Keep it small so it fits well on the page &mdash it will be
+        automatically shrunk if it is too big.  You can use an image saved as
+        either GIF, JPEG or PNG type.')); ?>
     <p><input name="userfile" type="file"><input type="submit" value="<?=_('Submit') ?>">
     <?  if ($pledge->has_picture()) {
             printf(p(_('Or you can %s if you don\'t want any image on your pledge any more.')), '<input name="removepicture" type="submit" value="' . _('Remove the picture') . '">');

@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.13 2005-09-07 21:53:07 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.14 2005-09-07 22:13:46 matthew Exp $';
 
 use strict;
 use warnings;
@@ -58,11 +58,11 @@ sub run {
     my $title   = '';
 
     # If there was a postcode add it to title.
-    $title = "Pledges near '$args{postcode}'" if $args{postcode};
+    $title = "Pledges near '$postcode'" if $postcode;
 
     # If pledges is undef then there was an error.
     unless ( defined $pledges ) {
-    $pledges = create_error_pledges;
+    $pledges = create_error_pledges();
     $title   = 'Error creating RSS';
     }
     
@@ -134,7 +134,7 @@ sub create_rss_from_pledges {
 # database. If the postcode lookup fails then returns ''.
 sub create_postcode_query {
     my %args = @_;
-    my $postcode = $args{postcode] || return '';
+    my $postcode = $args{postcode} || return '';
 
     # FIXME - could have a cheaper check here to see if the postcode is good.
 

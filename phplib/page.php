@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.74 2005-09-07 00:07:25 francis Exp $
+// $Id: page.php,v 1.75 2005-09-07 00:14:20 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -60,9 +60,10 @@ function page_header($title, $params = array()) {
         print '<link rel="alternate" type="application/rss+xml" title="' . $params['rss'][1] . '" href="'.$params['rss'][0].'">';
 ?>
 <script type="text/javascript" src="/pb.js"></script>
-<?  if (array_key_exists('gazejs', $params)) { ?>
+<?  //this was conditional, but now we need it nearly always for bottom of page local alert signups
+    //if (array_key_exists('gazejs', $params)) { ?>
 <script type="text/javascript" src="/gaze.js"></script>
-<? } ?>
+<? //} ?>
 </head>
 <body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
 <?

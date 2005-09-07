@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.12 2005-07-15 20:09:41 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.13 2005-09-07 21:53:07 matthew Exp $';
 
 use strict;
 use warnings;
@@ -23,17 +23,19 @@ BEGIN {
 }
 use mySociety::DBHandle qw(dbh);
 use mySociety::WatchUpdate;
+use mySociety::MaPit;
 use PB;
 
 # Hardcoded variables - should be in central conf file.
 my %CONF = ( number_of_pledges => 20,
-	     base_url => mySociety::Config::get('BASE_URL') . '/'
-	     );
+         base_url => mySociety::Config::get('BASE_URL') . '/'
+         );
 
 # Other modules we need.
 use XML::RSS;
 use CGI::Carp;
 use CGI::Fast qw(-no_xhtml);
+use Error qw(:try);
 
 # Run as a FCGI.
 my $W = new mySociety::WatchUpdate();
@@ -47,21 +49,63 @@ while ( $request = new CGI::Fast() ) {
 
 sub run {
 
-    # Get an rss object.
-    my $rss = new_rss_object();
+    # Get the parameters.
+    my $type     = $request->param('type');
+    my $postcode = $request->param('postcode');
 
     # Get the data from the database.
-    my $pledges = get_pledges($request->param('type'));
+    my $pledges = get_pledges( type => $type, postcode => $postcode );
+    my $title   = '';
+
+    # If there was a postcode add it to title.
+    $title = "Pledges near '$args{postcode}'" if $args{postcode};
+
+    # If pledges is undef then there was an error.
+    unless ( defined $pledges ) {
+    $pledges = create_error_pledges;
+    $title   = 'Error creating RSS';
+    }
+    
+    # Turn the pledges into RSS
+    my $rss = create_rss_from_pledges( $pledges, $title );
+
+    # Return the RSS.
+    print CGI->header( -type => 'application/xml' );
+    print $rss->as_string;
+}
+
+################################################################################
+#
+# helper subs
+
+# Produce a single line which will be an error.
+sub create_error_pledges {
+    return [{
+    title => 'Error',
+    description => 'Something went wrong.',
+    ref => '',
+    }];    
+}
+
+# Create rss from the list of pledges.
+sub create_rss_from_pledges {
+    my $pledges = shift;
+    my $title = shift;
+
+    # Get an rss object.
+    my $rss = new_rss_object( $title );
 
     # Add the pledges to the RSS.
     foreach my $pledge (@$pledges) {
 
         # Put together the title and description.
         my $title     = "$$pledge{title}";
-        my $description = sprintf("'I will %s but only if %s %s will %s.'", 
-                $$pledge{title}, 
-                $$pledge{target}, $$pledge{type}, $$pledge{signup});
-        $description .= " -- " . $$pledge{name};
+        my $description = $$pledge{description}
+    || sprintf("'I will %s but only if %s %s will %s.'", 
+           $$pledge{title}, 
+           $$pledge{target}, $$pledge{type}, $$pledge{signup})
+        . " -- " . $$pledge{name};
+
         if ($$pledge{identity}) {
             $description .= ", " . $$pledge{identity};
         }
@@ -83,24 +127,51 @@ sub run {
        $rss->add_item(%$params);
     }
 
-    # Return the RSS.
-    print CGI->header( -type => 'application/xml' );
-    print $rss->as_string;
+    return $rss;
 }
 
-################################################################################
-#
-# helper subs
+# Try to create an SQL query that can be used to search the
+# database. If the postcode lookup fails then returns ''.
+sub create_postcode_query {
+    my %args = @_;
+    my $postcode = $args{postcode] || return '';
 
-# Get the pledges
-sub get_pledges {
-    my $type = shift;
+    # FIXME - could have a cheaper check here to see if the postcode is good.
+
+    # Check that the postcode is well behaved. If it is no return ''.
+    my $loc = '';
+    try { $loc = mySociety::MaPit::get_location( $postcode, 1 ); }
+    catch RABX::Error with { return ''; }
+    otherwise { die "Failed to catch an error"; };
+
+    # Just in case the flash code above failed.
+    return '' unless ref($loc) eq 'HASH';
+
+    # Put the location into correct format.
+    # 50km. XXX Should be indexed with wgs84_lat, wgs84_lon
+    my $find_what = join ', ', $$loc{wgs84_lat}, $$loc{wgs84_lon}, 50;
+
+    # Create the SQL (lifted from pb/web/search.php).
+    my $sql = "SELECT pledges.*, distance ";
+    $sql .= "  FROM pledge_find_nearby( $find_what ) AS nearby ";
+    $sql .= "  LEFT JOIN pledges ON nearby.pledge_id = pledges.id ";
+    $sql .= "  WHERE ";
+    $sql .= "     pin IS NULL AND ";
+    $sql .= "     pledges.prominence <> \'backpage\' ";
+    $sql .= "  ORDER BY distance";
+
+    return $sql;
+}
+
+sub create_normal_query {
+    my %args = @_;
+    my $type = $args{type};
 
     my $query_text = "select *
            from pledges
            where pin IS NULL 
            AND pb_pledge_prominence(id) <> 'backpage' ";
-
+    
     if ($type && $type eq 'all') {
         $query_text .= " order by id desc ";
     } else {
@@ -108,21 +179,43 @@ sub get_pledges {
                limit $CONF{number_of_pledges}";
     }
 
-    my $query = dbh()->prepare($query_text);
+    return $query_text;
+}
 
-    $query->execute;
-
-    my $arrayref = [];
-
-    while ( my $pledge = $query->fetchrow_hashref ) {
-        push @$arrayref, $pledge;
+# Get the pledges - if there was an error returns undef.
+sub get_pledges {
+    my %args = @_;
+    my $type = $args{type};
+    my $query_text = '';
+    
+    # Create the sql depending on what args we have.
+    if ( $args{postcode} ) {
+    $query_text = create_postcode_query( %args );
+    } else {
+    $query_text = create_normal_query( %args );
     }
 
-    return $arrayref;
+    # If we did not get a query then return undef.
+    return undef unless $query_text;
+
+    # Run the query.
+    my $query = dbh()->prepare($query_text);
+    $query->execute;
+
+    # Extract the results onto an array
+    my @array = ();
+
+    while ( my $pledge = $query->fetchrow_hashref ) {
+        push @array, $pledge;
+    }
+
+    # Return as an array ref.
+    return \@array;
 }
 
 # Create an RSS object.
 sub new_rss_object {
+    my $title = shift;
 
     # Create the rss object.
     # Using 1.0, because geo tags didn't appear when using XML::RSS to make a 2.0 file.
@@ -131,12 +224,13 @@ sub new_rss_object {
 
     # Fill in the details needed.
     $rss->channel(
-        title       => 'PledgeBank.com',
+        title       => $title || 'PledgeBank.com',
         link        => $CONF{base_url},
         language    => 'en',
-        description => 'Newest pledges from PledgeBank.com',
+        description => 'Pledges from PledgeBank.com',
         ttl         => 5,
     );
 
     return $rss;
 }
+

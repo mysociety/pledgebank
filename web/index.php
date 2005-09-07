@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.210 2005-09-05 12:23:35 francis Exp $
+// $Id: index.php,v 1.211 2005-09-07 00:07:26 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,7 +15,8 @@ require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/person.php';
 
-page_header(null, array('rss'=>1, 'id'=>'front', 'gazejs'=>true));
+page_header(null, array('rss'=> array('/rss', _('New Pledges at PledgeBank.com')), 
+    'id'=>'front', 'gazejs'=>true));
 front_page();
 page_footer(array('nolocalsignup'=>true));
 

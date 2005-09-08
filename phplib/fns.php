@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.63 2005-09-04 13:35:49 matthew Exp $
+// $Id: fns.php,v 1.64 2005-09-08 11:34:20 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -241,11 +241,12 @@ function pb_view_gaze_places_choice($places, $place, $selected_gaze_place) {
     print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
     $nn = 0;
     foreach ($places as $p) {
-        list($name, $in, $near, $lat, $lon, $st) = $p;
+        list($name, $in, $near, $lat, $lon, $st, $score) = $p;
         $desc = $name;
         if ($in) $desc .= ", $in";
         if ($st) $desc .= ", $st";
         if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
+        if ($score) $desc .= " ($score%)";
         $t = htmlspecialchars("$lat,$lon,$desc");
         $checked = '';
         if ($t == $selected_gaze_place) {
@@ -293,7 +294,7 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
         print ">"
                 . htmlspecialchars($countries_code_to_name[$selected_country])
                 . "</option>";
-
+/* Disabled for now, as not necessary
         if (array_key_exists($selected_country, $countries_statecode_to_name)) {
             foreach ($countries_statecode_to_name[$selected_country] as $opt_statecode => $opt_statename) {
                 print "<option value=\"$selected_country,$opt_statecode\"";
@@ -305,6 +306,7 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
                 
             }
         }
+*/
     }
     if ($selected_country != $site_country && $site_country) {
         print "<option value=\"$site_country\">";
@@ -332,6 +334,7 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
         print "<option value=\"$opt_code\">"
                 . htmlspecialchars($opt_country)
                 . "</option>";
+/* Disabled for now, as not necessary
         if (array_key_exists($opt_code, $countries_statecode_to_name)) {
             foreach ($countries_statecode_to_name[$opt_code] as $opt_statecode => $opt_statename) {
                 print "<option value=\"$opt_code,$opt_statecode\">"
@@ -340,6 +343,7 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
                         . "</option>";
             }
         }
+*/
     }
 ?>
 </select>

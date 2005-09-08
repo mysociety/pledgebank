@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.21 2005-09-08 16:47:24 francis Exp $
+// $Id: search.php,v 1.22 2005-09-08 17:02:39 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -35,6 +35,7 @@ function get_location_results($pledge_select, $lat, $lon) {
                 $ret .= '<strong>under 1 km</strong> away: ';
             else
                 $ret .= '<strong>' . round($r['distance'],0) . " km</strong> away: ";
+            #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
             $ret .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
             $ret .= '</li>';
         }
@@ -66,14 +67,17 @@ function search() {
     $location = null;
     $location_description = null;
     if (validate_postcode($search))  {
+        $success = 1;
         $location = mapit_get_location($search);
         if (mapit_get_error($location)) {
             print p(_("We couldn't find that postcode, please check it again."));
         } else {
             $location_results = get_location_results($pledge_select, $location['wgs84_lat'], $location['wgs84_lon']);
+            print sprintf(p(_('Results for <strong>open pledges near</strong> UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );
             if ($location_results) {
-                print sprintf(p(_('Results for <strong>open pledges near</strong> UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );
                 print $location_results;
+            } else {
+                print "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
             }
         }
     }
@@ -104,13 +108,13 @@ function search() {
 
     // Places
     global $site_country, $countries_code_to_name;
+    $change_country = pb_get_change_country_link();
     if ($site_country) {
         $places = gaze_find_places($site_country, null, $search, 5, 70);
         if (gaze_check_error($places))
             err('Error doing place search');
         if (count($places) > 0) {
             $success = 1;
-            $change_country = pb_get_change_country_link();
             if (count($places) > 1) {
                 print p(sprintf(_("Results for <strong>open pledges near</strong> places matching <strong>%s</strong>, %s (%s):"), htmlspecialchars($search), $countries_code_to_name[$site_country], $change_country));
                 print "<ul>";
@@ -172,7 +176,7 @@ function search() {
         print '</ul>';
     }
 
-    // Signers and creators (NOT people, as we only search for publically visible names)
+    // Signers and creators (NOT person table, as we only search for publically visible names)
     $people = array();
     $q = db_query('SELECT ref, title, name FROM pledges WHERE pin IS NULL AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
     while ($r = db_fetch_array($q)) {
@@ -191,7 +195,7 @@ function search() {
             print '<dt><b>'.htmlspecialchars($name). '</b></dt> <dd>';
             foreach ($array as $item) {
                 print '<dd>';
-                print '<a href="' . $item[0] . '">' . $item[1] . '</a>';
+                print '<a href="/' . $item[0] . '">' . $item[1] . '</a>';
                 if ($item[2] == 'creator') print _(" (creator)");
                 print '</dd>';
             }
@@ -201,23 +205,6 @@ function search() {
 
     if (!$success) {
         print sprintf(p(_('Sorry, we could find nothing that matched "%s".')), htmlspecialchars($search) );
-    }
-
-    if (validate_postcode($search)) {
-        $email = '';
-        $P = person_if_signed_on();
-        if (!is_null($P)) {
-            $email = $P->email();
-        } 
-?>
-<form accept-charset="utf-8" id="localsignupsearch" name="localalert" action="/alert" method="post">
-<input type="hidden" name="subscribe_local_uk_alert" value="1">
-<p><strong><?=_('Get daily email about new local pledges') ?> &mdash;</strong>
-<label for="email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
-<label for="postcode"><?=_('UK Postcode:') ?></label><input type="text" size="12" name="postcode" id="postcode" value="<?=htmlspecialchars($search)?>">
-<input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
-</form>
-<?
     }
 }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.91 2005-09-08 11:34:20 francis Exp $
+// $Id: new.php,v 1.92 2005-09-08 17:17:55 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -487,17 +487,17 @@ function step1_error_check($data) {
     if (!$data['title']) $errors['title'] = _('Please enter a pledge');
 
     $pb_today_arr = explode('-', $pb_today);
-    $deadline_limit_months = 3; # in months
-    $deadline_limit = date('Y-m-d', mktime(12, 0, 0, $pb_today_arr[1] + $deadline_limit_months, $pb_today_arr[2], $pb_today_arr[0]));
+    $deadline_limit_years = 5; # in years
+    $deadline_limit = date('Y-m-d', mktime(12, 0, 0, $pb_today_arr[1], $pb_today_arr[2], $pb_today_arr[0] + $deadline_limit_years));
     if (!$data['date'] || !$data['parseddate']) $errors['date'] = _('Please enter a deadline');
     if ($data['parseddate']['iso'] < $pb_today) $errors['date'] = _('The deadline must be in the future');
     if ($data['parseddate']['error']) $errors['date'] = _('Please enter a valid date');
     if ($deadline_limit < $data['parseddate']['iso'])
-        $errors['date'] = sprintf(_('Please change your deadline so it is less than %d months into the
+        $errors['date'] = sprintf(_('Please change your deadline so it is less than %d years into the
         future. You must change the deadline in order to proceed with creating
         your pledge. If you want a longer deadline, please create your pledge
         with a short deadline, and drop us an email to <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>
-        asking for an alteration.'), $deadline_limit_months);
+        asking for an alteration.'), $deadline_limit_years);
 
     if (!$data['name']) $errors['name'] = _('Please enter your name');
     if (!$data['email']) $errors['email'] = _('Please enter your email address');
@@ -517,6 +517,7 @@ function target_warning_error_check($data) {
     $errors = array();
     if (!$data['target'] || !ctype_digit($data['target']))
         $errors['target'] = _('Please enter a target');
+/*  Higher target warning disabled, as was just annoying
     elseif ($data['target'] > OPTION_PB_TARGET_CAP) {
         $errors['target'] = sprintf(_('We have imposed a cap of
             %d people maximum on each pledge. This is not a
@@ -526,7 +527,7 @@ function target_warning_error_check($data) {
             Just drop us a quick email to <a
             href="mailto:team@pledgebank.com">team@pledgebank.com</a> letting us
             know who you are and what you are aiming to do.'), OPTION_PB_TARGET_CAP, OPTION_PB_TARGET_CAP);
-    }
+    } */
 
     return $errors;
 }

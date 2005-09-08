@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.97 2005-09-06 14:13:42 francis Exp $
+ * $Id: admin-pb.php,v 1.98 2005-09-08 09:38:57 francis Exp $
  * 
  */
 
@@ -184,6 +184,7 @@ class ADMIN_PAGE_PB_MAIN {
             print sprintf("Pledge '%s' not found", htmlspecialchars($pledge));
             return;
         }
+        $pledge_obj = new Pledge($pdata);
 
         print "<h2>Pledge '<a href=\"".OPTION_BASE_URL.'/'.$pdata['ref']."\">" . $pdata['ref'] . "</a>'";
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
@@ -203,8 +204,11 @@ class ADMIN_PAGE_PB_MAIN {
             print '<input name="update" type="submit" value="Update">';
             if (array_key_exists('description', $pdata) && $pdata['description'])
                 print '<br>Place: <b>' . $pdata['description'].'</b>';
-            if ($pdata['longitude'])
-                print ' Longitude/Latitude WGS84: <b>' . round($pdata['longitude'],2).'E ' . round($pdata['latitude'],2).'N</b>';
+            if ($pdata['longitude']) {
+                $coords = round($pdata['longitude'],2).'E ' . round($pdata['latitude'],2).'N';
+                print " Longitude/Latitude WGS84: <b>$coords</b> ";
+                print '<a href="'.htmlspecialchars($pledge_obj->url_place_map()).'">(google maps)</a>';
+            }
             print '</form>';
         }
 

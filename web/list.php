@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.14 2005-09-05 16:37:21 francis Exp $
+// $Id: list.php,v 1.15 2005-09-08 09:38:57 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -79,7 +79,7 @@ $sql_params[] = PAGE_SIZE;
 $qrows = db_query("
         SELECT pledges.*, pb_current_date() <= pledges.date AS open,
             (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
-            person.email AS email, country, state, description as local_place, method as location_method
+            person.email AS email, country, state, description, method, latitude, longitude
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id

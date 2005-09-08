@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.64 2005-09-08 11:34:20 francis Exp $
+// $Id: fns.php,v 1.65 2005-09-08 12:02:44 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -246,8 +246,8 @@ function pb_view_gaze_places_choice($places, $place, $selected_gaze_place) {
         if ($in) $desc .= ", $in";
         if ($st) $desc .= ", $st";
         if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
-        if ($score) $desc .= " ($score%)";
         $t = htmlspecialchars("$lat,$lon,$desc");
+        if ($score) $desc .= "<!--($score%)-->";
         $checked = '';
         if ($t == $selected_gaze_place) {
             $checked = 'checked';

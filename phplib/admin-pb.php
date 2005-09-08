@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.98 2005-09-08 09:38:57 francis Exp $
+ * $Id: admin-pb.php,v 1.99 2005-09-08 12:02:44 francis Exp $
  * 
  */
 
@@ -56,6 +56,7 @@ class ADMIN_PAGE_PB_MAIN {
             'c'=>'Creation Time', 
             'u'=>'Success Time',
             'o'=>'% complete',
+            'l'=>'Place',
         );
         foreach ($cols as $s => $col) {
             print '<th>';
@@ -71,7 +72,7 @@ class ADMIN_PAGE_PB_MAIN {
     function list_all_pledges() {
         global $open;
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdecspuo]/', $sort)) $sort = 'c';
+        if (!$sort || preg_match('/[^ratdecspuol]/', $sort)) $sort = 'c';
         $order = '';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
@@ -82,6 +83,7 @@ class ADMIN_PAGE_PB_MAIN {
         elseif ($sort=='u') $order = 'pledges.whensucceeded desc';
         elseif ($sort=='p') $order = 'prominence desc';
         elseif ($sort=='s') $order = 'signers desc';
+        elseif ($sort=='l') $order = 'country, description';
 
         $q = db_query("
             SELECT pledges.*, person.email,
@@ -89,10 +91,12 @@ class ADMIN_PAGE_PB_MAIN {
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 pb_current_date() <= date AS open,
-                pb_pledge_prominence(pledges.id) as calculated_prominence
+                pb_pledge_prominence(pledges.id) as calculated_prominence,
+                country, description
             FROM pledges 
-            LEFT JOIN person ON person.id = pledges.person_id" .
-            ($order ? ' ORDER BY ' . $order : '') );
+            LEFT JOIN person ON person.id = pledges.person_id
+            LEFT JOIN location ON location.id = pledges.location_id
+            " .  ($order ? ' ORDER BY ' . $order : '') );
         $open = array();
         $closed = array();
         while ($r = db_fetch_array($q)) {
@@ -103,9 +107,9 @@ class ADMIN_PAGE_PB_MAIN {
                 '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">admin</a> |
                 <a href="?page=pblatest&amp;ref='.$r['ref'].'">timeline</a>';
             $row .= '</td>';
-            $row .= '<td>'.$r['title'].'</td>';
-            $row .= '<td>'.$r['target'].' '.$r['type'].'</td>';
-            $row .= '<td>'.$r['signers'].'</td>';
+            $row .= '<td>'.htmlspecialchars($r['title']).'</td>';
+            $row .= '<td>'.htmlspecialchars($r['target']).' '.htmlspecialchars($r['type']).'</td>';
+            $row .= '<td>'.htmlspecialchars($r['signers']).'</td>';
             $row .= '<td>'.prettify($r['date']).'</td>';
 
             $row .= '<td>'.$r['prominence'];
@@ -115,7 +119,8 @@ class ADMIN_PAGE_PB_MAIN {
                 $row .= '<br><b>private</b> ';
             $row .= '</td>';
 
-            $row .= '<td>'.$r['name'].'<br>'.str_replace('@','@ ',$r['email']).'</td>';
+            $row .= '<td>'.htmlspecialchars($r['name']).'<br>'.
+                str_replace('@','@ ',htmlspecialchars($r['email'])).'</td>';
             $row .= '<td>'.prettify($r['creationtime']).'</td>';
             if ($r['whensucceeded']) 
                 $row .= '<td>'.prettify($r['whensucceeded']).'</td>';
@@ -123,6 +128,12 @@ class ADMIN_PAGE_PB_MAIN {
                 $row .= '<td>None</td>';
 
             $row .= '<td>' . str_replace('.00', '', number_format($r['signers']/$r['target']*100,2)) . '%</td>';
+            $row .= '<td>';
+            if ($r['country']) 
+                $row .= htmlspecialchars($r['country']) . "<br>" . htmlspecialchars($r['description']);
+            else
+                $row .= 'Global';
+            $row .= '</td>';
 
             if ($r['open'] == 't')
                 $open[] = $row;
@@ -409,16 +420,24 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
             if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
                 list($x, $country, $state) = $a;
         }
-        db_query("
-                insert into location
-                    (country, state, method, input, latitude, longitude, description)
-                values (?, ?, ?, ?, ?, ?, ?)", array(
-                    $country, $state,
-                    NULL, NULL,
-                    NULL, NULL,
-                    NULL
-                ));
-        db_query('UPDATE pledges set location_id = (select currval(\'location_id_seq\')) where id = ?', array($pledge_id));
+        global $countries_code_to_name;
+        if (!$country || $country == 'Global') {
+            db_query('UPDATE pledges set location_id = NULL where id = ?', array($pledge_id));
+        } elseif (array_key_exists($country, $countries_code_to_name)) {
+            db_query("
+                    insert into location
+                        (country, state, method, input, latitude, longitude, description)
+                    values (?, ?, ?, ?, ?, ?, ?)", array(
+                        $country, $state,
+                        NULL, NULL,
+                        NULL, NULL,
+                        NULL
+                    ));
+            db_query('UPDATE pledges set location_id = (select currval(\'location_id_seq\')) where id = ?', array($pledge_id));
+        } else {
+            print p(_("<em>Unknown country ".htmlspecialchars($country)."</em>"));
+            return;
+        }
         db_commit();
         print p(_("<em>Change to pledge country saved</em>"));
     }

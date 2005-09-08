@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.36 2005-09-01 16:32:28 francis Exp $
+// $Id: alert.php,v 1.37 2005-09-08 16:47:24 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -149,7 +149,7 @@ function local_alert_subscribe_box($errors = array()) {
     $places = null;
     if ($place) {
         # Look up nearby places
-        $places = gaze_find_places($country, $state, $place, 10);
+        $places = gaze_find_places($country, $state, $place, 10, 0);
         gaze_check_error($places);
         if (array_key_exists('gaze_place', $errors)) {
             if (count($places) > 0) {

@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.65 2005-09-08 12:02:44 francis Exp $
+// $Id: fns.php,v 1.66 2005-09-08 16:47:24 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -405,7 +405,7 @@ function pb_view_local_alert_quick_signup($class) {
 <?
 }
 
-function pb_print_change_country_link($attrs = "") {
+function pb_get_change_country_link() {
     global $site_country;
     $change = '<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">';
     if ($site_country)
@@ -413,11 +413,17 @@ function pb_print_change_country_link($attrs = "") {
     else
         $change .= _("choose country");
     $change .= '</a>';
+    return $change;
+}
+
+function pb_print_change_country_link($attrs = "") {
+    global $site_country;
+    $change = pb_get_change_country_link();
     if ($site_country)
         print "<p $attrs>".sprintf(_('%s (%s) and global pledges listed'), pb_site_country_name(), $change);
     else
         print "<p $attrs>".sprintf(_('%s (%s) pledges only listed'), pb_site_country_name(), $change);
-    $change .= '</p>';
+    print '</p>';
 }
 
 // Return array of country codes for countries which have SMS

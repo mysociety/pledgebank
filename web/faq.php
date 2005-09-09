@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.22 2005-09-01 11:10:59 francis Exp $
+// $Id: faq.php,v 1.23 2005-09-09 11:22:34 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -128,11 +128,13 @@ be worth it.  Don't put the value any higher than that.  This makes it
 most likely your pledge will succeed, and more people than you expected
 can always sign up."));
 
+/*
 print dt(sprintf(_('Why have you imposed a %d person cap?'), OPTION_PB_TARGET_CAP));
 
 print dd(_("In order to focus people's minds on highly achievable pledges, we have
 set this cap of maximum subscribers. We can raise the cap for individuals and
 organisations who ask - just contact us if you want to launch a bigger pledge."));
+*/
 
 print dt(_('Why does my new pledge not appear on the All Pledges page?'));
 

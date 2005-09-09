@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.151 2005-09-09 08:40:38 francis Exp $
+-- $Id: schema.sql,v 1.152 2005-09-09 11:21:51 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -110,6 +110,7 @@ create table location (
 
 create index location_latitude_idx on location(latitude);
 create index location_longitude_idx on location(longitude);
+create index location_country_idx on location(country);
 
 -- users, but call the table person rather than user so we don't have to quote
 -- its name in every statement....
@@ -196,6 +197,8 @@ create table pledges (
 
 -- Make connections-finding faster.
 create index pledges_person_id_idx on pledges(person_id);
+create index pledges_location_id_idx on pledges(location_id);
+create index pledges_date_idx on pledges(date);
 
 -- Make finding recently successful pledges faster.
 create index pledges_whensucceeded_idx on pledges(whensucceeded);

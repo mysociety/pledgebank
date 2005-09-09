@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.211 2005-09-07 00:07:26 francis Exp $
+// $Id: index.php,v 1.212 2005-09-09 11:21:51 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -130,7 +130,8 @@ function list_frontpage_pledges() {
                 date >= pb_current_date() AND 
                 pin is NULL AND 
                 whensucceeded IS NULL
-                ORDER BY RANDOM()", array('global'=>true,'sitecountry'=>true,'showcountry'=>false));
+                ORDER BY RANDOM()
+                LIMIT 10", array('global'=>true,'sitecountry'=>true,'showcountry'=>false));
     if (count($pledges) < 3) {
         // If too few frontpage, show a few of the normal pledges
         $normal_pledges = get_pledges_list("

@@ -5,8 +5,12 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.150 2005-08-30 14:31:39 francis Exp $
+-- $Id: schema.sql,v 1.151 2005-09-09 08:40:38 francis Exp $
 --
+
+-- LLL - means that field requires storing in potentially multiple languages
+--       (for simplicity, for now, names of people have not be marked like this,
+--       even though they theoretically should be, e.g. Chinese vs. Western name)
 
 -- secret
 -- A random secret.
@@ -55,7 +59,7 @@ create function pb_current_timestamp()
 create table category (
     id serial not null primary key,
     parent_category_id integer references category(id),
-    name text not null,
+    name text not null, -- LLL
     ican_id integer             -- integer ID shared with iCan
 );
 
@@ -87,7 +91,7 @@ create table location (
 
     -- Textual description of the location which we can show back to the user.
     -- The country and state is not included in this.  Only present if method is.
-    description text,
+    description text, -- LLL
 
     -- A location can represent either a point or a whole country.
     check (
@@ -127,25 +131,26 @@ create table pledges (
     ref text not null,
 
     -- summary of pledge
-    title text not null,
-    -- number of type ("people" etc.) to reach
+    title text not null, -- LLL
+    -- number of people to reach
     target integer not null check (target > 0),
-    type text not null,
+    -- type of person (e.g. "local people")
+    type text not null, -- LLL
     -- display verb for joining the pledge
-    signup text not null default 'sign up',
+    signup text not null default 'sign up', -- LLL
     -- target deadline, midnight at end of this day
     date date not null,
     -- actual text entered, just in case parse_date() goes wrong
     datetext text not null,
     -- extra detail by pledge setter
-    detail text not null default '',
+    detail text not null default '', -- LLL
     -- URL of accompanying image
     picture text,
 
     -- pledge setter
     person_id integer not null references person(id),
     name text not null,
-    identity text not null default '',
+    identity text not null default '', -- LLL
     -- metadata
     creationtime timestamp not null,
 
@@ -177,7 +182,7 @@ create table pledges (
     cancelled text,
     -- Notice puts an extra text banner at the top of the pledge (like cancelled
     -- but without stopping signups)
-    notice text,
+    notice text, -- LLL
 
     -- Which lists of pledges this one is shown in.  This value is set by
     -- the administrator, and tested only via pb_pledge_prominence().
@@ -477,7 +482,7 @@ create table outgoingsms (
     -- Recipient, as an international-format number, and text of message.
     recipient text not null,
     -- Message, as UTF-8.
-    message text not null,
+    message text not null, -- LLL
     -- Whether this is a premium reverse-billed message, or a "bulk" one.
     ispremium boolean not null default false,
     -- when the message was submitted.
@@ -919,9 +924,9 @@ create table message (
 
     -- content of message
     emailtemplatename text,
-    emailsubject text,
-    emailbody text,
-    sms text,
+    emailsubject text, -- LLL
+    emailbody text, -- LLL
+    sms text, -- LLL
 
     check (
         -- SMS-only message

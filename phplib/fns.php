@@ -4,7 +4,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.66 2005-09-08 16:47:24 francis Exp $
+// $Id: fns.php,v 1.67 2005-09-10 12:32:25 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -288,9 +288,10 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
 <?
     if ($selected_country and array_key_exists($selected_country, $countries_code_to_name)) {
         print "<option value=\"$selected_country\"";
-        if (!$selected_state) {
+/* Disabled with below
+        if (!$selected_state) { */
             print " selected";
-        }
+/*        } */
         print ">"
                 . htmlspecialchars($countries_code_to_name[$selected_country])
                 . "</option>";

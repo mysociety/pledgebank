@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.11 2005-09-06 10:37:40 francis Exp $
+// $Id: your.php,v 1.12 2005-09-10 12:32:25 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -22,7 +22,7 @@ $P = person_signon(array(
 page_header(_("Your Pledges"), array('id'=>"yourpledges"));
 
 // Pledges you might like (people who signed pledges you created/signed also signed these...)
-$s = db_query('SELECT pledges.id, SUM(strength) AS sum, max(date) - pb_current_date() AS daysleft
+$s = db_query("SELECT pledges.id, SUM(strength) AS sum, max(date) - '$pb_today' AS daysleft
         FROM pledge_connection, pledges
         WHERE (
                 (b_pledge_id = pledges.id AND
@@ -35,11 +35,11 @@ $s = db_query('SELECT pledges.id, SUM(strength) AS sum, max(date) - pb_current_d
             )
             AND pledges.id NOT IN (SELECT pledge_id from signers where signers.person_id = ?)
             AND pledges.id NOT IN (SELECT id from pledges where pledges.person_id = ?)
-            AND pledges.date >= pb_current_date() 
+            AND pledges.date >= '$pb_today'
         GROUP BY pledges.id
         ORDER BY sum DESC
         LIMIT 50
-        ', 
+        ", 
         array($P->id(), $P->id(), $P->id(), $P->id(), $P->id(), $P->id()));
 if (0 != db_num_rows($s)) {
     print "\n\n" . '<div id="yourconnections"><h2><a name="connections">' . _('Suggested pledges') . '</a></h2><ol>' . "\n\n";
@@ -99,7 +99,7 @@ if (!is_null($error))
 
 // Pledges you made
 $qrows = db_query("
-                SELECT pledges.*, date - pb_current_date() AS daysleft
+                SELECT pledges.*, date - '$pb_today' AS daysleft
                 FROM pledges
                 WHERE pledges.person_id = ?
                 ORDER BY creationtime DESC
@@ -117,7 +117,7 @@ if (db_num_rows($qrows) > 0) {
 
 // Pledges you have signed
 $qrows = db_query("
-                SELECT pledges.*, date - pb_current_date() AS daysleft
+                SELECT pledges.*, date - '$pb_today' AS daysleft
                 FROM pledges, signers
                 WHERE pledges.id = signers.pledge_id
                 AND signers.person_id = ?

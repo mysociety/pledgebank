@@ -8,13 +8,16 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.50 2005-08-01 23:10:08 francis Exp $
+ * $Id: frequentupdate,v 1.51 2005-09-10 12:32:25 francis Exp $
  *
  */
 
-require_once "../conf/general";
-require_once '../../phplib/db.php';
+$short_opts = '';
+$long_opts = array('verbose','help');
+
+require_once "../phplib/pbcgi.php";
 require_once '../phplib/fns.php';
+require_once '../../phplib/db.php';
 require_once "../../phplib/person.php";
 require_once '../../phplib/utility.php';
 
@@ -26,10 +29,6 @@ function verbose($str) {
 function error($str) {
     fwrite(STDERR, "frequentupdate: ERROR: $str\n");
 }
-
-$short_opts = '';
-$long_opts = array('verbose','help');
-require_once '../../phplib/phpcgi';
 
 $switches = $options[0];
 $args = $options[1];
@@ -59,22 +58,24 @@ Usage: frequentupdate [--verbose]
  * Mark pledges which have exceeded their target as successful, and dispatch
  * automatic success messages. */
 function mark_pledges_successful() {
+    global $pb_today, $pb_timestamp;
+
     verbose("finding newly successful pledges");
-    $q = db_query('
+    $q = db_query("
             select * from pledges
             where whensucceeded is null
-                and pb_current_date() <= date
+                and '$pb_today' <= date
                 and (select count(id) from signers
                     where pledge_id = pledges.id) >= target
-            for update');
+            for update");
 
     while ($pledge = db_fetch_array($q)) {
         verbose("pledge #${pledge['id']} (${pledge['ref']}) has succeeded");
     
-        db_query('
+        db_query("
                 update pledges
-                set whensucceeded = pb_current_timestamp()
-                where id = ?', $pledge['id']);
+                set whensucceeded = '$pb_timestamp'
+                where id = ?", $pledge['id']);
         
         /* Set up messages to go to creator and signers. */
         db_query("
@@ -110,11 +111,13 @@ function mark_pledges_successful() {
  * 3 days after the original was sent.
  */
 function send_pledge_success_reminder() {
+    global $pb_timestamp;
+
     verbose("finding pledges with no announcement messages for reminder");
     $q = db_query("
                 select * from pledges
                 where whensucceeded is not null
-                    and pb_current_timestamp() > whensucceeded + '3 day'::interval
+                    and '$pb_timestamp'::timestamp > whensucceeded + '3 day'::interval
                     and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
                     and (select id from message where pledge_id = pledges.id
                         and circumstance = 'success-auto-creator-reminder') is null
@@ -149,11 +152,13 @@ function send_pledge_success_reminder() {
  * (passed their deadline without the number of signers reaching the
  * threshold) and for which no such message has previously been sent. */
 function send_automatic_failure_messages() {
+    global $pb_today;
+
     verbose("finding newly failed pledges");
     $q = db_query("
                 select * from pledges
                 where whensucceeded is null
-                    and pb_current_date() > date
+                    and '$pb_today' > date
                     and (select id
                         from message
                         where pledge_id = pledges.id
@@ -209,14 +214,16 @@ function send_automatic_failure_messages() {
  *   pb_pledge_prominence algorithm)
  */
 function chivvy_creators_early() {
+    global $pb_today, $pb_timestamp;
+
     verbose("finding young pledges with few signups");
     $q = db_query("
                 select * from pledges
                 where (select count(*) from signers where signers.pledge_id = pledges.id) < 4
                     and target >= 8
-                    and pb_current_date() <= date
+                    and '$pb_today' <= date
                     and whensucceeded is null
-                    and pb_current_timestamp() > creationtime + '4 day'::interval
+                    and '$pb_timestamp'::timestamp > creationtime + '4 day'::interval
                     and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
                     and (select id
                         from message
@@ -257,19 +264,21 @@ function chivvy_creators_early() {
  */
 $chivvy_probable_will_reach_clause = "(round((select count(*) from signers 
         where signers.pledge_id = pledges.id
-            and signers.signtime > pb_current_timestamp() - '7 day'::interval)::numeric 
-                / 7::numeric * (date - pb_current_date()),0) + 
+            and signers.signtime > '$pb_timestamp'::timestamp - '7 day'::interval)::numeric 
+                / 7::numeric * (date - '$pb_today'),0) + 
         (select count(*) from signers where signers.pledge_id = pledges.id))";
 function chivvy_creators_lowrate() {
+    global $pb_today, $pb_timestamp;
+
     verbose("finding pledges with too low a signup rate to succeed");
     global $chivvy_probable_will_reach_clause;
     $q = db_query("
                 select * from pledges
                 where target >= 8
-                    and pb_current_date() <= date
+                    and '$pb_today' <= date
                     and whensucceeded is null
-                    and pb_current_timestamp() > creationtime + '8 day'::interval
-                    and pb_current_date() < date - '2 day'::interval
+                    and '$pb_timestamp'::timestamp > creationtime + '8 day'::interval
+                    and '$pb_today'::date < date - '2 day'::interval
                     and pb_pledge_prominence(pledges.id) <> 'backpage' 
                     and $chivvy_probable_will_reach_clause < target
                     and (select id

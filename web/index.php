@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.212 2005-09-09 11:21:51 francis Exp $
+// $Id: index.php,v 1.213 2005-09-10 12:32:25 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -75,8 +75,8 @@ can make your pledge succeed &raquo;') ?>"></a></div>
 #                 false include only pledges from other countries (or all countries if no site country)
 # 'showcountry' - whether to display country name in summary
 function get_pledges_list($where, $params) {
-    global $site_country;
-    $query = "SELECT pledges.*, pledges.ref, pledges.date - pb_current_date() AS daysleft,
+    global $site_country, $pb_today;
+    $query = "SELECT pledges.*, pledges.ref, pledges.date - '$pb_today' AS daysleft,
                      country
             FROM pledges LEFT JOIN location ON location.id = pledges.location_id
             WHERE ";
@@ -123,11 +123,12 @@ function print_no_featured_link() {
 }
 
 function list_frontpage_pledges() {
+    global $pb_today;
 ?><a href="/rss"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of newest pledges') ?>"></a>
 <h2><?=_('Why not sign a live pledge?') ?></h2><?
     $pledges = get_pledges_list("
                 pb_pledge_prominence(pledges.id) = 'frontpage' AND
-                date >= pb_current_date() AND 
+                date >= '$pb_today' AND 
                 pin is NULL AND 
                 whensucceeded IS NULL
                 ORDER BY RANDOM()
@@ -136,7 +137,7 @@ function list_frontpage_pledges() {
         // If too few frontpage, show a few of the normal pledges
         $normal_pledges = get_pledges_list("
                     pb_pledge_prominence(pledges.id) = 'normal' AND
-                    date >= pb_current_date() AND 
+                    date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
@@ -153,7 +154,7 @@ function list_frontpage_pledges() {
     if (count($pledges) < 3) {
         $pledges = get_pledges_list("
                     pb_pledge_prominence(pledges.id) = 'frontpage' AND
-                    date >= pb_current_date() AND 
+                    date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()

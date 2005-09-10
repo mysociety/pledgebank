@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.76 2005-09-07 21:52:49 matthew Exp $
+// $Id: page.php,v 1.77 2005-09-10 12:32:25 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -149,8 +149,8 @@ function page_footer($params = array()) {
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
-<p><label for="s"><?=_('Search') ?>:</label>
-<input type="text" id="s" name="q" size="10" value=""> <input type="submit" value="<?=_('Go') ?>"></p>
+<p><label for="q"><?=_('Search') ?>:</label>
+<input type="text" id="q" name="q" size="25" value="" onblur="fadeout(this)" onfocus="fadein(this)"> <input type="submit" value="<?=_('Go') ?>"></p>
 </form>
 <!-- remove all extraneous whitespace to avoid IE bug -->
 <ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/list"><?=_('All Pledges') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>">FAQ</acronym></a></li><li><a href="/contact"><?=_('Contact') ?></a></li><?

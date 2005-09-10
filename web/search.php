@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.22 2005-09-08 17:02:39 francis Exp $
+// $Id: search.php,v 1.23 2005-09-10 12:32:25 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -17,14 +17,15 @@ search();
 page_footer();
 
 function get_location_results($pledge_select, $lat, $lon) {
-    $q = db_query($pledge_select . ', distance
+    global $pb_today;
+    $q = db_query($pledge_select . ", distance
                 FROM pledge_find_nearby(?,?,?) AS nearby 
                 LEFT JOIN pledges ON nearby.pledge_id = pledges.id
                 WHERE 
                     pin IS NULL AND
-                    pb_pledge_prominence(pledges.id) <> \'backpage\' AND 
-                    pb_current_date() <= pledges.date 
-                ORDER BY distance', array($lat, $lon, 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon
+                    pb_pledge_prominence(pledges.id) <> 'backpage' AND 
+                    '$pb_today' <= pledges.date 
+                ORDER BY distance", array($lat, $lon, 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon
     $ret = "";
     if (db_num_rows($q)) {
         $success = 1;
@@ -45,13 +46,14 @@ function get_location_results($pledge_select, $lat, $lon) {
 }
 
 function search() {
+    global $pb_today;
     $search = trim(get_http_var('q'));
     $success = 0;
 
     // Exact pledge reference match
-    $pledge_select = 'SELECT pledges.*, pb_current_date() <= pledges.date as open,
+    $pledge_select = "SELECT pledges.*, '$pb_today' <= pledges.date as open,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                date - pb_current_date() AS daysleft';
+                date - '$pb_today' AS daysleft";
 
     $q = db_query("$pledge_select FROM pledges WHERE pin is NULL AND ref ILIKE ?", $search);
     if (db_num_rows($q)) {

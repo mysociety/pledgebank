@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.130 2005-09-08 09:38:57 francis Exp $
+ * $Id: pledge.php,v 1.131 2005-09-10 12:32:25 francis Exp $
  * 
  */
 
@@ -29,8 +29,9 @@ class Pledge {
     // - integer, the internal id from the pledges table
     // - array, a dictionary of data about the pledge
     function Pledge($ref) {
+        global $pb_today;
         $main_query_part = "SELECT pledges.*, 
-                               pb_current_date() <= pledges.date AS open,
+                               '$pb_today' <= pledges.date AS open,
                                (SELECT count(*) FROM signers WHERE 
                                     signers.pledge_id = pledges.id) AS signers,
                                person.email AS email,

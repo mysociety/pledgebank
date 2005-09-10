@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.99 2005-09-08 12:02:44 francis Exp $
+ * $Id: admin-pb.php,v 1.100 2005-09-10 12:32:25 francis Exp $
  * 
  */
 
@@ -24,11 +24,13 @@ class ADMIN_PAGE_PB_SUMMARY {
         $this->id = 'summary';
     }
     function display() {
+        global $pb_today;
+
         $pledges = db_getOne('SELECT COUNT(*) FROM pledges');
         $nonbackpage = db_getOne('SELECT COUNT(*) FROM pledges WHERE pb_pledge_prominence(id) != \'backpage\'');
         $successful = db_getOne('SELECT COUNT(*) FROM pledges WHERE whensucceeded IS NOT NULL');
-        $failed = db_getOne('SELECT COUNT(*) FROM pledges WHERE pb_current_date() > date AND whensucceeded IS NULL');
-        $open = db_getOne('SELECT COUNT(*) FROM pledges WHERE pb_current_date() <= date AND whensucceeded IS NULL');
+        $failed = db_getOne("SELECT COUNT(*) FROM pledges WHERE '$pb_today' > date AND whensucceeded IS NULL");
+        $open = db_getOne("SELECT COUNT(*) FROM pledges WHERE '$pb_today' <= date AND whensucceeded IS NULL");
         $signatures = db_getOne('SELECT COUNT(*) FROM signers');
         $signers = db_getOne('SELECT COUNT(DISTINCT person_id) FROM signers');
         $local = db_getOne('SELECT COUNT(*) FROM pledges WHERE location_id is not null');
@@ -70,7 +72,7 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function list_all_pledges() {
-        global $open;
+        global $open, $pb_today;
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^ratdecspuol]/', $sort)) $sort = 'c';
         $order = '';
@@ -90,7 +92,7 @@ class ADMIN_PAGE_PB_MAIN {
                 date_trunc('second',whensucceeded) as whensucceeded, 
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                pb_current_date() <= date AS open,
+                '$pb_today' <= date AS open,
                 pb_pledge_prominence(pledges.id) as calculated_prominence,
                 country, description
             FROM pledges 

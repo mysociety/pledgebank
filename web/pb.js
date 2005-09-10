@@ -5,14 +5,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.25 2005-09-07 00:14:20 francis Exp $
+ * $Id: pb.js,v 1.26 2005-09-10 12:32:25 francis Exp $
  * 
  */
 
 var greyed = [ 
     ['title', '<Enter your pledge>'], 
     ['date', '<Date>'],
-    ['name', '<Enter your name>']
+    ['name', '<Enter your name>'],
+    ['q', '<Enter town or keyword>']
     ]
 
 // http://www.scottandrew.com/weblog/articles/cbs-events

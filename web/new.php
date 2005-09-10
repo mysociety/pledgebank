@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.92 2005-09-08 17:17:55 francis Exp $
+// $Id: new.php,v 1.93 2005-09-10 12:32:25 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -277,7 +277,14 @@ is fulfilled?
 </p>
 
 <p id="ifyes_line">If yes, choose where.
-<? pb_view_gaze_place_choice($place, $data['gaze_place'], $places, $errors); ?>
+<? 
+// State is in the gaze_place list for selection, but stored with country later on
+// :( See code commented "split out state" elsewhere in this file
+$gaze_with_state = $data['gaze_place'];
+if ($state)
+    $gaze_with_state .= ", " . $state;
+pb_view_gaze_place_choice($place, $gaze_with_state, $places, $errors); 
+?>
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
@@ -427,6 +434,7 @@ function pledge_form_submitted() {
               (array_key_exists('prev_place', $data) && $data['prev_place'] != $data['place']))
          ) {
         $data['gaze_place'] = ''; 
+        $errors['gaze_place'] = 'NOTICE';
         pledge_form_two($data, $errors);
         return;
     }
@@ -479,8 +487,8 @@ function step1_error_check($data) {
     elseif (strlen($data['ref'])<6) $errors['ref'] = _('The short name must be at least six characters long');
     elseif (strlen($data['ref'])>16) $errors['ref'] = _('The short name can be at most 20 characters long');
     elseif (in_array($data['ref'], $disallowed_refs)) $errors['ref'] = _('That short name is not allowed.');
-    if (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = _('The short name must only contain letters, numbers, or a hyphen.  Spaces are not allowed.');
-    if (!preg_match('/[a-z]/i',$data['ref'])) $errors['ref2'] = _('The short name must contain at least one letter.');
+    elseif (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = _('The short name must only contain letters, numbers, or a hyphen.  Spaces are not allowed.');
+    elseif (!preg_match('/[a-z]/i',$data['ref'])) $errors['ref2'] = _('The short name must contain at least one letter.');
 
     $dupe = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', array($data['ref']));
     if ($dupe) $errors['ref'] = _('That short name is already taken!');
@@ -593,9 +601,10 @@ function step2_error_check(&$data) {
                         $a = array();
                         if (preg_match('/^(.+), ([^,]+)$/', $data['gaze_place'], $a)) {
                             list($x, $data['gaze_place'], $state) = $a;
+                            if ($data['prev_country'] == $data['country'])
+                                $data['prev_country'] .= ",$state";
                             $data['country'] .= ",$state";
                         }
-                        $data['prev_country'] = $data['country'];
                     }
                 }
                 if ($data['postcode'] && $data['country'] != 'GB')

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.15 2005-09-08 09:38:57 francis Exp $
+// $Id: list.php,v 1.16 2005-09-10 12:32:25 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -52,7 +52,7 @@ $ntotal = db_getOne("
                 FROM pledges LEFT JOIN location ON location.id = pledges.location_id
                 WHERE $locale_clause AND
                     pin IS NULL
-                    AND date $open pb_current_date()
+                    AND date $open '$pb_today'
                     AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target
                     AND pb_pledge_prominence(pledges.id) <> 'backpage'", $sql_params);
 if ($ntotal < $q_offset) {
@@ -77,14 +77,14 @@ if ($q_sort == 'category') {
 }
 $sql_params[] = PAGE_SIZE;
 $qrows = db_query("
-        SELECT pledges.*, pb_current_date() <= pledges.date AS open,
+        SELECT pledges.*, '$pb_today' <= pledges.date AS open,
             (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
             person.email AS email, country, state, description, method, latitude, longitude
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
             WHERE $locale_clause
-            AND date $open pb_current_date() 
+            AND date $open '$pb_today' 
             AND pin IS NULL
             AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target 
             AND pb_pledge_prominence(pledges.id) <> 'backpage'

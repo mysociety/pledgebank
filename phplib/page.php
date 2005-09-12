@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.77 2005-09-10 12:32:25 francis Exp $
+// $Id: page.php,v 1.78 2005-09-12 21:38:58 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -141,7 +141,6 @@ function page_header($title, $params = array()) {
  * If PARAMS['nolocalsignup'] is true then no local signup form is showed.
  */
 function page_footer($params = array()) {
-    global $lang, $langs;
 ?></div><? # id="content"
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
@@ -164,22 +163,7 @@ function page_footer($params = array()) {
 <?  if (!array_key_exists('nolocalsignup', $params) or !$params['nolocalsignup']) 
         pb_view_local_alert_quick_signup("localsignupeverypage"); ?>
 <hr class="v">
-<div id="footer"><?
-    print _('Available in');
-    $out = array();
-    foreach ($langs as $l => $pretty) {
-        $url = pb_domain_url(array('lang'=>$l));
-        if ($l == $lang) $o = '<strong>';
-        else $o = '<a href="'.$url.'" lang="' . $l . '" hreflang="' . $l . '">';
-        $o .= $pretty;
-        if ($l == $lang) $o .= '</strong>';
-        else $o .= '</a>';
-        $out[] = $o;
-    }
-    $first = array_splice($out, 0, -2);
-    if (count($first)) print ' ' . join(', ', $first) . ',';
-    print ' ' . $out[count($out)-2] . ' and ' . $out[count($out)-1];
-?>. <br> <a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
+<div id="footer"><? pb_print_change_language_links(); ?> <br> <a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
 <?
     }
 ?>

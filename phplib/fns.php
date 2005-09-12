@@ -1,10 +1,11 @@
-<?  // fns.php:
+<?  
+// fns.php:
 // General functions for PledgeBank
 //
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.67 2005-09-10 12:32:25 francis Exp $
+// $Id: fns.php,v 1.68 2005-09-12 21:38:58 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -60,6 +61,7 @@ function pb_domain_url($params = array('path'=>'/')) {
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
     global $lang;
+#    print "here<pre>"; print_r(debug_backtrace()); exit;
 
     if (array_key_exists('id', $values)) {
         $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
@@ -425,6 +427,25 @@ function pb_print_change_country_link($attrs = "") {
     else
         print "<p $attrs>".sprintf(_('%s (%s) pledges only listed'), pb_site_country_name(), $change);
     print '</p>';
+}
+
+function pb_print_change_language_links() {
+    global $lang, $langs;
+    print _('Available in');
+    $out = array();
+    foreach ($langs as $l => $pretty) {
+        $url = pb_domain_url(array('lang'=>$l));
+        if ($l == $lang) $o = '<strong>';
+        else $o = '<a href="'.$url.'" lang="' . $l . '" hreflang="' . $l . '">';
+        $o .= $pretty;
+        if ($l == $lang) $o .= '</strong>';
+        else $o .= '</a>';
+        $out[] = $o;
+    }
+    $first = array_splice($out, 0, -2);
+    if (count($first)) print ' ' . join(', ', $first) . ',';
+    print ' ' . $out[count($out)-2] . ' and ' . $out[count($out)-1];
+    print '. <br><a href="/translate/">'._('Translate PledgeBank into your language').'</a>.';
 }
 
 // Return array of country codes for countries which have SMS

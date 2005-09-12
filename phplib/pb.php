@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.35 2005-09-06 18:50:27 francis Exp $
+ * $Id: pb.php,v 1.36 2005-09-12 21:38:58 francis Exp $
  * 
  */
 
@@ -18,6 +18,7 @@ require_once '../../phplib/stash.php';
 require_once "../../phplib/error.php";
 require_once "../../phplib/utility.php";
 require_once "../../phplib/gaze.php";
+require_once "../../phplib/locale.php";
 require_once 'page.php';
 
 /* Output buffering: PHP's output buffering is broken, because it does not
@@ -76,19 +77,9 @@ if (OPTION_WEB_HOST == 'www') {
 }
 
 # Language negotiation
-$pb_langs = explode('|', OPTION_PB_LANGUAGES);
-$langs = array(); $langmap = array();
-foreach ($pb_langs as $pb_lang) {
-    list($code, $verbose, $locale) = explode(',', $pb_lang);
-    $langs[$code] = $verbose;
-    $langmap[$code] = $locale;
-}
-if ($domain_lang && array_key_exists($domain_lang, $langs))
-    $lang = $domain_lang;
-else {
-    $lang = negotiateLanguage($langs); # local copy, see further down this file
-    if ($lang=='en-US' || !$lang || !array_key_exists($lang, $langmap)) $lang = 'en-gb'; # Default override
-}
+locale_negotiate_language(OPTION_PB_LANGUAGES, $domain_lang);
+locale_change();
+locale_gettext_domain('PledgeBank');
 
 # Country negotiation
 # Find country for this IP address
@@ -109,15 +100,6 @@ if ($site_country) {
     }
 }
 
-/* Note: To get a language working from PHP on Unix, you also need
-to install the system locale for that language. In Debian this is done
-using "dpkg-reconfigure locales". You may need to restart Apache also. */
-putenv('LANG='.$langmap[$lang].'.UTF-8');
-setlocale(LC_ALL, $langmap[$lang].'.UTF-8');
-bindtextdomain('PledgeBank', '../../locale');
-textdomain('PledgeBank');
-bind_textdomain_codeset('PledgeBank', 'UTF-8');
-
 /* POST redirects */
 stash_check_for_post_redirect();
 
@@ -133,46 +115,6 @@ function pb_show_error($message) {
     print _('<h2>Sorry!  Something\'s gone wrong.</h2>') .
         "\n<p>" . $message . '</p>';
     page_footer(array('nolocalsignup'=>true));
-}
-
-# PHP's own negotiateLanguage in HTTP.php is broken in old versions, so we use a copy
-function negotiateLanguage(&$supported) {
-    $supported = array_change_key_case($supported, CASE_LOWER);
-    if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-        $accepted = preg_split('/\s*,\s*/', strtolower(trim($_SERVER['HTTP_ACCEPT_LANGUAGE'])));
-        for ($i = 0; $i < count($accepted); $i++) {
-            if (preg_match('/^([a-z_-]+);\s*q=([\d\.]+)/', $accepted[$i], $arr)) {
-                $q = (double)$arr[2];
-                $l = $arr[1];
-            } else {
-                $q = 1;
-                $l = $accepted[$i];
-            }
-            if ($q > 0.0) {
-                if (!empty($supported[$l])) {
-                    if ($q == 1) {
-                        return $l;
-                    }
-                    $candidates[$l] = $q;
-                } else {
-                    foreach (array_keys($supported) as $value) {
-                        if (preg_match("/^$l-/",$value)) {
-                            if ($q == 1) {
-                                return $value;
-                            }
-                            $candidates[$value] = $q;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        if (isset($candidates)) {
-            arsort($candidates);
-            reset($candidates);
-            return key($candidates);
-        }
-    }
 }
 
 function pb_site_country_name() {

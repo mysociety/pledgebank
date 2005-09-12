@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.93 2005-09-10 12:32:25 francis Exp $
+// $Id: new.php,v 1.94 2005-09-12 21:38:59 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -102,13 +102,17 @@ the door of that neighbour whose name you've forgotten.") ?></li>
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
 <h2><?=_('New Pledge &#8211; Step 1 of 4') ?></h2>
 <div class="c">
+<h3><?=_('Language')?></h3>
+<p><?=_('First, choose the language you would like your pledge to be in.')?>
+<p><? pb_print_change_language_links() ?>
+<h3><?=_('Your Pledge')?></h3>
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
 <input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):_('other local people')) ?>"></p>
 
 <p><strong><?=_('will') ?></strong> <input type="text" id="signup" name="signup"
-size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):'do the same') ?>">.</p>
+size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.</p>
 
 <p><?=_('The other people must sign up before') ?> <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(e.g. "<?
 if ($lang=='en-gb')
@@ -121,6 +125,10 @@ else
 <br><small><?=_('This gives your pledge an easy web address. e.g. www.pledgebank.com/tidyupthepark') ?></small>
 </p>
 
+<p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically spotted, no markup needed)') ?></small>
+<br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
+
+<h3>About You</h3>
 <p style="margin-bottom: 1em;"><strong><?=_('Your name:') ?></strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 <strong><?=_('Email:') ?></strong> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
@@ -128,9 +136,6 @@ else
 <p><?=_('On flyers and elsewhere, after your name, how would you like to be described? (optional)') ?>
 <br><small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
 <input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
-
-<p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically spotted, no markup needed)') ?></small>
-<br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
 </div>
 <? if (sizeof($data)) {
@@ -373,6 +378,8 @@ function pledge_form_submitted() {
     }
 
     # Step 1 fixes
+    global $lang;
+    $data['lang'] = $lang;
     if ($data['title']=='<Enter your pledge>') $data['title'] = '';
     if (!$data['type']) $data['type'] = 'other local people';
     $data['parseddate'] = parse_date($data['date']);
@@ -515,6 +522,11 @@ function step1_error_check($data) {
     if (stristr($data['title'], "<MY STREET>")) $errors['title'] = $mystreetmessage;
     if (stristr($data['type'], "<MY STREET>")) $errors['type'] = $mystreetmessage;
     if (stristr($data['identity'], "<MY STREET>")) $errors['identity'] = $mystreetmessage;
+
+    global $langs;
+    if (!array_key_exists($data['lang'], $langs)) {
+        $errors['lang'] = _('Unknown language code:') . ' ' . htmlspecialchars($data['lang']);
+    }
 
     return $errors;
 }
@@ -698,7 +710,7 @@ if ($data['country']) {
             print htmlspecialchars($desc);
         }
     } else {
-        print "No";
+        print _("No");
     }
     print "</em></li>";
 }
@@ -755,6 +767,8 @@ greater publicity and a greater chance of succeeding.');
 
 # Someone has submitted a new pledge
 function create_new_pledge($P, $data) {
+    global $lang;
+
     $isodate = $data['parseddate']['iso'];
     if ($data['visibility'] == 'all')
         $data['pin'] = null;
@@ -802,7 +816,7 @@ function create_new_pledge($P, $data) {
                     creationtime,
                     detail,
                     comparison,
-                    location_id,
+                    lang, location_id,
                     pin, identity
                 ) values (
                     ?, ?, ?,
@@ -811,7 +825,7 @@ function create_new_pledge($P, $data) {
                     pb_current_timestamp(),
                     ?,
                     ?,
-                    ?,
+                    ?, ?,
                     ?, ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
@@ -819,7 +833,7 @@ function create_new_pledge($P, $data) {
                     $P->id(), $data['name'], $data['ref'], 
                     $data['detail'],
                     $data['comparison'],
-                    $location_id,
+                    $lang, $location_id,
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity']
                 ));
 

@@ -16,7 +16,10 @@
 
 # TODO
 # Now we have hook in WebTestHarness, make it do error log check automatically
+# (at the moment we often get HTML validation errors shown for what are really
+# things that are in the error log)
 # Add test code for:
+#   Pledges in non-English languages
 #   "identity" column
 #   categories
 #   PDF and RTF stuff from poster.cgi
@@ -25,14 +28,15 @@
 #   Remember Me button (how do we test Cookie expirty with WWW::Mechanize?)
 #   Picture uploading
 #   Info page graph
-#   test algorithmic prominence stuff
+#   Prominence
+#     Calculated prominence stuff
+#     Backpage pledges
 #   Log in with wrong password
 #   Search
 #   Fuzzy pledge ref match
-#   Backpage pledges
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.144 2005-09-06 11:35:48 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.145 2005-09-12 21:38:57 francis Exp $';
 
 use strict;
 require 5.8.0;

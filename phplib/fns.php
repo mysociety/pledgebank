@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.69 2005-09-13 17:53:55 francis Exp $
+// $Id: fns.php,v 1.70 2005-09-13 18:25:45 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -425,9 +425,11 @@ function sms_site_country() {
 }
 
 function pb_get_change_country_link() {
-    global $site_country;
+    global $site_country, $microsite;
     $change = '<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">';
-    if ($site_country)
+    if ($microsite) 
+        $change .= _("choose site");
+    elseif ($site_country)
         $change .= _("change country");
     else
         $change .= _("choose country");
@@ -470,52 +472,100 @@ function pb_print_change_language_links() {
  * SQL_PARAMS is array ref, query parameters are pushed on here. 
  */
 function pb_site_pledge_filter_main(&$sql_params) {
-    global $site_country; 
-    $locale_clause = "(";
-    if ($site_country) {
-        $locale_clause .= "country = ?";
-        $sql_params[] = $site_country;
+    global $site_country, $microsite; 
+
+    if ($microsite) {
+        $sql_params[] = $microsite;
+        return "(microsite = ?)";
     } else {
-        $locale_clause .= "1 = 0"; # get no pledges
+        $query_fragment = "(";
+        if ($site_country) {
+            $query_fragment .= "country = ?";
+            $sql_params[] = $site_country;
+        } else {
+            $query_fragment .= "1 = 0"; # get no pledges
+        }
+        $query_fragment .= ")";
+        return $query_fragment;
     }
-    $locale_clause .= ")";
-    return $locale_clause;
 }
 /* pb_site_pledge_filter_general
  * Same as pb_site_pledge_filter_main except returns general pledges, i.e. 
- * global ones, or ones not specific to any microsite. */
+ * global ones. */
 function pb_site_pledge_filter_general(&$sql_params) {
-    global $lang;
-    $sql_params[] = $lang; 
-    return "(country IS NULL AND lang = ?)";
+    global $lang, $microsite;
+    if ($microsite) {
+        return "(1=0)";
+    } else {
+        $sql_params[] = $lang; 
+        return "(country IS NULL AND lang = ?)";
+    }
 }
 /* pb_site_pledge_filter_foreign
  * Same as pb_site_pledge_filter_main except returns foreign pledges.
  * i.e. for other countries only. */
 function pb_site_pledge_filter_foreign(&$sql_params) {
-    global $site_country, $lang; 
-    $locale_clause = "(";
-    if ($site_country) {
-        $locale_clause .= "country <> ?";
-        $sql_params[] = $site_country;
+    global $site_country, $lang, $microsite; 
+    if ($microsite) {
+        $sql_params[] = $microsite;
+        return "(microsite <> ?)";
     } else {
-        $locale_clause .= "1 = 0"; # get no pledges
+        $locale_clause = "(";
+        if ($site_country) {
+            $locale_clause .= "country <> ?";
+            $sql_params[] = $site_country;
+        } else {
+            $locale_clause .= "1 = 0"; # get no pledges
+        }
+        $locale_clause .= ")";
+        return $locale_clause;
     }
-    $locale_clause .= ")";
-    return $locale_clause;
 }
 
 /* Prints description of main OR general filter with links to change
  * country/language/microsite */
 function pb_print_filter_link_main_general($attrs = "") {
-    global $site_country, $lang, $langs;
+    global $site_country, $lang, $langs, $microsite;
     $change_country = pb_get_change_country_link();
     $change_language = pb_get_change_language_link();
     $langname = $langs[$lang];
-    if ($site_country)
-        print "<p $attrs>".sprintf(_('%s (%s) pledges and global %s (%s) pledges listed'), pb_site_country_name(), $change_country, $langname, $change_language);
-    else
-        print "<p $attrs>".sprintf(_('%s (%s) pledges in %s (%s) only listed'), pb_site_country_name(), $change_country, $langname, $change_language);
+
+    if ($microsite) {
+        print "<p $attrs>". sprintf(_('%s (%s) pledges only listed'), pb_get_microsite_name(), $change_country). "</p>";
+    }
+    else {
+        if ($site_country)
+            print "<p $attrs>".sprintf(_('%s (%s) pledges and global %s (%s) pledges listed'), pb_site_country_name(), $change_country, $langname, $change_language) . "</p>";
+        else
+            print "<p $attrs>".sprintf(_('%s (%s) pledges in %s (%s) only listed'), pb_site_country_name(), $change_country, $langname, $change_language) . "</p>";
+    }
+}
+
+function pb_print_no_featured_link() {
+    global $site_country;
+    $change = pb_get_change_country_link();
+    print '<p>' . sprintf(_('There are no featured pledges for %s (%s) at the moment.'),pb_site_country_name(), $change);
     print '</p>';
 }
+
+
+/* pb_get_microsite_name 
+ * Returns display name of microsite if we are on one. e.g. Glastonbury */
+function pb_get_microsite_name() {
+    global $microsite;
+    if ($microsite == 'glastonbury')
+        return "Glastonbury";
+    return null;
+}
+
+/* pb_site_country_name
+ * Returns name of site/microsite to display next to PledgeBank logo. */
+function pb_site_country_name() {
+    global $countries_code_to_name, $site_country, $microsite; 
+    if ($microsite)
+        return pb_get_microsite_name();
+    else
+        return $site_country ? $countries_code_to_name[$site_country] : 'Global';
+}
+
 

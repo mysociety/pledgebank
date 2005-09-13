@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.94 2005-09-12 21:38:59 francis Exp $
+// $Id: new.php,v 1.95 2005-09-13 18:25:45 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -378,8 +378,9 @@ function pledge_form_submitted() {
     }
 
     # Step 1 fixes
-    global $lang;
+    global $lang, $microsite;
     $data['lang'] = $lang;
+    $data['microsite'] = $microsite;
     if ($data['title']=='<Enter your pledge>') $data['title'] = '';
     if (!$data['type']) $data['type'] = 'other local people';
     $data['parseddate'] = parse_date($data['date']);
@@ -816,7 +817,7 @@ function create_new_pledge($P, $data) {
                     creationtime,
                     detail,
                     comparison,
-                    lang, location_id,
+                    lang, location_id, microsite,
                     pin, identity
                 ) values (
                     ?, ?, ?,
@@ -825,7 +826,7 @@ function create_new_pledge($P, $data) {
                     pb_current_timestamp(),
                     ?,
                     ?,
-                    ?, ?,
+                    ?, ?, ?,
                     ?, ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
@@ -833,7 +834,7 @@ function create_new_pledge($P, $data) {
                     $P->id(), $data['name'], $data['ref'], 
                     $data['detail'],
                     $data['comparison'],
-                    $lang, $location_id,
+                    $data['lang'], $location_id, $data['microsite'],
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity']
                 ));
 

@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.38 2005-09-13 17:53:55 francis Exp $
+ * $Id: pb.php,v 1.39 2005-09-13 18:25:45 francis Exp $
  * 
  */
 
@@ -60,20 +60,25 @@ err_set_handler_display('pb_handle_error');
 # xx . yy . OPTION_WEB_DOMAIN - xx is a country code, yy a language code (either aa or aa-bb)
 $domain_lang = null;
 $domain_country = null;
-if (OPTION_WEB_HOST == 'www') {
-    if (preg_match('#^(?:..|www)\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
-        $domain_lang = $m[1];
+$microsite = null;
+if (preg_match('#^glastonbury\.#', strtolower($_SERVER['HTTP_HOST']), $m)) {
+    $microsite = "glastonbury";
 } else {
-    if (preg_match('#^'.OPTION_WEB_HOST.'-..\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
-        $domain_lang = $m[1];
-}
+    if (OPTION_WEB_HOST == 'www') {
+        if (preg_match('#^(?:..|www)\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+            $domain_lang = $m[1];
+    } else {
+        if (preg_match('#^'.OPTION_WEB_HOST.'-..\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+            $domain_lang = $m[1];
+    }
 
-if (OPTION_WEB_HOST == 'www') {
-    if (preg_match('#^(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
-        $domain_country = strtoupper($m[1]);
-} else {
-    if (preg_match('#^'.OPTION_WEB_HOST.'-(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
-        $domain_country = strtoupper($m[1]);
+    if (OPTION_WEB_HOST == 'www') {
+        if (preg_match('#^(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+            $domain_country = strtoupper($m[1]);
+    } else {
+        if (preg_match('#^'.OPTION_WEB_HOST.'-(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+            $domain_country = strtoupper($m[1]);
+    }
 }
 
 # Language negotiation
@@ -115,11 +120,6 @@ function pb_show_error($message) {
     print _('<h2>Sorry!  Something\'s gone wrong.</h2>') .
         "\n<p>" . $message . '</p>';
     page_footer(array('nolocalsignup'=>true));
-}
-
-function pb_site_country_name() {
-    global $countries_code_to_name, $site_country; 
-    return $site_country ? $countries_code_to_name[$site_country] : 'Global';
 }
 
 

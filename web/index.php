@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.213 2005-09-10 12:32:25 francis Exp $
+// $Id: index.php,v 1.214 2005-09-13 15:11:04 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -38,8 +38,8 @@ about beating that feeling..."') ?>
 works</a>, as explained by mySociety\'s director Tom Steinberg.
 Or <a href="/explain">read a full transcript') ?></a>.</p>
 <? } else { ?>
-<p><a href="/explain"><?=_('Find out how PledgeBank
-works</a>, as explained by mySociety\'s director Tom Steinberg.')?></a></p>
+<p><?=_('<a href="/explain">Find out how PledgeBank
+works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
 <? } ?>
 </div>
 
@@ -134,7 +134,8 @@ function list_frontpage_pledges() {
                 ORDER BY RANDOM()
                 LIMIT 10", array('global'=>true,'sitecountry'=>true,'showcountry'=>false));
     if (count($pledges) < 3) {
-        // If too few frontpage, show a few of the normal pledges
+        // If too few frontpage, show a few of the normal pledges for the country
+        // (but not normal global ones)
         $normal_pledges = get_pledges_list("
                     pb_pledge_prominence(pledges.id) = 'normal' AND
                     date >= '$pb_today' AND 

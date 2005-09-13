@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.153 2005-09-12 21:38:57 francis Exp $
+-- $Id: schema.sql,v 1.154 2005-09-13 15:11:04 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -167,7 +167,7 @@ create table pledges (
         ),
 
     -- Human language the pledge is in 
-    lang text check(length(lang) = 2 or length(lang) = 5),
+    lang text not null check(length(lang) = 2 or length(lang) = 5),
     -- Where the pledge is. Null means that it is not in any specific location.
     location_id integer references location(id),
 

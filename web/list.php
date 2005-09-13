@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.17 2005-09-13 16:45:52 francis Exp $
+// $Id: list.php,v 1.18 2005-09-13 17:53:55 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -99,7 +99,7 @@ if ($q_type == 'open') {
 page_header($heading, array('id'=>'all'));
 print h2($heading);
 
-pb_print_change_country_link('align="center"');
+pb_print_filter_link_main_general('align="center"');
 
 $viewsarray = array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
     'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));

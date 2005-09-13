@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.68 2005-09-12 21:38:58 francis Exp $
+// $Id: fns.php,v 1.69 2005-09-13 17:53:55 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -408,6 +408,22 @@ function pb_view_local_alert_quick_signup($class) {
 <?
 }
 
+// Return array of country codes for countries which have SMS
+function sms_countries() {
+    return array('GB');
+}
+// Return description of countries which have SMS (for use in FAQ)
+function sms_countries_description() {
+    return _("the UK");
+}
+// Return whether site country supports SMS
+function sms_site_country() {
+    global $site_country;
+    if (!$site_country) 
+        return false;
+    return in_array($site_country, sms_countries());
+}
+
 function pb_get_change_country_link() {
     global $site_country;
     $change = '<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">';
@@ -419,14 +435,12 @@ function pb_get_change_country_link() {
     return $change;
 }
 
-function pb_print_change_country_link($attrs = "") {
+function pb_get_change_language_link() {
     global $site_country;
-    $change = pb_get_change_country_link();
-    if ($site_country)
-        print "<p $attrs>".sprintf(_('%s (%s) and global pledges listed'), pb_site_country_name(), $change);
-    else
-        print "<p $attrs>".sprintf(_('%s (%s) pledges only listed'), pb_site_country_name(), $change);
-    print '</p>';
+    $change = '<a href="#changelanguage">';
+    $change .= _("change language");
+    $change .= '</a>';
+    return $change;
 }
 
 function pb_print_change_language_links() {
@@ -448,20 +462,60 @@ function pb_print_change_language_links() {
     print '. <br><a href="/translate/">'._('Translate PledgeBank into your language').'</a>.';
 }
 
-// Return array of country codes for countries which have SMS
-function sms_countries() {
-    return array('GB');
+/* pb_site_pledge_filter_main SQL_PARAMS
+ * Returns an SQL query string fragment with the clause for the site.
+ * e.g. Country only pledges, or glastonbury only pledges.
+ * We return pledges of any language, as the country/microsite will
+ * be very specific.
+ * SQL_PARAMS is array ref, query parameters are pushed on here. 
+ */
+function pb_site_pledge_filter_main(&$sql_params) {
+    global $site_country; 
+    $locale_clause = "(";
+    if ($site_country) {
+        $locale_clause .= "country = ?";
+        $sql_params[] = $site_country;
+    } else {
+        $locale_clause .= "1 = 0"; # get no pledges
+    }
+    $locale_clause .= ")";
+    return $locale_clause;
 }
-// Return description of countries which have SMS (for use in FAQ)
-function sms_countries_description() {
-    return _("the UK");
+/* pb_site_pledge_filter_general
+ * Same as pb_site_pledge_filter_main except returns general pledges, i.e. 
+ * global ones, or ones not specific to any microsite. */
+function pb_site_pledge_filter_general(&$sql_params) {
+    global $lang;
+    $sql_params[] = $lang; 
+    return "(country IS NULL AND lang = ?)";
 }
-// Return whether site country supports SMS
-function sms_site_country() {
-    global $site_country;
-    if (!$site_country) 
-        return false;
-    return in_array($site_country, sms_countries());
+/* pb_site_pledge_filter_foreign
+ * Same as pb_site_pledge_filter_main except returns foreign pledges.
+ * i.e. for other countries only. */
+function pb_site_pledge_filter_foreign(&$sql_params) {
+    global $site_country, $lang; 
+    $locale_clause = "(";
+    if ($site_country) {
+        $locale_clause .= "country <> ?";
+        $sql_params[] = $site_country;
+    } else {
+        $locale_clause .= "1 = 0"; # get no pledges
+    }
+    $locale_clause .= ")";
+    return $locale_clause;
 }
 
+/* Prints description of main OR general filter with links to change
+ * country/language/microsite */
+function pb_print_filter_link_main_general($attrs = "") {
+    global $site_country, $lang, $langs;
+    $change_country = pb_get_change_country_link();
+    $change_language = pb_get_change_language_link();
+    $langname = $langs[$lang];
+    if ($site_country)
+        print "<p $attrs>".sprintf(_('%s (%s) pledges and global %s (%s) pledges listed'), pb_site_country_name(), $change_country, $langname, $change_language);
+    else
+        print "<p $attrs>".sprintf(_('%s (%s) pledges in %s (%s) only listed'), pb_site_country_name(), $change_country, $langname, $change_language);
+    print '</p>';
+}
 

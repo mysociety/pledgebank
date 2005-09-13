@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.37 2005-09-13 16:45:52 francis Exp $
+ * $Id: pb.php,v 1.38 2005-09-13 17:53:55 francis Exp $
  * 
  */
 
@@ -122,42 +122,4 @@ function pb_site_country_name() {
     return $site_country ? $countries_code_to_name[$site_country] : 'Global';
 }
 
-/* pb_site_pledge_filter_main SQL_PARAMS
- * Returns an SQL query string fragment with the clause for the site.
- * e.g. Country only pledges, or glastonbury only pledges.
- * SQL_PARAMS is array ref, query parameters are pushed on here. 
- */
-function pb_site_pledge_filter_main(&$sql_params) {
-    global $site_country; 
-    $locale_clause = "(";
-    if ($site_country) {
-        $locale_clause .= "country = ?";
-        $sql_params[] = $site_country;
-    } else {
-        $locale_clause .= "1 = 0";
-    }
-    $locale_clause .= ")";
-    return $locale_clause;
-}
-/* pb_site_pledge_filter_general
- * As pb_site_pledge_filter_main only returns general pledges, i.e. 
- * global ones, or ones not specific to any microsite. */
-function pb_site_pledge_filter_general(&$sql_params) {
-    return "country IS NULL";
-}
-/* pb_site_pledge_filter_foreign
- * As pb_site_pledge_filter_main only returns foreign pledges.
- * i.e. for other countries only. */
-function pb_site_pledge_filter_foreign(&$sql_params) {
-    global $site_country; 
-    $locale_clause = "(";
-    if ($site_country) {
-        $locale_clause .= "country <> ?";
-        $sql_params[] = $site_country;
-    } else {
-        $locale_clause .= "1 = 0";
-    }
-    $locale_clause .= ")";
-    return $locale_clause;
-}
 

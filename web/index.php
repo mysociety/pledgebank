@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.215 2005-09-13 16:45:52 francis Exp $
+// $Id: index.php,v 1.216 2005-09-13 17:53:55 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -143,7 +143,7 @@ function list_frontpage_pledges() {
     if (!$pledges) {
         print_no_featured_link();
     } else {
-        pb_print_change_country_link("");
+        pb_print_filter_link_main_general();
         print '<ol>' . join("",$pledges) . '</ol>';
     }
 
@@ -173,7 +173,7 @@ function list_successful_pledges() {
     if (!$pledges) {
         print_no_featured_link();
     } else {
-        pb_print_change_country_link();
+        pb_print_filter_link_main_general();
         print '<ol>'.join("",$pledges).'</ol>';
     }
 }

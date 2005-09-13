@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.12 2005-09-10 12:32:25 francis Exp $
+// $Id: your.php,v 1.13 2005-09-13 11:49:22 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -22,25 +22,41 @@ $P = person_signon(array(
 page_header(_("Your Pledges"), array('id'=>"yourpledges"));
 
 // Pledges you might like (people who signed pledges you created/signed also signed these...)
-$s = db_query("SELECT pledges.id, SUM(strength) AS sum, max(date) - '$pb_today' AS daysleft
-        FROM pledge_connection, pledges
-        WHERE (
-                (b_pledge_id = pledges.id AND
-                    (a_pledge_id IN (SELECT pledge_id FROM signers WHERE signers.person_id = ?)
-                    OR a_pledge_id IN (SELECT id FROM pledges WHERE pledges.person_id = ?)))
-                OR
-                (a_pledge_id = pledges.id AND
-                    (b_pledge_id IN (SELECT pledge_id FROM signers WHERE signers.person_id = ?)
-                    OR b_pledge_id IN (SELECT id FROM pledges WHERE pledges.person_id = ?)))
-            )
-            AND pledges.id NOT IN (SELECT pledge_id from signers where signers.person_id = ?)
-            AND pledges.id NOT IN (SELECT id from pledges where pledges.person_id = ?)
-            AND pledges.date >= '$pb_today'
+$s = db_query("
+        SELECT pledges.id, SUM(strength) AS sum, max(date) - '$pb_today' AS daysleft FROM
+        (
+            SELECT pledges.id, strength, date
+            FROM pledges, pledge_connection
+            WHERE (
+                    (b_pledge_id = pledges.id AND
+                        (a_pledge_id IN (SELECT pledge_id FROM signers WHERE signers.person_id = ?)
+                        OR a_pledge_id IN (SELECT id FROM pledges WHERE pledges.person_id = ?)))
+                        )
+                AND pledges.id NOT IN (SELECT pledge_id from signers where signers.person_id = ?)
+                AND pledges.id NOT IN (SELECT id from pledges where pledges.person_id = ?)
+                AND pledges.date >= '$pb_today'
+        UNION
+            SELECT pledges.id, strength, date
+            FROM pledges, pledge_connection
+            WHERE (
+                    (a_pledge_id = pledges.id AND
+                        (b_pledge_id IN (SELECT pledge_id FROM signers WHERE signers.person_id = ?)
+                        OR b_pledge_id IN (SELECT id FROM pledges WHERE pledges.person_id = ?)))
+                        )
+                AND pledges.id NOT IN (SELECT pledge_id from signers where signers.person_id = ?)
+                AND pledges.id NOT IN (SELECT id from pledges where pledges.person_id = ?)
+                AND pledges.date >= '$pb_today'
+        ) AS dummy
+
         GROUP BY pledges.id
+
         ORDER BY sum DESC
         LIMIT 50
         ", 
-        array($P->id(), $P->id(), $P->id(), $P->id(), $P->id(), $P->id()));
+        array($P->id(), $P->id(), 
+              $P->id(), $P->id(), 
+              $P->id(), $P->id(), 
+              $P->id(), $P->id()));
 if (0 != db_num_rows($s)) {
     print "\n\n" . '<div id="yourconnections"><h2><a name="connections">' . _('Suggested pledges') . '</a></h2><ol>' . "\n\n";
     print p(_("People who signed the pledges you created or signed also signed these..."));

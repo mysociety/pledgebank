@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.13 2005-09-13 11:49:22 francis Exp $
+// $Id: your.php,v 1.14 2005-09-13 12:27:05 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -23,7 +23,8 @@ page_header(_("Your Pledges"), array('id'=>"yourpledges"));
 
 // Pledges you might like (people who signed pledges you created/signed also signed these...)
 $s = db_query("
-        SELECT pledges.id, SUM(strength) AS sum, max(date) - '$pb_today' AS daysleft FROM
+        SELECT some_pledges.id, SUM(some_pledges.strength) AS sum, 
+               max(some_pledges.date) - '$pb_today' AS daysleft FROM
         (
             SELECT pledges.id, strength, date
             FROM pledges, pledge_connection
@@ -46,10 +47,9 @@ $s = db_query("
                 AND pledges.id NOT IN (SELECT pledge_id from signers where signers.person_id = ?)
                 AND pledges.id NOT IN (SELECT id from pledges where pledges.person_id = ?)
                 AND pledges.date >= '$pb_today'
-        ) AS dummy
+        ) AS some_pledges
 
-        GROUP BY pledges.id
-
+        GROUP BY some_pledges.id
         ORDER BY sum DESC
         LIMIT 50
         ", 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.16 2005-09-10 12:32:25 francis Exp $
+// $Id: list.php,v 1.17 2005-09-13 16:45:52 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -38,15 +38,10 @@ if ($q_type == 'failed') {
 }
 
 $sql_params = array();
-$locale_clause = "(";
-if ($site_country) {
-    $locale_clause .= "country = ?";
-    $sql_params[] = $site_country;
-} else {
-    $locale_clause .= "1 = 0";
-}
-$locale_clause .= " OR country IS NULL)";
-
+$locale_clause = "(".
+    pb_site_pledge_filter_main($sql_params) . 
+    ' OR ' . pb_site_pledge_filter_general($sql_params).
+    ")";
 $ntotal = db_getOne("
                 SELECT count(pledges.id)
                 FROM pledges LEFT JOIN location ON location.id = pledges.location_id

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.214 2005-09-13 15:11:04 francis Exp $
+// $Id: index.php,v 1.215 2005-09-13 16:45:52 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -81,22 +81,17 @@ function get_pledges_list($where, $params) {
             FROM pledges LEFT JOIN location ON location.id = pledges.location_id
             WHERE ";
     $sql_params = array();
-    $query .= "(";
-    if ($params['sitecountry']) {
-        $query .= "country = ?";
-        $sql_params[] = $site_country;
-    } else {
-        if ($site_country) {
-            $query .= "country <> ?"; 
-            $sql_params[] = $site_country;
-        } else {
-            $query .= "country IS NOT NULL"; 
-        }
-    }
+    
+    $query .= '(';
+    if ($params['sitecountry'])
+        $query .= pb_site_pledge_filter_main($sql_params, true);
+    else
+        $query .= pb_site_pledge_filter_foreign($sql_params, false);
     if ($params['global'])
-        $query .= " or country IS NULL";
-    $query .= ") AND ";
-    $query .= $where;
+        $query .= ' OR ' . pb_site_pledge_filter_general($sql_params, false);
+    $query .= ')';
+
+    $query .= " AND " . $where;
     $q = db_query($query, $sql_params);
     $pledges = array();
     while ($r = db_fetch_array($q)) {

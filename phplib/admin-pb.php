@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.100 2005-09-10 12:32:25 francis Exp $
+ * $Id: admin-pb.php,v 1.101 2005-09-14 17:04:06 francis Exp $
  * 
  */
 
@@ -59,6 +59,7 @@ class ADMIN_PAGE_PB_MAIN {
             'u'=>'Success Time',
             'o'=>'% complete',
             'l'=>'Place',
+            'g'=>'Lang',
         );
         foreach ($cols as $s => $col) {
             print '<th>';
@@ -74,7 +75,7 @@ class ADMIN_PAGE_PB_MAIN {
     function list_all_pledges() {
         global $open, $pb_today;
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdecspuol]/', $sort)) $sort = 'c';
+        if (!$sort || preg_match('/[^ratdecspuolg]/', $sort)) $sort = 'c';
         $order = '';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
@@ -86,6 +87,7 @@ class ADMIN_PAGE_PB_MAIN {
         elseif ($sort=='p') $order = 'prominence desc';
         elseif ($sort=='s') $order = 'signers desc';
         elseif ($sort=='l') $order = 'country, description';
+        elseif ($sort=='g') $order = 'lang';
 
         $q = db_query("
             SELECT pledges.*, person.email,
@@ -136,6 +138,7 @@ class ADMIN_PAGE_PB_MAIN {
             else
                 $row .= 'Global';
             $row .= '</td>';
+            $row .= '<td>' . htmlspecialchars($r['lang']) . '</td>';
 
             if ($r['open'] == 't')
                 $open[] = $row;
@@ -207,7 +210,24 @@ class ADMIN_PAGE_PB_MAIN {
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
         print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
-        print '<br>';
+
+        global $langs;
+        print '<form name="languageform" method="post" action="'.$this->self_link.'">';
+        print '<input type="hidden" name="update_language" value="1">';
+        print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+        print _('Language:') . ' ';
+        print '<select id="lang" name="lang">';
+        print ' <option value="(unknown)">(unknown)</option>';
+        foreach ($langs as $lang_code => $lang_name) {
+            $sel = '';
+            if ($lang_code == $pdata['lang'])
+                $sel = ' selected';
+            print ' <option value="'.$lang_code.'"'.$sel.'>'.$lang_name.'</option>'; // lang_name already in HTML
+        }
+        print '</select>';
+        print '<input name="update" type="submit" value="Update">';
+        print '</form>';
+
         if (array_key_exists('country', $pdata)) {
             print '<form name="countryform" method="post" action="'.$this->self_link.'">';
             print '<input type="hidden" name="update_country" value="1">';
@@ -444,6 +464,17 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         print p(_("<em>Change to pledge country saved</em>"));
     }
 
+    function update_language($pledge_id) {
+        global $langs;
+        $new_lang = get_http_var('lang');
+        if (!array_key_exists($new_lang, $langs)) {
+            err('Unknown language code: ' . htmlspecialchars($new_lang));
+        }
+        db_query('UPDATE pledges set lang = ? where id = ?', array($new_lang, $pledge_id));
+        db_commit();
+        print p(_("<em>Change to pledge language saved</em>"));
+    }
+
     function update_categories($pledge_id) {
         $cats = get_http_var('categories');
         db_query('delete from pledge_category where pledge_id = ?', $pledge_id);
@@ -469,6 +500,9 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         } elseif (get_http_var('update_country')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_country($pledge_id);
+        } elseif (get_http_var('update_language')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_language($pledge_id);
         } elseif (get_http_var('remove_pledge_id')) {
             $remove_id = get_http_var('remove_pledge_id');
             if (ctype_digit($remove_id))

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.79 2005-09-13 17:53:55 francis Exp $
+// $Id: page.php,v 1.80 2005-09-14 15:36:56 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -18,7 +18,7 @@ require_once 'pledge.php';
  * title and navigation are not displayed, or if PARAMS['noprint'] is true
  * then they are not there if the page is printed.  */
 function page_header($title, $params = array()) {
-    global $lang;
+    global $lang, $microsite;
 
     static $header_outputted = 0;
     if ($header_outputted && !array_key_exists('override', $params)) {
@@ -54,6 +54,9 @@ function page_header($title, $params = array()) {
         $category = db_getOne('SELECT name FROM category,pledge_category WHERE category_id=id AND pledge_id=(SELECT id FROM pledges WHERE ref=?)', substr($params['ref'],1) );
         if ($category && is_file('../web/css/' . strtolower($category) . '.css'))
             print '<style type="text/css" media="all">@import url(\'/css/' . rawurlencode(strtolower($category)) . '.css\');</style>';
+    }
+    if ($microsite && is_file('../web/' . $microsite . '.css')) {
+        print '<style type="text/css" media="all">@import url(\'/' . rawurlencode($microsite) . '.css\');</style>';
     }
 
     if (array_key_exists('rss', $params))

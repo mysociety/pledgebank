@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.39 2005-09-13 18:25:45 francis Exp $
+ * $Id: pb.php,v 1.40 2005-09-14 15:36:56 francis Exp $
  * 
  */
 
@@ -61,6 +61,7 @@ err_set_handler_display('pb_handle_error');
 $domain_lang = null;
 $domain_country = null;
 $microsite = null;
+# Explicitly match all microsites for now (other code relies on the names being from subset)
 if (preg_match('#^glastonbury\.#', strtolower($_SERVER['HTTP_HOST']), $m)) {
     $microsite = "glastonbury";
 } else {

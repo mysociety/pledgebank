@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.70 2005-09-13 18:25:45 francis Exp $
+// $Id: fns.php,v 1.71 2005-09-20 14:49:58 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -326,7 +326,9 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
 <?
     if (array_key_exists('gazeonly', $params)) {
         $countries_list = gaze_get_find_places_countries();
-        gaze_check_error($countries_list);
+        # Ignore errors, so outages in gaze don't stop every page rendering
+        if (rabx_is_error($countries_list))
+            $countries_list = array();
         usort($countries_list, "country_sort");
     } else {
         $countries_list = array_values($countries_name_to_code);

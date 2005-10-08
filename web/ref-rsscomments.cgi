@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 
-my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.1 2005-09-02 09:12:15 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.2 2005-10-08 00:22:52 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -72,7 +72,7 @@ sub run {
 
     while (my $row = $query->fetchrow_hashref) {
         $rss->add_item(
-            title => "Comment on \"$title\"",
+            title => "Comment by $row->{name}",
             link => "$CONF{base_url}$ref#comment_$row->{id}",
             description=> "$row->{text}"
          );

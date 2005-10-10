@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.20 2005-08-29 18:30:36 francis Exp $
+// $Id: alert.php,v 1.21 2005-10-10 23:15:04 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -135,7 +135,7 @@ function alert_h_description($alert_id) {
         return sprintf(_("new comments on the pledge '%s'"), $pledge->ref() );
     } elseif ($row['event_code'] == "pledges/local") { 
         if ($row['method'] == 'MaPit') 
-            return sprintf(_("new UK pledges near postcode %s"), $row['description'] );
+            return sprintf(_("new pledges near UK postcode %s"), $row['description'] );
         else 
             return sprintf(_("new pledges near %s"), $row['description'] );
     } else {
@@ -154,34 +154,31 @@ function alert_unsubscribe_link($alert_id, $email) {
     return $url;
 }
 
-/* Stuff to loop through / display all of someone's alerts
-// not used yet
-$s = db_query('SELECT alert.* from alert left join location on location.ild = alert.location_id
-                      where person_id = ?', $P->id());
-print "<h2>Alerts</h2>";
-if (0 != db_num_rows($s)) {
-    print "<p>People who signed the pledges you created or signed also signed these...</p>";
-    while ($row = db_fetch_array($s)) {
-        if ($row['event_code'] == "comments/ref") {
-            $pledge = new Pledge(intval($row['pledge_id']));
-?>
-<form accept-charset="utf-8" class="pledge" name="alertsetup" action="/alert" method="post">
-<input type="hidden" name="alter_alert" value="1">
-<?=$pledge->h_sentence(array('firstperson'=>true))?>
-<br>Comment alerts:
-<select id="country" name="country">
-  <option>subscribed</option>
-  <option>not subscribed</option>
-</select>
-<input type="submit" name="submit" value="Update">
-</form>
-<?
-        } else {
-            err("Unknown event code '".$row['event_code']."'");
+/* alert_list_pledges_local PERSON_ID
+ * Displays list of all local pledge alerts person has with unsubscribe button.
+ */
+function alert_list_pledges_local($person_id) {
+    $s = db_query('SELECT alert.* from alert where person_id = ? and event_code=\'pledges/local\'', $person_id);
+    print h2(_("Local pledge alerts"));
+    if (0 != db_num_rows($s)) {
+        print _("You will get email when there are:<ul>");
+        while ($row = db_fetch_array($s)) {
+            $description = ucfirst(alert_h_description($row['id']));
+    ?>
+    <li>
+    <?=$description?>
+    <form style="display: inline" accept-charset="utf-8" name="alertsetup" action="/alert" method="post">
+    <input type="hidden" name="direct_unsubscribe" value="<?=$row['id']?>">
+    <input type="submit" name="submit" value="Unsubscribe">
+    </form>
+    </li>
+    <?
         }
+        print "</ul>";
+        print _("To add a new place, <a href=\"/alert\">click here</a>.");
+    } else {
+        pb_view_local_alert_quick_signup("localsignupyourpage", false);
     }
-} else {
-    print "You have no alerts";
+    print '<p>';
 }
-*/
 

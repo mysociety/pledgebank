@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.37 2005-09-08 16:47:24 francis Exp $
+// $Id: alert.php,v 1.38 2005-10-10 23:15:04 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -67,6 +67,7 @@ if (get_http_var('subscribe_local_alert')) {
     if ($desc) {
         alert_unsubscribe($P->id(), $alert_id);
         printf(_("Thanks!  You won't receive more email about %s."), $desc);
+        print(p(_("You might like to <a href=\"/alert/\">subscribe to a new local alert</a>, or <a href=\"/your\">manage all your alerts</a>.")));
     } else {
         print _("Thanks!  You are already unsubscribed from that alert.");
     }
@@ -135,6 +136,8 @@ function do_local_alert_subscribe() {
     db_commit();
         ?>
 <p class="loudmessage" align="center"><?=_("Thanks for subscribing!  You'll now get emailed once a day when there are new pledges in your area.") ?> </p>
+
+<p class="noisymessage"><?=("To see all your local pledge alerts, <a href=\"/your\">click here</a>.")?></p>
 
 <p class="noisymessage"><strong><?=_("Summer pledgin'!")?></strong> <?=_("Given that it is summer time, why not use PledgeBank to ")?>
 <a href="/new/streetparty"><?=_("organise a street party")?></a>?

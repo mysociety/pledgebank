@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.14 2005-09-13 12:27:05 francis Exp $
+// $Id: your.php,v 1.15 2005-10-10 23:15:06 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -112,24 +112,48 @@ if (!is_null($error))
 </form>
 
 <?
+$made_pledges = false;
 
-// Pledges you made
+// Alerts
+alert_list_pledges_local($P->id());
+
+// Open pledges you made
 $qrows = db_query("
                 SELECT pledges.*, date - '$pb_today' AS daysleft
                 FROM pledges
                 WHERE pledges.person_id = ?
+                AND '$pb_today' <= pledges.date
                 ORDER BY creationtime DESC
             ", $P->id());
-print _("<h2>Pledges you created</h2>");
+print _("<h2>Open pledges you created</h2>");
 if (db_num_rows($qrows) > 0) {
+    $made_pledges = true;
     while ($r = db_fetch_array($qrows)) {
         $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
         $pledge = new Pledge($r);
         $pledge->render_box(array('class' => 'pledge-yourcreated', 'href'=>$pledge->url_main()));
     }
 } else {
-    print p(_('You have created no pledges.'));
+    print p(_('You have no open pledges. <a href="/new">Start a new pledge</a>.'));
 }
+
+// Closed pledges you made
+$qrows = db_query("
+                SELECT pledges.*, date - '$pb_today' AS daysleft
+                FROM pledges
+                WHERE pledges.person_id = ?
+                AND '$pb_today' > pledges.date
+                ORDER BY creationtime DESC
+            ", $P->id());
+if (db_num_rows($qrows) > 0) {
+    $made_pledges = true;
+    print _("<h2>Closed pledges you created</h2>");
+    while ($r = db_fetch_array($qrows)) {
+        $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
+        $pledge = new Pledge($r);
+        $pledge->render_box(array('class' => 'pledge-yourcreated', 'href'=>$pledge->url_main()));
+    }
+} 
 
 // Pledges you have signed
 $qrows = db_query("

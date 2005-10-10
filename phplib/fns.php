@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.73 2005-10-10 15:02:07 francis Exp $
+// $Id: fns.php,v 1.74 2005-10-10 23:15:04 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -392,7 +392,7 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
     <?
 }
 
-function pb_view_local_alert_quick_signup($class) {
+function pb_view_local_alert_quick_signup($class, $strong = true) {
     $email = '';
     $P = person_if_signed_on();
     if (!is_null($P)) {
@@ -402,10 +402,10 @@ function pb_view_local_alert_quick_signup($class) {
 <form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
-<p><strong><?=_('Sign up for emails when people make pledges in your local area')?> &mdash; <?=_('NEW! Now works in any country') ?> </strong>
-<br><label for="localquick_email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="localquick_email" value="<?=htmlspecialchars($email) ?>">
-<?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?>
-<label for="localquick_place"><span id="place_postcode_label"><?=_('Town:')?></span></label> <input type="text" size="12" name="place" id="localquick_place" value="">
+<p><?=$strong?'<strong>':''?><?=_('Sign up for emails when people make pledges in your local area')?> <?=$strong?'&mdash;':''?> <?=$strong?_('NEW! Now works in any country'):''?> <?=$strong?'</strong>':''?>
+<br><span style="white-space: nowrap"><label for="localquick_email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="localquick_email" value="<?=htmlspecialchars($email) ?>"></span>
+<span style="white-space: nowrap"><?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
+<span style="white-space: nowrap"><label for="localquick_place"><span id="place_postcode_label"><?=_('Town:')?></span></label>&nbsp;<input type="text" size="12" name="place" id="localquick_place" value=""></span>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 <?

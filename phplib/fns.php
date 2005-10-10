@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.71 2005-09-20 14:49:58 francis Exp $
+// $Id: fns.php,v 1.72 2005-10-10 12:30:16 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -441,18 +441,21 @@ function pb_get_change_country_link() {
 
 function pb_get_change_language_link() {
     global $site_country;
-    $change = '<a href="#changelanguage">';
+    $change = '<a href="/lang?r='.urlencode($_SERVER['REQUEST_URI']).'">';
     $change .= _("change language");
     $change .= '</a>';
     return $change;
 }
 
-function pb_print_change_language_links() {
+function pb_print_change_language_links($path = null) {
     global $lang, $langs;
     print _('Available in');
     $out = array();
     foreach ($langs as $l => $pretty) {
-        $url = pb_domain_url(array('lang'=>$l));
+        $params = array('lang'=>$l);
+        if ($path)
+            $params['path'] = $path;
+        $url = pb_domain_url($params);
         if ($l == $lang) $o = '<strong>';
         else $o = '<a href="'.$url.'" lang="' . $l . '" hreflang="' . $l . '">';
         $o .= $pretty;

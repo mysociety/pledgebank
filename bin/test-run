@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.146 2005-09-13 15:11:04 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.147 2005-10-10 12:30:16 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1277,7 +1277,7 @@ sub do_category_tests {
         { title => $pledge_action_english, 
             target => '3', type => 'other polyglots', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_english },
-        { country => 'Global', 'local' => 0 }, 
+        { country => 'PT', 'local' => 0 }, 
         { },
         { action => "viaemail", setpassword => 0 }
     );
@@ -1292,12 +1292,17 @@ sub do_category_tests {
         { title => $pledge_action_portuguese, 
             target => '3', type => 'other monoglots', signup => 'do the same',
             date => 'Tomorrow', ref => $pledge_ref_portugese },
-        { country => 'Global', 'local' => 0 },
+        { country => 'PT', 'local' => 0 },
         { },
         { action => "loggedin", setpassword => 0 }
     );
     $wth->browser_get($locale_url);
     $wth->browser_follow_link(text => "English");
+    lock_locale_url();
+
+    # Change to Portugese pages
+    $wth->browser_follow_link(text => "choose country");
+    $wth->browser_follow_link(text => "Portugal");
     lock_locale_url();
 
     # Check pledges appear correctly

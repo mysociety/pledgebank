@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.50 2005-09-10 12:32:25 francis Exp $
+// $Id: ref-index.php,v 1.51 2005-10-10 21:04:10 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -228,7 +228,9 @@ function draw_connections($p) {
     if (0 == db_num_rows($s))
         return;
 
-    print "\n\n" . '<div id="connections"><h2><a name="connections">' . _('People who signed this pledge also pledged to...') . '</a></h2><ul>' . "\n\n";
+    print "\n\n" . '<div id="connections"><h2><a name="connections">' . 
+        _('Suggested pledges') . ' </a></h2>'.
+        p(_('People who signed this pledge also signed these...')) . '<ul>' . "\n\n";
     while (list($a, $b, $strength) = db_fetch_row($s)) {
         $id = $a == $p->id() ? $b : $a;
         $p2 = new Pledge(intval($id));

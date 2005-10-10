@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.81 2005-10-10 12:30:18 francis Exp $
+// $Id: page.php,v 1.82 2005-10-10 21:04:10 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -155,12 +155,10 @@ function page_footer($params = array()) {
 <input type="text" id="q" name="q" size="25" value="" onblur="fadeout(this)" onfocus="fadein(this)"> <input type="submit" value="<?=_('Go') ?>"></p>
 </form>
 <!-- remove all extraneous whitespace to avoid IE bug -->
-<ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/list"><?=_('All Pledges') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>">FAQ</acronym></a></li><li><a href="/contact"><?=_('Contact') ?></a></li><?
+<ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/list"><?=_('All Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>">FAQ</acronym></a></li><li><a href="/contact"><?=_('Contact') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><?
         $P = person_if_signed_on(true); /* Don't renew any login cookie. */
         if ($P) {
 ?><li><a href="/logout"><?=_('Logout') ?></a></li><?
-        } else {
-?><li><a href="/login"><?=_('Login') ?></a></li><?
         }
 ?></ul>
 <?  if (!array_key_exists('nolocalsignup', $params) or !$params['nolocalsignup']) 

@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.40 2005-09-14 15:36:56 francis Exp $
+ * $Id: pb.php,v 1.41 2005-10-10 13:16:12 francis Exp $
  * 
  */
 
@@ -91,6 +91,8 @@ locale_gettext_domain('PledgeBank');
 # Find country for this IP address
 $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
 if (rabx_is_error($ip_country) || !$ip_country)
+    $ip_country = null;
+else if (!array_key_exists($ip_country, $countries_code_to_name)) # make sure we know country
     $ip_country = null;
 $site_country = $domain_country;
 if (!$domain_country) 

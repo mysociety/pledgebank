@@ -5,9 +5,10 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.72 2005-10-10 12:30:16 francis Exp $
+// $Id: fns.php,v 1.73 2005-10-10 15:02:07 francis Exp $
 
 require_once '../phplib/alert.php';
+require_once '../phplib/microsites.php';
 require_once "../../phplib/evel.php";
 require_once '../../phplib/person.php';
 require_once '../../phplib/utility.php';
@@ -536,7 +537,7 @@ function pb_print_filter_link_main_general($attrs = "") {
     $langname = $langs[$lang];
 
     if ($microsite) {
-        print "<p $attrs>". sprintf(_('%s (%s) pledges only listed'), pb_get_microsite_name(), $change_country). "</p>";
+        print "<p $attrs>". sprintf(_('%s (%s) pledges only listed'), microsites_get_name(), $change_country). "</p>";
     }
     else {
         if ($site_country)
@@ -553,22 +554,12 @@ function pb_print_no_featured_link() {
     print '</p>';
 }
 
-
-/* pb_get_microsite_name 
- * Returns display name of microsite if we are on one. e.g. Glastonbury */
-function pb_get_microsite_name() {
-    global $microsite;
-    if ($microsite == 'glastonbury')
-        return "Glastonbury";
-    return null;
-}
-
 /* pb_site_country_name
  * Returns name of site/microsite to display next to PledgeBank logo. */
 function pb_site_country_name() {
     global $countries_code_to_name, $site_country, $microsite; 
     if ($microsite)
-        return pb_get_microsite_name();
+        return microsites_get_name();
     else
         return $site_country ? $countries_code_to_name[$site_country] : 'Global';
 }

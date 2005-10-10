@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.41 2005-10-10 13:16:12 francis Exp $
+ * $Id: pb.php,v 1.42 2005-10-10 15:02:08 francis Exp $
  * 
  */
 
@@ -20,6 +20,7 @@ require_once "../../phplib/utility.php";
 require_once "../../phplib/gaze.php";
 require_once "../../phplib/locale.php";
 require_once 'page.php';
+require_once 'microsites.php';
 
 /* Output buffering: PHP's output buffering is broken, because it does not
  * affect headers. However, it's worth using it anyway, because in the common
@@ -62,8 +63,10 @@ $domain_lang = null;
 $domain_country = null;
 $microsite = null;
 # Explicitly match all microsites for now (other code relies on the names being from subset)
-if (preg_match('#^glastonbury\.#', strtolower($_SERVER['HTTP_HOST']), $m)) {
-    $microsite = "glastonbury";
+$m = array();
+preg_match('#^([a-z0-9]+)\.#', strtolower($_SERVER['HTTP_HOST']), $m);
+if (array_key_exists(strtolower($m[1]), $microsites_list)) {
+    $microsite = $m[1];
 } else {
     if (OPTION_WEB_HOST == 'www') {
         if (preg_match('#^(?:..|www)\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))

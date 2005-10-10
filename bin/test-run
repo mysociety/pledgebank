@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.148 2005-10-10 13:11:44 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.149 2005-10-10 14:11:56 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1171,7 +1171,7 @@ sub do_login_tests {
     create_pledge(200, 
         { title => $pledge_action_login_1, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
-            date => 'Tomorrow', ref => $pledge_ref_1 },
+            date => '1987-01-01', ref => $pledge_ref_1 },
         { country => 'GB', 'local' => 1, postcode => '  SN8  1AA' }, # Waitrose, Marlborough
         { },
         { action => "viaemail", setpassword => 1 }
@@ -1188,7 +1188,7 @@ sub do_login_tests {
     create_pledge(200, 
         { title => $pledge_action_login_2, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
-            date => 'Tomorrow', ref => $pledge_ref_2 },
+            date => '1987-01-01', ref => $pledge_ref_2 },
         { country => 'GB', 'local' => 1, place => 'marlborough', gaze_place => '51.4166667,-1.7166667,Marlborough' },
         { },
         { action => "viaemail", setpassword => 1 }
@@ -1202,7 +1202,7 @@ sub do_login_tests {
     create_pledge(200, 
         { title => $pledge_action_login_3, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
-            date => 'Tomorrow', ref => $pledge_ref_3 },
+            date => '1987-01-01', ref => $pledge_ref_3 },
         { country => 'Global' },
         { },
         { action => "password" }
@@ -1229,7 +1229,7 @@ sub do_login_tests {
     create_pledge(200, 
         { title => $pledge_action_login_4, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
-            date => 'Tomorrow', ref => $pledge_ref_4 },
+            date => '1987-01-01', ref => $pledge_ref_4 },
         { country => 'GB', 'local' => 0 },
         { },
         { action => "loggedin" }

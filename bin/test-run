@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.149 2005-10-10 14:11:56 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.150 2005-10-11 17:39:22 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -302,14 +302,14 @@ sub perform_login_action {
     } elsif ($login_action eq "loggedin") {
         # Nothing to do
     } elsif ($login_action eq "password") {
-        $wth->browser_check_contents("I have a PledgeBank password");
+        $wth->browser_check_contents("I have a PledgeBank <strong>password</strong>");
         $login_fields->{'password'} = password_n($who);
         $wth->browser_submit_form(form_name => 'login',
             fields => $login_fields,
             button => 'LogIn') or die "Failed to log in with password";
         $wth->log_watcher_check();
     } elsif ($login_action eq "wrongpassword") {
-        $wth->browser_check_contents("I have a PledgeBank password");
+        $wth->browser_check_contents("I have a PledgeBank <strong>password</strong>");
         $login_fields->{'password'} = "thispassswordisnonsense";
         $wth->browser_submit_form(form_name => 'login',
             fields => $login_fields,

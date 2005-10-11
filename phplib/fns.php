@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.75 2005-10-11 11:38:54 francis Exp $
+// $Id: fns.php,v 1.76 2005-10-11 17:39:22 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -360,7 +360,7 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
 /* pb_view_gaze_place_choice
  * Display options for choosing a local place
  */
-function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $places, $errors) {
+function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $places, $errors, $postcode) {
     ?> <ul>
     <li><p id="place_line"> <?
 
@@ -386,27 +386,37 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
 
     <li><p id="postcode_line">
     <?=_('Or, UK only, you can give a postcode area:') ?>
-    <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if (isset($data['postcode'])) print htmlspecialchars($data['postcode']) ?>">
+    <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if ($postcode) print htmlspecialchars($postcode) ?>">
     <br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
     </p></li>
     </ul>
     <?
 }
 
-function pb_view_local_alert_quick_signup($class, $strong = true) {
+# pb_view_local_alert_quick_signup
+# Display quick signup form for local alerts. Parameters can contain:
+# newflash - if true, put message in bold and show NEW! flash
+# place - default value for place
+function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>true)) {
     $email = '';
     $P = person_if_signed_on();
     if (!is_null($P)) {
         $email = $P->email();
     } 
+    $newflash = false;
+    if (array_key_exists('newflash', $params) && $params['newflash'])
+        $newflash = true;
+    $place = "";
+    if (array_key_exists('place', $params) && $params['place'])
+        $place = $params['place'];
 ?>
 <form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
-<p><?=$strong?'<strong>':''?><?=_('Sign up for emails when people make pledges in your local area')?> <?=$strong?'&mdash;':''?> <?=$strong?_('NEW! Now works in any country'):''?> <?=$strong?'</strong>':''?>
+<p><strong><?=_('Sign up for emails when people make pledges in your local area')?> <?=$newflash?'&mdash;':''?> <?=$newflash?_('NEW! Now works in any country'):''?> </strong>
 <br><span style="white-space: nowrap"><label for="localquick_email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="localquick_email" value="<?=htmlspecialchars($email) ?>"></span>
 <span style="white-space: nowrap"><?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
-<span style="white-space: nowrap"><label for="localquick_place"><span id="place_postcode_label"><?=_('Town:')?></span></label>&nbsp;<input type="text" size="12" name="place" id="localquick_place" value=""></span>
+<span style="white-space: nowrap"><label for="localquick_place"><span id="place_postcode_label"><?=_('Town:')?></span></label>&nbsp;<input type="text" size="12" name="place" id="localquick_place" value="<?=htmlspecialchars($place)?>"></span>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 <?

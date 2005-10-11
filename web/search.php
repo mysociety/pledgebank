@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.23 2005-09-10 12:32:25 francis Exp $
+// $Id: search.php,v 1.24 2005-10-11 17:39:22 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -140,7 +140,12 @@ function search() {
                 if (count($places) > 1) print "</li>";
             }
             if (count($places) > 1) print "</ul>";
+            pb_view_local_alert_quick_signup("localsignupsearchpage", 
+                array('newflash'=>false,
+                      'place'=>$search));
         }
+    } else {
+        print p(sprintf(_("To search for a town, please first %s."), $change_country));
     }
 
     // Open pledges

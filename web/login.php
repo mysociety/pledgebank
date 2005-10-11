@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.61 2005-10-11 15:46:50 francis Exp $
+ * $Id: login.php,v 1.62 2005-10-11 17:39:22 francis Exp $
  * 
  */
 
@@ -313,7 +313,7 @@ function login_form($errors = array()) {
 
 <li>
 <p><?=_("I have a PledgeBank")?>
- <strong><?=_("password:") ?></strong>
+ <strong><?=_("password") ?></strong>:
 
 <input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
 <input type="submit" name="LogIn" value="<?=_('Let me in') ?> &gt;&gt;"></p>

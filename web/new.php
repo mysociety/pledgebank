@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.95 2005-09-13 18:25:45 francis Exp $
+// $Id: new.php,v 1.96 2005-10-11 17:39:22 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -288,7 +288,7 @@ is fulfilled?
 $gaze_with_state = $data['gaze_place'];
 if ($state)
     $gaze_with_state .= ", " . $state;
-pb_view_gaze_place_choice($place, $gaze_with_state, $places, $errors); 
+pb_view_gaze_place_choice($place, $gaze_with_state, $places, $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null); 
 ?>
 
 <p style="text-align: right;">
@@ -586,7 +586,7 @@ function step2_error_check(&$data) {
                 $errors['local'] = _('Please choose whether the pledge is local or not');
             else if ($data['local']) {
                 if ($data['postcode'] && $data['place'])
-                    $errors['place'] = _("Please enter either a postcode or a place name, but not both");
+                    $errors['nohighlight'] = _("Please enter either a postcode or a place name, but not both");
                 else if ($data['postcode']) {
                     if (!validate_postcode($data['postcode']) && !validate_partial_postcode($data['postcode']))
                         $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode; for example, OX1 3DR or WC1.');

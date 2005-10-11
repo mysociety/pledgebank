@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.59 2005-08-22 13:31:20 francis Exp $
+ * $Id: login.php,v 1.60 2005-10-11 11:38:54 francis Exp $
  * 
  */
 
@@ -305,8 +305,8 @@ function login_form($errors = array()) {
 
 
 <li><?=_("I've never used PledgeBank before, let me confirm my email address now.") ?>
-
 <input type="submit" name="SendEmail" value="<?=_('Click here to continue') ?> &gt;&gt;"><br>
+
 <small><?=_("(we'll send an email, click the link in it to confirm your email is working)") ?></small>
 
 </li>

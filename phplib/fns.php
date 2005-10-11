@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.76 2005-10-11 17:39:22 francis Exp $
+// $Id: fns.php,v 1.77 2005-10-11 22:13:44 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -283,7 +283,7 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
         printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($selected_country));
 
 ?>
-<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> id="country" name="country" onchange="update_place_local(this, true)">
+<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> name="country" onchange="update_place_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
 <? if (!array_key_exists('noglobal', $params)) { ?>
   <option value="Global"<? if ($selected_country=='Global') print ' selected'; ?>><?=_('None &mdash; applies anywhere') ?></option>
@@ -414,9 +414,9 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
 <p><strong><?=_('Sign up for emails when people make pledges in your local area')?> <?=$newflash?'&mdash;':''?> <?=$newflash?_('NEW! Now works in any country'):''?> </strong>
-<br><span style="white-space: nowrap"><label for="localquick_email"><?=_('Email:') ?></label><input type="text" size="18" name="email" id="localquick_email" value="<?=htmlspecialchars($email) ?>"></span>
+<br><span style="white-space: nowrap"><?=_('Email:') ?><input type="text" size="18" name="email" value="<?=htmlspecialchars($email) ?>"></span>
 <span style="white-space: nowrap"><?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
-<span style="white-space: nowrap"><label for="localquick_place"><span id="place_postcode_label"><?=_('Town:')?></span></label>&nbsp;<input type="text" size="12" name="place" id="localquick_place" value="<?=htmlspecialchars($place)?>"></span>
+<span style="white-space: nowrap"><?=_('Town:')?>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 <?

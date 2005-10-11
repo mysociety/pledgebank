@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.150 2005-10-11 17:39:22 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.151 2005-10-11 22:13:44 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1216,10 +1216,10 @@ sub do_login_tests {
     $wth->browser_get($locale_url);
     # ... first update pledge connections (to test that a bit on your pledges page)
     call_findpledgeconnections();
-    $wth->browser_follow_link(text_regex => qr/Login/);
+    $wth->browser_follow_link(text_regex => qr/Your Pledges/);
     perform_login_action(200, {action=>"password", giveemail=>1}, undef);
     # ... check gone to Your Pledges page correctly
-    $wth->browser_check_contents("Pledges you created");
+    $wth->browser_check_contents("Open pledges you created");
     $wth->browser_check_contents($pledge_action_login_1);
     $wth->browser_check_contents($pledge_action_login_2);
     $wth->browser_check_contents($pledge_action_login_3);

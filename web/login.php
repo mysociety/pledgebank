@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.60 2005-10-11 11:38:54 francis Exp $
+ * $Id: login.php,v 1.61 2005-10-11 15:46:50 francis Exp $
  * 
  */
 
@@ -293,25 +293,27 @@ function login_form($errors = array()) {
 
 </ul>
 
-<p><strong><?=_('Have you used PledgeBank before?') ?></strong></p>
-
 <? } else { ?>
 
 <input type="hidden" name="email" value="<?=$q_h_email?>">
 
 <? } ?>
 
+<p><strong><?=_('Have you used PledgeBank before?') ?></strong></p>
+
 <ul>
 
 
-<li><?=_("I've never used PledgeBank before, let me confirm my email address now.") ?>
-<input type="submit" name="SendEmail" value="<?=_('Click here to continue') ?> &gt;&gt;"><br>
-
+<li>
+<input type="submit" name="SendEmail" value="<?=_("I've never used PledgeBank before") ?> &gt;&gt;">
+<br>
 <small><?=_("(we'll send an email, click the link in it to confirm your email is working)") ?></small>
 
 </li>
 
-<li><p><?=_("I've been here before, and I have a PledgeBank password:") ?>
+<li>
+<p><?=_("I have a PledgeBank")?>
+ <strong><?=_("password:") ?></strong>
 
 <input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
 <input type="submit" name="LogIn" value="<?=_('Let me in') ?> &gt;&gt;"></p>
@@ -321,9 +323,10 @@ function login_form($errors = array()) {
 
 </li>
 
-<li><p><?=_("I've been here before, but I've forgotten or don't have a password.") ?>
-
-<input type="submit" name="SendEmail" value="<?=_('Click here to continue') ?> &gt;&gt;"><br>
+<li><p>
+<input type="submit" name="SendEmail" value="<?=_("I've forgotten or didn't set a password") ?> &gt;&gt;">
+<br>
+<small><?=_("(we'll send an email, click the link in it to confirm your email)") ?></small>
 </p>
 
 </li>

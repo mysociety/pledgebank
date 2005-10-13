@@ -6,10 +6,11 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: deploy,v 1.5 2005-07-29 16:27:33 francis Exp $
+# $Id: deploy,v 1.6 2005-10-13 18:35:23 francis Exp $
 #
 
 set -e
+#set -x # trace everything for debug
 
 # Check who and where we are, and include useful functions
 PB_BIN=`pwd`
@@ -26,12 +27,19 @@ if [ "$1" = "www.pledgebank.com" ]
 then
     PB_VHOST=/data/vhost/www.pledgebank.com
     PB_SMSD=pbsmsd
+    PB_UNAME=pb
 elif [ "$1" = "staging.pledgebank.com" ]
 then
     PB_VHOST=/data/vhost/staging.pledgebank.com
     PB_SMSD=pbstagingsmsd
+    PB_UNAME=pb
+elif [ "$1" = "interface.pledgebank.com" ]
+then
+    PB_VHOST=/data/vhost/interface.pledgebank.com
+    PB_SMSD=pbinterfacesmsd
+    PB_UNAME=pbinterface
 else 
-    die "specify staging.pledgebank.com or www.pledgebank.com as parameter"
+    die "specify staging.pledgebank.com, www.pledgebank.com or interface.pledgebank.com as parameter"
 fi
 
 # Check virtual server directory
@@ -39,10 +47,9 @@ fi
 
 # Pledge Bank
 PB_NAME="PledgeBank.com"
-PB_UNAME=pb
 PB_DEPLOYSPACE=$PB_VHOST/deployspace
 hostname=$( echo $PB_VHOST | sed 's@/$@@' | sed 's@^.*/@@' )
-PB_DB_UNIX_USER=pb
+PB_DB_UNIX_USER=$PB_UNAME
 
 # Main body of script
 fmt << END

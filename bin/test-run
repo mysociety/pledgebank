@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.151 2005-10-11 22:13:44 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.152 2005-10-13 16:07:23 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -1375,9 +1375,7 @@ sub do_admin_tests {
     $wth->browser_check_contents("pretend to be an SMS aggregating service");
     $wth->browser_check_contents(mobile_n(105));
     $wth->browser_check_contents(name_n(105));
-    # ... it's annoying this has to use an explicit form_number, as every time
-    # a new form appears on the lines above it breaks and needs changing.
-    $wth->browser_submit_form(form_number => 5,
+    $wth->browser_submit_form(form_name => 'removesignerform',
             fields => { }, button => 'remove_signer') or die "Failed to remove signer";
     $wth->browser_check_contents("signer has been successfully removed");
     $wth->browser_check_contents("pretend to be an SMS aggregating service");

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.101 2005-09-14 17:04:06 francis Exp $
+ * $Id: admin-pb.php,v 1.102 2005-10-13 21:12:18 francis Exp $
  * 
  */
 
@@ -278,7 +278,9 @@ class ADMIN_PAGE_PB_MAIN {
         else $query .= ' ORDER BY signname DESC';
         $q = db_query($query, $pdata['id']);
         $out = array();
+        $c = 0;
         while ($r = db_fetch_array($q)) {
+            $c++;
             $r = array_map('htmlspecialchars', $r);
             $e = array();
             if ($r['signname'])
@@ -291,7 +293,7 @@ class ADMIN_PAGE_PB_MAIN {
             $out[$e] = '<td>'.$e.'</td>';
             $out[$e] .= '<td>'.prettify($r['signtime']).'</td>';
 
-            $out[$e] .= '<td><form name="shownameform" method="post" action="'.$this->self_link.'"><input type="hidden" name="showname_signer_id" value="' . $r['signid'] . '">';
+            $out[$e] .= '<td><form name="shownameform'.$c.'" method="post" action="'.$this->self_link.'"><input type="hidden" name="showname_signer_id" value="' . $r['signid'] . '">';
             $out[$e] .= '<select name="showname">';
             $out[$e] .=  '<option value="1"' . ($r['showname'] == 't'?' selected':'') . '>Yes</option>';
             $out[$e] .=  '<option value="0"' . ($r['showname'] == 'f'?' selected':'') . '>No</option>';
@@ -300,7 +302,7 @@ class ADMIN_PAGE_PB_MAIN {
             $out[$e] .= '</form></td>';
 
             $out[$e] .= '<td>';
-            $out[$e] .= '<form name="removesignerform" method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_signer_id" value="' . $r['signid'] . '"><input type="submit" name="remove_signer" value="Remove signer permanently"></form>';
+            $out[$e] .= '<form name="removesignerform'.$c.'" method="post" action="'.$this->self_link.'"><input type="hidden" name="remove_signer_id" value="' . $r['signid'] . '"><input type="submit" name="remove_signer" value="Remove signer permanently"></form>';
             $out[$e] .= '</td>';
         }
         if ($sort == 'e') {

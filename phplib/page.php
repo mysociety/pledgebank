@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.82 2005-10-10 21:04:10 francis Exp $
+// $Id: page.php,v 1.83 2005-10-14 12:43:32 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -77,9 +77,9 @@ function page_header($title, $params = array()) {
     // Display title bar
     if (!array_key_exists('nonav', $params) or !$params['nonav']) {
 ?>
-<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a>
-<span id="beta">Beta</span>
-<span id="countrytitle"><?=pb_site_country_name() ?>
+<h1><a href="/">
+<span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<span id="countrytitle"><?=pb_site_country_logo() ?>
  <a href="/where">(change)</a></span>
 </h1>
 <hr class="v"><?

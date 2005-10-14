@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.77 2005-10-11 22:13:44 francis Exp $
+// $Id: fns.php,v 1.78 2005-10-14 12:43:32 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -575,4 +575,13 @@ function pb_site_country_name() {
         return $site_country ? $countries_code_to_name[$site_country] : 'Global';
 }
 
-
+/* pb_site_country_logo
+ * Returns HTML to use for logo of microsite, or country. */
+function pb_site_country_logo() {
+    global $microsite;
+    $logo = pb_site_country_name();
+    if ($microsite && $microsite == 'interface') {
+        $logo = '<img src="interface-logo.gif" alt="interface">';
+    }
+    return $logo;
+}  

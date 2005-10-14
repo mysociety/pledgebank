@@ -6,12 +6,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.1 2005-10-10 15:02:08 francis Exp $
+ * $Id: microsites.php,v 1.2 2005-10-14 12:43:32 francis Exp $
  * 
  */
 
 $microsites_list = array('glastonbury' => 'Glastonbury',
-                         '365ways' => '365 Ways');
+                         '365ways' => '365 Ways',
+                         'interface' => 'Interface');
 
 /* microsites_get_name 
  * Returns display name of microsite if we are on one. e.g. Glastonbury */

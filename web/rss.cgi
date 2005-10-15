@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.14 2005-09-07 22:13:46 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.15 2005-10-15 11:51:04 matthew Exp $';
 
 use strict;
 use warnings;
@@ -52,9 +52,10 @@ sub run {
     # Get the parameters.
     my $type     = $request->param('type');
     my $postcode = $request->param('postcode');
+    my $query = $request->param('q');
 
     # Get the data from the database.
-    my $pledges = get_pledges( type => $type, postcode => $postcode );
+    my $pledges = get_pledges( type => $type, postcode => $postcode, query => $query );
     my $title   = '';
 
     # If there was a postcode add it to title.
@@ -166,12 +167,17 @@ sub create_postcode_query {
 sub create_normal_query {
     my %args = @_;
     my $type = $args{type};
+    my $query = $args{query};
 
     my $query_text = "select *
            from pledges
            where pin IS NULL 
            AND pb_pledge_prominence(id) <> 'backpage' ";
-    
+
+    if ($query) {
+        $query_text .= " AND title ILIKE " . dbh()->quote("%$query%");
+    }
+
     if ($type && $type eq 'all') {
         $query_text .= " order by id desc ";
     } else {
@@ -185,7 +191,6 @@ sub create_normal_query {
 # Get the pledges - if there was an error returns undef.
 sub get_pledges {
     my %args = @_;
-    my $type = $args{type};
     my $query_text = '';
     
     # Create the sql depending on what args we have.

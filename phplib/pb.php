@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.42 2005-10-10 15:02:08 francis Exp $
+ * $Id: pb.php,v 1.43 2005-10-15 00:38:01 francis Exp $
  * 
  */
 
@@ -64,8 +64,8 @@ $domain_country = null;
 $microsite = null;
 # Explicitly match all microsites for now (other code relies on the names being from subset)
 $m = array();
-preg_match('#^([a-z0-9]+)\.#', strtolower($_SERVER['HTTP_HOST']), $m);
-if (array_key_exists(strtolower($m[1]), $microsites_list)) {
+$got_matches = preg_match('#^([a-z0-9]+)\.#', strtolower($_SERVER['HTTP_HOST']), $m);
+if ($got_matches && array_key_exists(strtolower($m[1]), $microsites_list)) {
     $microsite = $m[1];
 } else {
     if (OPTION_WEB_HOST == 'www') {

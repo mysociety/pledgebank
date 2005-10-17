@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.30 2005-09-08 17:17:55 francis Exp $
+ * $Id: general-example,v 1.31 2005-10-17 11:07:01 chris Exp $
  * 
  */
 
@@ -33,8 +33,8 @@ define('OPTION_PHP_MAINDB', 'PB');
 define('OPTION_WEB_HOST', 'www');
 define('OPTION_WEB_DOMAIN', 'pledgebank.com');
 
-// Top-level URL of current website
-define('OPTION_BASE_URL', 'http://' . OPTION_WEB_HOST . '.' . OPTION_WEB_DOMAIN . '/');
+// Top-level URL of current website, without trailing /
+define('OPTION_BASE_URL', 'http://' . OPTION_WEB_HOST . '.' . OPTION_WEB_DOMAIN);
 define('OPTION_ADMIN_URL', 'https://secure.../admin');
 
 // Domain name for emails to current website
@@ -90,7 +90,7 @@ define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');
 // Where web services used are
 define('OPTION_EVEL_URL', 'http://services.mysociety.org/evel');
 define('OPTION_MAPIT_URL', 'http://services.mysociety.org/mapit');
-define('OPTION_GAZE_URL', 'http://services.mysociety.org/gaze');
+define('OPTION_GAZE_URL', 'http://gaze.mysociety.org/gaze');
 
 // Limit on new pledges
 define('OPTION_PB_TARGET_WARNING', '20');

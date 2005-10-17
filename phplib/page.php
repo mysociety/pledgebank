@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.83 2005-10-14 12:43:32 francis Exp $
+// $Id: page.php,v 1.84 2005-10-17 17:53:51 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -45,7 +45,7 @@ function page_header($title, $params = array()) {
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
 ?> PledgeBank<?if (!$title) print " - " . _("Tell the world \"I'll do it, but only if you'll help\"") ?></title>
-<style type="text/css" media="all">@import url('/pb.css');</style>
+<style type="text/css" media="all">@import url('<?=pb_css_file()?>');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <?
 
@@ -54,9 +54,6 @@ function page_header($title, $params = array()) {
         $category = db_getOne('SELECT name FROM category,pledge_category WHERE category_id=id AND pledge_id=(SELECT id FROM pledges WHERE ref=?)', substr($params['ref'],1) );
         if ($category && is_file('../web/css/' . strtolower($category) . '.css'))
             print '<style type="text/css" media="all">@import url(\'/css/' . rawurlencode(strtolower($category)) . '.css\');</style>';
-    }
-    if ($microsite && is_file('../web/' . $microsite . '.css')) {
-        print '<style type="text/css" media="all">@import url(\'/' . rawurlencode($microsite) . '.css\');</style>';
     }
 
     if (array_key_exists('rss', $params))
@@ -77,10 +74,8 @@ function page_header($title, $params = array()) {
     // Display title bar
     if (!array_key_exists('nonav', $params) or !$params['nonav']) {
 ?>
-<h1><a href="/">
-<span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
-<span id="countrytitle"><?=pb_site_country_logo() ?>
- <a href="/where">(change)</a></span>
+<h1>
+<?=pb_logo()?>
 </h1>
 <hr class="v"><?
     }

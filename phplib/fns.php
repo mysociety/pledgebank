@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.79 2005-10-15 00:36:47 francis Exp $
+// $Id: fns.php,v 1.80 2005-10-17 17:53:51 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -578,13 +578,30 @@ function pb_site_country_name() {
         return $site_country ? $countries_code_to_name[$site_country] : 'Global';
 }
 
-/* pb_site_country_logo
+/* pb_logo
  * Returns HTML to use for logo of microsite, or country. */
-function pb_site_country_logo() {
+function pb_logo() {
     global $microsite;
-    $logo = pb_site_country_name();
     if ($microsite && $microsite == 'interface') {
-        $logo = '<img src="interface-logo.gif" alt="interface">';
+        return '
+<a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<span id="countrytitle"><img src="interface-logo.gif" alt="interface">
+<a href="/where">(change)</a></span>';
+
+    } else {
+        $country_name = pb_site_country_name();
+        return '
+<a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<span id="countrytitle">'.$country_name.'
+<a href="/where">(change)</a></span>';
     }
-    return $logo;
-}  
+}
+
+function pb_css_file() {
+    global $microsite;
+    if ($microsite && $microsite == 'interface') {
+        return "/interface.css";
+    }
+    return "/pb.css";
+}
+

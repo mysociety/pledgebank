@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.217 2005-09-13 18:25:45 francis Exp $
+// $Id: index.php,v 1.218 2005-10-18 11:29:46 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -28,9 +28,7 @@ function front_page() {
 <blockquote class="noindent"><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
 alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;
 "></a>
-<?=_('"We all know what it is like to feel powerless, that our own actions
-can\'t really change the things that we want to change.  PledgeBank is
-about beating that feeling..."') ?>
+<?=microsites_frontpage_intro() ?>
 </blockquote>
 
 <? global $lang; if ($lang == 'en-gb') { ?>

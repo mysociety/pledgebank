@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.96 2005-10-11 17:39:22 francis Exp $
+// $Id: new.php,v 1.97 2005-10-18 10:23:37 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -109,7 +109,7 @@ the door of that neighbour whose name you've forgotten.") ?></li>
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
-<input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):_('other local people')) ?>"></p>
+<input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
 
 <p><strong><?=_('will') ?></strong> <input type="text" id="signup" name="signup"
 size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.</p>
@@ -346,11 +346,15 @@ function pledge_form_three($data, $errors = array()) {
 <br><small><?=_('(this will be used in future to help more people find your pledge)') ?></small>
 </p>
 
+<? if (microsites_private_allowed()) { ?>
 <p><?=_('Who do you want to be able to see your pledge?') ?>
 <br><input onclick="grey_pin(true)" type="radio" name="visibility" value="all"<?=($v=='all'?' checked':'') ?>> <?=_('Anyone') ?>
 <input onclick="grey_pin(false)" type="radio" name="visibility" value="pin"<?=($v=='pin'?' checked':'') ?>> <?=_('Only people to whom I give this PIN:') ?>
 <input <? if (array_key_exists('pin', $errors)) print ' class="error"' ?> type="text" id="pin" name="pin" value="">
 </p>
+<? } else { ?>
+<input type="hidden" name="visibility" value="all">
+<? } ?>
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
@@ -382,7 +386,7 @@ function pledge_form_submitted() {
     $data['lang'] = $lang;
     $data['microsite'] = $microsite;
     if ($data['title']=='<Enter your pledge>') $data['title'] = '';
-    if (!$data['type']) $data['type'] = 'other local people';
+    if (!$data['type']) $data['type'] = microsites_other_people();
     $data['parseddate'] = parse_date($data['date']);
     if (!$data['signup']) $data['signup'] = 'sign up';
     $data['signup'] = preg_replace('#\.$#', '', $data['signup']);
@@ -736,8 +740,8 @@ if ($v=='pin') print _('Only people to whom I give a PIN I have specified');
     print h2(_('Terms and Conditions'));
     print '<p><strong>' . _('Click "Create" to confirm that you wish PledgeBank.com to display the
 pledge at the top of this page in your name.') . '</strong> ';
-    if ($v == 'pin') { ?>
-<!-- no special terms for private pledge -->
+    if ($v == 'pin' || !microsites_syndication_warning()) { ?>
+<!-- no special terms for private pledge, or certain microsites -->
 <?  } else {
         print _('You also consent to the syndication of your pledge to other sites &mdash; this means that they will be able to display your pledge and your name');
         if ($data['country'] == "GB" && $local) {
@@ -809,6 +813,10 @@ function create_new_pledge($P, $data) {
                 list($x, $country, $state) = $a;
             db_query("insert into location (id, country, state) values (?, ?, ?)", array($location_id, $country, $state));
         }
+        $prominence = 'calculated';
+        if (microsites_new_pledges_frontpage()) {
+            $prominence = 'frontpage';
+        }
         db_query('
                 insert into pledges (
                     id, title, target,
@@ -818,7 +826,8 @@ function create_new_pledge($P, $data) {
                     detail,
                     comparison,
                     lang, location_id, microsite,
-                    pin, identity
+                    pin, identity, 
+                    prominence
                 ) values (
                     ?, ?, ?,
                     ?, ?, ?, ?,
@@ -827,7 +836,8 @@ function create_new_pledge($P, $data) {
                     ?,
                     ?,
                     ?, ?, ?,
-                    ?, ?
+                    ?, ?,
+                    ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
                     $data['type'], $data['signup'], $isodate, $data['date'],
@@ -835,7 +845,8 @@ function create_new_pledge($P, $data) {
                     $data['detail'],
                     $data['comparison'],
                     $data['lang'], $location_id, $data['microsite'],
-                    $data['pin'] ? sha1($data['pin']) : null, $data['identity']
+                    $data['pin'] ? sha1($data['pin']) : null, $data['identity'],
+                    $prominence
                 ));
 
         if ($data['category'] != -1)
@@ -862,7 +873,11 @@ function create_new_pledge($P, $data) {
 ?>
     <p class="noprint loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
     <p class="noprint loudmessage" align="center"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
+<?  if (microsites_new_pledges_frontpage()) { ?>
+    <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge.') ?></p>
+<?  } else { ?>
     <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not be publicised</strong> elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
+<?   } ?>
 <?  post_confirm_advertise($p);
 }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.80 2005-10-17 17:53:51 francis Exp $
+// $Id: fns.php,v 1.81 2005-10-18 10:23:37 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -29,7 +29,7 @@ function dd($s) { print "<dd>$s</dd>\n"; }
 #   'country' - country to change to
 #   'path' - path component, if not present uses request URI
 function pb_domain_url($params = array('path'=>'/')) {
-    global $domain_lang, $domain_country;
+    global $domain_lang, $domain_country, $microsite;
 
     $l = $domain_lang;
     if (array_key_exists('lang', $params))
@@ -40,17 +40,21 @@ function pb_domain_url($params = array('path'=>'/')) {
      
     $url = 'http://';
 
-    if (OPTION_WEB_HOST == 'www') {
-        if (!$c)
-            $url .= 'www.';
+    if ($microsite) {
+        $url .= "$microsite.";
     } else {
-        $url .= OPTION_WEB_HOST;
-        $url .= ($c) ? '-' : '.';
+        if (OPTION_WEB_HOST == 'www') {
+            if (!$c)
+                $url .= 'www.';
+        } else {
+            $url .= OPTION_WEB_HOST;
+            $url .= ($c) ? '-' : '.';
+        }
+        if ($c)
+            $url .= strtolower("$c.");
+        if ($l)
+            $url .= "$l.";
     }
-    if ($c)
-        $url .= strtolower("$c.");
-    if ($l)
-        $url .= "$l.";
 
     $url .= OPTION_WEB_DOMAIN;
     if (array_key_exists('path', $params) && $params['path'])
@@ -395,7 +399,7 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
 
 # pb_view_local_alert_quick_signup
 # Display quick signup form for local alerts. Parameters can contain:
-# newflash - if true, put message in bold and show NEW! flash
+# newflash - if true, put message in bold and show "works in any country" flash
 # place - default value for place
 function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>true)) {
     $email = '';
@@ -413,7 +417,7 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 <form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
-<p><strong><?=_('Sign up for emails when people make pledges in your local area')?> <?=$newflash?'&mdash;':''?> <?=$newflash?_('NEW! Now works in any country'):''?> </strong>
+<p><strong><?=_('Sign up for emails when people make pledges in your local area')?> <?=$newflash?'&mdash;':''?> <?=$newflash?_('Works in any country!'):''?> </strong>
 <br><span style="white-space: nowrap"><?=_('Email:') ?><input type="text" size="18" name="email" value="<?=htmlspecialchars($email) ?>"></span>
 <span style="white-space: nowrap"><?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
 <span style="white-space: nowrap"><?=_('Town:')?>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
@@ -578,30 +582,4 @@ function pb_site_country_name() {
         return $site_country ? $countries_code_to_name[$site_country] : 'Global';
 }
 
-/* pb_logo
- * Returns HTML to use for logo of microsite, or country. */
-function pb_logo() {
-    global $microsite;
-    if ($microsite && $microsite == 'interface') {
-        return '
-<a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
-<span id="countrytitle"><img src="interface-logo.gif" alt="interface">
-<a href="/where">(change)</a></span>';
-
-    } else {
-        $country_name = pb_site_country_name();
-        return '
-<a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
-<span id="countrytitle">'.$country_name.'
-<a href="/where">(change)</a></span>';
-    }
-}
-
-function pb_css_file() {
-    global $microsite;
-    if ($microsite && $microsite == 'interface') {
-        return "/interface.css";
-    }
-    return "/pb.css";
-}
 

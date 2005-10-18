@@ -5,12 +5,13 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.84 2005-10-17 17:53:51 francis Exp $
+// $Id: page.php,v 1.85 2005-10-18 10:23:37 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/countries.php';
 require_once 'pledge.php';
+require_once 'microsites.php';
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
@@ -45,7 +46,7 @@ function page_header($title, $params = array()) {
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
 ?> PledgeBank<?if (!$title) print " - " . _("Tell the world \"I'll do it, but only if you'll help\"") ?></title>
-<style type="text/css" media="all">@import url('<?=pb_css_file()?>');</style>
+<style type="text/css" media="all">@import url('<?=microsites_css_file()?>');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <?
 
@@ -75,7 +76,7 @@ function page_header($title, $params = array()) {
     if (!array_key_exists('nonav', $params) or !$params['nonav']) {
 ?>
 <h1>
-<?=pb_logo()?>
+<?=microsites_logo()?>
 </h1>
 <hr class="v"><?
     }

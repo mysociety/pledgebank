@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.55 2005-09-01 16:32:28 francis Exp $
+# $Id: poster.cgi,v 1.56 2005-10-19 16:29:28 wechsler Exp $
 #
 
 import os
@@ -586,6 +586,7 @@ while fcgi.isFCGI():
         outfile = "%s_%s_%s.%s" % (ref, size, type, format)
 
         # Cache file checking
+	# XXX TODO - sanity check size and date, or we risk caching a failure here!
         if os.path.exists(outdir + '/' + outfile) and incgi:
             # Use cache file
             file_to_stdout(outdir + '/' + outfile)

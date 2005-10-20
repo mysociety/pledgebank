@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.23 2005-09-09 11:22:34 francis Exp $
+// $Id: faq.php,v 1.24 2005-10-20 10:49:56 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -184,6 +184,12 @@ word' section on your pledge's page.  Otherwise tell people to text
 the short reference for your pledge which you chose when you made it, and which
 appears at the end of its address."), sms_countries_description(),
 OPTION_PB_SMS_DISPLAY_NUMBER));
+
+print dt(_('How do I add a picture to my pledge?'));
+
+print dd(_("Go to your pledge page and click 'Add a picture to your pledge
+(creator only)' under 'Spread the word on and offline'. Either find a picture
+of something to do with your pledge, or even just use a photo of yourself!"));
 
 print "</dl>\n";
 

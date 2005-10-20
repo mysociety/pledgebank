@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.40 2005-10-11 17:39:22 francis Exp $
+// $Id: alert.php,v 1.41 2005-10-20 13:54:10 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -112,10 +112,13 @@ function do_local_alert_subscribe() {
     if (count($errors))
         return $errors;
 
-    // Split out state in case where they picked US from dropdown, but place with state from gaze
-    $a = array();
-    if (preg_match('/^(.+), ([^,]+)$/', $gaze_place, $a)) {
-        list($x, $gaze_place, $state) = $a;
+    global $countries_statecode_to_name;
+    if (array_key_exists($country, $countries_statecode_to_name)) {
+        // Split out state in case where they picked US from dropdown, but place with state from gaze
+        $a = array();
+        if (preg_match('/^(.+), ([^,]+)$/', $gaze_place, $a)) {
+            list($x, $gaze_place, $state) = $a;
+        }
     }
 
     /* Get the user to log in. */

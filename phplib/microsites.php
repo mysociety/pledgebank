@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.4 2005-10-18 11:29:46 francis Exp $
+ * $Id: microsites.php,v 1.5 2005-10-21 10:08:21 francis Exp $
  * 
  */
 
@@ -82,7 +82,7 @@ function microsites_new_pledges_frontpage() {
 function microsites_other_people() {
     global $microsite;
     if ($microsite == 'interface')
-        return _('other Interfacers');
+        return 'other Interfacers'; // deliberately not translated
     else
         return _('other local people');
 }
@@ -101,10 +101,10 @@ function microsites_syndication_warning() {
 function microsites_frontpage_intro() {
     global $microsite;
     if ($microsite == 'interface')
-        return _('"Hello, and welcome to the demo version of PledgeBank we\'ve
+        return '"Hello, and welcome to the demo version of PledgeBank we\'ve
         built for internal use at Interface. PledgeBank is a handy tool which
         is good at getting people to do social or environmental things they
-        want to do but normally never get round to."');
+        want to do but normally never get round to."'; // deliberately not translated
     else
         return _('"We all know what it is like to feel powerless, that our own
         actions can\'t really change the things that we want to change.

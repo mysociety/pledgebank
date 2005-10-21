@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.43 2005-10-15 00:38:01 francis Exp $
+ * $Id: pb.php,v 1.44 2005-10-21 10:00:47 matthew Exp $
  * 
  */
 
@@ -72,7 +72,7 @@ if ($got_matches && array_key_exists(strtolower($m[1]), $microsites_list)) {
         if (preg_match('#^(?:..|www)\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
             $domain_lang = $m[1];
     } else {
-        if (preg_match('#^'.OPTION_WEB_HOST.'-..\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+        if (preg_match('#^'.OPTION_WEB_HOST.'(?:-..)?\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
             $domain_lang = $m[1];
     }
 

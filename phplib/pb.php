@@ -7,19 +7,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.44 2005-10-21 10:00:47 matthew Exp $
+ * $Id: pb.php,v 1.45 2005-10-22 09:06:46 francis Exp $
  * 
  */
 
 // Load configuration file
 require_once "../conf/general";
-require_once '../../phplib/db.php';
-require_once '../../phplib/stash.php';
+// Some early config files - put most config files after language negotiation below
 require_once "../../phplib/error.php";
-require_once "../../phplib/utility.php";
-require_once "../../phplib/gaze.php";
 require_once "../../phplib/locale.php";
-require_once 'page.php';
 require_once 'microsites.php';
 
 /* Output buffering: PHP's output buffering is broken, because it does not
@@ -89,6 +85,14 @@ if ($got_matches && array_key_exists(strtolower($m[1]), $microsites_list)) {
 locale_negotiate_language(OPTION_PB_LANGUAGES, $domain_lang);
 locale_change();
 locale_gettext_domain('PledgeBank');
+
+# Do includes after language negotiation, so translated globals
+# are translated in them
+require_once '../../phplib/db.php';
+require_once '../../phplib/stash.php';
+require_once "../../phplib/utility.php";
+require_once "../../phplib/gaze.php";
+require_once 'page.php';
 
 # Country negotiation
 # Find country for this IP address

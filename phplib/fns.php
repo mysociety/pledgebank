@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.81 2005-10-18 10:23:37 francis Exp $
+// $Id: fns.php,v 1.82 2005-10-22 11:13:53 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -482,7 +482,7 @@ function pb_print_change_language_links($path = null) {
     $first = array_splice($out, 0, -2);
     if (count($first)) print ' ' . join(', ', $first) . ',';
     if (count($out) >= 2)
-        print ' ' . $out[count($out)-2] . ' and ' . $out[count($out)-1];
+        print ' ' . $out[count($out)-2] . ' ' . _('and') . ' ' . $out[count($out)-1];
     elseif (count($out) == 1)
         print ' ' . $out[0];
     print '. <br><a href="/translate/">'._('Translate PledgeBank into your language').'</a>.';

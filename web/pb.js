@@ -5,15 +5,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.26 2005-09-10 12:32:25 francis Exp $
+ * $Id: pb.js,v 1.27 2005-10-22 11:13:49 matthew Exp $
  * 
  */
 
 var greyed = [ 
-    ['title', '<Enter your pledge>'], 
-    ['date', '<Date>'],
-    ['name', '<Enter your name>'],
-    ['q', '<Enter town or keyword>']
+    ['title', _('<Enter your pledge>')],
+    ['date', _('<Date>')],
+    ['name', _('<Enter your name>')],
+    ['q', _('<Enter town or keyword>')]
     ]
 
 // http://www.scottandrew.com/weblog/articles/cbs-events
@@ -35,9 +35,9 @@ function pluralize(t) {
         v = d.value;
         w = s.value;
         if (t==1) {
-            if (v=='other local people') d.value = 'other local person';
+            if (v==_('other local people')) d.value = _('other local person');
         } else {
-            if (v=='other local person') d.value = 'other local people';
+            if (v==_('other local person')) d.value = _('other local people');
         }
     }
 }
@@ -105,7 +105,7 @@ function update_place_local(item, optionclick) {
     state = arr[1]
 
     // Work out our situation
-    iscountry = (countryPicked != "Global" && countryPicked != "(separator)" && countryPicked != "(choose one)");
+    iscountry = (countryPicked != _("Global") && countryPicked != _("(separator)") && countryPicked != _("(choose one)"));
     isuk = (countryPicked == "GB");
     if (d.elements['local1'])
         islocal = d.elements['local1'].checked
@@ -123,10 +123,10 @@ function update_place_local(item, optionclick) {
     var place_postcode_label = document.getElementById('place_postcode_label')
     if (place_postcode_label) {
         var current = place_postcode_label.childNodes[0].nodeValue
-        if (current == 'Town:' && countryPicked == 'GB') {
-            place_postcode_label.childNodes[0].nodeValue = 'Postcode or town:'
-        } else if (current == 'Postcode or town:' && countryPicked != 'GB') {
-            place_postcode_label.childNodes[0].nodeValue = 'Town:'
+        if (current == _('Town:') && countryPicked == 'GB') {
+            place_postcode_label.childNodes[0].nodeValue = _('Postcode or town:')
+        } else if (current == _('Postcode or town:') && countryPicked != 'GB') {
+            place_postcode_label.childNodes[0].nodeValue = _('Town:')
         }
     }
 }
@@ -189,10 +189,28 @@ function count_sms_characters() {
     /* XXX should really use the DOM for that but that requires a little
      * appendChild/removeChild dance that might not even work in old
      * browsers. So do it lazily instead: */
-    if (n <= 160)
-        text = "You have used " + n + " characters; " + (160 - n) + " remain.";
-    else
-        text = "<b>You have used " + n + " characters, which is " + (n - 160) + " more than will fit in an SMS. Please make your message shorter.</b>";
+    if (n <= 160) {
+        text = sprintf(_("You have used %d characters; %d remain."), n, 160-n);
+    } else {
+        text = "<b>" + sprintf(_("You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter."), n, n-160) + "</b>";
+    }
     document.getElementById("smslengthcounter").innerHTML = text;
+}
+
+function _(s) {
+    if (typeof(translation)!='undefined' && translation[s]) return translation[s]
+    return s
+}
+
+// Noddy version that only does %d and nothing more
+function sprintf() {
+    if (!arguments || arguments.length < 1 || !RegExp) {
+        return
+    }
+    var str = arguments[0]
+    var re = /%d/
+    var numSubstitutions = 0
+    while(arguments[++numSubstitutions] && (str = str.replace(re, parseInt(arguments[numSubstitutions], 10))) )
+    return str
 }
 

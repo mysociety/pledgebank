@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.24 2005-10-20 10:49:56 francis Exp $
+// $Id: faq.php,v 1.25 2005-10-24 12:36:31 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -100,6 +100,16 @@ print dt(_('Do you need any help with the project?'));
 
 print dd(_('Yes, we can use help in all sorts of ways, technical or non-technical.
 Please <a href="/contact">contact us</a> if you want to get in touch.'));
+
+print dt(_('Where\'s the "source code" to PledgeBank?'));
+
+print dd(_('The software behind PledgeBank is open source, and available to you
+mainly under the Affero GPL software license. You can <a
+href="https://secure.mysociety.org/cvstrac/dir?d=mysociety">download the source
+code</a> (look under \'pb\') and help us develop it. You\'re welcome to use it
+in your own projects, although you must also make available the source code to
+any such projects.
+'));
 
 print "</dl>\n";
 

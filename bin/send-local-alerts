@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.14 2005-09-10 12:32:25 francis Exp $
+ * $Id: send-local-alerts,v 1.15 2005-10-24 12:40:18 francis Exp $
  *
  */
 
@@ -67,7 +67,10 @@ function send_local_alerts() {
                 from alert 
                     left join person as alerted on alert.person_id = alerted.id
                     left join location on alert.location_id = location.id
-                where event_code = 'pledges/local'");
+                where 
+                    whendisabled is null and
+                    event_code = 'pledges/local'
+                ");
 
     $consolidated = array();
     while ($alert = db_fetch_array($p)) {

@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.156 2005-10-21 10:00:15 matthew Exp $
+-- $Id: schema.sql,v 1.157 2005-10-24 12:40:18 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1012,12 +1012,14 @@ create table alert (
     pledge_id integer references pledges(id), -- specific pledge for ".../ref" event codes
     location_id integer references location(id), -- specific location for ".../local" event codes
 
-    whensubscribed timestamp not null default pb_current_timestamp()
+    whensubscribed timestamp not null default pb_current_timestamp(),
+    whendisabled timestamp default null -- set if alert has been turned off
 );
 
 create index alert_person_id_idx on alert(person_id);
 create index alert_event_code_idx on alert(event_code);
 create index alert_pledge_id_idx on alert(pledge_id);
+create index alert_whendisabled_idx on alert(whendisabled);
 create unique index alert_unique_idx on alert(person_id, event_code, pledge_id, location_id);
 
 create table alert_sent (

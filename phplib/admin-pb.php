@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.102 2005-10-13 21:12:18 francis Exp $
+ * $Id: admin-pb.php,v 1.103 2005-10-24 12:40:18 francis Exp $
  * 
  */
 
@@ -984,8 +984,11 @@ class ADMIN_PAGE_PB_STATS {
         db_connect();
 
         print h2(_("Local alerts by country"));
-        $q = db_query('select country, count(*) as c, 
-            date(min(whensubscribed)) as t1, date(max(whensubscribed)) as t2
+        $q = db_query('select country, 
+            count(case when whendisabled is null then 1 else null end) as active, 
+            count(whendisabled) as disabled, 
+            date(min(whensubscribed)) as t1, date(max(whensubscribed)) as t2,
+            date(min(whendisabled)) as d1, date(max(whendisabled)) as d2
             from alert 
                 left join location on location.id = alert.location_id 
             where event_code = \'pledges/local\' 
@@ -994,7 +997,12 @@ class ADMIN_PAGE_PB_STATS {
             ');
 
         print '<table border="1" cellpadding="3" cellspacing="0">';
-        print '<tr><th>Country</th><th>Local alert signups</th><th>Signup date range</th></tr>';
+        print '<tr><th>Country</th>
+            <th>Signups<br>(still active)</th>
+            <th>Signups<br>(now unsubscribed)</th>
+            <th>Signup date range</th>
+            <th>Unsubscribe date range</th>
+            </tr>';
         $n = 0;
         while ($r = db_fetch_array($q)) {
             if ($n++%2)
@@ -1002,14 +1010,22 @@ class ADMIN_PAGE_PB_STATS {
             else 
                 print '<tr class="v">';
             print '<td>'.htmlspecialchars($r['country']) . '</td>';
-            print '<td>'.htmlspecialchars($r['c']) . '</td>';
+            print '<td>'.htmlspecialchars($r['active']) . '</td>';
+            print '<td>'.htmlspecialchars($r['disabled']) . '</td>';
             print '<td>'.htmlspecialchars($r['t1']) . ' to '. htmlspecialchars($r['t2']) . '</td>';
+            if (!$r['d1'] && !$r['d2']) {
+                print '<td>n/a</td>';
+            } else {
+                print '<td>'.htmlspecialchars($r['d1']) . ' to '. htmlspecialchars($r['d2']) . '</td>';
+            }
             print "</tr>\n";
         }
         print '</table>';
 
         print h2(_("Local alert signups"));
-        $q = db_query('select date(whensubscribed) as date, count(*) as c
+        $q = db_query('select date(whensubscribed) as date, 
+                count(case when whendisabled is null then 1 else null end) as active, 
+                count(whendisabled) as disabled
             from alert 
                 left join location on location.id = alert.location_id 
             where event_code = \'pledges/local\' 
@@ -1018,7 +1034,7 @@ class ADMIN_PAGE_PB_STATS {
             ');
 
         print '<table border="1" cellpadding="3" cellspacing="0">';
-        print '<tr><th>Day</th><th>Local alert signups</th></tr>';
+        print '<tr><th>Day</th><th>Signups<br>(still active)</th><th>Signups<br>(now unsubscribed)</th></tr>';
         $n = 0;
         while ($r = db_fetch_array($q)) {
             if ($n++%2)
@@ -1026,7 +1042,8 @@ class ADMIN_PAGE_PB_STATS {
             else 
                 print '<tr class="v">';
             print '<td>'.htmlspecialchars($r['date']) . '</td>';
-            print '<td>'.htmlspecialchars($r['c']) . '</td>';
+            print '<td>'.htmlspecialchars($r['active']) . '</td>';
+            print '<td>'.htmlspecialchars($r['disabled']) . '</td>';
             print "</tr>\n";
         }
         print '</table>';

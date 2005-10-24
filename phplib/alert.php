@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.22 2005-10-11 17:39:22 francis Exp $
+// $Id: alert.php,v 1.23 2005-10-24 12:40:18 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -31,11 +31,16 @@ function alert_signup($person_id, $event_code, $params) {
     if ($event_code == "comments/ref") {
         /* Alert when a comment is added to a particular pledge */
 
-        $already = db_getOne("select id from alert where person_id = ? and event_code = ?
+        $already = db_getRow("select id, whendisabled from alert where person_id = ? and event_code = ?
             and pledge_id = ? for update", array($person_id, $event_code, $params['pledge_id']));
         if (is_null($already)) {
             db_query("insert into alert (person_id, event_code, pledge_id)
                 values (?, ?, ?)", array($person_id, $event_code, $params['pledge_id']));
+        } elseif ($already['whendisabled']) {
+            /* Re-enable disabled alert. Move subscription time as this is used to compare
+               against post dates */
+            db_query("update alert set whendisabled = null, whensubscribed = pb_current_timestamp()
+                where id = ?", array($already['id']));
         }
     } elseif ($event_code == "pledges/local") {
         /* Alert when a new pledge appears near a particular area */
@@ -71,7 +76,8 @@ function alert_signup($person_id, $event_code, $params) {
 
         /* Guard against double-insertion. */
         db_query('lock table alert in share mode');
-        $already = db_getOne("select alert.id from alert left join location on location.id = alert.location_id
+        $already = db_getRow("select alert.id, alert.whendisabled 
+                from alert left join location on location.id = alert.location_id
                 where person_id = ? and event_code = ?
                 and country = ? 
                 and method = ? and input = ? and latitude = ? and longitude = ?",
@@ -98,6 +104,11 @@ function alert_signup($person_id, $event_code, $params) {
                     values (?, ?, ?)", array(
                         $person_id, $event_code, $location_id
                     ));
+        } elseif ($already['whendisabled']) {
+            /* Re-enable disabled alert. Move subscription time as this is used to compare
+               against post dates */
+            db_query("update alert set whendisabled = null, whensubscribed = pb_current_timestamp()
+                where id = ?", array($already['id']));
         }
     } else {
         err("Unknown alert event '$event_code'");
@@ -115,9 +126,7 @@ function alert_unsubscribe($person_id, $alert_id) {
     if ($person_id != $row['person_id'])   
         err(sprintf(_("Alert %d does not belong to person %d"), intval($alert_id), intval($person_id)));
 
-    db_getOne('select id from alert where id = ? for update', $alert_id);
-    db_query("delete from alert_sent where alert_id = ?", $alert_id);
-    db_query("delete from alert where id = ?", $alert_id);
+    db_query("update alert set whendisabled = pb_current_timestamp() where id = ?", $alert_id);
     db_commit();
 }
 
@@ -130,14 +139,18 @@ function alert_h_description($alert_id) {
     if (!$row) 
         return false;
 
+    $disabled = "";
+    if ($row['whendisabled'])
+        $disabled = " (disabled)";
+
     if ($row['event_code'] == "comments/ref") { 
         $pledge = new Pledge(intval($row['pledge_id']));
-        return sprintf(_("new comments on the pledge '%s'"), $pledge->ref() );
+        return sprintf(_("new comments on the pledge '%s'%s"), $pledge->ref(), $disabled);
     } elseif ($row['event_code'] == "pledges/local") { 
         if ($row['method'] == 'MaPit') 
-            return sprintf(_("new pledges near UK postcode %s"), $row['description'] );
+            return sprintf(_("new pledges near UK postcode %s%s"), $row['description'], $disabled);
         else 
-            return sprintf(_("new pledges near %s"), $row['description'] );
+            return sprintf(_("new pledges near %s%s"), $row['description'], $disabled);
     } else {
         err(sprintf(_("Unknown event code '%s'"), $row['event_code']));
     }
@@ -158,7 +171,9 @@ function alert_unsubscribe_link($alert_id, $email) {
  * Displays list of all local pledge alerts person has with unsubscribe button.
  */
 function alert_list_pledges_local($person_id) {
-    $s = db_query('SELECT alert.* from alert where person_id = ? and event_code=\'pledges/local\'', $person_id);
+    $s = db_query('SELECT alert.* from alert where 
+            person_id = ? and event_code=\'pledges/local\'
+            and whendisabled is null', $person_id);
     print h2(_("Local pledge alerts"));
     if (0 != db_num_rows($s)) {
         print _("You will get email when there are:<ul>");

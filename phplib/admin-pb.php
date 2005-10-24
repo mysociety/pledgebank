@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.103 2005-10-24 12:40:18 francis Exp $
+ * $Id: admin-pb.php,v 1.104 2005-10-24 13:03:36 francis Exp $
  * 
  */
 
@@ -982,6 +982,13 @@ class ADMIN_PAGE_PB_STATS {
 
     function display($self_link) {
         db_connect();
+
+        $r = db_getRow('select 
+            count(case when whendisabled is null then 1 else null end) as active, 
+            count(whendisabled) as disabled
+            from alert
+            where event_code = \'pledges/local\'');
+        print "Total subscribers: " . $r['active'] . " Unsubscribed: " . $r['disabled'];
 
         print h2(_("Local alerts by country"));
         $q = db_query('select country, 

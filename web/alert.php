@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.41 2005-10-20 13:54:10 francis Exp $
+// $Id: alert.php,v 1.42 2005-10-24 10:37:30 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -140,9 +140,12 @@ function do_local_alert_subscribe() {
 
 <p class="noisymessage"><?=("To see all your local pledge alerts, <a href=\"/your\">click here</a>.")?></p>
 
-<p class="noisymessage"><strong><?=_("Summer pledgin'!")?></strong> <?=_("Given that it is summer time, why not use PledgeBank to ")?>
-<a href="/new/streetparty"><?=_("organise a street party")?></a>?
-Or <a href="/new/picnic"><?=_("a picnic")?></a>?
+
+<? if ($params['country'] == 'GB') { ?>
+<p class="loudmessage"><strong><?=('Have a <a href="http://www.hearfromyourmp.com">long term relationship</a> with your MP!')?></strong>
+<? } else { ?>
+<p class="loudmessage"><?=('Make your own <a href="/new/">new pledge</a>! Others in your area will be emailed about it automatically.')?>
+<? } ?>
 <?
 }
 

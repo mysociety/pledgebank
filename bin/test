@@ -1,0 +1,27 @@
+<?php
+/* 
+ * test:
+ *
+ * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: test,v 1.1 2005-10-25 11:35:54 francis Exp $
+ *
+ */
+
+$short_opts = '';
+$long_opts = array('verbose','help');
+
+#require_once "../phplib/pbcgi.php";
+
+$_SERVER['HTTP_HOST'] = "dummy";
+$_SERVER['REQUEST_URI'] = "/dummy";
+$_SERVER['REMOTE_ADDR'] = "dummy.dummy";
+require_once "../phplib/pb.php";
+
+print _('Start your own pledge') . "\n";
+locale_push('pt-br');
+print _('Start your own pledge') . "\n";
+locale_pop();
+print _('Start your own pledge') . "\n";
+

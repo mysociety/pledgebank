@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.82 2005-10-22 11:13:53 matthew Exp $
+// $Id: fns.php,v 1.83 2005-10-27 17:52:15 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -151,43 +151,58 @@ function pb_send_email_internal($to, $spec) {
 # Stolen from my railway script
 function parse_date($date) {
     global $pb_time;
-	$now = $pb_time;
-	$error = 0;
-	if (!$date)  {
+    $now = $pb_time;
+    $error = 0;
+    if (!$date)  {
         return null;
     }
 
-	$date = preg_replace('#((\b([a-z]|on|an|of|in|the|year of our lord))|(?<=\d)(st|nd|rd|th))\b#','',$date);
+    $date = preg_replace('#((\b([a-z]|on|an|of|in|the|year of our lord))|(?<=\d)(st|nd|rd|th))\b#','',$date);
+
+    # Translate foreign words to English as strtotime() is English only
+    $translate = array(
+        'Ionawr'=>'January', 'Chwefror'=>'February', 'Mawrth'=>'March', 'Ebrill'=>'April',
+        'Mai'=>'May', 'Mehefin'=>'June', 'Gorffennaf'=>'July', 'Awst'=>'August',
+        'Medi'=>'September', 'Hydref'=>'October', 'Tachwedd'=>'November', 'Rhagfyr'=>'December',
+        'Dydd Llun'=>'Monday', 'Dydd Mawrth'=>'Tuesday', 'Dydd Mercher'=>'Wednesday',
+        'Dydd Iau'=>'Thursday', 'Dydd Gwener'=>'Friday', 'Dydd Sadwrn'=>'Saturday', 'Dydd Sul'=>'Sunday'
+    );
+    $search = array(); $replace = array();
+    foreach ($translate as $foreign => $english) {
+        $search[] = "/$foreign/i";
+        $replace[] = $english;
+    }
+    $date = preg_replace($search, $replace, $date);
 
     $epoch = 0;
     $day = null;
     $year = null;
     $month = null;
-	if (preg_match('#(\d+)/(\d+)/(\d+)#',$date,$m)) {
-		$day = $m[1]; $month = $m[2]; $year = $m[3];
-	} elseif (preg_match('#(\d+)/(\d+)#',$date,$m)) {
-		$day = $m[1]; $month = $m[2]; $year = date('Y');
-	} elseif (preg_match('#^([0123][0-9])([01][0-9])([0-9][0-9])$#',$date,$m)) {
-		$day = $m[1]; $month = $m[2]; $year = $m[3];
-	} else {
-		$dayofweek = date('w'); # 0 Sunday, 6 Saturday
-		if (preg_match('#next\s+(sun|sunday|mon|monday|tue|tues|tuesday|wed|wednes|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday)\b#i',$date,$m)) {
-			$date = preg_replace('#next#i','this',$date);
-			if ($dayofweek == 5) {
-				$now = strtotime('3 days', $now);
-			} elseif ($dayofweek == 4) {
-				$now = strtotime('4 days', $now);
-			} else {
-				$now = strtotime('5 days', $now);
-			}
-		}
-		$t = strtotime($date,$now);
-		if ($t != -1) {
-			$day = date('d',$t); $month = date('m',$t); $year = date('Y',$t); $epoch = $t;
-		} else {
-			$error = 1;
-		}
-	}
+    if (preg_match('#(\d+)/(\d+)/(\d+)#',$date,$m)) {
+        $day = $m[1]; $month = $m[2]; $year = $m[3];
+    } elseif (preg_match('#(\d+)/(\d+)#',$date,$m)) {
+        $day = $m[1]; $month = $m[2]; $year = date('Y');
+    } elseif (preg_match('#^([0123][0-9])([01][0-9])([0-9][0-9])$#',$date,$m)) {
+        $day = $m[1]; $month = $m[2]; $year = $m[3];
+    } else {
+        $dayofweek = date('w'); # 0 Sunday, 6 Saturday
+        if (preg_match('#next\s+(sun|sunday|mon|monday|tue|tues|tuesday|wed|wednes|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday)\b#i',$date,$m)) {
+            $date = preg_replace('#next#i','this',$date);
+            if ($dayofweek == 5) {
+                $now = strtotime('3 days', $now);
+            } elseif ($dayofweek == 4) {
+                $now = strtotime('4 days', $now);
+            } else {
+                $now = strtotime('5 days', $now);
+            }
+        }
+        $t = strtotime($date,$now);
+        if ($t != -1) {
+            $day = date('d',$t); $month = date('m',$t); $year = date('Y',$t); $epoch = $t;
+        } else {
+            $error = 1;
+        }
+    }
     if (!$epoch && $day && $month && $year)
         $epoch = mktime(0,0,0,$month,$day,$year);
 

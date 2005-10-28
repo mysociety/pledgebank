@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.98 2005-10-22 11:13:49 matthew Exp $
+// $Id: new.php,v 1.99 2005-10-28 15:47:06 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -114,7 +114,7 @@ the door of that neighbour whose name you've forgotten.") ?></li>
 <p><strong><?=_('will') ?></strong> <input type="text" id="signup" name="signup"
 size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.</p>
 
-<p><?=_('The other people must sign up before') ?> <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(e.g. "<?
+<p><?=_('The other people must sign up before') ?> <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(<?=_('e.g.') ?> "<?
 if ($lang=='en-gb')
     print date('jS F', $pb_time+60*60*24*28); // 28 days
 else

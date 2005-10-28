@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.23 2005-10-24 12:40:18 francis Exp $
+// $Id: alert.php,v 1.24 2005-10-28 15:47:09 matthew Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -141,7 +141,7 @@ function alert_h_description($alert_id) {
 
     $disabled = "";
     if ($row['whendisabled'])
-        $disabled = " (disabled)";
+        $disabled = _(" (disabled)");
 
     if ($row['event_code'] == "comments/ref") { 
         $pledge = new Pledge(intval($row['pledge_id']));

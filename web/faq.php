@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.25 2005-10-24 12:36:31 francis Exp $
+// $Id: faq.php,v 1.26 2005-10-28 10:17:32 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -183,7 +183,7 @@ theirs, so you can stay in touch as you carry out your pledge.  If anybody
 signs your pledge later, all your messages will be automatically forwarded to
 them."));
 
-print dt(_('Can people to sign up by SMS (text message), and if so how?'));
+print dt(_('Can people sign up by SMS (text message), and if so how?'));
 
 print dd(sprintf(_("Yes, although only in %s. If you'd like to help us organise
 SMS for other countries, please contact us. The flyers for your pledge

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.99 2005-10-28 15:47:06 matthew Exp $
+// $Id: new.php,v 1.100 2005-10-28 20:06:22 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -35,11 +35,11 @@ page_footer(array('nolocalsignup'=>true));
 function pledge_form_one($data = array(), $errors = array()) {
     global $lang;
 # <!-- <p><big><strong>Before people can create pledges we should have a stiff warning page, with few, select, bold words about what makes for good &amp; bad pledges (we want to try to get people to keep their target numbers down).</strong></big></p> -->
-	if (sizeof($errors)) {
-		print '<div id="errors"><ul><li>';
-		print join ('</li><li>', array_values($errors));
-		print '</li></ul></div>';
-	} else {
+    if (sizeof($errors)) {
+        print '<div id="errors"><ul><li>';
+        print join ('</li><li>', array_values($errors));
+        print '</li></ul></div>';
+    } else {
 ?>
 <div id="tips">
 <h2><?=_('Top Tips for Successful Pledges') ?></h2>
@@ -102,9 +102,11 @@ the door of that neighbour whose name you've forgotten.") ?></li>
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
 <h2><?=_('New Pledge &#8211; Step 1 of 4') ?></h2>
 <div class="c">
+<?  if (!count($_POST)) { ?>
 <h3><?=_('Language')?></h3>
-<p><?=_('First, choose the language you would like your pledge to be in.')?>
-<p><? pb_print_change_language_links() ?>
+<p><?=_('First, choose the language you would like your pledge to be in.')?></p>
+<p><?   pb_print_change_language_links();
+    } ?>
 <h3><?=_('Your Pledge')?></h3>
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
@@ -368,11 +370,14 @@ function pledge_form_three($data, $errors = array()) {
 }
 
 function pledge_form_submitted() {
+    global $lang, $microsite;
     $errors = array();
     $data = array();
     foreach (array_keys($_POST) as $field) {
         $data[$field] = get_http_var($field);
     }
+    if (array_key_exists('title', $data))
+        $data['lang'] = $lang;
     
     if (array_key_exists('data', $data)) {
         $alldata = unserialize(base64_decode($data['data']));
@@ -382,10 +387,9 @@ function pledge_form_submitted() {
     }
 
     # Step 1 fixes
-    global $lang, $microsite;
-    $data['lang'] = $lang;
     $data['microsite'] = $microsite;
-    if ($data['title']=='<Enter your pledge>') $data['title'] = '';
+    if ($data['title']==_('<Enter your pledge>')) $data['title'] = '';
+    if ($data['name']==_('<Enter your name>')) $data['name'] = '';
     if (!$data['type']) $data['type'] = microsites_other_people();
     $data['parseddate'] = parse_date($data['date']);
     if (!$data['signup']) $data['signup'] = 'sign up';
@@ -772,8 +776,6 @@ greater publicity and a greater chance of succeeding.');
 
 # Someone has submitted a new pledge
 function create_new_pledge($P, $data) {
-    global $lang;
-
     $isodate = $data['parseddate']['iso'];
     if ($data['visibility'] == 'all')
         $data['pin'] = null;

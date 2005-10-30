@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.25 2005-10-30 23:44:29 francis Exp $
+// $Id: search.php,v 1.26 2005-10-30 23:58:01 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -49,6 +49,20 @@ function search() {
     global $pb_today;
     $search = trim(get_http_var('q'));
     $success = 0;
+
+    // Blank searches
+    if ($search == _('<Enter town or keyword>'))
+        $search = "";
+    if (!$search) {
+        print p(_('You can search for:'));
+        print "<ul>";
+        print li(_("The name of a <strong>town or city</strong> near you, to find pledges in your area"));
+        print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
+        print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
+        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
+        print "</ul>";
+        return;
+    }
 
     // Exact pledge reference match
     $pledge_select = "SELECT pledges.*, '$pb_today' <= pledges.date as open,

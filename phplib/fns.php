@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.83 2005-10-27 17:52:15 matthew Exp $
+// $Id: fns.php,v 1.84 2005-10-30 23:58:00 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -22,6 +22,7 @@ function h3($s) { return "<h3>$s</h3>\n"; }
 function strong($s) { return "<strong>$s</strong>"; }
 function dt($s) { print "<dt>$s</dt>\n"; }
 function dd($s) { print "<dd>$s</dd>\n"; }
+function li($s) { return "<li>$s</li>\n"; }
 
 # pb_domain_url returns current URL with country and language in it.
 # Defaults to keeping country country or language, unless param contains:

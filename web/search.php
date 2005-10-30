@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.24 2005-10-11 17:39:22 francis Exp $
+// $Id: search.php,v 1.25 2005-10-30 23:44:29 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -68,9 +68,11 @@ function search() {
     // Postcodes
     $location = null;
     $location_description = null;
-    if (validate_postcode($search))  {
+    $is_postcode = validate_postcode($search);
+    $is_partial_postcode = validate_partial_postcode($search);
+    if ($is_postcode || $is_partial_postcode)  {
         $success = 1;
-        $location = mapit_get_location($search);
+        $location = mapit_get_location($search, $is_partial_postcode ? 1 : 0);
         if (mapit_get_error($location)) {
             print p(_("We couldn't find that postcode, please check it again."));
         } else {

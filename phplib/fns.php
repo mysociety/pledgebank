@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.84 2005-10-30 23:58:00 francis Exp $
+// $Id: fns.php,v 1.85 2005-10-31 07:28:35 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -102,10 +102,8 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         
     $values['signature'] = _("-- the PledgeBank.com team");
 
-    if (is_file("../templates/emails/$lang/$template_name"))
-        $template = file_get_contents("../templates/emails/$lang/$template_name");
-    else
-        $template = file_get_contents("../templates/emails/$template_name");
+    $template = file_get_contents("../templates/emails/$template_name");
+    $template = _($template); # TODO: Check this works when we have some translations
 
     $spec = array(
         '_template_' => $template,

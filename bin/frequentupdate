@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.51 2005-09-10 12:32:25 francis Exp $
+ * $Id: frequentupdate,v 1.52 2005-10-31 08:39:11 francis Exp $
  *
  */
 
@@ -183,7 +183,9 @@ function send_automatic_failure_messages() {
         /* Unlike automatic success messages, automatic failure messages go
          * by SMS too, because there's no other way for SMS signers to hear
          * about them. */
-        $sms = "PledgeBank here. Sorry, the ${pledge['ref']} pledge has failed. Better luck next time!";
+        locale_push($pledge['lang']);
+        $sms = sprintf(_("PledgeBank here. Sorry, the %s pledge has failed. Better luck next time!"), $pledge['ref']);
+        locale_pop();
 
         db_query("
                 insert into message (
@@ -369,7 +371,9 @@ function send_pending_messages() {
         $f = false;
         if (isset($msg['emailtemplatename'])) {
             verbose("sending message #${msg['id']} using email template '${msg['emailtemplatename']}'");
+            locale_push($pledge->lang());
             $f = pb_send_email_template($pledge->creator_email(), $msg['emailtemplatename'], $data, $headers);
+            locale_pop();
         } else {
             verbose("sending message #${msg['id']} as raw email, subject '${msg['emailsubject']}'");
             $f = pb_send_email($pledge->creator_email(), $msg['emailsubject'], $msg['emailbody'], $headers);
@@ -440,16 +444,13 @@ function send_pending_messages() {
         verbose("message #${r['id']} to be sent to signer #${r['signer_id']}");
 
         // Make any extra headers
-        $pledge = db_getRow('select pledges.*, person.email as email,
-            (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
-            from pledges left join person on person.id = pledges.person_id
-            where pledges.id = ?', $r['pledge_id']);
+        $pledge = new Pledge($r['ref']);
 
         $headers = array();
         if ($r['fromaddress'] == 'pledgebank') {
             // the default in pb_send_email_internal is from PledgeBank
         } elseif ($r['fromaddress'] == 'creator') {
-            $headers['From'] = $pledge['name'] . " <" . $pledge['email'] .">";
+            $headers['From'] = $pledge->creator_name() . " <" . $pledge->creator_email() .">";
         } else {
             error("Unknown 'from' in message " . $r['id'] . ": " . $msg['fromaddress']);
         }
@@ -464,14 +465,16 @@ function send_pending_messages() {
             $f = true;
         } elseif (isset($r['emailtemplatename'])) {
             /* Local alert signup link */
-            $data = $pledge;
+            $data = $pledge->data;
             if ($r['emailtemplatename'] == 'succeeded-signer') {
                 $data['local_alert_url'] = person_make_signon_url(null, $r['signer_email'], "GET", OPTION_BASE_URL . "/alert", array());
             }
 
             /* Send email template. */
             verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
+            locale_push($pledge->lang());
             $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $data, $headers);
+            locale_pop();
         } else {
             /* Send raw mail. */
             $emailbody = $r['emailbody'];
@@ -490,18 +493,19 @@ function send_pending_messages() {
                 }
 
                 /* Add special header */
+                locale_push($pledge->lang());
                 if ($r['howlongago'] > 2 * 86400)
-                    $h = sprintf('%d days ago', intval($r['howlongago'] / 86400));
+                    $h = sprintf(_('%d days ago'), intval($r['howlongago'] / 86400));
                 elseif ($r['howlongago'] > 2 * 3600)
-                    $h = sprintf('%d hours ago', intval($r['howlongago'] / 3600));
+                    $h = sprintf(_('%d hours ago'), intval($r['howlongago'] / 3600));
                 elseif ($r['howlongago'] > 2 * 60)
-                    $h = sprintf('%d minutes ago', intval($r['howlongago'] / 60));
+                    $h = sprintf(_('%d minutes ago'), intval($r['howlongago'] / 60));
                 else
-                    $h = 'a minute ago';
-
-                $pledge = new Pledge($r['ref']);
+                    $h = _('a minute ago');
                 $url = person_make_signon_url(null, $r['signer_email'], "GET", $pledge->url_announce_archive(), array());
-                $emailbody = "[ You signed this pledge after this message was sent to the other signers. They will have received copies of this message $h. You can read older messages from the pledge creator that you missed here: $url ]\n\n" . $emailbody;
+                $emailbody = sprintf(_("[ You signed this pledge after this message was sent to the other signers. They will have received copies of this message %s. You can read older messages from the pledge creator that you missed here: %s ]"), $h, $url)
+                             . "\n\n" . $emailbody;
+                locale_pop();
                 
                 /* Record that it is a late signer message */
                 $latesigners[$r['signer_id']] = 1;

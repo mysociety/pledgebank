@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-comment-alerts,v 1.7 2005-10-24 12:40:18 francis Exp $
+ * $Id: send-comment-alerts,v 1.8 2005-10-31 08:39:11 francis Exp $
  *
  */
 
@@ -100,7 +100,9 @@ function send_comment_alerts() {
         $row['comment_url'] = $pledge->url_comments();
         $row['comment_text'] = trim($row['comment_text']);
         $row['unsubscribe_url'] = alert_unsubscribe_link($row['alert_id'], $row['alerted_email']);
+        locale_push($pledge->lang());
         $f = pb_send_email_template($row['alerted_email'], 'alert-comment', $row, array());
+        locale_pop();
         if (!$f) {
             # Revert record that it has been sent
             db_rollback();

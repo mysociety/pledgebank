@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.15 2005-10-24 12:40:18 francis Exp $
+ * $Id: send-local-alerts,v 1.16 2005-10-31 08:39:12 francis Exp $
  *
  */
 
@@ -111,31 +111,38 @@ function send_local_alerts() {
         $count = 0; # how many pledges in this alert
         $text = ""; # description and link to each
         $lastrow = array();
+        $first_lang = null;
         while ($row = db_fetch_array($q)) {
             verbose("person #${alert['alerted_person_id']} (${alert['alerted_email']}) has alert #${alert['alert_id']} on new local pledge ${row['ref']} which is ".round($row['distance'],1)."km from ${alert['alert_description']}");
 
             # Check to see if the alert has been sent meanwhile
             $alreadysent = db_getOne('select alert_id from alert_sent where alert_id = ? and pledge_id = ?', 
                      array($alert['alert_id'], $row['pledge_id']));
-            if ($alreadysent) continue;
+            if ($alreadysent) 
+                continue;
 
             # Store that alert has been sent
             db_query("insert into alert_sent (alert_id, pledge_id) values (?, ?)", 
                      array($alert['alert_id'], $row['pledge_id']));
 
+            # Construct repeating text
             $pledge = new Pledge($row);
+            locale_push($pledge->lang());
             $row['pledge_url'] = $pledge->url_main();
             $row['distance'] = round($row['distance'], 0);
             if ($row['distance'] < 1) {
-                $row['distance'] = "under 1";
+                $row['distance'] = _("under 1");
             }
             $lastrow = $row;
-           
-            # Construct repeating text
-            $text .= $row['distance'] . " km away: '" . $pledge->sentence(array('firstperson'=>true)) . "'";
+            $text .= $row['distance'] . " "._("km away").": '" . $pledge->sentence(array('firstperson'=>true)) . "'";
             $text .= " -- " . $row['creator_name'] . ".";
-            $text .=" Click for more info: " . $row['pledge_url'];
+            $text .=" "._("Click for more info:")." " . $row['pledge_url'];
             $text .= "\n\n";
+            locale_pop();
+
+            # Store language of first pledge in mail
+            if (!$first_lang)
+                $first_lang = $pledge->lang();
 
             # Record how many we have
             $count++;
@@ -145,12 +152,16 @@ function send_local_alerts() {
         $alert['unsubscribe_url'] = alert_unsubscribe_link($alert['alert_id'], $alert['alerted_email']);
         $alert['pledges_count'] = $count;
         $alert['pledges_text'] = $text;
+        # Use language of first pledge - for alerts containing pledges in multiple languages
+        # we are hoping the person receiving the alert speaks the first language.
+        locale_push($first_lang);
         if ($count > 1) {
             $f = pb_send_email_template($alert['alerted_email'], 'alert-local-multiple', $alert, array());
         } else {
             $params = array_merge($alert, $lastrow);
             $f = pb_send_email_template($alert['alerted_email'], 'alert-local-single', $params, array());
         }
+        locale_pop();
         verbose("sent $count new pledge alerts in one mail to " . $alert["alerted_email"]);
         if (!$f) {
             # Revert record that it has been sent

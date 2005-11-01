@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.25 2005-07-22 11:48:59 matthew Exp $
+ * $Id: ref-info.php,v 1.26 2005-11-01 17:57:13 matthew Exp $
  * 
  */
 
@@ -71,7 +71,7 @@ $p->render_box();
 <tr>
     <th><?=_('Number of signers') ?></th>
     <td><?= $p->signers() ?> / <?= $p->target() ?>
-        <?= sprintf('(%.1f%% of target)', 100. * $p->signers() / $p->target()) ?>
+        <?= sprintf(_('(%.1f%% of target)'), 100. * $p->signers() / $p->target()) ?>
     </td>
 </tr>
 <tr>

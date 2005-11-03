@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.157 2005-10-24 12:40:18 francis Exp $
+-- $Id: schema.sql,v 1.158 2005-11-03 17:34:26 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1048,7 +1048,8 @@ create table abusereport (
     ),
     reason text,
     whenreported timestamp not null default pb_current_timestamp(),
-    ipaddr text
+    ipaddr text,
+    email text
 );
 
 create index abusereport_what_id_idx on abusereport(what_id);

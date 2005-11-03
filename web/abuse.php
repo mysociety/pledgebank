@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.19 2005-07-31 22:29:48 matthew Exp $
+// $Id: abuse.php,v 1.20 2005-11-03 17:35:45 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -27,7 +27,8 @@ function report_abusive_thing() {
     $errors = importparams(
                 array('what',       '/^(comment|pledge|signer)$/',  ''),
                 array('id',         '/^[1-9]\d*$/',                 ''),
-                array('reason',     '//',                           '', null)
+                array('reason',     '//',                           '', null),
+                array('email',      '//',                           '', null)
             );
     if (!is_null($errors)) {
         print p(_("A required parameter was missing.") . ' ' . join(" ",$errors));
@@ -63,12 +64,12 @@ function report_abusive_thing() {
 
     if (!is_null($q_reason)) {
         $ip = $_SERVER["REMOTE_ADDR"];
-        db_query('insert into abusereport (what, what_id, reason, ipaddr) values (?, ?, ?, ?)', 
-            array($q_what, $q_id, $q_reason, $ip));
+        db_query('insert into abusereport (what, what_id, reason, ipaddr, email) values (?, ?, ?, ?, ?)', 
+            array($q_what, $q_id, $q_reason, $ip, $q_email));
         db_commit();
         $admin_url = OPTION_ADMIN_URL . "/?page=pbabusereports&what=" . $q_what;
         pb_send_email(OPTION_CONTACT_EMAIL, _("PledgeBank abuse report"), _(<<<EOF
-New abuse report for $q_what id $q_id from IP $ip.
+New abuse report for $q_what id $q_id from IP $ip, email $q_email
 
 $more
 
@@ -110,7 +111,9 @@ EOF;
     print '<p>';
     printf(_('Please give a short reason for reporting this %s.'), $w);
     print '<br><input type="text" name="reason" size="60"></p>
-<p><input name="submit" type="submit" value="' . _('Submit') . '"></p>
+<p><input name="submit" type="submit" value="' . _('Submit') . '"><br>'
+    printf(_('If you would like us to get back to you about your abuse report, please give your email address.'));
+    print '<br><input type="text" name="email" size="60"></p>
 </form>';
 
 }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.20 2005-11-03 17:35:45 chris Exp $
+// $Id: abuse.php,v 1.21 2005-11-03 19:13:15 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -108,6 +108,10 @@ as possible.')), $w);
 <input type="hidden" name="what" value="$q_h_what">
 <input type="hidden" name="id" value="$q_h_id">
 EOF;
+
+    /* XXX we should add a drop-down for category of abuse, to drive home the
+     * point that this is an *abuse* report. */
+
     print '<p>';
     printf(_('Please give a short reason for reporting this %s.'), $w);
     print '<br><input type="text" name="reason" size="60"></p>

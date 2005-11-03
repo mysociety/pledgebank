@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.45 2005-10-22 09:06:46 francis Exp $
+ * $Id: pb.php,v 1.46 2005-11-03 07:00:19 francis Exp $
  * 
  */
 
@@ -17,6 +17,7 @@ require_once "../conf/general";
 require_once "../../phplib/error.php";
 require_once "../../phplib/locale.php";
 require_once 'microsites.php';
+require_once 'page.php';
 
 /* Output buffering: PHP's output buffering is broken, because it does not
  * affect headers. However, it's worth using it anyway, because in the common
@@ -92,7 +93,6 @@ require_once '../../phplib/db.php';
 require_once '../../phplib/stash.php';
 require_once "../../phplib/utility.php";
 require_once "../../phplib/gaze.php";
-require_once 'page.php';
 
 # Country negotiation
 # Find country for this IP address

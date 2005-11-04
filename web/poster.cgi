@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.56 2005-10-19 16:29:28 wechsler Exp $
+# $Id: poster.cgi,v 1.57 2005-11-04 10:54:14 francis Exp $
 #
 
 import os
@@ -20,6 +20,8 @@ import fcgi
 import tempfile
 import string
 import sha
+import locale
+import gettext
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
@@ -34,8 +36,10 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph, Frame
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
+# This is translated using _() where used
 boilerplate_sms_smallprint = "SMS operated by charity UKCOD. Available in UK only. Sign-up message costs your normal text rate. Further messages are free. "
 
+# TODO: Localise
 # Add commas as thousand separators to integers.  Code taken from
 # http://groups.google.co.uk/group/comp.lang.python/browse_thread/thread/650005d9dff61adb/29c4c0920f6c95bb?q=python+thousand+separator&rnum=16&hl=en#29c4c0920f6c95bb
 def format_integer(i, places=3, separator=','):
@@ -82,10 +86,11 @@ addMapping('rockwell', 1, 1, 'Rockwell')
 
 db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
 
-types = ["cards", "tearoff", "flyers16", "flyers4", "flyers1", "flyers8"]
+types = ["flyers16", "flyers4", "flyers1", "flyers8"]
 sizes = ["A4", "A7"]
 formats = ["pdf", "png", "gif", "rtf"]
 
+# TODO: Localise
 def ordinal(day):
     if day==11 or day==12:
         return 'th'
@@ -112,76 +117,6 @@ def has_sms(pledge):
     return True
 
 sms_countries_description = 'UK'
-
-
-############################################################################
-# Tiled cards on a sheet.
-
-def draw_short_pledge(x, y):
-    text = "\"I will %s\"" % pledge['title']
-    size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
-    c.setFont("Helvetica", size)
-    c.drawCentredString(x, (y-1)*cm, text)
-
-    text = "Deadline: %s" % pledge['date']
-    size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
-    c.setFont("Helvetica", size)
-    c.drawCentredString(x, (y-2)*cm, text)
-
-    text = "www.pledgebank.com/%s" % ref
-    size = 14*10/(c.stringWidth(text, "Helvetica", 14)/cm)
-    c.setFont("Helvetica", size)
-    c.drawCentredString(x, (y-3)*cm, text)
-
-def cards():
-    c.setStrokeColorRGB(0,0,0)
-    c.setFillColorRGB(0,0,0)
-    c.setDash(3,3)
-    c.line(10.5*cm, 0, 10.5*cm, 30*cm)
-    for y in (5,10,15,20,25,30):
-        c.line(0,y*cm,21*cm,y*cm)
-        c.setFont("ZapfDingbats",24)
-        c.drawString(1*cm, y*cm-8, '"')
-        draw_short_pledge(10.5*cm/2, y)
-        draw_short_pledge(10.5*cm*3/2, y)
-    c.rotate(-90)
-    c.setFont("ZapfDingbats",24)
-    c.drawString(-29*cm, 10.5*cm-8, '"')
-    c.showPage()
-
-############################################################################
-# Little tear off strips at the bottom, like phone numbers on adverts on 
-# student noticeboards.
-
-def tearoff():
-    x = 10.5*cm
-    y = 20
-    text = "\"I will %s\"" % pledge['title']
-    size = 32/(c.stringWidth(text, "Helvetica", 32)/cm)*19
-    c.setFont("Helvetica", size)
-    c.drawCentredString(x, (y-1)*cm, text)
-    c.setFont("Helvetica", size*0.8)
-    text = "Deadline: %s" % pledge['date']
-    c.drawCentredString(x, (y-3)*cm, text)
-    text = "www.pledgebank.com/%s" % ref
-    c.drawCentredString(x, (y-5)*cm, text)
-    c.setDash(3,3)
-    stripheight = 8*cm
-    c.line(0, stripheight, 21*cm, stripheight)
-    c.rotate(90)
-    for x in (3, 6, 9, 12, 15, 18, 21):
-        c.line(0, -x*cm, stripheight, -x*cm)
-        c.setFont("ZapfDingbats", 24)
-        c.drawString(1*cm, -x*cm-9, '"')
-        c.setFont("Helvetica", 10)
-        text = "\"%s\"" % pledge['title']
-        c.drawCentredString(stripheight/2, (2.2-x)*cm, text)
-        c.setFont("Helvetica", 9)
-        text = "Deadline: %s" % pledge['date']
-        c.drawCentredString(stripheight/2, (1.2-x)*cm, text)
-        text = "www.pledgebank.com/%s" % ref
-        c.drawCentredString(stripheight/2, (0.7-x)*cm, text)
-    c.showPage()
 
 ############################################################################
 # Flyers using PyRTF for RTF generation
@@ -254,7 +189,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
                     ' to ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
                     ' (%s only) or pledge at ' % sms_countries_description, webdomain_text)
-        sms_smallprint = boilerplate_sms_smallprint
+        sms_smallprint = _(boilerplate_sms_smallprint)
 
     story.extend([ text_para, 
         PyRTF.Paragraph(ss.ParagraphStyles.normal, 'This pledge closes on ', PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), '. Thanks!'),
@@ -390,7 +325,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         sms_to_text = """<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
             (%s only) or """ % (ref, sms_number, sms_countries_description)
-        sms_smallprint = boilerplate_sms_smallprint
+        sms_smallprint = _(boilerplate_sms_smallprint)
 
     story.extend([
         Paragraph('''%s%s%s%s''' % 
@@ -498,7 +433,7 @@ while fcgi.isFCGI():
                 type = path_info[2]
                 (type, format) = type.split('.')
             else:
-                type = 'cards'
+                type = 'flyers4'
                 format = 'pdf'
         else:
             incgi = False
@@ -540,14 +475,27 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail, country FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE ref ILIKE %s', ref)
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country']) = q.fetchone()
+        q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail, country, lang FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE ref ILIKE %s', ref)
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang']) = q.fetchone()
         q.close()
         day = date.day
         pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         if pledge['signup'] == "do the same":
             pledge['signup'] = "too"
         sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
+
+        # Set language to that of the pledge
+        iso_lang = 'en_GB'
+        available_langs = mysociety.config.get('PB_LANGUAGES').split("|");
+        for available_lang in available_langs:
+            (loop_pb_code, loop_name, loop_iso) = available_lang.split(",")
+            if pledge['lang'] == loop_pb_code:
+                iso_lang = loop_iso
+        domain = 'PledgeBank'
+        translator = gettext.translation(domain, '../../locale', [iso_lang + '.UTF-8'])
+        translator.install(unicode = 1)
+        _ = translator.ugettext
+        #raise Exception, "Language '%s' %s" % (iso_lang, _("Start your own pledge"))
 
         # Check pin
         #req.err.write("pin %s\n" % pledge['pin'])
@@ -632,11 +580,7 @@ while fcgi.isFCGI():
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
             c = canvas.Canvas(canvasfilename, pagesize=papersizes[size])
             try:
-                if type == "cards":
-                    cards()
-                elif type == "tearoff":
-                    tearoff()
-                elif type == "flyers16":
+                if type == "flyers16":
                     flyers(16)
                 elif type == "flyers8":
                     flyers(8)

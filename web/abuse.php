@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.21 2005-11-03 19:13:15 chris Exp $
+// $Id: abuse.php,v 1.22 2005-11-04 21:43:56 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -115,7 +115,7 @@ EOF;
     print '<p>';
     printf(_('Please give a short reason for reporting this %s.'), $w);
     print '<br><input type="text" name="reason" size="60"></p>
-<p><input name="submit" type="submit" value="' . _('Submit') . '"><br>'
+<p><input name="submit" type="submit" value="' . _('Submit') . '"><br>';
     printf(_('If you would like us to get back to you about your abuse report, please give your email address.'));
     print '<br><input type="text" name="email" size="60"></p>
 </form>';

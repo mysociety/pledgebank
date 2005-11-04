@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.8 2005-11-03 18:45:25 matthew Exp $
+ * $Id: microsites.php,v 1.9 2005-11-04 10:29:31 matthew Exp $
  * 
  */
 
@@ -107,8 +107,6 @@ function microsites_frontpage_intro() {
         built for internal use at Interface. PledgeBank is a handy tool which
         is good at getting people to do social or environmental things they
         want to do but normally never get round to."'; // deliberately not translated
-    elseif ($site_country && $site_country == 'US')
-        return '"NEW! - <strong>Win $1000</strong> for the best pledge idea. Philanthropist Chris Anderson has given us a nice surprise, he\'s offering $1000 for the best pledge idea before the end of this month. <a href="http://tedblog.typepad.com/tedblog/2005/10/confidence_in_n.html">Go to his site</a> and give it your best!"';
     else
         return _('"We all know what it is like to feel powerless, that our own
         actions can\'t really change the things that we want to change.

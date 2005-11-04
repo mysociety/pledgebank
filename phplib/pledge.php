@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.134 2005-10-28 21:09:40 matthew Exp $
+ * $Id: pledge.php,v 1.135 2005-11-04 10:29:31 matthew Exp $
  * 
  */
 
@@ -638,14 +638,7 @@ function pledge_sign_box() {
 
 /* post_confirm_advertise PLEDGE_ROW
    Print relevant advertising */
-function post_confirm_advertise($pledge) { ?>
-<p id="finished"><strong>Win $1000 for the best pledge idea.</strong> Philanthropist Chris Anderson
-has given us a nice surprise - he's offering $1000 for the best pledge
-idea before the end of this month (Tuesday!).
-<a href="http://tedblog.typepad.com/tedblog/2005/10/confidence_in_n.html">Go to his site and give
-it your best.</a></p>
-<br>
-<?
+function post_confirm_advertise($pledge) {
     $local = pledge_is_local($pledge->data);
     if ($local) {
         post_confirm_advertise_flyers($pledge->data);

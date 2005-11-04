@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.15 2005-10-15 11:51:04 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.16 2005-11-04 18:31:54 matthew Exp $';
 
 use strict;
 use warnings;
@@ -152,13 +152,15 @@ sub create_postcode_query {
     # 50km. XXX Should be indexed with wgs84_lat, wgs84_lon
     my $find_what = join ', ', $$loc{wgs84_lat}, $$loc{wgs84_lon}, 50;
 
+    my $pb_today = dbh()->selectrow_array('SELECT pb_current_date()');
     # Create the SQL (lifted from pb/web/search.php).
     my $sql = "SELECT pledges.*, distance ";
     $sql .= "  FROM pledge_find_nearby( $find_what ) AS nearby ";
     $sql .= "  LEFT JOIN pledges ON nearby.pledge_id = pledges.id ";
     $sql .= "  WHERE ";
     $sql .= "     pin IS NULL AND ";
-    $sql .= "     pledges.prominence <> \'backpage\' ";
+    $sql .= "     pb_pledge_prominence(pledges.id) <> 'backpage' AND ";
+    $sql .= "     '$pb_today' <= pledges.date ";
     $sql .= "  ORDER BY distance";
 
     return $sql;

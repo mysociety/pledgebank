@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.57 2005-11-04 10:54:14 francis Exp $
+# $Id: poster.cgi,v 1.58 2005-11-04 23:05:01 francis Exp $
 #
 
 import os
@@ -22,6 +22,7 @@ import string
 import sha
 import locale
 import gettext
+_ = gettext.gettext
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
@@ -36,31 +37,19 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph, Frame
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
-# This is translated using _() where used
-boilerplate_sms_smallprint = "SMS operated by charity UKCOD. Available in UK only. Sign-up message costs your normal text rate. Further messages are free. "
+boilerplate_sms_smallprint = _("SMS operated by charity UKCOD. Available in UK only. Sign-up message costs your normal text rate. Further messages are free. ")
 
-# TODO: Localise
-# Add commas as thousand separators to integers.  Code taken from
-# http://groups.google.co.uk/group/comp.lang.python/browse_thread/thread/650005d9dff61adb/29c4c0920f6c95bb?q=python+thousand+separator&rnum=16&hl=en#29c4c0920f6c95bb
-def format_integer(i, places=3, separator=','):
-    s = `i`
-    r = ''
-    while len(s) > places:
-        r = separator + s[-places:] + r
-        s = s[:-places]
-    return s + r 
-
-# This is a special function to be able to use bold and italic in TTFs
-# See May 2004 Reportlab Users mailing list
+# this is a special function to be able to use bold and italic in ttfs
+# see may 2004 reportlab users mailing list
 def myRegisterFont(font):
-    "Registers a font, including setting up info for accelerated stringWidth"
+    "registers a font, including setting up info for accelerated string width"
     fontName = font.fontName
     _fonts[fontName] = font
     if font._multiByte:
         ttname = string.lower(font.fontName)
     else:
         if _stringWidth:
-            _rl_accel.setFontInfo(string.lower(fontName),
+            _rl_accel.setfontinfo(string.lower(fontName),
                     _dummyEncoding,
                     font.face.ascent,
                     font.face.descent,
@@ -90,8 +79,12 @@ types = ["flyers16", "flyers4", "flyers1", "flyers8"]
 sizes = ["A4", "A7"]
 formats = ["pdf", "png", "gif", "rtf"]
 
-# TODO: Localise
+# return 1st, 2nd, 3rd etc.
 def ordinal(day):
+    # for now not localised, only called for GB
+    assert locale.getlocale()[0] == 'en_GB'
+
+    # English
     if day==11 or day==12:
         return 'th'
     day = day % 10
@@ -102,6 +95,10 @@ def ordinal(day):
     elif day==3:
         return 'rd'
     return 'th'
+
+# add commas as thousand separators to integers.
+def format_integer(i):
+    return locale.format("%d", i, 1)
 
 def has_sms(pledge):
     # Private pledges have no SMS for now
@@ -161,39 +158,43 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
     story = PyRTF.Section()
     story.Footer.append(PyRTF.Paragraph(ss.ParagraphStyles.footer, "PledgeBank.com"))
     story.extend([
-        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.B('If'), ' ', PyRTF.TEXT(format_integer(pledge['target']), colour=ss.Colours.pb),
-        ''' %s will %s, then ''' % (pledge['type'], pledge['signup']), PyRTF.TEXT('I',colour=ss.Colours.pb),
-        ' will %s.' % pledge['title']),
+        PyRTF.Paragraph(
+            ss.ParagraphStyles.header, 
+            PyRTF.B(_('If')), ' ', 
+            PyRTF.TEXT(format_integer(pledge['target']), colour=ss.Colours.pb),
+            _(''' %s will %s, then ''') % (pledge['type'], pledge['signup']), 
+            PyRTF.TEXT(_('I'),colour=ss.Colours.pb),
+            _(' will %s.') % pledge['title']),
         PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\x97 ', PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
         PyRTF.Paragraph(ss.ParagraphStyles.detail, ''),
     ])
 
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
         d = pledge['detail'].split("\r?\n\r?\n")
-        story.append(PyRTF.Paragraph(ss.ParagraphStyles.detail, PyRTF.B('More details:'), ' ', d[0]))
+        story.append(PyRTF.Paragraph(ss.ParagraphStyles.detail, PyRTF.B(_('More details:')), ' ', d[0]))
         if len(d)>0:
             story.extend(
                 map(lambda text: PyRTF.Paragraph(ss.ParagraphStyles.detail, text), d[1:])
             )
 
     if not has_sms(pledge):
-        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 'Pledge at ', webdomain_text)
+        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, _('Pledge at '), webdomain_text)
         if pledge['pin']:
-            text_para.append(' pin ', PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
+            text_para.append(_(' pin '), PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
         sms_smallprint = ""
     else:
         text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 
-                    PyRTF.TEXT('Text', size=int(small_writing+4)), 
+                    PyRTF.TEXT(_('Text'), size=int(small_writing+4)), 
                     ' ', 
-                    PyRTF.TEXT('pledge %s' % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
+                    PyRTF.TEXT(_('pledge %s') % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
                     ' to ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
-                    ' (%s only) or pledge at ' % sms_countries_description, webdomain_text)
-        sms_smallprint = _(boilerplate_sms_smallprint)
+                    _(' (%s only) or pledge at ') % sms_countries_description, webdomain_text)
+        sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([ text_para, 
-        PyRTF.Paragraph(ss.ParagraphStyles.normal, 'This pledge closes on ', PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), '. Thanks!'),
-        PyRTF.Paragraph(ss.ParagraphStyles.normal, 'Remember, you only have to act if %d other people sign up \x96 that\x92s what PledgeBank is all about.' % pledge['target'])
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, _('This pledge closes on '), PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), _('. Thanks!')),
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, _('Remember, you only have to act if %d other people sign up \x96 that\x92s what PledgeBank is all about.') % pledge['target'])
 #        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
 #            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
     ])
@@ -266,7 +267,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     
     # PledgeBank logo
     story = [
-        Paragraph('<font color="#ffffff">Pledge</font>Bank.com', p_footer)
+        Paragraph(_('<font color="#ffffff">Pledge</font>Bank.com'), p_footer)
     ]
     dots_body_gap = 0
     f = Frame(x1, y1+0.1*h_purple, w, h_purple, showBoundary = 0, id='Footer',
@@ -292,10 +293,10 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     if pledge['identity']:
         identity = ', ' + pledge['identity']
     story = [
-        Paragraph('''
+        Paragraph(_('''
             <b>If</b> <font color="#522994">%s</font> %s will %s, 
             then <font color="#522994">I</font> will %s.
-            ''' % (
+            ''') % (
                 format_integer(pledge['target']), pledge['type'], pledge['signup'],
                 pledge['title']
             ), p_head),
@@ -308,32 +309,32 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
         story.extend(
             map(lambda text: Paragraph(text, p_detail), 
-                ('<b>More details:</b> %s' % pledge['detail']).split("\r?\n\r?\n"))
+                (_('<b>More details:</b> %s') % pledge['detail']).split("\r?\n\r?\n"))
             )
 
     if not has_sms(pledge):
-        pledge_at_text = "Pledge at "
+        pledge_at_text = _("Pledge at ")
         if pledge['pin']:
-            pin_text = ''' pin <font color="#522994" size="+2">%s</font>''' % userpin
+            pin_text = _(' pin ') + '''<font color="#522994" size="+2">%s</font>''' % userpin
         else:
             pin_text = ''
         sms_to_text = ""
         sms_smallprint = ""
     else:
-        pledge_at_text = "pledge at "
+        pledge_at_text = _("pledge at ")
         pin_text = ""
-        sms_to_text = """<font size="+2">Text</font> <font size="+8" color="#522994">
+        sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
-            (%s only) or """ % (ref, sms_number, sms_countries_description)
-        sms_smallprint = _(boilerplate_sms_smallprint)
+            (%s only) or """) % (ref, sms_number, sms_countries_description)
+        sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([
         Paragraph('''%s%s%s%s''' % 
             (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal),
-        Paragraph('''
+        Paragraph(_('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
-            ''' % pledge['date'], p_normal),
-        Paragraph(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.'.encode('utf-8') % pledge['target'], p_normal)
+            ''') % pledge['date'], p_normal),
+        Paragraph(_(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.').encode('utf-8') % pledge['target'], p_normal)
 #        Paragraph('''
 #            <b>Small print:</b> %s Questions?
 #            08453 330 160 or team@pledgebank.com.
@@ -478,11 +479,6 @@ while fcgi.isFCGI():
         q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail, country, lang FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE ref ILIKE %s', ref)
         (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang']) = q.fetchone()
         q.close()
-        day = date.day
-        pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
-        if pledge['signup'] == "do the same":
-            pledge['signup'] = "too"
-        sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
         # Set language to that of the pledge
         iso_lang = 'en_GB'
@@ -495,7 +491,18 @@ while fcgi.isFCGI():
         translator = gettext.translation(domain, '../../locale', [iso_lang + '.UTF-8'])
         translator.install(unicode = 1)
         _ = translator.ugettext
+        locale.setlocale(locale.LC_ALL, iso_lang + '.UTF-8')
         #raise Exception, "Language '%s' %s" % (iso_lang, _("Start your own pledge"))
+
+        # Set date
+        day = date.day
+        if iso_lang == 'en_GB':
+            pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
+        else:
+            pledge['date'] = date.strftime("%e %B %Y")
+        if pledge['signup'] == _("do the same"):
+            pledge['signup'] = _("too")
+        sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
         # Check pin
         #req.err.write("pin %s\n" % pledge['pin'])
@@ -628,7 +635,7 @@ while fcgi.isFCGI():
 
     except Exception, e:
         req.out.write("Content-Type: text/plain\r\n\r\n")
-        req.out.write("Sorry, we weren't able to make your poster.\n\n")
+        req.out.write(_("Sorry, we weren't able to make your poster.\n\n"))
         req.out.write(str(e) + "\n")
 
     req.Finish()

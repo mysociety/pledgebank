@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.58 2005-11-04 23:05:01 francis Exp $
+# $Id: poster.cgi,v 1.59 2005-11-07 14:52:12 francis Exp $
 #
 
 import os
@@ -488,9 +488,12 @@ while fcgi.isFCGI():
             if pledge['lang'] == loop_pb_code:
                 iso_lang = loop_iso
         domain = 'PledgeBank'
-        translator = gettext.translation(domain, '../../locale', [iso_lang + '.UTF-8'])
-        translator.install(unicode = 1)
-        _ = translator.ugettext
+        if iso_lang == 'en_GB':
+            _ = lambda x: x
+        else:
+            translator = gettext.translation(domain, '../../locale', [iso_lang + '.UTF-8'])
+            translator.install(unicode = 1)
+            _ = translator.ugettext
         locale.setlocale(locale.LC_ALL, iso_lang + '.UTF-8')
         #raise Exception, "Language '%s' %s" % (iso_lang, _("Start your own pledge"))
 

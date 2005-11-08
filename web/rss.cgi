@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.17 2005-11-08 12:55:29 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.18 2005-11-08 15:54:02 francis Exp $';
 
 use strict;
 use warnings;
@@ -215,7 +215,6 @@ sub get_pledges {
     my @array = ();
 
     while ( my $pledge = $query->fetchrow_hashref ) {
-        warn Dumper($pledge);
         push @array, $pledge;
     }
 

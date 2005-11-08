@@ -1,0 +1,41 @@
+#!/bin/bash
+# targets-graph:
+# Plot graph of target against actual signups for PledgeBank.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: francsi@mysociety.org. WWW: http://www.mysociety.org/
+# 
+# $Id: targets-graph,v 1.1 2005-11-08 01:16:23 francis Exp $
+
+SOURCE=/tmp/pb-targets-graph-data-$RANDOM$RANDOM
+GPSCRIPT=/tmp/pb-targets-graph-script-$RANDOM$RANDOM
+
+echo "select target, (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers
+    from pledges 
+    where 
+    whensucceeded is not null" | psql -A -F " " pb_testharness pb | egrep -v "date|rows|target" >$SOURCE-succ
+
+echo "select target, (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers
+    from pledges 
+    where 
+    whensucceeded is null and date < pb_current_date()" | psql -A -F " " pb_testharness pb | egrep -v "date|rows|target" >$SOURCE-fail
+
+cat >$GPSCRIPT <<END 
+    unset border
+    set xti nomi
+    set yti nomi
+    set xlabel "target sign-ups (with fuzz)"
+    set ylabel "actual sign-ups"
+    set xrange [0.9 to ]
+    set yrange [0.9 to ]
+    set logscale x
+    set logscale y
+    set terminal png
+    plot x lt 3 title 'target = actual', "$SOURCE-succ" using (\$1+1.0*rand(0)-0.5):2 title 'succesful pledges' with points ps .5 pt 1 lt 2, "$SOURCE-fail" using (\$1+1.0*rand(0)-0.5):2 title 'failed pledges' with points ps .5 pt 1 lt 1
+END
+
+echo "source $SOURCE"
+echo "gpscript $GPSCRIPT"
+
+gnuplot < $GPSCRIPT > /tmp/pb-targets.png
+

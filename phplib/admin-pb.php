@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.104 2005-10-24 13:03:36 francis Exp $
+ * $Id: admin-pb.php,v 1.105 2005-11-08 09:35:42 francis Exp $
  * 
  */
 
@@ -977,18 +977,50 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
 class ADMIN_PAGE_PB_STATS {
     function ADMIN_PAGE_PB_STATS() {
         $this->id = 'pbstats';
-        $this->navname = _('Alert statistics');
+        $this->navname = _('Statistics');
     }
 
     function display($self_link) {
         db_connect();
 
+        print h2(_("Local alert summary"));
         $r = db_getRow('select 
             count(case when whendisabled is null then 1 else null end) as active, 
             count(whendisabled) as disabled
             from alert
             where event_code = \'pledges/local\'');
-        print "Total subscribers: " . $r['active'] . " Unsubscribed: " . $r['disabled'];
+        print p("Total subscribers: " . $r['active'] . " Unsubscribed: " . $r['disabled']);
+
+        print h2(_("Alerts followed by signatures"));
+        $q = db_query('
+            select alert.location_id, ref, signers.name, person.email,
+                date_trunc(\'second\', whenqueued) as whenqueued, 
+                date_trunc(\'second\', signtime) as signtime,
+                date_trunc(\'second\', signtime - whenqueued) as timegap
+            from alert, alert_sent, signers, pledges, person
+            where 
+                alert.id = alert_sent.alert_id
+                and event_code = \'pledges/local\'
+                and signers.pledge_id = alert_sent.pledge_id
+                and signers.person_id = alert.person_id
+                and pledges.id = alert_sent.pledge_id
+                and signers.person_id = person.id
+                order by ref, signtime
+        ');
+        print p(sprintf(_("%d cases where somebody signed a pledge they had previously been alerted about. Time gap between alert and signing is displayed for each case."), db_num_rows($q)));
+        $last_ref = '';
+        while ($r = db_fetch_array($q)) {
+            if ($r['ref'] != $last_ref) {
+                if ($last_ref != "")
+                    print "<br>";
+                print "<strong>" . $r['ref'] . "</strong>";
+                print " (<a href=\"?page=pblatest&ref=" . $r['ref'] . "\">timeline</a>)";
+                print ": ";
+            }
+            print $r['email'] . " " . prettify($r['timegap']) . ', ';
+            $last_ref = $r['ref'];
+        }
+        print '</table>';
 
         print h2(_("Local alerts by country"));
         $q = db_query('select country, 

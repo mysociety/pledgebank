@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.19 2005-11-08 19:05:39 francis Exp $
+// $Id: list.php,v 1.20 2005-11-08 19:06:23 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -27,7 +27,7 @@ $rss = get_http_var('rss') ? true : false;
 
 // Old postcode RSS feed
 if ($rss && get_http_var('postcode')) {
-    header("Location: /rss/search?q=" . get_http_var('postcode')); 
+    header("Location: /rss/search?q=" . urlencode(get_http_var('postcode'))); 
     exit;
 }
 

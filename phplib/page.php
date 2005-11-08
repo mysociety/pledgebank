@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.87 2005-11-03 18:45:25 matthew Exp $
+// $Id: page.php,v 1.88 2005-11-08 19:05:39 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -25,7 +25,7 @@ function page_header($title, $params = array()) {
     if ($header_outputted && !array_key_exists('override', $params)) {
         return;
     }
-    
+
     // The http-equiv in the HTML below doesn't always seem to override HTTP
     // header, so we say that we are UTF-8 in the HTTP header as well (Case
     // where this was required: On my laptop, Apache wasn't setting UTF-8 in
@@ -57,8 +57,11 @@ function page_header($title, $params = array()) {
             print '<style type="text/css" media="all">@import url(\'/css/' . rawurlencode(strtolower($category)) . '.css\');</style>';
     }
 
-    if (array_key_exists('rss', $params))
-        print '<link rel="alternate" type="application/rss+xml" title="' . $params['rss'][1] . '" href="'.$params['rss'][0].'">';
+    if (array_key_exists('rss', $params)) {
+        foreach ($params['rss'] as $rss_title => $rss_url) {
+            print '<link rel="alternate" type="application/rss+xml" title="' . $rss_title . '" href="'.$rss_url.'">';
+        }
+    }
 ?>
 <script type="text/javascript" src="/js/pb.<?=$lang ?>.js"></script>
 <script type="text/javascript" src="/pb.js"></script>
@@ -166,7 +169,8 @@ function page_footer($params = array()) {
     }
 ?>
 </body></html>
-<?  }
+<?  
+}
 
 function print_this_link($link_text, $after_text) {
     return <<<EOF
@@ -178,6 +182,62 @@ $link_text$after_text
 </noscript> 
 EOF;
 }
+
+/* rss_header TITLE DESCRIPTION
+   Display header for RSS versions of page  
+ */
+function rss_header($title, $description, $params) {
+    global $lang, $microsite;
+    $country_name = pb_site_country_name();
+    header('Content-Type: application/xml; charset=utf-8');
+    print '<?xml version="1.0" encoding="UTF-8"?>';
+?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="<?=pb_domain_url(array('path'=>str_replace('rss/', '', $_SERVER['REQUEST_URI'])))?>">
+<title><?=$title?> - PledgeBank <?=$country_name?></title>
+<link><?=pb_domain_url()?></link>
+<description><?=$description?></description>
+<dc:language><?=$lang?></dc:language>
+
+<?
+}
+
+/* rss_footer ITEMS
+ * Display items and footer for RSS versions of page. The items
+ * is an array of entries. Each entry is an associative array
+ * containing title, link and description
+ */
+function rss_footer($items) {
+?>
+<items>
+ <rdf:Seq>
+<?  foreach ($items as $item) { ?>
+  <rdf:li rdf:resource="<?=$item['link']?>" />
+<? } ?>
+ </rdf:Seq>
+</items>
+</channel>
+<? foreach ($items as $item) { ?>
+<item rdf:about="<?=$item['link']?>">
+<title><?=$item['title']?></title>
+<link><?=$item['link']?></link>
+<description><?=$item['description']?></description>
+</item>
+<? } ?>
+</rdf:RDF>
+<?
+}
+
 
 /* page_check_ref REFERENCE
  * Given a pledge REFERENCE, check whether it uniquely identifies a pledge. If

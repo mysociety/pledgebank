@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.220 2005-10-20 11:14:33 wechsler Exp $
+// $Id: index.php,v 1.221 2005-11-08 19:05:39 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -16,8 +16,13 @@ require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/person.php';
 
-page_header(null, array('rss'=> array('/rss', _('New Pledges at PledgeBank.com')), 
-    'id'=>'front', 'gazejs'=>true));
+page_header(null, 
+            array('rss'=> array(
+                    _('New Pledges at PledgeBank.com') => pb_domain_url(array('path'=>'/rss/list')),
+                    _('Successful Pledges at PledgeBank.com') => pb_domain_url(array('path'=>'/rss/list/succeeded'))
+                    ), 
+                'id'=>'front', 'gazejs'=>true)
+            );
 front_page();
 page_footer(array('nolocalsignup'=>true));
 
@@ -106,7 +111,7 @@ function get_pledges_list($where, $params) {
 
 function list_frontpage_pledges() {
     global $pb_today;
-?><a href="/rss"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of newest pledges') ?>"></a>
+?><a href="<?=pb_domain_url(array('path'=>"/rss/list"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of new pledges') ?>"></a>
 <h2><?=_('Why not sign a live pledge?') ?></h2><?
     $pledges = get_pledges_list("
                 pb_pledge_prominence(pledges.id) = 'frontpage' AND
@@ -150,7 +155,9 @@ function list_frontpage_pledges() {
 }
 
 function list_successful_pledges() {
+?><a href="<?=pb_domain_url(array('path'=>"/rss/list/succeeded"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of successful pledges') ?>"></a><?
     print h2(_('Recent successful pledges'));
+
     $pledges = get_pledges_list("
                 pb_pledge_prominence(pledges.id) <> 'backpage' AND
                 pin IS NULL AND 

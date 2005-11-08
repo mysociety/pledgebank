@@ -5,19 +5,28 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.26 2005-10-30 23:58:01 francis Exp $
+// $Id: search.php,v 1.27 2005-11-08 19:05:39 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/comments.php';
 require_once '../../phplib/mapit.php';
 
-page_header(_("Search Results"));
+$rss = get_http_var('rss') ? true : false;
+$rss_items = array();
+$heading = _("Search Results");
+if ($rss) 
+    rss_header($heading, $heading, array());
+else 
+    page_header($heading);
 search();
-page_footer();
+if ($rss) 
+    rss_footer($rss_items);
+else
+    page_footer();
 
 function get_location_results($pledge_select, $lat, $lon) {
-    global $pb_today;
+    global $pb_today, $rss_items, $rss;
     $q = db_query($pledge_select . ", distance
                 FROM pledge_find_nearby(?,?,?) AS nearby 
                 LEFT JOIN pledges ON nearby.pledge_id = pledges.id
@@ -38,6 +47,16 @@ function get_location_results($pledge_select, $lat, $lon) {
                 $ret .= '<strong>' . round($r['distance'],0) . " km</strong> away: ";
             #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
             $ret .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+
+            if ($rss) {
+                $pledge = new Pledge($r['ref']);
+                $rss_items[] = array(
+                      'title'=> htmlspecialchars(trim_characters($pledge->title(), 0, 80)),
+                      'link'=> pb_domain_url(array('path'=>"/".$pledge->ref())),
+                      'description'=> "'" . $pledge->sentence(array('firstperson'=>true, 'html'=>true))
+                            . "' -- " . $pledge->h_name_and_identity());
+            }
+
             $ret .= '</li>';
         }
         $ret .= '</ul>';
@@ -46,37 +65,42 @@ function get_location_results($pledge_select, $lat, $lon) {
 }
 
 function search() {
-    global $pb_today;
+    global $pb_today, $rss;
     $search = trim(get_http_var('q'));
     $success = 0;
 
-    // Blank searches
-    if ($search == _('<Enter town or keyword>'))
-        $search = "";
-    if (!$search) {
-        print p(_('You can search for:'));
-        print "<ul>";
-        print li(_("The name of a <strong>town or city</strong> near you, to find pledges in your area"));
-        print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
-        print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
-        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
-        print "</ul>";
-        return;
+    if (!$rss) {
+        // Blank searches
+        if ($search == _('<Enter town or keyword>'))
+            $search = "";
+        if (!$search) {
+            print p(_('You can search for:'));
+            print "<ul>";
+            print li(_("The name of a <strong>town or city</strong> near you, to find pledges in your area"));
+            print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
+            print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
+            print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
+            print "</ul>";
+            return;
+        }
     }
 
-    // Exact pledge reference match
+    // General query
     $pledge_select = "SELECT pledges.*, '$pb_today' <= pledges.date as open,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 date - '$pb_today' AS daysleft";
 
-    $q = db_query("$pledge_select FROM pledges WHERE pin is NULL AND ref ILIKE ?", $search);
-    if (db_num_rows($q)) {
-        $success = 1;
-        $r = db_fetch_array($q);
-        print sprintf(p(_('Result <strong>exactly matching</strong> pledge <strong>%s</strong>:')), htmlspecialchars($search) );
-        print '<ul><li>';
-        print pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
-        print '</li></ul>';
+    // Exact pledge reference match
+    if (!$rss) {
+        $q = db_query("$pledge_select FROM pledges WHERE pin is NULL AND ref ILIKE ?", $search);
+        if (db_num_rows($q)) {
+            $success = 1;
+            $r = db_fetch_array($q);
+            print sprintf(p(_('Result <strong>exactly matching</strong> pledge <strong>%s</strong>:')), htmlspecialchars($search) );
+            print '<ul><li>';
+            print pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+            print '</li></ul>';
+        }
     }
 
     // Postcodes
@@ -91,14 +115,20 @@ function search() {
             print p(_("We couldn't find that postcode, please check it again."));
         } else {
             $location_results = get_location_results($pledge_select, $location['wgs84_lat'], $location['wgs84_lon']);
-            print sprintf(p(_('Results for <strong>open pledges near</strong> UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );
-            if ($location_results) {
-                print $location_results;
-            } else {
-                print "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
+            if (!$rss) {
+                print sprintf(p(_('Results for <strong>open pledges near</strong> UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );
+                if ($location_results) {
+                    print $location_results;
+                } else {
+                    print "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
+                }
             }
         }
     }
+
+    // TODO: RSS versions of string searches
+    if ($rss)
+        return;
  
     // Searching for text in pledges - stored in strings $open, $closed printed later
     $q = db_query($pledge_select . ' FROM pledges 

@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.16 2005-11-04 18:31:54 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: rss.cgi,v 1.17 2005-11-08 12:55:29 francis Exp $';
 
 use strict;
 use warnings;
@@ -36,6 +36,7 @@ use XML::RSS;
 use CGI::Carp;
 use CGI::Fast qw(-no_xhtml);
 use Error qw(:try);
+use Data::Dumper;
 
 # Run as a FCGI.
 my $W = new mySociety::WatchUpdate();
@@ -63,8 +64,8 @@ sub run {
 
     # If pledges is undef then there was an error.
     unless ( defined $pledges ) {
-    $pledges = create_error_pledges();
-    $title   = 'Error creating RSS';
+        $pledges = create_error_pledges();
+        $title   = 'Error creating RSS';
     }
     
     # Turn the pledges into RSS
@@ -154,9 +155,10 @@ sub create_postcode_query {
 
     my $pb_today = dbh()->selectrow_array('SELECT pb_current_date()');
     # Create the SQL (lifted from pb/web/search.php).
-    my $sql = "SELECT pledges.*, distance ";
+    my $sql = "SELECT pledges.*, distance, latitude, longitude ";
     $sql .= "  FROM pledge_find_nearby( $find_what ) AS nearby ";
     $sql .= "  LEFT JOIN pledges ON nearby.pledge_id = pledges.id ";
+    $sql .= "  LEFT JOIN location ON pledges.location_id = location.id";
     $sql .= "  WHERE ";
     $sql .= "     pin IS NULL AND ";
     $sql .= "     pb_pledge_prominence(pledges.id) <> 'backpage' AND ";
@@ -171,10 +173,10 @@ sub create_normal_query {
     my $type = $args{type};
     my $query = $args{query};
 
-    my $query_text = "select *
-           from pledges
+    my $query_text = "select pledges.*, latitude, longitude
+           from pledges left join location on pledges.location_id = location.id
            where pin IS NULL 
-           AND pb_pledge_prominence(id) <> 'backpage' ";
+           AND pb_pledge_prominence(pledges.id) <> 'backpage' ";
 
     if ($query) {
         $query_text .= " AND title ILIKE " . dbh()->quote("%$query%");
@@ -197,9 +199,9 @@ sub get_pledges {
     
     # Create the sql depending on what args we have.
     if ( $args{postcode} ) {
-    $query_text = create_postcode_query( %args );
+        $query_text = create_postcode_query( %args );
     } else {
-    $query_text = create_normal_query( %args );
+        $query_text = create_normal_query( %args );
     }
 
     # If we did not get a query then return undef.
@@ -213,6 +215,7 @@ sub get_pledges {
     my @array = ();
 
     while ( my $pledge = $query->fetchrow_hashref ) {
+        warn Dumper($pledge);
         push @array, $pledge;
     }
 

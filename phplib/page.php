@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.88 2005-11-08 19:05:39 francis Exp $
+// $Id: page.php,v 1.89 2005-11-08 19:56:11 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -218,9 +218,7 @@ function rss_header($title, $description, $params) {
  * containing title, link and description
  */
 function rss_footer($items) {
-?>
-<items>
- <rdf:Seq>
+?> <items> <rdf:Seq>
 <?  foreach ($items as $item) { ?>
   <rdf:li rdf:resource="<?=$item['link']?>" />
 <? } ?>
@@ -232,6 +230,10 @@ function rss_footer($items) {
 <title><?=$item['title']?></title>
 <link><?=$item['link']?></link>
 <description><?=$item['description']?></description>
+<? if ($item['latitude'] && $item['longitude']) { ?>
+<geo:lat><?=$item['latitude']?></geo:lat>
+<geo:lon><?=$item['longitude']?></geo:lon>
+<? } ?>
 </item>
 <? } ?>
 </rdf:RDF>

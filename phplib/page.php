@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.90 2005-11-09 15:40:21 francis Exp $
+// $Id: page.php,v 1.91 2005-11-09 15:46:48 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -96,7 +96,7 @@ function page_header($title, $params = array()) {
         if (!array_key_exists('noreflink', $params))
             print '</a>';
 /*            if ($category) {
-            print '<br>This pledge is in the <strong>' . $category . '</strong> category';
+            print '<br>This pledge is in the <strong>' . _($category) . '</strong> category';
         } */
         print '</p>';
     }

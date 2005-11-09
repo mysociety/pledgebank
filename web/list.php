@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.22 2005-11-09 15:40:21 francis Exp $
+// $Id: list.php,v 1.23 2005-11-09 15:46:48 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -80,7 +80,7 @@ if ($q_sort == 'percentcomplete') {
 if ($q_sort == 'category') {
     $sort_phrase = "coalesce ((SELECT name FROM pledge_category, category WHERE 
             pledge_category.category_id = category.id AND parent_category_id IS NULL AND 
-            pledge_category.pledge_id = pledges.id LIMIT 1), 'Miscellaneous')";
+            pledge_category.pledge_id = pledges.id LIMIT 1), '"._("Miscellaneous")."')";
 }
 $sql_params[] = PAGE_SIZE;
 $qrows = db_query("
@@ -181,10 +181,10 @@ if ($ntotal > 0) {
             $categories = $pledge->categories();
             $thiscategory = array_pop($categories);
             if ($thiscategory == null) 
-                $thiscategory = "Miscellaneous";
+                $thiscategory = _("Miscellaneous");
             if ($lastcategory <> $thiscategory) {
                 if (!$rss)
-                    print "<h2 style=\"clear:both\">$thiscategory</h2>";
+                    print "<h2 style=\"clear:both\">"._($thiscategory)."</h2>";
                 $c = 0;
                 $lastcategory = $thiscategory;
             }

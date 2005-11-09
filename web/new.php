@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.100 2005-10-28 20:06:22 matthew Exp $
+// $Id: new.php,v 1.101 2005-11-09 15:46:48 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -340,7 +340,7 @@ function pledge_form_three($data, $errors = array()) {
                     $id,
                     (array_key_exists('category', $data) && $id == $data['category'] ? ' selected' : ''),
                     (is_null($parent_id) ? '' : '&nbsp;-&nbsp;'),
-                    htmlspecialchars($name));
+                    htmlspecialchars(_($name)));
     }
 
 ?>
@@ -730,7 +730,7 @@ if ($data['country']) {
     $data['category'] == -1
         ? _('No')
         : _('Yes') . ': "'
-            . htmlspecialchars(db_getOne('select name from category where id = ?', $data['category'])) // XXX show enclosing cat?
+            . htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))) // XXX show enclosing cat?
             . '"'
 ?></em></li>
 

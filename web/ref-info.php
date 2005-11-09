@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.27 2005-11-09 15:40:21 francis Exp $
+ * $Id: ref-info.php,v 1.28 2005-11-09 15:46:48 francis Exp $
  * 
  */
 
@@ -88,7 +88,7 @@ $p->render_box();
         print '&mdash;';
     else {
         sort($a);
-        print implode('; ', array_map('htmlspecialchars', $a));
+        print implode('; ', array_map('htmlspecialchars', array_map('_', $a)));
     }
     ?></td>
 </table>

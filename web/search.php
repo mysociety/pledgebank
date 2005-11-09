@@ -5,23 +5,34 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.29 2005-11-09 15:40:21 francis Exp $
+// $Id: search.php,v 1.30 2005-11-09 18:14:12 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/comments.php';
 require_once '../../phplib/mapit.php';
 
+$search = trim(get_http_var('q'));
 $rss = get_http_var('rss') ? true : false;
 $rss_items = array();
-$heading = _("Search Results");
+$heading = _("Search results for '".htmlspecialchars($search)."'");
 if ($rss) 
     rss_header($heading, $heading, array());
 else 
-    page_header($heading);
-search();
-if ($rss) 
+    page_header($heading,
+            array('rss'=> array(
+                    $heading => pb_domain_url(array('explicit'=>true, 'path'=>'/rss'.$_SERVER['REQUEST_URI']))
+                    ))
+    );
+search($search);
+if ($rss) {
+    function compare_creationtime($a, $b) {
+        return strcmp($b['creationtime'], $a['creationtime']);
+    }
+    array_unique($rss_items);
+    usort($rss_items, "compare_creationtime");
     rss_footer($rss_items);
+}
 else
     page_footer();
 
@@ -30,6 +41,7 @@ function get_location_results($pledge_select, $lat, $lon) {
     $q = db_query($pledge_select . ", distance
                 FROM pledge_find_nearby(?,?,?) AS nearby 
                 LEFT JOIN pledges ON nearby.pledge_id = pledges.id
+                LEFT JOIN location ON location.id = pledges.location_id 
                 WHERE 
                     pin IS NULL AND
                     pb_pledge_prominence(pledges.id) <> 'backpage' AND 
@@ -50,14 +62,7 @@ function get_location_results($pledge_select, $lat, $lon) {
 
             if ($rss) {
                 $pledge = new Pledge($r['ref']);
-                $rss_items[] = array(
-                      'title'=> htmlspecialchars(trim_characters($pledge->title(), 0, 80)),
-                      'link'=> pb_domain_url(array('explicit'=>true, 'path'=>"/".$pledge->ref())),
-                      'description'=> "'" . $pledge->sentence(array('firstperson'=>true, 'html'=>true))
-                            . "' -- " . $pledge->h_name_and_identity(),
-                      'latitude' => $pledge->data['latitude'],
-                      'longitude' => $pledge->data['longitude'],
-                    );
+                $rss_items[] = $pledge->rss_entry();
             }
 
             $ret .= '</li>';
@@ -67,9 +72,8 @@ function get_location_results($pledge_select, $lat, $lon) {
     return $ret;
 }
 
-function search() {
-    global $pb_today, $rss;
-    $search = trim(get_http_var('q'));
+function search($search) {
+    global $pb_today, $rss, $rss_items;
     $success = 0;
 
     if (!$rss) {
@@ -87,15 +91,21 @@ function search() {
             return;
         }
     }
+    
+    // Link to RSS feed
+    if (!$rss) {
+?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss".$_SERVER['REQUEST_URI']))?>"><img align="right" border="0" src="/rss.gif" alt="<?=_('RSS feed of search for \'') . htmlspecialchars($search) ."'" ?>"></a><?
+    }
 
     // General query
     $pledge_select = "SELECT pledges.*, '$pb_today' <= pledges.date as open,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                date - '$pb_today' AS daysleft";
+                date - '$pb_today' AS daysleft, latitude, longitude";
 
     // Exact pledge reference match
     if (!$rss) {
-        $q = db_query("$pledge_select FROM pledges WHERE pin is NULL AND ref ILIKE ?", $search);
+        $q = db_query("$pledge_select FROM pledges LEFT JOIN location ON location.id = pledges.location_id 
+                    WHERE pin is NULL AND ref ILIKE ?", $search);
         if (db_num_rows($q)) {
             $success = 1;
             $r = db_fetch_array($q);
@@ -115,7 +125,8 @@ function search() {
         $success = 1;
         $location = mapit_get_location($search, $is_partial_postcode ? 1 : 0);
         if (mapit_get_error($location)) {
-            print p(_("We couldn't find that postcode, please check it again."));
+            if (!$rss)
+                print p(_("We couldn't find that postcode, please check it again."));
         } else {
             $location_results = get_location_results($pledge_select, $location['wgs84_lat'], $location['wgs84_lon']);
             if (!$rss) {
@@ -129,12 +140,10 @@ function search() {
         }
     }
 
-    // TODO: RSS versions of string searches
-    if ($rss)
-        return;
- 
+
     // Searching for text in pledges - stored in strings $open, $closed printed later
     $q = db_query($pledge_select . ' FROM pledges 
+                LEFT JOIN location ON location.id = pledges.location_id 
                 WHERE pin IS NULL 
                     AND pb_pledge_prominence(pledges.id) <> \'backpage\'
                     AND (title ILIKE \'%\' || ? || \'%\' OR 
@@ -154,6 +163,10 @@ function search() {
             } else {
                 $closed .= $text;
             }
+            if ($rss && $r['open'] == 't') {
+                $pledge = new Pledge($r);
+                $rss_items[] = $pledge->rss_entry();
+            }
         }
     }
 
@@ -166,7 +179,7 @@ function search() {
             err('Error doing place search');
         if (count($places) > 0) {
             $success = 1;
-            if (count($places) > 1) {
+            if (!$rss && count($places) > 1) {
                 print p(sprintf(_("Results for <strong>open pledges near</strong> places matching <strong>%s</strong>, %s (%s):"), htmlspecialchars($search), $countries_code_to_name[$site_country], $change_country));
                 print "<ul>";
             }
@@ -177,25 +190,34 @@ function search() {
                 if ($st) $desc .= ", $st";
                 if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
                 $location_results = get_location_results($pledge_select, $lat, $lon);
-                if (count($places) > 1) 
-                    print "<li>$desc";
-                else
-                    print p(sprintf(_("Results for <strong>open pledges near %s</strong>, %s (%s):"), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
-                if ($location_results) {
-                    print $location_results;
-                } else {
-                    print "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
+                if (!$rss) {
+                    if (count($places) > 1) 
+                        print "<li>$desc";
+                    else
+                        print p(sprintf(_("Results for <strong>open pledges near %s</strong>, %s (%s):"), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
+                    if ($location_results) {
+                        print $location_results;
+                    } else {
+                        print "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
+                    }
+                    if (count($places) > 1) print "</li>";
                 }
-                if (count($places) > 1) print "</li>";
             }
-            if (count($places) > 1) print "</ul>";
-            pb_view_local_alert_quick_signup("localsignupsearchpage", 
-                array('newflash'=>false,
-                      'place'=>$search));
+            if (!$rss) {
+                if (count($places) > 1) print "</ul>";
+                pb_view_local_alert_quick_signup("localsignupsearchpage", 
+                    array('newflash'=>false,
+                          'place'=>$search));
+            }
         }
     } else {
-        print p(sprintf(_("To search for a town, please first %s."), $change_country));
+        if (!$rss)
+            print p(sprintf(_("To search for a town, please first %s."), $change_country));
     }
+
+    // No more search types that go into RSS (only pledges do that for now)
+    if ($rss)
+        return;
 
     // Open pledges
     if ($open) {

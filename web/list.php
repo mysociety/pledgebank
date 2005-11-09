@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.23 2005-11-09 15:46:48 francis Exp $
+// $Id: list.php,v 1.24 2005-11-09 18:14:12 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -114,8 +114,8 @@ if ($rss)
     rss_header($heading, $heading, array());
 else {
     page_header($heading, array('id'=>'all',
-        'rss'=> array(
-                    $heading => pb_domain_url(array('explicit'=>true, 'path'=>'/list'.$_SERVER['REQUEST_URI']))
+            'rss'=> array(
+                    $heading => pb_domain_url(array('explicit'=>true, 'path'=>'/rss'.$_SERVER['REQUEST_URI']))
                     ) 
     ));
 }
@@ -191,16 +191,8 @@ if ($ntotal > 0) {
         }
         $arr = array('class'=>"pledge-".$c%2, 'href' => $pledge->url_main() );
         if ($q_type == 'succeeded_closed' || $q_type == 'failed') $arr['closed'] = true;
-        if ($rss) {
-            $rss_items[] = array(
-                  'title' => htmlspecialchars(trim_characters($pledge->title(), 0, 80)),
-                  'link' => pb_domain_url(array('explicit'=>true, 'path'=>"/".$pledge->ref())),
-                  'description' => "'" . $pledge->sentence(array('firstperson'=>true, 'html'=>true))
-                        . "' -- " . $pledge->h_name_and_identity(),
-                  'latitude' => $pledge->data['latitude'],
-                  'longitude' => $pledge->data['longitude'],
-                );
-        }
+        if ($rss)
+            $rss_items[] = $pledge->rss_entry();
         else
             $pledge->render_box($arr);
         $c++;

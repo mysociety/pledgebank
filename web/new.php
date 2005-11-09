@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.101 2005-11-09 15:46:48 francis Exp $
+// $Id: new.php,v 1.102 2005-11-09 19:52:14 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -283,8 +283,9 @@ is fulfilled?
 <input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_place_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="this.form.elements['local0'].click()" for="local0"><?=_('No') ?></label>
 </p>
 
-<p id="ifyes_line">If yes, choose where.
-<? 
+<p id="ifyes_line"><?
+print _('If yes, choose where.');
+
 // State is in the gaze_place list for selection, but stored with country later on
 // :( See code commented "split out state" elsewhere in this file
 $gaze_with_state = $data['gaze_place'];
@@ -683,7 +684,7 @@ function preview_pledge($data, $errors) {
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
 <?  print h2(_('New Pledge &#8211; Step 4 of 4'));
     print p(_('Please check the details you have entered, both the pledge itself (see left) 
-and other details below.  Click one of the two "Back" buttons if you would like
+and other details below.  Click one of the three "Back" buttons if you would like
 to go back and edit your data.  
 <strong>Check carefully, as you cannot edit your pledge after you have
 created it.</strong>

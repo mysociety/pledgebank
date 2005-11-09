@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.105 2005-11-08 09:35:42 francis Exp $
+ * $Id: admin-pb.php,v 1.106 2005-11-09 19:52:17 matthew Exp $
  * 
  */
 
@@ -459,7 +459,7 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
                     ));
             db_query('UPDATE pledges set location_id = (select currval(\'location_id_seq\')) where id = ?', array($pledge_id));
         } else {
-            print p(_("<em>Unknown country ".htmlspecialchars($country)."</em>"));
+            print p(sprintf(_("<em>Unknown country %s</em>"), htmlspecialchars($country)));
             return;
         }
         db_commit();

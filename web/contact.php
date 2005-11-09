@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.26 2005-07-08 12:01:37 matthew Exp $
+// $Id: contact.php,v 1.27 2005-11-09 19:52:14 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -47,7 +47,7 @@ If you prefer, you can email %s instead of using the form.')), '<a href="mailto:
         print '</li></ul>';
     } ?>
 <form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1">
-<div class="fr"><?=("Message to")?>: <strong><?=_("PledgeBank Team")?></strong></div>
+<div class="fr"><?=_('Message to')?>: <strong><?=_("PledgeBank Team")?></strong></div>
 <div class="fr"><label for="name"><?=_('Your name') ?></label>: <input type="text" id="name" name="name" onblur="fadeout(this)" onfocus="fadein(this)" value="<?=htmlentities($name) ?>" size="32"></div>
 <div class="fr"><label for="email"><?=_('Your email') ?></label>: <input type="text" id="email" name="email" value="<?=htmlentities($email) ?>" size="32"></div>
 <div class="fr"><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlentities(get_http_var('subject')) ?>" size="50"></div>

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.28 2005-11-08 19:56:11 francis Exp $
+// $Id: search.php,v 1.29 2005-11-09 15:40:21 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -52,7 +52,7 @@ function get_location_results($pledge_select, $lat, $lon) {
                 $pledge = new Pledge($r['ref']);
                 $rss_items[] = array(
                       'title'=> htmlspecialchars(trim_characters($pledge->title(), 0, 80)),
-                      'link'=> pb_domain_url(array('path'=>"/".$pledge->ref())),
+                      'link'=> pb_domain_url(array('explicit'=>true, 'path'=>"/".$pledge->ref())),
                       'description'=> "'" . $pledge->sentence(array('firstperson'=>true, 'html'=>true))
                             . "' -- " . $pledge->h_name_and_identity(),
                       'latitude' => $pledge->data['latitude'],

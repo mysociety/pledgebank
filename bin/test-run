@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.153 2005-10-13 21:12:18 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.154 2005-11-09 15:40:20 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -269,7 +269,7 @@ sub perform_login_action {
         if ($login_action ne "suspend") {
             my $confirmation_email = $wth->email_get_containing(
                 '%To: '.email_n($who).'%'.$email_text.'%');
-            die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^($base_url.*$)#m);
+            die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^(http://.*$)#m);
             $confirmation_url = $1;
             display_url("Email confirmation URL", $confirmation_url);
             $wth->log_watcher_check();
@@ -732,7 +732,7 @@ sub do_public_succeeding_pledge {
     set_pb_date('1982-02-04');
     call_frequentupdate();
     my $success_email = $wth->email_get_containing( '%To: '.email_n(0).'%However, you haven\'t sent a message yet%');
-    die "Success email link not found\n" if ($success_email !~ m#^\s*($base_url.*$)#m);
+    die "Success email link not found\n" if ($success_email !~ m#^\s*(http://.*$)#m);
     $announce_link = $1;
 
     # Send success message using announcements page, from creator to signers.
@@ -937,7 +937,7 @@ sub do_private_failing_pledge {
     # Check failure emails
     call_frequentupdate();
     my $failure_email = $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
-    die "Failure email link not found\n" if ($failure_email !~ m#^\s*($base_url.*$)#m);
+    die "Failure email link not found\n" if ($failure_email !~ m#^\s*(http://.*$)#m);
     my $announce_link = $1;
     $wth->email_get_containing('%Subject: Pledge failed%To: '.email_n(1).  '%');
 
@@ -1107,7 +1107,7 @@ sub do_sms_pledge {
     set_pb_date('1982-03-09');
     call_frequentupdate();
     my $success_email = $wth->email_get_containing( '%To: '.email_n(100).'%We are pleased to tell you%');
-    die "Announce link not found\n" if ($success_email !~ m#^($base_url.*$)#m);
+    die "Announce link not found\n" if ($success_email !~ m#^(http://.*$)#m);
     my $announce_link = $1;
     display_url("Announce URL", $announce_link);
     $wth->email_get_containing( '%To: '.email_n(105).'%We are pleased to tell you%');
@@ -1267,20 +1267,8 @@ sub do_login_tests {
 #############################################################################
 sub do_category_tests {
     set_pb_date('1984-01-01');
-
-    # Make English language pledge
-    my $pledge_action_english = 'stop English taking over as the world language';
-    my $pledge_ref_english = "english";
     $wth->browser_get($base_url);
     lock_locale_url();
-    create_pledge(300, 
-        { title => $pledge_action_english, 
-            target => '3', type => 'other polyglots', signup => 'do the same',
-            date => 'Tomorrow', ref => $pledge_ref_english },
-        { country => 'PT', 'local' => 0 }, 
-        { },
-        { action => "viaemail", setpassword => 0 }
-    );
 
     # Make Portuguese language pledge
     my $pledge_action_portuguese = 'learn to speak Portuguese';
@@ -1294,13 +1282,26 @@ sub do_category_tests {
             date => 'Tomorrow', ref => $pledge_ref_portugese },
         { country => 'PT', 'local' => 0 },
         { },
-        { action => "loggedin", setpassword => 0 }
+        { action => "viaemail", setpassword => 0 }
     );
     $wth->browser_get($locale_url);
     $wth->browser_follow_link(text => "English");
     lock_locale_url();
 
+    # Make English language pledge
+    my $pledge_action_english = 'stop English taking over as the world language';
+    my $pledge_ref_english = "english";
+    create_pledge(300, 
+        { title => $pledge_action_english, 
+            target => '3', type => 'other polyglots', signup => 'do the same',
+            date => 'Tomorrow', ref => $pledge_ref_english },
+        { country => 'PT', 'local' => 0 }, 
+        { },
+        { action => "loggedin", setpassword => 0 }
+    );
+
     # Change to Portugese pages
+    $wth->browser_get($locale_url);
     $wth->browser_follow_link(text => "choose country");
     $wth->browser_follow_link(text => "Portugal");
     lock_locale_url();
@@ -1312,6 +1313,9 @@ sub do_category_tests {
     $wth->browser_check_contents("mas somente se 3 other monoglots");
     $wth->browser_check_contents("but only if 3 other polyglots");
 
+    # Change to normal pages again
+    $wth->browser_get($base_url);
+    lock_locale_url();
 }
 
 #############################################################################
@@ -1395,10 +1399,15 @@ sub do_admin_tests {
 
 #############################################################################
 sub do_final_checks {
-    # Check RSS works and has correct entries
+    # Change to UK
+    $wth->browser_get($base_url);
+    $wth->browser_follow_link(text_regex => qr/choose country/, n => 1);
+    $wth->browser_follow_link(text => "United Kingdom");
+    lock_locale_url();
+
+    # Check RSS works and has vaguely correct entries
     $wth->browser_get($locale_url . "/rss");
-    $wth->browser_check_contents(qr/make sure a pledge can be completed/);
-    $wth->browser_check_no_contents(qr/pretend to be an SMS aggregating service/); # has been deleted earlier
+    $wth->browser_check_contents(qr/make multiple pledges using the magic of login/);
     $wth->browser_check_no_contents("privatepledge");
 
     # Check there were no errors

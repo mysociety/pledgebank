@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.89 2005-11-08 19:56:11 francis Exp $
+// $Id: page.php,v 1.90 2005-11-09 15:40:21 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -203,9 +203,9 @@ function rss_header($title, $description, $params) {
  xmlns:admin="http://webns.net/mvcb/"
 >
 
-<channel rdf:about="<?=pb_domain_url(array('path'=>str_replace('rss/', '', $_SERVER['REQUEST_URI'])))?>">
+<channel rdf:about="<?=pb_domain_url(array("explicit"=>true, 'path'=>str_replace('rss/', '', $_SERVER['REQUEST_URI'])))?>">
 <title><?=$title?> - PledgeBank <?=$country_name?></title>
-<link><?=pb_domain_url()?></link>
+<link><?=pb_domain_url(array("explicit"=>true))?></link>
 <description><?=$description?></description>
 <dc:language><?=$lang?></dc:language>
 

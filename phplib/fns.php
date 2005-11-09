@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.85 2005-10-31 07:28:35 francis Exp $
+// $Id: fns.php,v 1.86 2005-11-09 15:40:21 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -26,19 +26,27 @@ function li($s) { return "<li>$s</li>\n"; }
 
 # pb_domain_url returns current URL with country and language in it.
 # Defaults to keeping country country or language, unless param contains:
-#   'lang' - language to change to
-#   'country' - country to change to
+#   'lang' - language to change to, or "explicit" to explicitly include current language in URL
+#   'country' - country to change to, or "explicit" to explicitly include current country in URL
+#   'explicit' - if present and true, overrides lang and country to "explicit"
+# Parameters are:
 #   'path' - path component, if not present uses request URI
 function pb_domain_url($params = array('path'=>'/')) {
-    global $domain_lang, $domain_country, $microsite;
+    global $domain_lang, $domain_country, $microsite, $lang, $site_country;
+
+    if (array_key_exists('explicit', $params) && $params['explicit']) {
+        $params['lang'] = 'explicit';
+        $params['country'] = 'explicit';
+    }
 
     $l = $domain_lang;
     if (array_key_exists('lang', $params))
-        $l = $params['lang'];
+        $l = ($params['lang'] == "explicit") ? $lang : $params['lang'];
+
     $c = $domain_country;
     if (array_key_exists('country', $params))
-        $c = $params['country'];
-     
+        $c = ($params['country'] == "explicit") ? $site_country : $params['country'];
+
     $url = 'http://';
 
     if ($microsite) {
@@ -594,6 +602,17 @@ function pb_site_country_name() {
         return microsites_get_name();
     else
         return $site_country ? $countries_code_to_name[$site_country] : 'Global';
+}
+
+// Return SQL fragment which guesses as to what the number of signers will
+// reach, if rate in last 7 days continues until deadline.
+function pb_chivvy_probable_will_reach_clause() {
+    global $pb_timestamp, $pb_today;
+    return "(round((select count(*) from signers 
+        where signers.pledge_id = pledges.id
+            and signers.signtime > '$pb_timestamp'::timestamp - '7 day'::interval)::numeric 
+                / 7::numeric * (date - '$pb_today'),0) + 
+        (select count(*) from signers where signers.pledge_id = pledges.id))";
 }
 
 

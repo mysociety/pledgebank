@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.52 2005-10-31 08:39:11 francis Exp $
+ * $Id: frequentupdate,v 1.53 2005-11-09 15:40:20 francis Exp $
  *
  */
 
@@ -17,6 +17,7 @@ $long_opts = array('verbose','help');
 
 require_once "../phplib/pbcgi.php";
 require_once '../phplib/fns.php';
+require_once '../phplib/pledge.php';
 require_once '../../phplib/db.php';
 require_once "../../phplib/person.php";
 require_once '../../phplib/utility.php';
@@ -264,16 +265,10 @@ function chivvy_creators_early() {
  * - in the last week had a signup rate that, if continued until pledge
  *   deadline, would not have sufficient signers for success
  */
-$chivvy_probable_will_reach_clause = "(round((select count(*) from signers 
-        where signers.pledge_id = pledges.id
-            and signers.signtime > '$pb_timestamp'::timestamp - '7 day'::interval)::numeric 
-                / 7::numeric * (date - '$pb_today'),0) + 
-        (select count(*) from signers where signers.pledge_id = pledges.id))";
 function chivvy_creators_lowrate() {
     global $pb_today, $pb_timestamp;
 
     verbose("finding pledges with too low a signup rate to succeed");
-    global $chivvy_probable_will_reach_clause;
     $q = db_query("
                 select * from pledges
                 where target >= 8
@@ -282,7 +277,7 @@ function chivvy_creators_lowrate() {
                     and '$pb_timestamp'::timestamp > creationtime + '8 day'::interval
                     and '$pb_today'::date < date - '2 day'::interval
                     and pb_pledge_prominence(pledges.id) <> 'backpage' 
-                    and $chivvy_probable_will_reach_clause < target
+                    and " . pb_chivvy_probable_will_reach_clause() . " < target
                     and (select id
                         from message
                         where pledge_id = pledges.id
@@ -358,9 +353,9 @@ function send_pending_messages() {
         }
         // Number of signers reached at current probably rate
         if ($msg['circumstance'] == 'chivvy-creator-lowrate') {
-            global $chivvy_probable_will_reach_clause;
-            $probable_will_reach = db_getOne("select $chivvy_probable_will_reach_clause from pledges where
-                id = ?", $pledge->id());
+            $probable_will_reach = db_getOne("select 
+                    " . pb_chivvy_probable_will_reach_clause() . "
+                    from pledges where id = ?", $pledge->id());
             $data['probable_will_reach'] = $probable_will_reach;
         }
 

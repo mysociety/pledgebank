@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.26 2005-11-01 17:57:13 matthew Exp $
+ * $Id: ref-info.php,v 1.27 2005-11-09 15:40:21 francis Exp $
  * 
  */
 
@@ -50,11 +50,11 @@ $p->render_box();
     <td><?=$p->h_name_and_identity()?></td>
 </tr>
 <tr>
-    <th><?=_('Created') ?></th>
+    <th><?=_('Date created') ?></th>
     <td><?=prettify($p->creationdate())?></td>
 </tr>
 <tr>
-    <th><?= $p->open() ? _('Expires') : _('Expired') ?></th>
+    <th><?= $p->open() ? _('Date closes') : _('Date closed') ?></th>
     <td><?=prettify($p->date())?></td>
 </tr>
 <tr>
@@ -72,6 +72,12 @@ $p->render_box();
     <th><?=_('Number of signers') ?></th>
     <td><?= $p->signers() ?> / <?= $p->target() ?>
         <?= sprintf(_('(%.1f%% of target)'), 100. * $p->signers() / $p->target()) ?>
+    </td>
+</tr>
+<tr>
+    <th><?=_('Signers by deadline') ?></th>
+    <td><?= $p->probable_will_reach() ?> 
+        <?= sprintf(_('(%.1f%% of target)<br><small>if signup rate continues as in last week</small>'), 100. * $p->probable_will_reach() / $p->target()) ?>
     </td>
 </tr>
 <tr>

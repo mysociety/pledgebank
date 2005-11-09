@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.62 2005-10-11 17:39:22 francis Exp $
+ * $Id: login.php,v 1.63 2005-11-09 15:40:21 francis Exp $
  * 
  */
 
@@ -221,7 +221,7 @@ function login_page() {
                         'stash' => $q_stash
                     ));
         db_commit();
-        $url = OPTION_BASE_URL . "/L/$token";
+        $url = pb_domain_url(array("path" => "/L/$token"));
         $template_data = unserialize(stash_get_extra($q_stash));
         $template_data['url'] = $url;
         $template_data['user_name'] = $q_name;

@@ -1,12 +1,12 @@
 <?php
 /* 
  * pbcgi.php:
- * Include file for PHP CGI scripts for PledgeBank
+ * Include file for PHP CLI scripts for PledgeBank
  *
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: pbcgi.php,v 1.2 2005-09-12 21:38:58 francis Exp $
+ * $Id: pbcgi.php,v 1.3 2005-11-09 15:40:21 francis Exp $
  *
  */
 

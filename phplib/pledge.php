@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.135 2005-11-04 10:29:31 matthew Exp $
+ * $Id: pledge.php,v 1.136 2005-11-09 15:40:21 francis Exp $
  * 
  */
 
@@ -139,6 +139,15 @@ class Pledge {
     function target() { return $this->data['target']; }
     function signers() { return $this->data['signers']; }
     function left() { return $this->data['left']; }
+
+    function probable_will_reach() { 
+        if (!array_key_exists('probable_will_reach', $this->data)) {
+            $this->data['probable_will_reach'] = db_getOne("select 
+                    " . pb_chivvy_probable_will_reach_clause() . "
+                    from pledges where id = ?", $this->data['id']);
+        }
+        return $this->data['probable_will_reach'];
+    }
 
     function creator() { return new person($this->data['person_id']); }
     function creator_email() { return $this->data['email']; }

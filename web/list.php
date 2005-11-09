@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.21 2005-11-08 19:56:11 francis Exp $
+// $Id: list.php,v 1.22 2005-11-09 15:40:21 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -115,13 +115,13 @@ if ($rss)
 else {
     page_header($heading, array('id'=>'all',
         'rss'=> array(
-                    $heading => pb_domain_url(array('path'=>'/list'.$_SERVER['REQUEST_URI']))
+                    $heading => pb_domain_url(array('explicit'=>true, 'path'=>'/list'.$_SERVER['REQUEST_URI']))
                     ) 
     ));
 }
 
 if (!$rss) {
-?><a href="<?=pb_domain_url(array('path'=>"/rss".$_SERVER['REQUEST_URI']))?>"><img align="right" border="0" src="/rss.gif" alt="<?=_('RSS feed of ') . $heading ?>"></a><?
+?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss".$_SERVER['REQUEST_URI']))?>"><img align="right" border="0" src="/rss.gif" alt="<?=_('RSS feed of ') . $heading ?>"></a><?
     print h2($heading);
 
     pb_print_filter_link_main_general('align="center"');
@@ -194,7 +194,7 @@ if ($ntotal > 0) {
         if ($rss) {
             $rss_items[] = array(
                   'title' => htmlspecialchars(trim_characters($pledge->title(), 0, 80)),
-                  'link' => pb_domain_url(array('path'=>"/".$pledge->ref())),
+                  'link' => pb_domain_url(array('explicit'=>true, 'path'=>"/".$pledge->ref())),
                   'description' => "'" . $pledge->sentence(array('firstperson'=>true, 'html'=>true))
                         . "' -- " . $pledge->h_name_and_identity(),
                   'latitude' => $pledge->data['latitude'],

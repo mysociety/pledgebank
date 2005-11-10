@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.24 2005-11-09 18:14:12 francis Exp $
+// $Id: list.php,v 1.25 2005-11-10 12:27:01 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -98,7 +98,6 @@ $qrows = db_query("
             ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", $sql_params);
 /* PG bug: mustn't quote parameter of offset */
 
-$heading = 'All Pledges';
 if ($q_type == 'open') {
     $heading = _("Pledges which need signers");
     if ($rss)
@@ -107,9 +106,13 @@ if ($q_type == 'open') {
     $heading = _("Successful pledges, open to new signers");
 } elseif ($q_type == 'succeeded_closed') {
     $heading = _("Successful pledges, closed to new signers");
+} elseif ($q_type == 'succeeded') {
+    $heading = _("Successful pledges");
 } elseif ($q_type == 'failed') {
     $heading = _("Failed pledges");
-} 
+} else {
+    err('Unknown type ' . $q_type);
+}
 if ($rss) 
     rss_header($heading, $heading, array());
 else {

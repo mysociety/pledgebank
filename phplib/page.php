@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.91 2005-11-09 15:46:48 francis Exp $
+// $Id: page.php,v 1.92 2005-11-10 12:32:42 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -232,7 +232,7 @@ function rss_footer($items) {
 <description><?=$item['description']?></description>
 <? if ($item['latitude'] && $item['longitude']) { ?>
 <geo:lat><?=$item['latitude']?></geo:lat>
-<geo:lon><?=$item['longitude']?></geo:lon>
+<geo:long><?=$item['longitude']?></geo:long>
 <? } ?>
 </item>
 <? } ?>

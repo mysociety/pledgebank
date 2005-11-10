@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.18 2005-08-23 22:29:21 matthew Exp $
+// $Id: ref-email.php,v 1.19 2005-11-10 12:12:18 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -25,7 +25,7 @@ if ($pin_box) {
 }
 
 $title = _("Emailing friends");
-page_header($title, array('ref' => $p->url_main() ));
+page_header($title, array('ref' => $p->url_typein() ));
 
 # fromname, fromemail, frommessage
 # email as an array

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.137 2005-11-09 18:14:12 francis Exp $
+ * $Id: pledge.php,v 1.138 2005-11-10 12:12:18 francis Exp $
  * 
  */
 
@@ -225,9 +225,12 @@ class Pledge {
     }
 
     // Links. The semantics here is that the URLs are all escaped, but didn't
-    // need escaping. They can safely be used in HTML or plain text. We
-    // use OPTION_BASE_URL for the main case to create a shorter URL.
-    function url_main() { return OPTION_BASE_URL . "/" . $this->h_ref; }
+    // need escaping. They can safely be used in HTML or plain text. The
+    // "typein" URL is a short one for typing in - we use OPTION_BASE_URL 
+    // so it is just www.pledgbank.com, rather than containing any overriden
+    // language or country codes.
+    function url_main() { return pb_domain_url() . $this->h_ref; }
+    function url_typein() { return OPTION_BASE_URL . "/" . $this->h_ref; }
     function url_email() { return pb_domain_url() . $this->h_ref . "/email"; }
     function url_ical() { return pb_domain_url() . $this->h_ref . "/ical"; }
     function url_flyers() { return pb_domain_url() . $this->h_ref . "/flyers"; }

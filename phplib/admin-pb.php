@@ -6,14 +6,14 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.106 2005-11-09 19:52:17 matthew Exp $
+ * $Id: admin-pb.php,v 1.107 2005-11-10 12:12:18 francis Exp $
  * 
  */
 
 require_once "../phplib/pb.php";
 require_once "../phplib/pledge.php";
 require_once "../phplib/comments.php";
-require_once "fns.php";
+require_once "../phplib/fns.php";
 require_once "../../phplib/db.php";
 require_once "../../phplib/utility.php";
 require_once "../../phplib/importparams.php";
@@ -107,7 +107,9 @@ class ADMIN_PAGE_PB_MAIN {
             $r = array_map('htmlspecialchars', $r);
             $row = "";
 
-            $row .= '<td><a href="'.OPTION_BASE_URL . "/" . $r['ref'] .'">'.$r['ref'].'</a>'.
+            $row .= '<td><a href="'.
+                pb_domain_url(array('path'=>"/".$r['ref'], 'lang'=>$r['lang'], 'country'=>$r['country'])) .
+                '">'.$r['ref'].'</a>'.
                 '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">admin</a> |
                 <a href="?page=pblatest&amp;ref='.$r['ref'].'">timeline</a>';
             $row .= '</td>';
@@ -202,7 +204,9 @@ class ADMIN_PAGE_PB_MAIN {
         }
         $pledge_obj = new Pledge($pdata);
 
-        print "<h2>Pledge '<a href=\"".OPTION_BASE_URL.'/'.$pdata['ref']."\">" . $pdata['ref'] . "</a>'";
+        print "<h2>Pledge '<a href=\"".
+                pb_domain_url(array('path'=>"/".$pledge_obj->ref(), 'lang'=>$pledge_obj->lang(), 'country'=>$pledge_obj->country_code())) .
+                "\">" . $pdata['ref'] . "</a>'";
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
         print " &mdash; " .  $pdata['title'] . "</h2>";
 

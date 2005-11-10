@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.86 2005-11-09 15:40:21 francis Exp $
+// $Id: fns.php,v 1.87 2005-11-10 12:12:18 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -89,9 +89,9 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['sentence_third'] = pledge_sentence($values, array('firstperson' => false));
     }
     if (array_key_exists('ref', $values)) {
-        $values['pledge_url'] = OPTION_BASE_URL . "/" . $values['ref'];
-        $values['pledge_url_email'] = OPTION_BASE_URL . "/" . $values['ref'] . "/email";
-        $values['pledge_url_flyers'] = OPTION_BASE_URL . "/" . $values['ref'] . "/flyers";
+        $values['pledge_url'] = pb_domain_url(array('path'=> "/" . $values['ref']));
+        $values['pledge_url_email'] = pb_domain_url(array('path'=> "/" . $values['ref'] . "/email"));
+        $values['pledge_url_flyers'] = pb_domain_url(array('path'=> "/" . $values['ref'] . "/flyers"));
     }
     if (array_key_exists('date', $values))
         $values['pretty_date'] = prettify($values['date'], false);

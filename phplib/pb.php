@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.48 2005-11-09 15:40:21 francis Exp $
+ * $Id: pb.php,v 1.49 2005-11-10 12:16:58 francis Exp $
  * 
  */
 
@@ -20,6 +20,12 @@ require_once "../../phplib/error.php";
 require_once "../../phplib/locale.php";
 require_once 'microsites.php';
 require_once 'page.php';
+
+// Googlebot is crawling all our domains for different languages/codes at 
+// a high rate, which in combination is too much for our server.
+if (stristr($_SERVER['HTTP_USER_AGENT'], "Googlebot")) {
+    sleep(5);
+}
 
 /* Output buffering: PHP's output buffering is broken, because it does not
  * affect headers. However, it's worth using it anyway, because in the common

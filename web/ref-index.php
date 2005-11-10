@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.57 2005-11-08 19:05:39 francis Exp $
+// $Id: ref-index.php,v 1.58 2005-11-10 10:00:40 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -221,8 +221,8 @@ function draw_connections($p) {
             LEFT JOIN pledges AS a_pledges ON a_pledge_id = a_pledges.id
             LEFT JOIN pledges AS b_pledges ON b_pledge_id = b_pledges.id
         WHERE
-            (a_pledge_id = ? AND b_pledges.date >= $pb_today AND b_pledges.whensucceeded is null) or
-            (b_pledge_id = ? AND a_pledges.date >= $pb_today AND a_pledges.whensucceeded is null)
+            (a_pledge_id = ? AND b_pledges.date >= '$pb_today' AND b_pledges.whensucceeded is null) or
+            (b_pledge_id = ? AND a_pledges.date >= '$pb_today' AND a_pledges.whensucceeded is null)
         ORDER BY STRENGTH DESC 
         LIMIT 8", array($p->id(), $p->id()));
     if (0 == db_num_rows($s))

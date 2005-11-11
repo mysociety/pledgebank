@@ -4,12 +4,12 @@
  * General purpose functions specific to PledgeBank.  This must
  * be included first by all scripts to enable error logging.
  * This is only used by the web page PHP scripts, command line ones 
- * use pbcgi.php.
+ * use pbcli.php.
  * 
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.50 2005-11-10 16:27:08 francis Exp $
+ * $Id: pb.php,v 1.51 2005-11-11 12:34:57 francis Exp $
  * 
  */
 

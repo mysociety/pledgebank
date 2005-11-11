@@ -1,17 +1,18 @@
 <?php
 /* 
- * pbcgi.php:
- * Include file for PHP CLI scripts for PledgeBank
+ * pbcli.php:
+ * Include file for PHP CLI scripts for PledgeBank.
+ # Use pb.php instead for web pages.
  *
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: pbcgi.php,v 1.3 2005-11-09 15:40:21 francis Exp $
+ * $Id: pbcli.php,v 1.1 2005-11-11 12:34:57 francis Exp $
  *
  */
 
 require_once "../conf/general";
-require_once '../../phplib/phpcgi';
+require_once '../../phplib/phpcli.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/locale.php';
 

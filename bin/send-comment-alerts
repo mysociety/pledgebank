@@ -7,14 +7,14 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-comment-alerts,v 1.9 2005-11-11 11:35:38 francis Exp $
+ * $Id: send-comment-alerts,v 1.10 2005-11-11 12:34:56 francis Exp $
  *
  */
 
 $short_opts = '';
 $long_opts = array('verbose','help');
 
-require_once "../phplib/pbcgi.php";
+require_once "../phplib/pbcli.php";
 require_once '../phplib/fns.php';
 require_once "../phplib/alert.php";
 require_once '../../phplib/db.php';

@@ -8,8 +8,8 @@ The pledge, created by <?=$values['creator_name']?>, read:
 '<?=$values['sentence_first']?>'
 
 This means you don't have to do your part of the pledge.  Instead, why not
-sign up to local alerts at http://www.pledgebank.com/alert to find out
+sign up to local alerts at <?=$values['pledgebank_url']?>alert to find out
 when someone creates a new pledge near you, browse the pledges at
-http://www.pledgebank.com/list or perhaps make your own pledge.
+<?=$values['pledgebank_url']?>list or perhaps make your own pledge.
 
 <?=$values['signature']?>

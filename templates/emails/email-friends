@@ -1,14 +1,14 @@
-Subject: I saw this pledge and thought of you
+Subject: <?=$values['from_name']?> saw this pledge and thought of you
 
 <?=$values['from_name']?> <<?=$values['from_email']?>> has pledged their
 support to '<?=$values['title']?>' and wants you to do the same! Simply by
 clicking <?=$values['pledge_url']?> you can show the world that you're ready to
 start making a difference, alongside other like-minded people.
 
-http://www.pledgebank.com is a site set up to give power to
+<?=$values['pledgebank_url']?> is a site set up to give power to
 YOU, by allowing you to ensure that others will support your actions. If you
 have ever wanted to make a difference, but haven't known where to start and who
-will join you, click here http://www.pledgebank.com !
+will join you, click here <?=$values['pledgebank_url']?> !
 
 <?=$values['from_name']?>'s pledge will close on <?=$values['pretty_date']?>
 and they only need the support of <?=$values['target']?> people before their

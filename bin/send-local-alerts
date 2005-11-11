@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.16 2005-10-31 08:39:12 francis Exp $
+ * $Id: send-local-alerts,v 1.17 2005-11-11 11:35:38 francis Exp $
  *
  */
 
@@ -149,12 +149,13 @@ function send_local_alerts() {
         }
 
         # Send email
-        $alert['unsubscribe_url'] = alert_unsubscribe_link($alert['alert_id'], $alert['alerted_email']);
-        $alert['pledges_count'] = $count;
-        $alert['pledges_text'] = $text;
+
         # Use language of first pledge - for alerts containing pledges in multiple languages
         # we are hoping the person receiving the alert speaks the first language.
         locale_push($first_lang);
+        $alert['unsubscribe_url'] = alert_unsubscribe_link($alert['alert_id'], $alert['alerted_email']);
+        $alert['pledges_count'] = $count;
+        $alert['pledges_text'] = $text;
         if ($count > 1) {
             $f = pb_send_email_template($alert['alerted_email'], 'alert-local-multiple', $alert, array());
         } else {

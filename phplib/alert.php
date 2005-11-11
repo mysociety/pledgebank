@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.25 2005-11-10 12:12:18 francis Exp $
+// $Id: alert.php,v 1.26 2005-11-11 11:35:38 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once '../../phplib/person.php';
@@ -162,7 +162,7 @@ function alert_h_description($alert_id) {
  * an email to that will contain the URL.
  */
 function alert_unsubscribe_link($alert_id, $email) {
-    $url = person_make_signon_url(null, $email, 
+    $url = pb_person_make_signon_url(null, $email, 
                 "POST", pb_domain_url(array('path' => "/alert")), array('direct_unsubscribe'=>$alert_id));
     return $url;
 }

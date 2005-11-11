@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.155 2005-11-10 12:12:17 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.156 2005-11-11 11:35:38 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -614,7 +614,7 @@ sub do_public_succeeding_pledge {
     $wth->email_get_containing('%To: '.email_n(0).  '%It cost £0 to make and was mainly done in a café%');
     my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%It cost £0 to make and was mainly done in a café%');
     $wth->email_check_none_left();
-    die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\b($base_url/L/.*)\b#m);
+    die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\b(http://.*/L/.*)\b#m);
     my $comment_unsubscribe_url = $1;
     $wth->browser_get($comment_unsubscribe_url);
     $wth->browser_check_contents("You won't receive more email");
@@ -768,7 +768,7 @@ sub do_public_succeeding_pledge {
     # They won't get the earlier success announcement message, instead a URL...
     call_frequentupdate();
     my $late_success_announce_email = $wth->email_get_containing( '%To: '.email_n(4).'%You signed this pledge after this message was%By merely partaking%');
-    die $late_success_announce_email . "\n\nUnsubscribe link not found" if ($late_success_announce_email !~ m#\b($base_url/L/.*)\b#m);
+    die $late_success_announce_email . "\n\nUnsubscribe link not found" if ($late_success_announce_email !~ m#\b(http://.*/L/.*)\b#m);
     my $announce_archive_link = $1;
     # ... follow it to get other messages
     $wth->browser_get($announce_archive_link);

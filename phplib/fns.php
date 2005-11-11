@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.87 2005-11-10 12:12:18 francis Exp $
+// $Id: fns.php,v 1.88 2005-11-11 11:35:38 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -32,7 +32,7 @@ function li($s) { return "<li>$s</li>\n"; }
 # Parameters are:
 #   'path' - path component, if not present uses request URI
 function pb_domain_url($params = array('path'=>'/')) {
-    global $domain_lang, $domain_country, $microsite, $lang, $site_country;
+    global $domain_lang, $domain_country, $microsite, $lang, $site_country, $locale_current, $locale_stack;
 
     if (array_key_exists('explicit', $params) && $params['explicit']) {
         $params['lang'] = 'explicit';
@@ -42,6 +42,10 @@ function pb_domain_url($params = array('path'=>'/')) {
     $l = $domain_lang;
     if (array_key_exists('lang', $params))
         $l = ($params['lang'] == "explicit") ? $lang : $params['lang'];
+    # Where language has been changed, use that in URL
+    # (this is mainly for emails about pledges)
+    if ($locale_current && count($locale_stack) > 0)
+        $l = $locale_current; 
 
     $c = $domain_country;
     if (array_key_exists('country', $params))
@@ -71,6 +75,11 @@ function pb_domain_url($params = array('path'=>'/')) {
     else
         $url .= htmlspecialchars($_SERVER['REQUEST_URI']);
     return $url;
+}
+
+// Special version of person_make_signon_url which uses fancy PledgeBank domain URLs
+function pb_person_make_signon_url($data, $email, $method, $url, $params) {
+     return person_make_signon_url($data, $email, $method, $url, $params, pb_domain_url(array('path'=>'/')));
 }
 
 // $to can be one recipient address in a string, or an array of addresses
@@ -107,6 +116,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['signers_ordinal'] = english_ordinal($values['signers']);
     }
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
+    $values['pledgebank_url'] = pb_domain_url(array('path'=>'/'));
         
     $values['signature'] = _("-- the PledgeBank.com team");
 

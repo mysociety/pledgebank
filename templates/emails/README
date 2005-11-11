@@ -24,6 +24,8 @@ Values which are available in all emails are:
   - sentence_third, full pledge sentence in third person ("Pledge Setter...")
   - pledge_url, of the pledge page.
 
+  - pledgebank_url, URL of localised site, including trailing slash (http://br.pledgebank.com/)
+
 The text of each message should be pre-formatted as an email.
 
 Emails and the available variables are:

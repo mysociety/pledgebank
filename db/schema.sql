@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.158 2005-11-03 17:34:26 chris Exp $
+-- $Id: schema.sql,v 1.159 2005-11-13 13:02:29 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -852,30 +852,24 @@ create function smssubscription_sign(integer, text)
 -- Prominence of pledges
 -- 
 
--- pb_pledge_prominence PROMINENCE SIGNERS LOCAL
--- Return the effective prominence of a pledge having assigned PROMINENCE,
--- the given number of SIGNERS and a LOCAL co-ordinate as follows:
+-- pb_pledge_prominence_calculated SIGNERS LOCAL TARGET
+-- Return the effective prominence of a pledge with calculated prominence.  --
+-- The given number of SIGNERS and a LOCAL co-ordinate and TARGET target signers
+-- as follows:
 --
---  assigned    number of   effective
---  prominence  signers     local       prominence 
---  ----------- ----------- ----------- -----------
---  frontpage   n/a         n/a         frontpage
---  backpage    n/a         n/a         backpage
---  normal      n/a         n/a         normal
---  calculated  < 3         false       backpage
---  calculated  >= 3        false       normal
---  calculated  < 1         true        backpage
---  calculated  >= 1        true        normal
-create function pb_pledge_prominence(text, integer, boolean)
+--  number of     effective
+--  signers       local       prominence 
+--  ------------- ----------- -----------
+--  < 3           false       backpage
+--  < 1           true        backpage
+--  < 2.5% target false       backpage
+--  otherwise              normal
+create function pb_pledge_prominence_calculated(integer, boolean, integer)
     returns text as '
 select case
-    when $1 = ''frontpage'' then ''frontpage''
-    when $1 = ''backpage'' then ''backpage''
-    when $1 = ''normal'' then ''normal''
-    when (not $3) and $2 < 3 then ''backpage''
-    when (not $3) and $2 >= 3 then ''normal''
-    when $3 and $2 < 1 then ''backpage''
-    when $3 and $2 >= 1 then ''normal''
+    when (not $2) and $1 < 3 then ''backpage''
+    when $2 and $1 < 1 then ''backpage''
+    when $1 < ($3 * 0.025) then ''backpage''
     else ''normal''
     end;
 ' language sql;
@@ -895,8 +889,8 @@ select case
         then ''frontpage''
     when (select prominence from pledges where id = $1) = ''normal''
         then ''normal''
-    else
-        pb_pledge_prominence( (select prominence from pledges where id = $1), (select count(id) from signers where pledge_id = $1)::integer, (select longitude from pledges, location where pledges.location_id = location.id and pledges.id = $1) is not null )
+    else -- calculated
+        pb_pledge_prominence_calculated( (select count(id) from signers where pledge_id = $1)::integer, (select longitude from pledges, location where pledges.location_id = location.id and pledges.id = $1) is not null, (select target from pledges where id = $1) )
     end;
 ' language sql;
 

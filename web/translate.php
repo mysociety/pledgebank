@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: translate.php,v 1.4 2005-08-29 13:29:27 matthew Exp $
+// $Id: translate.php,v 1.5 2005-11-13 10:48:41 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../../phplib/utility.php';
@@ -90,8 +90,6 @@ in your translation (hopefully it won't :) ) :
 </pre>
 
 <li>Email me with as much or as little as you have done, and I will get it up and running as soon as possible. :-)
-
-<li>Oh, one other thing that needs translating are the emails we send out. <a href="https://secure.mysociety.org/cvstrac/dir?d=mysociety/pb/templates/emails">These are available</a>, and are free-standing translations. Ask for more information about this.
 
 </ol>
 
@@ -181,11 +179,9 @@ msgstr[1] "Eu tenho %d c&atilde;es."</pre>
 
 <li>Email me with as much or as little as you have done, and I will get it up and running as soon as possible. :-)
 
-<li>Oh, one other thing that needs translating are the emails we send out. <a href="https://secure.mysociety.org/cvstrac/dir?d=mysociety/pb/templates/emails">These are available</a>, and are free-standing translations. Ask for more information about this.
-
 </ol>
 
-<p align="right">Matthew Somerville<br>30<sup>th</sup> June 2005</p>
+<p align="right">Matthew Somerville<br>13<sup>th</sup> November 2005</p>
 
 <?
 page_footer();

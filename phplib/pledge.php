@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.139 2005-11-10 15:37:30 francis Exp $
+ * $Id: pledge.php,v 1.140 2005-11-13 10:48:42 matthew Exp $
  * 
  */
 
@@ -16,7 +16,6 @@ require_once '../../phplib/person.php';
 
 require_once '../../phplib/utility.php';
 require_once '../../phplib/rabx.php';
-require_once '../../phplib/countries.php';
 
 class Pledge {
     // Associative array of parameters about the pledge, taken from database

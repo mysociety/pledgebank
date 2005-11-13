@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.51 2005-11-11 12:34:57 francis Exp $
+ * $Id: pb.php,v 1.52 2005-11-13 10:48:42 matthew Exp $
  * 
  */
 
@@ -97,6 +97,7 @@ locale_gettext_domain('PledgeBank');
 
 # Do includes after language negotiation, so translated globals
 # are translated in them
+require_once '../../phplib/countries.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/stash.php';
 require_once "../../phplib/utility.php";

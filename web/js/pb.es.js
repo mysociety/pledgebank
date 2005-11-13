@@ -1,5 +1,5 @@
 /*
- * pb.ru.js
+ * pb.es.js
  * Translation of JS strings
  * Auto-generated from .po files by gettext-makejs
  *
@@ -9,15 +9,15 @@
  */
 
 var translation = {
-"(choose one)":"(выберите)",
-"Town:":"Город:",
-"other local people":"других людей из моего региона",
-"<Enter your pledge>":"<Введите Ваше обещание>",
-"<Enter your name>":"<Введите Ваше имя>",
-"<Enter town or keyword>":"<Укажите город или ключ>",
+"(choose one)":"(elija uno)",
+"Town:":"",
+"other local people":"otras personas cercanas",
+"<Enter your pledge>":"",
+"<Enter your name>":"",
+"<Enter town or keyword>":"",
 "<Date>":"",
 "other local person":"",
-"Global":"",
+"Global":"Global",
 "(separator)":"",
 "Postcode or town:":"",
 "You have used %d characters; %d remain.":"",

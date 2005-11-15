@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.42 2005-10-24 10:37:30 francis Exp $
+// $Id: alert.php,v 1.43 2005-11-15 15:13:38 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -92,7 +92,7 @@ function do_local_alert_subscribe() {
         if (!validate_partial_postcode($postcode) && !validate_postcode($postcode))
             $errors['postcode'] = _('Please enter a postcode, or just its first part; for example, OX1 3DR or WC1.');
         else if (mapit_get_error(mapit_get_location($postcode, 1)))
-            $errors['postcode'] = _("We couldn't recognise that postcode; please re-check it");
+            $errors['postcode'] = sprintf(_("We couldn't recognise the postcode '%s'; please re-check it"), htmlspecialchars($postcode));
         else
             $postcode = canonicalise_partial_postcode($postcode);
     } elseif ($place) {

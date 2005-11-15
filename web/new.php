@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.102 2005-11-09 19:52:14 matthew Exp $
+// $Id: new.php,v 1.103 2005-11-15 15:13:38 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -163,27 +163,49 @@ function pledge_form_target_warning($data, $errors) {
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
+
+    $must_gather = $data['target'] * 0.025; # 2.5%, as in pb_pledge_prominence_calculated in db
+    $total_pledges_above_target = db_getOne("select count(*) from pledges where target > ? and pb_current_date() > pledges.date", array($data['target']));
+    $successful_pledges_above_target = db_getOne("select count(*) from pledges where target > ? and pb_current_date() > pledges.date and whensucceeded is not null", array($data['target']));
+    if ($total_pledges_above_target == 0)
+        $percent_successful_above_target = 0.0;
+    else
+        $percent_successful_above_target = 100.0 * $successful_pledges_above_target / $total_pledges_above_target;
+
     
 ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
 
-<?  print h2(_('Rethink your target'));
-    printf(p(_("Hello - we've noticed that your pledge is aiming to recruit more than
-%d people.")), OPTION_PB_TARGET_WARNING);
-    printf(p(_("Recruiting more than %d people to a pledge is a
-lot of work, and many people who have set up pledges larger than this have not
-succeeded.  You should only set a large target if you are preprared to do some
-serious marketing of your pledge.")), OPTION_PB_TARGET_WARNING);
-    print p(_('We\'ve set your target to 10 for now. Please take advantage of this box to change it.  There is <a
-href="/faq#targets">more advice</a> about choosing a target in the FAQ.'));
+<?  print h2(_('Please lower your target!'));
+
+    printf(p(_("Recruiting more than %d people to a pledge is much harder than
+    most people think. <strong>Only %0.0f%%</strong> of people who have set
+    pledge targets at your level or above have succeeded - why risk it? Does
+    your pledge really need so many people to be worthwhile?")),
+    OPTION_PB_TARGET_WARNING, $percent_successful_above_target);
+
+    printf(p(_("Please note, in order to encourage people to aim at realistic
+    targets, we don't automatically show pledges with very few signers on the
+    site.  In order to make your new pledge appear to casual browsers, and in
+    order for your pledge to be automatically mailed to local people near you,
+    you <strong>must gather at least %d signers</strong> (once you have
+    finished making this pledge, and unless you reduce the target).")),
+    $must_gather);
+
+    print(p(_("We've <strong>reduced your target to 10</strong> for now. Please
+    use this box if you want to change back to another target.  There is 
+    <a href=\"/faq#targets\">more advice</a> about choosing a target in the
+    FAQ.")));
+
 ?>
 <p><?=_('<strong>My target</strong> is ') ?>
 <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="10">
 <strong><?=$data['type']?></strong></p>
 
 <p><?=_('Remember, a small but successful pledge can be the perfect preparation
-for a larger and more ambitious one.') ?></p>
+for a larger and more ambitious one. You can mail your subscribers, and ask
+them to help you with something bigger.') ?></p>
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">

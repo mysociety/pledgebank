@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.28 2005-11-08 19:11:34 matthew Exp $
+ * $Id: pb.js,v 1.29 2005-11-16 10:01:37 francis Exp $
  * 
  */
 
@@ -95,8 +95,8 @@ function checklength(thi) {
 
 // optionclick is "true" if user just clicked, or "false" during page load
 function update_place_local(item, optionclick) {
-    var d = item.form;
-    var e = d.elements['country'];
+    var d = item.form
+    var e = d.elements['country']
 
     // Find country/state
     countryPicked = e.options[e.selectedIndex].value
@@ -114,10 +114,10 @@ function update_place_local(item, optionclick) {
     hasgazetteer = (gaze_countries[countryPicked] == 1)
 
     // Ghost things appropriately
-    grey_local(!iscountry || !hasgazetteer); 
-    grey_ifyes(!islocal || !iscountry || !hasgazetteer);
-    grey_place(!islocal || !iscountry || !hasgazetteer, optionclick);
-    grey_postcode(!islocal || !isuk || !hasgazetteer, optionclick);
+    grey_local(!iscountry || !hasgazetteer)
+    grey_ifyes(!islocal || !iscountry || !hasgazetteer)
+    grey_place(!islocal || !iscountry || !hasgazetteer, optionclick)
+    grey_postcode(!islocal || !isuk || !hasgazetteer, optionclick)
 
     // Front page text
     var place_postcode_label = document.getElementById('place_postcode_label')

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.6 2005-09-01 12:12:16 francis Exp $
+// $Id: explain.php,v 1.7 2005-11-18 11:18:10 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -64,7 +64,7 @@ and so on."), sms_countries_description()));
 print p(_("PledgeBank is free, easy to use, and needs your involvement
 before we can launch.  So if there's something you'd like to achieve in
 your community, in your place of employment, your university, amongst
-your friends, or in your street.  Please take a look at PledgeBank.com
+your friends, or in your street, please take a look at PledgeBank.com
 and create a pledge right now.  Thank you."));
 print '</blockquote> <p><a href="/">' . _('To PledgeBank front page') . '</a></p>';
 page_footer();

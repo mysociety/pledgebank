@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.89 2005-11-16 10:01:37 francis Exp $
+// $Id: fns.php,v 1.90 2005-11-18 11:18:09 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -178,11 +178,35 @@ function parse_date($date) {
 
     # Translate foreign words to English as strtotime() is English only
     $translate = array(
+        # Welsh
         'Ionawr'=>'January', 'Chwefror'=>'February', 'Mawrth'=>'March', 'Ebrill'=>'April',
         'Mai'=>'May', 'Mehefin'=>'June', 'Gorffennaf'=>'July', 'Awst'=>'August',
         'Medi'=>'September', 'Hydref'=>'October', 'Tachwedd'=>'November', 'Rhagfyr'=>'December',
         'Dydd Llun'=>'Monday', 'Dydd Mawrth'=>'Tuesday', 'Dydd Mercher'=>'Wednesday',
-        'Dydd Iau'=>'Thursday', 'Dydd Gwener'=>'Friday', 'Dydd Sadwrn'=>'Saturday', 'Dydd Sul'=>'Sunday'
+        'Dydd Iau'=>'Thursday', 'Dydd Gwener'=>'Friday', 'Dydd Sadwrn'=>'Saturday', 'Dydd Sul'=>'Sunday',
+
+        # Russian
+        "\xd1\x8f\xd0\xbd\xd0\xb2\xd0\xb0\xd1\x80\xd1\x8f" => 'January',
+        "\xd1\x84\xd0\xb5\xd0\xb2\xd1\x80\xd0\xb0\xd0\xbb\xd1\x8f" => 'February',
+        "\xd0\xbc\xd0\xb0\xd1\x80\xd1\x82\xd0\xb0" => 'March',
+        "\xd0\xb0\xd0\xbf\xd1\x80\xd0\xb5\xd0\xbb\xd1\x8f" => 'April',
+        "\xd0\xbc\xd0\xb0\xd1\x8f" => 'May',
+        "\xd0\xb8\xd1\x8e\xd0\xbd\xd1\x8f" => 'June',
+        "\xd0\xb8\xd1\x8e\xd0\xbb\xd1\x8f" => 'July',
+        "\xd0\xb0\xd0\xb2\xd0\xb3\xd1\x83\xd1\x81\xd1\x82\xd0\xb0" => 'August',
+        "\xd1\x81\xd0\xb5\xd0\xbd\xd1\x82\xd1\x8f\xd0\xb1\xd1\x80\xd1\x8f" => 'September',
+        "\xd0\xbe\xd0\xba\xd1\x82\xd1\x8f\xd0\xb1\xd1\x80\xd1\x8f" => 'October', 
+        "\xd0\xbd\xd0\xbe\xd1\x8f\xd0\xb1\xd1\x80\xd1\x8f" => 'November', 
+        "\xd0\xb4\xd0\xb5\xd0\xba\xd0\xb0\xd0\xb1\xd1\x80\xd1\x8f" => 'December',
+
+        "\xd0\xb2\xd0\xbe\xd1\x81\xd0\xba\xd1\x80\xd0\xb5\xd1\x81\xd0\xb5\xd0\xbd\xd1\x8c\xd0\xb5" => 'Sunday',
+        "\xd0\xbf\xd0\xbe\xd0\xbd\xd0\xb5\xd0\xb4\xd0\xb5\xd0\xbb\xd1\x8c\xd0\xbd\xd0\xb8\xd0\xba" => 'Monday',
+        "\xd0\xb2\xd1\x82\xd0\xbe\xd1\x80\xd0\xbd\xd0\xb8\xd0\xba" => 'Tuesday',
+        "\xd1\x81\xd1\x80\xd0\xb5\xd0\xb4\xd0\xb0" => 'Wednesday',
+        "\xd1\x87\xd0\xb5\xd1\x82\xd0\xb2\xd0\xb5\xd1\x80\xd0\xb3" => 'Thursday', 
+        "\xd0\xbf\xd1\x8f\xd1\x82\xd0\xbd\xd0\xb8\xd1\x86\xd0\xb0" => 'Friday',
+        "\xd1\x81\xd1\x83\xd0\xb1\xd0\xb1\xd0\xbe\xd1\x82\xd0\xb0" => 'Saturday',
+
     );
     $search = array(); $replace = array();
     foreach ($translate as $foreign => $english) {

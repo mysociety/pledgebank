@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.90 2005-11-18 11:18:09 matthew Exp $
+// $Id: fns.php,v 1.91 2005-11-23 17:01:37 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -457,7 +457,11 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
 # Display quick signup form for local alerts. Parameters can contain:
 # newflash - if true, put message in bold and show "works in any country" flash
 # place - default value for place
+global $place_postcode_label; # ids must be unique (this will break 
+# the javascript on the few pages which have this form twice, but I couldn't
+# see an easy worthwhile way round this)
 function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>true)) {
+    global $place_postcode_label;
     $email = '';
     $P = person_if_signed_on();
     if (!is_null($P)) {
@@ -476,10 +480,11 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 <p><strong><?=_('Sign up for emails when people make pledges in your local area')?> <?=$newflash?'&mdash;':''?> <?=$newflash?_('Works in any country!'):''?> </strong>
 <br><span style="white-space: nowrap"><?=_('Email:') ?><input type="text" size="18" name="email" value="<?=htmlspecialchars($email) ?>"></span>
 <span style="white-space: nowrap"><?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
-<span style="white-space: nowrap"><span id="place_postcode_label"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
+<span style="white-space: nowrap"><span id="place_postcode_label<?=($place_postcode_label ? $place_postcode_label : '')?>"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 <?
+    $place_postcode_label++;
 }
 
 // Return array of country codes for countries which have SMS

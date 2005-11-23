@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.158 2005-11-23 12:35:36 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.159 2005-11-23 17:01:36 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1340,7 +1340,7 @@ sub do_admin_tests {
     # Submit abusive comment report
     $wth->browser_get($locale_url . "/automatedtest");
     $wth->browser_follow_link(text_regex => qr/Abusive/, n => 1);
-    $wth->browser_check_contents("Report something wrong with a comment");
+    $wth->browser_check_contents("Report abusive, suspicious or wrong comment");
     $wth->browser_submit_form(form_name => 'abuse',
             fields => { 
                 reason => "I hate this comment, it sucks",

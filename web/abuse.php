@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.23 2005-11-04 21:45:55 matthew Exp $
+// $Id: abuse.php,v 1.24 2005-11-23 12:35:37 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -87,8 +87,8 @@ as possible.')), $w);
     $title = htmlspecialchars(db_getOne('select title from pledges where id = ?', $pledge_id));
 
     print '<form accept-charset="utf-8" action="abuse" method="post" name="abuse" class="pledge">';
-    printf(h2(_('Report something wrong with a %s')), $w);
-    printf(p(_('You are reporting the following %s as being abusive, suspicious or having something wrong with it.')), $w);
+    printf(h2(_('Report abusive, suspicious or wrong %s')), $w);
+    printf(p(_('You are reporting the following %s:')), $w);
     print '<blockquote>';
     if ($q_what == 'pledge') {
         print $title;
@@ -102,6 +102,7 @@ as possible.')), $w);
     if ($q_what != 'pledge') {
         printf(p(_("This is on the pledge <strong>%s</strong>.")), $title);
     }
+    printf(p(_('(if you would like to send us a general comment, rather than an abuse report, <a href="/contact/">try here</a>)')));
 
     print <<<EOF
 <input type="hidden" name="abusive" value="1">
@@ -113,12 +114,14 @@ EOF;
      * point that this is an *abuse* report. */
 
     print '<p>';
-    printf(_('Please give a short reason for reporting this %s.'), $w);
-    print '<br><input type="text" name="reason" size="60"></p>
-<p><input name="submit" type="submit" value="' . _('Submit') . '"><br>';
-    printf(_('If you would like us to get back to you about your abuse report, please give your email address.'));
-    print '<br><input type="text" name="email" size="60"></p>
-</form>';
+    printf(_('<strong>Short reason</strong> for reporting this %s:'), $w);
+    print '<br><textarea style="max-width: 100%" name="reason" cols="60" rows="2"></textarea>';
+    print '<br>';
+    printf(_('<strong>Email</strong> (optional, if you want us to get back to you):'));
+    print '<input type="text" name="email" size="20"></p>';
+    print '<p>';
+    print '<input name="submit" type="submit" value="' . _('Submit') . '"><br>';
+    print '</form>';
 
 }
 

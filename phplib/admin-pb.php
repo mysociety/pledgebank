@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.108 2005-11-23 12:18:40 francis Exp $
+ * $Id: admin-pb.php,v 1.109 2005-11-23 12:35:36 francis Exp $
  * 
  */
 
@@ -869,7 +869,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
     function do_one_list($self_link, $what) {
 
         $old_id = null;
-        $q = db_query('select id, what_id, reason, ipaddr, extract(epoch from whenreported) as epoch from abusereport where what = ? order by what_id, whenreported desc', $what);
+        $q = db_query('select id, what_id, reason, email, ipaddr, extract(epoch from whenreported) as epoch from abusereport where what = ? order by what_id, whenreported desc', $what);
 
         if (db_num_rows($q) > 0) {
 
@@ -879,7 +879,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
     <p><input type="submit" name="discardReports" value="Discard selected abuse reports"></p>
     <table class="abusereporttable">
     ';
-            while (list($id, $what_id, $reason, $ipaddr, $t) = db_fetch_row($q)) {
+            while (list($id, $what_id, $reason, $email, $ipaddr, $t) = db_fetch_row($q)) {
                 if ($what_id !== $old_id) {
                 
                     /* XXX should group by pledge and then by signer/comment, but
@@ -966,6 +966,8 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
                             . $ipaddr
                         . '</td><td><b>Reason: </b>'
                             . htmlspecialchars($reason)
+                        . ' <b>Email: </b> '
+                            . htmlspecialchars($email)
                         . '</td></tr>';
             }
 

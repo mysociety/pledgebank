@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.31 2005-11-09 19:52:14 matthew Exp $
+// $Id: search.php,v 1.32 2005-11-23 12:18:40 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -46,7 +46,7 @@ function get_location_results($pledge_select, $lat, $lon) {
                     pin IS NULL AND
                     pb_pledge_prominence(pledges.id) <> 'backpage' AND 
                     '$pb_today' <= pledges.date 
-                ORDER BY distance", array($lat, $lon, 50)); // 50 miles. XXX Should be indexed with wgs84_lat, wgs84_lon
+                ORDER BY distance", array($lat, $lon, 20)); // 20 km. XXX Should be indexed with wgs84_lat, wgs84_lon
     $ret = "";
     if (db_num_rows($q)) {
         $success = 1;

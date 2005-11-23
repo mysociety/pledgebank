@@ -6,14 +6,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.107 2005-11-10 12:12:18 francis Exp $
+ * $Id: admin-pb.php,v 1.108 2005-11-23 12:18:40 francis Exp $
  * 
  */
 
 require_once "../phplib/pb.php";
 require_once "../phplib/pledge.php";
 require_once "../phplib/comments.php";
-require_once "../phplib/fns.php";
 require_once "../../phplib/db.php";
 require_once "../../phplib/utility.php";
 require_once "../../phplib/importparams.php";
@@ -375,8 +374,8 @@ class ADMIN_PAGE_PB_MAIN {
             if ($r['emailsubject'])
                 print "<br><strong>email subject:</strong> " . $r['emailsubject'];
             if ($r['emailbody']) {
-                ?><br><strong>email body:</strong>
-                <div class="message"><?= comments_text_to_html($r['emailbody']) ?></div> <?
+                print '<br><strong>email body:</strong>
+                <div class="message">.'.comments_text_to_html($r['emailbody'])."</div>";
             }
 
         }

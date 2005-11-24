@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.109 2005-11-23 12:35:36 francis Exp $
+ * $Id: admin-pb.php,v 1.110 2005-11-24 13:44:11 francis Exp $
  * 
  */
 
@@ -103,7 +103,6 @@ class ADMIN_PAGE_PB_MAIN {
         $open = array();
         $closed = array();
         while ($r = db_fetch_array($q)) {
-            $r = array_map('htmlspecialchars', $r);
             $row = "";
 
             $row .= '<td><a href="'.
@@ -209,10 +208,10 @@ class ADMIN_PAGE_PB_MAIN {
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
         print " &mdash; " .  $pdata['title'] . "</h2>";
 
-        print "<p>Set by: <b>" . $pdata['name'] . " &lt;" .  $pdata['email'] . "&gt;</b>";
+        print "<p>Set by: <b>" . htmlspecialchars($pdata['name']) . " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</b>";
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
-        print " Target: <b>" . $pdata['target'] . " " .  $pdata['type'] . "</b>";
+        print " Target: <b>" . $pdata['target'] . " " .  htmlspecialchars($pdata['type']) . "</b>";
 
         global $langs;
         print '<form name="languageform" method="post" action="'.$this->self_link.'">';
@@ -372,7 +371,7 @@ class ADMIN_PAGE_PB_MAIN {
             if ($r['emailtemplatename'])
                 print "<br><strong>email template:</strong> " . $r['emailtemplatename'];
             if ($r['emailsubject'])
-                print "<br><strong>email subject:</strong> " . $r['emailsubject'];
+                print "<br><strong>email subject:</strong> " . htmlspecialchars($r['emailsubject']);
             if ($r['emailbody']) {
                 print '<br><strong>email body:</strong>
                 <div class="message">.'.comments_text_to_html($r['emailbody'])."</div>";
@@ -717,16 +716,16 @@ class ADMIN_PAGE_PB_LATEST {
                     print ' anonymously';
                 print ' signed by ';
                 print $data['name'];
-                if ($data['email']) print ' &lt;'.$data['email'].'&gt;';
-                if ($data['mobile']) print ' (' . $data['mobile'] . ')';
+                if ($data['email']) print ' &lt;'.htmlspecialchars($data['email']).'&gt;';
+                if ($data['mobile']) print ' (' . htmlspecialchars($data['mobile']) . ')';
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, ";
                 print $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (confirmed)';
-                print " by $data[name] &lt;$data[email]&gt;";
+                print " by ".htmlspecialchars($data['name'])." &lt;".htmlspecialchars($data['email'])."&gt;";
             } elseif (array_key_exists('whenreceived', $data)) {
-                print "Incoming SMS from $data[sender] received, sent
-                $data[whensent], message $data[message]
-                ($data[foreignid] $data[network])";
+                print "Incoming SMS from ".htmlspecialchars($data['sender'])." received, sent
+                $data[whensent], message ".htmlspecialchars($data['message'])."
+                (".htmlspecialchars($data['foreignid'])." ".htmlspecialchars($data['network']);
             } elseif (array_key_exists('whencreated', $data)) {
                 print "Message $data[circumstance] queued for pledge " .
                 $this->pledge_link('ref', $data['ref']);
@@ -736,7 +735,7 @@ class ADMIN_PAGE_PB_LATEST {
                 }
                 print "$data[scope] token $data[token] created ";
                 if (array_key_exists('email', $data)) {
-                    print "for $data[name] $data[email] ";
+                    print "for ".htmlspecialchars($data['name'])." ".htmlspecialchars($data['email'])." ";
                     if (array_key_exists('pledge_id', $data)) {
                         print " pledge " . $this->pledge_link('id', $data['pledge_id']);
                     }
@@ -753,15 +752,15 @@ class ADMIN_PAGE_PB_LATEST {
             } elseif (array_key_exists('lastsendattempt', $data)) {
                 if ($data['ispremium'] == 't') 
                     print 'Premium ';
-                print "SMS sent to $data[recipient], message
-                    '$data[message]' status $data[lastsendstatus]";
+                print "SMS sent to ".htmlspecialchars($data['recipient']).", message
+                    '".htmlspecialchars($data[message])."' status $data[lastsendstatus]";
             } elseif (array_key_exists('commentposted', $data)) {
                 $comment_email = $data['email'];
                 if (!$comment_email)
                     $comment_email = $data['author_email'];
-                print "$data[name] &lt;$comment_email&gt; commented on " .
+                print htmlspecialchars($data['name'])." &lt;".htmlspecialchars($comment_email)."&gt; commented on " .
                     $this->pledge_link('id', $data['pledge_id']) . " saying
-                '$data[text]'";
+                '".htmlspecialchars($data['text'])."'";
             } elseif (array_key_exists('whenqueued', $data)) {
                 print "Local alert to ". htmlspecialchars($data['email']) .
                   " " . htmlspecialchars($data['alertdescription']) . " " .
@@ -1022,7 +1021,7 @@ class ADMIN_PAGE_PB_STATS {
                 print " (<a href=\"?page=pblatest&ref=" . $r['ref'] . "\">timeline</a>)";
                 print ": ";
             }
-            print $r['email'] . " " . prettify($r['timegap']) . ', ';
+            print htmlspecialchars($r['email']) . " " . prettify($r['timegap']) . ', ';
             $last_ref = $r['ref'];
         }
         print '</table>';

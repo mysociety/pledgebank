@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.17 2005-11-10 12:12:18 francis Exp $
+ * $Id: ref-picture.php,v 1.18 2005-11-24 19:04:25 matthew Exp $
  * 
  */
 
@@ -160,7 +160,7 @@ $pledge->render_box(array('showdetails' => true));
     <? if ($pledge->has_picture()) {
         print h2(_('Change pledge picture'));
     } else {
-        print h2(_('Add picture to your pledge'));
+        print h2(_('Add a picture to your pledge'));
     } ?>
         <input type="hidden" name="MAX_FILE_SIZE" value="<?=$picture_size_limit*1024?>">
     <?  print p(_('Choose the photo, logo or drawing that you would like to display on

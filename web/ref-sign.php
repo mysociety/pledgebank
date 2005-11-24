@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.22 2005-07-22 11:48:59 matthew Exp $
+// $Id: ref-sign.php,v 1.23 2005-11-24 19:04:25 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -35,8 +35,8 @@ function do_sign() {
                 array('name',       '/^[a-z]/i',        _('Please enter your name')),
                 array('email',      'importparams_validate_email'),
                 array('ref',        '/^[a-z0-9-]+$/i',  ''),
-                array('showname',   '//',               _('Please enter showname'), 0),
-                array('pin',         '//',              '', null)
+                array('showname',   '//',               '', 0),
+                array('pin',        '//',              '', null)
             );
     if ($q_email=='<Enter your name>') $q_email='';
 

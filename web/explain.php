@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.7 2005-11-18 11:18:10 matthew Exp $
+// $Id: explain.php,v 1.8 2005-11-24 13:16:24 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -53,7 +53,7 @@ already, and there are already some successful completed pledges
 completely outside our original ideas of how people might use the site.
 One person gathered 20 other fans of a BBC radio series to lobby for its
 release on CD. Another encouraged 8 people who he'd never met to bury
-buckets in their own gardens to make homes for endangered stag beatles.
+buckets in their own gardens to make homes for endangered stag beetles.
 And a member of an online community said he'd organise a 5th birthday
 party and now has 30 members of that community saying they'll come
 along."));

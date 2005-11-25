@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.160 2005-11-25 16:50:01 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.161 2005-11-25 17:38:20 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -611,8 +611,8 @@ sub do_public_succeeding_pledge {
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("It cost £0 to make and was mainly done in a café");
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(0).  '%It cost £0 to make and was mainly done in a café%');
-    my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%It cost £0 to make and was mainly done in a café%');
+    $wth->email_get_containing('%To: '.email_n(0).  '%It cost £0 to make and was mainly done in a%café%');
+    my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%It cost £0 to make and was mainly done in a%café%');
     $wth->email_check_none_left();
     die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\b(http://.*/L/.*)\b#m);
     my $comment_unsubscribe_url = $1;
@@ -678,7 +678,7 @@ sub do_public_succeeding_pledge {
     # Send mid-pledge announcement, to encourage signers to do more to help
     $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_follow_link(text_regex => qr/message to signers/);
-    perform_login_action(0, {action=>"viaemail", giveemail=>1}, "send a message to everyone who has signed your pledge");
+    perform_login_action(0, {action=>"viaemail", giveemail=>1}, "send a message to everyone");
     $wth->browser_check_contents("Send Announcement");
     $wth->browser_check_no_contents("successful");
     $wth->browser_submit_form(form_name => 'pledge',

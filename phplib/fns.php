@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.91 2005-11-23 17:01:37 francis Exp $
+// $Id: fns.php,v 1.92 2005-11-25 23:27:04 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -113,7 +113,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['email'] = null;
     }
     if (array_key_exists('signers', $values)) {
-        $values['signers_ordinal'] = english_ordinal($values['signers']);
+        $values['signers_ordinal'] = ordinal($values['signers']);
     }
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
     $values['pledgebank_url'] = pb_domain_url(array('path'=>'/'));

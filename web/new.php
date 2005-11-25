@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.104 2005-11-16 00:34:11 francis Exp $
+// $Id: new.php,v 1.105 2005-11-25 16:27:13 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -15,6 +15,7 @@ require_once '../phplib/comments.php';
 require_once '../phplib/alert.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/mapit.php';      # To test validity of postcodes
+require_once "../../phplib/votingarea.php";
 require_once '../../phplib/countries.php';
 require_once '../../phplib/gaze.php';
 

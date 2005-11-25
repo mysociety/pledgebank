@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.159 2005-11-23 17:01:36 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.160 2005-11-25 16:50:01 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -269,7 +269,7 @@ sub perform_login_action {
         if ($login_action ne "suspend") {
             my $confirmation_email = $wth->email_get_containing(
                 '%To: '.email_n($who).'%'.$email_text.'%');
-            die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^(http://.*$)#m);
+            die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^\s*(http://.*$)#m);
             $confirmation_url = $1;
             display_url("Email confirmation URL", $confirmation_url);
             $wth->log_watcher_check();
@@ -1107,7 +1107,7 @@ sub do_sms_pledge {
     set_pb_date('1982-03-09');
     call_frequentupdate();
     my $success_email = $wth->email_get_containing( '%To: '.email_n(100).'%We are pleased to tell you%');
-    die "Announce link not found\n" if ($success_email !~ m#^(http://.*$)#m);
+    die "Announce link not found\n" if ($success_email !~ m#^\s*(http://.*$)#m);
     my $announce_link = $1;
     display_url("Announce URL", $announce_link);
     $wth->email_get_containing( '%To: '.email_n(105).'%We are pleased to tell you%');

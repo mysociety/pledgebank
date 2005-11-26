@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.93 2005-11-26 14:29:20 matthew Exp $
+// $Id: fns.php,v 1.94 2005-11-26 17:09:53 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -207,6 +207,15 @@ function parse_date($date) {
         "\xd0\xbf\xd1\x8f\xd1\x82\xd0\xbd\xd0\xb8\xd1\x86\xd0\xb0" => 'Friday',
         "\xd1\x81\xd1\x83\xd0\xb1\xd0\xb1\xd0\xbe\xd1\x82\xd0\xb0" => 'Saturday',
 
+        # Esperanto
+        'januaro' => 'January', 'februaro' => 'February', 'marto' => 'March',
+        'aprilo' => 'April', 'majo' => 'May', 'junio' => 'June', 'julio' => 'July',
+        "a\xc5\xadgusto" => 'August', 'septembro' => 'September', 'oktobro' => 'October',
+        'novembro' => 'November', 'decembro' => 'December',
+        "dima\xc4\x89o" => 'Sunday', 'lundo' => 'Monday', 'mardo' => 'Tuesday',
+        'merkredo' => 'Wednesday', "\xc4\xb5a\xc5\xaddo" => 'Thursday',
+        'vendredo' => 'Friday', 'sabato' => 'Saturday'
+        
     );
     $search = array(); $replace = array();
     foreach ($translate as $foreign => $english) {

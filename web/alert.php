@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.43 2005-11-15 15:13:38 francis Exp $
+// $Id: alert.php,v 1.44 2005-11-26 17:09:54 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -138,13 +138,13 @@ function do_local_alert_subscribe() {
         ?>
 <p class="loudmessage" align="center"><?=_("Thanks for subscribing!  You'll now get emailed once a day when there are new pledges in your area.") ?> </p>
 
-<p class="noisymessage"><?=("To see all your local pledge alerts, <a href=\"/your\">click here</a>.")?></p>
+<p class="noisymessage"><?=_("To see all your local pledge alerts, <a href=\"/your\">click here</a>.")?></p>
 
 
 <? if ($params['country'] == 'GB') { ?>
-<p class="loudmessage"><strong><?=('Have a <a href="http://www.hearfromyourmp.com">long term relationship</a> with your MP!')?></strong>
+<p class="loudmessage"><strong><?=_('Have a <a href="http://www.hearfromyourmp.com">long term relationship</a> with your MP!')?></strong>
 <? } else { ?>
-<p class="loudmessage"><?=('Make your own <a href="/new/">new pledge</a>! Others in your area will be emailed about it automatically.')?>
+<p class="loudmessage"><?=_('Make your own <a href="/new/">new pledge</a>! Others in your area will be emailed about it automatically.')?>
 <? } ?>
 <?
 }

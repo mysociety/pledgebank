@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.3 2005-11-26 14:29:21 matthew Exp $
+// $Id: where.php,v 1.4 2005-11-26 17:09:54 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -25,7 +25,6 @@ $last = "*";
 print "<p>";
 ksort($countries_name_to_code);
 foreach ($countries_name_to_code as $name => $code) {
-    $name = $countries_code_to_name[$code];
     $firstchar = mb_substr($name, 0, 1, "UTF-8");
     if (str_replace("Å", "A", $firstchar) != str_replace("Å", "A",$last)) {
         print "</p><p>";

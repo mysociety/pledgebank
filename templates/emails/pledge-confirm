@@ -9,6 +9,6 @@ Your pledge reads:
 
 '<?=$values['sentence_first']?>'
 
-Thank you for submitting your pledge to PledgeBank. 
+Thank you for submitting your pledge to PledgeBank.
 
 <?=$values['signature']?>

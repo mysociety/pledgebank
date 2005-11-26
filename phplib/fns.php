@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.92 2005-11-25 23:27:04 matthew Exp $
+// $Id: fns.php,v 1.93 2005-11-26 14:29:20 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -394,6 +394,7 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
         usort($countries_list, "country_sort");
     } else {
         $countries_list = array_values($countries_name_to_code);
+        usort($countries_list, "country_sort");
     }
 
     foreach ($countries_list as $opt_code) {

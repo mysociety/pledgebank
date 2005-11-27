@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.15 2005-10-10 23:15:06 francis Exp $
+// $Id: your.php,v 1.16 2005-11-27 18:00:25 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -77,7 +77,7 @@ if (0 != db_num_rows($s)) {
 # Change/update your personal details
 ?>
 <form action="/your" method="post"><input type="hidden" name="UpdateDetails" value="1">
-<h2>Update your details</h2>
+<h2><?=_('Update your details') ?></h2>
 <?
 
 importparams(
@@ -98,17 +98,17 @@ if ($q_UpdateDetails) {
     else {
         $P->password($q_pw1);
         db_commit();
-        print '<p id="success">Password successfully updated</p>';
+        print '<p id="success">' . _('Password successfully updated') . '</p>';
     }
 }
 if (!is_null($error))
     print "<p id=\"error\">$error</p>";
 ?>
-<p>If you wish to change your password, you can do so here.</p>
+<p><?=_('If you wish to change your password, you can do so here.') ?></p>
 <p>
 <?=_('New password:') ?> <input type="password" name="pw1" id="pw1" size="15">
 <?=_('New password (again):') ?> <input type="password" name="pw2" id="pw2" size="15">
-<input type="submit" value="Submit"></p>
+<input type="submit" value="<?=_('Submit') ?>"></p>
 </form>
 
 <?

@@ -11,10 +11,10 @@
 var translation = {
 "(choose one)":"(elija uno)",
 "Town:":"Ciudad:",
-"other local people":"otras personas cercanas",
+"other local people":"personas más de mi entorno",
 "<Enter your pledge>":"<Introduzca su compromiso>",
 "<Enter your name>":"<Introduzca su nombre>",
-"<Enter town or keyword>":"",
+"<Enter town or keyword>":"<Introduzca un lugar o palabra clave>",
 "<Date>":"",
 "other local person":"otras personas cercanas ",
 "Global":"Global",

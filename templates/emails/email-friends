@@ -12,7 +12,7 @@ will join you, click here <?=$values['pledgebank_url']?> !
 
 <?=$values['from_name']?>'s pledge will close on <?=$values['pretty_date']?>
 and they only need the support of <?=$values['target']?> people before their
-pledge goes into action. 
+pledge goes into action.
 
 <?=$values['from_message']?>Thank you for your support!
 

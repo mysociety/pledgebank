@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.105 2005-11-25 16:27:13 francis Exp $
+// $Id: new.php,v 1.106 2005-11-27 01:47:25 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -120,6 +120,8 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 <p><?=_('The other people must sign up before') ?> <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(<?=_('e.g.') ?> "<?
 if ($lang=='en-gb')
     print date('jS F', $pb_time+60*60*24*28); // 28 days
+elseif ($lang=='eo')
+    print strftime('la %e-a de %B', $pb_time+60*60*24*28);
 else
     print strftime('%e %B', $pb_time+60*60*24*28); ?>")</small></p>
 
@@ -732,7 +734,7 @@ else if (preg_match('/^([A-Z]{2}),(.+)$/', $data['country'], $a)) {
 
 <?
 
-if ($data['country']) {
+if ($data['country'] && $data['country'] != 'Global') {
     print "<li>"
             . _('Within that country, is your pledge specific to a local area?')
             . " <em>";

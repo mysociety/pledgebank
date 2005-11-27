@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.59 2005-11-07 14:52:12 francis Exp $
+# $Id: poster.cgi,v 1.60 2005-11-27 01:47:25 matthew Exp $
 #
 
 import os
@@ -296,7 +296,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         Paragraph(_('''
             <b>If</b> <font color="#522994">%s</font> %s will %s, 
             then <font color="#522994">I</font> will %s.
-            ''') % (
+            ''').encode('utf-8') % (
                 format_integer(pledge['target']), pledge['type'], pledge['signup'],
                 pledge['title']
             ), p_head),
@@ -309,23 +309,23 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
         story.extend(
             map(lambda text: Paragraph(text, p_detail), 
-                (_('<b>More details:</b> %s') % pledge['detail']).split("\r?\n\r?\n"))
+                (_('<b>More details:</b> %s').encode('utf-8') % pledge['detail']).split("\r?\n\r?\n"))
             )
 
     if not has_sms(pledge):
-        pledge_at_text = _("Pledge at ")
+        pledge_at_text = _("Pledge at ").encode('utf-8')
         if pledge['pin']:
-            pin_text = _(' pin ') + '''<font color="#522994" size="+2">%s</font>''' % userpin
+            pin_text = _(' pin ').encode('utf-8') + '''<font color="#522994" size="+2">%s</font>''' % userpin
         else:
             pin_text = ''
         sms_to_text = ""
         sms_smallprint = ""
     else:
-        pledge_at_text = _("pledge at ")
+        pledge_at_text = _("pledge at ").encode('utf-8')
         pin_text = ""
         sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
-            (%s only) or """) % (ref, sms_number, sms_countries_description)
+            (%s only) or """).encode('utf-8') % (ref, sms_number, sms_countries_description)
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([
@@ -333,7 +333,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
             (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal),
         Paragraph(_('''
             This pledge closes on <font color="#522994">%s</font>. Thanks!
-            ''') % pledge['date'], p_normal),
+            ''').encode('utf-8') % pledge['date'], p_normal),
         Paragraph(_(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.').encode('utf-8') % pledge['target'], p_normal)
 #        Paragraph('''
 #            <b>Small print:</b> %s Questions?
@@ -503,7 +503,7 @@ while fcgi.isFCGI():
             pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         else:
             pledge['date'] = date.strftime("%e %B %Y")
-        if pledge['signup'] == _("do the same"):
+        if pledge['signup'].decode('utf-8') == _("do the same"):
             pledge['signup'] = _("too")
         sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.94 2005-11-26 17:09:53 matthew Exp $
+// $Id: fns.php,v 1.95 2005-11-27 01:47:23 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -167,7 +167,7 @@ function pb_send_email_internal($to, $spec) {
 
 # Stolen from my railway script
 function parse_date($date) {
-    global $pb_time;
+    global $pb_time, $lang;
     $now = $pb_time;
     $error = 0;
     if (!$date)  {
@@ -175,6 +175,8 @@ function parse_date($date) {
     }
 
     $date = preg_replace('#((\b([a-z]|on|an|of|in|the|year of our lord))|(?<=\d)(st|nd|rd|th))\b#','',$date);
+    if ($lang == 'eo')
+        $date = preg_replace('#((\b(de|la))|(?<=\d)-?a)\b#','',$date);
 
     # Translate foreign words to English as strtotime() is English only
     $translate = array(

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.60 2005-11-27 01:47:25 matthew Exp $
+# $Id: poster.cgi,v 1.61 2005-11-28 23:28:23 matthew Exp $
 #
 
 import os
@@ -160,41 +160,41 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
     story.extend([
         PyRTF.Paragraph(
             ss.ParagraphStyles.header, 
-            PyRTF.B(_('If')), ' ', 
+            PyRTF.B(_('If').encode('utf-8')), ' ', 
             PyRTF.TEXT(format_integer(pledge['target']), colour=ss.Colours.pb),
-            _(''' %s will %s, then ''') % (pledge['type'], pledge['signup']), 
-            PyRTF.TEXT(_('I'),colour=ss.Colours.pb),
-            _(' will %s.') % pledge['title']),
-        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\x97 ', PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
+            _(''' %s will %s, then ''').encode('utf-8') % (pledge['type'], pledge['signup']), 
+            PyRTF.TEXT(_('I').encode('utf-8'),colour=ss.Colours.pb),
+            _(' will %s.').encode('utf-8') % pledge['title']),
+        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\u8212- ', PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
         PyRTF.Paragraph(ss.ParagraphStyles.detail, ''),
     ])
 
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
         d = pledge['detail'].split("\r?\n\r?\n")
-        story.append(PyRTF.Paragraph(ss.ParagraphStyles.detail, PyRTF.B(_('More details:')), ' ', d[0]))
+        story.append(PyRTF.Paragraph(ss.ParagraphStyles.detail, PyRTF.B(_('More details:').encode('utf-8')), ' ', d[0]))
         if len(d)>0:
             story.extend(
                 map(lambda text: PyRTF.Paragraph(ss.ParagraphStyles.detail, text), d[1:])
             )
 
     if not has_sms(pledge):
-        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, _('Pledge at '), webdomain_text)
+        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, _('Pledge at ').encode('utf-8'), webdomain_text)
         if pledge['pin']:
-            text_para.append(_(' pin '), PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
+            text_para.append(_(' pin '),encode('utf-8'), PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
         sms_smallprint = ""
     else:
         text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 
-                    PyRTF.TEXT(_('Text'), size=int(small_writing+4)), 
+                    PyRTF.TEXT(_('Text').encode('utf-8'), size=int(small_writing+4)), 
                     ' ', 
-                    PyRTF.TEXT(_('pledge %s') % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
+                    PyRTF.TEXT(_('pledge %s').encode('utf-8') % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
                     ' to ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
-                    _(' (%s only) or pledge at ') % sms_countries_description, webdomain_text)
+                    _(' (%s only) or pledge at ').encode('utf-8') % sms_countries_description, webdomain_text)
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([ text_para, 
-        PyRTF.Paragraph(ss.ParagraphStyles.normal, _('This pledge closes on '), PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), _('. Thanks!')),
-        PyRTF.Paragraph(ss.ParagraphStyles.normal, _('Remember, you only have to act if %d other people sign up \x96 that\x92s what PledgeBank is all about.') % pledge['target'])
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, _('This pledge closes on ').encode('utf-8'), PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), _('. Thanks!').encode('utf-8')),
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, _('Remember, you only have to act if %d other people sign up \u8211- that\u8217\'s what PledgeBank is all about.').encode('utf-8') % pledge['target'])
 #        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
 #            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
     ])

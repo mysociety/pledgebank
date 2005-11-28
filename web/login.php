@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.64 2005-11-10 10:00:40 francis Exp $
+ * $Id: login.php,v 1.65 2005-11-28 23:28:23 matthew Exp $
  * 
  */
 
@@ -89,7 +89,7 @@ importparams(
         array('KeepName',       '/^.+$/',            '', false),
         array('ChangeName',     '/^.+$/',            '', false)
     );
-if ($q_name=='<Enter your name>') {
+if ($q_name==_('<Enter your name>')) {
     $q_name=null;
 }
 

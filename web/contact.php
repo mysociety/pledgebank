@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.28 2005-11-26 14:29:21 matthew Exp $
+// $Id: contact.php,v 1.29 2005-11-28 23:28:23 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -59,7 +59,7 @@ If you prefer, you can email %s instead of using the form.')), '<a href="mailto:
 
 function contact_form_submitted() {
     $name = get_http_var('name');
-    if ($name == '<Enter your name>') $name = '';
+    if ($name == _('<Enter your name>')) $name = '';
     $email = get_http_var('email');
     $subject = get_http_var('subject');
     $message = get_http_var('message');

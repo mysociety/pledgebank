@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.106 2005-11-27 01:47:25 matthew Exp $
+// $Id: new.php,v 1.107 2005-11-28 23:28:23 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -364,11 +364,15 @@ function pledge_form_three($data, $errors = array()) {
         order by id');
     while ($a = db_fetch_row($s)) {
         list($id, $parent_id, $name) = $a;
-        printf("<option value=\"%s\"%s>%s%s</option>",
+        $out[_($name)] = sprintf("<option value=\"%s\"%s>%s%s</option>",
                     $id,
                     (array_key_exists('category', $data) && $id == $data['category'] ? ' selected' : ''),
                     (is_null($parent_id) ? '' : '&nbsp;-&nbsp;'),
                     htmlspecialchars(_($name)));
+    }
+    ksort($out);
+    foreach ($out as $n => $s) {
+        print $s;
     }
 
 ?>
@@ -740,6 +744,7 @@ if ($data['country'] && $data['country'] != 'Global') {
             . " <em>";
 
     if ($data['local']) {
+        print _('Yes') . ': ';
         if ($data['country'] == 'GB' && $data['postcode'])
             print htmlspecialchars($data['postcode']);
         else {
@@ -779,7 +784,7 @@ pledge at the top of this page in your name.') . '</strong> ';
         if ($data['country'] == "GB" && $local) {
             print _(', and <strong>use (but not display) your postcode</strong> to locate your pledge in the right geographic area');
         }
-        print '.';
+        print '. ';
         print _('The purpose of this is simply to give your pledge
 greater publicity and a greater chance of succeeding.');
         print ' ';

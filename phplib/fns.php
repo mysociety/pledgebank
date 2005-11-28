@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.95 2005-11-27 01:47:23 matthew Exp $
+// $Id: fns.php,v 1.96 2005-11-28 23:28:22 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -232,6 +232,7 @@ function parse_date($date) {
     $month = null;
     if (preg_match('#(\d+)/(\d+)/(\d+)#',$date,$m)) {
         $day = $m[1]; $month = $m[2]; $year = $m[3];
+        if ($year<100) $year += 2000;
     } elseif (preg_match('#(\d+)/(\d+)#',$date,$m)) {
         $day = $m[1]; $month = $m[2]; $year = date('Y');
     } elseif (preg_match('#^([0123][0-9])([01][0-9])([0-9][0-9])$#',$date,$m)) {
@@ -255,8 +256,10 @@ function parse_date($date) {
             $error = 1;
         }
     }
-    if (!$epoch && $day && $month && $year)
-        $epoch = mktime(0,0,0,$month,$day,$year);
+    if (!$epoch && $day && $month && $year) {
+        $t = mktime(0,0,0,$month,$day,$year);
+        $day = date('d',$t); $month = date('m',$t); $year = date('Y',$t); $epoch = $t;
+    }
 
     if ($epoch == 0) 
         return null;

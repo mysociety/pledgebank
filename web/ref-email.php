@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.19 2005-11-10 12:12:18 francis Exp $
+// $Id: ref-email.php,v 1.20 2005-11-28 23:28:23 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -71,6 +71,8 @@ if (get_http_var('submit')) {
             $errors[] = _('Unfortunately, something went wrong when trying to send the emails. Please check that all the email addresses are correct.');
             view_friends_form($p, $errors);
         }
+    } else {
+        view_friends_form($p, $errors);
     }
 } else {
     view_friends_form($p, $errors);

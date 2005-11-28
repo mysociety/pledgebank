@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.110 2005-11-24 13:44:11 francis Exp $
+ * $Id: admin-pb.php,v 1.111 2005-11-28 18:02:19 francis Exp $
  * 
  */
 
@@ -186,11 +186,20 @@ class ADMIN_PAGE_PB_MAIN {
 
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 't';
+        $signers_limit = get_http_var('l');
+        if ($signers_limit) {
+            $signers_limit = intval($signers_limit);
+            if ($signers_limit == -1)
+                $signers_limit = null;
+        }
+        else
+            $signers_limit = 100;
 
         $q = db_query('SELECT pledges.*, person.email,
                 pb_pledge_prominence(pledges.id) as calculated_prominence,
                 location.country, location.state, location.description,
-                location.longitude, location.latitude
+                location.longitude, location.latitude,
+                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id 
             LEFT JOIN location ON location.id = pledges.location_id
@@ -267,7 +276,7 @@ class ADMIN_PAGE_PB_MAIN {
         print '</form>';
 
         // Signers
-        print "<h2>Signers</h2>";
+        print "<h2>Signers (".$pdata['signers']."/".$pdata['target'].")</h2>";
         $query = 'SELECT signers.name as signname,person.email as signemail,
                          signers.mobile as signmobile,
                          date_trunc(\'second\',signtime) AS signtime,
@@ -278,6 +287,8 @@ class ADMIN_PAGE_PB_MAIN {
         if ($sort=='t') $query .= ' ORDER BY signtime DESC';
         elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
         else $query .= ' ORDER BY signname DESC';
+        if ($signers_limit) 
+            $query .= " LIMIT $signers_limit";
         $q = db_query($query, $pdata['id']);
         $out = array();
         $c = 0;
@@ -335,6 +346,11 @@ class ADMIN_PAGE_PB_MAIN {
                 print '</tr>';
             }
             print '</table>';
+            if ($signers_limit && $c >= $signers_limit) {
+                print "<p>... only $signers_limit signers shown, "; 
+                print '<a href="'.$this->self_link.'&amp;pledge='.$pledge.'&amp;l=-1">show all</a>';
+                print ' (do not press if you are Tom, it will crash your computer :)</p>';
+            }
         } else {
             print '<p>Nobody has signed up to this pledge.</p>';
         }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.111 2005-11-29 18:25:57 francis Exp $
+// $Id: new.php,v 1.112 2005-11-29 19:30:33 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -262,9 +262,7 @@ function pledge_form_two($data, $errors = array()) {
         gaze_check_error($places);
         if (array_key_exists('gaze_place', $errors)) {
             if (count($places) > 0) {
-                print '<div id="formnote"><ul><li>';
-                print _('Please select one of the possible places; if none of them is right, please type the name of another nearby place');
-                print '</li></ul></div>';
+                # message printed in pb_view_gaze_place_choice
             } else {
                 $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
                 htmlspecialchars($place));

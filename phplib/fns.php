@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.96 2005-11-28 23:28:22 matthew Exp $
+// $Id: fns.php,v 1.97 2005-11-29 19:30:32 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -436,7 +436,17 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
  * Display options for choosing a local place
  */
 function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $places, $errors, $postcode) {
-    ?> <ul>
+    print "<ul>";
+
+    $select_place = false;
+    if (!(!$selected_place || array_key_exists('place', $errors) || count($places) == 0)) {
+        print '<div id="formnote">';
+        print _('Now please select one of the possible places; if none of them is right, please type the name of another nearby place');
+        print '</div>';
+        $select_place = true;
+    }
+
+    ?> 
     <li><p id="place_line"> <?
 
     /* Save previous value of 'place' so we can show a new selection list in the
@@ -447,7 +457,7 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
 
     /* If the user has already typed a place name, then we need to grab the
      * possible places from Gaze. */
-    if (!$selected_place || array_key_exists('place', $errors) || count($places) == 0) {
+    if (!$select_place) {
         ?>
            <?=_('Place name:') ?>
         <?

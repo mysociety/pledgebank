@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.110 2005-11-29 18:06:51 matthew Exp $
+// $Id: new.php,v 1.111 2005-11-29 18:25:57 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -437,8 +437,6 @@ function pledge_form_submitted() {
     if (array_key_exists('country', $data) && $data['country'] == '(separator)') unset($data['country']);
     if (!array_key_exists('gaze_place', $data)) $data['gaze_place'] = '';
     if (!array_key_exists('local', $data)) $data['local'] = '';
-    # Preview fixes
-    if (!array_key_exists('confirmconditions', $data)) $data['confirmconditions'] = 0;
 
     # Step 1, main pledge details
     if (get_http_var('tostep1')) {
@@ -502,8 +500,6 @@ function pledge_form_submitted() {
 
     # Step 4, preview
     if (get_http_var('topreview')) {
-        # we want to force checking of this every time get to this page
-        $data['confirmconditions'] = 0;
         preview_pledge($data, $errors);
         return;
     }
@@ -675,9 +671,6 @@ function step3_error_check(&$data) {
 
 function preview_error_check($data) {
     $errors = array();
-    if (!$data['confirmconditions']) {
-        $errors['confirmconditions'] = _('Please read the terms and conditions paragraph, and check the box to confirm that you have');
-    }
     return $errors;
 }
 
@@ -704,83 +697,48 @@ function preview_pledge($data, $errors) {
     print '<p>';
     printf(_('Your pledge, with short name <em>%s</em>, will look like this:'), $data['ref']);
     print '</p>';
-    $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
-    $partial_pledge = new Pledge($row);
-    $partial_pledge->render_box(array('showdetails' => true));
-    /* <p><img border="0" vspace="5" src="<?=$png_flyers1_url ?>" width="298" height="211" alt="Example of a PDF flyer"></p> */ 
-?>
+    ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
+<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 <?  print h2(_('New Pledge &#8211; Step 4 of 4'));
-    print p(_('Please check the details you have entered, both the pledge itself (see left) 
-and other details below.  Click one of the three "Back" buttons if you would like
-to go back and edit your data.  
-<strong>Check carefully, as you cannot edit your pledge after you have
-created it.</strong>
-(<a href="/faq#editpledge">why not?</a>)'));
-?>
-<ul>
-
-<li><?=_('Which country or state does your pledge apply to?') ?> <em><?
-
-$a = array();
-if ($data['country'] == 'Global')
-    print _("None &mdash; anywhere in the world");
-else if (preg_match('/^([A-Z]{2}),(.+)$/', $data['country'], $a)) {
-    list($x, $country, $state) = $a;
-    print htmlspecialchars($countries_statecode_to_name[$country][$state] . ", $countries_code_to_name[$country]");
-} else
-    print htmlspecialchars($countries_code_to_name[$data['country']]);
-?></em>
-</li>
-
-<?
-
-if ($data['country'] && $data['country'] != 'Global') {
-    print "<li>"
-            . _('Within that country, is your pledge specific to a local area?')
-            . " <em>";
-
-    if ($data['local']) {
-        print _('Yes') . ': ';
-        if ($data['country'] == 'GB' && $data['postcode'])
-            print htmlspecialchars($data['postcode']);
-        else {
-            list($lat, $lon, $desc) = explode(',', $data['gaze_place'], 3);
-            print htmlspecialchars($desc);
-        }
-    } else {
-        print _("No");
-    }
-    print "</em></li>";
-}
-
+    print p(sprintf(_('
+Now please read your pledge (on the left) and check the details thoroughly.
+<strong>Read carefully</strong> - we can\'t ethically let you %schange the wording%s of your pledge once people have
+started to sign up to it.    
+'), '<a href="/faq#editpledge" id="changethewording" onclick="return toggleNewModifyFAQ()">', '</a>')
+);
 ?>
 
-<li><?=_('Does your pledge fit into a specific topic or category?') ?> <em><?=
-    $data['category'] == -1
-        ? _('No')
-        : _('Yes') . ': "'
-            . htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))) // XXX show enclosing cat?
-            . '"'
-?></em></li>
+<div id="modifyfaq">
+<?=h3(_("Why can't I modify my pledge after I've made it?"))?>
 
-<li><?=_('Who do you want to be able to see your pledge?') ?> <em><?
-if ($v=='all') print _('Anyone');
-if ($v=='pin') print _('Only people to whom I give a PIN I have specified');
-?></em></li>
-</ul>
+<?=p(_("People who sign up to a pledge are signing up to the specific wording of
+the pledge. If you change the wording, then their signatures would no
+longer be valid."))?>
+
+</div>
+
+<p style="text-align: right;">
+<input type="submit" name="tostep1" value="&lt;&lt; <?=_('Change pledge text') ?>">
+<br><input type="submit" name="tostep2" value="&lt;&lt; <?=_('Change location') ?>">
+<br><input type="submit" name="tostep3" value="&lt;&lt; <?=_('Change category/privacy') ?>">
+</p>
 
 <?
-    print h2(_('Terms and Conditions'));
-    print '<p><strong>' . _('Click "Create" to confirm that you wish PledgeBank.com to display the
-pledge at the top of this page in your name.') . '</strong> ';
+    print '<p>' . _('When you\'re happy with your pledge, <strong>click "Create"</strong> to confirm that you wish PledgeBank.com to display the pledge at the top of this page in your name, and that you agree to the terms and conditions below.');
+?>
+<p style="text-align: right;">
+<input type="submit" name="tocreate" value="<?=_('Create') ?> &gt;&gt;&gt;">
+</p>
+<?
+    print h3(_('The Dull Terms and Conditions'));
     if ($v == 'pin' || !microsites_syndication_warning()) { ?>
 <!-- no special terms for private pledge, or certain microsites -->
 <?  } else {
-        print _('You also consent to the syndication of your pledge to other sites &mdash; this means that they will be able to display your pledge and your name');
+        print _('By creating your pledge you also consent to the syndication of your pledge to other sites &mdash; this means that other people will be able to display your pledge and your name');
         if ($data['country'] == "GB" && $local) {
-            print _(', and <strong>use (but not display) your postcode</strong> to locate your pledge in the right geographic area');
+            print _(', and use (but not display) your postcode to locate your pledge in the right geographic area');
         }
         print '. ';
         print _('The purpose of this is simply to give your pledge
@@ -788,19 +746,30 @@ greater publicity and a greater chance of succeeding.');
         print ' ';
     }
     print _("Rest assured that we won't ever give or sell anyone your email address."); ?>
-<br><input type="checkbox" name="confirmconditions" id="confirmconditions" value="1"><label for="confirmconditions"><?=_('Tick this box to confirm you have read the Terms and Conditions') ?>.</label>
-</p>
-
-
-<p style="text-align: right;">
-<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
-<input type="submit" name="tostep2" value="&lt;&lt; <?=_('Back to step 2') ?>">
-<input type="submit" name="tostep3" value="&lt;&lt; <?=_('Back to step 3') ?>">
-<input type="submit" name="tocreate" value="<?=_('Create') ?> &gt;&gt;&gt;">
 </p>
 
 </form>
+    <?
+    $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
+    $partial_pledge = new Pledge($row);
+    $partial_pledge->render_box(array('showdetails' => true));
+    ?>
+
+    <div id="otherdetails">
+    <?=h3(_("Other Details"))?>
+    <ul>
+    <li><?=_('Category') ?>: <strong><?=
+        $data['category'] == -1
+            ? _('None')
+            : htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))) // XXX show enclosing cat?
+    ?></strong></li>
+    <li><?=_('Privacy status') ?>: <strong><?
+    if ($v=='all') print _('Public');
+    if ($v=='pin') print _('Pledge can only be seen by people who I give the PIN to');
+    ?></strong></li>
+    </ul>
+    </div>
+
 <?
     
 }

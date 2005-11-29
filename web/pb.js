@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.30 2005-11-29 18:25:57 francis Exp $
+ * $Id: pb.js,v 1.31 2005-11-29 19:13:55 francis Exp $
  * 
  */
 
@@ -214,12 +214,11 @@ function sprintf() {
 }
 
 // Used in new pledge creation
-addEvent(window, 'load', hideNewModifyFAQ);
 function toggleNewModifyFAQ() {
     if (!document) 
         return true
     if (document.getElementById) {
-        modifyfaq = document.getElementById('modifyfaq')
+        var modifyfaq = document.getElementById('modifyfaq')
         if (modifyfaq.style.display == 'block')
             modifyfaq.style.display = 'none'
         else

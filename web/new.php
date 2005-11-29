@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.108 2005-11-29 11:47:30 francis Exp $
+// $Id: new.php,v 1.109 2005-11-29 12:59:30 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -34,8 +34,9 @@ print $contents;
 page_footer(array('nolocalsignup'=>true));
 
 function pledge_form_one($data = array(), $errors = array()) {
-    global $lang;
+    global $lang, $langs;
 # <!-- <p><big><strong>Before people can create pledges we should have a stiff warning page, with few, select, bold words about what makes for good &amp; bad pledges (we want to try to get people to keep their target numbers down).</strong></big></p> -->
+    $percent_successful_above_100 = percent_success_above(100);
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
@@ -46,20 +47,20 @@ function pledge_form_one($data = array(), $errors = array()) {
 <h2><?=_('Top Tips for Successful Pledges') ?></h2>
 <ol>
 
-<li> <?=_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
+<li> <?=sprintf(_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
 to do something when 5 would be enough? Every extra person makes your pledge
-harder to meet.') ?></li>
+harder to meet. Only %0.0f%% of pledges asking for more than 100 people succeed.'), $percent_successful_above_100) ?></li>
+
+<li> <?=_("<strong>Get ready to sell your pledge, hard</strong>. Pledges don't
+sell themselves just by sitting on this site. In fact your pledge won't even
+appear to general site visitors until you've got a few people to sign up to it
+yourself. Think hard about whether people you know would want to sign up to
+your pledge!") ?></li>
 
 <li> <?=_("<strong>Think about how your pledge reads.</strong> How will it look to
 someone who picks up a flyer from their doormat? Read your pledge to the person
 next to you, or to your mother, and see if they understand what you're talking
 about. If they don't, you need to rewrite it.") ?></li>
-
-<li> <?=_("<strong>Don't imagine that your pledge will sell itself.</strong> If
-you've created something, tell the world! Email your friends, print leaflets
-and stick them through your neighbours doors. Focus especially hard on breaking
-outside your circle of friends &mdash; ask your co-workers, put a flyer through
-the door of that neighbour whose name you've forgotten.") ?></li>
 
 </ol>
 </div>
@@ -103,12 +104,13 @@ the door of that neighbour whose name you've forgotten.") ?></li>
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
 <h2><?=_('New Pledge &#8211; Step 1 of 4') ?></h2>
 <div class="c">
-<?  if (!count($_POST)) { ?>
-<h3><?=_('Language')?></h3>
-<p><?=_('First, choose the language you would like your pledge to be in.')?></p>
-<p><?   pb_print_change_language_links();
-    } ?>
+
 <h3><?=_('Your Pledge')?></h3>
+<?  if (!count($_POST)) { ?>
+<p><small><?=sprintf(_('(if you\'d like your pledge in a language other than %s, <a href="%s">click here</a>)'), $langs[$lang],
+    "/lang?r=/new")?></small></p>
+<? } ?>
+
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
@@ -119,11 +121,11 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 
 <p><?=_('The other people must sign up before') ?> <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(<?=_('e.g.') ?> "<?
 if ($lang=='en-gb')
-    print date('jS F', $pb_time+60*60*24*28); // 28 days
+    print date('jS F Y', $pb_time+60*60*24*28); // 28 days
 elseif ($lang=='eo')
-    print strftime('la %e-a de %B', $pb_time+60*60*24*28);
+    print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
 else
-    print strftime('%e %B', $pb_time+60*60*24*28); ?>")</small></p>
+    print strftime('%e %B %Y', $pb_time+60*60*24*28); ?>")</small></p>
 
 <p><?=_('Choose a short name for your pledge (6 to 16 letters):') ?>
 <input<? if (array_key_exists('ref', $errors) || array_key_exists('ref2', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
@@ -146,9 +148,9 @@ else
 <? if (sizeof($data)) {
     print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
 } ?>
-<p style="text-align: right">
+<p style="text-align: center">
 <?=_("Did you read the tips at the top of the page? They'll help you make a successful pledge") ?> 
-<input type="submit" name="tostep2" value="<?=_('Next') ?> &gt;&gt;"></p>
+<input type="submit" name="tostep2" value="<?=_('Next') ?> &gt;&gt;&gt;"></p>
 </form>
 <? 
 }
@@ -170,12 +172,7 @@ function pledge_form_target_warning($data, $errors) {
     $must_gather = $data['target'] * 0.025; # 2.5%, as in pb_pledge_prominence_calculated in db
     if ($must_gather < 2)
         $must_gather = 2;
-    $total_pledges_above_warn = db_getOne("select count(*) from pledges where target > ? and pb_current_date() > pledges.date", array(/*$data['target']*/20));
-    $successful_pledges_above_warn = db_getOne("select count(*) from pledges where target > ? and pb_current_date() > pledges.date and whensucceeded is not null", array(/*$data['target']*/20));
-    if ($total_pledges_above_warn == 0)
-        $percent_successful_above_warn = 0.0;
-    else
-        $percent_successful_above_warn = 100.0 * $successful_pledges_above_warn / $total_pledges_above_warn;
+    $percent_successful_above_warn = percent_success_above(OPTION_PB_TARGET_WARNING);
 
     
 ?>
@@ -215,7 +212,7 @@ them to help you with something bigger.') ?></p>
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 
-<input class="topbutton" type="submit" name="donetargetwarning" value="<?=_('Next') ?> &gt;&gt;">
+<input class="topbutton" type="submit" name="donetargetwarning" value="<?=_('Next') ?> &gt;&gt;&gt;">
 <br><input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
 </p>
 
@@ -323,7 +320,7 @@ pb_view_gaze_place_choice($place, $gaze_with_state, $places, $errors, array_key_
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="tostep3" value="<?=_('Next') ?> &gt;&gt;">
+<input class="topbutton" type="submit" name="tostep3" value="<?=_('Next') ?> &gt;&gt;&gt;">
 <br><input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
 </p>
 
@@ -392,7 +389,7 @@ function pledge_form_three($data, $errors = array()) {
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?> &gt;&gt;">
+<input class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?> &gt;&gt;&gt;">
 <br><input type="submit" name="tostep2" value="&lt;&lt; <?=_('Back to step 2') ?>">
 </p>
 
@@ -800,7 +797,7 @@ greater publicity and a greater chance of succeeding.');
 <input type="submit" name="tostep1" value="&lt;&lt; <?=_('Back to step 1') ?>">
 <input type="submit" name="tostep2" value="&lt;&lt; <?=_('Back to step 2') ?>">
 <input type="submit" name="tostep3" value="&lt;&lt; <?=_('Back to step 3') ?>">
-<input type="submit" name="tocreate" value="<?=_('Create') ?> &gt;&gt;">
+<input type="submit" name="tocreate" value="<?=_('Create') ?> &gt;&gt;&gt;">
 </p>
 
 </form>

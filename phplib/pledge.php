@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.141 2005-11-27 01:47:23 matthew Exp $
+ * $Id: pledge.php,v 1.142 2005-11-29 12:59:30 francis Exp $
  * 
  */
 
@@ -746,5 +746,18 @@ function pledge_delete_comment($id) {
 function pledge_is_local($r) {
     return isset($r['description']); 
 }
+
+/* percent_success_above TARGET
+ * Return % of pledges successful above that target */
+function percent_success_above($threshold) {
+    $total_pledges_above = db_getOne("select count(*) from pledges where target > ? and pb_current_date() > pledges.date", array($threshold));
+    $successful_pledges_above = db_getOne("select count(*) from pledges where target > ? and pb_current_date() > pledges.date and whensucceeded is not null", array($threshold));
+    if ($total_pledges_above == 0)
+        $percent_successful_above = 0.0;
+    else
+        $percent_successful_above = 100.0 * $successful_pledges_above / $total_pledges_above;
+    return $percent_successful_above;
+}
+
 
 ?>

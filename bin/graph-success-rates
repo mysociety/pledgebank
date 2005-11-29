@@ -1,0 +1,43 @@
+#!/bin/bash
+# graph-success-rates
+# Plot graph of target against success rate
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: francsi@mysociety.org. WWW: http://www.mysociety.org/
+# 
+# $Id: graph-success-rates,v 1.1 2005-11-29 12:59:30 francis Exp $
+
+SOURCE=/tmp/pb-targets-graph-data-$RANDOM$RANDOM
+GPSCRIPT=/tmp/pb-targets-graph-script-$RANDOM$RANDOM
+echo "source $SOURCE"
+echo "gpscript $GPSCRIPT"
+
+for HUNDREDS in 0 1 2 3 4 5 6 7 8 9
+do
+    for NUMBERS in 00 05 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95
+    do 
+        echo "
+            SELECT $HUNDREDS$NUMBERS as above,
+            (select count(*) from pledges where target > $HUNDREDS$NUMBERS and pb_current_date() > pledges.date) AS allcount,
+            (select count(*) from pledges where target > $HUNDREDS$NUMBERS and pb_current_date() > pledges.date and whensucceeded is not null) AS successcount
+            " | psql -A -F " " pb_testharness pb | egrep -v "above|allcount|successcount|row" >>$SOURCE
+
+    done
+done
+
+cat >$GPSCRIPT <<END 
+    unset border
+    set xti nomi
+    set yti nomi
+    set xlabel "Target"
+    set ylabel "% successful pledges above"
+#    set xrange [0.9 to ]
+#    set yrange [0.9 to ]
+#    set logscale x
+#    set logscale y
+    set terminal png
+    plot "$SOURCE" using 1:(\$3/\$2*100) title 'Pledge targets vs. % successful pledges with larger target' with lines;
+END
+
+gnuplot < $GPSCRIPT > /tmp/pb-targets.png
+

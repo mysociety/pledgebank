@@ -1,11 +1,11 @@
 #!/bin/bash
-# targets-graph:
+# graph-targets:
 # Plot graph of target against actual signups for PledgeBank.
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francsi@mysociety.org. WWW: http://www.mysociety.org/
 # 
-# $Id: targets-graph,v 1.1 2005-11-08 01:16:23 francis Exp $
+# $Id: graph-targets,v 1.1 2005-11-29 12:59:30 francis Exp $
 
 SOURCE=/tmp/pb-targets-graph-data-$RANDOM$RANDOM
 GPSCRIPT=/tmp/pb-targets-graph-script-$RANDOM$RANDOM

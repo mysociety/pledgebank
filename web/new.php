@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.112 2005-11-29 19:30:33 francis Exp $
+// $Id: new.php,v 1.113 2005-11-29 23:23:03 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -617,6 +617,20 @@ function step2_error_check(&$data) {
             if (!array_key_exists('local', $data) || ($data['local'] != '1' && $data['local'] != '0'))
                 $errors['local'] = _('Please choose whether the pledge is local or not');
             else if ($data['local']) {
+                // Find exact matches
+                if ($data['place']) {
+                    $places = gaze_find_places($country, $state, $data['place'], 10, 0);
+                    gaze_check_error($places);
+                    $have_exact = have_exact_gaze_match($places, $data['place']);
+                    if ($have_exact) {
+                        list($desc, $radio_name) = pb_get_gaze_place_details($have_exact);
+                        $data['gaze_place'] = $radio_name;
+                        $data['prev_place'] = $data['place'];
+                        $data['prev_country'] = $data['country'];
+                        # print "new: have exact $desc $radio_name\n";
+                    }
+                }
+
                 if ($data['postcode'] && $data['place'])
                     $errors['nohighlight'] = _("Please enter either a postcode or a place name, but not both");
                 else if ($data['postcode']) {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.97 2005-11-29 19:30:32 francis Exp $
+// $Id: fns.php,v 1.98 2005-11-29 23:23:02 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -314,18 +314,24 @@ We will not give or sell either your or their email address to anyone else.')); 
 <?
 }
 
+// Given a row returned from gaze, returns a list of (description, radio button value)
+function pb_get_gaze_place_details($p) {
+    list($name, $in, $near, $lat, $lon, $st, $score) = $p;
+    $desc = $name;
+    if ($in) $desc .= ", $in";
+    if ($st) $desc .= ", $st";
+    if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
+    $t = htmlspecialchars("$lat,$lon,$desc");
+    if ($score) $desc .= "<!--($score%)-->";
+    return array($desc, $t);
+}
+
 // Prints HTML for radio buttons to select a list of places drawn from Gaze
 function pb_view_gaze_places_choice($places, $place, $selected_gaze_place) {
     print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
     $nn = 0;
     foreach ($places as $p) {
-        list($name, $in, $near, $lat, $lon, $st, $score) = $p;
-        $desc = $name;
-        if ($in) $desc .= ", $in";
-        if ($st) $desc .= ", $st";
-        if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
-        $t = htmlspecialchars("$lat,$lon,$desc");
-        if ($score) $desc .= "<!--($score%)-->";
+        list($desc, $t) = pb_get_gaze_place_details($p);
         $checked = '';
         if ($t == $selected_gaze_place) {
             $checked = 'checked';
@@ -679,4 +685,21 @@ function pb_chivvy_probable_will_reach_clause() {
         (select count(*) from signers where signers.pledge_id = pledges.id))";
 }
 
+// Is this match from gaze exact?
+function have_exact_gaze_match($places, $typed_place) {
+    if (count($places) < 1)
+        return;
+    $gotcount = 0;
+    $got = null;
+    foreach ($places as $place) {
+        if (trim(strtolower($place['0'])) == trim(strtolower($typed_place))) {
+            $got = $place;
+            $gotcount++;
+        }
+    }
+    if ($gotcount == 1)
+        return $got;
+    else
+        return null;
+}
 

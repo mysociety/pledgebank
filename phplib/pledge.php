@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.142 2005-11-29 12:59:30 francis Exp $
+ * $Id: pledge.php,v 1.143 2005-11-30 12:54:16 francis Exp $
  * 
  */
 
@@ -208,9 +208,9 @@ class Pledge {
 
     function is_local() { return isset($this->data['description']); }
     function h_local_type() { 
-        if ($this->data['method'] == 'Gaze') {
+        if (array_key_exists('method', $this->data) && $this->data['method'] == 'Gaze') {
             return _("Place");
-        } elseif ($this->data['method'] == 'MaPit') {
+        } elseif (array_key_exists('method', $this->data) && $this->data['method'] == 'MaPit') {
             return _("Postcode area");
         } else {
             err('Unknown method');

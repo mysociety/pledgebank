@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.111 2005-11-28 18:02:19 francis Exp $
+ * $Id: admin-pb.php,v 1.112 2005-11-30 12:54:16 francis Exp $
  * 
  */
 
@@ -57,6 +57,7 @@ class ADMIN_PAGE_PB_MAIN {
             'c'=>'Creation Time', 
             'u'=>'Success Time',
             'o'=>'% complete',
+            'z'=>'Surge',
             'l'=>'Place',
             'g'=>'Lang',
         );
@@ -74,7 +75,7 @@ class ADMIN_PAGE_PB_MAIN {
     function list_all_pledges() {
         global $open, $pb_today;
         $sort = get_http_var('s');
-        if (!$sort || preg_match('/[^ratdecspuolg]/', $sort)) $sort = 'c';
+        if (!$sort || preg_match('/[^ratdecspuolgz]/', $sort)) $sort = 'c';
         $order = '';
         if ($sort=='r') $order = 'ref';
         elseif ($sort=='a') $order = 'title';
@@ -87,6 +88,7 @@ class ADMIN_PAGE_PB_MAIN {
         elseif ($sort=='s') $order = 'signers desc';
         elseif ($sort=='l') $order = 'country, description';
         elseif ($sort=='g') $order = 'lang';
+        elseif ($sort=='z') $order = 'surge desc';
 
         $q = db_query("
             SELECT pledges.*, person.email,
@@ -95,7 +97,8 @@ class ADMIN_PAGE_PB_MAIN {
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 '$pb_today' <= date AS open,
                 pb_pledge_prominence(pledges.id) as calculated_prominence,
-                country, description
+                country, description,
+                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id AND signtime > pb_current_timestamp() - interval '1 day')::float / target::float * 100::float  AS surge
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
@@ -132,6 +135,7 @@ class ADMIN_PAGE_PB_MAIN {
                 $row .= '<td>None</td>';
 
             $row .= '<td>' . str_replace('.00', '', number_format($r['signers']/$r['target']*100,2)) . '%</td>';
+            $row .= '<td>'.htmlspecialchars(round($r['surge'],1)).'%</td>';
             $row .= '<td>';
             if ($r['country']) 
                 $row .= htmlspecialchars($r['country']) . "<br>" . htmlspecialchars($r['description']);
@@ -198,8 +202,9 @@ class ADMIN_PAGE_PB_MAIN {
         $q = db_query('SELECT pledges.*, person.email,
                 pb_pledge_prominence(pledges.id) as calculated_prominence,
                 location.country, location.state, location.description,
-                location.longitude, location.latitude,
-                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers
+                location.longitude, location.latitude, location.method,
+                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
+                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id) AS comments
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id 
             LEFT JOIN location ON location.id = pledges.location_id
@@ -211,11 +216,13 @@ class ADMIN_PAGE_PB_MAIN {
         }
         $pledge_obj = new Pledge($pdata);
 
+        $pledge_obj->render_box(array('showdetails' => true));
+
         print "<h2>Pledge '<a href=\"".
                 pb_domain_url(array('path'=>"/".$pledge_obj->ref(), 'lang'=>$pledge_obj->lang(), 'country'=>$pledge_obj->country_code())) .
                 "\">" . $pdata['ref'] . "</a>'";
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
-        print " &mdash; " .  $pdata['title'] . "</h2>";
+        print "</h2>";
 
         print "<p>Set by: <b>" . htmlspecialchars($pdata['name']) . " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</b>";
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
@@ -274,6 +281,8 @@ class ADMIN_PAGE_PB_MAIN {
             print " calculated to: ". $pdata['calculated_prominence'];
         }
         print '</form>';
+
+        print 'Comments: <strong>' . $pdata['comments']. '</strong>';
 
         // Signers
         print "<h2>Signers (".$pdata['signers']."/".$pdata['target'].")</h2>";

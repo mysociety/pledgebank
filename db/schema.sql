@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.159 2005-11-13 13:02:29 francis Exp $
+-- $Id: schema.sql,v 1.160 2005-11-30 17:01:49 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -206,6 +206,13 @@ create index pledges_date_idx on pledges(date);
 
 -- Make finding recently successful pledges faster.
 create index pledges_whensucceeded_idx on pledges(whensucceeded);
+
+-- Logos and so on for pledges
+create table picture (
+    id serial not null primary key,
+    filename text not null,
+    data bytea not null
+);
 
 -- 
 -- Geographical stuff

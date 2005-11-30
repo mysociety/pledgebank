@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.18 2005-11-24 19:04:25 matthew Exp $
+ * $Id: ref-picture.php,v 1.19 2005-11-30 17:01:49 francis Exp $
  * 
  */
 
@@ -128,17 +128,18 @@ function upload_picture() {
     } 
     
     $base_name =  $pledge->ref() . "." . $ext;
-    $upload_file = OPTION_PB_PICTURE_DIR . "/" . $base_name;
+    $picture_contents = file_get_contents($tmp_name);
+    if (!$picture_contents)
+        err("Failed to read file into memory");
 
-    if (move_uploaded_file($tmp_name, $upload_file)) {
-        db_query("update pledges set picture = ? where ref = ?",
-            array(OPTION_PB_PICTURE_URL . "/" . $base_name, $pledge->ref()));
-        db_commit();
-        print _("Thanks for uploading your picture to the pledge.  You can see below what it now looks like.");
-        $pledge = new Pledge($pledge->ref());
-    } else {
-       return _("Failed to upload the file.");
-    }
+    db_query("delete from picture where filename = ?", array($base_name));
+    db_query("insert into picture (filename, data) values ('$base_name', ".
+        "'".pg_escape_bytea($picture_contents)."')");
+    db_query("update pledges set picture = ? where ref = ?",
+        array(OPTION_PB_PICTURE_URL . "/" . $base_name, $pledge->ref()));
+    db_commit();
+    print _("Thanks for uploading your picture to the pledge.  You can see below what it now looks like.");
+    $pledge = new Pledge($pledge->ref());
     return true;
 }
 

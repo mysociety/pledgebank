@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.46 2005-11-29 23:23:03 francis Exp $
+// $Id: alert.php,v 1.47 2005-11-30 12:03:35 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -208,9 +208,10 @@ function local_alert_subscribe_box($errors = array()) {
 <? pb_view_gaze_country_choice($country, $state, $errors, array('noglobal'=>true, 'gazeonly'=>true)); ?>
 </p>
 
-<p id="ifyes_line">
+<div id="ifyes_line">
 <strong><?=_("Where in that country?")?></strong>
 <? pb_view_gaze_place_choice($place, $gaze_place, $places, $errors, $postcode); ?>
+</div>
 
 <p><input type="submit" name="submit" value="<?=_('Subscribe') ?>"></p>
 

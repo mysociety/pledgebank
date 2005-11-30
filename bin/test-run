@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.161 2005-11-25 17:38:20 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.162 2005-11-30 12:03:34 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -326,7 +326,9 @@ sub perform_login_action {
 # create_pledge WHO PAGE1 PAGE2 LOGIN_ACTION
 # Creates a new pledge, setter is person number WHO.  PAGE1,
 # PAGE2 and PAGE3 contain parameters for each page of the sign-up form.
-# LOGIN_ACTION is passed on to perform_login_action.
+# LOGIN_ACTION is passed on to perform_login_action.  If PAGE2 contains
+# appropriate gaze_place value, that will be used to select which radio
+# button in the choice of towns (if your town is unique, it is not needed)
 sub create_pledge {
     my ($who, $page1, $page2, $page3, $login_options) = @_;
     my $login_action = $login_options->{'action'};
@@ -377,7 +379,7 @@ sub create_pledge {
     # Preview
     $wth->browser_check_contents("Step 4");
     $wth->browser_submit_form(form_name => 'pledge',
-        fields => {confirmconditions => 1},
+        fields => {},
         button => 'tocreate') or die "Failed to submit creating form step 4";
 
     # Requires authentication
@@ -1189,7 +1191,7 @@ sub do_login_tests {
         { title => $pledge_action_login_2, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => '1987-01-01', ref => $pledge_ref_2 },
-        { country => 'GB', 'local' => 1, place => 'marlborough', gaze_place => '51.4166667,-1.7166667,Marlborough' },
+        { country => 'GB', 'local' => 1, place => 'marlborough' },
         { },
         { action => "viaemail", setpassword => 1 }
     );

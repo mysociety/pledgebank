@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.29 2005-11-10 12:12:18 francis Exp $
+ * $Id: ref-info.php,v 1.30 2005-11-30 12:03:35 francis Exp $
  * 
  */
 
@@ -75,7 +75,7 @@ $p->render_box();
     </td>
 </tr>
 <tr>
-    <th><?=_('Signers by deadline') ?></th>
+    <th><?=_('Estimated signers by deadline') ?></th>
     <td><?= $p->probable_will_reach() ?> 
         <?= sprintf(_('(%.1f%% of target)<br><small>if signup rate continues as in last week</small>'), 100. * $p->probable_will_reach() / $p->target()) ?>
     </td>

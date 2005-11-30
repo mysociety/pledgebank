@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.99 2005-11-30 09:16:15 matthew Exp $
+// $Id: fns.php,v 1.100 2005-11-30 12:03:35 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -464,15 +464,16 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
  * Display options for choosing a local place
  */
 function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $places, $errors, $postcode) {
-    print "<ul>";
 
     $select_place = false;
     if (!(!$selected_place || array_key_exists('place', $errors) || count($places) == 0)) {
-        print '<div id="formnote">';
+        print '<p></p><div id="formnote">';
         print _('Now please select one of the possible places; if none of them is right, please type the name of another nearby place');
         print '</div>';
         $select_place = true;
     }
+
+    print "<ul>";
 
     ?> 
     <li><p id="place_line"> <?

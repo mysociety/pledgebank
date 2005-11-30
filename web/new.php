@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.113 2005-11-29 23:23:03 francis Exp $
+// $Id: new.php,v 1.114 2005-11-30 12:03:35 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -745,6 +745,7 @@ longer be valid."))?>
 </p>
 <?
     print h3(_('The Dull Terms and Conditions'));
+    print "<p>";
     if ($v == 'pin' || !microsites_syndication_warning()) { ?>
 <!-- no special terms for private pledge, or certain microsites -->
 <?  } else {

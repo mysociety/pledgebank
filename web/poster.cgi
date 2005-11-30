@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.61 2005-11-28 23:28:23 matthew Exp $
+# $Id: poster.cgi,v 1.62 2005-11-30 09:16:17 matthew Exp $
 #
 
 import os
@@ -113,7 +113,7 @@ def has_sms(pledge):
     # UK countries have SMS
     return True
 
-sms_countries_description = 'UK'
+sms_countries_description = _('UK')
 
 ############################################################################
 # Flyers using PyRTF for RTF generation
@@ -187,7 +187,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
                     PyRTF.TEXT(_('Text').encode('utf-8'), size=int(small_writing+4)), 
                     ' ', 
                     PyRTF.TEXT(_('pledge %s').encode('utf-8') % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
-                    ' to ', 
+                    ' ', _('to'), ' ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
                     _(' (%s only) or pledge at ').encode('utf-8') % sms_countries_description, webdomain_text)
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
@@ -501,6 +501,8 @@ while fcgi.isFCGI():
         day = date.day
         if iso_lang == 'en_GB':
             pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
+        elif iso_lang == 'eo_XX':
+            pledge['date'] = date.strftime("la %e-a de %B %Y")
         else:
             pledge['date'] = date.strftime("%e %B %Y")
         if pledge['signup'].decode('utf-8') == _("do the same"):

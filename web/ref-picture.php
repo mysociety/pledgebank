@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.19 2005-11-30 17:01:49 francis Exp $
+ * $Id: ref-picture.php,v 1.20 2005-11-30 17:43:32 francis Exp $
  * 
  */
 
@@ -136,7 +136,7 @@ function upload_picture() {
     db_query("insert into picture (filename, data) values ('$base_name', ".
         "'".pg_escape_bytea($picture_contents)."')");
     db_query("update pledges set picture = ? where ref = ?",
-        array(OPTION_PB_PICTURE_URL . "/" . $base_name, $pledge->ref()));
+        array(OPTION_BASE_URL . "/pics/". $base_name, $pledge->ref()));
     db_commit();
     print _("Thanks for uploading your picture to the pledge.  You can see below what it now looks like.");
     $pledge = new Pledge($pledge->ref());

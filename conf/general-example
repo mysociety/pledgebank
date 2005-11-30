@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.31 2005-10-17 11:07:01 chris Exp $
+ * $Id: general-example,v 1.32 2005-11-30 17:43:32 francis Exp $
  * 
  */
 
@@ -78,11 +78,6 @@ define('OPTION_GNUPLOT_FONT', '/usr/X11R6/lib/X11/fonts/TTF/arial.ttf');
 // web. No trailing '/', in either case.
 define('OPTION_PB_GRAPH_DIR', "/path/to/somehwere/graphs");
 define('OPTION_PB_GRAPH_URL', "http://www.pledgebank.com/g");
-
-// Cache directory for uploaded pictures, and where it appears on the web.
-// No trailing '/', in either case.
-define('OPTION_PB_PICTURE_DIR', "/path/to/somehwere/pictures");
-define('OPTION_PB_PICTURE_URL', "http://www.pledgebank.com/p");
 
 // Log file (used in test harness, and later in admin scripts)
 define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');

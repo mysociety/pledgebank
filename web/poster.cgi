@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.62 2005-11-30 09:16:17 matthew Exp $
+# $Id: poster.cgi,v 1.63 2005-12-01 00:46:05 matthew Exp $
 #
 
 import os
@@ -112,8 +112,6 @@ def has_sms(pledge):
         return False
     # UK countries have SMS
     return True
-
-sms_countries_description = _('UK')
 
 ############################################################################
 # Flyers using PyRTF for RTF generation
@@ -496,6 +494,8 @@ while fcgi.isFCGI():
             _ = translator.ugettext
         locale.setlocale(locale.LC_ALL, iso_lang + '.UTF-8')
         #raise Exception, "Language '%s' %s" % (iso_lang, _("Start your own pledge"))
+
+        sms_countries_description = _('UK').encode('utf-8')
 
         # Set date
         day = date.day

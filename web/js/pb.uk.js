@@ -11,9 +11,9 @@
 var translation = {
 "(choose one)":"(виберіть одне)",
 "Town:":"Місто",
-"other local people":"інший місцевий люд",
-"<Enter your pledge>":"<Напишіть Вашу нову обіцянку>",
+"other local people":"інших людей",
 "<Enter your name>":"<Введіть ваше ім’я, будь-ласка>",
+"<Enter your pledge>":"<Напишіть Вашу нову обіцянку>",
 "<Enter town or keyword>":"<введіть місто або ключове слово>",
 "<Date>":"<Дата>",
 "other local person":"людей разом зі мною",

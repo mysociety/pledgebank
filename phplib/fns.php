@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.100 2005-11-30 12:03:35 francis Exp $
+// $Id: fns.php,v 1.101 2005-12-01 13:16:08 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -532,8 +532,8 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
 <p><strong><?=_('Sign up for emails when people make pledges in your local area')?> <?=$newflash?'&mdash;':''?> <?=$newflash?_('Works in any country!'):''?> </strong>
-<br><span style="white-space: nowrap"><?=_('Email:') ?><input type="text" size="18" name="email" value="<?=htmlspecialchars($email) ?>"></span>
-<span style="white-space: nowrap"><?=_('Country:') ?><? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
+<br><span style="white-space: nowrap"><?=_('Email:') ?> <input type="text" size="18" name="email" value="<?=htmlspecialchars($email) ?>"></span>
+<span style="white-space: nowrap"><?=_('Country:') ?> <? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
 <span style="white-space: nowrap"><span id="place_postcode_label<?=($place_postcode_label ? $place_postcode_label : '')?>"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.63 2005-12-01 00:46:05 matthew Exp $
+# $Id: poster.cgi,v 1.64 2005-12-01 22:44:48 matthew Exp $
 #
 
 import os
@@ -185,7 +185,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
                     PyRTF.TEXT(_('Text').encode('utf-8'), size=int(small_writing+4)), 
                     ' ', 
                     PyRTF.TEXT(_('pledge %s').encode('utf-8') % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
-                    ' ', _('to'), ' ', 
+                    ' ', _('to').encode('utf-8'), ' ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
                     _(' (%s only) or pledge at ').encode('utf-8') % sms_countries_description, webdomain_text)
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set

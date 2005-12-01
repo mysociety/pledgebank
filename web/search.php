@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.33 2005-11-25 16:27:13 francis Exp $
+// $Id: search.php,v 1.34 2005-12-01 17:02:07 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -39,6 +39,12 @@ else
 
 function get_location_results($pledge_select, $lat, $lon) {
     global $pb_today, $rss_items, $rss;
+    if (get_http_var("far")) {
+        $radius = intval(get_http_var("far"));
+    } else {
+        $radius = gaze_get_radius_containing_population($lat, $lon, OPTION_PB_SEARCH_POPULATION);
+        gaze_check_error($radius);
+    }
     $q = db_query($pledge_select . ", distance
                 FROM pledge_find_nearby(?,?,?) AS nearby 
                 LEFT JOIN pledges ON nearby.pledge_id = pledges.id
@@ -47,7 +53,7 @@ function get_location_results($pledge_select, $lat, $lon) {
                     pin IS NULL AND
                     pb_pledge_prominence(pledges.id) <> 'backpage' AND 
                     '$pb_today' <= pledges.date 
-                ORDER BY distance", array($lat, $lon, 20)); // 20 km. XXX Should be indexed with wgs84_lat, wgs84_lon
+                ORDER BY distance", array($lat, $lon, $radius)); 
     $ret = "";
     if (db_num_rows($q)) {
         $success = 1;
@@ -70,9 +76,26 @@ function get_location_results($pledge_select, $lat, $lon) {
         }
         $ret .= '</ul>';
     }
-    return $ret;
+    return array($ret, $radius);
 }
 
+function get_change_radius_link($search, $radius) {
+    // Link for changing radius of search
+    if (get_http_var("far")) {
+        $change_radius_link = "(<a href=\"search?q=".htmlspecialchars($search)."\">"._("decrease distance")."</a>)";
+    } else {
+        $far_radius = 50;
+        if ($radius > $far_radius / 2)
+            $far_radius = 100;
+        if ($radius > $far_radius / 2)
+            $far_radius = 200;
+        if ($radius > $far_radius / 2)
+            $far_radius = 300;
+        $change_radius_link = "(<a href=\"search?q=".htmlspecialchars($search)."&far=$far_radius\">"._("increase distance")."</a>)";
+    }
+    return $change_radius_link;
+}
+ 
 function search($search) {
     global $pb_today, $rss, $rss_items;
     $success = 0;
@@ -92,7 +115,7 @@ function search($search) {
             return;
         }
     }
-    
+       
     // Link to RSS feed
     if (!$rss) {
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss".$_SERVER['REQUEST_URI']))?>"><img align="right" border="0" src="/rss.gif" alt="<?=_('RSS feed of search for \'') . htmlspecialchars($search) ."'" ?>"></a><?
@@ -129,9 +152,9 @@ function search($search) {
             if (!$rss)
                 print p(_("We couldn't find that postcode, please check it again."));
         } else {
-            $location_results = get_location_results($pledge_select, $location['wgs84_lat'], $location['wgs84_lon']);
+            list($location_results, $radius) = get_location_results($pledge_select, $location['wgs84_lat'], $location['wgs84_lon']);
             if (!$rss) {
-                print sprintf(p(_('Results for <strong>open pledges near</strong> UK postcode <strong>%s</strong>:')), htmlspecialchars(strtoupper($search)) );
+                print sprintf(p(_('Results for <strong>open pledges</strong> within %2.0f km %s of UK postcode <strong>%s</strong>:')), $radius, get_change_radius_link($search, $radius), htmlspecialchars(strtoupper($search)) );
                 if ($location_results) {
                     print $location_results;
                 } else {
@@ -180,30 +203,34 @@ function search($search) {
             err('Error doing place search');
         if (count($places) > 0) {
             $success = 1;
-            if (!$rss && count($places) > 1) {
-                print p(sprintf(_("Results for <strong>open pledges near</strong> places matching <strong>%s</strong>, %s (%s):"), htmlspecialchars($search), $countries_code_to_name[$site_country], $change_country));
-                print "<ul>";
-            }
+            $out = "";
+            $max_radius = -1;
             foreach ($places as $p) {
                 list($name, $in, $near, $lat, $lon, $st, $score) = $p;
                 $desc = $name;
                 if ($in) $desc .= ", $in";
                 if ($st) $desc .= ", $st";
                 if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
-                $location_results = get_location_results($pledge_select, $lat, $lon);
+                list ($location_results, $radius) = get_location_results($pledge_select, $lat, $lon);
+                $max_radius = max($radius, $max_radius);
                 if (!$rss) {
                     if (count($places) > 1) 
-                        print "<li>$desc";
+                        $out .= "<li>$desc";
                     else
-                        print p(sprintf(_("Results for <strong>open pledges near %s</strong>, %s (%s):"), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
+                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %2.0f km %s of <strong>%s</strong>, %s (%s):"), $radius, get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
                     if ($location_results) {
-                        print $location_results;
+                        $out .= $location_results;
                     } else {
-                        print "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
+                        $out .= "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
                     }
-                    if (count($places) > 1) print "</li>";
+                    if (count($places) > 1) $out .= "</li>";
                 }
             }
+            if (!$rss && count($places) > 1) {
+                print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s (%s):"), get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[$site_country], $change_country));
+                print "<ul>";
+            }
+            print $out;
             if (!$rss) {
                 if (count($places) > 1) print "</ul>";
                 pb_view_local_alert_quick_signup("localsignupsearchpage", 

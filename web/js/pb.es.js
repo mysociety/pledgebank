@@ -14,12 +14,12 @@ var translation = {
 "other local people":"personas más de mi entorno",
 "<Enter your name>":"<Introduzca su nombre>",
 "<Enter your pledge>":"<Introduzca su compromiso>",
-"<Enter town or keyword>":"<Introduzca un lugar o palabra clave>",
-"<Date>":"",
+"<Enter town or keyword>":"<Lugar o palabra clave>",
+"<Date>":"<Fecha>",
 "other local person":"otras personas cercanas ",
 "Global":"Global",
-"(separator)":"",
+"(separator)":"(separador)",
 "Postcode or town:":"Código postal o ciudad:",
-"You have used %d characters; %d remain.":"",
-"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":""
+"You have used %d characters; %d remain.":"Ha usado %d caracteres; le quedan %d.",
+"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Ha usado %d caracteres, %d más de los que caben en un mensaje de texto (SMS). Por favor, reduzca el texto de su mensaje."
 }

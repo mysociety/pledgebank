@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.223 2005-11-24 19:04:25 matthew Exp $
+// $Id: index.php,v 1.224 2005-12-02 18:27:52 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -74,10 +74,12 @@ can make your pledge succeed &raquo;') ?>"></a></div>
 
 # params must have:
 # 'global' - true or false, whether global pledges to be included
+# 'showcountry' - whether to display country name in summary
+# Optional:
 # 'sitecountry' - specifies which country pledges to include:
 #                 true include only site country pledges, 
 #                 false include only pledges from other countries (or all countries if no site country)
-# 'showcountry' - whether to display country name in summary
+# 'language_anywhere' - to return any pledges in site language (don't need global if set)
 function get_pledges_list($where, $params) {
     global $site_country, $pb_today;
     $query = "SELECT pledges.*, pledges.ref, pledges.date - '$pb_today' AS daysleft,
@@ -86,16 +88,21 @@ function get_pledges_list($where, $params) {
             WHERE ";
     $sql_params = array();
     
-    $query .= '(';
-    if ($params['sitecountry'])
-        $query .= pb_site_pledge_filter_main($sql_params, true);
-    else
-        $query .= pb_site_pledge_filter_foreign($sql_params, false);
+    $query_bits = array();
+    if (array_key_exists('sitecountry', $params)) {
+        if ($params['sitecountry'])
+            $query_bits[] = pb_site_pledge_filter_main($sql_params, true);
+        else
+            $query_bits[] = pb_site_pledge_filter_foreign($sql_params, false);
+    }
     if ($params['global'])
-        $query .= ' OR ' . pb_site_pledge_filter_general($sql_params, false);
-    $query .= ')';
+        $query_bits[] = pb_site_pledge_filter_general($sql_params, false);
+    if (array_key_exists('language_anywhere', $params))
+        $query_bits[] = pb_site_pledge_filter_language($sql_params);
+    if (count($query_bits))
+        $query .= '(' . join(' OR ', $query_bits) . ') AND ';
 
-    $query .= " AND " . $where;
+    $query .= $where;
     $q = db_query($query, $sql_params);
     $pledges = array();
     while ($r = db_fetch_array($q)) {
@@ -110,16 +117,29 @@ function get_pledges_list($where, $params) {
 }
 
 function list_frontpage_pledges() {
-    global $pb_today;
+    global $pb_today, $lang;
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of new pledges') ?>"></a>
 <h2><?=_('Why not sign a live pledge?') ?></h2><?
-    $pledges = get_pledges_list("
+    $pledges = array();
+    if ($lang=='eo') {
+        $pledges = get_pledges_list("
+                pb_pledge_prominence(pledges.id) = 'frontpage' AND
+                date >= '$pb_today' AND 
+                pin is NULL AND 
+                whensucceeded IS NULL
+                ORDER BY RANDOM()
+                LIMIT 10", array('global'=>false, 'language_anywhere'=>true, 'showcountry'=>true));
+    }
+    if (count($pledges) < 3) {
+        $global_lang_or_country_pledges = get_pledges_list("
                 pb_pledge_prominence(pledges.id) = 'frontpage' AND
                 date >= '$pb_today' AND 
                 pin is NULL AND 
                 whensucceeded IS NULL
                 ORDER BY RANDOM()
                 LIMIT 10", array('global'=>true,'sitecountry'=>true,'showcountry'=>false));
+        $pledges = array_merge($pledges, $global_lang_or_country_pledges);
+    }
     if (count($pledges) < 3) {
         // If too few frontpage, show a few of the normal pledges for the country
         // (but not normal global ones)
@@ -155,6 +175,7 @@ function list_frontpage_pledges() {
 }
 
 function list_successful_pledges() {
+    global $lang;
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list/succeeded"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of successful pledges') ?>"></a><?
     print h2(_('Recent successful pledges'));
 
@@ -164,6 +185,15 @@ function list_successful_pledges() {
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC
                 LIMIT 10", array('global'=>true, 'sitecountry'=>true,'showcountry'=>false));
+    if ($lang=='eo') {
+        $pledges2 = get_pledges_list("
+                pb_pledge_prominence(pledges.id) <> 'backpage' AND
+                pin is NULL AND 
+                whensucceeded IS NOT NULL
+                ORDER BY whensucceeded DESC
+                LIMIT 10", array('global'=>false, 'language_anywhere'=>true, 'showcountry'=>true));
+        $pledges = array_merge($pledges2, $pledges);
+    }
     if (!$pledges) {
         pb_print_no_featured_link();
     } else {

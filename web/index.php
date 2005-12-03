@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.224 2005-12-02 18:27:52 matthew Exp $
+// $Id: index.php,v 1.225 2005-12-03 11:46:26 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -30,21 +30,7 @@ function front_page() {
     pb_view_local_alert_quick_signup("localsignupfrontpage");
 ?>
 <div id="tellworld">
-<h2><?=_('Tell the world &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;') ?></h2>
-<blockquote class="noindent"><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
-alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;
-"></a>
-<?=microsites_frontpage_intro() ?>
-</blockquote>
-
-<? global $lang; if ($lang == 'en-gb') { ?>
-<p><a href="tom-on-pledgebank-vbr.mp3"><?=_('Listen to how PledgeBank
-works</a>, as explained by mySociety\'s director Tom Steinberg.
-Or <a href="/explain">read a full transcript') ?></a>.</p>
-<? } else { ?>
-<p><?=_('<a href="/explain">Find out how PledgeBank
-works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
-<? } ?>
+<?microsites_frontpage_intro()?>
 </div>
 
 <div id="startblurb">

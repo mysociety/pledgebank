@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.93 2005-11-13 10:48:42 matthew Exp $
+// $Id: page.php,v 1.94 2005-12-03 11:46:26 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -78,9 +78,7 @@ function page_header($title, $params = array()) {
     // Display title bar
     if (!array_key_exists('nonav', $params) or !$params['nonav']) {
 ?>
-<h1>
 <?=microsites_logo()?>
-</h1>
 <hr class="v"><?
     }
 

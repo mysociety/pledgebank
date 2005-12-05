@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.34 2005-12-01 17:02:07 francis Exp $
+// $Id: search.php,v 1.35 2005-12-05 22:09:49 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -172,9 +172,11 @@ function search($search) {
                     AND pb_pledge_prominence(pledges.id) <> \'backpage\'
                     AND (title ILIKE \'%\' || ? || \'%\' OR 
                          detail ILIKE \'%\' || ? || \'%\' OR 
+                         identity ILIKE \'%\' || ? || \'%\' OR 
+                         type ILIKE \'%\' || ? || \'%\' OR 
                          ref ILIKE \'%\' || ? || \'%\')
                     AND ref NOT ILIKE ?
-                ORDER BY date DESC', array($search, $search, $search, $search));
+                ORDER BY date DESC', array($search, $search, $search, $search, $search, $search));
     $closed = ''; $open = '';
     if (db_num_rows($q)) {
         $success = 1;

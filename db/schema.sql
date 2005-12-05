@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.160 2005-11-30 17:01:49 francis Exp $
+-- $Id: schema.sql,v 1.161 2005-12-05 11:45:11 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -296,6 +296,7 @@ create function index_pledge_ref_parts(integer)
         o integer;
     begin
         t_pledge_id = $1;
+        delete from pledge_ref_part where pledge_id = t_pledge_id;
         -- do not index private pledges 
         if (select pin from pledges where id = t_pledge_id) is not null then
             return;
@@ -308,7 +309,6 @@ create function index_pledge_ref_parts(integer)
         if not found then
             raise exception ''bad pledge ID %'', t_pledge_id;
         end if;
-        delete from pledge_ref_part where pledge_id = t_pledge_id;
         for o in 1 .. length(t_ref) - 2 loop
             t_part = substring(t_ref from o for 3);
             update pledge_ref_part

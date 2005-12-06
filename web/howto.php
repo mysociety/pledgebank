@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: howto.php,v 1.2 2005-12-06 18:35:04 francis Exp $
+// $Id: howto.php,v 1.3 2005-12-06 18:39:42 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -85,6 +85,56 @@ if ($what == 'football') {
 } elseif ($what == 'residents') {
 ?>
 <img src="/howto_residents.jpg" style="float: right; margin-left: 10px; margin-bottom: 10px" width="200" height="273" alt="">
+<p>Want to start a residents' association for your street, estate or
+building?</p>
+
+<p>Any group of people living in the same area can set up a Residents'
+Association; an Association can be a useful tool to help solve problems in your
+local area, get funding to improve local facilities and housing, and foster a
+sense of community.</p>
+
+<p>To get your Association started you'll need to get other members of your
+local community interested, and organise a first meeting to elect the committee
+and officers of the Association. There's loads of information on the web on how
+to get started, for instance: (links open in new window)</p>
+
+<ul>
+<li><a href="http://www.bbc.co.uk/dna/actionnetwork/A2077823" target="_new">How we set up a tenants and residents assocation</a> (BBC Action Network)</li>
+<li><a href="http://www.doncaster.gov.uk/Living_in_Doncaster/Housing/improving_your_area/Forming_a_Tenants_and_Residents_Association.asp" target="_new">Forming a Tenants and Residents Association</a> (Doncaster Metropolitan Borough Council)</li>
+<li><a href="http://www.fpra.org.uk/pages/publications.htm" target="_new">Federation of Private Residents' Associations Information Pack</a> (not free)</li>
+</ul>
+
+<p>But the hardest step of all in getting started might be getting enough people
+to turn up to that first meeting. That's where this site, PledgeBank, can help.
+The way it works is simple. You create a pledge that has the basic format,
+"I'll do <em>something</em> but <em>only</em> if a number <em>X</em> of other
+people will pledge to do the <em>same</em> thing by <em>this<em> day." So you
+can set up a pledge that says, "I'll attend a meeting to set up a Residents'
+Association in Acacia Avenue, but only if 15 other people who live in Acacia
+Avenue will show up too."</p>
+
+<p>We have developed PledgeBank to not just start your Pledge but help you run
+it too! We believe there are people around you with the same ideas and
+interests; we just want to help you all find each other. To help you do
+this:</p>
+
+<ul>
+<li>You get an <strong>easy to remember website address</strong> to advertise,
+be it on flyers under your neighbours' doors, posters or emails to your
+neighbours (say, www.pledgebank.com/AcaciaAvenue). It will contain your pledge,
+it sdue date and a list of people who have pledged with you. This will give you
+a <strong>central communication point</strong> to organise your efforts around.
+</li>
+<li>Your neighbours can sign up to your pledge <strong>online</strong> or through a simple two-word <strong>text message!</strong> (UK only.)</li>
+<li>PledgeBank subscribers near you <strong>will receive an email update</strong
+about your pledge and the opportunity to join you</li>
+</ul>
+
+<p>PledgeBank is <strong>free</strong> and <strong>easy to use</strong>. And,
+if you want, it can help you organise more than just a local Residents'
+Association. You could use it to set up a local sports team, a neighbourhood
+watch scheme, or even organise a street party.</p>
+
 <?
 } else {
     err('Unknown activity.');

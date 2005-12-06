@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.226 2005-12-06 00:10:34 matthew Exp $
+// $Id: index.php,v 1.227 2005-12-06 23:30:34 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -171,13 +171,12 @@ function list_successful_pledges() {
                 ORDER BY whensucceeded DESC
                 LIMIT 10", array('global'=>true, 'sitecountry'=>true,'showcountry'=>false));
     if ($lang=='eo') {
-        $pledges2 = get_pledges_list("
+        $pledges = get_pledges_list("
                 pb_pledge_prominence(pledges.id) <> 'backpage' AND
                 pin is NULL AND 
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC
-                LIMIT 10", array('global'=>false, 'language_anywhere'=>true, 'showcountry'=>true));
-        $pledges = array_merge($pledges2, $pledges);
+                LIMIT 10", array('global'=>false, 'sitecountry'=>true, 'language_anywhere'=>true, 'showcountry'=>false));
     }
     if (!$pledges) {
         pb_print_no_featured_link();

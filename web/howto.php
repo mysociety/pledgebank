@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: howto.php,v 1.1 2005-12-06 17:48:19 francis Exp $
+// $Id: howto.php,v 1.2 2005-12-06 18:35:04 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -19,6 +19,8 @@ if (!$what)
 
 if ($what == 'football') {
     $heading = "Start your local football team";
+} elseif ($what == 'residents') {
+    $heading = "Start a residents association";
 } else {
     err('Unknown activity.');
 }
@@ -29,7 +31,6 @@ print "<h2>$heading</h2>";
 if ($what == 'football') {
 ?>
 <img src="/howto_football.jpg" style="float: right; margin-left: 10px; margin-bottom: 10px" width="300" height="173" alt="">
-
 
    <p>Want to start your local football team?  Don't want to be the only one
     who shows up at the pitch come Sunday morning? PledgeBank can help!</p>
@@ -80,6 +81,10 @@ if ($what == 'football') {
 
     <p class="align: left" id="start"><a href="./new/football"><?=_('Start your own football pledge') ?>&nbsp;&raquo;</a></p>
 
+<?
+} elseif ($what == 'residents') {
+?>
+<img src="/howto_residents.jpg" style="float: right; margin-left: 10px; margin-bottom: 10px" width="200" height="273" alt="">
 <?
 } else {
     err('Unknown activity.');

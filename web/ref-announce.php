@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.34 2005-12-06 00:10:34 matthew Exp $
+ * $Id: ref-announce.php,v 1.35 2005-12-06 00:20:52 matthew Exp $
  * 
  */
 
@@ -232,7 +232,7 @@ if (!sizeof($errors) && $q_submit) {
 ?>
 
 <form action="announce" accept-charset="utf-8" class="pledge" name="pledge" id="pledgeaction" method="post">
-<h2>Send <?=$descr[$circumstance]?></h2>
+<h2><?=_('Send') . ' ' . $descr[$circumstance]?></h2>
 <input type="hidden" name="message_id" value="<?=$q_h_message_id?>">
 <div class="c">
 <p>

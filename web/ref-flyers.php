@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.13 2005-11-10 12:12:18 francis Exp $
+// $Id: ref-flyers.php,v 1.14 2005-12-06 00:10:34 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -37,7 +37,7 @@ $png_flyers8_url = $p->url_flyer("A4_flyers8.png");
 print p(_('Here you can get <acronym title="Portable Document Format">PDF</acronym>s or editable <acronym title="Rich Text File">RTF</acronym>s (Word compatible) containing your pledge data, to print out, display, hand out, or whatever.'));
 ?>
 <ul>
-<li><? print_link_with_pin($pdf_flyers8_url, "", _("Flyers for handing out, 8 per page (A4, PDF") . (get_http_var("pin") ? "" : _(", like picture below")) . ")") ?> </li>
+<li><? print_link_with_pin($pdf_flyers8_url, "", _("Flyers for handing out, 8 per page (A4, PDF") . (get_http_var("pin", true) ? "" : _(", like picture below")) . ")") ?> </li>
 <li><? print_link_with_pin($pdf_flyers1_url, "", _("A4 PDF poster") . 
 ($p->has_details() ? _(', including more details') : '') ) ?> </li>
 <li><? print_link_with_pin($rtf_flyers1_url, "", _("A4 editable poster (RTF)") . 
@@ -48,7 +48,7 @@ print p(_('Here you can get <acronym title="Portable Document Format">PDF</acron
 // Show inline graphics only for PINless pledges (as PNG doesn't
 // work for the PIN protected ones, you can't POST a PIN
 // into an IMG SRC= link)
-if (!get_http_var('pin')) {
+if (!get_http_var('pin', true)) {
     print '<p class="noprint">';
     printf(_('Alternatively, simply %s to get these flyers.'), print_this_link(_("print this page out"), "") );
     print '</p>';

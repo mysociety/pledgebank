@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.143 2005-11-30 12:54:16 francis Exp $
+ * $Id: pledge.php,v 1.144 2005-12-06 00:10:32 matthew Exp $
  * 
  */
 
@@ -544,7 +544,7 @@ function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null) {
    Checks to see if PIN submitted is correct, returns true if it is and false
    for wrong or no PIN.  */
 function check_pin($ref, $actual) {
-    $raw = get_http_var('pin');
+    $raw = get_http_var('pin', true);
     $entered = $raw ? sha1($raw) : $raw;
     if (!$actual) 
         return true;
@@ -573,7 +573,7 @@ function deal_with_pin($link, $ref, $actual) {
     }
 
     $html = "";
-    if (get_http_var('pin')) {
+    if (get_http_var('pin', true)) {
         $html .= '<p id="error">' . _('Incorrect PIN!') . '</p>';
     }
     $html .= '<form class="pledge" name="pledge" action="'.$link.'" method="post">' .
@@ -591,10 +591,10 @@ function deal_with_pin($link, $ref, $actual) {
    should be already escaped, or not need escaping, for display in URLs or
    HTML.*/
 function print_link_with_pin($link, $title, $text) {
-    if (get_http_var('pin')) {
+    if (get_http_var('pin', true)) {
 ?> 
     <form class="buttonform" name="buttonform" action="<?=$link?>" method="post" title="<?=$title?>">
-    <input type="hidden" name="pin" value="<?=htmlspecialchars(get_http_var('pin'))?>">
+    <input type="hidden" name="pin" value="<?=htmlspecialchars(get_http_var('pin', true))?>">
     <input type="submit" name="submitbuttonform" value="<?=$text?>">
     </form>
 <?
@@ -629,7 +629,7 @@ function pledge_sign_box() {
         $showname = ' checked';
 
     $email = get_http_var('email');
-    $name = get_http_var('name');
+    $name = get_http_var('name', true);
 
     $P = person_if_signed_on();
     if (!is_null($P)) {
@@ -648,7 +648,7 @@ function pledge_sign_box() {
 <input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
 <?  print h2(_('Sign up now'));
-    if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">';
+    if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
     $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
     print '<p><b>';
     printf(_('I, %s, sign up to the pledge.'), $namebox);

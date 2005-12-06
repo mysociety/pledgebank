@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.25 2005-11-29 18:26:46 matthew Exp $
+// $Id: ref-sign.php,v 1.26 2005-12-06 00:10:34 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -32,11 +32,11 @@ page_footer();
 function do_sign() {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
     $errors = importparams(
-                array('name',       '/^[^0-9]/i',        _('Please enter your name')),
+                array(array('name',true),       '/^[^0-9]/i',        _('Please enter your name')),
                 array('email',      'importparams_validate_email'),
                 array('ref',        '/^[a-z0-9-]+$/i',  ''),
                 array('showname',   '//',               '', 0),
-                array('pin',        '//',              '', null)
+                array(array('pin',true),        '//',              '', null)
             );
     if ($q_email==_('<Enter your name>')) $q_email='';
 

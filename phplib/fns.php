@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.102 2005-12-02 18:27:51 matthew Exp $
+// $Id: fns.php,v 1.103 2005-12-06 00:10:32 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -291,7 +291,7 @@ function parse_date($date) {
 
 function view_friends_form($p, $errors = array()) {
 
-    $name = get_http_var('fromname');
+    $name = get_http_var('fromname', true);
     $email = get_http_var('fromemail');
     $P = person_if_signed_on();
     if (!is_null($P)) {
@@ -311,7 +311,7 @@ function view_friends_form($p, $errors = array()) {
     $p->render_box(array('showdetails'=>false));
 ?>
 <form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
-<? if (get_http_var('pin')) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin')).'">';
+<? if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
 print h2(_('Email this pledge'));
 print p(_('Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.')); ?>

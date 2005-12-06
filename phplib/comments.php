@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.36 2005-08-26 16:19:05 francis Exp $
+ * $Id: comments.php,v 1.37 2005-12-06 00:10:32 matthew Exp $
  * 
  */
 
@@ -215,7 +215,7 @@ but your email address will not be.') ?></small></p>
 <input type="submit" name="submit" value="<?=_('Post comment') ?>">
 <? } ?>
 
-<?  if ($p = get_http_var('pin')) print '<input type="hidden" name="pin" value="$p">'; ?>
+<?  if ($p = get_http_var('pin', true)) print '<input type="hidden" name="pin" value="' . $p . '">'; ?>
 </form>
 <?
 }

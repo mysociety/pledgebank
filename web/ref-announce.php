@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.33 2005-09-05 12:23:35 francis Exp $
+ * $Id: ref-announce.php,v 1.34 2005-12-06 00:10:34 matthew Exp $
  * 
  */
 
@@ -146,7 +146,7 @@ if ($p->succeeded()) {
 }
 
 $err = importparams(
-            array('message_body', '//', "", $default_message),
+            array(array('message_body',true), '//', "", $default_message),
             array('message_sms', '//', "", $default_sms),
             array('submit', '//', "", null)
         );

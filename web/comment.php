@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.26 2005-09-06 10:21:36 francis Exp $
+ * $Id: comment.php,v 1.27 2005-12-06 00:10:34 matthew Exp $
  * 
  */
 
@@ -20,7 +20,7 @@ require_once('../phplib/alert.php');
 
 $err = importparams(
             array('pledge_id',          '/^[1-9][0-9]*$/',      _("Missing pledge id")),
-            array('pin',                 '//',                  _("Missing PIN"),     null),
+            array(array('pin', true),                 '//',                  _("Missing PIN"),     null),
             array('comment_id',         '/^[1-9][0-9]*$/',      _("Missing comment id"),     null)
         );
 
@@ -50,11 +50,11 @@ page_header(sprintf(_("Commenting on '%s'"), $pledge->h_title()));
 
 /* Grab comment variables themselves. */
 $err = importparams(
-            array('author_name',        '//',                   "",     null),
+            array(array('author_name',true),        '//',                   "",     null),
             array('author_email',       '//',                   "",     null),
             array('author_website',     '//',                   "",     null),
             array('comment_alert_signup',     '/./',                   "",     false),
-            array('text',               '//',                   "",     ""),
+            array(array('text',true),               '//',                   "",     ""),
             array('n',                  '/^[0-9]+$/',           "",     0),
             array('submit',             '//',                   "",     false)
         );

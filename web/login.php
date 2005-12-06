@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.65 2005-11-28 23:28:23 matthew Exp $
+ * $Id: login.php,v 1.66 2005-12-06 00:10:34 matthew Exp $
  * 
  */
 
@@ -73,7 +73,7 @@ try again'));
 importparams(
         array('stash',          '/^[0-9a-f]+$/',    '', null),
         array('email',          '/./',              '', null),
-        array('name',           '//',               '', null),
+        array(array('name',true),           '//',               '', null),
         array('password',       '/[^\s]/',          '', null),
         array('t',              '/^.+$/',           '', null),
         array('rememberme',     '/./',              '', false),

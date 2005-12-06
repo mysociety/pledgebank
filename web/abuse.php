@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.24 2005-11-23 12:35:37 francis Exp $
+// $Id: abuse.php,v 1.25 2005-12-06 00:10:34 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -21,13 +21,12 @@ page_footer();
 /* report_abusive_thing
  * Reporting of abusive comments, signatures, and pledges. */
 function report_abusive_thing() {
-    $what = get_http_var('what');
     global $q_what, $q_id, $q_reason, $q_email;
     global $q_h_what, $q_h_id, $q_h_reason;
     $errors = importparams(
                 array('what',       '/^(comment|pledge|signer)$/',  ''),
                 array('id',         '/^[1-9]\d*$/',                 ''),
-                array('reason',     '//',                           '', null),
+                array(array('reason', true),     '//',                           '', null),
                 array('email',      '//',                           '', null)
             );
     if (!is_null($errors)) {

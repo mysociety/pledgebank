@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: howto.php,v 1.3 2005-12-06 18:39:42 chris Exp $
+// $Id: howto.php,v 1.4 2005-12-06 19:26:27 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -18,9 +18,9 @@ if (!$what)
     err('Please specify what you want to know how to use PledgeBank for.');
 
 if ($what == 'football') {
-    $heading = "Start your local football team";
+    $heading = "Want to organise a kickabout?";
 } elseif ($what == 'residents') {
-    $heading = "Start a residents association";
+    $heading = "Want to start a residents' association for your street, estate or building?";
 } else {
     err('Unknown activity.');
 }
@@ -32,108 +32,76 @@ if ($what == 'football') {
 ?>
 <img src="/howto_football.jpg" style="float: right; margin-left: 10px; margin-bottom: 10px" width="300" height="173" alt="">
 
-   <p>Want to start your local football team?  Don't want to be the only one
-    who shows up at the pitch come Sunday morning? PledgeBank can help!</p>
+<p>PledgeBank can help!</p>
 
-   <p>The way it works is simple. You create a pledge that has the basic
-   format "I'll do something but only if a number X of other people will
-   pledge to do the same thing by this day." If setting up a local
-   football match you are after, you could organise a pledge that says
-   "I'll play footie in the park every Sunday, but only if 21 people in
-   my neighbourhood show up too".</p>
+<p>The way it works is simple - it lets people create pledges that say
+"I'll do something, but only if 10 other people will". It's useful for
+all sorts of things, from cleaning up your local park, to raising
+money, to organising kickabouts.</p>
 
-    <p id="start"><a href="./new/football"><?=_('Start your own football pledge') ?>&nbsp;&raquo;</a></p>
+<p>All you have to do is create a pledge a bit like this one:</p>
 
-   <p>We have developed PledgeBank to not just start your Pledge but help
-   you run it too! We believe there are people around you with the same
-   ideas and interests; we just want to help you all find each other.</p>
+<p>"I will arrange a weekly kickabout at Green Park, but only if  9 other
+people (or more) will pledge to come along when they can"</p>
 
-   <p>To help you find your fellow footballers:</p>
+<p id="starthowto"><a href="/new/football">Start your own football pledge &nbsp;&raquo;</a></p>
 
-   <ul>
-    <li> You get an easy to remember website address to advertise, be it on
-       flyers under your neighbours' doors, posters or emails to friends
-       you think would be interested. (say
-       www.pledgebank.com/SundayFootball). It will contain your Pledge,
-       its due date and people who have pledged with you. This will give
-       you a central communication point to organise your efforts around! </li>
+<p>Once you've made your pledge, we help you spread the word.
 
-    <li> Your friends can sign up to your pledge online or through a simple
-       two-word text message! (UK only) </li>
+<ol>
+<li>We provide posters and flyers advertising your pledge.</li>
+<li>People can sign up not just on line, but via SMS. Handy for
+signing people up on the school bus, or at the office.</li>
+</ol>
 
-    <li> Sport enthusiasts from your neighbourhood can see your pledge and
-       join. PledgeBank allows its users to search based on interest and
-       geographical location! </li>
+<p>Try it today!</p>
 
-    <li> Subscribers from your neighbourhood will receive an email update
-       regarding your pledge and the opportunity to join you! </li>
-
-    <li> You can contact fellow players through PledgeBank and see your
-       idea through! </li>
-   </ul>
-
-   <p>PledgeBank is free and easy to use. And if you wish, it can help you
-   organise more than just football. It could be useful
-   if you are considering a neighbourhood watch scheme, a residents
-   association or even a street party.</p>
-
-   <p>Try it today!</p>
-
-    <p class="align: left" id="start"><a href="./new/football"><?=_('Start your own football pledge') ?>&nbsp;&raquo;</a></p>
+<p id="starthowto" style="text-align: left"><a href="/new/football">Start your own football pledge' &nbsp;&raquo;</a></p>
 
 <?
 } elseif ($what == 'residents') {
 ?>
 <img src="/howto_residents.jpg" style="float: right; margin-left: 10px; margin-bottom: 10px" width="200" height="273" alt="">
-<p>Want to start a residents' association for your street, estate or
-building?</p>
 
 <p>Any group of people living in the same area can set up a Residents'
-Association; an Association can be a useful tool to help solve problems in your
-local area, get funding to improve local facilities and housing, and foster a
-sense of community.</p>
+Association; an Association can be a useful tool to help solve
+problems in your local area, get funding to improve local facilities
+and housing, and foster a sense of community.</p>
 
-<p>To get your Association started you'll need to get other members of your
-local community interested, and organise a first meeting to elect the committee
-and officers of the Association. There's loads of information on the web on how
-to get started, for instance: (links open in new window)</p>
+<p>PledgeBank is a free website service for getting things done in local
+communities. One of the things it can help with is getting people who
+don't know each other to feel comfortable with meeting up to start new
+groups.</p>
+
+<p>The way it works is simple. You use this site, PledgeBank to create a
+pledge that says you'll get involved, but only if other people will
+too. For example:</p>
+
+<p>"I will hold a meeting to set up a Residents' Association and provide
+tea and cake, but only if 5 local people will pledge to come along".</p>
+
+<p id="starthowto" style="text-align: left"><a href="/new/residents">Click here to start a pledge like this &nbsp;&raquo;</a></p>
+
+<p>Once you've set up your pledge, we help you to spread the word around
+your neighbours:</p>
+
+<ul>
+<li> We give you printable leaflets and flyers to pin up or distribute in
+your local area. </li>
+<li> People can sign up via a cheap two word text message, so no internet
+access is required. </li>
+</ul>
+
+<h3>More information?</h3>
+
+<p>Why not read more information on how residents associations work, and
+then create a pledge when you feel ready?</p>
 
 <ul>
 <li><a href="http://www.bbc.co.uk/dna/actionnetwork/A2077823" target="_new">How we set up a tenants and residents assocation</a> (BBC Action Network)</li>
-<li><a href="http://www.doncaster.gov.uk/Living_in_Doncaster/Housing/improving_your_area/Forming_a_Tenants_and_Residents_Association.asp" target="_new">Forming a Tenants and Residents Association</a> (Doncaster Metropolitan Borough Council)</li>
-<li><a href="http://www.fpra.org.uk/pages/publications.htm" target="_new">Federation of Private Residents' Associations Information Pack</a> (not free)</li>
 </ul>
 
-<p>But the hardest step of all in getting started might be getting enough people
-to turn up to that first meeting. That's where this site, PledgeBank, can help.
-The way it works is simple. You create a pledge that has the basic format,
-"I'll do <em>something</em> but <em>only</em> if a number <em>X</em> of other
-people will pledge to do the <em>same</em> thing by <em>this<em> day." So you
-can set up a pledge that says, "I'll attend a meeting to set up a Residents'
-Association in Acacia Avenue, but only if 15 other people who live in Acacia
-Avenue will show up too."</p>
-
-<p>We have developed PledgeBank to not just start your Pledge but help you run
-it too! We believe there are people around you with the same ideas and
-interests; we just want to help you all find each other. To help you do
-this:</p>
-
-<ul>
-<li>You get an <strong>easy to remember website address</strong> to advertise,
-be it on flyers under your neighbours' doors, posters or emails to your
-neighbours (say, www.pledgebank.com/AcaciaAvenue). It will contain your pledge,
-it sdue date and a list of people who have pledged with you. This will give you
-a <strong>central communication point</strong> to organise your efforts around.
-</li>
-<li>Your neighbours can sign up to your pledge <strong>online</strong> or through a simple two-word <strong>text message!</strong> (UK only.)</li>
-<li>PledgeBank subscribers near you <strong>will receive an email update</strong
-about your pledge and the opportunity to join you</li>
-</ul>
-
-<p>PledgeBank is <strong>free</strong> and <strong>easy to use</strong>. And,
-if you want, it can help you organise more than just a local Residents'
-Association. You could use it to set up a local sports team, a neighbourhood
-watch scheme, or even organise a street party.</p>
+<p id="starthowto" style="text-align: left"><a href="/new/residents">Then, click here to get started &nbsp;&raquo;</a></p>
 
 <?
 } else {

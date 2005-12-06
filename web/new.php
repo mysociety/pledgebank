@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.117 2005-12-06 17:48:19 francis Exp $
+// $Id: new.php,v 1.118 2005-12-06 19:26:27 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -74,12 +74,21 @@ about. If they don't, you need to rewrite it.") ?></li>
         $data['type'] = _('people in my street');
     }
 
+    if (get_http_var('residents')) {
+        # Remember to change the error handling code down below if you change <MY STREET>
+        $data['title'] = "hold a meeting to set up a Residents' Association and provide tea and cake";
+        $data['target'] = 5;
+        $data['type'] = 'other people in <MY AREA>';
+        $data['signup'] = 'come along';
+        $data['identity'] = 'resident of <MY AREA>';
+    }
+
     if (get_http_var('football')) {
         # Remember to change the error handling code down below if you change <MY STREET>
-        $data['title'] = "start a football team in <MY AREA>";
+        $data['title'] = "arrange a weekly kickabout at <MY LOCAL PARK>";
         $data['target'] = 9;
-        $data['type'] = 'other people';
-        $data['signup'] = 'come to the first kickabout';
+        $data['type'] = 'other footie fans (or more)';
+        $data['signup'] = 'come along when they can';
         $data['identity'] = 'resident of <MY AREA>';
     }
 

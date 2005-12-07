@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.54 2005-12-07 18:37:58 chris Exp $
+ * $Id: pb.php,v 1.55 2005-12-07 18:39:51 matthew Exp $
  * 
  */
 
@@ -27,7 +27,7 @@ $lockfilehandle = null;
 if (array_key_exists('HTTP_USER_AGENT', $_SERVER) && stristr($_SERVER['HTTP_USER_AGENT'], "Googlebot")) {
     $lockfilehandle = fopen("../conf/general", "rw");
     if ($lockfilehandle)
-        flock($lockfilehandle, LOCK_SH, true);
+        flock($lockfilehandle, LOCK_SH);
 }
 
 /* Output buffering: PHP's output buffering is broken, because it does not

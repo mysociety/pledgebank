@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.52 2005-11-13 10:48:42 matthew Exp $
+ * $Id: pb.php,v 1.53 2005-12-07 17:49:08 francis Exp $
  * 
  */
 
@@ -24,7 +24,7 @@ require_once 'page.php';
 // Googlebot is crawling all our domains for different languages/codes at 
 // a high rate, which in combination is too much for our server.
 if (array_key_exists('HTTP_USER_AGENT', $_SERVER) && stristr($_SERVER['HTTP_USER_AGENT'], "Googlebot")) {
-    sleep(5);
+    sleep(10);
 }
 
 /* Output buffering: PHP's output buffering is broken, because it does not

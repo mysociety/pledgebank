@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.26 2005-10-28 10:17:32 matthew Exp $
+// $Id: faq.php,v 1.27 2005-12-07 12:18:22 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -210,20 +210,33 @@ print "<dl>\n";
 
 print dt(_('Can I put up pledges in languages other than English?'));
 
-print dd(_("You can try! Fully internationalised versions of PledgeBank are
-more than possible, but we can't do them without speakers of other languages.
-If you are interested in volunteering to help translate the site, please
-<a href=\"/translate\">read our translation help page</a>."));
+print dd(_("Yes! We have several fully internationalised versions of PledgeBank.
+If your browser is configured to use one of those languages, PledgeBank will 
+automatically appear in them. Otherwise, follow one of the links at the
+bottom of each page.  If you are interested in volunteering to help translate
+the site into your language, please <a href=\"/translate\">read our translation
+help page</a>."));
 
-print dt(_('Do I have to have a UK postcode to use this service?'));
+print dt(_('What countries does PledgeBank work in?'));
 
-print dd(_("No, although you get some extra, handy features if you are in the UK,
-such as the ability to search for pledges close to your location.
-Again, we'd be happy to talk to anyone who could help us extend these overseas
-- please <a
+print dd(_("All of them. We try to detect which country you are in
+automatically, and show you only pledges relevant to your country. To see what
+PledgeBank looks like in other countries, click on '(change)' at the top of any
+page, just right of the PledgeBank logo.  Please <a href=\"/contact\">contact
+us</a> if you'd like to help get more people in your country using PledgeBank."));
+
+print dt(_('Why do you only have UK postcodes?'));
+
+print dd(_("We'd be happy to talk to anyone who could help us extend
+the postcode search overseas - please <a
 href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
 email list</a> to help us out.
 "));
+
+print dt(_('... and SMS?'));
+
+print dd(_("Again, please <a href=\"/contact\">contact us</a> if you
+can help add text messaging in your country."));
 
 print "</dl>\n";
 

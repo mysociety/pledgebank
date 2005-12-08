@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.103 2005-12-06 00:10:32 matthew Exp $
+// $Id: fns.php,v 1.104 2005-12-08 12:27:19 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -611,7 +611,7 @@ function pb_print_change_language_links($path = null) {
  * SQL_PARAMS is array ref, query parameters are pushed on here. 
  */
 function pb_site_pledge_filter_main(&$sql_params) {
-    global $site_country, $microsite; 
+    global $site_country, $microsite, $lang; 
 
     if ($microsite) {
         $sql_params[] = $microsite;
@@ -623,6 +623,11 @@ function pb_site_pledge_filter_main(&$sql_params) {
             $sql_params[] = $site_country;
         } else {
             $query_fragment .= "1 = 0"; # get no pledges
+        }
+        # also show all Esperanto pledges when in Esperanto
+        if ($lang == 'eo') {
+            $query_fragment .= " or lang = ?";
+            $sql_params[] = $lang;
         }
         $query_fragment .= ")";
         return $query_fragment;
@@ -636,15 +641,20 @@ function pb_site_pledge_filter_general(&$sql_params) {
     if ($microsite) {
         return "(1=0)";
     } else {
-        $sql_params[] = $lang; 
-        return "(country IS NULL AND lang = ?)";
+        # In Esperanto we have already caught these above
+        if ($lang == 'eo') {
+            return "(1=0)";
+        } else {
+            $sql_params[] = $lang; 
+            return "(country IS NULL AND lang = ?)";
+        }
     }
 }
 /* pb_site_pledge_filter_foreign
  * Same as pb_site_pledge_filter_main except returns foreign pledges.
  * i.e. for other countries only. */
 function pb_site_pledge_filter_foreign(&$sql_params) {
-    global $site_country, $lang, $microsite; 
+    global $site_country, $microsite, $lang; 
     if ($microsite) {
         $sql_params[] = $microsite;
         return "(microsite <> ?)";
@@ -656,18 +666,13 @@ function pb_site_pledge_filter_foreign(&$sql_params) {
         } else {
             $locale_clause .= "1 = 0"; # get no pledges
         }
+        # Esperanto pledges already shown, so don't include again in foreign
+        if ($lang == 'eo') {
+            $locale_clause .= " and lang <> ?";
+            $sql_params[] = $lang;
+        }
         $locale_clause .= ")";
         return $locale_clause;
-    }
-}
-
-function pb_site_pledge_filter_language(&$sql_params) {
-    global $lang, $microsite;
-    if ($microsite) {
-        return "(1=0)";
-    } else {
-        $sql_params[] = $lang; 
-        return "(lang = ?)";
     }
 }
 

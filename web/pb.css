@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.97 2005-12-08 19:22:04 francis Exp $
+ * $Id: pb.css,v 1.98 2005-12-08 19:51:15 francis Exp $
  * 
  */
 
@@ -578,15 +578,7 @@ span.greyed {
 
 /* For /where */
 
-.where0 {
-    float: left; 
-    width: 33%; 
-}
-.where1 {
-    float: left; 
-    width: 33%; 
-}
-.where2 {
+.wherecolumn {
     float: left; 
     width: 33%; 
 }

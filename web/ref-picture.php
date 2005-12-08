@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.20 2005-11-30 17:43:32 francis Exp $
+ * $Id: ref-picture.php,v 1.21 2005-12-08 01:37:20 matthew Exp $
  * 
  */
 
@@ -165,7 +165,7 @@ $pledge->render_box(array('showdetails' => true));
     } ?>
         <input type="hidden" name="MAX_FILE_SIZE" value="<?=$picture_size_limit*1024?>">
     <?  print p(_('Choose the photo, logo or drawing that you would like to display on
-        your pledge.  Keep it small so it fits well on the page &mdash it will be
+        your pledge.  Keep it small so it fits well on the page &mdash; it will be
         automatically shrunk if it is too big.  You can use an image saved as
         either GIF, JPEG or PNG type.')); ?>
     <p><input name="userfile" type="file"><input type="submit" value="<?=_('Submit') ?>">

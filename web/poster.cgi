@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.65 2005-12-08 00:52:03 matthew Exp $
+# $Id: poster.cgi,v 1.66 2005-12-08 01:37:20 matthew Exp $
 #
 
 import os
@@ -142,13 +142,19 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
 
     # Set up styles
     # leading generally small * 1.2, 0.9 on detail and smallprint, though, and 0 on footer
-    text_style = PyRTF.TextStyle( PyRTF.TextPS(font=ss.Fonts.Transport, size=int(small_writing) ) )
+#    if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
+#        heading_font = ss.Fonts.TrebuchetMS
+#        main_font = ss.Fonts.Georgia
+#    else:
+    heading_font = ss.Fonts.Transport
+    main_font = ss.Fonts.Rockwell
+    text_style = PyRTF.TextStyle( PyRTF.TextPS(font=heading_font, size=int(small_writing) ) )
     p_head = PyRTF.ParagraphStyle('header', text_style.Copy(), PyRTF.ParagraphPS(alignment=1, space_before = 0, space_after = 0) )
     ss.ParagraphStyles.append(p_head)
     text_style.TextPropertySet.SetSize(int(h_purple*4/5))
     p_footer = PyRTF.ParagraphStyle('footer', text_style.Copy(), PyRTF.ParagraphPS(alignment=PyRTF.ParagraphPS.RIGHT, space_before = 0, space_after = 0) )
     ss.ParagraphStyles.append(p_footer)
-    text_style.TextPropertySet.SetFont(ss.Fonts.Rockwell)
+    text_style.TextPropertySet.SetFont(main_font)
     text_style.TextPropertySet.SetSize(int(small_writing))
     p_normal = PyRTF.ParagraphStyle('normal', text_style.Copy(), PyRTF.ParagraphPS(alignment = 1, space_before = 0, space_after = int(size*200)) )
     ss.ParagraphStyles.append(p_normal)
@@ -526,7 +532,7 @@ while fcgi.isFCGI():
         else:
             pledge['date'] = date.strftime("%e %B %Y")
         if pledge['signup'].decode('utf-8') == _("do the same"):
-            pledge['signup'] = _("too")
+            pledge['signup'] = _("too").encode('utf-8')
         sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
         # Check pin
@@ -580,8 +586,14 @@ while fcgi.isFCGI():
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir, prefix='tmp')
             ss = PyRTF.StyleSheet()
             ss.Colours.append(PyRTF.Colour('pb', 82, 41, 9*16+4)) # 522994
-            ss.Fonts.append(PyRTF.Font('Rockwell', 'roman', 0))
-            ss.Fonts.append(PyRTF.Font('Transport', 'swiss', 0))
+#            if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
+#                heading_font = 'Trebuchet MS'
+#                main_font = 'Georgia'
+#            else:
+            heading_font = 'Transport'
+            main_font = 'Rockwell'
+            ss.Fonts.append(PyRTF.Font(main_font, 'roman', 0))
+            ss.Fonts.append(PyRTF.Font(heading_font, 'swiss', 0))
             ps = PyRTF.ParagraphStyle('Body', PyRTF.TextStyle(PyRTF.TextPS(ss.Fonts.Arial, 22)), PyRTF.ParagraphPS(space_before=60, space_after=60))
             ss.ParagraphStyles.append(ps)
 

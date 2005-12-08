@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.64 2005-12-01 22:44:48 matthew Exp $
+# $Id: poster.cgi,v 1.65 2005-12-08 00:52:03 matthew Exp $
 #
 
 import os
@@ -61,6 +61,16 @@ mysociety.config.set_file("../conf/general")
 
 import PyRTF
 
+def add_standard_TTF(name, filename):
+    myRegisterFont(ttfonts.TTFont(name, font_dir + '/'+filename+'.ttf'))
+    myRegisterFont(ttfonts.TTFont(name+'-Bold', font_dir + '/'+filename+'b.ttf'))
+    myRegisterFont(ttfonts.TTFont(name+'-BoldItalic', font_dir + '/'+filename+'bi.ttf'))
+    myRegisterFont(ttfonts.TTFont(name+'-Italic', font_dir + '/'+filename+'i.ttf'))
+    addMapping(filename, 0, 0, name)
+    addMapping(filename, 1, 0, name+'-Bold')
+    addMapping(filename, 0, 1, name+'-Italic')
+    addMapping(filename, 1, 1, name+'-BoldItalic')
+
 from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.pdfbase.pdfmetrics import _fonts
 from reportlab.lib.fonts import addMapping
@@ -72,6 +82,9 @@ addMapping('rockwell', 0, 0, 'Rockwell')
 addMapping('rockwell', 1, 0, 'Rockwell-Bold')
 addMapping('rockwell', 0, 1, 'Rockwell')
 addMapping('rockwell', 1, 1, 'Rockwell')
+add_standard_TTF('Arial', 'arial')
+add_standard_TTF('Georgia', 'georgia')
+add_standard_TTF('Trebuchet MS', 'trebuchet')
 
 db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
 
@@ -237,18 +250,25 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         large_writing = 4
 
     # Set up styles
+    if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
+        heading_font = 'Trebuchet MS'
+        main_font = 'Georgia'
+    else:
+        heading_font = 'Transport'
+        main_font = 'Rockwell'
+
     p_head = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 0, 
-        fontSize = small_writing, leading = small_writing*1.2, fontName = 'Transport')
+        fontSize = small_writing, leading = small_writing*1.2, fontName = heading_font)
     p_normal = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*20, 
-        fontSize = small_writing, leading = small_writing*1.2, fontName = 'Rockwell')
+        fontSize = small_writing, leading = small_writing*1.2, fontName = main_font)
     p_detail = ParagraphStyle('detail', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*10, 
-        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = 'Rockwell')
+        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font)
     p_nospaceafter = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 1, 
-        fontSize = small_writing, leading = small_writing*1.2, fontName = 'Rockwell')
+        fontSize = small_writing, leading = small_writing*1.2, fontName = main_font)
     p_footer = ParagraphStyle('normal', alignment = TA_RIGHT, spaceBefore = 0, spaceAfter = 0,
-        fontSize = h_purple*4/5, leading = 0, fontName = 'Transport')
+        fontSize = h_purple*4/5, leading = 0, fontName = heading_font)
     p_smallprint = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 1, spaceAfter = 0,
-        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = 'Rockwell')
+        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font)
     if (w<h):
         ticksize = w*1.2
     else:

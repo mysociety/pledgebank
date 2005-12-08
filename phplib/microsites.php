@@ -8,13 +8,18 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.10 2005-12-03 11:46:26 francis Exp $
+ * $Id: microsites.php,v 1.11 2005-12-08 14:32:13 francis Exp $
  * 
  */
 
-$microsites_list = array('glastonbury' => 'Glastonbury',
-                         '365act' => '365 Act',
+/* Codes of microsites, and name displayed next to PledgeBank logo */
+$microsites_list = array('all' => 'All',
+                         '365act' => '365 Ways',
+                         'glastonbury' => 'Glastonbury',
                          'interface' => 'Interface');
+
+/* These are listed on /where */
+$microsites_public_list = array('all' => 'All pledges; for all countries in all languages');
 
 /* microsites_get_name 
  * Returns display name of microsite if we are on one. e.g. Glastonbury */

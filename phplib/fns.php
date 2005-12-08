@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.104 2005-12-08 12:27:19 francis Exp $
+// $Id: fns.php,v 1.105 2005-12-08 14:32:13 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -29,6 +29,7 @@ function li($s) { return "<li>$s</li>\n"; }
 #   'lang' - language to change to, or "explicit" to explicitly include current language in URL
 #   'country' - country to change to, or "explicit" to explicitly include current country in URL
 #   'explicit' - if present and true, overrides lang and country to "explicit"
+#   'microsite' - certain microsite
 # Parameters are:
 #   'path' - path component, if not present uses request URI
 function pb_domain_url($params = array('path'=>'/')) {
@@ -39,6 +40,7 @@ function pb_domain_url($params = array('path'=>'/')) {
         $params['country'] = 'explicit';
     }
 
+    # Language
     $l = $domain_lang;
     if (array_key_exists('lang', $params))
         $l = ($params['lang'] == "explicit") ? $lang : $params['lang'];
@@ -47,14 +49,20 @@ function pb_domain_url($params = array('path'=>'/')) {
     if ($locale_current && count($locale_stack) > 0)
         $l = $locale_current; 
 
+    # Country
     $c = $domain_country;
     if (array_key_exists('country', $params))
         $c = ($params['country'] == "explicit") ? $site_country : $params['country'];
 
+    # Microsite
+    $m = $microsite;
+    if (array_key_exists('microsite', $params))
+        $m = $params['microsite'];
+
     $url = 'http://';
 
-    if ($microsite) {
-        $url .= "$microsite.";
+    if ($m) {
+        $url .= "$m.";
     } else {
         if (OPTION_WEB_HOST == 'www') {
             if (!$c)
@@ -366,7 +374,7 @@ function pb_view_gaze_places_choice($places, $place, $selected_gaze_place) {
 
 function country_sort($a, $b) {
     global $countries_code_to_name;
-    return strcmp($countries_code_to_name[$a], $countries_code_to_name[$b]);
+    return strcoll($countries_code_to_name[$a], $countries_code_to_name[$b]);
 }
 
 /* pb_view_gaze_country_choice
@@ -560,7 +568,7 @@ function sms_site_country() {
 function pb_get_change_country_link() {
     global $site_country, $microsite;
     $change = '<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">';
-    if ($microsite) 
+    if ($microsite && ($microsite != "all")) 
         $change .= _("choose site");
     elseif ($site_country)
         $change .= _("change country");
@@ -614,6 +622,8 @@ function pb_site_pledge_filter_main(&$sql_params) {
     global $site_country, $microsite, $lang; 
 
     if ($microsite) {
+        if ($microsite == 'all')
+            return "(1=1)";
         $sql_params[] = $microsite;
         return "(microsite = ?)";
     } else {
@@ -656,6 +666,8 @@ function pb_site_pledge_filter_general(&$sql_params) {
 function pb_site_pledge_filter_foreign(&$sql_params) {
     global $site_country, $microsite, $lang; 
     if ($microsite) {
+        if ($microsite == 'all')
+            return "(1=0)";
         $sql_params[] = $microsite;
         return "(microsite <> ?)";
     } else {
@@ -685,7 +697,10 @@ function pb_print_filter_link_main_general($attrs = "") {
     $langname = $langs[$lang];
 
     if ($microsite) {
-        print "<p $attrs>". sprintf(_('%s (%s) pledges only listed'), microsites_get_name(), $change_country). "</p>";
+        if ($microsite == 'all') 
+            print "<p $attrs>". sprintf(_('%s (%s) pledges listed'), microsites_get_name(), $change_country). "</p>";
+        else 
+            print "<p $attrs>". sprintf(_('%s (%s) pledges only listed'), microsites_get_name(), $change_country). "</p>";
     }
     else {
         if ($site_country)

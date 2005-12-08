@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.6 2005-12-08 14:32:13 francis Exp $
+// $Id: where.php,v 1.7 2005-12-08 19:22:04 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -19,10 +19,16 @@ if (!$r)
     $r = "/";
 
 page_header(_('Choose your country'));
+
 print h2(_('Choose your country ...'));
 $lastchar = "*";
 print "<p>";
 uksort($countries_name_to_code, 'strcoll');
+$column = 0;
+$total_countries = count($countries_name_to_code);
+$n = 0;
+$last_col_n = 0;
+print "<div class=\"where$column\">";
 foreach ($countries_name_to_code as $name => $code) {
     $firstchar = mb_substr($name, 0, 1, "UTF-8");
     # Tricksy test to see if we are on the next "letter" by collation.
@@ -30,20 +36,32 @@ foreach ($countries_name_to_code as $name => $code) {
     # this on that when put before "a" and "b", you end up with "Xa" >= "Xb"
     $charcomp = strcoll($firstchar."a", $lastchar."b");
     if ($charcomp >= 0 || $lastchar == "*") {
-        print "</p><h3>$firstchar</h3><p>";
+        print "</p>";
+        if (($n > $total_countries / 3 && $column == 0) ||
+           ($n > 2 * $total_countries / 3 && $column == 1)) {
+           $column++;
+           print "</div><div class=\"where$column\">";
+           $last_col_n = $n;
+        }
+        print "<h3>$firstchar</h3><p>";
     }
     $url = pb_domain_url(array('country'=>$code, 'path'=>$r));
     print "<a href=\"".$url."\">".$name."</a>";
     print "<br>";
+    $n++;
     $lastchar = $firstchar;
 }
-print "</p>";
+print "</div></p>";
+
+print "<div class=\"wherespecial\">";
 print h2(_('... or choose a special site'));
 foreach ($microsites_public_list as $code => $name) {
     $url = pb_domain_url(array('microsite'=>$code, 'path'=>$r));
     print "<a href=\"".$url."\">".$name."</a>";
     print "<br>";
 }
+print "</div>";
+
 page_footer();
 
 ?>

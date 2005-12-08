@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.8 2005-12-08 19:51:15 francis Exp $
+// $Id: where.php,v 1.9 2005-12-08 20:33:09 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -28,7 +28,7 @@ $column = 0;
 $total_countries = count($countries_name_to_code);
 $n = 0;
 $last_col_n = 0;
-print "<div class=\"wherecolumn\">";
+print "<div class=\"wherecolumn\"><p>";
 foreach ($countries_name_to_code as $name => $code) {
     $firstchar = mb_substr($name, 0, 1, "UTF-8");
     # Tricksy test to see if we are on the next "letter" by collation.
@@ -51,7 +51,7 @@ foreach ($countries_name_to_code as $name => $code) {
     $n++;
     $lastchar = $firstchar;
 }
-print "</div></p>";
+print "</p></div>";
 
 print "<div class=\"wherespecial\">";
 print h2(_('... or choose a special site'));

@@ -8,18 +8,19 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.11 2005-12-08 14:32:13 francis Exp $
+ * $Id: microsites.php,v 1.12 2005-12-08 20:33:08 francis Exp $
  * 
  */
 
 /* Codes of microsites, and name displayed next to PledgeBank logo */
-$microsites_list = array('all' => 'All',
+$microsites_list = array('everywhere' => _('Everywhere'),
                          '365act' => '365 Ways',
                          'glastonbury' => 'Glastonbury',
                          'interface' => 'Interface');
 
 /* These are listed on /where */
-$microsites_public_list = array('all' => 'All pledges; for all countries in all languages');
+$microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countries in all languages'),
+                                '365act' => _('365 Ways to Change the World'));
 
 /* microsites_get_name 
  * Returns display name of microsite if we are on one. e.g. Glastonbury */
@@ -54,6 +55,7 @@ function microsites_logo() {
     "></a>
 <h1>
 <a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<span id="countrytitle"><a href="/where">' . _('(other PledgeBanks)') . '</a></span>
 </h1>
 ';
 

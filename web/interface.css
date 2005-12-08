@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: interface.css,v 1.3 2005-10-27 11:03:05 francis Exp $
+ * $Id: interface.css,v 1.4 2005-12-08 20:33:09 francis Exp $
  * 
  */
 
@@ -15,7 +15,7 @@
 
 body {
     text-align: center;
-    font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, sans-serif;
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Arial, sans-serif;
     margin: 0;
     padding: 0;
     color: #222222;
@@ -211,6 +211,10 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     text-align: center;
     font-size: 150%;
 }
+#starthowto {
+    margin: 0;
+    font-size: 150%;
+}
 #localsignupfrontpage {
     text-align: center;
     margin-bottom: 1em;
@@ -344,7 +348,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 .pledge .c {
     text-align: center;
 }
-.pledge, #pledgeaction {
+.pledge, #pledgeaction, #otherdetails {
     border: solid 2px #8f8f8f;
     margin: 0 auto 1em;
     padding: 10px;
@@ -395,6 +399,14 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #spreadword a {
     font-weight: bold;
 }
+
+#otherdetails {
+    width: 45%;
+    float: left;
+    clear: left;
+    margin: 1em auto;
+}
+
 #signatories ul, #connections ul, #yourconnections ul {
     margin: 0;
     padding: 0 0 0 1.5em;
@@ -560,6 +572,20 @@ span.greyed {
     float: right;
 }
 .offline h2, .offline p {
+}
+
+#modifyfaq {
+    display: none;
+}
+
+/* For /where */
+
+.wherecolumn {
+    float: left; 
+    width: 33%; 
+}
+.wherespecial {
+    clear: both;
 }
 
 

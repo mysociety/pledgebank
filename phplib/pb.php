@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.55 2005-12-07 18:39:51 matthew Exp $
+ * $Id: pb.php,v 1.56 2005-12-08 20:33:08 francis Exp $
  * 
  */
 
@@ -69,28 +69,19 @@ err_set_handler_display('pb_handle_error');
 # xx . yy . OPTION_WEB_DOMAIN - xx is a country code, yy a language code (either aa or aa-bb)
 $domain_lang = null;
 $domain_country = null;
-$microsite = null;
-# Explicitly match all microsites for now (other code relies on the names being from subset)
-$m = array();
-$got_matches = preg_match('#^([a-z0-9]+)\.#', strtolower($_SERVER['HTTP_HOST']), $m);
-if ($got_matches && array_key_exists(strtolower($m[1]), $microsites_list)) {
-    $microsite = $m[1];
+if (OPTION_WEB_HOST == 'www') {
+    if (preg_match('#^(?:[^.]+|www)\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+        $domain_lang = $m[1];
 } else {
-    if (OPTION_WEB_HOST == 'www') {
-        if (preg_match('#^(?:..|www)\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
-            $domain_lang = $m[1];
-    } else {
-        if (preg_match('#^'.OPTION_WEB_HOST.'(?:-..)?\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
-            $domain_lang = $m[1];
-    }
-
-    if (OPTION_WEB_HOST == 'www') {
-        if (preg_match('#^(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
-            $domain_country = strtoupper($m[1]);
-    } else {
-        if (preg_match('#^'.OPTION_WEB_HOST.'-(..)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
-            $domain_country = strtoupper($m[1]);
-    }
+    if (preg_match('#^'.OPTION_WEB_HOST.'(?:-[^.]+)?\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+        $domain_lang = $m[1];
+}
+if (OPTION_WEB_HOST == 'www') {
+    if (preg_match('#^([^.]+)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+        $domain_country = strtoupper($m[1]);
+} else {
+    if (preg_match('#^'.OPTION_WEB_HOST.'-([^.+])\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+        $domain_country = strtoupper($m[1]);
 }
 
 # Language negotiation
@@ -113,6 +104,7 @@ if (rabx_is_error($ip_country) || !$ip_country)
     $ip_country = null;
 else if (!array_key_exists($ip_country, $countries_code_to_name)) # make sure we know country
     $ip_country = null;
+$microsite = null;
 $site_country = $domain_country;
 if (!$domain_country) 
     $site_country = $ip_country;
@@ -123,8 +115,15 @@ if ($site_country) {
         $site_country = 'GB';
     }
     if (!array_key_exists($site_country, $countries_code_to_name)) {
+        if (array_key_exists(strtolower($site_country), $microsites_list)) {
+            $microsite = strtolower($site_country);
+        }
         $site_country = null;
     }
+}
+if ($site_country == null && $microsite == null) {
+    # Without this, would go to 'Global' (only global pledges)
+    $microsite = "everywhere";
 }
 
 /* POST redirects */

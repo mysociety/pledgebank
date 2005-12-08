@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.30 2005-12-06 00:10:34 matthew Exp $
+// $Id: contact.php,v 1.31 2005-12-08 23:10:33 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -80,7 +80,7 @@ function send_contact_form($name, $email, $subject, $message) {
     /* User mail must be submitted with \n line endings. */
     $message = str_replace("\r\n", "\n", $message);
 
-    $postfix = '[ Sent by contact.php from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . ' ]';
+    $postfix = '[ Sent by contact.php on ' . $_SERVER['HTTP_HOST'] . ' from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . ' ]';
     $headers = array();
     $headers['From'] = '"' . str_replace(array('\\','"'), array('\\\\','\"'), $name) . '" <' . $email . '>';
     $success = pb_send_email(OPTION_CONTACT_EMAIL, $subject, $message . "\n\n" . $postfix, $headers);

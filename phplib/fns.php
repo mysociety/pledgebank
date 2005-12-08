@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.106 2005-12-08 20:33:08 francis Exp $
+// $Id: fns.php,v 1.107 2005-12-08 21:32:06 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -57,7 +57,7 @@ function pb_domain_url($params = array('path'=>'/')) {
         $c = ($params['country'] == "explicit") ? $site_country : $params['country'];
     if (array_key_exists('microsite', $params))
         $c = $params['microsite'];
-
+    
     $url = 'http://';
 
     if (OPTION_WEB_HOST == 'www') {

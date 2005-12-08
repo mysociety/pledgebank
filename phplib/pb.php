@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.56 2005-12-08 20:33:08 francis Exp $
+ * $Id: pb.php,v 1.57 2005-12-08 21:32:06 francis Exp $
  * 
  */
 
@@ -105,22 +105,26 @@ if (rabx_is_error($ip_country) || !$ip_country)
 else if (!array_key_exists($ip_country, $countries_code_to_name)) # make sure we know country
     $ip_country = null;
 $microsite = null;
-$site_country = $domain_country;
-if (!$domain_country) 
-    $site_country = $ip_country;
-if ($site_country) {
+if (array_key_exists(strtolower($domain_country), $microsites_list)) {
+    $microsite = strtolower($domain_country);
+}
+if ($domain_country) {
     if (array_key_exists('UK', $countries_code_to_name)) 
         err('UK in countries_code_to_name');
-    if ($site_country == 'UK') {
-        $site_country = 'GB';
+    if ($domain_country == 'UK') {
+        $domain_country = 'GB';
     }
-    if (!array_key_exists($site_country, $countries_code_to_name)) {
-        if (array_key_exists(strtolower($site_country), $microsites_list)) {
-            $microsite = strtolower($site_country);
-        }
-        $site_country = null;
+    if (!array_key_exists($domain_country, $countries_code_to_name)) {
+        $domain_country = null;
     }
+    $site_country = $domain_country;
+} else {
+    $site_country = $ip_country;
 }
+if ($site_country) {
+    $microsite = null;
+}
+
 if ($site_country == null && $microsite == null) {
     # Without this, would go to 'Global' (only global pledges)
     $microsite = "everywhere";

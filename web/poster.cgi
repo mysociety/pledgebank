@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.66 2005-12-08 01:37:20 matthew Exp $
+# $Id: poster.cgi,v 1.67 2005-12-09 11:09:18 matthew Exp $
 #
 
 import os
@@ -24,12 +24,18 @@ import locale
 import gettext
 _ = gettext.gettext
 
+import PyRTF
+
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
-from reportlab.lib.pagesizes import A4 # only goes down to A6
+from reportlab.lib.pagesizes import A4, LETTER # only goes down to A6
 papersizes = {}
+papersizesRTF = {}
 papersizes['A4'] = A4
 papersizes['A7'] = (A4[0] * 0.5, A4[1] * 0.25)
+papersizes['letter'] = LETTER
+papersizesRTF['A4'] = PyRTF.StandardPaper.A4
+papersizesRTF['letter'] = PyRTF.StandardPaper.LETTER
 
 from reportlab.lib.styles import ParagraphStyle
 
@@ -59,8 +65,6 @@ sys.path.append("../../pylib")
 import mysociety.config
 mysociety.config.set_file("../conf/general")
 
-import PyRTF
-
 def add_standard_TTF(name, filename):
     myRegisterFont(ttfonts.TTFont(name, font_dir + '/'+filename+'.ttf'))
     myRegisterFont(ttfonts.TTFont(name+'-Bold', font_dir + '/'+filename+'b.ttf'))
@@ -89,7 +93,7 @@ add_standard_TTF('Trebuchet MS', 'trebuchet')
 db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
 
 types = ["flyers16", "flyers4", "flyers1", "flyers8"]
-sizes = ["A4", "A7"]
+sizes = ["A4", "A7", "letter"]
 formats = ["pdf", "png", "gif", "rtf"]
 
 # return 1st, 2nd, 3rd etc.
@@ -129,7 +133,7 @@ def has_sms(pledge):
 ############################################################################
 # Flyers using PyRTF for RTF generation
 
-def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
+def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
     w = x2 - x1
     h = y2 - y1
 
@@ -172,7 +176,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, **keywords):
     identity = ''
     if pledge['identity']:
         identity = ', ' + pledge['identity']
-    story = PyRTF.Section()
+    story = PyRTF.Section(paper=papersizesRTF[papersize])
     story.Footer.append(PyRTF.Paragraph(ss.ParagraphStyles.footer, "PledgeBank.com"))
     story.extend([
         PyRTF.Paragraph(
@@ -395,7 +399,7 @@ def flyers(number, papersize='A4', **keywords):
 
     # Just A4 for now
     (page_width, page_height) = papersizes[papersize]
-    if papersize == 'A4':
+    if papersize == 'A4' or papersize == 'letter':
         # Tweaked to make sure dotted lines are displayed on all edges
         margin_top = 1 * cm
         margin_left = 1 * cm
@@ -600,7 +604,7 @@ while fcgi.isFCGI():
             doc = PyRTF.Document(style_sheet=ss, default_language=2057, view_kind=1, view_zoom_kind=0, view_scale=100)  
 
             (page_width, page_height) = papersizes[size]
-            if size == 'A4':
+            if size == 'A4' or size == 'letter':
                 margin_top = 1 * cm
                 margin_left = 1 * cm
                 margin_bottom = 1 * cm
@@ -611,7 +615,7 @@ while fcgi.isFCGI():
 
             flyerRTF(doc, margin_left, margin_bottom, 
                 flyer_width + margin_left, flyer_height + margin_bottom,
-                neededsize, detail=True)
+                neededsize, size, detail=True)
 
             DR = PyRTF.Renderer()
             DR.Write(doc, file(canvasfilename, 'w'))
@@ -627,10 +631,10 @@ while fcgi.isFCGI():
                 if type == "flyers16":
                     flyers(16)
                 elif type == "flyers8":
-                    flyers(8)
+                    flyers(8, size)
                 elif type == "flyers4":
                     flyers(4)
-                elif type == "flyers1" and size=='A4':
+                elif type == "flyers1" and (size=='A4' or size=='letter'):
                     flyers(1, size, detail = True)
                 elif type == "flyers1":
                     flyers(1, size)

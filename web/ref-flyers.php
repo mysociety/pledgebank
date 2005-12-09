@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.14 2005-12-06 00:10:34 matthew Exp $
+// $Id: ref-flyers.php,v 1.15 2005-12-09 11:09:18 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -26,9 +26,12 @@ if ($pin_box) {
 $title = _("Flyers");
 page_header($title, array('ref' => $p->url_typein(), 'noprint' => true));
 
-$pdf_flyers8_url = $p->url_flyer("A4_flyers8.pdf");
-$pdf_flyers1_url = $p->url_flyer("A4_flyers1.pdf");
-$rtf_flyers1_url = $p->url_flyer("A4_flyers1.rtf");
+$pdf_a4_flyers8_url = $p->url_flyer("A4_flyers8.pdf");
+$pdf_letter_flyers8_url = $p->url_flyer("letter_flyers8.pdf");
+$pdf_a4_flyers1_url = $p->url_flyer("A4_flyers1.pdf");
+$pdf_letter_flyers1_url = $p->url_flyer("letter_flyers1.pdf");
+$rtf_a4_flyers1_url = $p->url_flyer("A4_flyers1.rtf");
+$rtf_letter_flyers1_url = $p->url_flyer("letter_flyers1.rtf");
 $png_flyers8_url = $p->url_flyer("A4_flyers8.png");
 
 ?>
@@ -37,11 +40,19 @@ $png_flyers8_url = $p->url_flyer("A4_flyers8.png");
 print p(_('Here you can get <acronym title="Portable Document Format">PDF</acronym>s or editable <acronym title="Rich Text File">RTF</acronym>s (Word compatible) containing your pledge data, to print out, display, hand out, or whatever.'));
 ?>
 <ul>
-<li><? print_link_with_pin($pdf_flyers8_url, "", _("Flyers for handing out, 8 per page (A4, PDF") . (get_http_var("pin", true) ? "" : _(", like picture below")) . ")") ?> </li>
-<li><? print_link_with_pin($pdf_flyers1_url, "", _("A4 PDF poster") . 
+<? if ($site_country == 'US') { ?>
+<li><? print_link_with_pin($pdf_letter_flyers8_url, "", _("Flyers for handing out, 8 per page (Letter-sized, PDF") . (get_http_var("pin", true) ? "" : _(", like picture below")) . ")") ?> </li>
+<li><? print_link_with_pin($pdf_letter_flyers1_url, "", _("Letter-sized PDF poster") . 
 ($p->has_details() ? _(', including more details') : '') ) ?> </li>
-<li><? print_link_with_pin($rtf_flyers1_url, "", _("A4 editable poster (RTF)") . 
+<li><? print_link_with_pin($rtf_letter_flyers1_url, "", _("Letter-sized editable poster (RTF)") . 
 ($p->has_details() ? _(', including more details') : '') ) ?> </li>
+<? } else { ?>
+<li><? print_link_with_pin($pdf_a4_flyers8_url, "", _("Flyers for handing out, 8 per page (A4, PDF") . (get_http_var("pin", true) ? "" : _(", like picture below")) . ")") ?> </li>
+<li><? print_link_with_pin($pdf_a4_flyers1_url, "", _("A4 PDF poster") . 
+($p->has_details() ? _(', including more details') : '') ) ?> </li>
+<li><? print_link_with_pin($rtf_a4_flyers1_url, "", _("A4 editable poster (RTF)") . 
+($p->has_details() ? _(', including more details') : '') ) ?> </li>
+<? } ?>
 </ul>
 </div>
 <?

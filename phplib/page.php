@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.95 2005-12-09 11:53:02 francis Exp $
+// $Id: page.php,v 1.96 2005-12-10 09:44:29 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -188,6 +188,7 @@ EOF;
 function rss_header($title, $description, $params) {
     global $lang, $microsite;
     $country_name = pb_site_country_name();
+    $main_page = pb_domain_url(array("explicit"=>true, 'path'=>str_replace('rss/', '', $_SERVER['REQUEST_URI'])));
     header('Content-Type: application/xml; charset=utf-8');
     print '<?xml version="1.0" encoding="UTF-8"?>';
 ?>
@@ -202,9 +203,9 @@ function rss_header($title, $description, $params) {
  xmlns:admin="http://webns.net/mvcb/"
 >
 
-<channel rdf:about="<?=pb_domain_url(array("explicit"=>true, 'path'=>str_replace('rss/', '', $_SERVER['REQUEST_URI'])))?>">
+<channel rdf:about="<?=$main_page?>">
 <title><?=$title?> - PledgeBank <?=$country_name?></title>
-<link><?=pb_domain_url(array("explicit"=>true))?></link>
+<link><?=$main_page?></link>
 <description><?=$description?></description>
 <dc:language><?=$lang?></dc:language>
 

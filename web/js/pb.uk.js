@@ -18,8 +18,8 @@ var translation = {
 "<Date>":"<Дата>",
 "other local person":"людей разом зі мною",
 "Global":"Глобально",
-"(separator)":"",
-"Postcode or town:":"",
+"(separator)":"(розмежування)",
+"Postcode or town:":"Поштовий індекс, або населений пункт",
 "You have used %d characters; %d remain.":"Ви використали %d символів; %d залишилось.",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter."
 }

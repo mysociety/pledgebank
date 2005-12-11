@@ -15,11 +15,11 @@ var translation = {
 "<Enter your name>":"<укажите свое имя>",
 "<Enter your pledge>":"<введите свое обещание>",
 "<Enter town or keyword>":"<укажите город или ключ>",
-"<Date>":"",
-"other local person":"",
+"<Date>":"<дата>",
+"other local person":"человек из моего региона",
 "Global":"",
-"(separator)":"",
-"Postcode or town:":"",
-"You have used %d characters; %d remain.":"",
-"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":""
+"(separator)":"(разделитель)",
+"Postcode or town:":"Почтовый индекс",
+"You have used %d characters; %d remain.":"Вы использовали %d символов; %d осталось.",
+"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Вы использовали %d символов, что на %d больше, чем может поместиться в SMS. Пожалуйста, уменьшите свое сообщение."
 }

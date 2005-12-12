@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.144 2005-12-06 00:10:32 matthew Exp $
+ * $Id: pledge.php,v 1.145 2005-12-12 16:41:56 francis Exp $
  * 
  */
 
@@ -304,7 +304,7 @@ class Pledge {
         <p> <?=$this->h_local_type()?>:
         <strong><?=$this->h_description()?></strong>
         <? if ($this->url_place_map()) { ?>
-        (<a href="<?=htmlspecialchars($this->url_place_map())?>">view map</a>)
+        (<a href="<?=htmlspecialchars($this->url_place_map())?>"><?=_("view map")?></a>)
         <? } ?>
         <br><?=_('Country:')?>
         <strong><?=$this->h_country()?></strong>

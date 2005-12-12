@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.107 2005-12-08 21:32:06 francis Exp $
+// $Id: fns.php,v 1.108 2005-12-12 19:14:04 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -95,7 +95,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['sentence_third'] = pledge_sentence($values['id'], array('firstperson' => false));
         $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
         if ($values['actual'] >= $values['target'])
-            $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? 'exceeded' : 'met');
+            $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? _('exceeded') : _('met'));
     } elseif (array_key_exists('title', $values)) {
         $values['sentence_first'] = pledge_sentence($values, array('firstperson' => true));
         $values['sentence_third'] = pledge_sentence($values, array('firstperson' => false));
@@ -116,7 +116,11 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['email'] = null;
     }
     if (array_key_exists('signers', $values)) {
+        # XXX: Hmm, probably a better way to do this
+        $pledge_lang = db_getOne('select lang from pledges where id = ?', $values['id']);
+        locale_push($pledge_lang);
         $values['signers_ordinal'] = ordinal($values['signers']);
+        locale_pop();
     }
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
     $values['pledgebank_url'] = pb_domain_url(array('path'=>'/'));

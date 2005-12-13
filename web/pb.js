@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.31 2005-11-29 19:13:55 francis Exp $
+ * $Id: pb.js,v 1.32 2005-12-13 18:56:37 matthew Exp $
  * 
  */
 
@@ -209,7 +209,7 @@ function sprintf() {
     var str = arguments[0]
     var re = /%d/
     var numSubstitutions = 0
-    while(arguments[++numSubstitutions] && (str = str.replace(re, parseInt(arguments[numSubstitutions], 10))) ) {}
+    while(typeof(arguments[++numSubstitutions])!='undefined' && (str = str.replace(re, parseInt(arguments[numSubstitutions], 10))) ) {}
     return str
 }
 

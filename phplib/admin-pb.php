@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.112 2005-11-30 12:54:16 francis Exp $
+ * $Id: admin-pb.php,v 1.113 2005-12-14 13:10:05 francis Exp $
  * 
  */
 
@@ -47,19 +47,18 @@ class ADMIN_PAGE_PB_MAIN {
     function pledge_header($sort) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
         $cols = array(
+            'z'=>'Surge (day)',
             'r'=>'Ref', 
             'a'=>'Title', 
-            't'=>'Target', 
             's'=>'Signers', 
+            'o'=>'%',
             'd'=>'Deadline', 
-            'p'=>'Prominence', 
+            'p'=>'Promin.', 
+            'l'=>'Place',
+            'g'=>'Lang',
             'e'=>'Creator', 
             'c'=>'Creation Time', 
             'u'=>'Success Time',
-            'o'=>'% complete',
-            'z'=>'Surge',
-            'l'=>'Place',
-            'g'=>'Lang',
         );
         foreach ($cols as $s => $col) {
             print '<th>';
@@ -108,16 +107,17 @@ class ADMIN_PAGE_PB_MAIN {
         while ($r = db_fetch_array($q)) {
             $row = "";
 
+            $row .= '<td>'.htmlspecialchars(round($r['surge'],1)).'%</td>';
             $row .= '<td><a href="'.
                 pb_domain_url(array('path'=>"/".$r['ref'], 'lang'=>$r['lang'], 'country'=>$r['country'])) .
                 '">'.$r['ref'].'</a>'.
                 '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">admin</a> |
                 <a href="?page=pblatest&amp;ref='.$r['ref'].'">timeline</a>';
             $row .= '</td>';
-            $row .= '<td>'.htmlspecialchars($r['title']).'</td>';
-            $row .= '<td>'.htmlspecialchars($r['target']).' '.htmlspecialchars($r['type']).'</td>';
-            $row .= '<td>'.htmlspecialchars($r['signers']).'</td>';
-            $row .= '<td>'.prettify($r['date']).'</td>';
+            $row .= '<td>'.trim_characters(htmlspecialchars($r['title']),0,100).'</td>';
+            $row .= '<td>'.htmlspecialchars($r['signers']) . ' / '.htmlspecialchars($r['target'])./*' '.htmlspecialchars($r['type']).*/'</td>';
+            $row .= '<td>' . str_replace('.00', '', round($r['signers']/$r['target']*100,0)) . '%</td>';
+            $row .= '<td>'.$r['date'].'</td>';
 
             $row .= '<td>'.$r['prominence'];
             if ($r['calculated_prominence'] <> $r['prominence'])
@@ -126,23 +126,21 @@ class ADMIN_PAGE_PB_MAIN {
                 $row .= '<br><b>private</b> ';
             $row .= '</td>';
 
-            $row .= '<td>'.htmlspecialchars($r['name']).'<br>'.
-                str_replace('@','@ ',htmlspecialchars($r['email'])).'</td>';
-            $row .= '<td>'.prettify($r['creationtime']).'</td>';
-            if ($r['whensucceeded']) 
-                $row .= '<td>'.prettify($r['whensucceeded']).'</td>';
-            else
-                $row .= '<td>None</td>';
-
-            $row .= '<td>' . str_replace('.00', '', number_format($r['signers']/$r['target']*100,2)) . '%</td>';
-            $row .= '<td>'.htmlspecialchars(round($r['surge'],1)).'%</td>';
             $row .= '<td>';
             if ($r['country']) 
-                $row .= htmlspecialchars($r['country']) . "<br>" . htmlspecialchars($r['description']);
+                $row .= htmlspecialchars($r['country']) . ($r['description'] ? (" (<span title=\"".htmlspecialchars($r['description'])."\">" . substr(htmlspecialchars($r['description']),0,20).(strlen(htmlspecialchars($r['description'])) > 20 ? "..." : "")."</span>)") : '');
             else
                 $row .= 'Global';
             $row .= '</td>';
             $row .= '<td>' . htmlspecialchars($r['lang']) . '</td>';
+
+            $row .= '<td><a href="mailto:'.htmlspecialchars($r['email']).'">'.
+                htmlspecialchars($r['name']).'</td>';
+            $row .= '<td>'.$r['creationtime'].'</td>';
+            if ($r['whensucceeded']) 
+                $row .= '<td>'.$r['whensucceeded'].'</td>';
+            else
+                $row .= '<td>None</td>';
 
             if ($r['open'] == 't')
                 $open[] = $row;

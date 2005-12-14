@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.118 2005-12-06 19:26:27 matthew Exp $
+// $Id: new.php,v 1.119 2005-12-14 18:59:04 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -419,7 +419,7 @@ function pledge_form_submitted() {
     $errors = array();
     $data = array();
     foreach (array_keys($_POST) as $field) {
-        if ($field == 'ref' || $field == 'data')
+        if ($field == 'ref' || $field == 'data' || $field == 'email')
             $data[$field] = get_http_var($field);
         else
             $data[$field] = get_http_var($field, true);

@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.59 2005-12-13 18:46:01 matthew Exp $
+ * $Id: pb.php,v 1.60 2005-12-14 09:15:52 francis Exp $
  * 
  */
 
@@ -97,13 +97,14 @@ require_once '../../phplib/stash.php';
 require_once "../../phplib/utility.php";
 require_once "../../phplib/gaze.php";
 
-# Country negotiation
 # Find country for this IP address
 $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
 if (rabx_is_error($ip_country) || !$ip_country)
     $ip_country = null;
 else if (!array_key_exists($ip_country, $countries_code_to_name)) # make sure we know country
     $ip_country = null;
+
+# Decide which country or microsite to use
 $microsite = null;
 if (array_key_exists(strtolower($domain_country), $microsites_list)) {
     $microsite = strtolower($domain_country);
@@ -120,7 +121,7 @@ if ($domain_country) {
     }
     $site_country = $domain_country;
 } 
-if (!$site_country) {
+if (!$site_country && !$microsite) {
     $site_country = $ip_country;
 }
 if ($site_country) {

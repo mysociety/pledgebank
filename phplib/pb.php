@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.60 2005-12-14 09:15:52 francis Exp $
+ * $Id: pb.php,v 1.61 2005-12-15 19:22:38 matthew Exp $
  * 
  */
 
@@ -69,18 +69,23 @@ err_set_handler_display('pb_handle_error');
 # xx . yy . OPTION_WEB_DOMAIN - xx is a country code, yy a language code (either aa or aa-bb)
 $domain_lang = null;
 $domain_country = null;
+$re_lang = '(..(?:-..)?)';
 if (OPTION_WEB_HOST == 'www') {
-    if (preg_match('#^(?:[^.]+|www)\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+    if (preg_match("#^(?:[^.]+|www)\.$re_lang\.#", strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_lang = $m[1];
 } else {
-    if (preg_match('#^'.OPTION_WEB_HOST.'(?:-[^.]+)?\.(..(?:-..)?)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+    if (preg_match('#^'.OPTION_WEB_HOST."(?:-[^.]+)?\.$re_lang\.#", strtolower($_SERVER['HTTP_HOST']), $m))
+        $domain_lang = $m[1];
+    elseif (preg_match("#^(?:[^.]+)\.$re_lang\.".OPTION_WEB_HOST.'\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_lang = $m[1];
 }
 if (OPTION_WEB_HOST == 'www') {
     if (preg_match('#^([^.]+)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_country = strtoupper($m[1]);
 } else {
-    if (preg_match('#^'.OPTION_WEB_HOST.'-([^.+])\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+    if (preg_match('#^'.OPTION_WEB_HOST.'-([^.]+)\.#', strtolower($_SERVER['HTTP_HOST']), $m))
+        $domain_country = strtoupper($m[1]);
+    elseif (preg_match('#^([^.]+)\.(?:..(?:-..)?\.)?'.OPTION_WEB_HOST.'\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_country = strtoupper($m[1]);
 }
 

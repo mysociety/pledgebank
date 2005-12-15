@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.113 2005-12-14 13:10:05 francis Exp $
+ * $Id: admin-pb.php,v 1.114 2005-12-15 22:22:45 francis Exp $
  * 
  */
 
@@ -135,7 +135,7 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '<td>' . htmlspecialchars($r['lang']) . '</td>';
 
             $row .= '<td><a href="mailto:'.htmlspecialchars($r['email']).'">'.
-                htmlspecialchars($r['name']).'</td>';
+                htmlspecialchars($r['name']).'</a></td>';
             $row .= '<td>'.$r['creationtime'].'</td>';
             if ($r['whensucceeded']) 
                 $row .= '<td>'.$r['whensucceeded'].'</td>';

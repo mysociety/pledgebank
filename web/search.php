@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.36 2005-12-06 00:10:34 matthew Exp $
+// $Id: search.php,v 1.37 2005-12-16 11:58:52 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -38,7 +38,7 @@ else
     page_footer();
 
 function get_location_results($pledge_select, $lat, $lon) {
-    global $pb_today, $rss_items, $rss;
+    global $pb_today, $rss_items, $rss, $site_country;
     if (get_http_var("far")) {
         $radius = intval(get_http_var("far"));
     } else {
@@ -60,10 +60,16 @@ function get_location_results($pledge_select, $lat, $lon) {
         $ret .= '<ul>';
         while ($r = db_fetch_array($q)) {
             $ret .= '<li>';
-            if (round($r['distance'],0) < 1) 
-                $ret .= '<strong>under 1 km</strong> away: ';
+            if ($site_country != 'US' && round($r['distance'],0) < 1)
+                $ret .= _('<strong>under 1 km</strong> away: ');
+            elseif ($site_country == 'US' && $r['distance'] < 1)
+                $ret .= _('<strong>under 1 mile</strong> away: ');
+            elseif ($site_country == 'US')
+                $ret .= sprintf(_('<strong>%d miles</strong> away: '), round($r['distance']/1.609344,0) );
+            elseif ($site_country == 'GB')
+                $ret .= sprintf(_('<strong>%d km (%d miles)</strong> away: '), round($r['distance'],0), round($r['distance']/1.609344,0) );
             else
-                $ret .= '<strong>' . round($r['distance'],0) . " km</strong> away: ";
+                $ret .= sprintf(_('<strong>%d km</strong> away: '), round($r['distance'],0) );
             #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
             $ret .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
 
@@ -154,7 +160,7 @@ function search($search) {
         } else {
             list($location_results, $radius) = get_location_results($pledge_select, $location['wgs84_lat'], $location['wgs84_lon']);
             if (!$rss) {
-                print sprintf(p(_('Results for <strong>open pledges</strong> within %2.0f km %s of UK postcode <strong>%s</strong>:')), $radius, get_change_radius_link($search, $radius), htmlspecialchars(strtoupper($search)) );
+                print sprintf(p(_('Results for <strong>open pledges</strong> within %2.0f km (%d miles) %s of UK postcode <strong>%s</strong>:')), $radius, round($radius/1.609344, 0), get_change_radius_link($search, $radius), htmlspecialchars(strtoupper($search)) );
                 if ($location_results) {
                     print $location_results;
                 } else {
@@ -218,6 +224,10 @@ function search($search) {
                 if (!$rss) {
                     if (count($places) > 1) 
                         $out .= "<li>$desc";
+                    elseif ($site_country == 'US')
+                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %2.0f miles %s of <strong>%s</strong>, %s (%s):"), $radius/1.609344, get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
+                    elseif ($site_country == 'GB')
+                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %2.0f km (%2.0f miles) %s of <strong>%s</strong>, %s (%s):"), $radius, $radius/1.609344, get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
                     else
                         $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %2.0f km %s of <strong>%s</strong>, %s (%s):"), $radius, get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
                     if ($location_results) {

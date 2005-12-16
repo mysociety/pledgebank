@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.68 2005-12-16 13:32:33 francis Exp $
+# $Id: poster.cgi,v 1.69 2005-12-16 18:28:27 francis Exp $
 #
 
 import sys
@@ -506,7 +506,10 @@ while fcgi.isFCGI():
         q = db.cursor()
         pledge = {}
         q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail, country, lang FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE ref ILIKE %s', ref)
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang']) = q.fetchone()
+        row = q.fetchone()
+        if not row:
+            raise Exception, "Unknown ref '%s'" % ref
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang']) = row
         q.close()
 
         # Set language to that of the pledge

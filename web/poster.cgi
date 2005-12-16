@@ -8,11 +8,13 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.67 2005-12-09 11:09:18 matthew Exp $
+# $Id: poster.cgi,v 1.68 2005-12-16 13:32:33 francis Exp $
 #
 
-import os
 import sys
+sys.path.append("../../pylib")
+
+import os
 import popen2
 from time import time
 from pyPgSQL import PgSQL
@@ -61,7 +63,6 @@ def myRegisterFont(font):
                     font.face.descent,
                     font.widths)
 
-sys.path.append("../../pylib")
 import mysociety.config
 mysociety.config.set_file("../conf/general")
 

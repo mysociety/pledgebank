@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.19 2005-12-01 17:02:07 francis Exp $
+ * $Id: send-local-alerts,v 1.20 2005-12-17 19:28:12 matthew Exp $
  *
  */
 
@@ -61,6 +61,7 @@ function send_local_alerts() {
                 select alert.id as alert_id,
                     latitude as alert_latitude, longitude as alert_longitude, 
                     location.description as alert_description,
+                    location.country as alert_country,
                     alerted.name as alerted_name,
                     alerted.email as alerted_email,
                     alerted.id as alerted_person_id
@@ -131,15 +132,12 @@ function send_local_alerts() {
             $pledge = new Pledge($row);
             locale_push($pledge->lang());
             $row['pledge_url'] = $pledge->url_main();
-            $row['distance'] = round($row['distance'], 0);
-            if ($row['distance'] < 1) {
-                $row['distance'] = _("under 1");
-            }
-            $lastrow = $row;
-            $text .= $row['distance'] . " "._("km away").": '" . $pledge->sentence(array('firstperson'=>true)) . "'";
+            $text .= pb_pretty_distance($row['distance'], $alert['alert_country']);
+            $text .= ": '" . $pledge->sentence(array('firstperson'=>true)) . "'";
             $text .= " -- " . $row['creator_name'] . ".";
             $text .=" "._("Click for more info:")." " . $row['pledge_url'];
             $text .= "\n\n";
+            $lastrow = $row;
             locale_pop();
 
             # Store language of first pledge in mail
@@ -162,6 +160,7 @@ function send_local_alerts() {
             $f = pb_send_email_template($alert['alerted_email'], 'alert-local-multiple', $alert, array());
         } else {
             $params = array_merge($alert, $lastrow);
+            $params['distance_string'] = pb_pretty_distance($lastrow['distance'], $alert['alert_country']);
             $f = pb_send_email_template($alert['alerted_email'], 'alert-local-single', $params, array());
         }
         locale_pop();

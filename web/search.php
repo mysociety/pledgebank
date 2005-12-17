@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.37 2005-12-16 11:58:52 matthew Exp $
+// $Id: search.php,v 1.38 2005-12-17 19:28:15 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -60,16 +60,8 @@ function get_location_results($pledge_select, $lat, $lon) {
         $ret .= '<ul>';
         while ($r = db_fetch_array($q)) {
             $ret .= '<li>';
-            if ($site_country != 'US' && round($r['distance'],0) < 1)
-                $ret .= _('<strong>under 1 km</strong> away: ');
-            elseif ($site_country == 'US' && $r['distance'] < 1)
-                $ret .= _('<strong>under 1 mile</strong> away: ');
-            elseif ($site_country == 'US')
-                $ret .= sprintf(_('<strong>%d miles</strong> away: '), round($r['distance']/1.609344,0) );
-            elseif ($site_country == 'GB')
-                $ret .= sprintf(_('<strong>%d km (%d miles)</strong> away: '), round($r['distance'],0), round($r['distance']/1.609344,0) );
-            else
-                $ret .= sprintf(_('<strong>%d km</strong> away: '), round($r['distance'],0) );
+            $distance_line = pb_pretty_distance($r['distance'], $site_country);
+            $ret .= preg_replace('#^(.*)( away)$#', '<strong>$1</strong>$2: ', $distance_line);
             #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
             $ret .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
 

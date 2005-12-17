@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.109 2005-12-15 20:49:49 francis Exp $
+// $Id: fns.php,v 1.110 2005-12-17 19:28:13 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -755,3 +755,17 @@ function have_exact_gaze_match($places, $typed_place) {
         return null;
 }
 
+function pb_pretty_distance($distance, $country) {
+    $dist_miles = round($distance/1.609344, 0);
+    $dist_km = round($distance, 0);
+    if ($country != 'US' && $dist_km < 1)
+        return _('under 1 km away');
+    elseif ($country == 'US' && $dist_miles < 1)
+        return _('under 1 mile away');
+    elseif ($country == 'US')
+        return sprintf(ngettext('%d mile away', '%d miles away', $dist_miles), $dist_miles);
+    elseif ($country == 'GB')
+        return sprintf(ngettext('%d km (%d mile) away', '%d km (%d miles) away', $dist_miles), $dist_km, $dist_miles);
+    else
+        return sprintf(_('%d km away'), $dist_km);
+}

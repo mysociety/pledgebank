@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.110 2005-12-17 19:28:13 matthew Exp $
+// $Id: fns.php,v 1.111 2005-12-17 21:08:55 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -350,7 +350,7 @@ function pb_get_gaze_place_details($p) {
     if ($in) $desc .= ", $in";
     if ($st) $desc .= ", $st";
     if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
-    $t = htmlspecialchars("$lat,$lon,$desc");
+    $t = htmlspecialchars("$lat|$lon|$desc");
     if ($score) $desc .= "<!--($score%)-->";
     return array($desc, $t);
 }

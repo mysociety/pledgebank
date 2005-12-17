@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.27 2005-11-25 16:27:13 francis Exp $
+// $Id: alert.php,v 1.28 2005-12-17 21:08:55 matthew Exp $
 
 require_once '../../phplib/mapit.php';
 require_once "../../phplib/votingarea.php";
@@ -65,7 +65,7 @@ function alert_signup($person_id, $event_code, $params) {
             $location['method'] = "MaPit";
         } elseif ($params['gaze_place']) {
             $location = array();    
-            list($lat, $lon, $desc) = explode(',', $params['gaze_place'], 3);
+            list($lat, $lon, $desc) = explode('|', $params['gaze_place'], 3);
             $location['wgs84_lat'] = $lat;
             $location['wgs84_lon'] = $lon;
             $location['description'] = $desc;
@@ -185,7 +185,7 @@ function alert_list_pledges_local($person_id) {
     <?=$description?>
     <form style="display: inline" accept-charset="utf-8" name="alertsetup" action="/alert" method="post">
     <input type="hidden" name="direct_unsubscribe" value="<?=$row['id']?>">
-    <input type="submit" name="submit" value="Unsubscribe">
+    <input type="submit" name="submit" value="<?=_('Unsubscribe') ?>">
     </form>
     </li>
     <?

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.120 2005-12-15 16:42:26 francis Exp $
+// $Id: new.php,v 1.121 2005-12-17 21:08:56 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -665,7 +665,7 @@ function step2_error_check(&$data) {
                             array_key_exists('prev_place', $data) && $data['prev_place'] == $data['place'] && 
                             array_key_exists('prev_country', $data) && $data['prev_country'] == $data['country'] && 
                             !$data['gaze_place'])
-                           || !preg_match('/^-?(0|[1-9]\d*)(\.\d*|),-?(0|[1-9]\d*)(\.\d*|),.+$/', $data['gaze_place'])) {
+                           || !preg_match('/^-?(0|[1-9]\d*)((?:\.|,)\d*|)\|-?(0|[1-9]\d*)((?:\.|,)\d*|)\|.+$/', $data['gaze_place'])) { # XXX: Too inflexible for other locales?
                     if (!$data['place'])
                         $errors['place'] = _("Please enter a place name");
                     else 
@@ -832,7 +832,7 @@ function create_new_pledge($P, $data) {
             $location_id = db_getOne("select nextval('location_id_seq')");
             db_query("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", array($location_id, $data['postcode'], $location['wgs84_lat'], $location['wgs84_lon'], $data['postcode']));
         } else if ($data['gaze_place']) {
-            list($lat, $lon, $desc) = explode(',', $data['gaze_place'], 3);
+            list($lat, $lon, $desc) = explode('|', $data['gaze_place'], 3);
             $location_id = db_getOne("select nextval('location_id_seq')");
             $a = array();
             $country = $data['country'];

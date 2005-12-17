@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.145 2005-12-12 16:41:56 francis Exp $
+ * $Id: pledge.php,v 1.146 2005-12-17 21:08:55 matthew Exp $
  * 
  */
 
@@ -92,7 +92,7 @@ class Pledge {
                 $this->data['method'] = 'MaPit';
             } 
             if (array_key_exists('gaze_place', $this->data) && $this->data['gaze_place']) {
-                list($lat, $lon, $desc) = explode(',', $this->data['gaze_place'], 3);
+                list($lat, $lon, $desc) = explode('|', $this->data['gaze_place'], 3);
                 $this->data['description'] = $desc;
                 $this->data['method'] = 'Gaze';
             }

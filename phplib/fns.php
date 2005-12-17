@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.111 2005-12-17 21:08:55 matthew Exp $
+// $Id: fns.php,v 1.112 2005-12-17 21:21:36 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -343,6 +343,11 @@ We will not give or sell either your or their email address to anyone else.')); 
 <?
 }
 
+function pb_gaze_find_places($country, $state, $query, $maxresults = null, $minscore = null) {
+    locale_push('en-gb');
+    gaze_find_places($country, $state, $query, $maxresults, $minscore);
+    locale_pop();
+}
 // Given a row returned from gaze, returns a list of (description, radio button value)
 function pb_get_gaze_place_details($p) {
     list($name, $in, $near, $lat, $lon, $st, $score) = $p;

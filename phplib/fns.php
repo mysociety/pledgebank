@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.112 2005-12-17 21:21:36 matthew Exp $
+// $Id: fns.php,v 1.113 2005-12-18 00:16:16 chris Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -760,15 +760,20 @@ function have_exact_gaze_match($places, $typed_place) {
         return null;
 }
 
+/* pb_pretty_distance DISTANCE COUNTRY
+ * Given DISTANCE, in km, and an ISO COUNTRY code, return a text string
+ * describing the DISTANCE in human-readable form, accounting for particular
+ * local foibles of the given COUNTRY. */
 function pb_pretty_distance($distance, $country) {
-    $dist_miles = round($distance/1.609344, 0);
+    $dist_miles = round($distance / 1.609344, 0);
+    $dist_usmiles = round($distance / 1.6093472, 0);
     $dist_km = round($distance, 0);
     if ($country != 'US' && $dist_km < 1)
-        return _('under 1 km away');
-    elseif ($country == 'US' && $dist_miles < 1)
-        return _('under 1 mile away');
+        return _('less than 1 km away');
+    elseif ($country == 'US' && $dist_usmiles < 1)
+        return _('less than 1 mile away');
     elseif ($country == 'US')
-        return sprintf(ngettext('%d mile away', '%d miles away', $dist_miles), $dist_miles);
+        return sprintf(ngettext('%d mile away', '%d miles away', $dist_usmiles), $dist_usmiles);
     elseif ($country == 'GB')
         return sprintf(ngettext('%d km (%d mile) away', '%d km (%d miles) away', $dist_miles), $dist_km, $dist_miles);
     else

@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.20 2005-12-17 19:28:12 matthew Exp $
+ * $Id: send-local-alerts,v 1.21 2005-12-19 12:58:35 chris Exp $
  *
  */
 
@@ -82,7 +82,8 @@ function send_local_alerts() {
         $alert['alert_radius'] = $local_alert_radius;
         gaze_check_error($radius);
         $q = db_query("
-                select pledges.*, pledges.id as pledge_id, distance, person.name as creator_name
+                select pledges.*, pledges.id as pledge_id, distance,
+                    person.name as creator_name
                 from pledge_find_nearby(?, ?, ?) as nearby
                     left join pledges on nearby.pledge_id = pledges.id
                     left join person on pledges.person_id = person.id
@@ -150,8 +151,9 @@ function send_local_alerts() {
 
         # Send email
 
-        # Use language of first pledge - for alerts containing pledges in multiple languages
-        # we are hoping the person receiving the alert speaks the first language.
+        # Use language of first pledge - for alerts containing pledges in
+        # multiple languages we are hoping the person receiving the alert
+        # speaks the first language.
         locale_push($first_lang);
         $alert['unsubscribe_url'] = alert_unsubscribe_link($alert['alert_id'], $alert['alerted_email']);
         $alert['pledges_count'] = $count;

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.114 2005-12-19 13:13:43 francis Exp $
+// $Id: fns.php,v 1.115 2005-12-19 14:30:31 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -770,10 +770,12 @@ function pb_pretty_distance($distance, $country, $away = true) {
     $dist_miles = round($distance / 1.609344, 0);
     $dist_usmiles = round($distance / 1.6093472, 0);
     $dist_km = round($distance, 0);
-    if ($away && $country != 'US' && $dist_km < 1)
-        return _('less than 1 km away');
-    elseif ($away && $country == 'US' && $dist_usmiles < 1)
+    if ($away && $country == 'US' && $dist_usmiles < 1)
         return _('less than 1 mile away');
+    elseif ($away && $country == 'GB' && $dist_miles < 1)
+        return _('less than 1 mile away');
+    elseif ($away && $dist_km < 1)
+        return _('less than 1 km away');
     elseif ($country == 'US')
         return sprintf(($away ? ngettext('%d mile away', '%d miles away', $dist_usmiles)
             : ngettext('%d mile', '%d miles', $dist_usmiles)), $dist_usmiles);

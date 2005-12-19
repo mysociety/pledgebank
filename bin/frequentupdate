@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.56 2005-11-11 12:34:56 francis Exp $
+ * $Id: frequentupdate,v 1.57 2005-12-19 12:33:18 chris Exp $
  *
  */
 
@@ -109,12 +109,12 @@ function mark_pledges_successful() {
 /* send_pledge_success_reminder
  * Send message to creators of successful pledges reminding them
  * to send an announce message, if they haven't yet.  This happens
- * 3 days after the original was sent.
- */
+ * 3 days after the original was sent. */
 function send_pledge_success_reminder() {
     global $pb_timestamp;
 
     verbose("finding pledges with no announcement messages for reminder");
+    db_query("lock table message in share mode");
     $q = db_query("
                 select * from pledges
                 where whensucceeded is not null
@@ -220,6 +220,7 @@ function chivvy_creators_early() {
     global $pb_today, $pb_timestamp;
 
     verbose("finding young pledges with few signups");
+    db_query("lock table message in share mode");
     $q = db_query("
                 select * from pledges
                 where (select count(*) from signers where signers.pledge_id = pledges.id) < 4
@@ -269,6 +270,7 @@ function chivvy_creators_lowrate() {
     global $pb_today, $pb_timestamp;
 
     verbose("finding pledges with too low a signup rate to succeed");
+    db_query("lock table message in share mode");
     $q = db_query("
                 select * from pledges
                 where target >= 8
@@ -325,6 +327,7 @@ function send_pending_messages() {
          * something (send an email) which isn't transactional in the
          * database, so we must do only one thing per transaction and commit
          * once that transaction has succeeded. */
+        db_query("lock table message_creator_recipient in share mode");
         $f = db_getOne('
                     select message_id
                     from message_creator_recipient
@@ -422,8 +425,8 @@ function send_pending_messages() {
 
     $latesigners = array();
     while ($r = db_fetch_array($q)) {
-        /* Grab a lock. Actually it doesn't matter what we lock here, so just
-         * use the row in the signers table. */
+        /* Grab a lock. */
+        db_query("lock table message_signer_recipient in share mode");
         db_getOne('select id from signers where id = ? for update', $r['id']);
 
         /* Check that the message hasn't already been sent. */

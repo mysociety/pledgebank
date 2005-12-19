@@ -4,16 +4,16 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.1 2005-12-19 13:36:22 francis Exp $
+# $Id: crontab.ugly,v 1.2 2005-12-19 15:33:51 francis Exp $
 
 # Frequently
-0-59/2 * * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate
-0-59/15 * * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts
+0-59/2 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate
+0-59/15 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts
 
 # Once an hour
-33 * * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections
-32 * * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
+33 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections
+32 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
 
 # Once a day, early morning
-0 7 * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts
+0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts
 

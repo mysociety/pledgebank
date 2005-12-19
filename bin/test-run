@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.163 2005-12-19 13:13:43 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.164 2005-12-19 22:06:30 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -488,30 +488,48 @@ sub set_pledge_prominence {
     dbh()->commit();
 }
 
+# multi_spawn NUMBER_OF_TIMES COMMAND
+# Launch the COMMAND multiple times, and wait for them all
+# to finish. Die if any of them return
+sub multi_spawn {
+    my ($nprocs, $command) = @_;
+
+    my @pids; 
+    for (my $i = 0; $i < $nprocs; ++$i) { 
+        my $p = fork(); 
+        if ($p) { 
+            push(@pids, $p); 
+        } else { 
+            { exec("/bin/sh", "-c", $command); } 
+            die "Couldn't exec '$command'";
+        } 
+    } 
+        
+    for (my $i = 0; $i < @pids; ++$i) { 
+        waitpid($pids[$i], 0);
+        die "exit code $? from '$command'" if ($? != 0);
+    }
+}
+
 # Call frequentupdate cron job
 sub call_frequentupdate {
-    system("php", "frequentupdate", $verbose > 1 ? qw(--verbose) : ()) 
-        and die "Failed to call frequentupdate";
+    multi_spawn(2, "php frequentupdate " . ($verbose > 1 ? qw(--verbose) : ()));
 }
 
 # Call sendalerts cron job
 sub call_send_alerts {
-    system("php", "send-comment-alerts", $verbose > 1 ? qw(--verbose) : ()) 
-        and die "Failed to call send-comment-alerts";
-    system("php", "send-local-alerts", $verbose > 1 ? qw(--verbose) : ()) 
-        and die "Failed to call send-local-alerts";
+    multi_spawn(2, "php send-comment-alerts " . ($verbose > 1 ? qw(--verbose) : ()));
+    multi_spawn(2, "php send-local-alerts " . ($verbose > 1 ? qw(--verbose) : ()));
 }
 
 # Call find-pledge-connections cron job
 sub call_findpledgeconnections {
-    system("./find-pledge-connections", $verbose > 1 ? qw(--verbose) : ()) 
-        and die "Failed to call find-pledge-connections";
+    multi_spawn(2, "./find-pledge-connections " . ($verbose > 1 ? qw(--verbose) : ()));
 }
 
 # Run pbsmsd once
 sub call_smsd {
-    system("./pbsmsd", "--once", $verbose > 1 ? qw(--debug) : ()) 
-        and die "Failed to call pbsmsd";
+    multi_spawn(2, "./pbsmsd --once " . ($verbose > 1 ? qw(--debug) : ()));
 }
 
 #############################################################################

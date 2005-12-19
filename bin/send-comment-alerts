@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-comment-alerts,v 1.10 2005-11-11 12:34:56 francis Exp $
+ * $Id: send-comment-alerts,v 1.11 2005-12-19 22:06:30 francis Exp $
  *
  */
 
@@ -57,7 +57,7 @@ function send_comment_alerts() {
 
     // Search for alert
     $q = db_query("
-            select alert.id as alert_id, alert.person_id, alert.pledge_id, comment.id as comment_id,
+            select alert.id as alert_id, alert.person_id as alert_person_id, alert.pledge_id, comment.id as comment_id,
                    comment.text as comment_text,
                    comment.name as comment_author_name,
                    comment.website as comment_author_website,
@@ -80,8 +80,6 @@ function send_comment_alerts() {
             ");
 
     while ($row = db_fetch_array($q)) {
-        verbose("person #${row['person_id']} (${row['alerted_email']}) has alert on pledge ${row['ref']} for comment #${row['comment_id']} (by ${row['comment_author_name']})");
-
         # Grab a lock, making sure alert hasn't been deleted meanwhile
         $stillthere = db_getOne('select id from alert where id = ? for update', $row['alert_id']);
         if (!$stillthere) continue;
@@ -90,6 +88,8 @@ function send_comment_alerts() {
         $alreadysent = db_getOne('select alert_id from alert_sent where alert_id = ? and comment_id = ?', 
                  array($row['alert_id'], $row['comment_id']));
         if ($alreadysent) continue;
+
+        verbose("person #${row['alert_person_id']} (${row['alerted_email']}) has alert on pledge ${row['ref']} for comment #${row['comment_id']} (by ${row['comment_author_name']})");
 
         # Store that alert has been sent
         db_query("insert into alert_sent (alert_id, comment_id) values (?, ?)", 

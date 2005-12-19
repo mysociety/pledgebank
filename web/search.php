@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.39 2005-12-17 21:21:39 matthew Exp $
+// $Id: search.php,v 1.40 2005-12-19 13:13:43 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -152,7 +152,7 @@ function search($search) {
         } else {
             list($location_results, $radius) = get_location_results($pledge_select, $location['wgs84_lat'], $location['wgs84_lon']);
             if (!$rss) {
-                print sprintf(p(_('Results for <strong>open pledges</strong> within %2.0f km (%d miles) %s of UK postcode <strong>%s</strong>:')), $radius, round($radius/1.609344, 0), get_change_radius_link($search, $radius), htmlspecialchars(strtoupper($search)) );
+                print sprintf(p(_('Results for <strong>open pledges</strong> within %s %s of UK postcode <strong>%s</strong>:')), pb_pretty_distance($radius, 'GB', false), get_change_radius_link($search, $radius), htmlspecialchars(strtoupper($search)) );
                 if ($location_results) {
                     print $location_results;
                 } else {
@@ -216,12 +216,8 @@ function search($search) {
                 if (!$rss) {
                     if (count($places) > 1) 
                         $out .= "<li>$desc";
-                    elseif ($site_country == 'US')
-                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %2.0f miles %s of <strong>%s</strong>, %s (%s):"), $radius/1.609344, get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
-                    elseif ($site_country == 'GB')
-                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %2.0f km (%2.0f miles) %s of <strong>%s</strong>, %s (%s):"), $radius, $radius/1.609344, get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
                     else
-                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %2.0f km %s of <strong>%s</strong>, %s (%s):"), $radius, get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
+                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s (%s):"), pb_pretty_distance($radius, $site_country, false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
                     if ($location_results) {
                         $out .= $location_results;
                     } else {

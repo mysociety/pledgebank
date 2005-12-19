@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.162 2005-11-30 12:03:34 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.163 2005-12-19 13:13:43 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -555,7 +555,7 @@ sub do_public_succeeding_pledge {
         button => 'submit');
     $wth->browser_submit_form(form_name => 'pledge',
         fields => {
-            gaze_place => '39.52972,-119.81278,Reno, Washoe County, NV'
+            gaze_place => '39.52972|-119.81278|Reno, Washoe County, NV'
         },
         button => 'submit');
     perform_login_action(11, {action=>"viaemail"}, "emailed whenever a new");
@@ -571,7 +571,7 @@ sub do_public_succeeding_pledge {
             date => '10th February', ref => $pledge_ref,
             detail => "This pledge has just one purpose.  And that is as part of an automated test suite which ensures PledgeBank always works.  It is really quite good, in our humblest opinion.  It would save the planet, if only it was more comprehensive, and updated in a timely manner.\n\nAnd this bit is the start of a brand new shiny paragraph.  It should be formatted below on posters in the correct manner.",
             identity => 'lover of PledgeBank' },
-        { country => 'US', 'local' => 1, place => 'Sparks', gaze_place => '39.535,-119.75167,Sparks, Washoe County, NV' },
+        { country => 'US', 'local' => 1, place => 'Sparks', gaze_place => '39.535|-119.75167|Sparks, Washoe County, NV' },
         { },
         { action => "viaemail" }
     );

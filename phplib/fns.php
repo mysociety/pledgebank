@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.113 2005-12-18 00:16:16 chris Exp $
+// $Id: fns.php,v 1.114 2005-12-19 13:13:43 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/microsites.php';
@@ -345,8 +345,9 @@ We will not give or sell either your or their email address to anyone else.')); 
 
 function pb_gaze_find_places($country, $state, $query, $maxresults = null, $minscore = null) {
     locale_push('en-gb');
-    gaze_find_places($country, $state, $query, $maxresults, $minscore);
+    $ret = gaze_find_places($country, $state, $query, $maxresults, $minscore);
     locale_pop();
+    return $ret;
 }
 // Given a row returned from gaze, returns a list of (description, radio button value)
 function pb_get_gaze_place_details($p) {
@@ -760,22 +761,25 @@ function have_exact_gaze_match($places, $typed_place) {
         return null;
 }
 
-/* pb_pretty_distance DISTANCE COUNTRY
+/* pb_pretty_distance DISTANCE COUNTRY [AWAY]
  * Given DISTANCE, in km, and an ISO COUNTRY code, return a text string
  * describing the DISTANCE in human-readable form, accounting for particular
- * local foibles of the given COUNTRY. */
-function pb_pretty_distance($distance, $country) {
+ * local foibles of the given COUNTRY. Specificy AWAY as false to not put
+ * "away" at the end of the string, or round distances less than 1 km/mile. */
+function pb_pretty_distance($distance, $country, $away = true) {
     $dist_miles = round($distance / 1.609344, 0);
     $dist_usmiles = round($distance / 1.6093472, 0);
     $dist_km = round($distance, 0);
-    if ($country != 'US' && $dist_km < 1)
+    if ($away && $country != 'US' && $dist_km < 1)
         return _('less than 1 km away');
-    elseif ($country == 'US' && $dist_usmiles < 1)
+    elseif ($away && $country == 'US' && $dist_usmiles < 1)
         return _('less than 1 mile away');
     elseif ($country == 'US')
-        return sprintf(ngettext('%d mile away', '%d miles away', $dist_usmiles), $dist_usmiles);
+        return sprintf(($away ? ngettext('%d mile away', '%d miles away', $dist_usmiles)
+            : ngettext('%d mile', '%d miles', $dist_usmiles)), $dist_usmiles);
     elseif ($country == 'GB')
-        return sprintf(ngettext('%d km (%d mile) away', '%d km (%d miles) away', $dist_miles), $dist_km, $dist_miles);
+        return sprintf(($away ? ngettext('%d mile away', '%d miles away', $dist_miles)
+            : ngettext('%d mile', '%d miles', $dist_miles)), $dist_miles);
     else
-        return sprintf(_('%d km away'), $dist_km);
+        return sprintf($away ? _('%d km away') : _('%d km'), $dist_km);
 }

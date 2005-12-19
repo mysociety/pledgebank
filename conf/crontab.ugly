@@ -1,0 +1,19 @@
+# crontab.ugly:
+# Timed tasks for PledgeBank. Template file.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+#
+# $Id: crontab.ugly,v 1.1 2005-12-19 13:36:22 francis Exp $
+
+# Frequently
+0-59/2 * * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate
+0-59/15 * * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts
+
+# Once an hour
+33 * * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections
+32 * * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
+
+# Once a day, early morning
+0 7 * * * /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts
+

@@ -16,7 +16,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.31 2005-07-01 16:11:37 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.32 2005-12-20 10:24:51 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -301,7 +301,7 @@ sub run_gathering_process () {
             print_log('debug', "get receipts: query is '$p{strWhere}'");
             my $result = do_post_request("get receipts", $sms_outgoing_url, \%p);
             if (ref($result) eq 'ARRAY') {
-                if ($result->[0] eq 'system error') {
+                if ($result->[0] eq 'systemerror') {
                     print_log('warning', "get receipts: system error: $result->[1]");
                 } else {
                     print_log('warning', "get receipts: HTTP error: $result->[1]");
@@ -426,7 +426,7 @@ sub run_gathering_process () {
             print_log('debug', "get missed messages: query is '$p{strWhere}'");
             my $result = do_post_request("get missed messages", $sms_outgoing_url, \%p);
             if (ref($result) eq 'ARRAY') {
-                if ($result->[0] eq 'system error') {
+                if ($result->[0] eq 'systemerror') {
                     print_log('warning', "get missed messages: system error: $result->[1]");
                 } else {
                     print_log('warning', "get missed messages: HTTP error: $result->[1]");
@@ -717,5 +717,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.31 2005-07-01 16:11:37 francis Exp $
+$Id: pbsmsd,v 1.32 2005-12-20 10:24:51 chris Exp $
 

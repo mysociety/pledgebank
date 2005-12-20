@@ -16,7 +16,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.35 2005-12-20 13:04:36 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.36 2005-12-20 15:55:23 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -539,15 +539,21 @@ sub run_processing_process () {
             $n = 0;
             while (my ($id, $message, $sender, $recipient, $status) = $s->fetchrow_array()) {
                 my $H;
+                my $tbl = 'outgoingsms';
                 if (!defined($status)) {
-                    dbh()->do('lock table incomingsms in exclusive mode');
+                    $tbl = 'incomingsms';
                     $H = \@PB::SMS::received_handlers;
                 } elsif ($status eq 'delivered') {
-                    dbh()->do('lock table outgoingsms in exclusive mode');
                     $H = \@PB::SMS::delivered_handlers;
                 } else {
-                    dbh()->do('lock table outgoingsms in exclusive mode');
                     $H = \@PB::SMS::failed_handlers;
+                }
+                # Check that the message is still present.
+                dbh()->do("lock table $tbl in exclusive mode");
+                if (!defined(scalar(dbh()->selectrow("select id from $tbl where id = ?", {}, $id)))) {
+                    # Message has gone away.
+                    dbh()->do("unlock table $tbl");
+                    next;
                 }
                 my $result;
                 my $dodelete = 1;
@@ -725,5 +731,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.35 2005-12-20 13:04:36 chris Exp $
+$Id: pbsmsd,v 1.36 2005-12-20 15:55:23 chris Exp $
 

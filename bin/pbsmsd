@@ -16,7 +16,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.32 2005-12-20 10:24:51 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.33 2005-12-20 11:40:14 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -266,6 +266,7 @@ sub run_gathering_process () {
                             and lastsendattempt < ?
                             and (laststatuscheck is null or
                                     laststatuscheck < ?)
+                        for update
                         ");
 
     # Missed messages. We try to extract ranges of missed message IDs, and
@@ -389,6 +390,7 @@ sub run_gathering_process () {
         #
         # Missed messages
         #
+        dbh()->do('lock table incomingsms_foreignid_gap in access exclusive mode');
         $s_missed->execute(PB::Time() - min_polling_interval);
 
         # Try to produce an efficient query to pick up ranges.
@@ -717,5 +719,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.32 2005-12-20 10:24:51 chris Exp $
+$Id: pbsmsd,v 1.33 2005-12-20 11:40:14 chris Exp $
 

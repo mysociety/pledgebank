@@ -16,7 +16,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.36 2005-12-20 15:55:23 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.37 2005-12-20 16:04:27 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -550,9 +550,9 @@ sub run_processing_process () {
                 }
                 # Check that the message is still present.
                 dbh()->do("lock table $tbl in exclusive mode");
-                if (!defined(scalar(dbh()->selectrow("select id from $tbl where id = ?", {}, $id)))) {
+                if (!defined(scalar(dbh()->selectrow_array("select id from $tbl where id = ?", {}, $id)))) {
                     # Message has gone away.
-                    dbh()->do("unlock table $tbl");
+                    dbh()->rollback();
                     next;
                 }
                 my $result;
@@ -731,5 +731,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.36 2005-12-20 15:55:23 chris Exp $
+$Id: pbsmsd,v 1.37 2005-12-20 16:04:27 francis Exp $
 

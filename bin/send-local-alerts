@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.23 2005-12-19 14:30:31 francis Exp $
+ * $Id: send-local-alerts,v 1.24 2005-12-21 01:19:22 francis Exp $
  *
  */
 
@@ -173,10 +173,12 @@ function send_local_alerts() {
         $alert['pledges_text'] = $text;
         if ($count > 1) {
             $f = pb_send_email_template($alert['alerted_email'], 'alert-local-multiple', $alert, array());
-        } else {
+        } elseif ($count == 1) {
             $params = array_merge($alert, $lastrow);
             $params['distance_string'] = pb_pretty_distance($lastrow['distance'], $alert['alert_country']);
             $f = pb_send_email_template($alert['alerted_email'], 'alert-local-single', $params, array());
+        } else {
+            # $count == 0, do nothing 
         }
         locale_pop();
         verbose("sent $count new pledge alerts in one mail to " . $alert["alerted_email"]);

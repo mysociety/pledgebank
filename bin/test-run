@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.164 2005-12-19 22:06:30 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.165 2005-12-21 01:19:22 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -814,6 +814,8 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("This pledge has been successful!");
     $wth->browser_check_contents(name_n(4));
     $wth->browser_check_no_contents(name_n(5));
+
+    $wth->email_check_none_left();
 
     # Change back to global
     $wth->browser_get($base_url);

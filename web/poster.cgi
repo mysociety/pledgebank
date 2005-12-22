@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.70 2005-12-22 01:50:53 matthew Exp $
+# $Id: poster.cgi,v 1.71 2005-12-22 14:46:03 matthew Exp $
 #
 
 import sys
@@ -92,7 +92,7 @@ add_standard_TTF('Arial', 'arial')
 add_standard_TTF('Georgia', 'georgia')
 add_standard_TTF('Trebuchet MS', 'trebuchet')
 
-db = PgSQL.connect('::' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
+db = PgSQL.connect(mysociety.config.get('PB_DB_HOST') + ':' + mysociety.config.get('PB_DB_PORT') + ':' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
 
 types = ["flyers16", "flyers4", "flyers1", "flyers8"]
 sizes = ["A4", "A7", "letter"]
@@ -137,7 +137,10 @@ def has_sms(pledge):
 
 def rtf_repr(s):
     s = repr(s)
-    s = s[2:-1]
+    if s[0:2] == "u'":
+        s = s[2:-1]
+    else:
+        s = s[1:-1]
     for i in re.findall('\u([0-9a-f]{4})', s):
         dec = int(i, 16)
         s = re.sub('\\\u%s' % i, '\u%s?' % dec, s) # I don't quite understand why so many slashes, but it works

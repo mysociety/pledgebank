@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.69 2005-12-16 18:28:27 francis Exp $
+# $Id: poster.cgi,v 1.70 2005-12-22 01:50:53 matthew Exp $
 #
 
 import sys
@@ -24,6 +24,7 @@ import string
 import sha
 import locale
 import gettext
+import re
 _ = gettext.gettext
 
 import PyRTF
@@ -134,6 +135,14 @@ def has_sms(pledge):
 ############################################################################
 # Flyers using PyRTF for RTF generation
 
+def rtf_repr(s):
+    s = repr(s)
+    s = s[2:-1]
+    for i in re.findall('\u([0-9a-f]{4})', s):
+        dec = int(i, 16)
+        s = re.sub('\\\u%s' % i, '\u%s?' % dec, s) # I don't quite understand why so many slashes, but it works
+    return s
+
 def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
     w = x2 - x1
     h = y2 - y1
@@ -182,41 +191,41 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
     story.extend([
         PyRTF.Paragraph(
             ss.ParagraphStyles.header, 
-            PyRTF.B(_('If').encode('utf-8')), ' ', 
+            PyRTF.B(rtf_repr(_('If'))), ' ', 
             PyRTF.TEXT(format_integer(pledge['target']), colour=ss.Colours.pb),
-            _(''' %s will %s, then ''').encode('utf-8') % (pledge['type'], pledge['signup']), 
-            PyRTF.TEXT(_('I').encode('utf-8'),colour=ss.Colours.pb),
-            _(' will %s.').encode('utf-8') % pledge['title']),
-        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\u8212- ', PyRTF.TEXT('%s%s' % (pledge['name'], identity), colour=ss.Colours.pb)),
+            rtf_repr(_(''' %s will %s, then ''') % (pledge['type'].decode('utf-8'), pledge['signup'].decode('utf-8'))), 
+            PyRTF.TEXT(rtf_repr(_('I')),colour=ss.Colours.pb),
+            rtf_repr(_(' will %s.') % pledge['title'].decode('utf-8'))),
+        PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\u8212- ', PyRTF.TEXT(rtf_repr('%s%s' % (pledge['name'].decode('utf-8'), identity.decode('utf-8'))), colour=ss.Colours.pb)),
         PyRTF.Paragraph(ss.ParagraphStyles.detail, ''),
     ])
 
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
         d = pledge['detail'].split("\r?\n\r?\n")
-        story.append(PyRTF.Paragraph(ss.ParagraphStyles.detail, PyRTF.B(_('More details:').encode('utf-8')), ' ', d[0]))
+        story.append(PyRTF.Paragraph(ss.ParagraphStyles.detail, PyRTF.B(rtf_repr(_('More details:'))), ' ', rtf_repr(d[0])))
         if len(d)>0:
             story.extend(
-                map(lambda text: PyRTF.Paragraph(ss.ParagraphStyles.detail, text), d[1:])
+                map(lambda text: PyRTF.Paragraph(ss.ParagraphStyles.detail, rtf_repr(text)), d[1:])
             )
 
     if not has_sms(pledge):
-        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, _('Pledge at ').encode('utf-8'), webdomain_text)
+        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('Pledge at ')), webdomain_text)
         if pledge['pin']:
-            text_para.append(_(' pin '),encode('utf-8'), PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
+            text_para.append(rtf_repr(_(' pin ')), PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
         sms_smallprint = ""
     else:
         text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 
-                    PyRTF.TEXT(_('Text').encode('utf-8'), size=int(small_writing+4)), 
+                    PyRTF.TEXT(rtf_repr(_('Text')), size=int(small_writing+4)), 
                     ' ', 
-                    PyRTF.TEXT(_('pledge %s').encode('utf-8') % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
-                    ' ', _('to').encode('utf-8'), ' ', 
+                    PyRTF.TEXT(rtf_repr(_('pledge %s')) % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
+                    ' ', rtf_repr(_('to')), ' ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
-                    _(' (%s only) or pledge at ').encode('utf-8') % sms_countries_description, webdomain_text)
+                    rtf_repr(_(' (%s only) or pledge at ') % sms_countries_description), webdomain_text)
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([ text_para, 
-        PyRTF.Paragraph(ss.ParagraphStyles.normal, _('This pledge closes on ').encode('utf-8'), PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), _('. Thanks!').encode('utf-8')),
-        PyRTF.Paragraph(ss.ParagraphStyles.normal, _('Remember, you only have to act if %d other people sign up \u8211- that\u8217\'s what PledgeBank is all about.').encode('utf-8') % pledge['target'])
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('This pledge closes on ')), PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), rtf_repr(_('. Thanks!'))),
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.')) % pledge['target'])
 #        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
 #            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
     ])

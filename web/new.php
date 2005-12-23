@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.122 2005-12-17 21:21:39 matthew Exp $
+// $Id: new.php,v 1.123 2005-12-23 19:02:16 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -445,6 +445,7 @@ function pledge_form_submitted() {
     $locale_info = localeconv();
     $data['target'] = str_replace($locale_info['thousands_sep'], '', $data['target']);
     $data['title'] = preg_replace('#^' . _('I will') . ' #i', '', $data['title']);
+    $data['title'] = preg_replace('#^' . _('will') . ' #i', '', $data['title']);
     # Step 2 fixes
     if (array_key_exists('local', $data) && !$data['local']) { 
         $data['gaze_place'] = ''; 

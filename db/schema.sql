@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.161 2005-12-05 11:45:11 chris Exp $
+-- $Id: schema.sql,v 1.162 2005-12-23 12:17:11 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1055,6 +1055,11 @@ create table abusereport (
 
 create index abusereport_what_id_idx on abusereport(what_id);
 create index abusereport_what_idx on abusereport(what);
+
+create table translator (
+    lang text not null,
+    email text not null
+);
 
 create function abusereport_id_check()
     returns trigger as '

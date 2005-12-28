@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.40 2005-12-19 13:13:43 francis Exp $
+// $Id: search.php,v 1.41 2005-12-28 10:24:12 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -14,6 +14,7 @@ require_once '../../phplib/mapit.php';
 require_once "../../phplib/votingarea.php";
 
 $search = trim(get_http_var('q', true));
+if (!$search) $search = trim(get_http_var('s', true));
 $rss = get_http_var('rss') ? true : false;
 $rss_items = array();
 $heading = sprintf(_("Search results for '%s'"), htmlspecialchars($search));

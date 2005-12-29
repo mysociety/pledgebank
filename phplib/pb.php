@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.61 2005-12-15 19:22:38 matthew Exp $
+ * $Id: pb.php,v 1.62 2005-12-29 19:15:09 matthew Exp $
  * 
  */
 
@@ -18,7 +18,6 @@ require_once "../conf/general";
 // Some early config files - put most config files after language negotiation below
 require_once "../../phplib/error.php";
 require_once "../../phplib/locale.php";
-require_once 'microsites.php';
 require_once 'page.php';
 
 // Googlebot is crawling all our domains for different languages/codes at 
@@ -96,6 +95,7 @@ locale_gettext_domain('PledgeBank');
 
 # Do includes after language negotiation, so translated globals
 # are translated in them
+require_once 'microsites.php';
 require_once '../../phplib/countries.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/stash.php';

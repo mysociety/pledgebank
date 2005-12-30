@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.32 2005-12-23 12:17:13 matthew Exp $
+// $Id: contact.php,v 1.33 2005-12-30 12:32:06 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -89,7 +89,7 @@ function send_contact_form($name, $email, $subject, $message) {
 
     $postfix = '[ Sent by contact.php on ' . $_SERVER['HTTP_HOST'] . ' from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . ' ]';
     $headers = array();
-    $headers['From'] = '"' . str_replace(array('\\','"'), array('\\\\','\"'), $name) . '" <' . $email . '>';
+    $headers['From'] = array($email, $name);
     $success = pb_send_email($to, $subject, $message . "\n\n" . $postfix, $headers);
     if (!$success)
         err(_("Failed to send message.  Please try again, or <a href=\"mailto:team@pledgebank.com\">email us</a>."));

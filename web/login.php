@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.66 2005-12-06 00:10:34 matthew Exp $
+ * $Id: login.php,v 1.67 2005-12-31 10:51:30 matthew Exp $
  * 
  */
 
@@ -110,6 +110,7 @@ if (get_http_var("now")) {
  * (unlikely but possible) the other branch would fail for lack of a stash
  * parameter. */
 if (!is_null($q_t)) {
+    $q_t = preg_replace('#</a$#', '', $q_t);
     /* Process emailed token */
     $d = auth_token_retrieve('login', $q_t);
     if (!$d)

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.58 2005-12-19 22:06:30 francis Exp $
+ * $Id: frequentupdate,v 1.59 2006-01-03 12:03:32 chris Exp $
  *
  */
 
@@ -405,7 +405,8 @@ function send_pending_messages() {
                     extract(epoch from signers.signtime)
                         - extract(epoch from message.whencreated) as howlongago,
                     (sendtolatesigners and signers.signtime >= message.whencreated) as islatesigner,
-                    pledges.ref
+                    pledges.ref,
+                    pledges.id as pledge_id
                 from message, pledges, signers
                 left join person as signer_person on signer_person.id = signers.person_id
                 where sendtosigners
@@ -521,11 +522,21 @@ function send_pending_messages() {
             }
         }
 
-        if ($f)
-            db_query('
-                insert into message_signer_recipient (message_id, signer_id)
-                values (?, ?)', array($r['id'], $r['signer_id']));
-        else
+        if ($f) {
+            if ($r['islatesigner'] == 't')
+                /* Record this as if all the messages were sent, since
+                 * otherwise two concurrent runs of this script might send two
+                 * late signer messages. */
+                db_query('
+                    insert into message_signer_recipient (message_id, signer_id)
+                    select id as message_id, ? as signer_id from message
+                    where message.pledge_id = ?
+                        and sendtolatesigners', array($r['signer_id'], $r['pledge_id']));
+            else
+                db_query('
+                    insert into message_signer_recipient (message_id, signer_id)
+                    values (?, ?)', array($r['id'], $r['signer_id']));
+        } else
             error("failed to send message #${r['id']} to signer #${r['signer_id']} of pledge #${r['pledge_id']}");
 
 

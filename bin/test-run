@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.165 2005-12-21 01:19:22 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.166 2006-01-04 15:30:58 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -65,8 +65,9 @@ If you specify no actions, it will run all of them, plus some
 extra smaller testes.
 
 Options are:
-    --verbose=n   Choose 0 (no progress), 1 (basic actions), 2 (full debug)
-    --pause       Pause after displaying URLs read from emails
+    --verbose=n    Choose 0 (no progress), 1 (basic actions), 2 (full debug)
+    --pause        Pause after displaying URLs read from emails
+    --multispawn=n Test concurrency by calling scripts this many times at once (default 2)
 
 END
 }
@@ -74,10 +75,12 @@ END
 # Parse command line
 our $verbose = 0; # currently 3 levels: 0, 1 and 2
 our $pause = 0;
+our $multispawn = 2;
 our $help;
 if (!GetOptions(
         'verbose=i' => \$verbose,
         'pause' => \$pause,
+        'multispawn=i' => \$multispawn,
         'help' => \$help
     )) {
     help();
@@ -493,6 +496,7 @@ sub set_pledge_prominence {
 # to finish. Die if any of them return
 sub multi_spawn {
     my ($nprocs, $command) = @_;
+    print "$nprocs x $command\n" if $verbose > 1;
 
     my @pids; 
     for (my $i = 0; $i < $nprocs; ++$i) { 
@@ -513,23 +517,23 @@ sub multi_spawn {
 
 # Call frequentupdate cron job
 sub call_frequentupdate {
-    multi_spawn(2, "php frequentupdate " . ($verbose > 1 ? qw(--verbose) : ()));
+    multi_spawn($multispawn, "php frequentupdate " . ($verbose > 1 ? qw(--verbose) : ()));
 }
 
 # Call sendalerts cron job
 sub call_send_alerts {
-    multi_spawn(2, "php send-comment-alerts " . ($verbose > 1 ? qw(--verbose) : ()));
-    multi_spawn(2, "php send-local-alerts " . ($verbose > 1 ? qw(--verbose) : ()));
+    multi_spawn($multispawn, "php send-comment-alerts " . ($verbose > 1 ? qw(--verbose) : ()));
+    multi_spawn($multispawn, "php send-local-alerts " . ($verbose > 1 ? qw(--verbose) : ()));
 }
 
 # Call find-pledge-connections cron job
 sub call_findpledgeconnections {
-    multi_spawn(2, "./find-pledge-connections " . ($verbose > 1 ? qw(--verbose) : ()));
+    multi_spawn($multispawn, "./find-pledge-connections " . ($verbose > 1 ? qw(--verbose) : ()));
 }
 
 # Run pbsmsd once
 sub call_smsd {
-    multi_spawn(2, "./pbsmsd --once " . ($verbose > 1 ? qw(--debug) : ()));
+    multi_spawn($multispawn, "./pbsmsd --once " . ($verbose > 1 ? qw(--debug) : ()));
 }
 
 #############################################################################

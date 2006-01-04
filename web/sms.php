@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.34 2005-07-08 12:01:37 matthew Exp $
+ * $Id: sms.php,v 1.35 2006-01-04 15:30:59 francis Exp $
  * 
  */
 
@@ -42,6 +42,7 @@ elseif (!isset($r['signer_id'])) {
     $res = pledge_dbresult_to_code(
                 db_getOne('select smssubscription_sign(null, ?)', $q_token)
             );
+    db_commit();
     if ($res != PLEDGE_OK)
         oops($res, 'sms');
     else {

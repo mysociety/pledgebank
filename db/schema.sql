@@ -5,7 +5,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.162 2005-12-23 12:17:11 matthew Exp $
+-- $Id: schema.sql,v 1.163 2006-01-04 19:18:32 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -254,11 +254,12 @@ create function pledge_find_nearby(double precision, double precision, double pr
     -- within a wedge of side about 2 * DISTANCE. That cuts down substantially
     -- on the amount of work we have to do.
 '
+    -- trunc due to inaccuracies in floating point arithmetic
     select pledges.id,
-            R_e() * acos(
-                sin(radians($1)) * sin(radians(latitude))
+            R_e() * acos(trunc(
+                (sin(radians($1)) * sin(radians(latitude))
                 + cos(radians($1)) * cos(radians(latitude))
-                    * cos(radians($2 - longitude))
+                    * cos(radians($2 - longitude)))::numeric, 14)
             ) as distance
         from pledges left join location on location.id = pledges.location_id
         where

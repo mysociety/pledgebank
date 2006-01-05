@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.21 2005-12-08 01:37:20 matthew Exp $
+ * $Id: ref-picture.php,v 1.22 2006-01-05 19:07:29 chris Exp $
  * 
  */
 
@@ -93,12 +93,21 @@ function upload_picture() {
         );
         return $errors[$_FILES['userfile']['error']];
     }
-    if (!is_uploaded_file($tmp_name)) {
+    if (!is_uploaded_file($tmp_name))
         return _("Failed to upload the picture, please try again.");
-    }
-    if ($_FILES['userfile']['size'] > $picture_size_limit * 1024) {
+
+    if ($_FILES['userfile']['size'] > $picture_size_limit * 1024)
         return sprintf(_("Please use a smaller picture.  Try scaling it down in a paint program, reducing the number of colours, or saving it as a JPEG or PNG.  Files of up to %d kilobytes are allowed. Your picture is about %d kilobytes in size."), $picture_size_limit, intval($_FILES['userfile']['size'] / 1024) );
-    }
+    elseif ($_FILES['userfile']['size'] == 0)
+        /* This can occur when the user names a nonexistent file in their
+         * browser. exif_imagetype barfs (fatal error) on an empty file, so
+         * try to detect it here. */
+        return _("We didn't receive a complete picture file.  Please check that you're uploading the picture you want to use.");
+    elseif ($_FILES['userfile']['size'] < 64)
+        /* Probably exif_imagetype can't cope with truncated files either. Why
+         * take the chance? */
+        return sprintf(_("That doesn't seem to be a valid picture file.  It is only %.2f kilobytes in size."), $_FILES['userfile']['size'] / 1024.);
+
     // TODO: Add BMP, and convert them to PNG.
 
     $picture_type = exif_imagetype($tmp_name);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.41 2005-12-28 10:24:12 matthew Exp $
+// $Id: search.php,v 1.42 2006-01-07 19:21:06 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -46,6 +46,7 @@ function get_location_results($pledge_select, $lat, $lon) {
         $radius = gaze_get_radius_containing_population($lat, $lon, OPTION_PB_SEARCH_POPULATION);
         gaze_check_error($radius);
     }
+    locale_push('en-gb');
     $q = db_query($pledge_select . ", distance
                 FROM pledge_find_nearby(?,?,?) AS nearby 
                 LEFT JOIN pledges ON nearby.pledge_id = pledges.id
@@ -55,6 +56,7 @@ function get_location_results($pledge_select, $lat, $lon) {
                     pb_pledge_prominence(pledges.id) <> 'backpage' AND 
                     '$pb_today' <= pledges.date 
                 ORDER BY distance", array($lat, $lon, $radius)); 
+    locale_pop();
     $ret = "";
     if (db_num_rows($q)) {
         $success = 1;
@@ -200,8 +202,6 @@ function search($search) {
     $change_country = pb_get_change_country_link();
     if ($site_country) {
         $places = pb_gaze_find_places($site_country, null, $search, 5, 70);
-        if (gaze_check_error($places))
-            err('Error doing place search');
         if (count($places) > 0) {
             $success = 1;
             $out = "";

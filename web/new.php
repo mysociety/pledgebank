@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.123 2005-12-23 19:02:16 francis Exp $
+// $Id: new.php,v 1.124 2006-01-07 19:21:06 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -277,7 +277,6 @@ function pledge_form_two($data, $errors = array()) {
     if ($place) {
         # Look up nearby places
         $places = pb_gaze_find_places($country, $state, $place, 10, 0);
-        gaze_check_error($places);
         if (array_key_exists('gaze_place', $errors)) {
             if (count($places) > 0) {
                 # message printed in pb_view_gaze_place_choice
@@ -642,7 +641,6 @@ function step2_error_check(&$data) {
                 // Find exact matches
                 if ($data['place']) {
                     $places = pb_gaze_find_places($country, $state, $data['place'], 10, 0);
-                    gaze_check_error($places);
                     $have_exact = have_exact_gaze_match($places, $data['place']);
                     if ($have_exact) {
                         list($desc, $radio_name) = pb_get_gaze_place_details($have_exact);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.49 2005-12-17 21:21:39 matthew Exp $
+// $Id: alert.php,v 1.50 2006-01-07 18:34:25 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -18,7 +18,7 @@ require_once '../../phplib/gaze.php';
 $email = get_http_var('email');
 $country = get_http_var('country');
 $state = null;
-if ($country) {
+if (is_string($country)) {
     $a = array();
     if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
         list($x, $country, $state) = $a;

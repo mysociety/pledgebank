@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.42 2006-01-07 19:21:06 matthew Exp $
+// $Id: search.php,v 1.43 2006-01-09 13:30:02 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -17,6 +17,7 @@ $search = trim(get_http_var('q', true));
 if (!$search) $search = trim(get_http_var('s', true));
 $rss = get_http_var('rss') ? true : false;
 $rss_items = array();
+$pledges_output = array();
 $heading = sprintf(_("Search results for '%s'"), htmlspecialchars($search));
 if ($rss) 
     rss_header($heading, $heading, array());
@@ -39,7 +40,7 @@ else
     page_footer();
 
 function get_location_results($pledge_select, $lat, $lon) {
-    global $pb_today, $rss_items, $rss, $site_country;
+    global $pb_today, $rss_items, $rss, $site_country, $pledges_output;
     if (get_http_var("far")) {
         $radius = intval(get_http_var("far"));
     } else {
@@ -67,6 +68,7 @@ function get_location_results($pledge_select, $lat, $lon) {
             $ret .= preg_replace('#^(.*)( away)$#', '<strong>$1</strong>$2: ', $distance_line);
             #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
             $ret .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+            $pledges_output[$r['ref']] = 1;
 
             if ($rss) {
                 $pledge = new Pledge($r['ref']);
@@ -98,7 +100,7 @@ function get_change_radius_link($search, $radius) {
 }
  
 function search($search) {
-    global $pb_today, $rss, $rss_items;
+    global $pb_today, $rss, $rss_items, $pledges_output;
     $success = 0;
 
     if (!$rss) {
@@ -137,6 +139,7 @@ function search($search) {
             print sprintf(p(_('Result <strong>exactly matching</strong> pledge <strong>%s</strong>:')), htmlspecialchars($search) );
             print '<ul><li>';
             print pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+            $pledges_output[$r['ref']] = 1;
             print '</li></ul>';
         }
     }
@@ -165,37 +168,6 @@ function search($search) {
         }
     }
 
-
-    // Searching for text in pledges - stored in strings $open, $closed printed later
-    $q = db_query($pledge_select . ' FROM pledges 
-                LEFT JOIN location ON location.id = pledges.location_id 
-                WHERE pin IS NULL 
-                    AND pb_pledge_prominence(pledges.id) <> \'backpage\'
-                    AND (title ILIKE \'%\' || ? || \'%\' OR 
-                         detail ILIKE \'%\' || ? || \'%\' OR 
-                         identity ILIKE \'%\' || ? || \'%\' OR 
-                         type ILIKE \'%\' || ? || \'%\' OR 
-                         ref ILIKE \'%\' || ? || \'%\')
-                    AND ref NOT ILIKE ?
-                ORDER BY date DESC', array($search, $search, $search, $search, $search, $search));
-    $closed = ''; $open = '';
-    if (db_num_rows($q)) {
-        $success = 1;
-        while ($r = db_fetch_array($q)) {
-            $text = '<li>';
-            $text .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
-            $text .= '</li>';
-            if ($r['open']=='t') {
-                $open .= $text;
-            } else {
-                $closed .= $text;
-            }
-            if ($rss && $r['open'] == 't') {
-                $pledge = new Pledge($r);
-                $rss_items[] = $pledge->rss_entry();
-            }
-        }
-    }
 
     // Places
     global $site_country, $countries_code_to_name;
@@ -242,6 +214,41 @@ function search($search) {
     } else {
         if (!$rss)
             print p(sprintf(_("To search for a town, please first %s."), $change_country));
+    }
+
+    // Searching for text in pledges - stored in strings $open, $closed printed later
+    $q = db_query($pledge_select . ' FROM pledges 
+                LEFT JOIN location ON location.id = pledges.location_id 
+                WHERE pin IS NULL 
+                    AND pb_pledge_prominence(pledges.id) <> \'backpage\'
+                    AND (title ILIKE \'%\' || ? || \'%\' OR 
+                         detail ILIKE \'%\' || ? || \'%\' OR 
+                         identity ILIKE \'%\' || ? || \'%\' OR 
+                         type ILIKE \'%\' || ? || \'%\' OR 
+                         ref ILIKE \'%\' || ? || \'%\')
+                    AND ref NOT ILIKE ?
+                ORDER BY date DESC', array($search, $search, $search, $search, $search, $search));
+    $closed = ''; $open = '';
+    if (db_num_rows($q)) {
+        $success = 1;
+        while ($r = db_fetch_array($q)) {
+            if (array_key_exists($r['ref'], $pledges_output))
+                continue;
+        
+            $text = '<li>';
+            $text .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+            $pledges_output[$r['ref']] = 1;
+            $text .= '</li>';
+            if ($r['open']=='t') {
+                $open .= $text;
+            } else {
+                $closed .= $text;
+            }
+            if ($rss && $r['open'] == 't') {
+                $pledge = new Pledge($r);
+                $rss_items[] = $pledge->rss_entry();
+            }
+        }
     }
 
     // No more search types that go into RSS (only pledges do that for now)

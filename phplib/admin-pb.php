@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.114 2005-12-15 22:22:45 francis Exp $
+ * $Id: admin-pb.php,v 1.115 2006-01-09 20:07:32 matthew Exp $
  * 
  */
 
@@ -776,7 +776,7 @@ class ADMIN_PAGE_PB_LATEST {
                 if ($data['ispremium'] == 't') 
                     print 'Premium ';
                 print "SMS sent to ".htmlspecialchars($data['recipient']).", message
-                    '".htmlspecialchars($data[message])."' status $data[lastsendstatus]";
+                    '".htmlspecialchars($data['message'])."' status $data[lastsendstatus]";
             } elseif (array_key_exists('commentposted', $data)) {
                 $comment_email = $data['email'];
                 if (!$comment_email)

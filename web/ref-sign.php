@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.26 2005-12-06 00:10:34 matthew Exp $
+// $Id: ref-sign.php,v 1.27 2006-01-09 13:13:35 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -18,7 +18,7 @@ page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));
 
 $title = _('Signature addition');
-page_header($title);
+page_header($title, array('ref'=>$p->url_typein()));
 $errors = do_sign();
 if (is_array($errors)) {
     print '<div id="errors"><ul><li>';
@@ -32,13 +32,19 @@ page_footer();
 function do_sign() {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
     $errors = importparams(
-                array(array('name',true),       '/^[^0-9]/i',        _('Please enter your name')),
+                array(array('name',true),       '//',        '', null),
                 array('email',      'importparams_validate_email'),
                 array('ref',        '/^[a-z0-9-]+$/i',  ''),
                 array('showname',   '//',               '', 0),
                 array(array('pin',true),        '//',              '', null)
             );
-    if ($q_email==_('<Enter your name>')) $q_email='';
+    if ($q_name==_('<Enter your name>')) {
+        $q_name = null;
+    }
+    if (!$q_name) {
+        $q_showname = false;
+        $q_name = null;
+    }
 
     $pledge = new Pledge($q_ref);
     if (!check_pin($q_ref, $pledge->pin()))
@@ -58,7 +64,7 @@ function do_sign() {
 
     if (!pledge_is_error($R)) {
         /* All OK, sign pledge. */
-        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($pledge->id(), $P->name(), $P->id(), $q_showname ? 't' : 'f'));
+        db_query('insert into signers (pledge_id, name, person_id, showname, signtime) values (?, ?, ?, ?, pb_current_timestamp())', array($pledge->id(), ($P->has_name() ? $P->name() : null), $P->id(), $q_showname ? 't' : 'f'));
         db_commit();
         print '<p class="noprint loudmessage" align="center">' . _('Thanks for signing up to this pledge!') . '</p>';
 

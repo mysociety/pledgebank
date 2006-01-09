@@ -1,11 +1,10 @@
---
 -- schema.sql:
 -- Schema for PledgeBank database.
 --
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.163 2006-01-04 19:18:32 francis Exp $
+-- $Id: schema.sql,v 1.164 2006-01-09 13:13:35 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -633,7 +632,8 @@ create table signers (
     signtime timestamp not null,
   
     check (
-        (name is not null and person_id is not null)
+        (showname and name is not null and person_id is not null)
+        or (not showname and person_id is not null)
         or (name is null and person_id is null and mobile is not null)
     )
 );

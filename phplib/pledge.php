@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.146 2005-12-17 21:08:55 matthew Exp $
+ * $Id: pledge.php,v 1.147 2006-01-09 12:09:56 francis Exp $
  * 
  */
 
@@ -116,6 +116,13 @@ class Pledge {
         if ($this->is_cancelled())
             $finished = true;
         $this->data['finished'] = $finished;
+
+        // Check we know the language of the pledge, otherwise set to default
+        // (page) language.
+        global $lang, $langs;
+        if (!array_key_exists($this->data['lang'], $langs)) {
+            $this->data['lang'] = $lang;
+        }
     }
 
     // Basic data access

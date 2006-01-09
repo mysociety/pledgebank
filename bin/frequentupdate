@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.59 2006-01-03 12:03:32 chris Exp $
+ * $Id: frequentupdate,v 1.60 2006-01-09 12:09:55 francis Exp $
  *
  */
 
@@ -180,11 +180,12 @@ function send_automatic_failure_messages() {
                     'failed-creator'
                 )", $pledge['id']);
 
+        $pledge_obj = new Pledge(intval($pledge['id']));
 
         /* Unlike automatic success messages, automatic failure messages go
          * by SMS too, because there's no other way for SMS signers to hear
          * about them. */
-        locale_push($pledge['lang']);
+        locale_push($pledge_obj->lang());
         $sms = sprintf(_("PledgeBank here. Sorry, the %s pledge has failed. Better luck next time!"), $pledge['ref']);
         locale_pop();
 

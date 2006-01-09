@@ -1,4 +1,4 @@
-#!/usr/local/bin/php -q
+#!/usr/bin/php -q
 <?php
 // gaze.js.gen
 // 
@@ -6,7 +6,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-js-gen,v 1.5 2005-11-11 12:34:56 francis Exp $
+// $Id: gaze-js-gen,v 1.6 2006-01-09 17:59:05 francis Exp $
 
 require_once "../phplib/pbcli.php";
 require_once '../../phplib/gaze.php';

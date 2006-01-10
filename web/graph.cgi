@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.14 2005-09-04 14:08:40 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.15 2006-01-10 12:06:51 chris Exp $';
 
 use strict;
 
@@ -162,7 +162,7 @@ while (my $q = new CGI::Fast()) {
         # XXX should also incorporate number of signers or time of generating
         # graph so that we can have a more prompt update on fast-growing
         # pledges.
-        my $gparam = join(',', $pledge_id, $start_date, $end_date);
+        my $gparam = join(',', $pledge_id, $start_date, $end_date, int(time() / 1800));
         my $hash = Digest::SHA1::sha1_hex($gparam);
 
         # Determine hashed location for graph, creating the directories if

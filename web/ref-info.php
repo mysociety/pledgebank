@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.30 2005-11-30 12:03:35 francis Exp $
+ * $Id: ref-info.php,v 1.31 2006-01-10 12:06:51 chris Exp $
  * 
  */
 
@@ -104,7 +104,7 @@ $p->render_box();
         print p(_('Signup graph not available for private pledges.'));
 } else { ?>
 <p><img src="/graph.cgi?pledge_id=<?= $p->id() ?>;interval=pledge" alt="<?=_('Graph of signers to this pledge') ?>" width="500" height="300"></p>
-<p><small><?=_('Graph updated once per day') ?></small></p>
+<p><small><?=_('Graph updated every 30 minutes') ?></small></p>
 <?
 }
 

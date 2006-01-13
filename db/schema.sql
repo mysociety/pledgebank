@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.164 2006-01-09 13:13:35 francis Exp $
+-- $Id: schema.sql,v 1.165 2006-01-13 11:25:51 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -269,10 +269,10 @@ create function pledge_find_nearby(double precision, double precision, double pr
                     or angle_between(radians(longitude), radians($2))
                             < $3 / (R_e() * cos(radians($1 + $3 / R_e()))))
             -- ugly -- unable to use attribute name "distance" here, sadly
-            and R_e() * acos(
-                sin(radians($1)) * sin(radians(latitude))
+            and R_e() * acos(trunc(
+                (sin(radians($1)) * sin(radians(latitude))
                 + cos(radians($1)) * cos(radians(latitude))
-                    * cos(radians($2 - longitude))
+                    * cos(radians($2 - longitude)))::numeric, 14)
                 ) < $3
         order by distance desc
 ' language sql;

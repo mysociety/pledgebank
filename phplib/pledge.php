@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.147 2006-01-09 12:09:56 francis Exp $
+ * $Id: pledge.php,v 1.148 2006-01-14 12:31:57 matthew Exp $
  * 
  */
 
@@ -481,7 +481,7 @@ function pledge_summary($r, $params) {
         if ($r['daysleft'] == 0)
             $text .= _('Target met, pledge open until midnight tonight, London time.');
         elseif ($r['daysleft'] < 0)
-            $text .= _('Target met, pledge over.');
+            $text .= _('Target met, pledge closed.');
         else
             $text .= sprintf(ngettext('Target met, pledge still open for %d day.', 'Target met, pledge still open for %d days.', $r['daysleft']), $r['daysleft']);
     } else {

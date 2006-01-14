@@ -17,7 +17,7 @@ var translation = {
 "<Enter town or keyword>":"<укажите город или ключ>",
 "<Date>":"<дата>",
 "other local person":"человек из моего региона",
-"Global":"",
+"Global":"Весь мир",
 "(separator)":"(разделитель)",
 "Postcode or town:":"Почтовый индекс",
 "You have used %d characters; %d remain.":"Вы использовали %d символов; %d осталось.",

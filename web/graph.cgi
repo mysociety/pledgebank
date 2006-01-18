@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.15 2006-01-10 12:06:51 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.16 2006-01-18 17:47:11 chris Exp $';
 
 use strict;
 
@@ -31,6 +31,7 @@ use Digest::SHA1;
 use Encode;
 use Errno;
 use Error qw(:try);
+use File::stat;
 use POSIX;
 use Time::HiRes qw(sleep);
 use utf8;
@@ -303,16 +304,38 @@ EOF
             }
         }
 
-        # Graph already exists, so just redirect to it.
-        print $q->redirect(
-                    -uri => mySociety::Config::get('PB_GRAPH_URL') . "/$filename",
-                    -status => 302
-                );
-
         # We haven't done anything in the transaction, but we must close it
         # because otherwise pb_current_time() will always return the time at
         # the *start* of the transaction, and so graphs will be out of date.
         dbh()->commit();
+
+        # Graph already exists, so just redirect to it.
+        my $f = new IO::File("$graph_dir/$filename", O_RDONLY)
+                    || die "$graph_dir/$filename: $!";
+        my $st = stat($f);
+
+        print $q->header(
+                    -type => 'image/png',
+                    -content_length => $st->size(),
+                    -expires => '+20m'
+                );
+        binmode(STDOUT, ':bytes');
+        binmode($f, ':bytes');
+        my $buf;
+        my $n = 0;
+        while ($n < $st->size()) {
+            my $m = $f->read($buf, 65536, 0);
+            if (!defined($m)) {
+                die "$graph_dir/$filename: $!";
+            } elsif ($m == 0) {
+                last;
+            } else {
+                $n += $m;
+            }
+            print $buf;
+        }
+        $f->close();
+        
     } catch PB::Error with {
         my $E = shift;
         my $t = $E->text();

@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.167 2006-01-12 15:35:19 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.168 2006-01-19 19:50:56 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -152,6 +152,7 @@ $wth->database_drop_reload('../db/schema.sql');
 $wth->database_load_schema('../db/ican-categories.sql');
 $wth->database_cycle_sequences(200);
 $wth->email_setup({ eveld_bin => "$FindBin::Bin/../../services/EvEl/bin/eveld",
+                    eveld_multispawn => $multispawn,
                     log_mailbox => "log_mailbox" });
 $wth->browser_set_validator("/usr/bin/validate");
 sms_setup();

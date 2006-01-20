@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.16 2006-01-18 17:47:11 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.17 2006-01-20 17:29:05 chris Exp $';
 
 use strict;
 
@@ -309,7 +309,8 @@ EOF
         # the *start* of the transaction, and so graphs will be out of date.
         dbh()->commit();
 
-        # Graph already exists, so just redirect to it.
+        # Graph already exists, so emit it. We can't redirect as we may be
+        # running on >1 server.
         my $f = new IO::File("$graph_dir/$filename", O_RDONLY)
                     || die "$graph_dir/$filename: $!";
         my $st = stat($f);

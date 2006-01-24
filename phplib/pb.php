@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.62 2005-12-29 19:15:09 matthew Exp $
+ * $Id: pb.php,v 1.63 2006-01-24 18:09:26 francis Exp $
  * 
  */
 
@@ -86,6 +86,8 @@ if (OPTION_WEB_HOST == 'www') {
         $domain_country = strtoupper($m[1]);
     elseif (preg_match('#^([^.]+)\.(?:..(?:-..)?\.)?'.OPTION_WEB_HOST.'\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_country = strtoupper($m[1]);
+    else
+        $domain_country = OPTION_WEB_HOST; # e.g. for interface.pledgebank.com
 }
 
 # Language negotiation

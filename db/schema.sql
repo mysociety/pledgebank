@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.165 2006-01-13 11:25:51 francis Exp $
+-- $Id: schema.sql,v 1.166 2006-01-27 11:54:03 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1144,6 +1144,31 @@ create function pb_delete_signer(integer)
         delete from message_signer_recipient where signer_id = $1;
         delete from smssubscription where signer_id = $1;
         delete from signers where id = $1;
+        return;
+    end
+' language 'plpgsql';
+
+create function pb_delete_person(integer)
+    returns void as '
+    begin
+        -- comments made by the person
+        delete from alert_sent where comment_id in (select id from comment where person_id = $1);
+        delete from abusereport where what_id in (select id from comment where person_id = $1) and what = ''comment'';
+        delete from comment where person_id = $1;
+
+        -- alerts set up for the person
+        delete from alert_sent where alert_id in (select id from alert where person_id = $1);
+        delete from alert where person_id = $1;
+
+        -- pledges the person has signed
+        delete from abusereport where what_id in (select id from signers where person_id = $1) and what = ''signer'';
+        delete from message_signer_recipient where signer_id in (select id from signers where person_id = $1);
+        delete from smssubscription where signer_id in (select id from signers where person_id = $1);
+        delete from signers where person_id = $1;
+
+        -- we deliberately don''t do pledges they''ve made; they should be checked first
+
+        delete from person where id = $1;
         return;
     end
 ' language 'plpgsql';

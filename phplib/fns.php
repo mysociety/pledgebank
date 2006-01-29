@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.119 2006-01-29 02:12:46 matthew Exp $
+// $Id: fns.php,v 1.120 2006-01-29 16:27:54 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -175,6 +175,8 @@ function parse_date($date) {
     $date = preg_replace('#((\b([a-z]|on|an|of|in|the|year of our lord))|(?<=\d)(st|nd|rd|th))\b#','',$date);
     if ($lang == 'eo')
         $date = preg_replace('#((\b(de|la))|(?<=\d)-?a)\b#','',$date);
+    if ($lang == 'nl')
+        $date = preg_replace('#(?<=\d)e\b#','',$date);
 
     # Translate foreign words to English as strtotime() is English only
     $translate = array(
@@ -236,8 +238,13 @@ function parse_date($date) {
         "\xd1\x81\xd0\xb5\xd1\x80\xd0\xb5\xd0\xb4\xd0\xb8\xd1" => 'Wednesday', 
         "\xd1\x87\xd0\xb5\xd1\x82\xd0\xb2\xd0\xb5\xd1\x80\xd0\xb3\xd0\xb0\xd1" => 'Thursday',
         "\xd0\xbf'\xd1\x8f\xd1\x82\xd0\xbd\xd0\xb8\xd1\x86\xd1\x96" => 'Friday', 
-        "\xd1\x81\xd1\x83\xd0\xb1\xd0\xbe\xd1\x82\xd0\xb8" => 'Saturday'
+        "\xd1\x81\xd1\x83\xd0\xb1\xd0\xbe\xd1\x82\xd0\xb8" => 'Saturday',
         
+        # Dutch
+        'januari'=>'January', 'februari'=>'February', 'maart'=>'March', 'mei'=>'May', 'juni'=>'June',
+        'juli'=>'July', 'augustus'=>'August', 'oktober'=>'October',
+        'maandag'=>'Monday', 'dinsdag'=>'Tuesday', 'woensdag'=>'Wednesday', 'donderdag'=>'Thursday',
+        'vrijdag'=>'Friday', 'zaterdag'=>'Saturday', 'zondag'=>'Sunday',
     );
     $search = array(); $replace = array();
     foreach ($translate as $foreign => $english) {

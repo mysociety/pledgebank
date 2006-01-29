@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.118 2006-01-09 17:43:23 francis Exp $
+// $Id: fns.php,v 1.119 2006-01-29 02:12:46 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -84,7 +84,6 @@ function pb_person_make_signon_url($data, $email, $method, $url, $params) {
 
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
-    global $lang;
 #    print "here<pre>"; print_r(debug_backtrace()); exit;
 
     if (array_key_exists('id', $values)) {
@@ -112,13 +111,8 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['creator_email'] = $values['email'];
         $values['email'] = null;
     }
-    if (array_key_exists('signers', $values)) {
-        # XXX: Hmm, probably a better way to do this
-        $pledge_lang = db_getOne('select lang from pledges where id = ?', $values['id']);
-        locale_push($pledge_lang);
+    if (array_key_exists('signers', $values))
         $values['signers_ordinal'] = ordinal($values['signers']);
-        locale_pop();
-    }
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
     $values['pledgebank_url'] = pb_domain_url(array('path'=>'/'));
         

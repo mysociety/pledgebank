@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.98 2005-12-29 19:23:22 matthew Exp $
+// $Id: page.php,v 1.99 2006-02-02 11:08:48 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -15,7 +15,8 @@ require_once 'pledge.php';
  * Print top part of HTML page, with the given TITLE. This prints up to the
  * start of the "content" <div>.  If PARAMS['nonav'] is true then the top 
  * title and navigation are not displayed, or if PARAMS['noprint'] is true
- * then they are not there if the page is printed.  */
+ * then they are not there if the page is printed. TITLE must be in HTML,
+ * with codes already escape */
 function page_header($title, $params = array()) {
     global $lang, $microsite;
 
@@ -40,7 +41,7 @@ function page_header($title, $params = array()) {
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><?
     if ($title) 
-        print htmlspecialchars($title) . " - ";
+        print $title . " - ";
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
 ?> PledgeBank<?if (!$title) print " - " . _("Tell the world \"I'll do it, but only if you'll help\"") ?></title>

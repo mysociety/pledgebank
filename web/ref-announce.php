@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.35 2005-12-06 00:20:52 matthew Exp $
+ * $Id: ref-announce.php,v 1.36 2006-02-04 17:32:01 matthew Exp $
  * 
  */
 
@@ -204,7 +204,7 @@ if (!sizeof($errors) && $q_submit) {
             emailsubject, emailbody, sms)
         values
             (?, ?, ?, ?, 'creator',
-            false, true, true,
+            true, true, true,
             ?, ?, ?)",
         array(
             $q_message_id, $p->id(), $circumstance, $circumstance_count,

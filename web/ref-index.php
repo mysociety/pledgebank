@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.59 2005-11-10 12:12:18 francis Exp $
+// $Id: ref-index.php,v 1.60 2006-02-06 19:07:13 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -175,7 +175,7 @@ function draw_signatories($p) {
     print '</div>';
 }
 
-define('MAX_PAGE_COMMENTS', '25');
+define('MAX_PAGE_COMMENTS', '50');
 function draw_comments($p) {
     print "\n\n" . '<div class="comments">';
     print '<a href="' . $p->url_comments_rss() . '"><img align="right" border="0" src="rss.gif" alt="' . _('RSS feed of comments on this pledge') . '"></a>';

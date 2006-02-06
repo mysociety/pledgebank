@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.168 2006-01-19 19:50:56 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.169 2006-02-06 17:09:27 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -130,6 +130,8 @@ sub name_n { my $n = shift; return ($n % 100  == 0) ? "Peter Setter $n" : "Siegf
 sub mobile_n { my $n = shift; return "9876543$n"; }
 sub password_n { my $n = shift; return "mypass$n"; }
 our $login_count; # reference to hash of person number => how many times they've logged in
+our $name_admin = "\"PledgeBank.com\"";
+
 
 #############################################################################
 # Main code
@@ -690,6 +692,7 @@ sub do_public_succeeding_pledge {
     $wth->log_watcher_check();
     call_frequentupdate();
     # Check they all arrived
+    $wth->email_get_containing( '%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%Love and kisses%');
     $wth->email_get_containing( '%To: '.email_n(1).  '%From: '.name_n(0).  '%Love and kisses%');
     $wth->email_get_containing( '%To: '.email_n(2).  '%From: '.name_n(0).  '%Love and kisses%');
     call_frequentupdate();
@@ -751,10 +754,10 @@ sub do_public_succeeding_pledge {
     # Check they all arrived
     for (my $i = 1; $i <= 3; ++$i) {
         my $success_email = $wth->email_get_containing( 
-            '%To: '.email_n($i).
-            '%From: '.name_n(0).
-            '%By merely partaking%');
+            '%To: '.email_n($i).  '%From: '.name_n(0). '%By merely partaking%');
     }
+    my $success_email = $wth->email_get_containing( 
+        '%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%By merely partaking%');
     # Make sure no extra emails - in particular that late partial-signer hasn't got message
     call_frequentupdate();
     # TODO: Make this next line check that we only have the (unconfirmed) signup
@@ -961,6 +964,7 @@ sub do_private_failing_pledge {
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
     $wth->log_watcher_check();
     call_frequentupdate();
+    my $success_email = $wth->email_get_containing('%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%What a hassle%');
     my $success_email = $wth->email_get_containing('%To: '.email_n(1).  '%From: '.name_n(0).  '%What a hassle%');
     $wth->email_check_none_left();
     # Try to send second failure, which is not allowed
@@ -1126,6 +1130,7 @@ sub do_sms_pledge {
     call_frequentupdate();
     call_smsd();
     # Check they all arrived
+    $wth->email_get_containing( '%To: '.email_n(100).'%[ This is a copy of the message%hurrah!%');
     $wth->email_get_containing( '%To: '.email_n(105).'%hurrah!%');
     # ... the input unicode pound sign should come out as HTML entity
     for (my $who = 101; $who <= 103; ++$who) {

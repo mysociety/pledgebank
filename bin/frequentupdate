@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.62 2006-01-09 23:48:21 francis Exp $
+ * $Id: frequentupdate,v 1.63 2006-02-06 17:09:27 francis Exp $
  *
  */
 
@@ -364,6 +364,11 @@ function send_pending_messages() {
                     " . pb_chivvy_probable_will_reach_clause() . "
                     from pledges where id = ?", $pledge->id());
             $data['probable_will_reach'] = $probable_will_reach;
+        }
+
+        // Case when it is a copy sent to creator
+        if ($msg['sendtosigners'] == 't' && in_array($msg['circumstance'], array('failure-announce', 'success-announce', 'success-followup', 'general-announce') )) {
+            $msg['emailbody'] = sprintf(_("[ This is a copy of the message you have just sent to everyone who signed your pledge %s ]\n\n%s"), $pledge->url_main(), $msg['emailbody']);
         }
 
         // Make any extra headers

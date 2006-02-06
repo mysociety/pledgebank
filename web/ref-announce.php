@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.36 2006-02-04 17:32:01 matthew Exp $
+ * $Id: ref-announce.php,v 1.37 2006-02-06 17:09:27 francis Exp $
  * 
  */
 
@@ -79,7 +79,7 @@ function refuse_announce($p, $c) {
  * Page thanking punter for sending message. */
 function message_success() {
     page_header(_("Announcement sent"));
-    print p(_("<strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge."));
+    print p(_("<strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge. A copy will also be sent to you for your records."));
     page_footer();
     exit();
 }

@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: PB.pm,v 1.6 2005-04-20 13:51:31 chris Exp $
+# $Id: PB.pm,v 1.7 2006-02-06 10:57:22 chris Exp $
 #
 
 package PB::Error;
@@ -30,13 +30,17 @@ BEGIN {
             User => mySociety::Config::get('PB_DB_USER'),
             Password => mySociety::Config::get('PB_DB_PASS'),
             Host => mySociety::Config::get('PB_DB_HOST', undef),
-            Port => mySociety::Config::get('PB_DB_PORT', undef)
+            Port => mySociety::Config::get('PB_DB_PORT', undef),
+            OnFirstUse => sub {
+                if (!dbh()->selectrow_array('select secret from secret')) {
+                    dbh()->{RaiseError} = 0;
+                    dbh()->do('insert into secret (secret) values (?)',
+                                {}, unpack('h*', random_bytes(32)));
+                    dbh()->commit();
+                    dbh()->{RaiseError} = 1;
+                }
+            }
         );
-
-    if (!dbh()->selectrow_array('select secret from secret for update of secret')) {
-        dbh()->do('insert into secret (secret) values (?)', {}, unpack('h*', mySociety::Util::random_bytes(32)));
-    }
-    dbh()->commit();
 }
 
 =item secret

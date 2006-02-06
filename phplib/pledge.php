@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.148 2006-01-14 12:31:57 matthew Exp $
+ * $Id: pledge.php,v 1.149 2006-02-06 19:23:33 matthew Exp $
  * 
  */
 
@@ -435,6 +435,10 @@ function pledge_sentence($r, $params = array()) {
     if ($html)
         $r = array_map('htmlspecialchars', $r);
         
+    global $lang, $langs;
+    if (!array_key_exists($r['lang'], $langs)) {
+        $r['lang'] = $lang;
+    }
     locale_push($r['lang']);
 
     if (array_key_exists('href', $params)) {

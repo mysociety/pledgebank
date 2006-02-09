@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.27 2006-01-09 13:13:35 francis Exp $
+// $Id: ref-sign.php,v 1.28 2006-02-09 12:14:26 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -45,6 +45,13 @@ function do_sign() {
         $q_showname = false;
         $q_name = null;
     }
+
+    if (!$q_ref)
+        /* I don't think this error is likely to occur with real users, (see
+         * mysociety-developers email of 20060209) but the error message which
+         * occurs when ref is null is confusing, so better to trap it
+         * explicitly. */
+        err(_("No pledge reference was specified"));
 
     $pledge = new Pledge($q_ref);
     if (!check_pin($q_ref, $pledge->pin()))

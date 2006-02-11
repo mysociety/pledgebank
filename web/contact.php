@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.33 2005-12-30 12:32:06 matthew Exp $
+// $Id: contact.php,v 1.34 2006-02-11 19:31:49 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -87,6 +87,11 @@ function send_contact_form($name, $email, $subject, $message) {
     /* User mail must be submitted with \n line endings. */
     $message = str_replace("\r\n", "\n", $message);
 
+    if ($_SERVER['REMOTE_ADDR'] == '202.71.106.121') {
+        # TODO: Use a database instead, but this'll do for now
+        print _('Please stop sending us spam. Thank you.');
+        return;
+    }
     $postfix = '[ Sent by contact.php on ' . $_SERVER['HTTP_HOST'] . ' from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . ' ]';
     $headers = array();
     $headers['From'] = array($email, $name);

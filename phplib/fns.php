@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.120 2006-01-29 16:27:54 matthew Exp $
+// $Id: fns.php,v 1.121 2006-02-11 22:27:17 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -119,7 +119,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
     $values['signature'] = _("-- the PledgeBank.com team");
 
     $template = file_get_contents("../templates/emails/$template_name");
-    $template = _($template); # TODO: Check this works when we have some translations
+    $template = _($template);
 
     $spec = array(
         '_template_' => $template,

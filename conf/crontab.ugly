@@ -4,8 +4,9 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.6 2006-02-16 12:48:21 chris Exp $
+# $Id: crontab.ugly,v 1.7 2006-02-16 13:24:20 chris Exp $
 
+PATH=/usr/local/bin:/usr/bin:/bin
 MAILTO=team@pledgebank.com
 
 # Frequently

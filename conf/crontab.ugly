@@ -4,7 +4,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.7 2006-02-16 13:24:20 chris Exp $
+# $Id: crontab.ugly,v 1.8 2006-02-16 17:44:16 chris Exp $
 
 PATH=/usr/local/bin:/usr/bin:/bin
 MAILTO=team@pledgebank.com
@@ -14,7 +14,7 @@ MAILTO=team@pledgebank.com
 0-59/15 * * * * !!(*= $user *)!! !!(*= $randomly *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts || echo "stalled?"
 
 # Once an hour
-33 * * * * !!(*= $user *)!! !!(*= $only_one *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "stalled?"
+33 * * * * !!(*= $user *)!! !!(*= $only_one *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "stalled?" )
 32 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
 
 # Once a day, early morning

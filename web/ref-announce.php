@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.38 2006-02-17 15:09:08 matthew Exp $
+ * $Id: ref-announce.php,v 1.39 2006-02-17 15:12:58 matthew Exp $
  * 
  */
 
@@ -235,7 +235,6 @@ if (!sizeof($errors) && $q_submit) {
 <form action="announce" accept-charset="utf-8" class="pledge" name="pledge" id="pledgeaction" method="post">
 <h2><?=_('Send') . ' ' . $descr[$circumstance]?></h2>
 <input type="hidden" name="message_id" value="<?=$q_h_message_id?>">
-<div class="c">
 <p>
 <?
     if ($p->succeeded()) {
@@ -255,7 +254,7 @@ who signed your pledge can reply directly to you. <strong>You may want to also
 give your phone number or website</strong>, so they can contact you in other
 ways.')); ?>
 
-<p><label for="message_subject">Subject:</label> <input name="message_subject" id="message_subject" size="40" value="<?=$q_h_message_subject?>"></p>
+<p><label for="message_subject"><?=_('Subject') ?>:</label> <input name="message_subject" id="message_subject" size="40" value="<?=$q_h_message_subject?>"></p>
 
 <p><textarea
     name="message_body"
@@ -301,7 +300,7 @@ count_sms_characters();
     print '<p>';
     print _('(Remember, when you send this message <strong>your email address will be given to everyone</strong> who has already, or who will in the future, sign up to your pledge by email)');
     print ' <input type="submit" name="submit" value="' . _('Send') . ' &gt;&gt;"></p>';
-    print '</div></form>';
+    print '</form>';
 }
 
 page_footer();

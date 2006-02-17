@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.37 2006-02-06 17:09:27 francis Exp $
+ * $Id: ref-announce.php,v 1.38 2006-02-17 15:09:08 matthew Exp $
  * 
  */
 
@@ -129,7 +129,7 @@ if ($do_sms) {
 $fill_in = _("ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE, INCLUDING YOUR CONTACT INFO");
 
 /* All OK. */
-page_header(sprintf(_("Send %s to signers of '%s'"), $descr[$circumstance], $p->title()), array());
+page_header(sprintf(_("Send %s to signers of '%s'"), $descr[$circumstance], $p->title()), array('ref'=>$p->url_typein()));
 
 $sentence = $p->sentence(array('firstperson'=>'includename'));
 
@@ -147,6 +147,7 @@ if ($p->succeeded()) {
 
 $err = importparams(
             array(array('message_body',true), '//', "", $default_message),
+            array(array('message_subject',true), '//', "", $email_subject),
             array('message_sms', '//', "", $default_sms),
             array('submit', '//', "", null)
         );
@@ -208,7 +209,7 @@ if (!sizeof($errors) && $q_submit) {
             ?, ?, ?)",
         array(
             $q_message_id, $p->id(), $circumstance, $circumstance_count,
-            $email_subject, $q_message_body, $do_sms ? $q_message_sms : null));
+            $q_message_subject, $q_message_body, $do_sms ? $q_message_sms : null));
 
     db_commit();
 
@@ -253,6 +254,8 @@ if (!sizeof($errors) && $q_submit) {
 who signed your pledge can reply directly to you. <strong>You may want to also
 give your phone number or website</strong>, so they can contact you in other
 ways.')); ?>
+
+<p><label for="message_subject">Subject:</label> <input name="message_subject" id="message_subject" size="40" value="<?=$q_h_message_subject?>"></p>
 
 <p><textarea
     name="message_body"

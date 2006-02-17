@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.121 2006-02-11 22:27:17 matthew Exp $
+// $Id: fns.php,v 1.122 2006-02-17 15:09:03 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -165,7 +165,7 @@ function pb_send_email_internal($to, $spec) {
 
 # Stolen from my railway script
 function parse_date($date) {
-    global $pb_time, $lang;
+    global $pb_time, $lang, $site_country;
     $now = $pb_time;
     $error = 0;
     if (!$date)  {
@@ -258,10 +258,21 @@ function parse_date($date) {
     $year = null;
     $month = null;
     if (preg_match('#(\d+)/(\d+)/(\d+)#',$date,$m)) {
-        $day = $m[1]; $month = $m[2]; $year = $m[3];
+    	# XXX: Might be better to offer back ambiguous dates for clarification?
+    	if ($site_country == 'US') {
+		$day = $m[2]; $month = $m[1];
+	} else {
+	        $day = $m[1]; $month = $m[2];
+	}
+	$year = $m[3];
         if ($year<100) $year += 2000;
     } elseif (preg_match('#(\d+)/(\d+)#',$date,$m)) {
-        $day = $m[1]; $month = $m[2]; $year = date('Y');
+    	if ($site_country == 'US') {
+        	$day = $m[2]; $month = $m[1];
+	} else {
+		$day = $m[1]; $month = $m[2];
+	}
+	$year = date('Y');
     } elseif (preg_match('#^([0123][0-9])([01][0-9])([0-9][0-9])$#',$date,$m)) {
         $day = $m[1]; $month = $m[2]; $year = $m[3];
     } else {

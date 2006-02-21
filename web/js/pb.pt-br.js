@@ -9,17 +9,17 @@
  */
 
 var translation = {
-"(choose one)":"(Escolha um)",
-"Town:":"",
+"(choose one)":"(escolha um)",
+"Town:":"Cidade:",
 "other local people":"outras pessoas locais",
-"<Enter your name>":"",
+"<Enter your name>":"<Digite seu nome>",
 "<Enter your pledge>":"",
-"<Enter town or keyword>":"",
-"<Date>":"",
-"other local person":"",
+"<Enter town or keyword>":"Digitar cidade ou palavra-chave",
+"<Date>":"<Data>",
+"other local person":"outras pessoas locais",
 "Global":"Global",
-"(separator)":"",
+"(separator)":"(separador)",
 "Postcode or town:":"",
-"You have used %d characters; %d remain.":"",
+"You have used %d characters; %d remain.":"V. usou %d caracteres; faltam %d.",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":""
 }

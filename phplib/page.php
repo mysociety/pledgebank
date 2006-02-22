@@ -5,12 +5,15 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.100 2006-02-22 17:22:25 francis Exp $
+// $Id: page.php,v 1.101 2006-02-22 18:09:31 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
 require_once 'pledge.php';
-require_once 'microsites.php';
+
+// Do NOT include microsites.php here, or it won't get translated.
+// This may cause funny errors, but you'll just have to deal with it :)
+//require_once 'microsites.php';
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the

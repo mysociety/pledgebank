@@ -1,39 +1,40 @@
+#!/usr/bin/php -q
 <?php
 /* 
- * test:
- * Test language stuff.
+ * send-local-alerts:
+ * Run from cron regularly to send new pledge local alerts.
  *
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: test,v 1.4 2005-11-08 15:52:38 francis Exp $
+ * $Id: test,v 1.5 2006-02-22 13:08:17 francis Exp $
  *
  */
 
-require_once '../../phplib/locale.php';
-require_once '../conf/general';
+$short_opts = '';
+$long_opts = array('verbose','help');
 
-function err($message) {
-    $stderr = fopen('php://stderr', 'w');
-    fwrite($stderr,$message);
-    fclose($stderr); 
-    exit(1);
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once '../phplib/fns.php';
+require_once "../phplib/alert.php";
+require_once '../../phplib/db.php';
+require_once '../../phplib/utility.php';
+
+function verbose($str) {
+    global $verbose;
+    if ($verbose) 
+        fwrite(STDERR, "send-local-alerts: $str\n");
+}
+function error($str) {
+    fwrite(STDERR, "send-local-alerts: ERROR: $str\n");
 }
 
-/* Language negotiation */
-locale_negotiate_language(OPTION_PB_LANGUAGES, 'en-gb');
-locale_change();
-locale_gettext_domain('PledgeBank');
+#error("hello");
+#error_log("blah blah");
 
-# For faking using web server environment
-#$_SERVER['HTTP_HOST'] = "dummy";
-#$_SERVER['REQUEST_URI'] = "/dummy";
-#$_SERVER['REMOTE_ADDR'] = "dummy.dummy";
-#require_once "../phplib/pb.php";
+print "\n";
+$result = pb_send_email('francis@flourish.org', 'testeroo', 'body text');
+print "\npb_send_email result: $result\n";
 
-print _('Start your own pledge') . " " . strftime('%e %B %Y') .  "\n";
-locale_push('pt-br');
-print _('Start your own pledge') . " " . strftime('%e %B %Y') .  "\n";
-locale_pop();
-print _('Start your own pledge') . " " . strftime('%e %B %Y') .  "\n";
 

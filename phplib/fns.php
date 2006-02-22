@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.122 2006-02-17 15:09:03 matthew Exp $
+// $Id: fns.php,v 1.123 2006-02-22 21:23:35 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -659,8 +659,9 @@ function pb_site_pledge_filter_main(&$sql_params) {
     }
 }
 /* pb_site_pledge_filter_general
- * Same as pb_site_pledge_filter_main except returns general pledges, i.e. 
- * global ones. */
+ * Returns SQL query fragment for getting general pledges, i.e. global ones. 
+ * Compare pb_site_pledge_filter_main.
+ */
 function pb_site_pledge_filter_general(&$sql_params) {
     global $lang, $microsite;
     if ($microsite) {

@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.169 2006-02-06 17:09:27 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.170 2006-02-22 19:20:41 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -262,11 +262,11 @@ sub perform_login_action {
 
         # Request confirmation email (unless we are resuming request)
         if ($login_action ne "resume") {
-            $wth->browser_check_contents(qr/(I've never used PledgeBank before|Eu nunca utilizei o PledgeBank antes)/);
+            $wth->browser_check_contents(qr/(I've never used PledgeBank before|Nunca usei PledgeBank antes)/);
             $wth->browser_submit_form(form_name => 'login',
                 fields => $login_fields,
                 button => 'SendEmail') or die "Failed to request confirmation email";
-            $wth->browser_check_contents(qr/(you'll need to click the link|um link que deve ser clicado)/);
+            $wth->browser_check_contents(qr/(you'll need to click the link|clicar no link dele antes)/);
             $wth->log_watcher_check();
         }
 
@@ -347,7 +347,7 @@ sub create_pledge {
     # Make new pledge, step 1
     $wth->browser_get($locale_url);
     $wth->browser_follow_link(text_regex => qr/(Start your own pledge|Iniciar seu proprio contrato)/);
-    $wth->browser_check_contents("New Pledge");
+    $wth->browser_check_contents(qr/(New Pledge|Neova Promessa)/);
     $wth->browser_submit_form(form_name => 'pledge', fields => $page1,
         button => 'tostep2') or die "Failed to submit creating form step 1";
     if ($page1->{target} >= 20) {
@@ -357,7 +357,7 @@ sub create_pledge {
     }
 
     # Step 2
-    $wth->browser_check_contents("Step 2");
+    $wth->browser_check_contents(qr/(Step 2|Passo 2)/);
     $wth->log_watcher_check();
     my $gaze_place;
     if ($page2->{gaze_place}) {
@@ -376,14 +376,14 @@ sub create_pledge {
     }
 
     # Step 3
-    $wth->browser_check_contents("Step 3");
+    $wth->browser_check_contents(qr/(Step 3|Passo 3)/);
     $wth->log_watcher_check();
     $wth->browser_submit_form(form_name => 'pledge',
         fields => $page3,
         button => 'topreview') or die "Failed to submit creating form step 3";
 
     # Preview
-    $wth->browser_check_contents("Step 4");
+    $wth->browser_check_contents(qr/(Step 4)|(Passo 4)/);
     $wth->browser_submit_form(form_name => 'pledge',
         fields => {},
         button => 'tocreate') or die "Failed to submit creating form step 4";
@@ -1318,7 +1318,7 @@ sub do_category_tests {
     set_pledge_prominence($pledge_ref_english, 'frontpage');
     set_pledge_prominence($pledge_ref_portugese, 'frontpage');
     $wth->browser_get($locale_url);
-    $wth->browser_check_contents("mas somente se 3 other monoglots");
+    $wth->browser_check_contents("mas só se 3 other monoglots");
     $wth->browser_check_contents("but only if 3 other polyglots");
 
     # Change to normal pages again

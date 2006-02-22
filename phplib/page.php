@@ -5,11 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.99 2006-02-02 11:08:48 francis Exp $
+// $Id: page.php,v 1.100 2006-02-22 17:22:25 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
 require_once 'pledge.php';
+require_once 'microsites.php';
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the

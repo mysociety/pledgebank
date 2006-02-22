@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francsi@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: test.php,v 1.11 2005-07-22 11:48:59 matthew Exp $
+// $Id: test.php,v 1.12 2006-02-22 17:22:25 francis Exp $
 
 require_once "../phplib/pb.php";
 
@@ -23,4 +23,8 @@ if (get_http_var('phpinfo')) {
 if (get_http_var('smstest')) {
     print_r($_GET);
     print_r($_POST);
+}
+
+if (get_http_var('general')) {
+    print "hello";
 }

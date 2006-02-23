@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.28 2006-02-06 23:24:33 matthew Exp $
+// $Id: abuse.php,v 1.29 2006-02-23 15:17:31 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -21,13 +21,14 @@ page_footer();
 /* report_abusive_thing
  * Reporting of abusive comments, signatures, and pledges. */
 function report_abusive_thing() {
-    global $q_what, $q_id, $q_reason, $q_email;
-    global $q_h_what, $q_h_id, $q_h_reason;
+    global $q_what, $q_id, $q_reason, $q_email, $q_magicword;
+    global $q_h_what, $q_h_id, $q_h_reason, $q_h_magicword, $q_h_email;
     $errors = importparams(
                 array('what',       '/^(comment|pledge|signer)$/',  ''),
                 array('id',         '/^[1-9]\d*$/',                 ''),
                 array(array('reason', true),     '//',                           '', null),
-                array('email',      '//',                           '', null)
+                array('email',      '//',                           '', null),
+                array('magicword',      '//',                           '', null)
             );
     if (!is_null($errors)) {
         print p(_("A required parameter was missing.") . ' ' . join(" ",$errors));
@@ -61,7 +62,15 @@ function report_abusive_thing() {
         return;
     }
 
-    if (!is_null($q_reason)) {
+    $errors = array();
+    if (!is_null($q_reason) && !validate_email($q_email)) {
+        $errors['email'] = _('Please enter a valid email address');
+    }
+/*    if (!is_null($q_reason) && $q_magicword != _('together')) {
+        $errors['magicword'] = _("Please enter the word 'together' in the <strong>magic word</strong> box. We ask you to do this because there are people who run software which crawls the internet and automatically posts adverts. Asking you to enter the word is a reliable and unobtrusive way of making sure you are a human, not a piece of software.");
+    } */
+
+    if (!is_null($q_reason) && !$errors) {
         $ip = $_SERVER["REMOTE_ADDR"];
         $host = $_SERVER['HTTP_HOST'];
         db_query('insert into abusereport (what, what_id, reason, ipaddr, email) values (?, ?, ?, ?, ?)', 
@@ -93,6 +102,12 @@ as possible.')), $w);
 
     $title = htmlspecialchars(db_getOne('select title from pledges where id = ?', $pledge_id));
 
+    if ($errors) {
+        print '<div id="errors"><ul><li>';
+        print join("</li><li>", $errors);
+        print '</li></ul></div>';
+    }
+
     print '<form accept-charset="utf-8" action="abuse" method="post" name="abuse" class="pledge">';
     printf(h2(_('Report abusive, suspicious or wrong %s')), $w);
     printf(p(_('You are reporting the following %s:')), $w);
@@ -121,11 +136,15 @@ EOF;
      * point that this is an *abuse* report. */
 
     print '<p>';
-    printf(_('<strong>Short reason</strong> for reporting this %s:'), $w);
-    print '<br><textarea style="max-width: 100%" name="reason" cols="60" rows="2"></textarea>';
+    printf(_('<strong>Your email</strong>:'));
+    print ' <input type="text" name="email" '.(array_key_exists('email', $errors) ? 'class="error" ' : '').'size="20" value="'.$q_h_email.'">';
+    print '</p>';
+    #print ' <small>'._('(optional, if you want us to get back to you)').'</small>';
+    printf(_('<strong>Reason for reporting this %s</strong>:'), $w);
+    print '<br><textarea style="max-width: 100%" name="reason" cols="60" rows="3">'.$q_h_reason.'</textarea>';
     print '<br>';
-    printf(_('<strong>Email</strong> (optional, if you want us to get back to you):'));
-    print '<input type="text" name="email" size="20"></p>';
+    #printf(_('<strong>Enter the magic word</strong>, which is \'together\':'));
+    #print ' <input type="text" name="magicword" '.(array_key_exists('magicword', $errors) ? 'class="error" ' : '').'size="20"></p>';
     print '<p>';
     print '<input name="submit" type="submit" value="' . _('Submit') . '"><br>';
     print '</form>';

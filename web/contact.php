@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.34 2006-02-11 19:31:49 matthew Exp $
+// $Id: contact.php,v 1.35 2006-02-23 16:53:33 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -42,9 +42,9 @@ If you prefer, you can email %s instead of using the form.')), '<a href="mailto:
     print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge.  These messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator."));
     print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
     if (sizeof($errors)) {
-        print '<ul id="errors"><li>';
+        print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
-        print '</li></ul>';
+        print '</li></ul></div>';
     } ?>
 <form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1">
 <div class="fr"><?=_('Message to')?>: <strong><?=_("PledgeBank Team")?></strong></div>

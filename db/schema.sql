@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.166 2006-01-27 11:54:03 francis Exp $
+-- $Id: schema.sql,v 1.167 2006-02-24 12:32:32 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -363,7 +363,9 @@ create function pledge_find_fuzzily(text)
         -- get all confused that the table has gone away and been recreated on
         -- the second call to this function.)
         perform relname from pg_class
-            where relname = ''pledge_ref_fuzzy_match_tmp'';
+            where relname = ''pledge_ref_fuzzy_match_tmp''
+              and case when has_schema_privilege(relnamespace, ''USAGE'')
+                    then pg_table_is_visible(oid) else false end;
         if not found then
             create temporary table pledge_ref_fuzzy_match_tmp (
                 pledge_id integer,

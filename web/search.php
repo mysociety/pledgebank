@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.43 2006-01-09 13:30:02 francis Exp $
+// $Id: search.php,v 1.44 2006-02-24 19:21:55 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -190,7 +190,8 @@ function search($search) {
                     if (count($places) > 1) 
                         $out .= "<li>$desc";
                     else
-                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s (%s):"), pb_pretty_distance($radius, $site_country, false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
+                        # TRANS: For example: "Results for <strong>open pledges</strong> near places matching <strong>Bolton</strong>, United Kingdom (<a href="....">change country</a>):"
+			$out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s (%s):"), pb_pretty_distance($radius, $site_country, false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[$site_country], $change_country));
                     if ($location_results) {
                         $out .= $location_results;
                     } else {
@@ -200,7 +201,7 @@ function search($search) {
                 }
             }
             if (!$rss && count($places) > 1) {
-                print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s (%s):"), get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[$site_country], $change_country));
+		print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s (%s):"), get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[$site_country], $change_country));
                 print "<ul>";
             }
             print $out;

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.149 2006-02-06 19:23:33 matthew Exp $
+ * $Id: pledge.php,v 1.150 2006-02-24 19:21:49 matthew Exp $
  * 
  */
 
@@ -690,10 +690,13 @@ function post_confirm_advertise_flyers($r) {
 ?>
 <p class="noprint noisymessage" align="center">
 <?
+    # TRANS: Esperanto translated this as "In order to massive increase the chance of this pledge succeeding, " to keep it in the imperative
     print _('You will massively increase the chance of this pledge succeeding if you ');
     if (!$r['pin']) {
+        # TRANS: This phrase is used in two different places, once in present tense, once in imperative. Shout if this is a problem.
         print print_this_link(_("print this page out"), "");
         $flyerurl = '<a href="/' . htmlspecialchars($r['ref']) . '/flyers">' . _('these more attractive PDF and RTF (Word) versions') . '</a>';
+	# TRANS: Use the imperative here to go with msgid "You will massively increase......." and msgid "print this page out". (Tim Morley, 2005-11-30)
         printf(_('(or use %s), cut up the flyers and stick them through your neighbours\' letterboxes.'), $flyerurl);
    } else {
         // TODO - we don't have the PIN raw here, but really want it on

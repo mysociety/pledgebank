@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.115 2006-01-09 20:07:32 matthew Exp $
+ * $Id: admin-pb.php,v 1.116 2006-02-24 19:21:48 matthew Exp $
  * 
  */
 
@@ -452,6 +452,7 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         db_query('UPDATE signers set showname = ? where id = ?', 
             array(get_http_var('showname') ? true : false, $id));
         db_commit();
+	# TRANS: http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000078.html
         print p(_('<em>Show name for signer updated</em>'));
     }
 
@@ -553,6 +554,7 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
             $pledge_id = get_http_var('send_announce_token_pledge_id');
             if (ctype_digit($pledge_id)) {
                 send_announce_token($pledge_id);
+		# TRANS: This is an admin message, printed when someone has pressed the button to send an email to a pledge creator letting them send an announcement message. (Matthew Somerville,  http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
                 print p(_('<em>Announcement permission mail sent</em>'));
             }
         }
@@ -826,7 +828,8 @@ class ADMIN_PAGE_PB_LATEST {
 class ADMIN_PAGE_PB_ABUSEREPORTS {
     function ADMIN_PAGE_PB_ABUSEREPORTS() {
         $this->id = 'pbabusereports';
-        $this->navname = _('Abuse reports');
+        # TRANS: I'm assuming this means "reports of abuse" rather than "we should abuse these reports". OK, I'm tired... (Tim Morley, 2005-11-21)
+	$this->navname = _('Abuse reports');
     }
 
     function display($self_link) {

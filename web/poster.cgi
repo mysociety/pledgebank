@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.72 2006-02-17 17:18:46 matthew Exp $
+# $Id: poster.cgi,v 1.73 2006-02-24 19:21:55 matthew Exp $
 #
 
 import sys
@@ -212,17 +212,23 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
             )
 
     if not has_sms(pledge):
-        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('Pledge at ')), webdomain_text)
+        # TRANS: This is on a poster, it becomes "Pledge at http://www.pledgebank.com/PLEDGEREF", so "Pledge" in this context is a verb, as below. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
+	text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('Pledge at ')), webdomain_text)
         if pledge['pin']:
             text_para.append(rtf_repr(_(' pin ')), PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
         sms_smallprint = ""
     else:
         text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, 
+                    # TRANS: Text is an instruction (verb in the imperative)
                     PyRTF.TEXT(rtf_repr(_('Text')), size=int(small_writing+4)), 
                     ' ', 
+		    # TRANS: Do not translate 'pledge' here, it is the SMS shortcode we use
                     PyRTF.TEXT(rtf_repr(_('pledge %s')) % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
+		    # TRANS: This appears on posters/flyers in the sentence: "Text 'pledge REFERENCE' *to* 60022". (Tim Morley, 2005-11-30)
                     ' ', rtf_repr(_('to')), ' ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
+		    # TRANS: I think 'pledge' here means 'sign up to', as part of "text xxxxxxxxxx to 60022 (UK only) or pledge at http://xxxxxxxxx". Is that right? (Tim Morley, 2005-11-23)
+		    # Yes, as above. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
                     rtf_repr(_(' (%s only) or pledge at ') % sms_countries_description), webdomain_text)
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
@@ -364,6 +370,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     else:
         pledge_at_text = _("pledge at ").encode('utf-8')
         pin_text = ""
+	# TRANS: Again, please don't translate "pledge" in this one
         sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
             (%s only) or """).encode('utf-8') % (ref, sms_number, sms_countries_description)

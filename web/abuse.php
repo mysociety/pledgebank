@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.29 2006-02-23 15:17:31 francis Exp $
+// $Id: abuse.php,v 1.30 2006-02-24 19:21:55 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -109,6 +109,7 @@ as possible.')), $w);
     }
 
     print '<form accept-charset="utf-8" action="abuse" method="post" name="abuse" class="pledge">';
+    # TRANS: %s is singular, one of "pledge", "comment", or "signature" 
     printf(h2(_('Report abusive, suspicious or wrong %s')), $w);
     printf(p(_('You are reporting the following %s:')), $w);
     print '<blockquote>';

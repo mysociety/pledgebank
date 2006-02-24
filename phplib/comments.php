@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.37 2005-12-06 00:10:32 matthew Exp $
+ * $Id: comments.php,v 1.38 2006-02-24 19:21:48 matthew Exp $
  * 
  */
 
@@ -46,6 +46,7 @@ function comments_show_one($comment, $noabuse = false) {
     if (isset($comment['ref'])) {
         $r = '<a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a>';
         if (isset($comment['whenposted'])) {
+	    # TRANS: "blah, blah, this is a comment. - To pledge artnotads by Matthew at 08:00 today." (Matthew Somerville in http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000099.html)
             printf(_('To pledge %s by %s at %s.'), $r, $name, prettify($comment['whenposted']));
         } else {
             printf(_('To pledge %s by %s.'), $r, $name);
@@ -125,6 +126,7 @@ function comments_summary($r) {
     if (strlen($text) > 20) $text = trim_characters($text, 0, 30);
     $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . $text . '</a>';
     
+    # TRANS: "<start of comment text...> by <name>, on <pledge reference link> at <time>" - these are the strings under Latest comments on the front page. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
     return sprintf(_('%s by %s, on %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
 }
 

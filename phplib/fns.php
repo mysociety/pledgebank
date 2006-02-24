@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.123 2006-02-22 21:23:35 francis Exp $
+// $Id: fns.php,v 1.124 2006-02-24 19:21:48 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -584,7 +584,9 @@ function pb_get_change_country_link() {
     global $site_country, $microsite;
     $change = '<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">';
     if ($microsite && ($microsite != 'everywhere')) 
-        $change .= _("choose site");
+        # TRANS: i.e. "choose website" or "choose local place where action will be taken?" I've assumed the former. (Tim Morley, 2005-11-21)
+	# Yes, it's choose website. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
+	$change .= _("choose site");
     elseif ($site_country)
         $change .= _("change country");
     else
@@ -719,6 +721,7 @@ function pb_print_filter_link_main_general($attrs = "") {
             print "<p $attrs>". sprintf(_('%s (%s) pledges only listed'), microsites_get_name(), $change_country). "</p>";
     }
     else {
+        # TRANS: Worth thinking about word order here. The English reads e.g. "UK (change country) pledges and global English (change language) pledges listed. Even in English, and certainly in other languages, it'd probably be clearer as something like: "Listed below are pledges for the UK (change country) and global pledges written in English (change language)." (Tim Morley, 2005-11-27)
         if ($site_country)
             print "<p $attrs>".sprintf(_('%s (%s) pledges and global %s (%s) pledges listed'), pb_site_country_name(), $change_country, $langname, $change_language) . "</p>";
         else

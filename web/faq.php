@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.27 2005-12-07 12:18:22 francis Exp $
+// $Id: faq.php,v 1.28 2006-02-24 19:21:55 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -156,6 +156,7 @@ neighbours about your pledge!"));
 
 print dt(_('Do you remove silly or illegal pledges?'));
 
+# TRANS: 'backpage' means the pledge is hidden, so you could translate it as "hide"
 print dd(_("PledgeBank reserves the right to 'backpage' any pledge which we
 consider to be inappropriate. This means that your pledge will work, but will
 not show up on the all page, or in the search. We will normally backpage

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.31 2006-01-10 12:06:51 chris Exp $
+ * $Id: ref-info.php,v 1.32 2006-02-24 19:21:55 matthew Exp $
  * 
  */
 
@@ -62,6 +62,7 @@ $p->render_box();
     <td><?
     if ($p->open())
         print _('open for signers; ')
+	        # TRANS: "successful" is only ever used in singular context
                 . ($p->succeeded() ? _('successful') : _('not yet successful'));
     else
         print _('closed; ')

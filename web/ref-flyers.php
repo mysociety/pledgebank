@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.16 2005-12-09 12:37:39 francis Exp $
+// $Id: ref-flyers.php,v 1.17 2006-02-24 19:21:55 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -66,6 +66,7 @@ print p(_('Here you can get <acronym title="Portable Document Format">PDF</acron
 // into an IMG SRC= link)
 if (!get_http_var('pin', true)) {
     print '<p class="noprint">';
+    # TRANS: The %s below becomes "print this page out"
     printf(_('Alternatively, simply %s to get these flyers.'), print_this_link(_("print this page out"), "") );
     print '</p>';
 ?>

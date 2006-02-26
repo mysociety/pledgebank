@@ -13,13 +13,13 @@ var translation = {
 "Town:":"Cidade:",
 "other local people":"outras pessoas locais",
 "<Enter your name>":"<Digite seu nome>",
-"<Enter your pledge>":"",
+"<Enter your pledge>":"<Digite sua Promessa> ",
 "<Enter town or keyword>":"Digitar cidade ou palavra-chave",
 "<Date>":"<Data>",
 "other local person":"outras pessoas locais",
 "Global":"Global",
 "(separator)":"(separador)",
-"Postcode or town:":"",
+"Postcode or town:":"Código postal ou cidade:",
 "You have used %d characters; %d remain.":"V. usou %d caracteres; faltam %d.",
-"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":""
+"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Você usou %d caracteres, o que é %d mais do que cabe numa SMS.\nFavor reduzir esse texto.  "
 }

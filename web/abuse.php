@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.31 2006-03-01 16:42:19 francis Exp $
+// $Id: abuse.php,v 1.32 2006-03-01 16:45:11 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -139,15 +139,16 @@ EOF;
     print '<p>';
     printf(_('<strong>Your email</strong>:'));
     print ' <input type="text" name="email" '.(array_key_exists('email', $errors) ? 'class="error" ' : '').'size="20" value="'.$q_h_email.'">';
-    print '</p>';
     #print ' <small>'._('(optional, if you want us to get back to you)').'</small>';
+    print '<br>';
     printf(_('<strong>Reason for reporting this %s</strong>:'), $w);
     print '<br><textarea style="max-width: 100%" name="reason" cols="60" rows="3">'.$q_h_reason.'</textarea>';
     print '<br>';
     printf(_('<strong>Enter the magic word</strong>, which is \'together\':'));
-    print ' <input type="text" name="magicword" '.(array_key_exists('magicword', $errors) ? 'class="error" ' : '').'size="20"></p>';
+    print ' <input type="text" name="magicword" '.(array_key_exists('magicword', $errors) ? 'class="error" ' : '').'size="20">';
+    print '</p>';
     print '<p>';
-    print '<input name="submit" type="submit" value="' . _('Submit') . '"><br>';
+    print '<input name="submit" type="submit" value="' . _('Submit') . '"></p>';
     print '</form>';
 
 }

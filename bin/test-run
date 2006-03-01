@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.170 2006-02-22 19:20:41 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.171 2006-03-01 16:42:18 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -249,7 +249,7 @@ sub display_url {
 #       0 the login form does not require email (was entered in an earlier form)
 #       1 the login form requires email
 #   TODO distinguish viaemail already logged in from not?
-# EMAIL_TEXT is an SQL LIKE query fragment that confirmation mail must match.
+# EMAIL_TEXT is an array of SQL LIKE query fragments that confirmation mail must match one of.
 sub perform_login_action {
     my ($who, $login_options, $email_text) = @_;
     my $login_action = $login_options->{'action'};
@@ -273,8 +273,8 @@ sub perform_login_action {
         # Wait for it to arrive, and extract the link (unless we are suspending request)
         my $confirmation_url;
         if ($login_action ne "suspend") {
-            my $confirmation_email = $wth->email_get_containing(
-                '%To: '.email_n($who).'%'.$email_text.'%');
+            my @email_text_array = map { '%To: '.email_n($who).'%'.$_.'%' } @$email_text;
+            my $confirmation_email = $wth->email_get_containing(\@email_text_array);
             die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^\s*(http://.*$)#m);
             $confirmation_url = $1;
             display_url("Email confirmation URL", $confirmation_url);
@@ -346,8 +346,8 @@ sub create_pledge {
 
     # Make new pledge, step 1
     $wth->browser_get($locale_url);
-    $wth->browser_follow_link(text_regex => qr/(Start your own pledge|Iniciar seu proprio contrato)/);
-    $wth->browser_check_contents(qr/(New Pledge|Neova Promessa)/);
+    $wth->browser_follow_link(text_regex => qr/(Start your own pledge|Comece a sua promessa)/);
+    $wth->browser_check_contents(qr/(New Pledge|Nova Promessa)/);
     $wth->browser_submit_form(form_name => 'pledge', fields => $page1,
         button => 'tostep2') or die "Failed to submit creating form step 1";
     if ($page1->{target} >= 20) {
@@ -389,12 +389,12 @@ sub create_pledge {
         button => 'tocreate') or die "Failed to submit creating form step 4";
 
     # Requires authentication
-    perform_login_action($who, $login_options, "to confirm that you");
+    perform_login_action($who, $login_options, ["to confirm that you", "para confirmar que deseja"]);
     if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword") {
         print "Done creating pledge ". $page1->{'ref'} . " ($login_action)\n" if $verbose > 1;
         return;
     }
-    $wth->browser_check_contents(qr/(Thank you for creating your pledge|Obrigado por criar seu contrato)/);
+    $wth->browser_check_contents(qr/(Thank you for creating your pledge|Obrigado por criar sua promessa)/);
     print "Done creating pledge ". $page1->{'ref'} . " ($login_action)\n" if $verbose > 1;
     return;
 }
@@ -424,7 +424,7 @@ sub sign_pledge {
     }
 
     # Perform appropriate login action
-    perform_login_action($who, $login_options, "to confirm your signature");
+    perform_login_action($who, $login_options, ["to confirm your signature"]);
     return if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword");
 
     # Look for appropriate result in web page
@@ -559,7 +559,7 @@ sub do_public_succeeding_pledge {
             gaze_place => '39.52972|-119.81278|Reno, Washoe County, NV'
         },
         button => 'submit');
-    perform_login_action(11, {action=>"viaemail"}, "emailed whenever a new");
+    perform_login_action(11, {action=>"viaemail"}, ["emailed whenever a new"]);
     $wth->browser_check_contents("Thanks for subscribing!");
 
     # Make the pledge
@@ -593,7 +593,7 @@ sub do_public_succeeding_pledge {
         button => 'preview');
     $wth->browser_check_contents("Hey! This is a great pledge.");
     $wth->browser_submit_form(form_name => 'commentform', fields => {}, button => 'submit');
-    perform_login_action(90, {action=>"viaemail"}, "comment will then be displayed");
+    perform_login_action(90, {action=>"viaemail"}, ["comment will then be displayed"]);
     $wth->browser_check_contents("Your comment has now been posted");
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("Do I have to be a computer to take part?");
@@ -609,7 +609,7 @@ sub do_public_succeeding_pledge {
         button => 'preview');
     $wth->browser_check_contents("This is a second comment");
     $wth->browser_submit_form(form_name => 'commentform', fields => {}, button => 'submit');
-    perform_login_action(91, {action=>"viaemail"}, "comment will then be displayed");
+    perform_login_action(91, {action=>"viaemail"}, ["comment will then be displayed"]);
     $wth->browser_check_contents("Your comment has now been posted");
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("It cost £0 to make and was mainly done in a café");
@@ -631,7 +631,7 @@ sub do_public_succeeding_pledge {
         button => 'preview');
     $wth->browser_check_contents("This is a third comment");
     $wth->browser_submit_form(form_name => 'commentform', fields => {}, button => 'submit');
-    perform_login_action(91, {action=>"viaemail"}, "comment will then be displayed");
+    perform_login_action(91, {action=>"viaemail"}, ["comment will then be displayed"]);
     $wth->browser_check_contents("Your comment has now been posted");
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("This is a third comment");
@@ -681,7 +681,7 @@ sub do_public_succeeding_pledge {
     # Send mid-pledge announcement, to encourage signers to do more to help
     $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_follow_link(text_regex => qr/message to signers/);
-    perform_login_action(0, {action=>"viaemail", giveemail=>1}, "send a message to everyone");
+    perform_login_action(0, {action=>"viaemail", giveemail=>1}, ["send a message to everyone"]);
     $wth->browser_check_contents("Send Announcement");
     $wth->browser_check_no_contents("successful");
     $wth->browser_submit_form(form_name => 'pledge',
@@ -1097,7 +1097,7 @@ sub do_sms_pledge {
             phone => mobile_n(105), name => name_n(105), email => email_n(105), showname => 1
             },
         button => 'submit') or die "Failed to submit SMS conversion form";
-    perform_login_action(105, {action=>"viaemail"}, "to confirm your signature");
+    perform_login_action(105, {action=>"viaemail"}, ["to confirm your signature"]);
     $wth->browser_check_contents("Thanks for signing up");
     # Check signup now appears
     $wth->browser_get($locale_url . "/$pledge_ref");
@@ -1161,7 +1161,7 @@ sub do_login_tests {
             postcode => 'SN81rF', # Red Lion pub, Avebury
         },
         button => 'submit');
-    perform_login_action(250, {action=>"viaemail"}, "emailed whenever a new");
+    perform_login_action(250, {action=>"viaemail"}, ["emailed whenever a new"]);
     $wth->browser_check_contents("Thanks for subscribing!");
 
     # Make the pledge
@@ -1318,7 +1318,7 @@ sub do_category_tests {
     set_pledge_prominence($pledge_ref_english, 'frontpage');
     set_pledge_prominence($pledge_ref_portugese, 'frontpage');
     $wth->browser_get($locale_url);
-    $wth->browser_check_contents("mas só se 3 other monoglots");
+    $wth->browser_check_contents("mas s se 3 other monoglots");
     $wth->browser_check_contents("but only if 3 other polyglots");
 
     # Change to normal pages again
@@ -1352,7 +1352,8 @@ sub do_admin_tests {
     $wth->browser_submit_form(form_name => 'abuse',
             fields => { 
                 reason => "I hate this comment, it sucks",
-                email => email_n(1000)},
+                email => email_n(1000),
+                magicword => 'together'},
             button => 'submit') or die "Failed to submit comment abuse form";
     $wth->browser_check_contents("One of our team will investigate");
     $wth->email_get_containing('%To: '.$contact_email.  '%New abuse report for%');

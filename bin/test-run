@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.171 2006-03-01 16:42:18 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.172 2006-03-02 12:22:04 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1318,7 +1318,7 @@ sub do_category_tests {
     set_pledge_prominence($pledge_ref_english, 'frontpage');
     set_pledge_prominence($pledge_ref_portugese, 'frontpage');
     $wth->browser_get($locale_url);
-    $wth->browser_check_contents("mas s se 3 other monoglots");
+    $wth->browser_check_contents("mas só se 3 other monoglots");
     $wth->browser_check_contents("but only if 3 other polyglots");
 
     # Change to normal pages again

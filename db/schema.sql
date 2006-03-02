@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.168 2006-03-01 19:48:43 chris Exp $
+-- $Id: schema.sql,v 1.169 2006-03-02 10:06:27 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -370,9 +370,6 @@ create function pledge_find_fuzzily(text)
                 pledge_id integer primary key,
                 score integer
             );
-            raise warning ''creating table'';
-        else
-            raise warning ''table already exists'';
         end if;
 
         for o in 1 .. length(t_ref) - 2 loop
@@ -386,7 +383,7 @@ create function pledge_find_fuzzily(text)
                     set score = score + 1
                     where pledge_id = '' || r.pledge_id;
 
-                -- would normally use "if not found", but this doesn't work
+                -- would normally use "if not found", but this does not work
                 -- (reliably?) when using execute.
                 get diagnostics l = row_count;
                 if l = 0 then

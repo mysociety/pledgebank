@@ -21,5 +21,5 @@ var translation = {
 "(separator)":"(separador)",
 "Postcode or town:":"Código postal ou cidade:",
 "You have used %d characters; %d remain.":"V. usou %d caracteres; faltam %d.",
-"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":""
+"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Você usou %d caracteres, o que é %d mais do que cabe numa SMS. Favor reduzir esse texto.  "
 }

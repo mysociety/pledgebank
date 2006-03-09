@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.28 2006-02-24 19:21:55 matthew Exp $
+// $Id: faq.php,v 1.29 2006-03-09 16:59:54 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -110,6 +110,41 @@ code</a> (look under \'pb\') and help us develop it. You\'re welcome to use it
 in your own projects, although you must also make available the source code to
 any such projects.
 '));
+
+print dt(_('People build things, not organisations. Who <em>actually</em> built it?'));
+
+print dd(_('OK, we are
+Mike Bracken,
+Edmund von der Burg,
+James Cronin,
+Francis Irving,
+Chris Lightfoot,
+Tom Loosemore, 
+Etienne Pollard,
+Richard Pope,
+Matthew Somerville,
+Tom Steinberg.
+
+<strong>Translations by</strong>
+Nic Dafis (Welsh),
+Hugo Caballero Figueroa (Spanish),
+Tim Morley (Esperanto),
+Diego Galli (Italian),
+Alexander Markushin (Russian),
+maidan.org.ua team (Ukrainian).
+
+<strong>Thanks also to</strong>
+<a href="http://www.c360uk.com/">c360</a> (for SMS in the UK), 
+the <a href="http://earth-info.nga.mil/gns/html/cntry_files.html">US military</a> (for the world gazetteer),
+<a href="http://sedac.ciesin.columbia.edu/gpw/">CIESIN</a> (for population density data),
+<a href="http://www.ordnancesurvey.co.uk">Ordnance Survey</a> (for UK postcodes),
+the entire free software community (FreeBSD, Linux, PHP, Perl, Python, Apache, MySQL, PostgreSQL, we love and use you all!)
+and <a href="http://www.easynet.net/">Easynet</a> (who kindly host all our servers).
+
+Let us know if we\'ve missed anyone.
+
+'));
+
 
 print "</dl>\n";
 

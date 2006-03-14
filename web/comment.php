@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.28 2005-12-11 21:37:29 matthew Exp $
+ * $Id: comment.php,v 1.29 2006-03-14 11:26:22 chris Exp $
  * 
  */
 
@@ -50,11 +50,13 @@ page_header(sprintf(_("Commenting on '%s'"), $pledge->h_title()));
 
 /* Grab comment variables themselves. */
 $err = importparams(
-            array(array('author_name',true),        '//',                   "",     null),
+            array(array('author_name', true),
+                                        '//',                   "",     null),
             array('author_email',       '//',                   "",     null),
             array('author_website',     '//',                   "",     null),
-            array('comment_alert_signup',     '/./',                   "",     false),
-            array(array('text',true),               '//',                   "",     ""),
+            array('comment_alert_signup',
+                                        '/./',                  "",     false),
+            array(array('text', true),  '//',                   "",     ""),
             array('n',                  '/^[0-9]+$/',           "",     0),
             array('submit',             '//',                   "",     false)
         );

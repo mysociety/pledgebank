@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.31 2006-03-14 11:27:14 chris Exp $
+ * $Id: comment.php,v 1.32 2006-03-14 11:58:59 chris Exp $
  * 
  */
 
@@ -55,7 +55,7 @@ $err = importparams(
             array('author_email',       '//',                   "",     null),
             array('author_website',     '//',                   "",     null),
             array('comment_alert_signup',
-                                        '/./',                  "",     false),
+                                        '//',                   "",     false),
             array(array('text', true),  '//',                   "",     ""),
             array('n',                  '/^[0-9]+$/',           "",     0),
             array('submit',             '//',                   "",     false)
@@ -63,6 +63,11 @@ $err = importparams(
 
 if (!is_null($err))
     err(_("Sorry -- something seems to have gone wrong"));
+    
+if (strlen($q_comment_alert_signup) == 0)
+    $q_comment_alert_signup = false;
+else
+    $q_comment_alert_signup = true;
 
 $err = array();
 

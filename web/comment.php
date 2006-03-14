@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.29 2006-03-14 11:26:22 chris Exp $
+ * $Id: comment.php,v 1.30 2006-03-14 11:26:48 chris Exp $
  * 
  */
 
@@ -20,8 +20,8 @@ require_once('../phplib/alert.php');
 
 $err = importparams(
             array('pledge_id',          '/^[1-9][0-9]*$/',      _("Missing pledge id")),
-            array(array('pin', true),                 '//',                  _("Missing PIN"),     null),
-            array('comment_id',         '/^[1-9][0-9]*$/',      _("Missing comment id"),     null)
+            array(array('pin', true),                 '//',     _("Missing PIN"),           null),
+            array('comment_id',         '/^[1-9][0-9]*$/',      _("Missing comment id"),    null)
         );
 
 if (!is_null($err)) {

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.169 2006-03-02 10:06:27 chris Exp $
+-- $Id: schema.sql,v 1.170 2006-03-15 11:59:44 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -387,7 +387,6 @@ create function pledge_find_fuzzily(text)
                 -- (reliably?) when using execute.
                 get diagnostics l = row_count;
                 if l = 0 then
-                   raise warning '' ... insert'';
                     execute
                     ''insert into pledge_ref_fuzzy_match_tmp (pledge_id, score)
                         values ('' || r.pledge_id || '', 1)'';

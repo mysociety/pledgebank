@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.44 2006-02-24 19:21:55 matthew Exp $
+// $Id: search.php,v 1.45 2006-03-15 12:50:05 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -305,7 +305,7 @@ function search($search) {
         $success = 1;
         print sprintf(p(_('Results for <strong>people</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
         print '<dl>';
-        ksort($people);
+        uksort($people, 'strcoll');
         foreach ($people as $name => $array) {
             print '<dt><b>'.htmlspecialchars($name). '</b></dt> <dd>';
             foreach ($array as $item) {

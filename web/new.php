@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.125 2006-02-24 19:21:55 matthew Exp $
+// $Id: new.php,v 1.126 2006-03-15 12:50:05 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -382,7 +382,7 @@ function pledge_form_three($data, $errors = array()) {
                     (is_null($parent_id) ? '' : '&nbsp;-&nbsp;'),
                     htmlspecialchars(_($name)));
     }
-    ksort($out);
+    uksort($out, 'strcoll');
     foreach ($out as $n => $s) {
         print $s;
     }

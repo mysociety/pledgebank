@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.116 2006-02-24 19:21:48 matthew Exp $
+ * $Id: admin-pb.php,v 1.117 2006-03-15 11:37:20 francis Exp $
  * 
  */
 
@@ -97,7 +97,7 @@ class ADMIN_PAGE_PB_MAIN {
                 '$pb_today' <= date AS open,
                 pb_pledge_prominence(pledges.id) as calculated_prominence,
                 country, description,
-                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id AND signtime > pb_current_timestamp() - interval '1 day')::float / target::float * 100::float  AS surge
+                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id AND signtime > pb_current_timestamp() - interval '1 day') AS surge
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
@@ -107,7 +107,7 @@ class ADMIN_PAGE_PB_MAIN {
         while ($r = db_fetch_array($q)) {
             $row = "";
 
-            $row .= '<td>'.htmlspecialchars(round($r['surge'],1)).'%</td>';
+            $row .= '<td>'.$r['surge'].'</td>';
             $row .= '<td><a href="'.
                 pb_domain_url(array('path'=>"/".$r['ref'], 'lang'=>$r['lang'], 'country'=>$r['country'])) .
                 '">'.$r['ref'].'</a>'.
@@ -901,7 +901,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
             print '<form name="discardreportsform" method="POST" action="'.$this->self_link.'"><input type="hidden" name="prev_url" value="'
                         . htmlspecialchars($self_link) . '">';
             print '
-    <p><input type="submit" name="discardReports" value="Discard selected abuse reports"></p>
+    <p><input type="submit" name="discardReports" value="'._("Discard selected abuse reports").'"></p>
     <table class="abusereporttable">
     ';
             while (list($id, $what_id, $reason, $email, $ipaddr, $t) = db_fetch_row($q)) {

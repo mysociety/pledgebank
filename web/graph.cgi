@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.17 2006-01-20 17:29:05 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.18 2006-03-16 00:35:56 chris Exp $';
 
 use strict;
 
@@ -286,7 +286,7 @@ EOF
             while (!-e "$graphfile") {
                 sleep(0.1);
                 ++$i;
-                die "timed out waiting for gnuplot to render graph" if ($i == 20);
+                die "timed out waiting for gnuplot to render graph" if ($i == 50);
             }
 
             unlink($signuprate_file);

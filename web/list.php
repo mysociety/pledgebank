@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.25 2005-11-10 12:27:01 francis Exp $
+// $Id: list.php,v 1.26 2006-03-18 12:37:35 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -16,12 +16,13 @@ define('PAGE_SIZE', 50);
 
 $err = importparams(
             array('offset', '/^(0|[1-9]\d*)$/', '', 0),
-            array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete|category)$/', '', 'default'),
+            array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete|category)\/?$/', '', 'default'),
             array('type', '/^[a-z_]*$/', '', 'open')
         );
 if ($err) {
     err(_('Illegal offset or sort parameter passed'));
 }
+if ($q_type == 'all') $q_type = 'open';
 
 $rss = get_http_var('rss') ? true : false;
 

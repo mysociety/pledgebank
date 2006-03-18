@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.73 2006-02-24 19:21:55 matthew Exp $
+# $Id: poster.cgi,v 1.74 2006-03-18 12:37:37 matthew Exp $
 #
 
 import sys
@@ -233,7 +233,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([ text_para, 
-        PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('This pledge closes on ')), PyRTF.TEXT('%s' % pledge['date'], colour=ss.Colours.pb), rtf_repr(_('. Thanks!'))),
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('This pledge closes on ')), PyRTF.TEXT('%s' % rtf_repr(pledge['date'].decode('utf-8')), colour=ss.Colours.pb), rtf_repr(_('. Thanks!'))),
         PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.')) % pledge['target'])
 #        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
 #            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
@@ -373,7 +373,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 	# TRANS: Again, please don't translate "pledge" in this one
         sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
-            (%s only) or """).encode('utf-8') % (ref, sms_number, sms_countries_description)
+            (%s only) or """).encode('utf-8') % (ref, sms_number, sms_countries_description.encode('utf-8'))
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([
@@ -548,7 +548,7 @@ while fcgi.isFCGI():
         locale.setlocale(locale.LC_ALL, iso_lang + '.UTF-8')
         #raise Exception, "Language '%s' %s" % (iso_lang, _("Start your own pledge"))
 
-        sms_countries_description = _('UK').encode('utf-8')
+        sms_countries_description = _('UK')
 
         # Set date
         day = date.day

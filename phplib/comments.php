@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.38 2006-02-24 19:21:48 matthew Exp $
+ * $Id: comments.php,v 1.39 2006-03-20 11:49:04 francis Exp $
  * 
  */
 
@@ -133,28 +133,52 @@ function comments_summary($r) {
 /* comments_show_latest [NUM]
  * Show a brief summary of the NUM (default 10) most recent comments. */
 function comments_show_latest($comments_to_show = 10) { 
+    $c = 0;
+
+    $sql_params = array();
+    $site_limit = pb_site_pledge_filter_main($sql_params);
+    $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit);
+
+    if ($c == 0) {
+        $sql_params = array();
+        $site_limit = pb_site_pledge_filter_general($sql_params);
+        $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit);
+    }
+
+    if ($c == 0) {
+        $sql_params = array();
+        $site_limit = pb_site_pledge_filter_foreign($sql_params);
+        $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit);
+    }
+}
+
+function comments_show_latest_internal($comments_to_show, $sql_params, $site_limit) {
+    $sql_params[] = $comments_to_show;
     $q = db_query("
                 SELECT comment.id,
                     extract(epoch from whenposted) as whenposted, text,
                     comment.name, website, ref
-                FROM comment, pledges
+                FROM comment, pledges, location
                 WHERE comment.pledge_id = pledges.id
+                    AND location.id = pledges.location_id
                     AND NOT ishidden
                     AND pb_pledge_prominence(pledges.id) <> 'backpage'
+                    AND ($site_limit)
                 ORDER BY whenposted DESC
-                LIMIT $comments_to_show");
-    if (db_num_rows($q) > 0) {
+                LIMIT ?", $sql_params);
+    $num = db_num_rows($q);
+    if ($num > 0) {
         ?><div class="comments">
         <?=_('<h2>Latest comments</h2>') ?> <?  
         print '<ul>';
         while($r = db_fetch_array($q)) {
             print '<li>';
             print comments_summary($r);
-            #        comments_show_one($r, true);
             print '</li>';
         }
         print '</ul></div>';
     }
+    return $num;
 }
 
 /* comments_form PLEDGE N [ALLOWPOST]

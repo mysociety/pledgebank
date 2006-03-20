@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.117 2006-03-15 11:37:20 francis Exp $
+ * $Id: admin-pb.php,v 1.118 2006-03-20 12:02:40 francis Exp $
  * 
  */
 
@@ -89,21 +89,27 @@ class ADMIN_PAGE_PB_MAIN {
         elseif ($sort=='g') $order = 'lang';
         elseif ($sort=='z') $order = 'surge desc';
 
+        $openness = get_http_var('o');
+        if ($openness == 'closed') {
+            $openness_condition = "'$pb_today' > date";
+         } else {
+            $openness_condition = "'$pb_today' <= date";
+        }
+
         $q = db_query("
             SELECT pledges.*, person.email,
                 date_trunc('second',whensucceeded) as whensucceeded, 
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                '$pb_today' <= date AS open,
                 pb_pledge_prominence(pledges.id) as calculated_prominence,
                 country, description,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id AND signtime > pb_current_timestamp() - interval '1 day') AS surge
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
+            WHERE $openness_condition
             " .  ($order ? ' ORDER BY ' . $order : '') );
-        $open = array();
-        $closed = array();
+        $found = array();
         while ($r = db_fetch_array($q)) {
             $row = "";
 
@@ -142,10 +148,7 @@ class ADMIN_PAGE_PB_MAIN {
             else
                 $row .= '<td>None</td>';
 
-            if ($r['open'] == 't')
-                $open[] = $row;
-            else
-                $closed[] = $row;
+            $found[] = $row;
         }
         if ($sort=='o') {
             function sort_by_percent($a, $b) {
@@ -157,29 +160,33 @@ class ADMIN_PAGE_PB_MAIN {
             }
             uksort($open, 'sort_by_percent');
         }
-         
-        if (count($open)) {
-            print h2(_("All Open Pledges"));
-            $this->pledge_header($sort);
-            $a = 0;
-            foreach ($open as $row) {
-                print '<tr'.($a++%2==0?' class="v"':'').'>';
-                print $row;
-                print '</tr>'."\n";
-            }
-            print '</table>';
+
+        print "<p>";
+        if ($openness == 'closed') {
+            print '<a href="?page=pb">';
+            print _('All Open Pledges');
+            print '</a>';
+            print " | ";
+            print _('All Closed Pledges');
+            print " (" . count($found) . ")";
+         } else {
+            print _('All Open Pledges');
+            print " (" . count($found) . ")";
+            print " | ";
+            print '<a href="?page=pb&o=closed">';
+            print _('All Closed Pledges');
+            print '</a>';
         }
-        if (count($closed)) {
-            print h2(_("All Closed Pledges"));
-            $this->pledge_header($sort);
-            $a = 0;
-            foreach ($closed as $row) {
-                print '<tr'.($a++%2==0?' class="v"':'').'>';
-                print $row;
-                print '</tr>'."\n";
-            }
-            print '</table>';
+        print "</p>";
+          
+        $this->pledge_header($sort);
+        $a = 0;
+        foreach ($found as $row) {
+            print '<tr'.($a++%2==0?' class="v"':'').'>';
+            print $row;
+            print '</tr>'."\n";
         }
+        print '</table>';
         print '<p>';
     }
 

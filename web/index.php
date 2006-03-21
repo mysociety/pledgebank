@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.232 2006-02-22 21:28:23 francis Exp $
+// $Id: index.php,v 1.233 2006-03-21 16:56:36 chris Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -100,7 +100,7 @@ function list_frontpage_pledges() {
     $pledges_required_fp = 8; // number of pledges to show on main part of front page if frontpaged
     $pledges_required_n = 6; // number of pledges below which we show normal pledges, rather than just frontpaged ones
     $pledges = get_pledges_list("
-                pb_pledge_prominence(pledges.id) = 'frontpage' AND
+                cached_prominence = 'frontpage' AND
                 date >= '$pb_today' AND 
                 pin is NULL AND 
                 whensucceeded IS NULL
@@ -111,7 +111,7 @@ function list_frontpage_pledges() {
         // If too few, show some global frontpage pledges
         $more =$pledges_required_fp - count($pledges);
         $global_pledges = get_pledges_list("
-                    pb_pledge_prominence(pledges.id) = 'frontpage' AND
+                    cached_prominence = 'frontpage' AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
@@ -124,7 +124,7 @@ function list_frontpage_pledges() {
         // If too few, show a few of the normal pledges for the country
         $more = $pledges_required_n - count($pledges);
         $normal_pledges = get_pledges_list("
-                    pb_pledge_prominence(pledges.id) = 'normal' AND
+                    cached_prominence = 'normal' AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
@@ -137,7 +137,7 @@ function list_frontpage_pledges() {
         // If too few, show some global normal pledges
         $more =$pledges_required_n - count($pledges);
         $global_normal_pledges = get_pledges_list("
-                    pb_pledge_prominence(pledges.id) = 'normal' AND
+                    cached_prominence = 'normal' AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
@@ -158,7 +158,7 @@ function list_frontpage_pledges() {
     if (count($pledges) < 4) {
         $more = 4 - count($pledges);
         $pledges = get_pledges_list("
-                    pb_pledge_prominence(pledges.id) = 'frontpage' AND
+                    cached_prominence = 'frontpage' AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
@@ -176,7 +176,7 @@ function list_successful_pledges() {
     print h2(_('Recent successful pledges'));
 
     $pledges = get_pledges_list("
-                pb_pledge_prominence(pledges.id) <> 'backpage' AND
+                cached_prominence <> 'backpage' AND
                 pin IS NULL AND 
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC

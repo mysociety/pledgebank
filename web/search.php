@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.45 2006-03-15 12:50:05 francis Exp $
+// $Id: search.php,v 1.46 2006-03-21 16:56:36 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -54,7 +54,7 @@ function get_location_results($pledge_select, $lat, $lon) {
                 LEFT JOIN location ON location.id = pledges.location_id 
                 WHERE 
                     pin IS NULL AND
-                    pb_pledge_prominence(pledges.id) <> 'backpage' AND 
+                    pledges.cached_prominence <> 'backpage' AND 
                     '$pb_today' <= pledges.date 
                 ORDER BY distance", array($lat, $lon, $radius)); 
     locale_pop();
@@ -221,7 +221,7 @@ function search($search) {
     $q = db_query($pledge_select . ' FROM pledges 
                 LEFT JOIN location ON location.id = pledges.location_id 
                 WHERE pin IS NULL 
-                    AND pb_pledge_prominence(pledges.id) <> \'backpage\'
+                    AND pledges.cached_prominence <> \'backpage\'
                     AND (title ILIKE \'%\' || ? || \'%\' OR 
                          detail ILIKE \'%\' || ? || \'%\' OR 
                          identity ILIKE \'%\' || ? || \'%\' OR 

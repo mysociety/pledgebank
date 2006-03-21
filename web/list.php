@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.26 2006-03-18 12:37:35 matthew Exp $
+// $Id: list.php,v 1.27 2006-03-21 16:56:36 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -61,7 +61,7 @@ $query = "
                 WHERE $locale_clause AND pin IS NULL ".
                 ($open ? " AND date $open '$pb_today' " : ""). 
                 " AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target
-                    AND pb_pledge_prominence(pledges.id) <> 'backpage'";
+                    AND cached_prominence <> 'backpage'";
 $ntotal = db_getOne($query , $sql_params);
 if ($ntotal < $q_offset) {
     $q_offset = $ntotal - PAGE_SIZE;
@@ -95,7 +95,7 @@ $qrows = db_query("
             ($open ? " AND date $open '$pb_today' " : ""). 
            "AND pin IS NULL
             AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target 
-            AND pb_pledge_prominence(pledges.id) <> 'backpage'
+            AND cached_prominence <> 'backpage'
             ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", $sql_params);
 /* PG bug: mustn't quote parameter of offset */
 

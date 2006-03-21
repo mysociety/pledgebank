@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.171 2006-03-21 16:44:01 chris Exp $
+-- $Id: schema.sql,v 1.172 2006-03-21 16:47:48 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -198,7 +198,7 @@ create table pledges (
     ),
 
     -- Cached version of computed prominence.
-    cached_prominence text not null default 'normal' check (
+    cached_prominence text not null default 'backpage' check (
         cached_prominence = 'normal' or
         cached_prominence = 'frontpage' or
         cached_prominence = 'backpage'

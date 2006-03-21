@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.118 2006-03-20 12:02:40 francis Exp $
+ * $Id: admin-pb.php,v 1.119 2006-03-21 17:15:31 chris Exp $
  * 
  */
 
@@ -26,7 +26,7 @@ class ADMIN_PAGE_PB_SUMMARY {
         global $pb_today;
 
         $pledges = db_getOne('SELECT COUNT(*) FROM pledges');
-        $nonbackpage = db_getOne('SELECT COUNT(*) FROM pledges WHERE pb_pledge_prominence(id) != \'backpage\'');
+        $nonbackpage = db_getOne("SELECT COUNT(*) FROM pledges WHERE cached_prominence <> 'backpage'");
         $successful = db_getOne('SELECT COUNT(*) FROM pledges WHERE whensucceeded IS NOT NULL');
         $failed = db_getOne("SELECT COUNT(*) FROM pledges WHERE '$pb_today' > date AND whensucceeded IS NULL");
         $open = db_getOne("SELECT COUNT(*) FROM pledges WHERE '$pb_today' <= date AND whensucceeded IS NULL");
@@ -101,7 +101,7 @@ class ADMIN_PAGE_PB_MAIN {
                 date_trunc('second',whensucceeded) as whensucceeded, 
                 date_trunc('second',creationtime) AS creationtime, 
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                pb_pledge_prominence(pledges.id) as calculated_prominence,
+                pledges.cached_prominence as calculated_prominence,
                 country, description,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id AND signtime > pb_current_timestamp() - interval '1 day') AS surge
             FROM pledges 
@@ -205,7 +205,7 @@ class ADMIN_PAGE_PB_MAIN {
             $signers_limit = 100;
 
         $q = db_query('SELECT pledges.*, person.email,
-                pb_pledge_prominence(pledges.id) as calculated_prominence,
+                pledges.cached_prominence as calculated_prominence,
                 location.country, location.state, location.description,
                 location.longitude, location.latitude, location.method,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,

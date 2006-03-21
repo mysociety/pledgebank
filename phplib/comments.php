@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.40 2006-03-21 13:02:35 francis Exp $
+ * $Id: comments.php,v 1.41 2006-03-21 17:13:05 chris Exp $
  * 
  */
 
@@ -162,7 +162,7 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
                 WHERE comment.pledge_id = pledges.id
                     AND location.id = pledges.location_id
                     AND NOT ishidden
-                    AND pb_pledge_prominence(pledges.id) <> 'backpage'
+                    AND pledges.cached_prominence <> 'backpage'
                     AND ($site_limit)
                 ORDER BY whenposted DESC
                 LIMIT ?", $sql_params);

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pics.php,v 1.5 2006-03-21 17:20:38 chris Exp $
+ * $Id: pics.php,v 1.6 2006-03-21 17:24:32 chris Exp $
  * 
  */
 
@@ -34,6 +34,8 @@ else
     err('Unknown image type');
 
 header("Content-Length: " . strlen($data));
+/* XXX should also record time picture was uploaded and send a Last-Modified:
+ * for that time. */
 print $data;
 
 ?>

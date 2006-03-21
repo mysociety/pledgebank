@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.66 2006-02-24 19:21:43 matthew Exp $
+ * $Id: frequentupdate,v 1.67 2006-03-21 16:44:00 chris Exp $
  *
  */
 
@@ -558,14 +558,22 @@ function send_pending_messages() {
     }
 }
 
+/* compute_prominences
+ * Compute pledge prominences and save them in the database. */
+function compute_prominences() {
+    verbose("cacheing pledge prominences");
+    db_query('update pledges set cached_prominence = pb_pledge_prominence(id)');
+    db_commit();
+}
+
 // Main code
 db_connect();
 
+compute_prominences();
 mark_pledges_successful();
 send_automatic_failure_messages();
 chivvy_creators_early();
 chivvy_creators_lowrate();
 send_pledge_success_reminder();
 send_pending_messages();
-
 

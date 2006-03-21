@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.39 2006-03-20 11:49:04 francis Exp $
+ * $Id: comments.php,v 1.40 2006-03-21 13:02:35 francis Exp $
  * 
  */
 
@@ -19,7 +19,7 @@ require_once('../../phplib/db.php');
  * Convert TEXT to HTML. To start with we just turn line-feeds into <br>s and
  * URLs and hostnames beginning "www." into HREFs. */
 function comments_text_to_html($text) {
-    return nl2br(make_clickable( htmlspecialchars($text), array('contract'=>true)));
+    return nl2br(ms_make_clickable( htmlspecialchars($text), array('contract'=>true)));
 }
 
 /* comments_format_timestamp TIME

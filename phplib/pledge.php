@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.150 2006-02-24 19:21:49 matthew Exp $
+ * $Id: pledge.php,v 1.151 2006-03-21 13:02:35 francis Exp $
  * 
  */
 
@@ -324,7 +324,7 @@ class Pledge {
         print '</p>';
         if (array_key_exists('showdetails', $params) && $params['showdetails'] && isset($this->data['detail']) && $this->data['detail']) {
             $det = htmlspecialchars($this->data['detail']);
-            $det = make_clickable($det, array('contract'=>true));
+            $det = ms_make_clickable($det, array('contract'=>true));
             $det = nl2br($det);
             print '<p id="moredetails"><strong>' . _('More details') . '</strong><br>' . $det . '</p>';
         }

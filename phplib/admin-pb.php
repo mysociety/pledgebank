@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.119 2006-03-21 17:15:31 chris Exp $
+ * $Id: admin-pb.php,v 1.120 2006-03-21 18:44:28 francis Exp $
  * 
  */
 
@@ -44,7 +44,7 @@ class ADMIN_PAGE_PB_MAIN {
         $this->navname = _("Pledges and Signers");
     }
 
-    function pledge_header($sort) {
+    function pledge_header($sort, $openness_url) {
         print '<table border="1" cellpadding="3" cellspacing="0"><tr>';
         $cols = array(
             'z'=>'Surge (day)',
@@ -62,7 +62,7 @@ class ADMIN_PAGE_PB_MAIN {
         );
         foreach ($cols as $s => $col) {
             print '<th>';
-            if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.'">';
+            if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.$openness_url.'">';
             print $col;
             if ($sort != $s) print '</a>';
             print '</th>';
@@ -162,6 +162,7 @@ class ADMIN_PAGE_PB_MAIN {
         }
 
         print "<p>";
+        $openness_url = "";
         if ($openness == 'closed') {
             print '<a href="?page=pb">';
             print _('All Open Pledges');
@@ -169,6 +170,7 @@ class ADMIN_PAGE_PB_MAIN {
             print " | ";
             print _('All Closed Pledges');
             print " (" . count($found) . ")";
+            $openness_url = "&o=closed";
          } else {
             print _('All Open Pledges');
             print " (" . count($found) . ")";
@@ -179,7 +181,7 @@ class ADMIN_PAGE_PB_MAIN {
         }
         print "</p>";
           
-        $this->pledge_header($sort);
+        $this->pledge_header($sort, $openness_url);
         $a = 0;
         foreach ($found as $row) {
             print '<tr'.($a++%2==0?' class="v"':'').'>';

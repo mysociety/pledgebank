@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.63 2006-01-24 18:09:26 francis Exp $
+ * $Id: pb.php,v 1.64 2006-03-22 13:49:03 matthew Exp $
  * 
  */
 
@@ -104,6 +104,19 @@ require_once '../../phplib/stash.php';
 require_once "../../phplib/utility.php";
 require_once "../../phplib/gaze.php";
 
+if ($domain_country) {
+    if (array_key_exists('UK', $countries_code_to_name)) 
+        err('UK in countries_code_to_name');
+    if ($domain_country == 'UK')
+        $domain_country = 'GB';
+    if (array_key_exists($domain_country, $countries_code_to_name)) {
+        $url = pb_domain_url(array());
+        setcookie('country', $domain_country, 0, '/', '.' . OPTION_WEB_DOMAIN);
+        header('Location: ' . $url);
+        exit;
+    }
+} 
+
 # Find country for this IP address
 $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
 if (rabx_is_error($ip_country) || !$ip_country)
@@ -116,23 +129,12 @@ $microsite = null;
 if (array_key_exists(strtolower($domain_country), $microsites_list)) {
     $microsite = strtolower($domain_country);
 }
-$site_country = null;
-if ($domain_country) {
-    if (array_key_exists('UK', $countries_code_to_name)) 
-        err('UK in countries_code_to_name');
-    if ($domain_country == 'UK') {
-        $domain_country = 'GB';
-    }
-    if (!array_key_exists($domain_country, $countries_code_to_name)) {
-        $domain_country = null;
-    }
-    $site_country = $domain_country;
-} 
+$site_country = isset($_COOKIE['country']) ? $_COOKIE['country'] : null;
+if (!array_key_exists($site_country, $countries_code_to_name))
+    $site_country = null;
+
 if (!$site_country && !$microsite) {
     $site_country = $ip_country;
-}
-if ($site_country) {
-    $microsite = null;
 }
 
 if ($site_country == null && $microsite == null) {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.125 2006-03-10 17:36:49 matthew Exp $
+// $Id: fns.php,v 1.126 2006-03-22 13:49:03 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -32,7 +32,7 @@ function li($s) { return "<li>$s</li>\n"; }
 # Parameters are:
 #   'path' - path component, if not present uses request URI
 function pb_domain_url($params = array('path'=>'/')) {
-    global $domain_lang, $domain_country, $microsite, $lang, $site_country, $locale_current, $locale_stack;
+    global $domain_lang, $microsite, $lang, $site_country, $locale_current, $locale_stack;
 
     if (array_key_exists('explicit', $params) && $params['explicit']) {
         $params['lang'] = 'explicit';
@@ -49,9 +49,7 @@ function pb_domain_url($params = array('path'=>'/')) {
         $l = $locale_current; 
 
     # Country / microsite
-    $c = $domain_country;
-    if (!$c)
-        $c = $microsite;
+    $c = $microsite;
     if (array_key_exists('country', $params))
         $c = ($params['country'] == "explicit") ? $site_country : $params['country'];
     if (array_key_exists('microsite', $params))

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.173 2006-03-21 16:57:07 chris Exp $
+-- $Id: schema.sql,v 1.174 2006-03-22 14:15:25 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -204,6 +204,9 @@ create table pledges (
         cached_prominence = 'backpage'
     )
 );
+
+-- Index by reference.
+create unique index pledges_ref_idx on pledges(ref);
 
 -- Make connections-finding faster.
 create index pledges_person_id_idx on pledges(person_id);

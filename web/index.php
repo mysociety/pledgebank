@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.233 2006-03-21 16:56:36 chris Exp $
+// $Id: index.php,v 1.234 2006-03-22 12:27:16 chris Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -22,14 +22,21 @@ page_header(null,
                     ), 
                 'id'=>'front', 'gazejs'=>true)
             );
+debug_comment_timestamp("after page_header()");
 front_page();
+debug_comment_timestamp("after front_page()");
 page_footer(array('nolocalsignup'=>true));
 
 function front_page() {
+    debug_comment_timestamp("in front_page()");
     pb_view_local_alert_quick_signup("localsignupfrontpage");
+    debug_comment_timestamp("after pb_view_local_alert_quick_signup()");
 ?>
 <div id="tellworld">
-<?microsites_frontpage_intro()?>
+<?
+    microsites_frontpage_intro();
+    debug_comment_timestamp("after microsites_frontpage_intro()");
+?>
 </div>
 
 <div id="startblurb">
@@ -41,8 +48,12 @@ only if 5 other people will do the same".') ?>
 </div>
 
 <div id="currentpledges">
-<?    list_frontpage_pledges(); ?>
-<?    list_successful_pledges(); ?>
+<?
+    list_frontpage_pledges();
+    debug_comment_timestamp("after list_frontpage_pledges()");
+    list_successful_pledges();
+    debug_comment_timestamp("after list_successful_pledges()");
+?>
 </div>
 
 <? global $lang;
@@ -55,6 +66,7 @@ can make your pledge succeed &raquo;') ?>"></a></div>
 <? }?>
 
 <?  comments_show_latest();
+    debug_comment_timestamp("after comments_show_latest()");
 }
 
 # params must have:

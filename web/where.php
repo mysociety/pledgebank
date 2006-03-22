@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.10 2006-03-22 18:41:49 francis Exp $
+// $Id: where.php,v 1.11 2006-03-22 22:59:36 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -38,8 +38,8 @@ $query = "SELECT count(*) as c, location.country as country
         GROUP BY location.country";
 $q = db_query($query);
 $country_count = array();
-while ($r = db_fetch_array($q)) {
-    $country_count[$r['country']] = $r['c'];
+while ($row = db_fetch_array($q)) {
+    $country_count[$row['country']] = $row['c'];
 }
 
 // Display countries which have at least one pledge

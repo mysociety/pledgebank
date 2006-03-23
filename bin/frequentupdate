@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.69 2006-03-23 12:01:36 francis Exp $
+ * $Id: frequentupdate,v 1.70 2006-03-23 12:32:54 chris Exp $
  *
  */
 
@@ -63,6 +63,20 @@ function mark_pledges_successful() {
     global $pb_today, $pb_timestamp;
 
     verbose("finding newly successful pledges");
+
+    /* Do a query for completed pledges on the unlocked table -- no point in
+     * locking the table just to test this, since the later queries are
+     * idempotent anyway. */
+    if (!db_getOne("
+            select id from pledges
+            where whensucceeded is null
+                and '$pb_today' <= date
+                and (select count(id) from signers
+                    where pledge_id = pledges.id) >= target")) {
+        verbose("... no newly successful pledges");
+        return;
+    }
+    
     db_query("lock table message in exclusive mode");
     $q = db_query("
             select * from pledges
@@ -158,6 +172,21 @@ function send_automatic_failure_messages() {
     global $pb_today;
 
     verbose("finding newly failed pledges");
+
+    /* Do a query before locking the table. */
+    if (!db_getOne("
+                select id from pledges
+                where whensucceeded is null
+                    and '$pb_today' > date
+                    and (select id
+                        from message
+                        where pledge_id = pledges.id
+                        and circumstance = 'failure-auto-creator') is null
+                for update")) {
+        verbose("... no newly failed pledges");
+        return;
+    }
+    
     db_query("lock table message in exclusive mode");
     $q = db_query("
                 select * from pledges

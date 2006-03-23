@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.103 2006-03-23 13:20:54 matthew Exp $
+// $Id: page.php,v 1.104 2006-03-23 13:53:05 chris Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -251,7 +251,9 @@ function rss_footer($items) {
  * it does, return. Otherwise, fuzzily find possibly matching pledges and
  * show the user a set of possible pages. */
 function page_check_ref($ref) {
-    if (!is_null(db_getOne('select ref from pledges where ref ilike ?', $ref)))
+    if (!is_null(db_getOne('select ref from pledges where ref = ?', $ref)))
+        return;
+    else if (!is_null(db_getOne('select ref from pledges where ref ilike ?', $ref)))
         return;
     page_header(_("We couldn't find that pledge"));
     $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);

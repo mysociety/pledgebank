@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.174 2006-03-22 14:15:25 chris Exp $
+-- $Id: schema.sql,v 1.175 2006-03-23 11:06:53 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1017,6 +1017,7 @@ create table comment (
 
 create index comment_pledge_id_idx on comment(pledge_id);
 create index comment_pledge_id_whenposted_idx on comment(pledge_id, whenposted);
+create index comment_ishidden_idx on comment(ishidden);
 
 -- Alerts and notifications
 

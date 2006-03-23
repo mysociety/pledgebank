@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.104 2006-03-23 13:53:05 chris Exp $
+// $Id: page.php,v 1.105 2006-03-23 14:19:00 chris Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -254,6 +254,8 @@ function page_check_ref($ref) {
     if (!is_null(db_getOne('select ref from pledges where ref = ?', $ref)))
         return;
     else if (!is_null(db_getOne('select ref from pledges where ref ilike ?', $ref)))
+        /* XXX should redirect to the page with the correctly-capitalised
+         * ref so that we never do the slow query */
         return;
     page_header(_("We couldn't find that pledge"));
     $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);

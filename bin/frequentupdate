@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.70 2006-03-23 12:32:54 chris Exp $
+ * $Id: frequentupdate,v 1.71 2006-03-23 13:37:50 chris Exp $
  *
  */
 
@@ -130,6 +130,23 @@ function send_pledge_success_reminder() {
     global $pb_timestamp;
 
     verbose("finding pledges with no announcement messages for reminder");
+
+    if (!db_getOne("
+                select id from pledges
+                where whensucceeded is not null
+                    and '$pb_timestamp'::timestamp > whensucceeded + '3 day'::interval
+                    and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
+                    and (select id from message where pledge_id = pledges.id
+                        and circumstance = 'success-auto-creator-reminder') is null
+                    and (select id from message where pledge_id = pledges.id
+                        and circumstance = 'success-auto-creator') is not null
+                    and (select id from message where pledge_id = pledges.id
+                        and circumstance = 'success-announce') is null")) {
+        verbose("... no such pledges found");
+        return;
+    }
+
+    
     db_query("lock table message in exclusive mode");
     $q = db_query("
                 select * from pledges
@@ -253,6 +270,23 @@ function chivvy_creators_early() {
     global $pb_today, $pb_timestamp;
 
     verbose("finding young pledges with few signups");
+
+    if (!db_getOne("
+                select id from pledges
+                where (select count(*) from signers where signers.pledge_id = pledges.id) < 4
+                    and target >= 8
+                    and '$pb_today' <= date
+                    and whensucceeded is null
+                    and '$pb_timestamp'::timestamp > creationtime + '4 day'::interval
+                    and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
+                    and (select id
+                        from message
+                        where pledge_id = pledges.id
+                        and circumstance = 'chivvy-creator') is null")) {
+        verbose("... no such pledges");
+        return;
+    }
+
     db_query("lock table message in exclusive mode");
     $q = db_query("
                 select * from pledges
@@ -303,6 +337,24 @@ function chivvy_creators_lowrate() {
     global $pb_today, $pb_timestamp;
 
     verbose("finding pledges with too low a signup rate to succeed");
+
+    if (!db_getOne("
+                select id from pledges
+                where target >= 8
+                    and '$pb_today' <= date
+                    and whensucceeded is null
+                    and '$pb_timestamp'::timestamp > creationtime + '8 day'::interval
+                    and '$pb_today'::date < date - '2 day'::interval
+                    and cached_prominence <> 'backpage'
+                    and " . pb_chivvy_probable_will_reach_clause() . " < target
+                    and (select id
+                        from message
+                        where pledge_id = pledges.id
+                        and circumstance = 'chivvy-creator-lowrate') is null")) {
+        verbose("... no such pledges found");
+        return;
+    }
+
     db_query("lock table message in exclusive mode");
     $q = db_query("
                 select * from pledges

@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.64 2006-03-22 13:49:03 matthew Exp $
+ * $Id: pb.php,v 1.65 2006-03-24 01:19:40 matthew Exp $
  * 
  */
 
@@ -44,6 +44,7 @@ function pb_handle_error($num, $message, $file, $line, $context) {
         while (ob_get_level()) {
             ob_end_clean();
         }
+	ob_start();
         page_header(_("Sorry! Something's gone wrong."), array('override'=>true));
         print("<strong>$message</strong> in $file:$line");
         page_footer(array('nolocalsignup'=>true));
@@ -52,6 +53,7 @@ function pb_handle_error($num, $message, $file, $line, $context) {
         while (ob_get_level()) {
             ob_end_clean();
         }
+	ob_start();
         /* Message will be in log file, don't display it for cleanliness */
         $err = p(_('Please try again later, or <a href="mailto:team@pledgebank.com">email us</a> for help resolving the problem.'));
         if ($num & E_USER_ERROR) {

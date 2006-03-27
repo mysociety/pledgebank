@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.105 2006-03-23 14:19:00 chris Exp $
+// $Id: page.php,v 1.106 2006-03-27 17:55:42 francis Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -27,6 +27,12 @@ function page_header($title, $params = array()) {
     static $header_outputted = 0;
     if ($header_outputted && !array_key_exists('override', $params)) {
         return;
+    }
+
+    global $contact_ref;
+    $contact_ref = '';
+    if (array_key_exists('ref', $params)) {
+        $contact_ref = "?ref=" . htmlspecialchars($params['ref']);
     }
 
     // The http-equiv in the HTML below doesn't always seem to override HTTP
@@ -145,6 +151,7 @@ function page_header($title, $params = array()) {
  * If PARAMS['nolocalsignup'] is true then no local signup form is showed.
  */
 function page_footer($params = array()) {
+    global $contact_ref;
 ?></div><? # id="content"
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
@@ -156,7 +163,7 @@ function page_footer($params = array()) {
 <input type="text" id="q" name="q" size="25" value="" onblur="fadeout(this)" onfocus="fadein(this)"> <input type="submit" value="<?=_('Go') ?>"></p>
 </form>
 <!-- remove all extraneous whitespace to avoid IE bug -->
-<ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/list"><?=_('All Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>"><?=_('FAQ') ?></acronym></a></li><li><a href="/contact"><?=_('Contact') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><?
+<ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/list"><?=_('All Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>"><?=_('FAQ') ?></acronym></a></li><li><a href="/contact<?=$contact_ref?>"><?=_('Contact') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><?
         $P = person_if_signed_on(true); /* Don't renew any login cookie. */
         if ($P) {
 ?><li><a href="/logout"><?=_('Logout') ?></a></li><?

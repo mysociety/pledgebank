@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.35 2006-02-23 16:53:33 francis Exp $
+// $Id: contact.php,v 1.36 2006-03-27 17:55:43 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -26,6 +26,7 @@ page_footer();
 function contact_form($errors = array()) {
     $name = get_http_var('name', true);
     $email = get_http_var('email');
+    $ref = get_http_var('ref');
     $P = person_if_signed_on();
     if (!is_null($P)) {
         if (is_null($name) || !$name)
@@ -46,7 +47,7 @@ If you prefer, you can email %s instead of using the form.')), '<a href="mailto:
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
     } ?>
-<form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1">
+<form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>">
 <div class="fr"><?=_('Message to')?>: <strong><?=_("PledgeBank Team")?></strong></div>
 <div class="fr"><label for="name"><?=_('Your name') ?></label>: <input type="text" id="name" name="name" onblur="fadeout(this)" onfocus="fadein(this)" value="<?=htmlspecialchars($name) ?>" size="32"></div>
 <div class="fr"><label for="email"><?=_('Your email') ?></label>: <input type="text" id="email" name="email" value="<?=htmlspecialchars($email) ?>" size="32"></div>
@@ -63,6 +64,7 @@ function contact_form_submitted() {
     $email = get_http_var('email');
     $subject = get_http_var('subject', true);
     $message = get_http_var('message', true);
+    $ref = get_http_var('ref');
     $errors = array();
 	if (!$name) $errors[] = _('Please enter your name');
 	if (!$email) $errors[] = _('Please enter your email address');
@@ -72,11 +74,11 @@ function contact_form_submitted() {
 	if (sizeof($errors)) {
 		contact_form($errors);
 	} else {
-		send_contact_form($name, $email, $subject, $message);
+		send_contact_form($name, $email, $subject, $message, $ref);
 	}
 }
 
-function send_contact_form($name, $email, $subject, $message) {
+function send_contact_form($name, $email, $subject, $message, $ref) {
     global $lang;
 
     # See if we have someone special to send the email to
@@ -92,7 +94,7 @@ function send_contact_form($name, $email, $subject, $message) {
         print _('Please stop sending us spam. Thank you.');
         return;
     }
-    $postfix = '[ Sent by contact.php on ' . $_SERVER['HTTP_HOST'] . ' from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . ' ]';
+    $postfix = '[ Sent by contact.php ' . ($ref ? ('for pledge ' . $ref . ' ') : '')  .  'on ' . $_SERVER['HTTP_HOST'] . ' from IP address ' . $_SERVER['REMOTE_ADDR'] . (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . ' ]';
     $headers = array();
     $headers['From'] = array($email, $name);
     $success = pb_send_email($to, $subject, $message . "\n\n" . $postfix, $headers);

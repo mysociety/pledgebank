@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.151 2006-03-21 13:02:35 francis Exp $
+ * $Id: pledge.php,v 1.152 2006-03-27 17:55:42 francis Exp $
  * 
  */
 
@@ -259,6 +259,25 @@ class Pledge {
         return $google_maps_url;
     }
 
+    // This one needs encoding for use HTML, to escape the &
+    function url_translate_pledge() {
+        global $locale_current;
+        $explicit_url = pb_domain_url(array('lang'=>$this->lang(), 'path'=>"/".$this->ref()));
+        $from_lang =  $this->lang(); 
+        $split_locale_current = split("-", $locale_current);
+        $to_lang = $split_locale_current[0];
+
+        if ($from_lang == $to_lang)
+            return false;
+
+        $translate_type = $from_lang."_".$to_lang;
+        $babelfish_languages = array("zh_en" => 1, "zt_en" => 1, "en_zh" => 1, "en_zt" => 1, "en_nl" => 1, "en_fr" => 1, "en_de" => 1, "en_el" => 1, "en_it" => 1, "en_ja" => 1, "en_ko" => 1, "en_pt" => 1, "en_ru" => 1, "en_es" => 1, "nl_en" => 1, "nl_fr" => 1, "fr_en" => 1, "fr_de" => 1, "fr_el" => 1, "fr_it" => 1, "fr_pt" => 1, "fr_nl" => 1, "fr_es" => 1, "de_en" => 1, "de_fr" => 1, "el_en" => 1, "el_fr" => 1, "it_en" => 1, "it_fr" => 1, "ja_en" => 1, "ko_en" => 1, "pt_en" => 1, "pt_fr" => 1, "ru_en" => 1, "es_en" => 1, "es_fr");
+        if (!array_key_exists($translate_type, $babelfish_languages))
+            return false;
+
+        return "http://babelfish.altavista.com/babelfish/tr?doit=done&tt=url&intl=1&trurl=".$explicit_url."&lp=".$translate_type;
+    }
+
     // Rendering the pledge in various ways
 
     // Draws a plaque containing the pledge.  $params is an array, which
@@ -280,7 +299,11 @@ class Pledge {
 ?>
 <p style="margin-top: 0">
 <? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
-&quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;</p>
+&quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;
+    <? if ($this->url_translate_pledge()) { ?>
+    (<a title="<?=_("Roughly translate the pledge into your language (using Altavista's Babel Fish machine translator)")?>" href="<?=htmlspecialchars($this->url_translate_pledge())?>"><?=_("translate")?></a>)
+    <? } ?>
+</p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
 <p>
 <?=_('Deadline to sign up by:') ?> <strong><?=$this->h_pretty_date()?></strong>
@@ -311,7 +334,7 @@ class Pledge {
         <p> <?=$this->h_local_type()?>:
         <strong><?=$this->h_description()?></strong>
         <? if ($this->url_place_map()) { ?>
-        (<a href="<?=htmlspecialchars($this->url_place_map())?>"><?=_("view map")?></a>)
+        (<a title="<?=_("Show where exactly this place is (using Google Maps)")?>" href="<?=htmlspecialchars($this->url_place_map())?>"><?=_("view map")?></a>)
         <? } ?>
         <br><?=_('Country:')?>
         <strong><?=$this->h_country()?></strong>

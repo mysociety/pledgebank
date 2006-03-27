@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.11 2006-03-22 22:59:36 matthew Exp $
+// $Id: where.php,v 1.12 2006-03-27 17:05:14 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -50,7 +50,7 @@ $column = 0;
 $total_countries = count($country_count);
 $n = 0;
 $last_col_n = 0;
-print "<div class=\"wherecolumn\"><p>";
+print "<div class=\"wherecolumn\"><p>\n";
 foreach ($countries_name_to_code as $name => $code) {
     if (!array_key_exists($code, $country_count))
         continue;
@@ -60,22 +60,23 @@ foreach ($countries_name_to_code as $name => $code) {
     # this on that when put before "a" and "b", you end up with "Xa" >= "Xb"
     $charcomp = strcoll($firstchar."a", $lastchar."b");
     if ($charcomp >= 0 || $lastchar == "*") {
-        print "</p>";
+        print "\n</p>";
         if (($n > $total_countries / 3 && $column == 0) ||
            ($n > 2 * $total_countries / 3 && $column == 1)) {
            $column++;
            print "</div><div class=\"wherecolumn\">";
            $last_col_n = $n;
         }
-        print "<h3>$firstchar</h3><p>";
+        print "<h3>$firstchar</h3><p>\n";
     }
     $url = pb_domain_url(array('country'=>$code, 'path'=>$r));
     print "<a href=\"".$url."\">".$name."</a>";
-    print "<br>";
+    print " <!-- pledges: " . $country_count[$code] . " --> ";
+    print "<br>\n";
     $n++;
     $lastchar = $firstchar;
 }
-print "</p></div>";
+print "\n</p></div>";
 
 print "<div class=\"wheremakepledge\">";
 print p(_('Your country isn\'t there? <a href="/new">Make a pledge</a> specific to your country, and get people to sign up to it.'));

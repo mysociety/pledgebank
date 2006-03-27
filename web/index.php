@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.234 2006-03-22 12:27:16 chris Exp $
+// $Id: index.php,v 1.235 2006-03-27 18:21:24 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -109,8 +109,9 @@ function list_frontpage_pledges() {
     global $pb_today;
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of new pledges') ?>"></a>
 <h2><?=_('Why not sign a live pledge?') ?></h2><?
-    $pledges_required_fp = 8; // number of pledges to show on main part of front page if frontpaged
-    $pledges_required_n = 6; // number of pledges below which we show normal pledges, rather than just frontpaged ones
+    $pledges_required_fp = 8 + 1; // number of pledges to show on main part of front page if frontpaged
+    $pledges_required_n = 6 + 1; // number of pledges below which we show normal pledges, rather than just frontpaged ones
+    $more_threshold = $pledges_required_fp;
     $pledges = get_pledges_list("
                 cached_prominence = 'frontpage' AND
                 date >= '$pb_today' AND 
@@ -132,6 +133,9 @@ function list_frontpage_pledges() {
         $pledges = array_merge($pledges, $global_pledges);
         //print "<p>global frontpage: ".count($global_pledges);
     }
+    if (count($pledges) <= $pledges_required_n) 
+        $more_threshold = $pledges_required_n;
+    
     if (count($pledges) < $pledges_required_n) {
         // If too few, show a few of the normal pledges for the country
         $more = $pledges_required_n - count($pledges);
@@ -159,6 +163,11 @@ function list_frontpage_pledges() {
         //print "<p>global normal: ".count($global_normal_pledges);
     }
 
+    $more = false;
+    if (count($pledges) == $more_threshold) {
+        $more = true;
+        array_pop($pledges);
+    }
 
     if (!$pledges) {
         pb_print_no_featured_link();
@@ -168,18 +177,22 @@ function list_frontpage_pledges() {
     }
 
     if (count($pledges) < 4) {
-        $more = 4 - count($pledges);
+        $foriegn_more = 4 - count($pledges);
         $pledges = get_pledges_list("
                     cached_prominence = 'frontpage' AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
-                    LIMIT $more", array('global'=>false,'main'=>false,'foreign'=>true,'showcountry'=>true));
+                    LIMIT $foriegn_more", array('global'=>false,'main'=>false,'foreign'=>true,'showcountry'=>true));
         if ($pledges) {
             print p(_("Interesting pledges from other countries"));
             print '<ol>' . join("",$pledges) . '</ol>';
         }
+    } 
+    if ($more) {
+        $succeeded_url = pb_domain_url(array('path'=>'/list'));
+        print p("<a href=\"$succeeded_url\">"._('More pledges to sign...')."</a>");
     }
 }
 
@@ -192,12 +205,22 @@ function list_successful_pledges() {
                 pin IS NULL AND 
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC
-                LIMIT 10", array('global'=>true, 'main'=>true,'foreign'=>false,'showcountry'=>false));
+                LIMIT 11", array('global'=>true, 'main'=>true,'foreign'=>false,'showcountry'=>false));
+    $more = false;
     if (!$pledges) {
         pb_print_no_featured_link();
     } else {
+        if (count($pledges) == 11) {
+            $more = true;
+            array_pop($pledges);
+        }
         pb_print_filter_link_main_general();
         print '<ol>'.join("",$pledges).'</ol>';
+    }
+
+    if ($more) {
+        $succeeded_url = pb_domain_url(array('path'=>'/list/succeeded'));
+        print p("<a href=\"$succeeded_url\">"._('More successful pledges...')."</a>");
     }
 }
 

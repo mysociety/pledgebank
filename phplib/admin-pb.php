@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.120 2006-03-21 18:44:28 francis Exp $
+ * $Id: admin-pb.php,v 1.121 2006-03-28 10:06:11 francis Exp $
  * 
  */
 
@@ -170,12 +170,12 @@ class ADMIN_PAGE_PB_MAIN {
             print " | ";
             print _('All Closed Pledges');
             print " (" . count($found) . ")";
-            $openness_url = "&o=closed";
+            $openness_url = "&amp;o=closed";
          } else {
             print _('All Open Pledges');
             print " (" . count($found) . ")";
             print " | ";
-            print '<a href="?page=pb&o=closed">';
+            print '<a href="?page=pb&amp;o=closed">';
             print _('All Closed Pledges');
             print '</a>';
         }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.29 2006-03-09 16:59:54 francis Exp $
+// $Id: faq.php,v 1.30 2006-03-28 10:09:40 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -130,6 +130,8 @@ Nic Dafis (Welsh),
 Hugo Caballero Figueroa (Spanish),
 Tim Morley (Esperanto),
 Diego Galli (Italian),
+LaPingvino and Leo De Cooman (Dutch),
+Creso Moraes (Brazilian Portuguese),
 Alexander Markushin (Russian),
 maidan.org.ua team (Ukrainian).
 

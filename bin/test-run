@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.173 2006-03-27 17:55:42 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.174 2006-03-28 15:44:54 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1366,9 +1366,11 @@ sub do_admin_tests {
     # Check pledges and signers page
     $wth->browser_get($admin_url);
     $wth->browser_follow_link(text_regex => qr/Pledges and Signers/);
+    $wth->browser_check_contents("portuguese");
+    $wth->browser_follow_link(text_regex => qr/All Closed Pledges/);
     $wth->browser_check_contents("automatedtest");
     $wth->browser_check_contents("privatepledge");
-    $wth->browser_follow_link(text_regex => qr/(admin)/);
+    $wth->browser_follow_link(text_regex => qr/admin/);
     $wth->browser_check_contents("This really is forever");
 
     # Check timeline page
@@ -1416,7 +1418,7 @@ sub do_admin_tests {
 sub do_final_checks {
     # Change to UK
     $wth->browser_get($base_url);
-    $wth->browser_follow_link(text_regex => qr/choose country/, n => 1);
+    $wth->browser_follow_link(text_regex => qr/(change)/, n => 1);
     $wth->browser_follow_link(text => "United Kingdom");
 
     # Check RSS works and has vaguely correct entries

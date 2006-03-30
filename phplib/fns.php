@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.127 2006-03-30 15:50:17 francis Exp $
+// $Id: fns.php,v 1.128 2006-03-30 16:06:49 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -560,7 +560,7 @@ global $place_postcode_label; # ids must be unique (this will break
 # the javascript on the few pages which have this form twice, but I couldn't
 # see an easy worthwhile way round this)
 function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>true)) {
-    global $place_postcode_label;
+    global $place_postcode_label, $microsite;
     $email = '';
     $P = person_if_signed_on();
     if (!is_null($P)) {
@@ -572,14 +572,33 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
     $place = "";
     if (array_key_exists('place', $params) && $params['place'])
         $place = $params['place'];
+
+    # Microsite specific changes
+    $london = false;
+    $any_country = true;
+    $force_country = false;
+    if ($microsite && $microsite == 'london') {
+        $london = true;
+        $any_country = false;
+        $force_country = 'GB';
+    }
 ?>
 <form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">
 <input type="hidden" name="from_frontpage" value="1">
-<p><strong><?=_('Sign up for emails when people make pledges in your local area')?> <?=$newflash?'&mdash;':''?> <?=$newflash?_('Works in any country!'):''?> </strong>
+<p><strong><?=$london ? 'Sign up for emails when people make pledges in your part of London' : _('Sign up for emails when people make pledges in your local area')?> 
+<? if ($any_country) { ?>
+<?=$newflash?'&mdash;':''?> <?=$newflash?_('Works in any country!'):''?> 
+<? } ?>
+</strong>
 <br><span style="white-space: nowrap"><?=_('Email:') ?> <input type="text" size="18" name="email" value="<?=htmlspecialchars($email) ?>"></span>
+<? if ($force_country) { ?>
+<input type="hidden" name="country" value="<?=$force_country?>">
+<span style="white-space: nowrap"><?=_('Postcode:')?>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
+<? } else { ?>
 <span style="white-space: nowrap"><?=_('Country:') ?> <? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
 <span style="white-space: nowrap"><span id="place_postcode_label<?=($place_postcode_label ? $place_postcode_label : '')?>"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
+<? } ?>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>
 <?

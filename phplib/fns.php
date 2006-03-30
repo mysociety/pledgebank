@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.126 2006-03-22 13:49:03 matthew Exp $
+// $Id: fns.php,v 1.127 2006-03-30 15:50:17 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -607,8 +607,8 @@ function pb_get_change_country_link() {
     $change = '<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">';
     if ($microsite && ($microsite != 'everywhere')) 
         # TRANS: i.e. "choose website" or "choose local place where action will be taken?" I've assumed the former. (Tim Morley, 2005-11-21)
-	# Yes, it's choose website. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
-	$change .= _("choose site");
+        # Yes, it's choose website. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
+        $change .= _("choose site");
     elseif ($site_country)
         $change .= _("change country");
     else
@@ -661,10 +661,7 @@ function pb_site_pledge_filter_main(&$sql_params) {
     global $site_country, $microsite, $lang; 
 
     if ($microsite) {
-        if ($microsite == 'everywhere')
-            return "(1=1)";
-        $sql_params[] = $microsite;
-        return "(microsite = ?)";
+        return microsites_filter_main($sql_params);
     } else {
         $query_fragment = "(";
         if ($site_country) {
@@ -689,7 +686,7 @@ function pb_site_pledge_filter_main(&$sql_params) {
 function pb_site_pledge_filter_general(&$sql_params) {
     global $lang, $microsite;
     if ($microsite) {
-        return "(1=0)";
+        return microsites_filter_general($sql_params);
     } else {
         # In Esperanto we have already caught these above
         if ($lang == 'eo') {
@@ -706,10 +703,7 @@ function pb_site_pledge_filter_general(&$sql_params) {
 function pb_site_pledge_filter_foreign(&$sql_params) {
     global $site_country, $microsite, $lang; 
     if ($microsite) {
-        if ($microsite == 'everywhere')
-            return "(1=0)";
-        $sql_params[] = $microsite;
-        return "(microsite <> ?)";
+        return microsites_filter_foreign($sql_params);
     } else {
         $locale_clause = "(";
         if ($site_country) {

@@ -8,18 +8,20 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.12 2005-12-08 20:33:08 francis Exp $
+ * $Id: microsites.php,v 1.13 2006-03-30 15:50:17 francis Exp $
  * 
  */
 
 /* Codes of microsites, and name displayed next to PledgeBank logo */
 $microsites_list = array('everywhere' => _('Everywhere'),
+                         'london' => 'London',
                          '365act' => '365 Ways',
                          'glastonbury' => 'Glastonbury',
                          'interface' => 'Interface');
 
 /* These are listed on /where */
 $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countries in all languages'),
+                                'london' => _('London (United Kingdom)'),
                                 '365act' => _('365 Ways to Change the World'));
 
 /* microsites_get_name 
@@ -78,6 +80,8 @@ function microsites_css_file() {
         return "/glastonbury.css";
     } elseif ($microsite && $microsite == '365act') {
         return "/365act.css";
+    } elseif ($microsite && $microsite == 'london') {
+        return "/london.css";
     }
     return "/pb.css";
 }
@@ -111,6 +115,8 @@ function microsites_other_people() {
     global $microsite;
     if ($microsite == 'interface')
         return 'other Interfacers'; // deliberately not translated
+    elseif ($microsite == 'london')
+        return 'other Londoners'; // deliberately not translated
     else
         return _('other local people');
 }
@@ -177,6 +183,30 @@ Or <a href="/explain">read a full transcript') ?></a>.</p>
 works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
 <? }  ?>
 <?
+}
+
+function microsites_filter_main(&$sql_params) {
+    global $microsite;
+    if ($microsite == 'everywhere')
+        return "(1=1)";
+    if ($microsite == 'london')
+        return "(pledges.id in (select pledge_id from pledge_find_nearby(51.5,-0.1166667, 25)))";
+    $sql_params[] = $microsite;
+    return "(microsite = ?)";
+}
+
+function microsites_filter_general(&$sql_params) {
+    return "(1=0)";
+}
+
+function microsites_filter_foreign(&$sql_params) {
+    global $microsite;
+    if ($microsite == 'everywhere')
+        return "(1=0)";
+    if ($microsite == 'london')
+        return "(pledges.id not in (select pledge_id from pledge_find_nearby(51.5,-0.1166667, 25)))";
+    $sql_params[] = $microsite;
+    return "(microsite <> ?)";
 }
 
 ?>

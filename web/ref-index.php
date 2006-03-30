@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.61 2006-03-23 13:40:09 chris Exp $
+// $Id: ref-index.php,v 1.62 2006-03-30 20:58:25 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -230,11 +230,15 @@ function draw_connections($p) {
 
     print "\n\n" . '<div id="connections"><h2><a name="connections">' . 
         _('Suggested pledges') . ' </a></h2>'.
-        p(_('People who signed this pledge also signed these...')) . '<ul>' . "\n\n";
+        p(_('Some of the people who signed this pledge also signed these pledges...')) . '<ul>' . "\n\n";
     while (list($a, $b, $strength) = db_fetch_row($s)) {
         $id = $a == $p->id() ? $b : $a;
         $p2 = new Pledge(intval($id));
-        print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a></li>';
+        print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
+        print ' (';
+        printf(ngettext('%s person', '%s people', $strength), $strength);
+        print ')';
+        print '</li>';
         print "<!-- strength $strength -->\n";
     }
     print "\n\n";

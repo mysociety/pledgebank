@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.13 2006-03-30 15:50:17 francis Exp $
+ * $Id: microsites.php,v 1.14 2006-03-30 16:27:54 francis Exp $
  * 
  */
 
@@ -60,6 +60,12 @@ function microsites_logo() {
 <span id="countrytitle"><a href="/where">' . _('(other PledgeBanks)') . '</a></span>
 </h1>
 ';
+
+    } elseif ($microsite && $microsite == 'london') {
+        $country_name = pb_site_country_name();
+        return '
+<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a><span id="beta">Beta</span>
+<span id="countrytitle"><a href="/where">' . _('(change)') . '</a></span></h1>';
 
     } else {
         $country_name = pb_site_country_name();
@@ -155,6 +161,14 @@ function microsites_frontpage_intro() {
 
         See all of the <a href="http://365act.com">365 ways to change the world...</a>
         <?
+    } elseif ($microsite == 'london') {
+	?><h2>Tell Londoners &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
+	In the summer of 2012 the eyes of the world will be on London for a
+	fortnight as the Olympics games return to the capital for the third
+	time in its history. This site is collecting pledges encouraging
+	Londoners to work together on projects to turn London from a great city
+	to the geatest city in the world by 2012.
+	<?
     } else {
         # Main site
         $tom = _('"We all know what it is like to feel powerless, that our own

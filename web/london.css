@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: london.css,v 1.1 2006-03-30 15:50:17 francis Exp $
+ * $Id: london.css,v 1.2 2006-03-30 16:27:54 francis Exp $
  * 
  */
 
@@ -24,7 +24,7 @@ body {
 h2 {
     margin-top: 0;
 }
-a:link { color: #0000ff; }
+a:link { color: #0022ee; }
 a:visited { color: #004488; }
 a:hover, a:active { color: #000000; }
 h1 a:link, h1 a:visited {
@@ -54,7 +54,7 @@ input[type=text], input[type=password], input[type=submit], textarea {
     border: solid 2px #ec4000;
 }
 textarea:hover, textarea:focus, input[type=text]:hover, input[type=submit]:hover, input[type=password]:hover, input[type=text]:focus, input[type=submit]:focus, input[type=password]:focus {
-    border: solid 2px #0000ff;
+    border: solid 2px #0022ee;
 }
 input.topbutton {
     margin-bottom: 2px;
@@ -80,7 +80,7 @@ h1 {
     margin: 0;
     color: #ffffff;
     background-color: #ec4000;
-    border-bottom: solid 2px #0000ff;
+    border-bottom: solid 2px #0022ee;
 }
 h1 span#logo_pledge {
     background-color: #ec4000;
@@ -195,15 +195,15 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #tellworld {
     float: left;
     width: 59%;
-    border: solid 2px #0000ff;
+    border: solid 2px #0022ee;
     padding: 10px;
     background-color: #ffffff;
 }
 #startblurb {
     float: right;
     width: 32%;
-    border: solid 2px #0000ff;
-    background-color: #a8fc00;
+    border: solid 2px #0022ee;
+    background-color: #ffbfbf;
     padding: 10px;
 }
 #start {
@@ -218,8 +218,8 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #localsignupfrontpage {
     text-align: center;
     margin-bottom: 1em;
-    border: solid 2px #0000ff;
-    background-color: #a8fc00;
+    border: solid 2px #0022ee;
+    background-color: #ffbfbf;
     padding: 10px;
 }
 #localsignupfrontpage p {
@@ -246,8 +246,8 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #localsignupyourpage {
     text-align: left;
     width: 60%;
-    border: solid 2px #0000ff;
-    background-color: #a8fc00;
+    border: solid 2px #0022ee;
+    background-color: #ffbfbf;
     padding: 10px;
 }
 #localsignupyourpage p {
@@ -259,8 +259,8 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #localsignupsearchpage {
     text-align: left;
     width: 100%;
-    border: solid 2px #0000ff;
-    background-color: #a8fc00;
+    border: solid 2px #0022ee;
+    background-color: #ffbfbf;
     padding: 10px;
 }
 #localsignupsearchpage p {
@@ -300,7 +300,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #photo {
     /* background: url("leaflet-phone-scissors-275px.png") no-repeat 50% 50%; */
     margin-top: 1em;
-    border: solid 2px #0000ff;
+    border: solid 2px #0022ee;
     float: right;
 }
 #photo img {
@@ -349,10 +349,10 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     text-align: center;
 }
 .pledge, #pledgeaction, #otherdetails {
-    border: solid 2px #0000ff;
+    border: solid 2px #0022ee;
     margin: 0 auto 1em;
     padding: 10px;
-    background-color: #23e400;
+    background-color: #ff8080;
 }
 .pledge p, #pledgeaction p {
     margin-bottom: 0;
@@ -363,8 +363,8 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     margin: 1em 0 0.5em 0;
 }
 #tips, #pledge, #all .pledge, #yourpledges .pledge {
-    border: solid 2px #0000ff;
-    background-color: #a8fc00;
+    border: solid 2px #0022ee;
+    background-color: #ffbfbf;
     margin-bottom: 1em;
     padding: 10px;
 }
@@ -518,7 +518,7 @@ ul#nav li {
     color: #000000;
     margin-left: 0.5em;
     display: inline;
-    border: solid 1px #0000ff;
+    border: solid 1px #0022ee;
     border-width: 2px 2px 0 2px;
 }
 

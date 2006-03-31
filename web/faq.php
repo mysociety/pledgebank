@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.30 2006-03-28 10:09:40 francis Exp $
+// $Id: faq.php,v 1.31 2006-03-31 17:02:43 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -90,11 +90,14 @@ elected representatives, for free.'));
 
 print dt(_('Who pays for it?'));
 
-print dd(_('PledgeBank has been built by mySociety thanks to the effort
+$paid = _('PledgeBank has been built by mySociety thanks to the effort
 of a combination of paid core developers and unpaid volunteers. The
 core developers were paid for by the 
 <acronym title="Office of the Deputy Prime Minister">ODPM</acronym>\'s 
-e-innovations fund in partnership with West Sussex County Council.'));
+e-innovations fund in partnership with West Sussex County Council.');
+if ($lang == 'en-gb')
+    $paid .= ' The <a href="http://www.williampears.co.uk/found.htm">Pears Foundation</a> sponsored the <a href="http://london.pledgebank.com/">London version of PledgeBank</a>.';
+print dd($paid);
 
 print dt(_('Do you need any help with the project?'));
 

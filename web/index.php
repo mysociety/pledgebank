@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.235 2006-03-27 18:21:24 francis Exp $
+// $Id: index.php,v 1.236 2006-03-31 17:02:43 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -67,8 +67,12 @@ can make your pledge succeed &raquo;') ?>"></a></div>
 
 <?  comments_show_latest();
     debug_comment_timestamp("after comments_show_latest()");
+    global $microsite;
+    if ($microsite == 'london') {
+?>
+<div id="sponsor"><a href="http://www.williampears.co.uk/found.htm"><img src="/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></a></div>
+<?  }
 }
-
 # params must have:
 # 'global' - true or false, whether global pledges to be included
 # 'main' - true or false, whether site country pledges to be included

@@ -16,13 +16,18 @@ while(<MAINCSS>) {
     s/pb.css/london.css/;
     s/Top-level style sheet for PledgeBank.com/Custom style sheet for London version of PledgeBank/;
 
-    s/#522994/#0022ee/gi;  # link colour
+    s/#522994/#31659c/gi;  # link colour
     s/#7b52a5/#004488/gi;  # visited link colour
     s/#21004a/#000000/gi;  # purple lettering/thin-borders 
-    s/#9c7bbd/#ec4000/gi;  # darker purple background (at top of page)
-    s/#f6e5ff/#ffbfbf/gi;  # lighter pink plaque background
-    s/#c6b5de/#ff8080/gi;  # darker pink plaque background
+    s/#9c7bbd/#ee3438/gi;  # darker purple background (at top of page)
+    s/#f6e5ff/#ccccff/gi;  # lighter pink plaque background
+    s/#c6b5de/#9999ff/gi;  # darker pink plaque background
 
     print LONDONCSS $_;
 }
-
+print LONDONCSS <<EOF;
+#sponsor {
+    text-align: center;
+    clear: both;
+}
+EOF

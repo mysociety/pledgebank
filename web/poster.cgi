@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.75 2006-03-31 15:52:37 matthew Exp $
+# $Id: poster.cgi,v 1.76 2006-03-31 17:02:43 matthew Exp $
 #
 
 import sys
@@ -265,8 +265,10 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     # Draw purple bar
     if microsite == 'london':
         c.setFillColorRGB(0.93, 0.2, 0.22)
+	html_colour = '#31659c'
     else:
         c.setFillColorRGB(0.6, 0.45, 0.7)
+	html_colour = '#522994'
     h_purple = 0.1*h
     c.rect(x1, y1, w, h_purple, fill=1, stroke=0)
 
@@ -340,7 +342,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
     # Check web domain fits, as that is long word that doesn't fit on
     # (and platypus/reportlab doesn't raise an error in that case)
-    webdomain_text = '''<font size="+3" color="#522994"><b>%s/%s</b></font>''' % (pb_domain_url(), ref)
+    webdomain_text = '''<font size="+3" color="%s"><b>%s/%s</b></font>''' % (html_colour, pb_domain_url(), ref)
     webdomain_para = Paragraph(webdomain_text, p_normal)
     webdomain_allowed_width = w - dots_body_gap * 2
     webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]
@@ -354,15 +356,15 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         identity = ', ' + pledge['identity']
     story = [
         Paragraph(_('''
-            <b>If</b> <font color="#522994">%s</font> %s will %s, 
-            then <font color="#522994">I</font> will %s.
-            ''').encode('utf-8') % (
-                format_integer(pledge['target']), pledge['type'], pledge['signup'],
+            <b>If</b> <font color="%s">%s</font> %s will %s, 
+            then <font color="%s">I</font> will %s.
+            ''').encode('utf-8') % (html_colour,
+                format_integer(pledge['target']), pledge['type'], pledge['signup'], html_colour,
                 pledge['title']
             ), p_head),
         Paragraph(u'''<para align="right">\u2014 
-            <font color="#522994">%s%s</font></para>'''.encode('utf-8') 
-            % (pledge['name'], identity), p_head),
+            <font color="%s">%s%s</font></para>'''.encode('utf-8') 
+            % (html_colour, pledge['name'], identity), p_head),
         Paragraph('', p_detail),
     ]
     
@@ -375,7 +377,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     if not has_sms(pledge):
         pledge_at_text = _("Pledge at ").encode('utf-8')
         if pledge['pin']:
-            pin_text = _(' pin ').encode('utf-8') + '''<font color="#522994" size="+2">%s</font>''' % userpin
+            pin_text = _(' pin ').encode('utf-8') + '''<font color="%s" size="+2">%s</font>''' % (html_colour, userpin)
         else:
             pin_text = ''
         sms_to_text = ""
@@ -384,17 +386,17 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         pledge_at_text = _("pledge at ").encode('utf-8')
         pin_text = ""
     # TRANS: Again, please don't translate "pledge" in this one
-        sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="#522994">
-            <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
-            (%s only) or """).encode('utf-8') % (ref, sms_number, sms_countries_description.encode('utf-8'))
+        sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="%s">
+            <b>pledge %s</b></font> to <font color="%s"><b>%s</b></font> 
+            (%s only) or """).encode('utf-8') % (html_colour, ref, html_colour, sms_number, sms_countries_description.encode('utf-8'))
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([
         Paragraph('''%s%s%s%s''' % 
             (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal),
         Paragraph(_('''
-            This pledge closes on <font color="#522994">%s</font>. Thanks!
-            ''').encode('utf-8') % pledge['date'], p_normal),
+            This pledge closes on <font color="%s">%s</font>. Thanks!
+            ''').encode('utf-8') % (html_colour, pledge['date']), p_normal),
         Paragraph(_(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.').encode('utf-8') % pledge['target'], p_normal)
 #        Paragraph('''
 #            <b>Small print:</b> %s Questions?
@@ -648,7 +650,10 @@ while fcgi.isFCGI():
 
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir, prefix='tmp')
             ss = PyRTF.StyleSheet()
-            ss.Colours.append(PyRTF.Colour('pb', 82, 41, 9*16+4)) # 522994
+	    if microsite == 'london':
+                ss.Colours.append(PyRTF.Colour('pb', 49, 101, 156)) # 31659c
+	    else:
+                ss.Colours.append(PyRTF.Colour('pb', 82, 41, 148)) # 522994
 #            if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
 #                heading_font = 'Trebuchet MS'
 #                main_font = 'Georgia'

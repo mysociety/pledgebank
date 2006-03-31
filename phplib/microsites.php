@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.15 2006-03-30 16:44:15 francis Exp $
+ * $Id: microsites.php,v 1.16 2006-03-31 15:52:31 matthew Exp $
  * 
  */
 
@@ -167,7 +167,7 @@ function microsites_frontpage_intro() {
 	fortnight as the Olympics games return to the capital for the third
 	time in its history. This site is collecting pledges encouraging
 	Londoners to work together on projects to turn London from a great city
-	to the geatest city in the world by 2012.
+	to the greatest city in the world by 2012.
 	<?
     } else {
         # Main site

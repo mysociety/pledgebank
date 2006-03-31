@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.74 2006-03-18 12:37:37 matthew Exp $
+# $Id: poster.cgi,v 1.75 2006-03-31 15:52:37 matthew Exp $
 #
 
 import sys
@@ -132,6 +132,16 @@ def has_sms(pledge):
     # UK countries have SMS
     return True
 
+def pb_domain_url():
+    if microsite:
+        url = microsite + '.'
+    else:
+        url = 'www.'
+    if web_host != 'www':
+        url += web_host + '.'
+    url += mysociety.config.get('WEB_DOMAIN')
+    return url
+
 ############################################################################
 # Flyers using PyRTF for RTF generation
 
@@ -183,7 +193,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
     p_smallprint = PyRTF.ParagraphStyle('smallprint', text_style.Copy(), PyRTF.ParagraphPS(alignment=1, space_before=10, space_after=0) )
     ss.ParagraphStyles.append(p_smallprint)
 
-    webdomain_text = PyRTF.TEXT('%s.%s/%s' % (mysociety.config.get('WEB_HOST'), mysociety.config.get('WEB_DOMAIN'), ref), size=int(small_writing+6), bold=True, colour=ss.Colours.pb)
+    webdomain_text = PyRTF.TEXT('%s/%s' % (pb_domain_url(), ref), size=int(small_writing+6), bold=True, colour=ss.Colours.pb)
 
     # Draw text
     identity = ''
@@ -213,7 +223,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
 
     if not has_sms(pledge):
         # TRANS: This is on a poster, it becomes "Pledge at http://www.pledgebank.com/PLEDGEREF", so "Pledge" in this context is a verb, as below. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
-	text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('Pledge at ')), webdomain_text)
+        text_para = PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('Pledge at ')), webdomain_text)
         if pledge['pin']:
             text_para.append(rtf_repr(_(' pin ')), PyRTF.TEXT('%s' % userpin, colour=ss.Colours.pb, size=int(small_writing+4)))
         sms_smallprint = ""
@@ -222,13 +232,13 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
                     # TRANS: Text is an instruction (verb in the imperative)
                     PyRTF.TEXT(rtf_repr(_('Text')), size=int(small_writing+4)), 
                     ' ', 
-		    # TRANS: Do not translate 'pledge' here, it is the SMS shortcode we use
+            # TRANS: Do not translate 'pledge' here, it is the SMS shortcode we use
                     PyRTF.TEXT(rtf_repr(_('pledge %s')) % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
-		    # TRANS: This appears on posters/flyers in the sentence: "Text 'pledge REFERENCE' *to* 60022". (Tim Morley, 2005-11-30)
+            # TRANS: This appears on posters/flyers in the sentence: "Text 'pledge REFERENCE' *to* 60022". (Tim Morley, 2005-11-30)
                     ' ', rtf_repr(_('to')), ' ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
-		    # TRANS: I think 'pledge' here means 'sign up to', as part of "text xxxxxxxxxx to 60022 (UK only) or pledge at http://xxxxxxxxx". Is that right? (Tim Morley, 2005-11-23)
-		    # Yes, as above. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
+            # TRANS: I think 'pledge' here means 'sign up to', as part of "text xxxxxxxxxx to 60022 (UK only) or pledge at http://xxxxxxxxx". Is that right? (Tim Morley, 2005-11-23)
+            # Yes, as above. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
                     rtf_repr(_(' (%s only) or pledge at ') % sms_countries_description), webdomain_text)
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
@@ -253,7 +263,10 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     h = y2 - y1
 
     # Draw purple bar
-    c.setFillColorRGB(0.6, 0.45, 0.7)
+    if microsite == 'london':
+        c.setFillColorRGB(0.93, 0.2, 0.22)
+    else:
+        c.setFillColorRGB(0.6, 0.45, 0.7)
     h_purple = 0.1*h
     c.rect(x1, y1, w, h_purple, fill=1, stroke=0)
 
@@ -327,7 +340,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
     # Check web domain fits, as that is long word that doesn't fit on
     # (and platypus/reportlab doesn't raise an error in that case)
-    webdomain_text = '''<font size="+3" color="#522994"><b>%s.%s/%s</b></font>''' % (mysociety.config.get('WEB_HOST'), mysociety.config.get('WEB_DOMAIN'), ref)
+    webdomain_text = '''<font size="+3" color="#522994"><b>%s/%s</b></font>''' % (pb_domain_url(), ref)
     webdomain_para = Paragraph(webdomain_text, p_normal)
     webdomain_allowed_width = w - dots_body_gap * 2
     webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]
@@ -370,7 +383,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     else:
         pledge_at_text = _("pledge at ").encode('utf-8')
         pin_text = ""
-	# TRANS: Again, please don't translate "pledge" in this one
+    # TRANS: Again, please don't translate "pledge" in this one
         sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="#522994">
             <b>pledge %s</b></font> to <font color="#522994"><b>%s</b></font> 
             (%s only) or """).encode('utf-8') % (ref, sms_number, sms_countries_description.encode('utf-8'))
@@ -521,6 +534,23 @@ while fcgi.isFCGI():
         if not format in formats:
             raise Exception, "Unknown format '%s'" % format
 
+        # Work out if we're on a microsite
+        http_host = req.env.get('HTTP_HOST')
+        if not http_host:
+            http_host = ''
+        microsite = ''
+        web_host = mysociety.config.get('WEB_HOST')
+        if web_host == 'www':
+            g = re.match('([^.]+)\.', http_host)
+            if g:
+                microsite = g.group(1)
+        else:
+            g = re.match('([^.]+)\.(?:..(?:-..)?\.)?'+web_host+'\.', http_host)
+            if g:
+                microsite = g.group(1)
+        if microsite != 'london':
+            microsite = ''
+
         # Get information from database
         q = db.cursor()
         pledge = {}
@@ -595,11 +625,17 @@ while fcgi.isFCGI():
             req.out.write(content)
 
         outdir = mysociety.config.get("PB_PDF_CACHE")
-        outpdf = "%s_%s_%s.pdf" % (ref, size, type)
-        outfile = "%s_%s_%s.%s" % (ref, size, type, format)
+        if microsite:
+            outpdf = "%s_%s_%s_%s.pdf" % (microsite, ref, size, type)
+        else:
+            outpdf = "%s_%s_%s.pdf" % (ref, size, type)
+        if microsite:
+            outfile = "%s_%s_%s_%s.%s" % (microsite, ref, size, type, format)
+        else:
+            outfile = "%s_%s_%s.%s" % (ref, size, type, format)
 
         # Cache file checking
-	# XXX TODO - sanity check size and date, or we risk caching a failure here!
+        # XXX TODO - sanity check size and date, or we risk caching a failure here!
         if os.path.exists(outdir + '/' + outfile) and incgi:
             # Use cache file
             file_to_stdout(outdir + '/' + outfile)

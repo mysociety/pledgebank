@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.47 2006-03-30 16:44:15 francis Exp $
+// $Id: search.php,v 1.48 2006-03-31 17:53:02 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -64,7 +64,7 @@ function get_location_results($pledge_select, $lat, $lon) {
         $ret .= '<ul>';
         while ($r = db_fetch_array($q)) {
             $ret .= '<li>';
-            $distance_line = pb_pretty_distance($r['distance'], mircosites_search_country());
+            $distance_line = pb_pretty_distance($r['distance'], microsites_search_country());
             $ret .= preg_replace('#^(.*)( away)$#', '<strong>$1</strong>$2: ', $distance_line);
             #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
             $ret .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));

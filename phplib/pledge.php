@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.152 2006-03-27 17:55:42 francis Exp $
+ * $Id: pledge.php,v 1.153 2006-03-31 17:10:02 matthew Exp $
  * 
  */
 
@@ -470,14 +470,17 @@ function pledge_sentence($r, $params = array()) {
         $title = sprintf("<strong>%s</strong>", $r['title']);
     }
 
+    $signup = $r['signup'] == 'do the same' ? 'too' : trim($r['signup']);
+    if ($html)
+        $signup = ms_make_clickable($signup);
     if ($firstperson) {
         if ($firstperson === "includename") {
-            $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], ($r['signup'] == 'do the same' ? 'too' : trim($r['signup']) ) );
+            $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
         } else {
-            $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], ($r['signup'] == 'do the same' ? 'too' : trim($r['signup']) ) );
+            $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], $signup);
         }
     } else {
-        $s = sprintf(_("%s will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], ($r['signup'] == 'do the same' ? 'too' : trim($r['signup']) ) );
+        $s = sprintf(_("%s will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
     }
 
     if (!$html or array_key_exists('href', $params))

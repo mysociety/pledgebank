@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.32 2006-03-14 11:58:59 chris Exp $
+ * $Id: comment.php,v 1.33 2006-04-01 16:55:41 francis Exp $
  * 
  */
 
@@ -40,6 +40,9 @@ $comment_id = $q_comment_id;
 
 $pledge = new Pledge(intval($pledge_id));
 $ref = $pledge->ref();
+if ($pledge->closed_for_comments()) {
+    err(_("Sorry, this pledge is now closed for new comments."));
+}
 
 if (!check_pin($ref, $pledge->pin()))
     err(_("Permission denied"));
@@ -153,7 +156,7 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     }
 
     print "\n\n" . '<div class="comments">';
-    comments_form($pledge_id, $nextn, sizeof($err) == 0);
+    comments_form($pledge_id, $nextn, sizeof($err) == 0, $pledge->closed_for_comments());
     print '</div>';
 }
 

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.175 2006-03-23 11:06:53 chris Exp $
+-- $Id: schema.sql,v 1.176 2006-04-01 16:55:40 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -187,6 +187,8 @@ create table pledges (
     -- Notice puts an extra text banner at the top of the pledge (like cancelled
     -- but without stopping signups)
     notice text, -- LLL
+    -- No longer taking new comments
+    closed_for_comments boolean not null default false,
 
     -- Which lists of pledges this one is shown in.  This value is set by
     -- the administrator, and tested only via pb_pledge_prominence().

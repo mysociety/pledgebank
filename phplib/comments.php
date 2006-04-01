@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.41 2006-03-21 17:13:05 chris Exp $
+ * $Id: comments.php,v 1.42 2006-04-01 16:55:41 francis Exp $
  * 
  */
 
@@ -185,8 +185,9 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
  * Show a form for entering a comment on the given PLEDGE. N is a number which
  * should be increased each time the form is shown; unless ALLOWPOST is set,
  * the form displays only a button to preview the comment, rather than to
- * finally post it. */
-function comments_form($pledge_id, $nextn, $allow_post = false) {
+ * finally post it. If CLOSED_FOR_COMMENTS is true, instead of form displays
+ * a message saying no more comments.*/
+function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
     global $q_h_comment_id;
     global $q_h_author_name, $q_h_author_email, $q_h_author_website, $q_comment_alert_signup;
     global $q_h_text;
@@ -205,9 +206,11 @@ function comments_form($pledge_id, $nextn, $allow_post = false) {
     
 ?>
 <form method="POST" action="comment.php" id="commentform" name="commentform" class="pledge">
+<? if ($closed_for_comments) { ?>
+<?=_("This pledge is closed for new comments.")?> 
+<? } else { ?>
 <input type="hidden" name="pledge_id" value="<?=$pledge_id ?>">
 <?=_('<h2>Add Comment</h2>') ?>
-
 <div class="form_row">
  <label for="author_name"><?=_('Your name') ?></label>
  <input type="text" id="author_name" name="author_name" value="<?=$q_h_author_name?>" size="30">
@@ -242,6 +245,8 @@ but your email address will not be.') ?></small></p>
 <? } ?>
 
 <?  if ($p = get_http_var('pin', true)) print '<input type="hidden" name="pin" value="' . $p . '">'; ?>
+
+<? } ?>
 </form>
 <?
 }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.62 2006-03-30 20:58:25 francis Exp $
+// $Id: ref-index.php,v 1.63 2006-04-01 16:55:41 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -210,7 +210,7 @@ function draw_comments($p) {
         print p($showall_para);
     }*/
 
-    comments_form($p->id(), 1);
+    comments_form($p->id(), 1, false, $p->closed_for_comments());
     print '</div>';
 }
 

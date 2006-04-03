@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.154 2006-04-01 16:55:41 francis Exp $
+ * $Id: pledge.php,v 1.155 2006-04-03 16:36:27 matthew Exp $
  * 
  */
 
@@ -237,7 +237,13 @@ class Pledge {
     // so it is just www.pledgbank.com, rather than containing any overriden
     // language or country codes.
     function url_main() { return pb_domain_url() . $this->h_ref; }
-    function url_typein() { return OPTION_BASE_URL . "/" . $this->h_ref; }
+    function url_typein() {
+        global $microsite;
+        $m = $microsite;
+        if ($m == 'everywhere')
+            $m = null;
+        return pb_domain_url(array('lang'=>'', 'microsite'=>$m, 'path'=>'/')) . $this->h_ref;
+    }
     function url_email() { return pb_domain_url() . $this->h_ref . "/email"; }
     function url_ical() { return pb_domain_url() . $this->h_ref . "/ical"; }
     function url_flyers() { return pb_domain_url() . $this->h_ref . "/flyers"; }

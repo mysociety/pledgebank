@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.31 2006-03-31 17:02:43 matthew Exp $
+// $Id: faq.php,v 1.32 2006-04-03 09:43:20 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -17,11 +17,23 @@ page_header(_("Frequently Asked Questions"));
 print h2(_('Frequently Asked Questions'));
 print "<dl>\n";
 
-print dt(_('What is PledgeBank for?'));
-print dd(_("PledgeBank is a site to help people get things done, especially things
-that require several people. We think that the world needs such a
-service: lots of good things don't happen because there aren't enough
-organised people to do them."));
+if ($microsite && $microsite == 'london') {
+    print dt('What is PledgeBank London for?');
+    print dd("PledgeBank London is a site to help Londoners to work together to
+    improve the quality of life in their city. It is based on PledgeBank,
+    a global website, but it only shows Pledges specific to London.");
+    
+    print dt(_('How does PledgeBank do for me? Why should I use it?'));
+    print dd(_('PledgeBank gives you the reassurance that if you decide to do
+    something for the wider community you won\'t be doing it alone.'));
+} else {
+    print dt(_('What is PledgeBank for?'));
+    print dd(_("PledgeBank is a site to help people get things done, especially things
+    that require several people. We think that the world needs such a
+    service: lots of good things don't happen because there aren't enough
+    organised people to do them."));
+}
+
 print dt(_('Can you give me some examples?'));
 print dd(_("Sure. 'I will start recycling if 100 people in my town will do the
 same'; 'I will organise my child's school play if 3 other parents will
@@ -49,11 +61,12 @@ taken down - this is a family friendly site!"));
 print dt(_('How can you be sure people will bother to carry out the pledge?'));
 
 print dd(_("We can't; PledgeBank is based on a psychological bet. We believe that
-if a person posesses a slight desire to do something, and then we help
+if a person possesses a slight desire to do something, and then we help
 connect them to a bunch of  people who also want to do the same thing
-then that first person is much more likely to act. Our guess is that
-this will work rather well in some areas of activity and not at all in
-others - such is human nature."));
+then that first person is much more likely to act.  Update: we have now
+surveyed a load of money based pledges that have succeeded, and found that
+payment rates vary from 50% to well over 150%, with three-quarters of 
+people paying being typical."));
 
 print dt(_('What do I get out of it?'));
 

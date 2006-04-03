@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.32 2006-04-03 09:43:20 francis Exp $
+// $Id: faq.php,v 1.33 2006-04-03 09:58:24 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -23,7 +23,7 @@ if ($microsite && $microsite == 'london') {
     improve the quality of life in their city. It is based on PledgeBank,
     a global website, but it only shows Pledges specific to London.");
     
-    print dt(_('How does PledgeBank do for me? Why should I use it?'));
+    print dt(_('What does PledgeBank do for me? Why should I use it?'));
     print dd(_('PledgeBank gives you the reassurance that if you decide to do
     something for the wider community you won\'t be doing it alone.'));
 } else {

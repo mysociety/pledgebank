@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.126 2006-03-15 12:50:05 francis Exp $
+// $Id: new.php,v 1.127 2006-04-04 17:57:17 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -547,7 +547,7 @@ function step1_error_check($data) {
     if (!$data['ref']) $errors['ref'] = _('Please enter a short name for your pledge');
     elseif (strlen($data['ref'])<6) $errors['ref'] = _('The short name must be at least six characters long');
     elseif (strlen($data['ref'])>16) $errors['ref'] = _('The short name can be at most 20 characters long');
-    elseif (in_array($data['ref'], $disallowed_refs)) $errors['ref'] = _('That short name is not allowed.');
+    elseif (in_array(strtolower($data['ref']), $disallowed_refs)) $errors['ref'] = _('That short name is not allowed.');
     elseif (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = _('The short name must only contain letters, numbers, or a hyphen.  Spaces are not allowed.');
     elseif (!preg_match('/[a-z]/i',$data['ref'])) $errors['ref2'] = _('The short name must contain at least one letter.');
 

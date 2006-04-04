@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.64 2006-04-04 13:05:55 matthew Exp $
+// $Id: ref-index.php,v 1.65 2006-04-04 17:57:17 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -14,7 +14,8 @@ require_once '../phplib/comments.php';
 require_once '../../phplib/utility.php';
 
 $ref = get_http_var('ref');
-if ($microsite != 'london' && strcasecmp($ref, 'sportclubpatrons') == 0) {
+if (($microsite != 'london' && strcasecmp($ref, 'sportclubpatrons') == 0) ||
+    strcasecmp($ref, 'sportsclubpatrons') == 0) {
     header('Location: http://london.pledgebank.com/Sportclubpatrons');
     exit;
 }

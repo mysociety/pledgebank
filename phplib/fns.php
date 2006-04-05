@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.128 2006-03-30 16:06:49 francis Exp $
+// $Id: fns.php,v 1.129 2006-04-05 08:56:44 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -422,7 +422,7 @@ function country_sort($a, $b) {
  *      'gazeonly' - only list countries for which we have local gaze place
  */
 function pb_view_gaze_country_choice($selected_country, $selected_state, $errors, $params = array()) {
-    global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name, $ip_country, $site_country;
+    global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name, $ip_country;
 
     /* Save previous value of country, so that we can detect if it's changed after
      * one of a list of placenames is selected. */
@@ -460,12 +460,12 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
         }
 */
     }
-    if ($selected_country != $site_country && $site_country) {
-        print "<option value=\"$site_country\">";
-        print htmlspecialchars($countries_code_to_name[$site_country]);
+    if ($selected_country != microsites_site_country() && microsites_site_country()) {
+        print "<option value=\"".microsites_site_country()."\">";
+        print htmlspecialchars($countries_code_to_name[microsites_site_country()]);
         print "</option>";
     }
-    if ($selected_country != $ip_country && $ip_country && $ip_country != $site_country) {
+    if ($selected_country != $ip_country && $ip_country && $ip_country != microsites_site_country()) {
         print "<option value=\"$ip_country\">";
         print htmlspecialchars($countries_code_to_name[$ip_country]);
         print "</option>";
@@ -596,7 +596,7 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 <input type="hidden" name="country" value="<?=$force_country?>">
 <span style="white-space: nowrap"><?=_('Postcode:')?>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <? } else { ?>
-<span style="white-space: nowrap"><?=_('Country:') ?> <? global $site_country; pb_view_gaze_country_choice($site_country, null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
+<span style="white-space: nowrap"><?=_('Country:') ?> <? pb_view_gaze_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
 <span style="white-space: nowrap"><span id="place_postcode_label<?=($place_postcode_label ? $place_postcode_label : '')?>"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <? } ?>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>

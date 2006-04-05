@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.48 2006-03-31 17:53:02 matthew Exp $
+// $Id: search.php,v 1.49 2006-04-05 08:56:44 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -64,7 +64,7 @@ function get_location_results($pledge_select, $lat, $lon) {
         $ret .= '<ul>';
         while ($r = db_fetch_array($q)) {
             $ret .= '<li>';
-            $distance_line = pb_pretty_distance($r['distance'], microsites_search_country());
+            $distance_line = pb_pretty_distance($r['distance'], microsites_site_country());
             $ret .= preg_replace('#^(.*)( away)$#', '<strong>$1</strong>$2: ', $distance_line);
             #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
             $ret .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
@@ -172,8 +172,8 @@ function search($search) {
     // Places
     global $countries_code_to_name;
     $change_country = pb_get_change_country_link();
-    if (microsites_search_country()) {
-        $places = pb_gaze_find_places(microsites_search_country(), null, $search, 5, 70);
+    if (microsites_site_country()) {
+        $places = pb_gaze_find_places(microsites_site_country(), null, $search, 5, 70);
         if (count($places) > 0) {
             $success = 1;
             $out = "";
@@ -191,7 +191,7 @@ function search($search) {
                         $out .= "<li>$desc";
                     else
                         # TRANS: For example: "Results for <strong>open pledges</strong> near places matching <strong>Bolton</strong>, United Kingdom (<a href="....">change country</a>):"
-			$out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s (%s):"), pb_pretty_distance($radius,microsites_search_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_search_country()], $change_country));
+			$out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s (%s):"), pb_pretty_distance($radius,microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()], $change_country));
                     if ($location_results) {
                         $out .= $location_results;
                     } else {
@@ -201,7 +201,7 @@ function search($search) {
                 }
             }
             if (!$rss && count($places) > 1) {
-		print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s (%s):"), get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[microsites_search_country()], $change_country));
+		print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s (%s):"), get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[microsites_site_country()], $change_country));
                 print "<ul>";
             }
             print $out;

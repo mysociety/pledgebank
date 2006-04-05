@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.129 2006-04-05 08:56:44 francis Exp $
+// $Id: fns.php,v 1.130 2006-04-05 15:13:04 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -27,8 +27,8 @@ function li($s) { return "<li>$s</li>\n"; }
 # Defaults to keeping country country or language, unless param contains:
 #   'lang' - language to change to, or "explicit" to explicitly include current language in URL
 #   'country' - country to change to, or "explicit" to explicitly include current country in URL
-#   'explicit' - if present and true, overrides lang and country to "explicit"
-#   'microsite' - certain microsite
+#   'microsite' - certain microsite, or "explicit" to explicitly include current microsite in URL
+#   'explicit' - if present and true, overrides lang, country and microsite to "explicit"
 # Parameters are:
 #   'path' - path component, if not present uses request URI
 function pb_domain_url($params = array('path'=>'/')) {
@@ -37,6 +37,7 @@ function pb_domain_url($params = array('path'=>'/')) {
     if (array_key_exists('explicit', $params) && $params['explicit']) {
         $params['lang'] = 'explicit';
         $params['country'] = 'explicit';
+        $params['microsite'] = 'explicit';
     }
 
     # Language
@@ -53,7 +54,7 @@ function pb_domain_url($params = array('path'=>'/')) {
     if (array_key_exists('country', $params))
         $c = ($params['country'] == "explicit") ? $site_country : $params['country'];
     if (array_key_exists('microsite', $params))
-        $c = $params['microsite'];
+        $c = ($params['microsite'] == "explicit") ? $microsite : $params['microsite'];
     
     $url = 'http://';
 

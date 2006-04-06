@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.121 2006-03-28 10:06:11 francis Exp $
+ * $Id: admin-pb.php,v 1.122 2006-04-06 00:10:58 matthew Exp $
  * 
  */
 
@@ -855,8 +855,8 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
                 # if (preg_match('/^delete_(comment|pledge|signer)_([1-9]\d*)$/', $k, $a))
                 if (preg_match('/^delete_(comment)_([1-9]\d*)$/', $k, $a)) {
                     if ($a[1] == 'comment') {
-                        pledge_delete_comment($a[2]);
-                    } else if ($a[1] == 'pledge') {
+		        db_query('update comment set ishidden=true where id=?', $a[2]);
+                    } elseif ($a[1] == 'pledge') {
                         // pledge_delete_pledge($a[2]);
                     } else {
                         // pledge_delete_signer($a[2]);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.22 2005-12-30 12:32:06 matthew Exp $
+// $Id: ref-email.php,v 1.23 2006-04-07 15:21:27 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -60,7 +60,7 @@ if (get_http_var('submit')) {
                 array_merge($p->data, array(
                     'from_name'=>$fromname, 
                     'from_email' => $fromemail, 
-                    'from_message' => $frommessage ? _('They added this message:') . " \"$frommessage\"\n\n" : "",
+                    'from_message' => $frommessage ? sprintf(_('%s added this message:'), $fromname) . " \"$frommessage\"\n\n" : "",
                 )), array('From'=>array($fromemail, $fromname))
             );
         }

@@ -1,19 +1,20 @@
 Subject: <?=$values['from_name']?> saw this pledge and thought of you
 
-<?=$values['from_name']?> <<?=$values['from_email']?>> has pledged their
-support to '<?=$values['title']?>' and wants you to do the same! Simply by
-clicking <?=$values['pledge_url']?> you can show the world that you're ready to
-start making a difference, alongside other like-minded people.
+<?=$values['from_name']?> <<?=$values['from_email']?>> thought you would
+be interested in a pledge by <?=$values['creator_name']?> to '<?=$values['title']?>'.
+Simply by clicking <?=$values['pledge_url']?> you can show the world that
+you're ready to start making a difference, alongside other like-minded people.
 
-<?=$values['pledgebank_url']?> is a site set up to give power to
-YOU, by allowing you to ensure that others will support your actions. If you
-have ever wanted to make a difference, but haven't known where to start and who
-will join you, click here <?=$values['pledgebank_url']?> !
+<?=$values['creator_name']?>'s pledge will close on <?=$values['pretty_date']?>
+and it only needs the support of <?=$values['target']?> people before it
+goes into action.
 
-<?=$values['from_name']?>'s pledge will close on <?=$values['pretty_date']?>
-and they only need the support of <?=$values['target']?> people before their
-pledge goes into action.
+<?=$values['from_message']?><?=$values['pledgebank_url']?> is a site set up
+to give power to YOU, by allowing you to ensure that others will support
+your actions. If you have ever wanted to make a difference, but haven't
+known where to start and who will join you, visit us now:
+<?=$values['pledgebank_url']?>
 
-<?=$values['from_message']?>Thank you for your support!
+Thank you for your support!
 
 <?=$values['signature']?>

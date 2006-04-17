@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.122 2006-04-06 00:10:58 matthew Exp $
+ * $Id: admin-pb.php,v 1.123 2006-04-17 15:29:59 francis Exp $
  * 
  */
 
@@ -211,7 +211,7 @@ class ADMIN_PAGE_PB_MAIN {
                 location.country, location.state, location.description,
                 location.longitude, location.latitude, location.method,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id) AS comments
+                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id AND NOT ishidden) AS comments
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id 
             LEFT JOIN location ON location.id = pledges.location_id
@@ -688,6 +688,7 @@ class ADMIN_PAGE_PB_LATEST {
                                   person.email as author_email
                              FROM comment
                              LEFT JOIN person ON person.id = comment.person_id
+                             WHERE not ishidden
                          ORDER BY whenposted DESC');
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['pledge_id']) {
@@ -855,7 +856,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
                 # if (preg_match('/^delete_(comment|pledge|signer)_([1-9]\d*)$/', $k, $a))
                 if (preg_match('/^delete_(comment)_([1-9]\d*)$/', $k, $a)) {
                     if ($a[1] == 'comment') {
-		        db_query('update comment set ishidden=true where id=?', $a[2]);
+                        db_query('update comment set ishidden=true where id=?', $a[2]);
                     } elseif ($a[1] == 'pledge') {
                         // pledge_delete_pledge($a[2]);
                     } else {
@@ -925,7 +926,9 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
                     elseif ($what == 'signer')
                         $pledge_id = db_getRow('select pledge_id from signers where id = ?', $what_id);
                     elseif ($what == 'comment')
-                        $pledge_id = db_getOne('select pledge_id from comment where id = ?', $what_id);
+                        $pledge_id = db_getOne('select pledge_id from comment where id = ? and not ishidden', $what_id);
+                    if (!$pledge_id)
+                        continue;
                     
                     $pledge = db_getRow('
                                     select *,

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.42 2006-04-01 16:55:41 francis Exp $
+ * $Id: comments.php,v 1.43 2006-04-17 15:29:59 francis Exp $
  * 
  */
 
@@ -70,7 +70,7 @@ function comments_show_one($comment, $noabuse = false) {
  * Returns how many comments pledge has. */
 function comments_count($pledge) {
     $id = $pledge;
-    return db_getOne('select count(id) from comment where pledge_id = ?', $id);
+    return db_getOne('select count(id) from comment where pledge_id = ? and not ishidden', $id);
 }
 
 /* comments_show PLEDGE [NOABUSE] [LIMIT]
@@ -88,7 +88,7 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
 
     print '<div class="commentsbox">';
     
-    $count = db_getOne('select count(id) from comment where pledge_id = ?', $id);
+    $count = db_getOne('select count(id) from comment where pledge_id = ? and not ishidden', $id);
     if ($count == 0)
         print '<p><em>' . _('No comments yet! Why not add one?') . '</em></p>';
     else {

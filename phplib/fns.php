@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.130 2006-04-05 15:13:04 francis Exp $
+// $Id: fns.php,v 1.131 2006-04-17 14:06:34 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -167,11 +167,10 @@ function parse_date($date) {
     global $pb_time, $lang, $site_country;
     $now = $pb_time;
     $error = 0;
-    if (!$date)  {
-        return null;
-    }
-
     $date = preg_replace('#((\b([a-z]|on|an|of|in|the|year of our lord))|(?<=\d)(st|nd|rd|th))\b#','',$date);
+    if (!$date)
+        return null;
+
     if ($lang == 'eo')
         $date = preg_replace('#((\b(de|la))|(?<=\d)-?a)\b#','',$date);
     if ($lang == 'nl')

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.132 2006-04-26 22:17:22 timsk Exp $
+// $Id: fns.php,v 1.133 2006-04-26 23:08:47 timsk Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -219,11 +219,11 @@ function parse_date($date) {
 	),
 	'January' => array('enero', 'gennaio', 'janeiro', 'Ionawr', 
         "\xd1\x8f\xd0\xbd\xd0\xb2\xd0\xb0\xd1\x80\xd1\x8f", "\xd1\x81\xd1\x96\xd1\x87\xd0\xbd\xd1\x8f", 
-        'januaro', 'januari', "Januar", 
+        'januaro', 'januari', "Januar", "Jänner", 
 	),
 	'February' => array('febrero', 'febbraio', 'fevereiro', 'Chwefror', 
         "\xd1\x84\xd0\xb5\xd0\xb2\xd1\x80\xd0\xb0\xd0\xbb\xd1\x8f", "\xd0\xbb\xd1\x8e\xd1\x82\xd0\xbe\xd0\xb3\xd0\xbe", 
-	'februaro', 'februari', "Februar", 
+	'februaro', 'februari', "Februar", "Feber", 
 	),
 	'March' => array('marzo', "mar\xc3\xa7o", 'Mawrth', 
         "\xd0\xbc\xd0\xb0\xd1\x80\xd1\x82\xd0\xb0", "\xd0\xb1\xd0\xb5\xd1\x80\xd0\xb5\xd0\xb7\xd0\xbd\xd1\x8f",

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.176 2006-04-01 16:55:40 francis Exp $
+-- $Id: schema.sql,v 1.177 2006-04-26 15:10:11 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -147,7 +147,7 @@ create table pledges (
     -- URL of accompanying image
     picture text,
 
-    -- pledge setter
+    -- pledge creator
     person_id integer not null references person(id),
     name text not null,
     identity text not null default '', -- LLL

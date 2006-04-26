@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.128 2006-04-15 22:26:52 matthew Exp $
+// $Id: new.php,v 1.129 2006-04-26 22:36:02 timsk Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -148,6 +148,8 @@ if ($lang=='en-gb')
     print date('jS F Y', $pb_time+60*60*24*28); // 28 days
 elseif ($lang=='eo')
     print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
+elseif ($lang=='de')
+    print strftime('%e. %B %Y', $pb_time+60*60*24*28);
 else
     print strftime('%e %B %Y', $pb_time+60*60*24*28); ?>")</small></p>
 

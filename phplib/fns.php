@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.133 2006-04-26 23:08:47 timsk Exp $
+// $Id: fns.php,v 1.134 2006-04-27 20:22:36 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -176,8 +176,10 @@ function parse_date($date) {
     if ($lang == 'nl')
         $date = preg_replace('#(?<=\d)e\b#','',$date);
 
+    $date = preg_replace('#^(\d+)\.(\d+)\.(\d+)$#', '$1/$2/$3', $date);
+
     # Remove dots, mainly for German format "23. Mai 2006"
-    $date = preg_replace('#(?<=\d)\.\b#','',$date);
+    $date = str_replace('.', '', $date);
 
     # Translate foreign words to English as strtotime() is English only
     $translate = array(

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.123 2006-04-17 15:29:59 francis Exp $
+ * $Id: admin-pb.php,v 1.124 2006-04-30 16:31:44 francis Exp $
  * 
  */
 
@@ -889,7 +889,10 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
             if ($w != $q_what)
                 print "<a href=\"$self_link&amp;what=$w\">";
             print "${w}s ("
-                    . db_getOne('select count(id) from abusereport where what = ?', $w)
+                    . 
+                    ($w == "comment" 
+                    ? db_getOne('select count(abusereport.id) from abusereport, comment where comment.id = abusereport.what_id and not ishidden')
+                    : db_getOne('select count(id) from abusereport where what = ?', $w))
                     . ")";
             if ($w != $q_what)
                 print "</a>";

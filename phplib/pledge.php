@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.155 2006-04-03 16:36:27 matthew Exp $
+ * $Id: pledge.php,v 1.156 2006-05-02 09:32:13 francis Exp $
  * 
  */
 
@@ -309,6 +309,10 @@ class Pledge {
 &quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;
     <? if ($this->url_translate_pledge()) { ?>
     (<a title="<?=_("Roughly translate the pledge into your language (using Altavista's Babel Fish machine translator)")?>" href="<?=htmlspecialchars($this->url_translate_pledge())?>"><?=_("translate")?></a>)
+    <? } ?>
+    <? $P = person_if_signed_on();
+       if (!is_null($P) && !is_null($P->email()) && preg_match('/(@mysociety.org$)|(^francis@flourish.org$)/', $P->email())) { ?>
+    (<a href="<?=OPTION_ADMIN_URL?>?page=pb&amp;pledge=<?=$this->ref()?>"><?=_("admin")?></a>)
     <? } ?>
 </p>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>

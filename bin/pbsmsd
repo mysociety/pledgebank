@@ -16,7 +16,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.40 2006-05-03 12:10:52 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.41 2006-05-03 12:45:05 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -550,9 +550,11 @@ sub run_processing_process () {
                 } else {
                     $H = \@PB::SMS::failed_handlers;
                 }
-                # Check that the message is still present.
-                dbh()->do("lock table $tbl in exclusive mode");
-                if (!defined(scalar(dbh()->selectrow_array("select id from $tbl where id = ?", {}, $id)))) {
+                # Check that the message is still present. SELECT ... FOR
+                # UPDATE should be enough here, because we're only worried
+                # about another thread grabbing or deleting the message, and
+                # the row lock will prevent either.
+                if (!defined(scalar(dbh()->selectrow_array("select id from $tbl where id = ? for update", {}, $id)))) {
                     # Message has gone away.
                     dbh()->rollback();
                     next;
@@ -733,5 +735,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.40 2006-05-03 12:10:52 chris Exp $
+$Id: pbsmsd,v 1.41 2006-05-03 12:45:05 chris Exp $
 

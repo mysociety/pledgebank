@@ -16,7 +16,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.39 2006-04-26 15:10:11 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.40 2006-05-03 12:10:52 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -70,6 +70,7 @@ sub do_post_request ($$$) {
                 );
 
     my $R;
+    my $t1 = time();
     eval {
         local $SIG{ALRM} = sub { die "timed out in eval\n"; };
         alarm(300);
@@ -96,6 +97,10 @@ sub do_post_request ($$$) {
         print_log('warning', "$what: $@");
         $R = ['systemerror', $@];
     }
+
+    my $t2 = time();
+    print_log('warning', "$what: HTTP POST request took " . ($t2 - $t1) . " seconds")
+        if ($t2 > $t1 + 10);
 
     return $R;
 }
@@ -291,9 +296,6 @@ sub run_gathering_process () {
         # Receipts
         #
 
-        # Ugly. If the query to the remote side takes any significant time,
-        # this will cause any process sending SMSs to lock up for that period.
-        # dbh()->do('lock table outgoingsms in exclusive mode');
         $s_status->execute(PB::Time() - max_polling_age, PB::Time() - min_polling_age, PB::Time() - min_polling_interval);
         my $min_id = $s_status->fetchrow_array();
         if (defined($min_id)) {
@@ -731,5 +733,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.39 2006-04-26 15:10:11 francis Exp $
+$Id: pbsmsd,v 1.40 2006-05-03 12:10:52 chris Exp $
 

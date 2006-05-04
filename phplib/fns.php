@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.134 2006-04-27 20:22:36 matthew Exp $
+// $Id: fns.php,v 1.135 2006-05-04 20:53:12 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -275,7 +275,7 @@ function parse_date($date) {
     );
     $search = array(); $replace = array();
     foreach ($translate as $english => $foreign) {
-        $search[] = '/(' . join('|', $foreign) . ')/i';
+        $search[] = '/\b(' . join('|', $foreign) . ')\b/i';
         $replace[] = $english;
     }
     $date = preg_replace($search, $replace, $date);

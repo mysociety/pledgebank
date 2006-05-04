@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.33 2006-04-03 09:58:24 francis Exp $
+// $Id: faq.php,v 1.34 2006-05-04 17:45:33 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -234,8 +234,8 @@ reasons, this will not go to SMS signers.  If your pledge succeeds you will be
 given a link to send a message to all your signers, including those who
 signed up by text message.  You should give your contact details, and ask for
 theirs, so you can stay in touch as you carry out your pledge.  If anybody
-signs your pledge later, all your messages will be automatically forwarded to
-them."));
+signs your pledge later, the last message that you sent will be automatically
+forwarded to them, and they will be given a link to read older messages."));
 
 print dt(_('Can people sign up by SMS (text message), and if so how?'));
 

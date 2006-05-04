@@ -5,10 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.106 2006-03-27 17:55:42 francis Exp $
+// $Id: page.php,v 1.107 2006-05-04 11:10:00 chris Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
+require_once '../../phplib/tracking.php';
 require_once 'pledge.php';
 
 // Do NOT include microsites.php here, or it won't get translated.
@@ -147,9 +148,10 @@ function page_header($title, $params = array()) {
 
 /* page_footer PARAMS
  * Print bottom of HTML page. This closes the "content" <div>.  
- * If PARAMS['nonav'] is true then the footer navigation is not displayed. 
- * If PARAMS['nolocalsignup'] is true then no local signup form is showed.
- */
+ * If PARAMS['nonav'] is true then the footer navigation is not displayed. If
+ * PARAMS['nolocalsignup'] is true then no local signup form is showed. If
+ * PARAMS['extra'] is set, then it is passed to track_event as extra
+ * user-tracking information to be associated with this page view. */
 function page_footer($params = array()) {
     global $contact_ref;
 ?></div><? # id="content"
@@ -177,6 +179,12 @@ function page_footer($params = array()) {
 </div>
 <?
     }
+
+    /* User-tracking. */
+    $extra = null;
+    if (array_key_exists('extra', $params) && $params['extra'])
+        $extra = $params['extra'];
+    track_event($extra);
 ?>
 </body></html>
 <?  

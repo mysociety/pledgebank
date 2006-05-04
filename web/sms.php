@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.36 2006-02-24 19:21:55 matthew Exp $
+ * $Id: sms.php,v 1.37 2006-05-04 12:14:13 chris Exp $
  * 
  */
 
@@ -47,7 +47,7 @@ elseif (!isset($r['signer_id'])) {
         oops($res, 'sms');
     else {
         /* We've now signed up, so just redirect to this script. */
-        header("Location: " . invoked_url());
+        header("Location: " . url_invoked());
         exit();
     }
 }

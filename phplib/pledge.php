@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.156 2006-05-02 09:32:13 francis Exp $
+ * $Id: pledge.php,v 1.157 2006-05-04 12:14:12 chris Exp $
  * 
  */
 
@@ -723,7 +723,7 @@ function post_confirm_advertise($pledge) {
 /* post_confirm_advertise_flyers PLEDGE_ROW
  * Print some stuff advertising flyers for PLEDGE. */
 function post_confirm_advertise_flyers($r) {
-    $png_flyers8_url = new_url("/flyers/{$r['ref']}_A4_flyers8.png", false);
+    $png_flyers8_url = url_new("/flyers/{$r['ref']}_A4_flyers8.png", false);
 ?>
 <p class="noprint noisymessage" align="center">
 <?

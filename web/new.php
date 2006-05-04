@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.129 2006-04-26 22:36:02 timsk Exp $
+// $Id: new.php,v 1.130 2006-05-04 12:14:12 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -734,7 +734,7 @@ function preview_pledge($data, $errors) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
-    } #    $png_flyers1_url = new_url("../flyers/{$ref}_A7_flyers1.png", false);
+    } #    $png_flyers1_url = url_new("../flyers/{$ref}_A7_flyers1.png", false);
 
     print '<p>';
     printf(_('Your pledge, with short name <em>%s</em>, will look like this:'), $data['ref']);

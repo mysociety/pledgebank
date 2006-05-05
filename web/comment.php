@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.33 2006-04-01 16:55:41 francis Exp $
+ * $Id: comment.php,v 1.34 2006-05-05 09:44:35 chris Exp $
  * 
  */
 
@@ -25,8 +25,11 @@ $err = importparams(
         );
 
 if (!is_null($err)) {
-    #  implode(". ", array_values($err))
-    err(_("Sorry -- something seems to have gone wrong. "));
+    /* this error seems mostly to be triggered by bots presumably trying to
+     * find places to post spam, so just redirect to the home page. */
+    //err(_("Sorry -- something seems to have gone wrong. "));
+    header("Location: /");
+    exit();
 }
 
 /* Allocate a comment ID here to stop double-posting. */

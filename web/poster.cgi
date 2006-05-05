@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.76 2006-03-31 17:02:43 matthew Exp $
+# $Id: poster.cgi,v 1.77 2006-05-05 18:06:11 matthew Exp $
 #
 
 import sys
@@ -590,8 +590,8 @@ while fcgi.isFCGI():
             pledge['date'] = date.strftime("la %e-a de %B %Y")
         else:
             pledge['date'] = date.strftime("%e %B %Y")
-        if pledge['signup'].decode('utf-8') == _("do the same"):
-            pledge['signup'] = _("too").encode('utf-8')
+        if pledge['signup'].decode('utf-8') == u"do the same":
+            pledge['signup'] = "too"
         sms_number = mysociety.config.get('PB_SMS_DISPLAY_NUMBER')
 
         # Check pin

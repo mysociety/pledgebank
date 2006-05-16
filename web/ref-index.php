@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.65 2006-04-04 17:57:17 matthew Exp $
+// $Id: ref-index.php,v 1.66 2006-05-16 16:00:51 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -111,7 +111,7 @@ function draw_signatories($p) {
         if (!get_http_var('showall')) {
             $showall_para = sprintf(_("Because there are so many signers, only the most recent %d are shown on this page."), MAX_PAGE_SIGNERS);
 
-            $showall_nav = sprintf("<a href=\"/%s/?showall=1\">&gt;&gt; "
+            $showall_nav = sprintf("<a href=\"/%s?showall=1\">&gt;&gt; "
                     . htmlspecialchars(_("Show all signers"))
                     . "</a>",
                     htmlspecialchars($p->ref()));
@@ -195,7 +195,7 @@ function draw_comments($p) {
         if (!get_http_var('showall')) {
             $showall_para = sprintf(_("Because there are so many comments, only the most recent %d are shown on this page."), MAX_PAGE_COMMENTS);
 
-            $showall_nav = sprintf("<a href=\"/%s/?showall=1\">&gt;&gt; "
+            $showall_nav = sprintf("<a href=\"/%s?showall=1\">&gt;&gt; "
                     . htmlspecialchars(_("Show all comments"))
                     . "</a>",
                     htmlspecialchars($p->ref()));

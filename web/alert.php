@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.52 2006-01-19 09:35:33 francis Exp $
+// $Id: alert.php,v 1.53 2006-05-25 17:01:26 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -47,6 +47,8 @@ if ($place && (validate_partial_postcode($place) || validate_postcode($place))) 
     $place = null;
 }
  
+$track = get_http_var('track');
+
 // Display page
 $title = _('New pledge alerts');
 page_header($title, array("gazejs" => true));
@@ -72,10 +74,14 @@ if (get_http_var('subscribe_local_alert')) {
 } else {
     local_alert_subscribe_box();
 }
-page_footer(array('nolocalsignup'=>true));
+
+$params = array('nolocalsignup'=>true);
+if ($track)
+    $params['extra'] = $track;
+page_footer($params);
 
 function do_local_alert_subscribe() {
-    global $email, $country, $state, $place, $gaze_place, $postcode;
+    global $email, $country, $state, $place, $gaze_place, $postcode, $track;
     $errors = array();
     if (!$email) $errors['email'] = _("Please enter your email address");
     if (!validate_email($email)) $errors['email'] = _("Please enter a valid email address");
@@ -144,7 +150,9 @@ function do_local_alert_subscribe() {
     $params['postcode'] = $postcode;
     alert_signup($person->id(), "pledges/local", $params);
     db_commit();
-        ?>
+    if ($track)
+        $track .= '; subscribed'
+?>
 <p class="loudmessage" align="center"><?=_("Thanks for subscribing!  You'll now get emailed once a day when there are new pledges in your area.") ?> </p>
 
 <p class="noisymessage"><?=_("To add an alert for another place, <a href=\"/alert\">click here</a>.")?></p>
@@ -161,7 +169,7 @@ function do_local_alert_subscribe() {
 
 /* Display form for email alert sign up. */
 function local_alert_subscribe_box($errors = array()) {
-    global $email, $country, $state, $place, $gaze_place, $postcode;
+    global $email, $country, $state, $place, $gaze_place, $postcode, $track;
 
     $places = null;
     if ($place) {
@@ -193,6 +201,9 @@ function local_alert_subscribe_box($errors = array()) {
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/alert">
 <input type="hidden" name="subscribe_local_alert" value="1">
+<?  if ($track)
+        print '<input type="hidden" name="track" value="' . htmlentities($track) . '">';
+?>
 <h2><?=_('Get emails about local pledges') ?></h2>
 <p><?=_("Fill in the form, and we'll email you when someone creates a new pledge near you.") ?></p>
 <p>

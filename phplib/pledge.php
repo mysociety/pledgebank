@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.157 2006-05-04 12:14:12 chris Exp $
+ * $Id: pledge.php,v 1.158 2006-05-25 17:01:19 matthew Exp $
  * 
  */
 
@@ -711,13 +711,16 @@ function pledge_sign_box() {
 /* post_confirm_advertise PLEDGE_ROW
    Print relevant advertising */
 function post_confirm_advertise($pledge) {
-    $local = pledge_is_local($pledge->data);
-    if ($local) {
-        post_confirm_advertise_flyers($pledge->data);
+    $random = rand(1,2);
+    if ($random==1) {
+        $random = 'friends';
+	print '<p class="noisymessage">Pledges only ever succeed when signers encourage other people to sign them:</p>';
+        view_friends_form($pledge, array(), 'signer-confirm');
     } else {
-        post_confirm_advertise_sms($pledge->data);
-        view_friends_form($pledge);
+        $random = 'local-alerts';
+        pb_view_local_alert_quick_signup("localsignupfrontpage", array('track'=>'signer-confirm'));
     }
+    return "signer-confirm-advert=$random";
 }
 
 /* post_confirm_advertise_flyers PLEDGE_ROW
@@ -751,7 +754,6 @@ go out to the shops or your pledge is unlikely to succeed.');
     if (!$r['pin']) { ?>
 <p align="center"><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="<?=_('Graphic of flyers for printing') ?>"></a></p>
 <?  }
-    post_confirm_advertise_sms($r);
 }
 
 /* post_confirm_advertise_sms PLEDGE_ROW

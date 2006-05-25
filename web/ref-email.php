@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.23 2006-04-07 15:21:27 matthew Exp $
+// $Id: ref-email.php,v 1.24 2006-05-25 17:01:26 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -25,6 +25,8 @@ if ($pin_box) {
 
 $title = _("Emailing friends");
 page_header($title, array('ref' => $p->url_typein() ));
+
+$track = get_http_var('track');
 
 # fromname, fromemail, frommessage
 # email as an array
@@ -66,17 +68,22 @@ if (get_http_var('submit')) {
         }
         if ($success) {
             print p(_('Your message has been sent.  Thanks very much for spreading the word of this pledge.'));
+	    if ($track)
+	        $track .= '; sent=' . sizeof($emails);
         } else {
             $errors[] = _('Unfortunately, something went wrong when trying to send the emails. Please check that all the email addresses are correct.');
-            view_friends_form($p, $errors);
+            view_friends_form($p, $errors, $track);
         }
     } else {
-        view_friends_form($p, $errors);
+        view_friends_form($p, $errors, $track);
     }
 } else {
-    view_friends_form($p, $errors);
+    view_friends_form($p, $errors, $track);
 }
 
-page_footer();
+$params = array();
+if ($track)
+    $params['extra'] = $track;
+page_footer($params);
 
 ?>

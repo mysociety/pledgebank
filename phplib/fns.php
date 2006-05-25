@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.135 2006-05-04 20:53:12 matthew Exp $
+// $Id: fns.php,v 1.136 2006-05-25 17:01:19 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -332,7 +332,7 @@ function parse_date($date) {
     return array('iso'=>"$year-$month-$day", 'epoch'=>$epoch, 'day'=>$day, 'month'=>$month, 'year'=>$year, 'error'=>$error);
 }
 
-function view_friends_form($p, $errors = array()) {
+function view_friends_form($p, $errors = array(), $track=null) {
 
     $name = get_http_var('fromname', true);
     $email = get_http_var('fromemail');
@@ -354,7 +354,9 @@ function view_friends_form($p, $errors = array()) {
     $p->render_box(array('showdetails'=>false));
 ?>
 <form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
-<? if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
+<?  if ($track)
+        print '<input type="hidden" name="track" value="' . htmlentities($track) . '">';
+    if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
 print h2(_('Email this pledge'));
 print p(_('Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.')); ?>
@@ -590,7 +592,9 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 ?>
 <form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">
-<input type="hidden" name="from_frontpage" value="1">
+<?  if (array_key_exists('track', $params) && $params['track'])
+        print '<input type="hidden" name="track" value="' . htmlentities($params['track']) . '">';
+?>
 <p><strong><?=$london ? 'Sign up for emails when people make pledges in your part of London' : _('Sign up for emails when people make pledges in your local area')?> 
 <? if ($any_country) { ?>
 <?=$newflash?'&mdash;':''?> <?=$newflash?_('Works in any country!'):''?> 

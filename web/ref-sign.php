@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.28 2006-02-09 12:14:26 chris Exp $
+// $Id: ref-sign.php,v 1.29 2006-05-25 17:01:26 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -18,6 +18,7 @@ page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));
 
 $title = _('Signature addition');
+$extra = null;
 page_header($title, array('ref'=>$p->url_typein()));
 $errors = do_sign();
 if (is_array($errors)) {
@@ -27,10 +28,10 @@ if (is_array($errors)) {
      $p->render_box(array('showdetails'=>false));
     pledge_sign_box();
 }
-page_footer();
+page_footer(array('extra'=>$extra));
 
 function do_sign() {
-    global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
+    global $q_email, $q_name, $q_showname, $q_ref, $q_pin, $extra;
     $errors = importparams(
                 array(array('name',true),       '//',        '', null),
                 array('email',      'importparams_validate_email'),
@@ -80,7 +81,7 @@ function do_sign() {
         if (!$f1 && $pledge->succeeded())
             print '<p><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
 
-        post_confirm_advertise($pledge);
+        $extra = post_confirm_advertise($pledge);
     } else if ($R == PLEDGE_SIGNED) {
         /* Either has already signer, or is creator. */
         print '<p><strong>';

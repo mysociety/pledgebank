@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.159 2006-05-25 17:22:30 matthew Exp $
+ * $Id: pledge.php,v 1.160 2006-05-25 19:11:35 chris Exp $
  * 
  */
 
@@ -130,8 +130,11 @@ class Pledge {
     function id() { return $this->data['id']; }
     function open() { return $this->data['open']; } // not gone past the deadline date
     function finished() { return $this->data['finished']; } // can take no more signers, for whatever reason
-    function succeeded() {
-        return pledge_is_successful($this->id());
+
+    /* succeeded [LOCK]
+     * Wraps pledge_is_successful. */
+    function succeeded($lock = false) {
+        return pledge_is_successful($this->id(), $lock);
     }
 
     function failed() {
@@ -544,14 +547,18 @@ function pledge_summary($r, $params) {
     return $text;
 }
 
-/* pledge_is_successful PLEDGE
- * Has PLEDGE completed successfully? This function is not reliable. */
-function pledge_is_successful($pledge_id) {
+/* pledge_is_successful PLEDGE [LOCK]
+ * Has PLEDGE completed successfully? That is, has it as many signers as its
+ * target? If LOCK is true then the pledge row is locked (FOR UPDATE) in the
+ * query, ensuring that the value of this function will not change for the
+ * remainder of this transaction. */
+function pledge_is_successful($pledge_id, $lock = false) {
     $target = db_getOne('
                     select target
                     from pledges
                     where id = ?
-                    for update', $pledge_id);
+                    ' . ($lock ? 'for update' : ''),
+                    $pledge_id);
     $num = db_getOne('
                     select count(id)
                     from signers

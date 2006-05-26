@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.107 2006-05-04 11:10:00 chris Exp $
+// $Id: page.php,v 1.108 2006-05-26 11:24:13 chris Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -158,6 +158,7 @@ function page_footer($params = array()) {
     static $footer_outputted = 0; 
     if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
         $footer_outputted = 1;
+        debug_timestamp(true, "begin footer");
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
@@ -167,17 +168,21 @@ function page_footer($params = array()) {
 <!-- remove all extraneous whitespace to avoid IE bug -->
 <ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/list"><?=_('All Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>"><?=_('FAQ') ?></acronym></a></li><li><a href="/contact<?=$contact_ref?>"><?=_('Contact') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><?
         $P = person_if_signed_on(true); /* Don't renew any login cookie. */
+        debug_timestamp(true, "retrieved person record");
         if ($P) {
 ?><li><a href="/logout"><?=_('Logout') ?></a></li><?
         }
 ?></ul>
 <div class="noprint">
 <?  if (!array_key_exists('nolocalsignup', $params) or !$params['nolocalsignup']) 
-        pb_view_local_alert_quick_signup("localsignupeverypage"); ?>
+        pb_view_local_alert_quick_signup("localsignupeverypage");
+        debug_timestamp(true, "local alert quick timestamp");
+        ?>
 <hr class="v">
 <div id="footer"><? pb_print_change_language_links(); ?> <br> <a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
 </div>
 <?
+        debug_timestamp(true, "change language links");
     }
 
     /* User-tracking. */

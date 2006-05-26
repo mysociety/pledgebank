@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.32 2006-02-24 19:21:55 matthew Exp $
+ * $Id: ref-info.php,v 1.33 2006-05-26 11:10:15 chris Exp $
  * 
  */
 
@@ -27,6 +27,8 @@ if (!is_null($err))
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
 
+debug_timestamp(true, "retrieved Pledge");
+
 $pin_box = deal_with_pin($p->url_info(), $p->ref(), $p->pin());
 if ($pin_box) {
     page_header(_("Enter PIN"));
@@ -39,6 +41,8 @@ page_header(_("More information: ") . $p->h_title(), array('ref'=>$p->url_typein
 
 /* Brief table of info about the pledge. */
 $p->render_box();
+
+debug_timestamp(true, "pledge info box");
 
 ?>
 
@@ -67,6 +71,7 @@ $p->render_box();
     else
         print _('closed; ')
                 . ($p->succeeded() ? _('successful') : _('failed'));
+    debug_timestamp(true);
     ?></td?
 </tr>
 <tr>
@@ -75,12 +80,14 @@ $p->render_box();
         <?= sprintf(_('(%.1f%% of target)'), 100. * $p->signers() / $p->target()) ?>
     </td>
 </tr>
+<? debug_timestamp(); ?>
 <tr>
     <th><?=_('Estimated signers by deadline') ?></th>
     <td><?= $p->probable_will_reach() ?> 
         <?= sprintf(_('(%.1f%% of target)<br><small>if signup rate continues as in last week</small>'), 100. * $p->probable_will_reach() / $p->target()) ?>
     </td>
 </tr>
+<? debug_timestamp(); ?>
 <tr>
     <th><?=_('Categories') ?></th>
     <td><?
@@ -108,6 +115,8 @@ $p->render_box();
 <p><small><?=_('Graph updated every 30 minutes') ?></small></p>
 <?
 }
+
+debug_timestamp();
 
 page_footer();
 

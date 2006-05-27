@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.31 2006-05-25 19:11:36 chris Exp $
+// $Id: ref-sign.php,v 1.32 2006-05-27 10:40:40 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -29,8 +29,8 @@ if (is_array($errors)) {
     pledge_sign_box();
 }
 $params = array('extra'=>$extra);
-if ($extra=='signer-confirm-advert=local-alerts')
-    $params['nolocalsignup'] = true;
+# if ($extra=='signer-confirm-advert=local-alerts')
+$params['nolocalsignup'] = true;
 page_footer($params);
 
 function do_sign() {

@@ -1,0 +1,2 @@
+User-Agent: Slurp
+Crawl-delay: 5

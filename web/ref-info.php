@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.34 2006-05-26 11:18:09 chris Exp $
+ * $Id: ref-info.php,v 1.35 2006-05-30 17:35:51 chris Exp $
  * 
  */
 
@@ -36,7 +36,13 @@ if ($pin_box) {
     exit;
 }
 
-page_header(_("More information: ") . $p->h_title(), array('ref'=>$p->url_typein()) );
+if (cond_maybe_respond($p->last_change_time()))
+    exit();
+
+page_header(_("More information: ") . $p->h_title(), array(
+            'ref' => $p->url_typein()
+            'last-modified' => $p->last_change_time()
+        ));
 
 debug_timestamp(true, "retrieved pledge");
 

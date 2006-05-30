@@ -5,8 +5,9 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.109 2006-05-30 09:01:05 matthew Exp $
+// $Id: page.php,v 1.110 2006-05-30 17:35:51 chris Exp $
 
+require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/tracking.php';
@@ -19,9 +20,11 @@ require_once 'pledge.php';
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE. This prints up to the
  * start of the "content" <div>.  If PARAMS['nonav'] is true then the top 
- * title and navigation are not displayed, or if PARAMS['noprint'] is true
- * then they are not there if the page is printed. TITLE must be in HTML,
- * with codes already escape */
+ * title and navigation are not displayed, or if PARAMS['noprint'] is true then
+ * they are not there if the page is printed. PARAMS['last-modified'] should
+ * give the last-modified time of the page as seconds since the epoch, if
+ * known, and PARAMS['etag'] an entity tag for the page, if one is computed.
+ * TITLE must be in HTML, with codes already escaped. */
 function page_header($title, $params = array()) {
     global $lang, $microsite;
 
@@ -42,6 +45,17 @@ function page_header($title, $params = array()) {
     // header by default as on live server, and FireFox was defaulting to
     // latin-1 -- Francis)
     header('Content-Type: text/html; charset=utf-8');
+
+    /* Send Last-Modified: and ETag: headers, if we have enough information to
+     * do so. */
+    $lm = null;
+    $etag = null;
+    if (array_key_exists($params['last-modified']))
+        $lm = $params['last-modified'];
+    if (array_key_exists($params['etag']))
+        $etag = null;
+    if (defined($lm) || defined($etag))
+        cond_headers($lm, $etag);
 
     $P = person_if_signed_on(true); /* Don't renew any login cookie. */
 

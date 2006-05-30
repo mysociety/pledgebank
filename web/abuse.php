@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.32 2006-03-01 16:45:11 francis Exp $
+// $Id: abuse.php,v 1.33 2006-05-30 09:01:12 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -14,7 +14,7 @@ require_once '../phplib/comments.php';
 require_once '../../phplib/importparams.php';
 require_once '../../phplib/utility.php';
 
-page_header(_('Report Abuse'));
+page_header(_('Report Abuse'), array('robots'=>'noindex,nofollow'));
 report_abusive_thing();
 page_footer();
 

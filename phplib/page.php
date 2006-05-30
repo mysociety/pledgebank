@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.108 2006-05-26 11:24:13 chris Exp $
+// $Id: page.php,v 1.109 2006-05-30 09:01:05 matthew Exp $
 
 require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
@@ -50,6 +50,9 @@ function page_header($title, $params = array()) {
 <html lang="<?=$lang ?>">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<?  if (array_key_exists('robots', $params)) { ?>
+<meta name="robots" content="<?=$params['robots']?>">
+<?  } ?>
 <title><?
     if ($title) 
         print $title . " - ";

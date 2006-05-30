@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.162 2006-05-30 10:17:59 matthew Exp $
+ * $Id: pledge.php,v 1.163 2006-05-30 17:29:04 chris Exp $
  * 
  */
 
@@ -395,6 +395,21 @@ class Pledge {
           'longitude' => $this->data['longitude'],
           'creationtime' => $this->data['creationtime']
         );
+    }
+
+    /* last_change_time
+     * Return the time that the pledge was last changed in any way. */
+    function last_change_time() {
+        $t = $this->data['creationtime'];
+        foreach (array(
+                //  'select extract(epoch from changetime) from pledges where id = ?',
+                    'select max(extract(epoch from signtime)) from signers where pledge_id = ?',
+                    'select max(extract(epoch from whenposted)) from comment where pledge_id = ?'
+                ) as $query) {
+            $t2 = db_getOne($query, $this->data['id']);
+            if (defined($t2) && $t2 > $t) $t = $t2;
+        }
+        return $t;
     }
 }
 

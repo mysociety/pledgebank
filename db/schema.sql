@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.177 2006-04-26 15:10:11 francis Exp $
+-- $Id: schema.sql,v 1.178 2006-05-30 17:29:04 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -153,6 +153,8 @@ create table pledges (
     identity text not null default '', -- LLL
     -- metadata
     creationtime timestamp not null,
+    -- changes which are not caught by signtime, comment whenposted etc.
+    changetime timestamp,
 
     -- PIN for private pledges
     pin text check (pin <> ''),

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.111 2006-05-30 17:38:33 chris Exp $
+// $Id: page.php,v 1.112 2006-05-30 20:24:20 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -55,11 +55,11 @@ function page_header($title, $params = array()) {
      * do so. */
     $lm = null;
     $etag = null;
-    if (array_key_exists($params['last-modified']))
+    if (array_key_exists('last-modified', $params))
         $lm = $params['last-modified'];
-    if (array_key_exists($params['etag']))
-        $etag = null;
-    if (defined($lm) || defined($etag))
+    if (array_key_exists('etag', $params))
+        $etag = $params['etag'];
+    if (isset($lm) || isset($etag))
         cond_headers($lm, $etag);
 
     $P = person_if_signed_on(true); /* Don't renew any login cookie. */

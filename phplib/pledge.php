@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.164 2006-05-30 18:07:19 matthew Exp $
+ * $Id: pledge.php,v 1.165 2006-05-30 20:24:20 matthew Exp $
  * 
  */
 
@@ -402,14 +402,17 @@ class Pledge {
     /* last_change_time
      * Return the time that the pledge was last changed in any way. */
     function last_change_time() {
-        $t = $this->data['creationtime'];
+        $t = -1;
+	$i = 1;
         foreach (array(
+                    'select extract(epoch from creationtime) from pledges where id = ?',
                 //  'select extract(epoch from changetime) from pledges where id = ?',
                     'select max(extract(epoch from signtime)) from signers where pledge_id = ?',
                     'select max(extract(epoch from whenposted)) from comment where pledge_id = ?'
                 ) as $query) {
-            $t2 = db_getOne($query, $this->data['id']);
-            if (defined($t2) && $t2 > $t) $t = $t2;
+            $t2 = intval(db_getOne($query, $this->data['id']));
+            if (isset($t2) && $t2 > $t) $t = $t2;
+	   ++$i;
         }
         return $t;
     }

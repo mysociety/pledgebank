@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.110 2006-05-30 17:35:51 chris Exp $
+// $Id: page.php,v 1.111 2006-05-30 17:38:33 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -45,6 +45,11 @@ function page_header($title, $params = array()) {
     // header by default as on live server, and FireFox was defaulting to
     // latin-1 -- Francis)
     header('Content-Type: text/html; charset=utf-8');
+
+    /* We must tell caches what headers alter the behaviour of the pages.
+     * This list is conservative (it may contain headers which don't affect a
+     * particular page), and we may wish to optimise this later. */
+    header('Vary: Cookie, Accept-Encoding, Accept-Language');
 
     /* Send Last-Modified: and ETag: headers, if we have enough information to
      * do so. */

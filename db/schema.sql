@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.178 2006-05-30 17:29:04 chris Exp $
+-- $Id: schema.sql,v 1.179 2006-05-30 23:42:19 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1211,6 +1211,29 @@ create function pb_delete_comment(integer)
 ' language 'plpgsql';
 
 
-
+-- pledge_last_change_time PLEDGE
+-- Return the time of the last change to PLEDGE.
+create function pledge_last_change_time(integer)
+    returns timestamp as '
+    declare
+        t timestamp;
+        t2 timestamp;
+    begin
+        t := (select creationtime from pledges where id = $1);
+        t2 := (select changetime from pledges where id = $1);
+        if t2 > t then
+            t = t2;
+        end if;
+        t2 := (select max(signtime) from signers where pledge_id = $1);
+        if t2 > t then
+            t = t2;
+        end if;
+        t2 := (select max(whenposted) from comment where pledge_id = $1);
+        if t2 > t then
+            t = t2;
+        end if;
+        return t;
+    end;
+' language 'plpgsql';
 
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.37 2006-05-04 12:14:13 chris Exp $
+ * $Id: sms.php,v 1.38 2006-05-30 10:18:05 matthew Exp $
  * 
  */
 
@@ -68,7 +68,7 @@ if (!is_null(db_getOne('select pin from pledges where id = ?', $pledge_id)))
 if (db_getOne('select person_id from signers where id = ?', $signer_id)) {
     page_header(_('SMS'));
     print p(strong(_('Thanks for signing up to this pledge!')));
-    post_confirm_advertise($pledge);
+    post_confirm_advertise($pledge, 'sms-confirm');
     page_footer();
     exit();
 }
@@ -142,7 +142,7 @@ db_commit();
 
 print p(strong(_('Thanks for signing up to this pledge!')));
 
-post_confirm_advertise($pledge);
+post_confirm_advertise($pledge, 'sms-confirm');
 
 page_footer();
 

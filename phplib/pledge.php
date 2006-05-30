@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.163 2006-05-30 17:29:04 chris Exp $
+ * $Id: pledge.php,v 1.164 2006-05-30 18:07:19 matthew Exp $
  * 
  */
 
@@ -264,8 +264,10 @@ class Pledge {
             return null;
         if (!array_key_exists('latitude', $this->data)) // pledges during creation
             return null;
+    	locale_push('en-gb');
         $coords_google = round($this->data['latitude'],2).' '.round($this->data['longitude'],2);
         $google_maps_url = 'http://maps.google.com/maps?q='.urlencode($coords_google).'&t=h';
+	locale_pop();
         return $google_maps_url;
     }
 

@@ -5,7 +5,18 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.68 2006-05-30 20:24:27 matthew Exp $
+// $Id: ref-index.php,v 1.69 2006-05-31 17:35:54 matthew Exp $
+
+require_once '../conf/general';
+require_once '../../phplib/conditional.php';
+require_once '../../phplib/db.php';
+
+/* Short-circuit the conditional GET as soon as possible -- parsing the rest of
+ * the includes is costly. */
+if (array_key_exists('ref', $_GET)
+    && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))
+    && cond_maybe_respond(intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id))))
+    exit();
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -21,6 +32,11 @@ if (($microsite != 'london' && strcasecmp($ref, 'sportclubpatrons') == 0) ||
 }
 page_check_ref($ref);
 $p  = new Pledge($ref);
+
+/* Do this again because it's possible we'll reach here with a non-canonical
+ * ref (e.g. different case from that entered by the creator). */
+if (cond_maybe_respond($p->last_change_time()))
+    exit();
 
 $pin_box = deal_with_pin($p->url_main(), $p->ref(), $p->pin());
 if ($pin_box) {
@@ -250,9 +266,6 @@ function draw_connections($p) {
     print "\n\n";
     print '</ul></div>';
 }
-
-if (cond_maybe_respond($p->last_change_time()))
-    exit();
 
 locale_push($p->lang());
 $title = "'" . _('I will') . ' ' . $p->h_title() . "'";

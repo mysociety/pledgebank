@@ -6,9 +6,20 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.35 2006-05-30 17:35:51 chris Exp $
+ * $Id: ref-info.php,v 1.36 2006-05-31 17:35:54 matthew Exp $
  * 
  */
+
+require_once '../conf/general';
+require_once '../../phplib/conditional.php';
+require_once '../../phplib/db.php';
+
+/* Short-circuit the conditional GET as soon as possible -- parsing the rest of
+ * the includes is costly. */
+if (array_key_exists('ref', $_GET)
+    && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))
+    && cond_maybe_respond(intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id))))
+    exit();
 
 require_once '../phplib/pb.php';
 
@@ -27,6 +38,10 @@ if (!is_null($err))
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
 
+/* Do this again because it's possible we'll reach here with a non-canonical
+ * ref (e.g. different case from that entered by the creator). */
+if (cond_maybe_respond($p->last_change_time()))
+    exit();
 
 $pin_box = deal_with_pin($p->url_info(), $p->ref(), $p->pin());
 if ($pin_box) {
@@ -36,11 +51,8 @@ if ($pin_box) {
     exit;
 }
 
-if (cond_maybe_respond($p->last_change_time()))
-    exit();
-
 page_header(_("More information: ") . $p->h_title(), array(
-            'ref' => $p->url_typein()
+            'ref' => $p->url_typein(),
             'last-modified' => $p->last_change_time()
         ));
 

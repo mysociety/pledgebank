@@ -6,11 +6,12 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pics.php,v 1.6 2006-03-21 17:24:32 chris Exp $
+ * $Id: pics.php,v 1.7 2006-06-02 09:44:18 chris Exp $
  * 
  */
 
 require_once '../phplib/pb.php';
+require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
 
 $file = get_http_var('file');
@@ -19,8 +20,12 @@ if (!$file)
 if (preg_match('/[^a-z0-9-.]/i', $file)) 
     err("Invalid picture filename '$file'");
 
+/* Implement conditional GET. */
+$time = db_getOne('select extract(epoch from uploaded) from picture where filename = ?', $file);
+if (!is_null($time)) cond_maybe_respond($time);
+
 # Get from database
-$data = db_getOne("select data from picture where filename = ?", array($file));
+$data = db_getOne('select data from picture where filename = ?', $file);
 if (!$data)
     err("Picture file doesn't exist");
 $data = pg_unescape_bytea($data);
@@ -33,9 +38,8 @@ elseif (preg_match('/.png/i', $file))
 else
     err('Unknown image type');
 
+cond_headers($time);
 header("Content-Length: " . strlen($data));
-/* XXX should also record time picture was uploaded and send a Last-Modified:
- * for that time. */
 print $data;
 
 ?>

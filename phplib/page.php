@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.113 2006-06-02 12:19:37 chris Exp $
+// $Id: page.php,v 1.114 2006-06-02 12:23:36 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -34,6 +34,8 @@ require_once 'pledge.php';
  *  cache-max-age
  *      Optionally gives the maximum age of the page in seconds, for use in
  *      a Cache-Control: header.
+ *  id
+ *      Optionally specify an id for the <body> tag of the page.
  *  ref
  *      Optional pledge ref which will be saved for use in the contact link
  *      output by page_footer and used in a link to "This pledge's permanent
@@ -52,7 +54,7 @@ function page_header($title, $params = array()) {
     if (!is_array($params))
         err("PARAMS must be an array in page_header");
     foreach ($params as $k => $v) {
-        if (!preg_match('/^(nonav|noprint|last-modified|etag|cache-max-age|ref|robots|rss|override)$/', $k))
+        if (!preg_match('/^(nonav|noprint|last-modified|etag|cache-max-age|id|ref|robots|rss|override)$/', $k))
             err("bad key '$k' with value '$v' in PARAMS argument to page_header");
     }
 

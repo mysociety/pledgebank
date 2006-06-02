@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.112 2006-05-30 20:24:20 matthew Exp $
+// $Id: page.php,v 1.113 2006-06-02 12:19:37 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -18,15 +18,43 @@ require_once 'pledge.php';
 //require_once 'microsites.php';
 
 /* page_header TITLE [PARAMS]
- * Print top part of HTML page, with the given TITLE. This prints up to the
- * start of the "content" <div>.  If PARAMS['nonav'] is true then the top 
- * title and navigation are not displayed, or if PARAMS['noprint'] is true then
- * they are not there if the page is printed. PARAMS['last-modified'] should
- * give the last-modified time of the page as seconds since the epoch, if
- * known, and PARAMS['etag'] an entity tag for the page, if one is computed.
- * TITLE must be in HTML, with codes already escaped. */
+ * Print top part of HTML page, with the given TITLE, which should be in HTML
+ * with special characters encoded as entities. This prints up to the
+ * start of the "content" <div>. Optionally, PARAMS specifies other featurs
+ * of the page; possible keys in PARAMS are:
+ *  nonav
+ *      If true, suppresses display of the top title and navigation.
+ *  noprint
+ *      If true, suppresses printing of the top title and navication
+ *  last-modified
+ *      Optionally gives the last-modified time of the page as seconds since
+ *      the epoch.
+ *  etag
+ *      Optionally gives an etag (assumed weak) for the current page.
+ *  cache-max-age
+ *      Optionally gives the maximum age of the page in seconds, for use in
+ *      a Cache-Control: header.
+ *  ref
+ *      Optional pledge ref which will be saved for use in the contact link
+ *      output by page_footer and used in a link to "This pledge's permanent
+ *      location".
+ *  robots
+ *      Optional content for a robots meta-tag.
+ *  rss
+ *      Optional array of feed title to feed URL to be output in link tags.
+ *  override
+ *      If true, ouput the page header even if it appears that one has already
+ *      been output.
+ */
 function page_header($title, $params = array()) {
     global $lang, $microsite;
+
+    if (!is_array($params))
+        err("PARAMS must be an array in page_header");
+    foreach ($params as $k => $v) {
+        if (!preg_match('/^(nonav|noprint|last-modified|etag|cache-max-age|ref|robots|rss|override)$/', $k))
+            err("bad key '$k' with value '$v' in PARAMS argument to page_header");
+    }
 
     static $header_outputted = 0;
     if ($header_outputted && !array_key_exists('override', $params)) {
@@ -61,6 +89,10 @@ function page_header($title, $params = array()) {
         $etag = $params['etag'];
     if (isset($lm) || isset($etag))
         cond_headers($lm, $etag);
+
+    /* Ditto a max-age if specified. */
+    if (array_key_exists('cache-max-age', $params))
+        header('Cache-Control: max-age=' . $params['cache-max-age']);
 
     $P = person_if_signed_on(true); /* Don't renew any login cookie. */
 
@@ -168,12 +200,17 @@ function page_header($title, $params = array()) {
     }
 }
 
-/* page_footer PARAMS
- * Print bottom of HTML page. This closes the "content" <div>.  
- * If PARAMS['nonav'] is true then the footer navigation is not displayed. If
- * PARAMS['nolocalsignup'] is true then no local signup form is showed. If
- * PARAMS['extra'] is set, then it is passed to track_event as extra
- * user-tracking information to be associated with this page view. */
+/* page_footer [PARAMS]
+ * Print bottom of HTML page. This closes the "content" <div>. Possible keys in
+ * PARAMS are:
+ *  nonav
+ *      If true, don't display footer navigation.
+ *  nolocalsignup
+ *      If true, don't display the local alerts signup form.
+ *  extra
+ *      Supplies extra user-tracking information associated with this page view
+ *      to pass to track_event.
+ */
 function page_footer($params = array()) {
     global $contact_ref;
 ?></div><? # id="content"
@@ -230,7 +267,7 @@ EOF;
 }
 
 /* rss_header TITLE DESCRIPTION
-   Display header for RSS versions of page  
+ * Display header for RSS versions of page  
  */
 function rss_header($title, $description, $params) {
     global $lang, $microsite;

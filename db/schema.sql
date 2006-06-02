@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.179 2006-05-30 23:42:19 chris Exp $
+-- $Id: schema.sql,v 1.180 2006-06-02 09:35:53 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -227,7 +227,8 @@ create index pledges_cached_prominence_idx on pledges(cached_prominence);
 create table picture (
     id serial not null primary key,
     filename text not null,
-    data bytea not null
+    data bytea not null,
+    uploaded timestamp not null default pb_current_timestamp()
 );
 
 -- 

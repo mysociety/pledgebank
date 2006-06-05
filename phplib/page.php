@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.114 2006-06-02 12:23:36 chris Exp $
+// $Id: page.php,v 1.115 2006-06-05 13:41:46 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -26,6 +26,9 @@ require_once 'pledge.php';
  *      If true, suppresses display of the top title and navigation.
  *  noprint
  *      If true, suppresses printing of the top title and navication
+ *  noreflink
+ *      If true, suppresses display of link to "this pledge's permanent
+ *      location".
  *  last-modified
  *      Optionally gives the last-modified time of the page as seconds since
  *      the epoch.
@@ -54,7 +57,7 @@ function page_header($title, $params = array()) {
     if (!is_array($params))
         err("PARAMS must be an array in page_header");
     foreach ($params as $k => $v) {
-        if (!preg_match('/^(nonav|noprint|last-modified|etag|cache-max-age|id|ref|robots|rss|override)$/', $k))
+        if (!preg_match('/^(nonav|noprint|noreflink|last-modified|etag|cache-max-age|id|ref|robots|rss|override)$/', $k))
             err("bad key '$k' with value '$v' in PARAMS argument to page_header");
     }
 

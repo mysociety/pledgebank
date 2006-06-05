@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.69 2006-05-31 17:35:54 matthew Exp $
+// $Id: ref-index.php,v 1.70 2006-06-05 13:28:22 chris Exp $
 
 require_once '../conf/general';
 require_once '../../phplib/conditional.php';
@@ -293,4 +293,3 @@ debug_comment_timestamp("after draw_connections()");
 
 page_footer();
 ?>
-

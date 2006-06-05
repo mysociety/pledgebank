@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.131 2006-05-30 10:18:05 matthew Exp $
+// $Id: new.php,v 1.132 2006-06-05 18:28:02 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -20,7 +20,7 @@ require_once '../../phplib/countries.php';
 require_once '../../phplib/gaze.php';
 
 $page_title = _('Create a New Pledge');
-$page_params = array("gazejs" => true);
+$page_params = array();
 ob_start();
 if (get_http_var('tostep1') || get_http_var('tostep2') || get_http_var('tostep3') || get_http_var('topreview') || get_http_var('tocreate') || get_http_var('donetargetwarning')) {
     pledge_form_submitted();

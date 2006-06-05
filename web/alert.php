@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.53 2006-05-25 17:01:26 matthew Exp $
+// $Id: alert.php,v 1.54 2006-06-05 18:28:02 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -51,7 +51,7 @@ $track = get_http_var('track');
 
 // Display page
 $title = _('New pledge alerts');
-page_header($title, array("gazejs" => true));
+page_header($title);
 if (get_http_var('subscribe_local_alert')) {
     $errors = do_local_alert_subscribe();
     if (is_array($errors)) {

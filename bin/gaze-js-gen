@@ -6,7 +6,10 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-js-gen,v 1.7 2006-01-09 23:48:21 francis Exp $
+// $Id: gaze-js-gen,v 1.8 2006-06-05 13:44:42 chris Exp $
+
+
+$long_opts = $short_opts = '';
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 require_once "../phplib/pbcli.php";

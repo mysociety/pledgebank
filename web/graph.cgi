@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.19 2006-06-06 17:44:08 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.20 2006-06-06 17:50:50 chris Exp $';
 
 use strict;
 
@@ -160,9 +160,8 @@ while (my $q = new CGI::Fast()) {
             $start_date = sprintf('%04d-%02d-%02d', Add_Delta_Days(split(/-/, $end_date), -7));
         }
 
-        # XXX should also incorporate number of signers or time of generating
-        # graph so that we can have a more prompt update on fast-growing
-        # pledges.
+        # Incorporate time to nearest 30 minutes; graphs will last that long.
+        # XXX now we're using an accelerator we can do better than this.
         my $gparam = join(',', $pledge_id, $start_date, $end_date, int(time() / 1800));
         my $hash = Digest::SHA1::sha1_hex($gparam);
 
@@ -178,7 +177,10 @@ while (my $q = new CGI::Fast()) {
             # really matter that much.
         }
         my $filename = "$filepath/$gparam.png";
-        if (!-e "$graph_dir/$filename") {
+
+        my $f = new IO::File("$graph_dir/$filename", O_RDONLY);
+        
+        if (!$f && $!{ENOENT}) {
             # Don't have a graph, so create it.
             spawn_gnuplot_if_necessary();
 
@@ -298,6 +300,9 @@ EOF
             unlink($signuprate_file);
             unlink($signers_file);
 
+            $f = new IO::File("$graph_dir/$filename", O_RDONLY)
+                    or die "$graph_dir/$filename: $! (after rendering graph)";
+
             ++$gnuplot_uses;
 
             # Don't use an individual gnuplot process for too long -- they
@@ -308,6 +313,8 @@ EOF
                 undef($gnuplot_pid);
                     # child should be automatically reaped
             }
+        } elsif (!$f) {
+            die "$graph_dir/$filename: $!";
         }
 
         # We haven't done anything in the transaction, but we must close it
@@ -317,8 +324,6 @@ EOF
 
         # Graph already exists, so emit it. We can't redirect as we may be
         # running on >1 server.
-        my $f = new IO::File("$graph_dir/$filename", O_RDONLY)
-                    || die "$graph_dir/$filename: $!";
         my $st = stat($f);
 
         print $q->header(

@@ -5,12 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.34 2006-05-04 17:45:33 francis Exp $
+// $Id: faq.php,v 1.35 2006-06-06 12:19:43 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 
-page_header(_("Frequently Asked Questions"));
+page_header(_("Frequently Asked Questions"), array('cache-max-age' => 600));
 
 ############################################################################
 

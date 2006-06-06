@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.18 2006-03-16 00:35:56 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.19 2006-06-06 17:44:08 chris Exp $';
 
 use strict;
 
@@ -200,8 +200,14 @@ while (my $q = new CGI::Fast()) {
 
             my ($h, $signers_file) = mySociety::Util::named_tempfile();
 
-            my $n = dbh()->selectrow_array('select count(id) from signers where pledge_id = ? and signtime::date < ?', {}, $pledge_id, $start_date);
-            my $n1 = dbh()->selectrow_array('select count(id) from signers where pledge_id = ? and signtime::date <= ?', {}, $pledge_id, $end_date);
+            my $n = dbh()->selectrow_array('
+                        select count(id) from signers
+                        where pledge_id = ? and signtime::date < ?',
+                        {}, $pledge_id, $start_date);
+            my $n1 = dbh()->selectrow_array('
+                        select count(id) from signers
+                        where pledge_id = ? and signtime::date <= ?',
+                        {}, $pledge_id, $end_date);
 
             my $s = dbh()->prepare('
                         select signtime::date from signers

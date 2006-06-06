@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.66 2006-03-27 17:55:42 francis Exp $
+ * $Id: pb.php,v 1.67 2006-06-06 10:04:19 chris Exp $
  * 
  */
 
@@ -119,12 +119,23 @@ if ($domain_country) {
     }
 } 
 
-# Find country for this IP address
-$ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
-if (rabx_is_error($ip_country) || !$ip_country)
+/* Find country for this IP address. If we're being called through the
+ * accelerator it will have made up an X-GeoIP-Country: header which will
+ * contain this information; otherwise, we must call out to Gaze. */
+$ip_country = null;
+if (array_key_exists('HTTP_X_GEOIP_COUNTRY', $_SERVER)) {
+    $ip_country = $_SERVER['HTTP_X_GEOIP_COUNTRY'];
+    if ($ip_country == 'none')
+        $ip_country = null;
+} else {
+    $ip_country = gaze_get_country_from_ip($_SERVER['REMOTE_ADDR']);
+    if (rabx_is_error($ip_country) || !$ip_country)
+        $ip_country = null;
+}
+/* Ensure it's a country we know about. */
+if (!array_key_exists($ip_country, $countries_code_to_name))
     $ip_country = null;
-else if (!array_key_exists($ip_country, $countries_code_to_name)) # make sure we know country
-    $ip_country = null;
+
 
 # Decide which country or microsite to use
 $microsite = null;

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.115 2006-06-05 13:41:46 chris Exp $
+// $Id: page.php,v 1.116 2006-06-07 15:50:03 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -82,7 +82,7 @@ function page_header($title, $params = array()) {
     /* We must tell caches what headers alter the behaviour of the pages.
      * This list is conservative (it may contain headers which don't affect a
      * particular page), and we may wish to optimise this later. */
-    header('Vary: Cookie, Accept-Encoding, Accept-Language');
+    header('Vary: Cookie, Accept-Encoding, Accept-Language, X-GeoIP-Country');
 
     /* Send Last-Modified: and ETag: headers, if we have enough information to
      * do so. */

@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.34 2006-05-05 09:44:35 chris Exp $
+ * $Id: comment.php,v 1.35 2006-06-08 10:22:29 matthew Exp $
  * 
  */
 
@@ -94,12 +94,12 @@ if (strlen($q_author_name) == 0)
 if (strlen($q_text) == 0)
     array_push($err, _("Please enter a message"));
 
-if ($q_author_website == '')
-    $q_author_website = null;
-if (!is_null($q_author_website) && !preg_match('#^https?://.+#', $q_author_website))
+if ($q_author_website && !preg_match('#^https?://.+#', $q_author_website))
     $q_author_website = 'http://' . $q_author_website;
 
 if (sizeof($err) == 0 && isset($_POST['submit'])) {
+    if ($q_author_website == '')
+        $q_author_website = null;
     /* Require login for comments */
     $r = $pledge->data;
     $r['reason_web'] = _('Before adding your comment to the pledge, we need to check that your email is working.');

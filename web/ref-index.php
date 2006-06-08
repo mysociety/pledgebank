@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.71 2006-06-08 16:04:07 chris Exp $
+// $Id: ref-index.php,v 1.72 2006-06-08 16:10:10 chris Exp $
 
 require_once '../conf/general';
 require_once '../../phplib/conditional.php';
@@ -274,13 +274,7 @@ page_header($title, array(
             'ref' => $p->url_typein(),
             'noreflink' => 1,
             'rss' => array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss()),
-            'last-modified' => $p->last_change_time(),
-            /* Really we shouldn't issue a max-age here because the cached
-             * version may be invalidated asynchronously at any time. But
-             * conditional GET based on the Last-Modified: header won't detect
-             * changes younger than one second (well, 0.5s on average) so this
-             * shouldn't hurt us much. */
-            'cache-max-age' => 1
+            'last-modified' => $p->last_change_time()
         ));
 debug_comment_timestamp("after page_header()");
 draw_status_plaque($p);

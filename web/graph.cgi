@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.20 2006-06-06 17:50:50 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.21 2006-06-08 09:49:54 matthew Exp $';
 
 use strict;
 
@@ -214,7 +214,7 @@ while (my $q = new CGI::Fast()) {
             my $s = dbh()->prepare('
                         select signtime::date from signers
                         where pledge_id = ?
-                            and signtime::date >= ? and signtime::date < ?
+                            and signtime::date >= ? and signtime::date <= ?
                         order by signtime');
 
             $h->printf("%s %d\n", $start_date, $n);

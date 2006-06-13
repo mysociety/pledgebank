@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.166 2006-05-30 23:44:03 chris Exp $
+ * $Id: pledge.php,v 1.167 2006-06-13 22:38:19 matthew Exp $
  * 
  */
 
@@ -219,9 +219,10 @@ class Pledge {
 
     function is_local() { return isset($this->data['description']); }
     function h_local_type() { 
-        if (array_key_exists('method', $this->data) && $this->data['method'] == 'Gaze') {
+        if (!array_key_exists('method', $this->data) || !$this->data['method']) return;
+        if ($this->data['method'] == 'Gaze') {
             return _("Place");
-        } elseif (array_key_exists('method', $this->data) && $this->data['method'] == 'MaPit') {
+        } elseif ($this->data['method'] == 'MaPit') {
             return _("Postcode area");
         } else {
             err('Unknown method');
@@ -264,10 +265,10 @@ class Pledge {
             return null;
         if (!array_key_exists('latitude', $this->data)) // pledges during creation
             return null;
-    	locale_push('en-gb');
+        locale_push('en-gb');
         $coords_google = round($this->data['latitude'],2).' '.round($this->data['longitude'],2);
         $google_maps_url = 'http://maps.google.com/maps?q='.urlencode($coords_google).'&t=h';
-	locale_pop();
+        locale_pop();
         return $google_maps_url;
     }
 
@@ -729,13 +730,13 @@ function post_confirm_advertise($pledge, $curr_page) {
     $random = rand(1,2);
     if ($random==1) {
         $random = 'friends';
-	print '<p class="noisymessage">'._('Pledges only ever succeed when signers encourage other people to sign them:').'</p>';
+        print '<p class="noisymessage">'._('Pledges only ever succeed when signers encourage other people to sign them:').'</p>';
         view_friends_form($pledge, array(), $curr_page);
     } else {
         $random = 'local-alerts';
-	print _("<p>PledgeBank can send you email alerts when people
-	create local pledges in your area. Sign up - you don't know
-	what interesting things people might be getting up to.</p>");
+        print _("<p>PledgeBank can send you email alerts when people
+        create local pledges in your area. Sign up - you don't know
+        what interesting things people might be getting up to.</p>");
         pb_view_local_alert_quick_signup("localsignupfrontpage", array('track'=>$curr_page));
     }
     return "signer-confirm-advert=$random";
@@ -754,7 +755,7 @@ function post_confirm_advertise_flyers($r) {
         # TRANS: This phrase is used in two different places, once in present tense, once in imperative. Shout if this is a problem.
         print print_this_link(_("print this page out"), "");
         $flyerurl = '<a href="/' . htmlspecialchars($r['ref']) . '/flyers">' . _('these more attractive PDF and RTF (Word) versions') . '</a>';
-	# TRANS: Use the imperative here to go with msgid "You will massively increase......." and msgid "print this page out". (Tim Morley, 2005-11-30)
+        # TRANS: Use the imperative here to go with msgid "You will massively increase......." and msgid "print this page out". (Tim Morley, 2005-11-30)
         printf(_('(or use %s), cut up the flyers and stick them through your neighbours\' letterboxes.'), $flyerurl);
    } else {
         // TODO - we don't have the PIN raw here, but really want it on

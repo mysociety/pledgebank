@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.180 2006-06-02 09:35:53 chris Exp $
+-- $Id: schema.sql,v 1.181 2006-06-13 10:29:52 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -676,6 +676,9 @@ create unique index signers_pledge_id_person_id_idx on signers(pledge_id, person
 -- Used to make connection-finding faster.
 create index signers_person_id_idx on signers(person_id);
 
+-- Used to make pledge change time calculation faster.
+create index signers_signtime_idx on signers(signtime);
+
 -- signers_combine_2 ID1 ID2
 -- Given the IDs ID1 and ID2 of two signers of a pledge, coalesce them into one
 -- signer combining the two. One signer should have a name and person ID, and
@@ -1024,6 +1027,9 @@ create index comment_pledge_id_idx on comment(pledge_id);
 create index comment_pledge_id_whenposted_idx on comment(pledge_id, whenposted);
 create index comment_ishidden_idx on comment(ishidden);
 
+-- Used for pledge change time calculation.
+create index comment_whenposted_idx on comment(whenposted);
+
 -- Alerts and notifications
 
 -- get emailed when various events happen
@@ -1225,11 +1231,11 @@ create function pledge_last_change_time(integer)
         if t2 > t then
             t = t2;
         end if;
-        t2 := (select max(signtime) from signers where pledge_id = $1);
+        t2 := (select signtime from signers where pledge_id = $1 order by signtime desc limit 1);
         if t2 > t then
             t = t2;
         end if;
-        t2 := (select max(whenposted) from comment where pledge_id = $1);
+        t2 := (select whenposted from comment where pledge_id = $1 order by whenposted desc limit 1);
         if t2 > t then
             t = t2;
         end if;

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.182 2006-06-15 10:56:58 chris Exp $
+-- $Id: schema.sql,v 1.183 2006-06-15 11:01:45 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -208,6 +208,20 @@ create table pledges (
         cached_prominence = 'backpage'
     )
 );
+
+-- Create a trigger to update the last-change-time for the pledge on any
+-- update to the table. This should cover manual edits only; anything else
+-- (signers, comments, ...) should be covered by pledge_last_change_time or by
+-- the individual implementing functions.
+create function pledges_update_changetime()
+    returns trigger as '
+    begin
+        new.changetime := pledge_last_change_time(new.id);
+    end;
+' function 'plpgsql';
+
+create trigger pledges_changetime_trigger after update on pledges
+    for each row execute procedure pledges_update_changetime();
 
 -- Index by reference.
 create unique index pledges_ref_idx on pledges(ref);

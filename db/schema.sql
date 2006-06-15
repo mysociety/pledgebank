@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.181 2006-06-13 10:29:52 chris Exp $
+-- $Id: schema.sql,v 1.182 2006-06-15 10:56:58 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1138,6 +1138,8 @@ create table requeststash (
 -- make expiring old requests quite quick
 create index requeststash_whensaved_idx on requeststash(whensaved);
 
+-- pb_delete_pledge ID
+-- Delete the pledge with the given ID, and all associated content.
 create function pb_delete_pledge(integer)
     returns void as '
     begin
@@ -1171,23 +1173,32 @@ create function pb_delete_pledge(integer)
     end
 ' language 'plpgsql';
 
+-- pb_delete_signer ID
+-- Delete the signer with the given ID (note *not* person_id).
 create function pb_delete_signer(integer)
     returns void as '
     begin
         delete from abusereport where what_id = $1 and what = ''signer'';
         delete from message_signer_recipient where signer_id = $1;
         delete from smssubscription where signer_id = $1;
+        update pledges set changetime = pb_current_timestamp()
+            where id = (select pledge_id from signers where id = $1);
         delete from signers where id = $1;
         return;
     end
 ' language 'plpgsql';
 
+-- pb_delete_person ID
+-- Delete the person with the given ID. Fails if the person has created any
+-- pledges.
 create function pb_delete_person(integer)
     returns void as '
     begin
         -- comments made by the person
         delete from alert_sent where comment_id in (select id from comment where person_id = $1);
         delete from abusereport where what_id in (select id from comment where person_id = $1) and what = ''comment'';
+        update pledges set changetime = pb_current_timestamp()
+            where id in (select pledge_id from comment where person_id = $1);
         delete from comment where person_id = $1;
 
         -- alerts set up for the person
@@ -1198,6 +1209,8 @@ create function pb_delete_person(integer)
         delete from abusereport where what_id in (select id from signers where person_id = $1) and what = ''signer'';
         delete from message_signer_recipient where signer_id in (select id from signers where person_id = $1);
         delete from smssubscription where signer_id in (select id from signers where person_id = $1);
+        update pledges set changetime = pb_current_timestamp()
+            where id in (select pledge_id from signers where person_id = $1);
         delete from signers where person_id = $1;
 
         -- we deliberately don''t do pledges they''ve made; they should be checked first
@@ -1207,9 +1220,13 @@ create function pb_delete_person(integer)
     end
 ' language 'plpgsql';
 
+-- pb_delete_comment ID
+-- Delete the comment with the given ID.
 create function pb_delete_comment(integer)
     returns void as '
     begin
+        update pledges set changetime = pb_current_timestamp()
+            where id = (select pledge_id from comment where id = $1);
         delete from abusereport where what_id = $1 and what = ''comment'';
         delete from alert_sent where comment_id = $1;
         delete from comment where id = $1;

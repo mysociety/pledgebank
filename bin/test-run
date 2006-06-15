@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.175 2006-04-11 07:13:03 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.176 2006-06-15 14:27:11 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -497,23 +497,23 @@ sub set_pledge_prominence {
 
 # Call frequentupdate cron job
 sub call_frequentupdate {
-    $wth->multi_spawn($multispawn, "php frequentupdate " . ($verbose > 1 ? qw(--verbose) : ()), $verbose);
+    $wth->multi_spawn($multispawn, "php frequentupdate " . ($verbose > 1 ? qw(--verbose) : ''), $verbose);
 }
 
 # Call sendalerts cron job
 sub call_send_alerts {
-    $wth->multi_spawn($multispawn, "php send-comment-alerts " . ($verbose > 1 ? qw(--verbose) : ()), $verbose);
-    $wth->multi_spawn($multispawn, "php send-local-alerts " . ($verbose > 1 ? qw(--verbose) : ()), $verbose);
+    $wth->multi_spawn($multispawn, "php send-comment-alerts " . ($verbose > 1 ? qw(--verbose) : ''), $verbose);
+    $wth->multi_spawn($multispawn, "php send-local-alerts " . ($verbose > 1 ? qw(--verbose) : ''), $verbose);
 }
 
 # Call find-pledge-connections cron job
 sub call_findpledgeconnections {
-    $wth->multi_spawn($multispawn, "./find-pledge-connections " . ($verbose > 1 ? qw(--verbose) : ()), $verbose);
+    $wth->multi_spawn($multispawn, "./find-pledge-connections " . ($verbose > 1 ? qw(--verbose) : ''), $verbose);
 }
 
 # Run pbsmsd once
 sub call_smsd {
-    $wth->multi_spawn($multispawn, "./pbsmsd --once " . ($verbose > 1 ? qw(--debug) : ()), $verbose);
+    $wth->multi_spawn($multispawn, "./pbsmsd --once " . ($verbose > 1 ? qw(--debug) : ''), $verbose);
 }
 
 #############################################################################
@@ -757,7 +757,7 @@ sub do_public_succeeding_pledge {
         my $success_email = $wth->email_get_containing( 
             '%To: '.email_n($i).  '%From: '.name_n(0). '%By merely partaking%');
     }
-    my $success_email = $wth->email_get_containing( 
+    $success_email = $wth->email_get_containing( 
         '%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%By merely partaking%');
     # Make sure no extra emails - in particular that late partial-signer hasn't got message
     call_frequentupdate();
@@ -860,7 +860,7 @@ sub do_private_failing_pledge {
     die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
     $wth->log_watcher_check();
     call_smsd();
-    my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
+    $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
     print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
     # Wait for delivery notification, which would confirm signature
     # (want to test that nothing happens, as nothing was signed)
@@ -917,7 +917,7 @@ sub do_private_failing_pledge {
     $wth->browser_get("$locale_url/$pledge_ref/sign");
     $wth->browser_check_contents("Permission denied");
     $wth->browser_check_no_contents($pledge_action_private);
-    my $errors = $wth->log_watcher_get_errors();
+    $errors = $wth->log_watcher_get_errors();
     die if ($errors !~ m/Permission denied/);
     $wth->log_watcher_check();
 
@@ -966,7 +966,7 @@ sub do_private_failing_pledge {
     $wth->log_watcher_check();
     call_frequentupdate();
     my $success_email = $wth->email_get_containing('%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%What a hassle%');
-    my $success_email = $wth->email_get_containing('%To: '.email_n(1).  '%From: '.name_n(0).  '%What a hassle%');
+    $success_email = $wth->email_get_containing('%To: '.email_n(1).  '%From: '.name_n(0).  '%What a hassle%');
     $wth->email_check_none_left();
     # Try to send second failure, which is not allowed
     $wth->browser_get($locale_url . "/$pledge_ref/announce");

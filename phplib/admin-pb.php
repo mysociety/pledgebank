@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.124 2006-04-30 16:31:44 francis Exp $
+ * $Id: admin-pb.php,v 1.125 2006-06-15 09:10:30 francis Exp $
  * 
  */
 
@@ -883,7 +883,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
 
         print "<p><strong>See reports on:</strong> ";
 
-        $ww = array('comment', 'signer', 'pledge');
+        $ww = array('comment', /* 'signer', */ 'pledge');
         $i = 0;
         foreach ($ww as $w) {
             if ($w != $q_what)

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.1 2006-06-13 22:38:20 matthew Exp $
+ * $Id: ref-plain.php,v 1.2 2006-06-15 10:04:02 matthew Exp $
  * 
  */
 
@@ -128,7 +128,7 @@ function add_signatories($p) {
     if ($nsigners == 0) {
         return;
     }
-    $out = array();
+    $names = array();
     $anon = 0;
     $unknownname = 0;
 
@@ -138,7 +138,7 @@ function add_signatories($p) {
         $showname = ($r['showname'] == 't');
         if ($showname) {
             if (isset($r['name'])) {
-                $out[] = $r['name'];
+                $names[] = $r['name'];
             } else {
                 ++$unknownname;
             }
@@ -148,14 +148,14 @@ function add_signatories($p) {
     }
     if ($q_output == 'xml') {
         print "<signerslist>\n";
-        print "  <signer>" . join("</signer>\n  <signer>", array_map('htmlspecialchars', $out)) . "</signer>\n";;
+        print "  <signer>" . join("</signer>\n  <signer>", array_map('htmlspecialchars', $names)) . "</signer>\n";;
         print "  <anonymous>$anon</anonymous>\n";
         print "  <mobile>$unknownname</mobile>\n";
         print "</signerslist>\n";
     } elseif ($q_output == 'rabx') {
-        global $rabx, $out;
+        global $out;
         $out['signers'] = array(
-            'list' => $out,
+            'list' => $names,
             'anonymous' => $anon,
             'mobile' => $unknownname
         );

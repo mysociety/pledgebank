@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.184 2006-06-15 11:02:36 chris Exp $
+-- $Id: schema.sql,v 1.185 2006-06-16 07:32:17 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -219,7 +219,7 @@ create function pledges_update_changetime()
         new.changetime := pledge_last_change_time(new.id);
         return new;
     end;
-' function 'plpgsql';
+' language 'plpgsql';
 
 create trigger pledges_changetime_trigger after update on pledges
     for each row execute procedure pledges_update_changetime();

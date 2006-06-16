@@ -35,7 +35,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.176 2006-06-15 14:27:11 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.177 2006-06-16 13:48:48 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1382,10 +1382,8 @@ sub do_admin_tests {
     $wth->browser_get($admin_url);
     $wth->browser_follow_link(text_regex => qr/Abuse reports/);
     $wth->browser_check_contents(qr/pledges \(0\)/);
-    $wth->browser_check_contents(qr/signers \(0\)/);
     $wth->browser_check_contents(qr/comments \(1\)/);
     $wth->browser_follow_link(text_regex => qr/pledges \(0\)/);
-    $wth->browser_follow_link(text_regex => qr/signers \(0\)/);
     $wth->browser_follow_link(text_regex => qr/comments \(1\)/);
     my $name = name_n(90);
     $wth->browser_check_contents(qr/$name/);

@@ -5,14 +5,16 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.72 2006-06-08 16:10:10 chris Exp $
+// $Id: ref-index.php,v 1.73 2006-06-16 14:08:40 chris Exp $
 
 require_once '../conf/general';
+require_once '../phplib/page.php';
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
 
 /* Short-circuit the conditional GET as soon as possible -- parsing the rest of
  * the includes is costly. */
+page_send_vary_header();
 if (array_key_exists('ref', $_GET)
     && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))
     && cond_maybe_respond(intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id))))

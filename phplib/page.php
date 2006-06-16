@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.116 2006-06-07 15:50:03 chris Exp $
+// $Id: page.php,v 1.117 2006-06-16 14:06:12 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -16,6 +16,21 @@ require_once 'pledge.php';
 // Do NOT include microsites.php here, or it won't get translated.
 // This may cause funny errors, but you'll just have to deal with it :)
 //require_once 'microsites.php';
+
+$page_vary_header_sent = false;
+
+/* page_send_vary_header
+ * Emit an appropriate Vary: header for PledgeBank. */
+function page_send_vary_header() {
+    global $page_vary_header_sent;
+    if ($page_vary_header_sent)
+        return;
+    /* We must tell caches what headers alter the behaviour of the pages.
+     * This list is conservative (it may contain headers which don't affect a
+     * particular page), and we may wish to optimise this later. */
+    header('Vary: Cookie, Accept-Encoding, Accept-Language, X-GeoIP-Country');
+    $page_vary_header_sent = true;
+}
 
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE, which should be in HTML
@@ -79,10 +94,7 @@ function page_header($title, $params = array()) {
     // latin-1 -- Francis)
     header('Content-Type: text/html; charset=utf-8');
 
-    /* We must tell caches what headers alter the behaviour of the pages.
-     * This list is conservative (it may contain headers which don't affect a
-     * particular page), and we may wish to optimise this later. */
-    header('Vary: Cookie, Accept-Encoding, Accept-Language, X-GeoIP-Country');
+    page_send_vary_header();
 
     /* Send Last-Modified: and ETag: headers, if we have enough information to
      * do so. */

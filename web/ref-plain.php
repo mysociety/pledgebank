@@ -6,16 +6,18 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.2 2006-06-15 10:04:02 matthew Exp $
+ * $Id: ref-plain.php,v 1.3 2006-06-17 09:09:23 matthew Exp $
  * 
  */
 
 require_once '../conf/general';
+require_once '../phplib/page.php';
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
 
 /* Short-circuit the conditional GET as soon as possible -- parsing the rest of
  * the includes is costly. */
+page_send_vary_header();
 if (array_key_exists('ref', $_GET)
     && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))
     && cond_maybe_respond(intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id))))
@@ -72,7 +74,7 @@ $out = array(
         'sentence_third' => pledge_sentence($p->data, array('firstperson'=>false)),
         'title' => $title,
         'target' => $p->target(),
-        'deadline' => $p->date(),
+        'deadline' => $p->date() . 'T24:00:00Z',
         'detail' => $p->data['detail'],
         'creator_name' => $p->creator_name(),
         'creator_identity' => $p->data['identity'],
@@ -91,7 +93,7 @@ $out = array(
         'signers' => $p->signers(),
         'left' => $p->left(),
         'probable_will_reach' => $p->probable_will_reach(),
-        'last_change_time' => $p->last_change_time(),
+        'last_change_time' => gmdate('Y-m-d\TH:i:s\Z', $p->last_change_time()),
         'cancelled' => $p->data['cancelled'],
         'notice' => $p->data['notice'],
         'cached_prominence' => $p->data['cached_prominence'],

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.167 2006-06-13 22:38:19 matthew Exp $
+ * $Id: pledge.php,v 1.168 2006-06-19 17:47:02 francis Exp $
  * 
  */
 
@@ -822,8 +822,8 @@ function pledge_is_local($r) {
 /* percent_success_above TARGET
  * Return % of pledges successful above that target */
 function percent_success_above($threshold) {
-    $total_pledges_above = db_getOne("select count(*) from pledges where target > ? and pb_current_date() > pledges.date", array($threshold));
-    $successful_pledges_above = db_getOne("select count(*) from pledges where target > ? and pb_current_date() > pledges.date and whensucceeded is not null", array($threshold));
+    $total_pledges_above = db_getOne("select count(*) from pledges where target > ? and ms_current_date() > pledges.date", array($threshold));
+    $successful_pledges_above = db_getOne("select count(*) from pledges where target > ? and ms_current_date() > pledges.date and whensucceeded is not null", array($threshold));
     if ($total_pledges_above == 0)
         $percent_successful_above = 0.0;
     else

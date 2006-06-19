@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.24 2006-06-02 09:44:02 chris Exp $
+ * $Id: ref-picture.php,v 1.25 2006-06-19 17:47:03 francis Exp $
  * 
  */
 
@@ -148,7 +148,7 @@ function upload_picture() {
     db_query("
         update pledges
         set picture = ?,
-            changetime = pb_current_timestamp()
+            changetime = ms_current_timestamp()
         where ref = ?",
         OPTION_BASE_URL . "/pics/$base_name", $pledge->ref());
     db_commit();

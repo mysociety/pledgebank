@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.21 2006-06-08 09:49:54 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.22 2006-06-19 17:47:03 francis Exp $';
 
 use strict;
 
@@ -119,8 +119,8 @@ while (my $q = new CGI::Fast()) {
         my $P = dbh()->selectrow_hashref('
                         select *,
                             case
-                                when date < pb_current_date() then date
-                                else pb_current_date()
+                                when date < ms_current_date() then date
+                                else ms_current_date()
                             end as graph_date
                         from pledges
                         where id = ?', {}, $pledge_id);

@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: pbcli.php,v 1.1 2005-11-11 12:34:57 francis Exp $
+ * $Id: pbcli.php,v 1.2 2006-06-19 17:47:02 francis Exp $
  *
  */
 
@@ -17,8 +17,8 @@ require_once '../../phplib/db.php';
 require_once '../../phplib/locale.php';
 
 /* Date which PledgeBank application believes it is */
-$pb_today = db_getOne('select pb_current_date()');
-$pb_timestamp = substr(db_getOne('select pb_current_timestamp()'), 0, 19);
+$pb_today = db_getOne('select ms_current_date()');
+$pb_timestamp = substr(db_getOne('select ms_current_timestamp()'), 0, 19);
 $pb_time = strtotime($pb_timestamp);
 
 /* Language negotiation */

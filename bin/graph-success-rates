@@ -5,7 +5,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francsi@mysociety.org. WWW: http://www.mysociety.org/
 # 
-# $Id: graph-success-rates,v 1.1 2005-11-29 12:59:30 francis Exp $
+# $Id: graph-success-rates,v 1.2 2006-06-19 17:47:01 francis Exp $
 
 SOURCE=/tmp/pb-targets-graph-data-$RANDOM$RANDOM
 GPSCRIPT=/tmp/pb-targets-graph-script-$RANDOM$RANDOM
@@ -18,8 +18,8 @@ do
     do 
         echo "
             SELECT $HUNDREDS$NUMBERS as above,
-            (select count(*) from pledges where target > $HUNDREDS$NUMBERS and pb_current_date() > pledges.date) AS allcount,
-            (select count(*) from pledges where target > $HUNDREDS$NUMBERS and pb_current_date() > pledges.date and whensucceeded is not null) AS successcount
+            (select count(*) from pledges where target > $HUNDREDS$NUMBERS and ms_current_date() > pledges.date) AS allcount,
+            (select count(*) from pledges where target > $HUNDREDS$NUMBERS and ms_current_date() > pledges.date and whensucceeded is not null) AS successcount
             " | psql -A -F " " pb_testharness pb | egrep -v "above|allcount|successcount|row" >>$SOURCE
 
     done

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.125 2006-06-15 09:10:30 francis Exp $
+ * $Id: admin-pb.php,v 1.126 2006-06-19 17:47:02 francis Exp $
  * 
  */
 
@@ -103,7 +103,7 @@ class ADMIN_PAGE_PB_MAIN {
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
                 pledges.cached_prominence as calculated_prominence,
                 country, description,
-                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id AND signtime > pb_current_timestamp() - interval '1 day') AS surge
+                (SELECT count(*) FROM signers WHERE pledge_id=pledges.id AND signtime > ms_current_timestamp() - interval '1 day') AS surge
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id

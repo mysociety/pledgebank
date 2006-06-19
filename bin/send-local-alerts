@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.29 2006-03-21 17:15:31 chris Exp $
+ * $Id: send-local-alerts,v 1.30 2006-06-19 17:47:01 francis Exp $
  *
  */
 
@@ -76,7 +76,7 @@ function send_local_alerts() {
                         (select max(whenqueued) from alert_sent
                             where alert_sent.alert_id = alert.id),
                         '1970-01-01'::timestamp
-                    ) < pb_current_timestamp() - '1 day'::interval
+                    ) < ms_current_timestamp() - '1 day'::interval
                 ");
 
     $consolidated = array();
@@ -122,7 +122,7 @@ function send_local_alerts() {
                             (select max(whenqueued) from alert_sent
                                 where alert_sent.alert_id = alert.id),
                             '1970-01-01'::timestamp
-                        ) < pb_current_timestamp() - '1 day'::interval
+                        ) < ms_current_timestamp() - '1 day'::interval
                     for update", $alert['alert_id']);
         if (!$stillthere) continue;
 

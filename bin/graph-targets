@@ -5,7 +5,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francsi@mysociety.org. WWW: http://www.mysociety.org/
 # 
-# $Id: graph-targets,v 1.1 2005-11-29 12:59:30 francis Exp $
+# $Id: graph-targets,v 1.2 2006-06-19 17:47:01 francis Exp $
 
 SOURCE=/tmp/pb-targets-graph-data-$RANDOM$RANDOM
 GPSCRIPT=/tmp/pb-targets-graph-script-$RANDOM$RANDOM
@@ -18,7 +18,7 @@ echo "select target, (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) A
 echo "select target, (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers
     from pledges 
     where 
-    whensucceeded is null and date < pb_current_date()" | psql -A -F " " pb_testharness pb | egrep -v "date|rows|target" >$SOURCE-fail
+    whensucceeded is null and date < ms_current_date()" | psql -A -F " " pb_testharness pb | egrep -v "date|rows|target" >$SOURCE-fail
 
 cat >$GPSCRIPT <<END 
     unset border

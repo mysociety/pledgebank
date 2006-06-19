@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.185 2006-06-16 07:32:17 francis Exp $
+-- $Id: schema.sql,v 1.186 2006-06-19 17:47:02 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -24,7 +24,7 @@ create table debugdate (
 );
 
 -- Returns the date of "today", which can be overriden for testing.
-create function pb_current_date()
+create function ms_current_date()
     returns date as '
     declare
         today date;
@@ -40,7 +40,7 @@ create function pb_current_date()
 ' language 'plpgsql';
 
 -- Returns the timestamp of current time, but with possibly overriden "today".
-create function pb_current_timestamp()
+create function ms_current_timestamp()
     returns timestamp as '
     declare
         today date;
@@ -243,7 +243,7 @@ create table picture (
     id serial not null primary key,
     filename text not null,
     data bytea not null,
-    uploaded timestamp not null default pb_current_timestamp()
+    uploaded timestamp not null default ms_current_timestamp()
 );
 
 -- 
@@ -498,7 +498,7 @@ create function pledge_is_valid_to_sign(integer, text, text)
             end if;
         end if;
 
-        if p.date < pb_current_date() or p.cancelled is not null then
+        if p.date < ms_current_date() or p.cancelled is not null then
             return ''finished'';
         end if;
         
@@ -889,7 +889,7 @@ create function smssubscription_sign(integer, text)
         -- showname = true here so that they will appear as a "person whose
         -- name we do not know" rather than an anonymous person
         insert into signers (id, pledge_id, mobile, showname, signtime)
-            values (t_signer_id, t_pledge_id, t_mobile, true, pb_current_timestamp());
+            values (t_signer_id, t_pledge_id, t_mobile, true, ms_current_timestamp());
 
        
         update smssubscription
@@ -967,7 +967,7 @@ create table message (
     pledge_id integer not null references pledges(id),
     circumstance text not null,
     circumstance_count int not null default 0,
-    whencreated timestamp not null default pb_current_timestamp(),
+    whencreated timestamp not null default ms_current_timestamp(),
     fromaddress text not null default 'pledgebank'
         check (fromaddress in ('pledgebank', 'creator')),
 
@@ -1031,7 +1031,7 @@ create table comment (
 
     website text,
     -- add a reply_comment_id here if we ever want threading
-    whenposted timestamp not null default pb_current_timestamp(),
+    whenposted timestamp not null default ms_current_timestamp(),
     text text not null,                     -- as entered by comment author
     ishidden boolean not null default false -- hidden from view
     -- other fields? one to indicate whether this was written by the pledge
@@ -1063,7 +1063,7 @@ create table alert (
     pledge_id integer references pledges(id), -- specific pledge for ".../ref" event codes
     location_id integer references location(id), -- specific location for ".../local" event codes
 
-    whensubscribed timestamp not null default pb_current_timestamp(),
+    whensubscribed timestamp not null default ms_current_timestamp(),
     whendisabled timestamp default null -- set if alert has been turned off
 );
 
@@ -1081,7 +1081,7 @@ create table alert_sent (
     -- which comment for event code "/comments"
     comment_id integer references comment(id),
 
-    whenqueued timestamp not null default pb_current_timestamp()
+    whenqueued timestamp not null default ms_current_timestamp()
 );
 
 create index alert_sent_alert_id_idx on alert_sent(alert_id);
@@ -1098,7 +1098,7 @@ create table abusereport (
         what = 'comment' or what = 'pledge' or what = 'signer'
     ),
     reason text,
-    whenreported timestamp not null default pb_current_timestamp(),
+    whenreported timestamp not null default ms_current_timestamp(),
     ipaddr text,
     email text
 );
@@ -1137,7 +1137,7 @@ create trigger abusereport_insert_trigger before insert on abusereport
 
 create table requeststash (
     key varchar(16) not null primary key check (length(key) = 8 or length(key) = 16),
-    whensaved timestamp not null default pb_current_timestamp(),
+    whensaved timestamp not null default ms_current_timestamp(),
     method text not null default 'GET' check (
             method = 'GET' or method = 'POST'
         ),
@@ -1196,7 +1196,7 @@ create function pb_delete_signer(integer)
         delete from abusereport where what_id = $1 and what = ''signer'';
         delete from message_signer_recipient where signer_id = $1;
         delete from smssubscription where signer_id = $1;
-        update pledges set changetime = pb_current_timestamp()
+        update pledges set changetime = ms_current_timestamp()
             where id = (select pledge_id from signers where id = $1);
         delete from signers where id = $1;
         return;
@@ -1212,7 +1212,7 @@ create function pb_delete_person(integer)
         -- comments made by the person
         delete from alert_sent where comment_id in (select id from comment where person_id = $1);
         delete from abusereport where what_id in (select id from comment where person_id = $1) and what = ''comment'';
-        update pledges set changetime = pb_current_timestamp()
+        update pledges set changetime = ms_current_timestamp()
             where id in (select pledge_id from comment where person_id = $1);
         delete from comment where person_id = $1;
 
@@ -1224,7 +1224,7 @@ create function pb_delete_person(integer)
         delete from abusereport where what_id in (select id from signers where person_id = $1) and what = ''signer'';
         delete from message_signer_recipient where signer_id in (select id from signers where person_id = $1);
         delete from smssubscription where signer_id in (select id from signers where person_id = $1);
-        update pledges set changetime = pb_current_timestamp()
+        update pledges set changetime = ms_current_timestamp()
             where id in (select pledge_id from signers where person_id = $1);
         delete from signers where person_id = $1;
 
@@ -1240,7 +1240,7 @@ create function pb_delete_person(integer)
 create function pb_delete_comment(integer)
     returns void as '
     begin
-        update pledges set changetime = pb_current_timestamp()
+        update pledges set changetime = ms_current_timestamp()
             where id = (select pledge_id from comment where id = $1);
         delete from abusereport where what_id = $1 and what = ''comment'';
         delete from alert_sent where comment_id = $1;

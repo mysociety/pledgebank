@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.67 2006-06-06 10:04:19 chris Exp $
+ * $Id: pb.php,v 1.68 2006-06-19 17:47:02 francis Exp $
  * 
  */
 
@@ -159,8 +159,8 @@ if ($site_country == null && $microsite == null) {
 stash_check_for_post_redirect();
 
 /* Date which PledgeBank application believes it is */
-$pb_today = db_getOne('select pb_current_date()');
-$pb_timestamp = substr(db_getOne('select pb_current_timestamp()'), 0, 19);
+$pb_today = db_getOne('select ms_current_date()');
+$pb_timestamp = substr(db_getOne('select ms_current_timestamp()'), 0, 19);
 $pb_time = strtotime($pb_timestamp);
 
 /* pb_show_error MESSAGE

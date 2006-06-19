@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.28 2005-12-17 21:08:55 matthew Exp $
+// $Id: alert.php,v 1.29 2006-06-19 17:47:02 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once "../../phplib/votingarea.php";
@@ -40,7 +40,7 @@ function alert_signup($person_id, $event_code, $params) {
         } elseif ($already['whendisabled']) {
             /* Re-enable disabled alert. Move subscription time as this is used to compare
                against post dates */
-            db_query("update alert set whendisabled = null, whensubscribed = pb_current_timestamp()
+            db_query("update alert set whendisabled = null, whensubscribed = ms_current_timestamp()
                 where id = ?", array($already['id']));
         }
     } elseif ($event_code == "pledges/local") {
@@ -108,7 +108,7 @@ function alert_signup($person_id, $event_code, $params) {
         } elseif ($already['whendisabled']) {
             /* Re-enable disabled alert. Move subscription time as this is used to compare
                against post dates */
-            db_query("update alert set whendisabled = null, whensubscribed = pb_current_timestamp()
+            db_query("update alert set whendisabled = null, whensubscribed = ms_current_timestamp()
                 where id = ?", array($already['id']));
         }
     } else {
@@ -127,7 +127,7 @@ function alert_unsubscribe($person_id, $alert_id) {
     if ($person_id != $row['person_id'])   
         err(sprintf(_("Alert %d does not belong to person %d"), intval($alert_id), intval($person_id)));
 
-    db_query("update alert set whendisabled = pb_current_timestamp() where id = ?", $alert_id);
+    db_query("update alert set whendisabled = ms_current_timestamp() where id = ?", $alert_id);
     db_commit();
 }
 

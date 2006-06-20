@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.36 2006-03-27 17:55:43 francis Exp $
+// $Id: contact.php,v 1.37 2006-06-20 23:03:11 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -40,7 +40,7 @@ function contact_form($errors = array()) {
 We make PledgeBank and thrive off feedback, good and bad.
 Use this form to contact us.
 If you prefer, you can email %s instead of using the form.')), '<a href="mailto:' . OPTION_CONTACT_EMAIL . '">' . OPTION_CONTACT_EMAIL . '</a>');
-    print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge.  These messages go to the PledgeBank Team, <strong>not</strong> the Pledge Creator."));
+    print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge. The form below is for messages to the PledgeBank Team only, <strong>not</strong> the Pledge Creator."));
     print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';

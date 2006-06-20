@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.35 2006-06-06 12:19:43 chris Exp $
+// $Id: faq.php,v 1.36 2006-06-20 14:52:48 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -71,7 +71,7 @@ people paying being typical."));
 print dt(_('What do I get out of it?'));
 
 print dd(_("As a well intentioned subscriber, you get insurance against being the
-only person to show up to the demo the freezing rain or against being
+only person to show up to the demo in the freezing rain or against being
 the parent who discovers they've just volunteered to run the entire
 school play on their own. As a pledge creator - you get a greatly
 improved chance of achieving whatever change it is you want."));

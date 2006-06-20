@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.134 2006-06-19 17:47:03 francis Exp $
+// $Id: new.php,v 1.135 2006-06-20 14:14:23 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -35,7 +35,6 @@ page_footer(array('nolocalsignup'=>true));
 
 function pledge_form_one($data = array(), $errors = array()) {
     global $lang, $langs;
-# <!-- <p><big><strong>Before people can create pledges we should have a stiff warning page, with few, select, bold words about what makes for good &amp; bad pledges (we want to try to get people to keep their target numbers down).</strong></big></p> -->
     $percent_successful_above_100 = percent_success_above(100);
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';

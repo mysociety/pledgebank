@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.169 2006-06-21 17:30:59 francis Exp $
+ * $Id: pledge.php,v 1.170 2006-06-21 22:52:37 francis Exp $
  * 
  */
 
@@ -715,13 +715,21 @@ function pledge_sign_box() {
 <?  print h2(_('Sign up now'));
     if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
     $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
-    print '<p><b>';
+    print '<p><strong>';
     printf(_('I, %s, sign up to the pledge.'), $namebox);
-    print '<br>' . _('Your email') . ': <input type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"></b><br><small>';
-    print _('(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)') . '</small>
+    print '</strong><br>
 </p>
-<p><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name on this pledge') . ' </p>
-<p><input type="submit" name="submit" value="' . _('Sign Pledge') . '"> </p>
+<p>
+<small>
+<strong><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publically on this pledge.') . '</strong>
+'._('People searching for your name on the Internet will be able
+to find your signature, unless you uncheck this box.').'</small>
+</p> 
+
+<p><strong>' . _('Your email') . '</strong>: <input type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
+_('(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)') . '</small> </p>
+
+<p><input type="submit" name="submit" value="' . _('Sign Pledge') . '"></p>
 </form>';
 }
 

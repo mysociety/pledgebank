@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.46 2006-06-21 19:33:10 francis Exp $
+ * $Id: comments.php,v 1.47 2006-06-21 22:52:37 francis Exp $
  * 
  */
 
@@ -270,7 +270,7 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 <?=_("This pledge is closed for new comments.")?> 
 <? } else { ?>
 <input type="hidden" name="pledge_id" value="<?=$pledge_id ?>">
-<?=_('<h2>Add Comment</h2>') ?>
+<?=_('<h2>Add public comment</h2>') ?>
 <div class="form_row">
  <label for="author_name"><?=_('Your name') ?></label>
  <input type="text" id="author_name" name="author_name" value="<?=$q_h_author_name?>" size="30">
@@ -282,8 +282,8 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 </div>
 
 <div class="form_row">
-<label for="author_website"><?=_('Your web site') ?></label> <small><i><?=_('(optional)') ?></i></small>
-  <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="30">
+<label for="author_website"><?=_('Your web site address') ?></label> <small><i><?=_('(optional)') ?></i></small>
+  <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="40">
 </div>
 
 <p><strong><?=_('Your comment') ?></strong>
@@ -294,9 +294,12 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 <input type="hidden" name="comment_id" value="<?=$q_h_comment_id?>">
 <? } ?>
 <input type="hidden" name="n" value="<?=$nextn?>">
-<p><small><?=_('Your name and web site, if given, will be shown on your comment,
-but your email address will not be.') ?></small></p>
-<p><input type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ? "checked" : ""?>>
+<p><small><strong><?=_('Privacy note:')?></strong>
+<?=_('Your name (and web site address if given) will be shown publically on this page
+with your comment. Your email address will not be shown. People searching for your
+name on the Internet may find your comment.') ?></small></p> <p><input
+type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ?
+"checked" : ""?>>
 <?=_(' Email me future comments on this pledge') ?></p>
 
 <p><input type="submit" name="preview" value="<?=_('Preview') ?>">

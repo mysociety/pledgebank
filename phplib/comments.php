@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.45 2006-06-21 18:37:07 francis Exp $
+ * $Id: comments.php,v 1.46 2006-06-21 19:33:10 francis Exp $
  * 
  */
 
@@ -69,7 +69,7 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
     }
 
     if (isset($comment['id']) && !$noabuse)
-        print ' <a class="abusivecommentlink" href="/abuse?what=comment&amp;id=' . $comment['id'] . '">' . _('Abusive? Report it!') . '</a>';
+        print ' <a class="abusivecommentlink" href="/contact?pledge_id=' . $comment['pledge_id'] . '&amp;comment_id=' . $comment['id'] . '">' . _('Abusive? Report it!') . '</a>';
     if (isset($comment['id']) && $admin) {
         print '<select name="deletecomment_status">';
         print '<option value="0"' . ($comment['ishidden'] == 'f'?' selected':'') . '>Visible</option>';
@@ -114,7 +114,7 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
 
         $query = '
                     select id, extract(epoch from whenposted) as whenposted,
-                        text, name, website
+                        text, name, website, pledge_id
                     from comment
                     where comment.pledge_id = ?
                         and not ishidden

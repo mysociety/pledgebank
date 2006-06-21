@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.127 2006-06-21 18:37:07 francis Exp $
+ * $Id: admin-pb.php,v 1.128 2006-06-21 19:33:10 francis Exp $
  * 
  */
 
@@ -998,7 +998,7 @@ class ADMIN_PAGE_PB_ABUSEREPORTS {
                         print '<b>Signed at:</b> ' . date('Y-m-d H:m', $signer['epoch']);
                     } elseif ($what == 'comment') {
                         $comment = db_getRow('
-                                        select id,
+                                        select id, pledge_id,
                                             extract(epoch from whenposted)
                                                 as whenposted,
                                             text, name, website

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.74 2006-06-21 17:30:59 francis Exp $
+// $Id: ref-index.php,v 1.75 2006-06-21 19:33:10 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -162,9 +162,6 @@ function draw_signatories($p) {
             if (isset($r['name'])) {
                 $out .= '<li>'
                         . htmlspecialchars($r['name'])
-                        /*.' <small>(<a href="/abuse?what=signer&amp;id='
-                            . htmlspecialchars($r['id'])
-                        . '">dodgy? report it</a>)</small>' */
                         . '</li>';
             } else {
                 ++$unknownname;

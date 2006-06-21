@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.126 2006-06-19 17:47:02 francis Exp $
+ * $Id: admin-pb.php,v 1.127 2006-06-21 18:37:07 francis Exp $
  * 
  */
 
@@ -197,14 +197,14 @@ class ADMIN_PAGE_PB_MAIN {
 
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 't';
-        $signers_limit = get_http_var('l');
-        if ($signers_limit) {
-            $signers_limit = intval($signers_limit);
-            if ($signers_limit == -1)
-                $signers_limit = null;
+        $list_limit = get_http_var('l');
+        if ($list_limit) {
+            $list_limit = intval($list_limit);
+            if ($list_limit == -1)
+                $list_limit = null;
         }
         else
-            $signers_limit = 100;
+            $list_limit = 100;
 
         $q = db_query('SELECT pledges.*, person.email,
                 pledges.cached_prominence as calculated_prominence,
@@ -303,8 +303,8 @@ class ADMIN_PAGE_PB_MAIN {
         if ($sort=='t') $query .= ' ORDER BY signtime DESC';
         elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
         else $query .= ' ORDER BY signname DESC';
-        if ($signers_limit) 
-            $query .= " LIMIT $signers_limit";
+        if ($list_limit) 
+            $query .= " LIMIT $list_limit";
         $q = db_query($query, $pdata['id']);
         $out = array();
         $c = 0;
@@ -362,8 +362,8 @@ class ADMIN_PAGE_PB_MAIN {
                 print '</tr>';
             }
             print '</table>';
-            if ($signers_limit && $c >= $signers_limit) {
-                print "<p>... only $signers_limit signers shown, "; 
+            if ($list_limit && $c >= $list_limit) {
+                print "<p>... only $list_limit signers shown, "; 
                 print '<a href="'.$this->self_link.'&amp;pledge='.$pledge.'&amp;l=-1">show all</a>';
                 print ' (do not press if you are Tom, it will crash your computer :)</p>';
             }
@@ -438,10 +438,18 @@ class ADMIN_PAGE_PB_MAIN {
         }
         print '</select> <input type="submit" value="Update"></p></form>';
 
+        print '<h2>Comments</h2>';
+        comments_show_admin($pledge_obj->id(), $list_limit); 
+        if ($list_limit && $c >= $list_limit) {
+            print "<p>... only $list_limit comments shown, "; 
+            print '<a href="'.$this->self_link.'&amp;pledge='.$pledge.'&amp;l=-1">show all</a>';
+            print ' (do not press if you are Tom, it will crash your computer :)</p>';
+        }
+
         print '<h2>Actions</h2>';
         print '<form name="sendannounceform" method="post" action="'.$this->self_link.'"><input type="hidden" name="send_announce_token_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="send_announce_token" value="Send announce URL to creator"></form>';
 
-print '<form name="removepledgepermanentlyform" method="post" action="'.$this->self_link.'"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
+print '<form name="removepledgepermanentlyform" method="post" action="'.$this->self_link.'" style="clear:both"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
 
     }
 
@@ -463,6 +471,13 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         db_commit();
 	# TRANS: http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000078.html
         print p(_('<em>Show name for signer updated</em>'));
+    }
+
+    function deletecomment($id) {
+        db_query('UPDATE comment set ishidden = ? where id = ?', 
+            array(get_http_var('deletecomment_status') ? true : false, $id));
+        db_commit();
+        print p(_('<em>That comment has been shown/hidden</em>'));
     }
 
     function update_prominence($pledge_id) {
@@ -556,7 +571,13 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
                 $pledge_id = db_getOne("SELECT pledge_id FROM signers WHERE id = $signer_id");
                 $this->showname_signer($signer_id);
             }
-         } elseif (get_http_var('update_cats')) {
+        } elseif (get_http_var('deletecomment_comment_id')) {
+            $pledge_id = get_http_var('pledge_id');
+            $comment_id = get_http_var('deletecomment_comment_id');
+            if (ctype_digit($comment_id)) {
+                $this->deletecomment($comment_id);
+            }
+        } elseif (get_http_var('update_cats')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_categories($pledge_id);
         } elseif (get_http_var('send_announce_token')) {

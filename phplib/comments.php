@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.44 2006-06-08 10:22:23 matthew Exp $
+ * $Id: comments.php,v 1.45 2006-06-21 18:37:07 francis Exp $
  * 
  */
 
@@ -34,14 +34,22 @@ function comments_format_timestamp($time) {
  * posting time in seconds since the epoch), print HTML for the comment
  * described. If NOABUSE is true, don't show the link for reporting an abusive
  * comment. */
-function comments_show_one($comment, $noabuse = false) {
+function comments_show_one($comment, $noabuse = false, $admin = false) {
+    if (isset($comment['id']) && $admin) {
+        print '<td><form name="deletecommentform'.$comment['id'].'" method="post" action="'.OPTION_ADMIN_URL.'?page=pb&amp;pledge_id='.$comment['pledge_id'].'"><input type="hidden" name="deletecomment_comment_id" value="' . $comment['id'] . '">';
+    }
+
     $name = htmlspecialchars($comment['name']);
     if (isset($comment['website']))
         $name = '<a href="' . htmlspecialchars($comment['website']) . '">' . $name . '</a>';
 
-    print '<div class="commentcontent">'
-            . comments_text_to_html($comment['text'])
-            . '</div>';
+    print '<div class="commentcontent">';
+    if (array_key_exists('ishidden', $comment) && $comment['ishidden'] == 't')
+        print "<strike>";
+    print comments_text_to_html($comment['text']);
+    if (array_key_exists('ishidden', $comment) && $comment['ishidden'] == 't')
+        print "</strike>";
+    print '</div>';
     print '<div class="commentheader"><small>';  /* XXX or h1 or something? */
     if (isset($comment['ref'])) {
         $r = '<a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a>';
@@ -62,8 +70,18 @@ function comments_show_one($comment, $noabuse = false) {
 
     if (isset($comment['id']) && !$noabuse)
         print ' <a class="abusivecommentlink" href="/abuse?what=comment&amp;id=' . $comment['id'] . '">' . _('Abusive? Report it!') . '</a>';
+    if (isset($comment['id']) && $admin) {
+        print '<select name="deletecomment_status">';
+        print '<option value="0"' . ($comment['ishidden'] == 'f'?' selected':'') . '>Visible</option>';
+        print '<option value="1"' . ($comment['ishidden'] == 't'?' selected':'') . '>Hidden</option>';
+        print '</select>';
+        print '<input type="submit" name="deletecomment" value="update">';
+    }
 
     print '</small></div>';
+    if (isset($comment['id']) && $admin) {
+        print '</form></td>';
+    }
 }
 
 /* comments_count PLEDGE
@@ -180,6 +198,48 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
     }
     return $num;
 }
+
+/* comments_show_admin PLEDGE [LIMIT]
+ * Show the comments for admin page. */
+function comments_show_admin($pledge, $limit = 0) {
+    $id = $pledge;
+
+    if (is_null($id))
+        $id = db_getOne('select id from pledges where ref = ?', $pledge);
+    if (is_null($id))
+        err(sprintf(_("No pledge '%s'"), $pledge));
+
+    print '<div class="commentsbox">';
+    
+    $count = db_getOne('select count(id) from comment where pledge_id = ?', $id);
+    if ($count == 0)
+        print '<p><em>' . _('No comments') . '</em></p>';
+    else {
+        print '<ul class="commentslist">';
+
+        $query = ' select id, extract(epoch from whenposted) as whenposted,
+                        text, name, website, ishidden, pledge_id
+                    from comment
+                    where comment.pledge_id = ?
+                    order by whenposted desc';
+        if ($limit) {
+            $query .= " LIMIT " . $limit . " OFFSET " . ($count - $limit);
+        }
+        $q = db_query($query , $id);
+
+        while ($r = db_fetch_array($q)) {
+            print '<li class="comment" id="comment_' . $r['id'] . '">';
+
+            comments_show_one($r, true, true);
+
+            print '</li>';
+        }
+
+        print "</ul>";
+    }
+    print "</div>";
+}
+
 
 /* comments_form PLEDGE N [ALLOWPOST]
  * Show a form for entering a comment on the given PLEDGE. N is a number which

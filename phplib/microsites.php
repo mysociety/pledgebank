@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.17 2006-04-05 08:56:44 francis Exp $
+ * $Id: microsites.php,v 1.18 2006-06-21 17:47:39 francis Exp $
  * 
  */
 
@@ -64,13 +64,13 @@ function microsites_logo() {
     } elseif ($microsite && $microsite == 'london') {
         $country_name = pb_site_country_name();
         return '
-<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a><span id="beta">Beta</span>
+<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a>
 <span id="countrytitle"><a href="/where">' . _('(change)') . '</a></span></h1>';
 
     } else {
         $country_name = pb_site_country_name();
         return '
-<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a>
 <span id="countrytitle">'.$country_name.'
 <a href="/where">' . _('(change)') . '</a></span></h1>';
     }

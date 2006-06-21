@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.34 2006-06-19 17:47:03 francis Exp $
+// $Id: ref-sign.php,v 1.35 2006-06-21 17:30:59 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -19,7 +19,7 @@ $p = new Pledge(get_http_var('ref'));
 
 $title = _('Signature addition');
 $extra = null;
-page_header($title, array('ref'=>$p->url_typein()));
+page_header($title, array('ref'=>$p->ref(),'pref'=>$p->url_typein()));
 $errors = do_sign();
 if (is_array($errors)) {
     print '<div id="errors"><ul><li>';

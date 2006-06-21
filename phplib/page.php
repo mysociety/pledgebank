@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.118 2006-06-21 13:41:59 francis Exp $
+// $Id: page.php,v 1.119 2006-06-21 17:30:59 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -56,8 +56,9 @@ function page_send_vary_header() {
  *      Optionally specify an id for the <body> tag of the page.
  *  ref
  *      Optional pledge ref which will be saved for use in the contact link
- *      output by page_footer and used in a link to "This pledge's permanent
- *      location".
+ *      output by page_footer 
+ *  pref 
+ *      Optional URL to use in a link to "This pledge's permanent location".
  *  robots
  *      Optional content for a robots meta-tag.
  *  rss
@@ -72,7 +73,7 @@ function page_header($title, $params = array()) {
     if (!is_array($params))
         err("PARAMS must be an array in page_header");
     foreach ($params as $k => $v) {
-        if (!preg_match('/^(nonav|noprint|noreflink|last-modified|etag|cache-max-age|id|ref|robots|rss|override)$/', $k))
+        if (!preg_match('/^(nonav|noprint|noreflink|last-modified|etag|cache-max-age|id|pref|ref|robots|rss|override)$/', $k))
             err("bad key '$k' with value '$v' in PARAMS argument to page_header");
     }
 
@@ -165,8 +166,8 @@ function page_header($title, $params = array()) {
     }
 
     // Display link to main pledge page
-    if (array_key_exists('ref', $params)) {
-        $url = $params['ref'];
+    if (array_key_exists('pref', $params)) {
+        $url = $params['pref'];
         print '<p id="reference">';
         print _('This pledge\'s permanent location: ');
         if (!array_key_exists('noreflink', $params))

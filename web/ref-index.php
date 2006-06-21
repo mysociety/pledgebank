@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.73 2006-06-16 14:08:40 chris Exp $
+// $Id: ref-index.php,v 1.74 2006-06-21 17:30:59 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -273,7 +273,8 @@ locale_push($p->lang());
 $title = "'" . _('I will') . ' ' . $p->h_title() . "'";
 locale_pop();
 page_header($title, array(
-            'ref' => $p->url_typein(),
+            'ref'=>$p->ref(),
+            'pref' => $p->url_typein(),
             'noreflink' => 1,
             'rss' => array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss()),
             'last-modified' => $p->last_change_time()

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announcearchive.php,v 1.4 2005-11-10 12:12:18 francis Exp $
+ * $Id: ref-announcearchive.php,v 1.5 2006-06-21 17:30:59 francis Exp $
  * 
  */
 
@@ -54,7 +54,7 @@ if (!is_null($P)) {
         $priv |= PRIV_CREATOR | PRIV_SIGNER;
 }
 
-page_header(_("Messages sent by creator to signers: ") . $p->h_title(), array('ref'=>$p->url_typein()) );
+page_header(_("Messages sent by creator to signers: ") . $p->h_title(), array('ref'=>$p->ref(),'pref'=>$p->url_typein()) );
 
 $p->render_box();
 

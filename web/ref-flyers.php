@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-flyers.php,v 1.17 2006-02-24 19:21:55 matthew Exp $
+// $Id: ref-flyers.php,v 1.18 2006-06-21 17:30:59 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -24,7 +24,7 @@ if ($pin_box) {
 }
 
 $title = _("Flyers");
-page_header($title, array('ref' => $p->url_typein(), 'noprint' => true));
+page_header($title, array('ref'=>$p->ref(),'pref' => $p->url_typein(), 'noprint' => true));
 
 // We show both letter and A4 in these countries, only A4 in others
 // See http://www.cl.cam.ac.uk/~mgk25/iso-paper.html

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.39 2006-06-16 14:08:40 chris Exp $
+ * $Id: ref-info.php,v 1.40 2006-06-21 17:30:59 francis Exp $
  * 
  */
 
@@ -54,7 +54,8 @@ if ($pin_box) {
 }
 
 page_header(_("More information: ") . $p->h_title(), array(
-            'ref' => $p->url_typein(),
+            'ref'=>$p->ref(),
+            'pref' => $p->url_typein(),
             'last-modified' => $p->last_change_time()
         ));
 

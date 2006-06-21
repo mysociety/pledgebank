@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.117 2006-06-16 14:06:12 chris Exp $
+// $Id: page.php,v 1.118 2006-06-21 13:41:59 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -207,7 +207,7 @@ function page_header($title, $params = array()) {
 <a href="http://www.pledgebank.com/">the real site</a>.');
     }
     global $pb_today;
-    if ($pb_today != date('Y-m-d')) {
+    if ($pb_today && $pb_today != date('Y-m-d')) {
         $devwarning[] = _("Note: On this test site, the date is faked to be") . " $pb_today";
     }
     if (count($devwarning) > 0) {

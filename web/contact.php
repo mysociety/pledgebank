@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.42 2006-06-22 15:40:31 matthew Exp $
+// $Id: contact.php,v 1.43 2006-06-22 16:21:13 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -72,12 +72,12 @@ function contact_form($errors = array()) {
 <form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>"><input type="hidden" name="referrer" value="<?=htmlspecialchars($referrer)?>"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($pledge_id)?>"><input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
 <p><?=_('Message to')?>: <strong><?=_("PledgeBank Team")?></strong></p>
 
-<p><label for="name"><strong><?=_('Your name') ?></strong></label>: <input type="text" id="name" name="name" onblur="fadeout(this)" onfocus="fadein(this)" value="<?=htmlspecialchars($name) ?>" size="25">
-<br><label for="email"><strong><?=_('Your email') ?></strong></label>: <input type="text" id="email" name="email" value="<?=htmlspecialchars($email) ?>" size="30"></p>
+<p><label for="name"><?=_('Your name') ?></label>: <input type="text" id="name" name="name" onblur="fadeout(this)" onfocus="fadein(this)" value="<?=htmlspecialchars($name) ?>" size="25">
+<br><label for="email"><?=_('Your email') ?></label>: <input type="text" id="email" name="email" value="<?=htmlspecialchars($email) ?>" size="30"></p>
 
-<p><label for="subject"><strong><?=_('Subject') ?></strong></label>: <input type="text" id="subject" name="subject" value="<?=htmlspecialchars(get_http_var('subject', true)) ?>" size="48"></p>
+<p><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlspecialchars(get_http_var('subject', true)) ?>" size="48"></p>
 
-<p><label for="message"><strong><?=_('Write your message') ?></strong></label>
+<p><label for="message"><?=_('Write your message') ?></label>
 <br><textarea rows="7" cols="60" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
 
 <?  print '<p>' . _('Did you <a href="/faq">read the FAQ</a> first?') . '

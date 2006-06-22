@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.40 2006-06-22 08:40:43 francis Exp $
+// $Id: contact.php,v 1.41 2006-06-22 09:07:59 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -132,7 +132,7 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
     "IP address " . $_SERVER['REMOTE_ADDR'] . 
     (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) ? ' (forwarded from '.$_SERVER['HTTP_X_FORWARDED_FOR'].')' : '') . '. ' .
     ($referrer ? ("\n  Referrer: " . $referrer) : '') . 
-    ($ref ? ("\n  Admin: ".OPTION_ADMIN_URL.'?page=pb&amp;pledge='.$ref
+    ($ref ? ("\n  Admin: ".OPTION_ADMIN_URL.'?page=pb&pledge='.$ref
         .($comment_id ? ('#comment_' . $comment_id) : '')
         ) : '') . 
     ($comment_id ? ("\n  Comment author: " . db_getOne('select name from comment where id = ?', $comment_id)

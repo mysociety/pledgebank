@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.119 2006-06-21 17:30:59 francis Exp $
+// $Id: page.php,v 1.120 2006-06-22 08:40:42 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -384,7 +384,7 @@ function page_check_ref($ref) {
     ?>
 <form accept-charset="utf-8" action="/search" method="get" class="pledge">
 <label for="s"><?=_('Search for a pledge') ?>:</label>
-<input type="text" id="s" name="s" size="15" value=""> <input type="submit" value=<?=_('Go') ?>></p>
+<input type="text" id="s" name="s" size="15" value=""> <input type="submit" value=<?=_('Go') ?>>
 </form>
 <?
     

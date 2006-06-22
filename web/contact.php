@@ -5,11 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.39 2006-06-21 19:33:10 francis Exp $
+// $Id: contact.php,v 1.40 2006-06-22 08:40:43 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
+require_once '../phplib/comments.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/person.php';
 
@@ -40,13 +41,29 @@ function contact_form($errors = array()) {
             $email = $P->email();
     }
  
-    print h2(_('Contact Us'));
-    printf(p(_('Was it useful?  How could it be better?
-We make PledgeBank and thrive off feedback, good and bad.
-Use this form to contact us.
-If you prefer, you can email %s instead of using the form.')), '<a href="mailto:' . OPTION_CONTACT_EMAIL . '">' . OPTION_CONTACT_EMAIL . '</a>');
+    if ($comment_id) {
+        print h2(_('Report abusive, suspicious or wrong comment'));
+    } else {
+        print h2(_('Contact Us'));
+    }
+    if ($comment_id) {
+        print p(_('You are reporting the following comment:'));
+        print '<blockquote>';
+        comments_show_one(db_getRow('select *,extract(epoch from whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id), true);
+        print '</blockquote>';
+    } else {
+        print "<p>";
+        print _('Was it useful?  How could it be better?
+    We make PledgeBank and thrive off feedback, good and bad.
+    Use this form to contact us.');
+        printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . OPTION_CONTACT_EMAIL . '">' . OPTION_CONTACT_EMAIL . '</a>');
+        print "</p>";
+    }
+
     print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge. The form below is for messages to the PledgeBank Team only, <strong>not</strong> the Pledge Creator."));
-    print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
+    if (!$comment_id) 
+        print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
+
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
@@ -127,7 +144,10 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
     $success = pb_send_email($to, $subject, $message . "\n\n" . $postfix, $headers);
     if (!$success)
         err(_("Failed to send message.  Please try again, or <a href=\"mailto:team@pledgebank.com\">email us</a>."));
-    print _('Thanks for your feedback.  We\'ll get back to you as soon as we can!');
+    if ($comment_id) 
+        print p(_('<strong>Thank you!</strong> One of our team will investigate that comment as soon as possible'));
+    else 
+        print _('Thanks for your feedback.  We\'ll get back to you as soon as we can!');
 }
 
 ?>

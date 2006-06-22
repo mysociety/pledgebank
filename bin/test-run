@@ -25,6 +25,7 @@
 #   Search
 #   Categories
 #   Fuzzy pledge ref match
+#   Deleting comments
 
 #   PDF and RTF stuff from poster.cgi
 #   SMS on failure
@@ -35,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.177 2006-06-16 13:48:48 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.178 2006-06-22 08:40:42 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1354,14 +1355,16 @@ sub do_admin_tests {
     $wth->browser_get($locale_url . "/automatedtest");
     $wth->browser_follow_link(text_regex => qr/Abusive/, n => 1);
     $wth->browser_check_contents("Report abusive, suspicious or wrong comment");
-    $wth->browser_submit_form(form_name => 'abuse',
+    $wth->browser_submit_form(form_name => 'contact',
             fields => { 
-                reason => "I hate this comment, it sucks",
+                name => name_n(1000),
                 email => email_n(1000),
-                magicword => 'together'},
+                subject => "Sucky sucky comment",
+                message => "I hate this comment, it sucks",
+                },
             button => 'submit') or die "Failed to submit comment abuse form";
     $wth->browser_check_contents("One of our team will investigate");
-    $wth->email_get_containing('%To: '.$contact_email.  '%New abuse report for%');
+    $wth->email_get_containing('%To: '.$contact_email.  '%I hate this comment, it sucks%');
 
     # Check pledges and signers page
     $wth->browser_get($admin_url);
@@ -1382,12 +1385,9 @@ sub do_admin_tests {
     $wth->browser_get($admin_url);
     $wth->browser_follow_link(text_regex => qr/Abuse reports/);
     $wth->browser_check_contents(qr/pledges \(0\)/);
-    $wth->browser_check_contents(qr/comments \(1\)/);
+    $wth->browser_check_contents(qr/comments \(0\)/);
     $wth->browser_follow_link(text_regex => qr/pledges \(0\)/);
-    $wth->browser_follow_link(text_regex => qr/comments \(1\)/);
-    my $name = name_n(90);
-    $wth->browser_check_contents(qr/$name/);
-    $wth->browser_check_contents(qr/Discard selected abuse reports/);
+    $wth->browser_follow_link(text_regex => qr/comments \(0\)/);
 
     # Delete a signer
     $wth->browser_get($admin_url . "/?page=pb&pledge=smsspoof");

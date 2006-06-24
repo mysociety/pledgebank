@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.186 2006-06-19 17:47:02 francis Exp $
+-- $Id: schema.sql,v 1.187 2006-06-24 14:32:42 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -672,6 +672,9 @@ create table signers (
       
     -- when they signed
     signtime timestamp not null,
+
+    -- IP address of browser at time of signing
+    ipaddr varchar(15),     -- nullable since added late
   
     check (
         (showname and name is not null and person_id is not null)

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.3 2006-06-17 09:09:23 matthew Exp $
+ * $Id: ref-plain.php,v 1.4 2006-06-24 22:17:23 matthew Exp $
  * 
  */
 
@@ -151,16 +151,14 @@ function add_signatories($p) {
     if ($q_output == 'xml') {
         print "<signerslist>\n";
         print "  <signer>" . join("</signer>\n  <signer>", array_map('htmlspecialchars', $names)) . "</signer>\n";;
-        print "  <anonymous>$anon</anonymous>\n";
-        print "  <mobile>$unknownname</mobile>\n";
         print "</signerslist>\n";
+        print "<anonymous_signers>$anon</anonymous_signers>\n";
+        print "<mobile_signers>$unknownname</mobile_signers>\n";
     } elseif ($q_output == 'rabx') {
         global $out;
-        $out['signers'] = array(
-            'list' => $names,
-            'anonymous' => $anon,
-            'mobile' => $unknownname
-        );
+        $out['signers']['list'] = $names;
+        $out['data']['anonymous_signers'] = $anon;
+        $out['data']['mobile_signers'] = $unknownname;
     }
 }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.137 2006-06-19 10:33:34 francis Exp $
+// $Id: fns.php,v 1.138 2006-06-26 19:01:46 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once "../../phplib/evel.php";
@@ -394,6 +394,112 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
     </ul>
     <?
 }
+
+# pb_gaze_get_location
+function pb_gaze_get_location() {
+    $location = array();
+    $location['country'] = get_http_var('country');
+    $location['state'] = null;
+    if (is_string($location['country'])) {
+        $a = array();
+        if (preg_match('/^([A-Z]{2}),(.+)$/', $location['country'], $a))
+            list($x, $location['country'], $location['state']) = $a;
+    } else {
+        $location['country'] = $site_country;
+    }
+    $location['place'] = get_http_var('place');
+    if ($location['country'] && $location['country'] == 'Global')
+        $location['place'] = null;
+    else {
+        # Check gaze has this country
+        $countries_with_gazetteer = gaze_get_find_places_countries();
+        gaze_check_error($countries_with_gazetteer);
+        if (!in_array($location['country'], $countries_with_gazetteer)) {
+            $location['place'] = null;
+        }
+    }
+    $location['gaze_place'] = get_http_var('gaze_place');
+    $location['postcode'] = get_http_var('postcode');
+    if ($location['country'] && $location['country'] != 'GB') $location['postcode'] = '';
+    if ($location['country'] && $location['country'] == '(choose one)') $location['country'] = null;
+    if ($location['country'] && $location['country'] == '(separator)') $location['country'] = null;
+
+    if ($location['place'] && (validate_partial_postcode($location['place']) || validate_postcode($location['place']))) {
+        $location['postcode'] = $location['place'];
+        $location['place'] = null;
+    }
+    return $location;
+}
+
+# pb_gaze_validate_location
+# Validates a location entered for a form.
+function pb_gaze_validate_location(&$location, &$errors) {
+    if (!$location['country']) $errors['country'] = _("Please choose a country");
+    if ($location['country'] == 'GB') {
+        if ($location['postcode'] && $location['place'])
+            $errors['place'] = _("Please enter either a place name or a postcode area, but not both");
+    } else {
+        if ($location['postcode'])
+            $errors['postcode'] = _("You can only enter a postcode area if your pledge applies to the UK");
+    }
+    if ($location['postcode']) {
+        if (!validate_partial_postcode($location['postcode']) && !validate_postcode($location['postcode']))
+            $errors['postcode'] = _('Please enter a postcode, or just its first part; for example, OX1 3DR or WC1.');
+        else if (mapit_get_error(mapit_get_location($location['postcode'], 1)))
+            $errors['postcode'] = sprintf(_("We couldn't recognise the postcode '%s'; please re-check it"), htmlspecialchars($location['postcode']));
+        else
+            $location['postcode'] = canonicalise_partial_postcode($location['postcode']);
+    } elseif ($location['place']) {
+        if (!$location['gaze_place']) {
+            $errors['gaze_place'] = "NOTICE";
+        }
+    } else {
+        if ($location['country'] == 'GB') {
+            $errors['place'] = _("Please enter either a place name or a postcode area");
+        } else {
+            $errors['place'] = _("Please enter a place name");
+        }
+    }
+    if ($location['place'] && ($location['country'] != get_http_var('prev_country') || $location['place'] != get_http_var('prev_place'))) {
+        $errors['gaze_place'] = "NOTICE";
+    }
+    if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == "NOTICE") {
+        $places = pb_gaze_find_places($location['country'], $location['state'], $location['place'], 10, 0);
+        $have_exact = have_exact_gaze_match($places, $location['place']);
+        if ($have_exact) {
+            list($desc, $radio_name) = pb_get_gaze_place_details($have_exact);
+            $location['gaze_place'] = $radio_name;
+            unset($errors['gaze_place']);
+            #print "have exact $desc $radio_name\n"; exit;
+        }
+    }
+
+    global $countries_statecode_to_name;
+    if (array_key_exists($location['country'], $countries_statecode_to_name)) {
+        // Split out state in case where they picked US from dropdown, but place with state from gaze
+        $a = array();
+        if (preg_match('/^(.+), ([^,]+)$/', $location['gaze_place'], $a)) {
+            list($x, $location['gaze_place'], $location['state']) = $a;
+        }
+    }
+    
+    // Create list of possibly matching places to choose from
+    $location['places'] = null;
+    if ($location['place']) {
+        // Look up nearby places
+        $location['places'] = pb_gaze_find_places($location['country'], $location['state'], $location['place'], 10, 0);
+        if (array_key_exists('gaze_place', $errors)) {
+            if (count($location['places']) > 0) {
+                // message printed in pb_view_gaze_place_choice
+            } else {
+                $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
+                htmlspecialchars($location['place']));
+            }
+          #unset($errors['gaze_place']); # remove NOTICE
+        } 
+    }
+}
+
 
 # pb_view_local_alert_quick_signup
 # Display quick signup form for local alerts. Parameters can contain:

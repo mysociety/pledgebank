@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.170 2006-06-21 22:52:37 francis Exp $
+ * $Id: pledge.php,v 1.171 2006-06-26 19:01:46 francis Exp $
  * 
  */
 
@@ -142,6 +142,7 @@ class Pledge {
     }
     
     function exactly() { return ($this->data['comparison'] == 'exactly'); }
+    function byarea() { return ($this->data['target_type'] == 'byarea'); }
     function has_details() { return $this->data['detail'] ? true : false; }
     function is_cancelled() { return $this->data['cancelled'] ? true : false; }
 
@@ -405,6 +406,55 @@ class Pledge {
      * Return the time that the pledge was last changed in any way. */
     function last_change_time() {
         return intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $this->data['id']));
+    }
+
+    /* Display form for pledge signing. */
+    function sign_box($errors = array()) {
+        if (get_http_var('add_signatory'))
+            $showname = get_http_var('showname') ? ' checked' : '';
+        else
+            $showname = ' checked';
+
+        $email = get_http_var('email');
+        $name = get_http_var('name', true);
+
+        $P = person_if_signed_on();
+        if (!is_null($P)) {
+            if (is_null($email) || !$email)
+                $email = $P->email();
+            if (is_null($name) || !$name)
+                $name = $P->name_or_blank();
+        } else {
+            // error_log("nobody signed on");
+        }
+
+        // error_log("$email $name");
+    ?>
+    <form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=htmlspecialchars($this->ref()) ?>/sign" method="post">
+    <input type="hidden" name="add_signatory" value="1">
+    <input type="hidden" name="pledge" value="<?=htmlspecialchars($this->ref()) ?>">
+    <input type="hidden" name="ref" value="<?=htmlspecialchars($this->ref()) ?>">
+    <?  print h2(_('Sign up now'));
+        if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
+        $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
+        print '<p><strong>';
+        printf(_('I, %s, sign up to the pledge.'), $namebox);
+        print '</strong><br></p>';
+        if ($this->byarea()) {
+            #print "byarea";
+        }
+        print '<p>
+    <small>
+    <strong><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publically on this pledge.') . '</strong>
+    '._('People searching for your name on the Internet will be able
+    to find your signature, unless you uncheck this box.').'</small>
+    </p> 
+
+    <p><strong>' . _('Your email') . '</strong>: <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
+    _('(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)') . '</small> </p>
+
+    <p><input type="submit" name="submit" value="' . _('Sign Pledge') . '"></p>
+    </form>';
     }
 }
 
@@ -686,52 +736,6 @@ function send_announce_token($pledge_id) {
     db_commit();
 }
 
-/* Display form for pledge signing. */
-function pledge_sign_box() {
-    if (get_http_var('add_signatory'))
-        $showname = get_http_var('showname') ? ' checked' : '';
-    else
-        $showname = ' checked';
-
-    $email = get_http_var('email');
-    $name = get_http_var('name', true);
-
-    $P = person_if_signed_on();
-    if (!is_null($P)) {
-        if (is_null($email) || !$email)
-            $email = $P->email();
-        if (is_null($name) || !$name)
-            $name = $P->name_or_blank();
-    } else {
-        // error_log("nobody signed on");
-    }
-
-    // error_log("$email $name");
-?>
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=htmlspecialchars(get_http_var('ref')) ?>/sign" method="post">
-<input type="hidden" name="add_signatory" value="1">
-<input type="hidden" name="pledge" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
-<input type="hidden" name="ref" value="<?=htmlspecialchars(get_http_var('ref')) ?>">
-<?  print h2(_('Sign up now'));
-    if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
-    $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
-    print '<p><strong>';
-    printf(_('I, %s, sign up to the pledge.'), $namebox);
-    print '</strong><br>
-</p>
-<p>
-<small>
-<strong><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publically on this pledge.') . '</strong>
-'._('People searching for your name on the Internet will be able
-to find your signature, unless you uncheck this box.').'</small>
-</p> 
-
-<p><strong>' . _('Your email') . '</strong>: <input type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
-_('(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)') . '</small> </p>
-
-<p><input type="submit" name="submit" value="' . _('Sign Pledge') . '"></p>
-</form>';
-}
 
 /* post_confirm_advertise PLEDGE_ROW
    Print relevant advertising */

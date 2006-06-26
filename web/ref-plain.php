@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.4 2006-06-24 22:17:23 matthew Exp $
+ * $Id: ref-plain.php,v 1.5 2006-06-26 10:35:33 matthew Exp $
  * 
  */
 
@@ -50,8 +50,6 @@ if ($pin_box) {
     page_footer();
     exit;
 }
-
-header("Content-Type: text/plain");
 
 locale_push($p->lang());
 $title = _('I will') . ' ' . $p->h_title();
@@ -101,8 +99,10 @@ $out = array(
 );
 
 if ($q_output == 'xml') {
+    header("Content-Type: text/xml");
     print "<pledge>\n";
 } elseif ($q_output == 'rabx') {
+    header("Content-Type: text/plain");
     $rabx = '';
 }
 

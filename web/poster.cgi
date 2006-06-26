@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.77 2006-05-05 18:06:11 matthew Exp $
+# $Id: poster.cgi,v 1.78 2006-06-26 17:03:55 matthew Exp $
 #
 
 import sys
@@ -740,7 +740,7 @@ while fcgi.isFCGI():
 
     except Exception, e:
         req.out.write("Content-Type: text/plain\r\n\r\n")
-        req.out.write(_("Sorry, we weren't able to make your poster.\n\n"))
+        req.out.write(_("Sorry, we weren't able to make your poster.\n\n").encode('utf-8'))
         req.out.write(str(e) + "\n")
 
     req.Finish()

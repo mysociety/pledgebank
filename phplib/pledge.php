@@ -6,14 +6,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.171 2006-06-26 19:01:46 francis Exp $
+ * $Id: pledge.php,v 1.172 2006-06-27 17:27:27 francis Exp $
  * 
  */
 
-require_once '../../phplib/db.php';
 require_once 'fns.php';
-require_once '../../phplib/person.php';
+require_once 'gaze-controls.php'; // for sign_box
 
+require_once '../../phplib/db.php';
+require_once '../../phplib/person.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/rabx.php';
 
@@ -217,6 +218,13 @@ class Pledge {
         } else
             return 'Global';
     }
+    function h_country_no_state() { 
+        global $countries_code_to_name;
+        if (isset($this->data['country']))
+            return htmlspecialchars($countries_code_to_name[$this->data['country']]); 
+        else
+            return null;
+    }
 
     function is_local() { return isset($this->data['description']); }
     function h_local_type() { 
@@ -332,15 +340,19 @@ class Pledge {
                 printf(ngettext('%s person signed up', '%s people signed up', $this->signers()), prettify($this->signers()));
             else
                 printf(ngettext('%s person has signed up', '%s people have signed up', $this->signers()), prettify($this->signers()));
-            if ($this->left() < 0) {
-                print ' ';
-                printf(_('(%d over target)'), -$this->left() );
-            } elseif ($this->left() > 0) {
-                print ', ';
-                if (array_key_exists('closed', $params))
-                    printf(ngettext('%d more was needed', '%d more were needed', $this->left()), $this->left() );
-                else
-                    printf(ngettext('%d more needed', '%d more needed', $this->left()), $this->left() );
+        if ($this->byarea()) {
+                // TODO: Work out how many areas success has occurred in, and display here
+            } else {
+                if ($this->left() < 0) {
+                    print ' ';
+                    printf(_('(%d over target)'), -$this->left() );
+                } elseif ($this->left() > 0) {
+                    print ', ';
+                    if (array_key_exists('closed', $params))
+                        printf(ngettext('%d more was needed', '%d more were needed', $this->left()), $this->left() );
+                    else
+                        printf(ngettext('%d more needed', '%d more needed', $this->left()), $this->left() );
+                }
             }
             print '</i>';
         }
@@ -409,7 +421,7 @@ class Pledge {
     }
 
     /* Display form for pledge signing. */
-    function sign_box($errors = array()) {
+    function sign_box($errors = array(), $location = array()) {
         if (get_http_var('add_signatory'))
             $showname = get_http_var('showname') ? ' checked' : '';
         else
@@ -438,18 +450,51 @@ class Pledge {
         if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
         $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
         print '<p><strong>';
-        printf(_('I, %s, sign up to the pledge.'), $namebox);
+        if ($this->byarea())
+            printf(_('I, %s, sign up to the pledge in my local area.'), $namebox);
+        else 
+            printf(_('I, %s, sign up to the pledge.'), $namebox);
         print '</strong><br></p>';
-        if ($this->byarea()) {
-            #print "byarea";
-        }
         print '<p>
     <small>
     <strong><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publically on this pledge.') . '</strong>
     '._('People searching for your name on the Internet will be able
     to find your signature, unless you uncheck this box.').'</small>
-    </p> 
+    </p>';
+        if ($this->byarea()) {
+            // Pledges where target is per town, rather than overall
+            if ($this->is_global()) {
+                ?> <p><strong><?=_('Your country:') ?></strong>&nbsp;<? 
+                if ($location)
+                    pb_view_gaze_country_choice($location['country'], $location['state'], $errors, array('noglobal'=>true, 'gazeonly'=>true)); 
+                else
+                    pb_view_gaze_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true));
+            } else {
+?>            <p><input type="hidden" name="prev_country" value="<?=$this->country_code()?>"> 
+              <input type="hidden" name="country" value="<?=$this->country_code()?>"> <?
+            }
 
+            if ($location) {
+?>
+</p>
+
+<div id="ifyes_line">
+<strong><?=_("Where in that country?")?></strong>
+<?              pb_view_gaze_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode']); ?>
+</div>
+<?
+
+            } else {
+?>
+<span style="white-space: nowrap"><strong><?=
+    $this->is_global() ?  _('Your town:') :
+    sprintf(_('Your town in %s:'), $this->h_country_no_state())
+?>&nbsp;<input type="text" size="20" name="place" value=""></strong></span>
+<?
+
+            }
+        }
+        print '
     <p><strong>' . _('Your email') . '</strong>: <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
     _('(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)') . '</small> </p>
 

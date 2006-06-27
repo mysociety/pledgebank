@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.1 2006-06-27 08:50:38 francis Exp $
+// $Id: gaze-controls.php,v 1.2 2006-06-27 17:27:27 francis Exp $
 
 // TODO: 
 // - Alter new.php to call these functions, rather than have its own,
@@ -21,6 +21,7 @@ function pb_gaze_find_places($country, $state, $query, $maxresults = null, $mins
     gaze_check_error($ret);
     return $ret;
 }
+
 // Given a row returned from gaze, returns a list of (description, radio button value)
 function pb_get_gaze_place_details($p) {
     list($name, $in, $near, $lat, $lon, $st, $score) = $p;
@@ -299,60 +300,23 @@ function pb_gaze_validate_location(&$location, &$errors) {
     }
 }
 
-
-# pb_view_local_alert_quick_signup
-# Display quick signup form for local alerts. Parameters can contain:
-# newflash - if true, put message in bold and show "works in any country" flash
-# place - default value for place
-global $place_postcode_label; # ids must be unique (this will break 
-# the javascript on the few pages which have this form twice, but I couldn't
-# see an easy worthwhile way round this)
-function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>true)) {
-    global $place_postcode_label, $microsite;
-    $email = '';
-    $P = person_if_signed_on();
-    if (!is_null($P)) {
-        $email = $P->email();
-    } 
-    $newflash = false;
-    if (array_key_exists('newflash', $params) && $params['newflash'])
-        $newflash = true;
-    $place = "";
-    if (array_key_exists('place', $params) && $params['place'])
-        $place = $params['place'];
-
-    # Microsite specific changes
-    $london = false;
-    $any_country = true;
-    $force_country = false;
-    if ($microsite && $microsite == 'london') {
-        $london = true;
-        $any_country = false;
-        $force_country = 'GB';
+// Is this match from gaze exact?
+function have_exact_gaze_match($places, $typed_place) {
+    if (count($places) < 1)
+        return;
+    $gotcount = 0;
+    $got = null;
+    foreach ($places as $place) {
+        if (trim(strtolower($place['0'])) == trim(strtolower($typed_place))) {
+            $got = $place;
+            $gotcount++;
+        }
     }
-?>
-<form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
-<input type="hidden" name="subscribe_local_alert" value="1">
-<?  if (array_key_exists('track', $params) && $params['track'])
-        print '<input type="hidden" name="track" value="' . htmlentities($params['track']) . '">';
-?>
-<p><strong><?=$london ? 'Sign up for emails when people make pledges in your part of London' : _('Sign up for emails when people make pledges in your local area')?> 
-<? if ($any_country) { ?>
-<?=$newflash?'&mdash;':''?> <?=$newflash?_('Works in any country!'):''?> 
-<? } ?>
-</strong>
-<br><span style="white-space: nowrap"><?=_('Email:') ?> <input type="text" size="18" name="email" value="<?=htmlspecialchars($email) ?>"></span>
-<? if ($force_country) { ?>
-<input type="hidden" name="country" value="<?=$force_country?>">
-<span style="white-space: nowrap"><?=_('Postcode:')?>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
-<? } else { ?>
-<span style="white-space: nowrap"><?=_('Country:') ?> <? pb_view_gaze_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
-<span style="white-space: nowrap"><span id="place_postcode_label<?=($place_postcode_label ? $place_postcode_label : '')?>"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
-<? } ?>
-<input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
-</form>
-<?
-    $place_postcode_label++;
+    if ($gotcount == 1)
+        return $got;
+    else
+        return null;
 }
+
 
 

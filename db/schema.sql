@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.189 2006-06-27 08:50:38 francis Exp $
+-- $Id: schema.sql,v 1.190 2006-06-27 17:27:27 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -136,8 +136,8 @@ create table pledges (
     target integer not null check (target > 0),
     -- type of target
     target_type text not null default 'overall' check (
-        target_type = 'overall' or
-        target_type = 'byarea'
+        target_type = 'overall' or -- one global target
+        target_type = 'byarea'     -- target applies separately per local area
     ),
     -- type of person (e.g. "local people")
     type text not null, -- LLL
@@ -674,6 +674,10 @@ create table signers (
 
     -- whether they want their name public
     showname boolean not null default false,
+
+    -- if target_type for the pledge is 'byarea' then this is the id
+    -- of the location which the signature is for
+    byarea_location_id integer references location(id),
       
     -- when they signed
     signtime timestamp not null,

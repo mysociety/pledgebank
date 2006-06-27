@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.76 2006-06-26 19:01:46 francis Exp $
+// $Id: ref-index.php,v 1.77 2006-06-27 17:27:28 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -59,7 +59,9 @@ function draw_status_plaque($p) {
     if (!$p->open()) {
         print '<p id="finished">' . _('This pledge is now closed, as its deadline has passed.') . '</p>';
     }
-    if ($p->left() <= 0) {
+    if ($p->byarea()) {
+        // TODO: Show number of times, and places, of success for "by area" pledges
+    } else if ($p->left() <= 0) {
         if ($p->exactly()) {
             print '<p id="finished">' . _('This pledge is now closed, as its target has been reached.') . '</p>';
         } else {
@@ -151,7 +153,8 @@ function draw_signatories($p) {
     $anon = 0;
     $unknownname = 0;
 
-    $query = "SELECT * FROM signers WHERE pledge_id = ? ORDER BY id";
+    $query = "SELECT signers.*, location.description as location_description, location.country as location_country
+        from signers LEFT JOIN location on location.id = signers.byarea_location_id WHERE pledge_id = ? ORDER BY id";
     if ($limit) {
         $query .= " LIMIT " . MAX_PAGE_SIGNERS . " OFFSET " . ($nsigners - MAX_PAGE_SIGNERS);
     }
@@ -162,6 +165,7 @@ function draw_signatories($p) {
             if (isset($r['name'])) {
                 $out .= '<li>'
                         . htmlspecialchars($r['name'])
+                        . ($p->byarea() ? ' ('.$r['location_description'].')' : '')
                         . '</li>';
             } else {
                 ++$unknownname;

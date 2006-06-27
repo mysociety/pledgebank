@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.38 2006-06-26 19:01:46 francis Exp $
+// $Id: ref-sign.php,v 1.39 2006-06-27 17:27:28 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -16,24 +16,30 @@ require_once '../../phplib/importparams.php';
 
 page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));
+$location = array();
+if ($p->byarea())
+    $location = pb_gaze_get_location();
 
 $title = _('Signature addition');
 $extra = null;
 page_header($title, array('ref'=>$p->ref(),'pref'=>$p->url_typein()));
-$errors = do_sign();
+$errors = do_sign($location);
 if (is_array($errors)) {
+    if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == 'NOTICE') {
+        unset($errors['gaze_place']); # remove NOTICE
+    }
     print '<div id="errors"><ul><li>';
     print join ('</li><li>', $errors);
     print '</li></ul></div>';
     $p->render_box(array('showdetails'=>false));
-    $p->sign_box($errors);
+    $p->sign_box($errors, $location);
 }
 $params = array('extra'=>$extra);
 # if ($extra=='signer-confirm-advert=local-alerts')
 $params['nolocalsignup'] = true;
 page_footer($params);
 
-function do_sign() {
+function do_sign(&$location) {
     global $q_email, $q_name, $q_showname, $q_ref, $q_pin, $extra;
     $errors = importparams(
                 array(array('name',true),       '//',        '', null),
@@ -61,7 +67,13 @@ function do_sign() {
     if (!check_pin($q_ref, $pledge->pin()))
         err(_("Permission denied"));
 
-    if (!is_null($errors))
+    if ($pledge->byarea()) {
+        if (!$errors)
+            $errors = array();
+        pb_gaze_validate_location($location, $errors);
+    }
+
+    if ($errors)
         return $errors;
 
     /* Get the user to log in. */
@@ -75,7 +87,29 @@ function do_sign() {
 
     if (!pledge_is_error($R)) {
         /* All OK, sign pledge. */
-        db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr) values (?, ?, ?, ?, ms_current_timestamp(), ?)', array($pledge->id(), ($P->has_name() ? $P->name() : null), $P->id(), $q_showname ? 't' : 'f', $_SERVER['REMOTE_ADDR']));
+
+        $byarea_location_id = null;
+        if ($pledge->byarea()) {
+            $byarea_location_id = db_getOne("select nextval('location_id_seq')");
+            list($lat, $lon, $desc) = explode('|', $location['gaze_place'], 3);
+            $location['wgs84_lat'] = $lat;
+            $location['wgs84_lon'] = $lon;
+            $location['description'] = $desc;
+            $location['input'] = $location['place'];
+            $location['method'] = "Gaze";
+            db_query("
+                    insert into location
+                        (id, country, state, method, input, latitude, longitude, description)
+                    values (?, ?, ?, ?, ?, ?, ?, ?)", array(
+                        $byarea_location_id,
+                        $location['country'], $location['state'],
+                        $location['method'], $location['input'],
+                        $location['wgs84_lat'], $location['wgs84_lon'],
+                        $location['description']
+                    ));
+        }
+        
+        db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge->id(), ($P->has_name() ? $P->name() : null), $P->id(), $q_showname ? 't' : 'f', $_SERVER['REMOTE_ADDR'], $byarea_location_id));
         db_commit();
         print '<p class="noprint loudmessage" align="center">' . _('Thanks for signing up to this pledge!') . '</p>';
 

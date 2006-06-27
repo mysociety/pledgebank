@@ -5,8 +5,9 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.29 2006-06-19 17:47:02 francis Exp $
+// $Id: alert.php,v 1.30 2006-06-27 08:50:38 francis Exp $
 
+require_once '../phplib/gaze-controls.php';
 require_once '../../phplib/mapit.php';
 require_once "../../phplib/votingarea.php";
 require_once '../../phplib/person.php';

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.188 2006-06-26 19:01:46 francis Exp $
+-- $Id: schema.sql,v 1.189 2006-06-27 08:50:38 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -138,7 +138,7 @@ create table pledges (
     target_type text not null default 'overall' check (
         target_type = 'overall' or
         target_type = 'byarea'
-    )
+    ),
     -- type of person (e.g. "local people")
     type text not null, -- LLL
     -- display verb for joining the pledge

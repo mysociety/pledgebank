@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.120 2006-06-22 08:40:42 francis Exp $
+// $Id: page.php,v 1.121 2006-06-28 11:18:35 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -97,20 +97,22 @@ function page_header($title, $params = array()) {
 
     page_send_vary_header();
 
-    /* Send Last-Modified: and ETag: headers, if we have enough information to
-     * do so. */
-    $lm = null;
-    $etag = null;
-    if (array_key_exists('last-modified', $params))
-        $lm = $params['last-modified'];
-    if (array_key_exists('etag', $params))
-        $etag = $params['etag'];
-    if (isset($lm) || isset($etag))
-        cond_headers($lm, $etag);
+    if (OPTION_PB_CACHE_HEADERS) {
+        /* Send Last-Modified: and ETag: headers, if we have enough information to
+         * do so. */
+        $lm = null;
+        $etag = null;
+        if (array_key_exists('last-modified', $params))
+            $lm = $params['last-modified'];
+        if (array_key_exists('etag', $params))
+            $etag = $params['etag'];
+        if (isset($lm) || isset($etag))
+            cond_headers($lm, $etag);
 
-    /* Ditto a max-age if specified. */
-    if (array_key_exists('cache-max-age', $params))
-        header('Cache-Control: max-age=' . $params['cache-max-age']);
+        /* Ditto a max-age if specified. */
+        if (array_key_exists('cache-max-age', $params))
+            header('Cache-Control: max-age=' . $params['cache-max-age']);
+    }
 
     $P = person_if_signed_on(true); /* Don't renew any login cookie. */
 

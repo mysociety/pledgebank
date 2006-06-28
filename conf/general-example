@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.37 2006-05-04 11:10:00 chris Exp $
+ * $Id: general-example,v 1.38 2006-06-28 11:18:35 francis Exp $
  * 
  */
 
@@ -46,6 +46,8 @@ define('OPTION_EMAIL_PREFIX', 'pb-');
 define('OPTION_PHP_DEBUG_LEVEL', 0);
 // Is this a staging site?  Affects how errors are displayed.
 define('OPTION_PB_STAGING', 1);
+// Send appropriate last-modified and cache control headers.
+define('OPTION_PB_CACHE_HEADERS', 1);
 
 // C360 aggregator specific values.
 define('OPTION_PB_SMS_C360_INCOMING_URL', 'http://pledgebank.owl/c360smsin.cgi');

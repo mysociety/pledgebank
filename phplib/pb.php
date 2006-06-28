@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.68 2006-06-19 17:47:02 francis Exp $
+ * $Id: pb.php,v 1.69 2006-06-28 10:37:25 matthew Exp $
  * 
  */
 
@@ -164,7 +164,7 @@ $pb_timestamp = substr(db_getOne('select ms_current_timestamp()'), 0, 19);
 $pb_time = strtotime($pb_timestamp);
 
 /* pb_show_error MESSAGE
- * General purpose eror display. */
+ * General purpose error display. */
 function pb_show_error($message) {
     header('HTTP/1.0 500 Internal Server Error');
     page_header(_("Sorry! Something's gone wrong."), array('override'=>true));

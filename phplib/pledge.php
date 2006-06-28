@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.172 2006-06-27 17:27:27 francis Exp $
+ * $Id: pledge.php,v 1.173 2006-06-28 13:54:40 francis Exp $
  * 
  */
 
@@ -486,12 +486,11 @@ class Pledge {
 
             } else {
 ?>
-<span style="white-space: nowrap"><strong><?=
-    $this->is_global() ?  _('Your town:') :
-    sprintf(_('Your town in %s:'), $this->h_country_no_state())
-?>&nbsp;<input type="text" size="20" name="place" value=""></strong></span>
-<?
-
+<span style="white-space: nowrap"><strong><?=_('Your town:')?>
+&nbsp;<input type="text" size="20" name="place" value=""></strong></span>
+                <? if (!$this->is_global()) { ?>
+<br><small><?=sprintf(_('(%s only)'), $this->h_country_no_state())?></small>
+                <? } 
             }
         }
         print '

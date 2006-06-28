@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.178 2006-06-22 08:40:42 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.179 2006-06-28 13:54:39 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -62,6 +62,7 @@ Actions are a list of tests, run if present in this order:
     sms - make a pledge, sign up by SMS and convert
     login - exhaustively test user login / authentication
     category - display of pledges by prominence, category and language
+    byarea - test pledges which have target "by area" 
 If you specify no actions, it will run all of them, plus some
 extra smaller tests.
 
@@ -103,6 +104,8 @@ foreach (@ARGV) {
         $action{'login'} = 1;
     } elsif ($_ eq "category") {
         $action{'category'} = 1;
+    } elsif ($_ eq "byarea") {
+        $action{'byarea'} = 1;
     } else {
         help();
         print "Action '$_' not known\n";
@@ -116,6 +119,7 @@ if (scalar(@ARGV) == 0) {
     $action{'sms'} = 1;
     $action{'login'} = 1;
     $action{'category'} = 1;
+    $action{'byarea'} = 1;
 }
 
 # Set up options
@@ -131,6 +135,11 @@ sub email_n { my $n = shift; return "pbharness+$n\@$email_domain"; }
 sub name_n { my $n = shift; return ($n % 100  == 0) ? "Peter Setter $n" : "Siegfried Signer $n"; }
 sub mobile_n { my $n = shift; return "9876543$n"; }
 sub password_n { my $n = shift; return "mypass$n"; }
+sub location_n { my $n = shift; 
+    return ($n % 2 == 0) ? 
+        { country => 'GB', place => 'Hexham' } 
+        : { country => 'GB', place => 'Liverpool' } 
+} # for byarea pledge signing
 our $login_count; # reference to hash of person number => how many times they've logged in
 our $name_admin = "\"PledgeBank.com\"";
 
@@ -197,6 +206,10 @@ if ($action{'login'}) {
 if ($action{'category'}) {
     print "Testing display of pledges of different types...\n" if $verbose > 0;
     do_category_tests();
+}
+if ($action{'byarea'}) {
+    print "Testing pledges with targets by area...\n" if $verbose > 0;
+    do_byarea_tests();
 }
 if ($action{'all'}) {
     print "Checking administration functions...\n" if $verbose > 0;
@@ -401,7 +414,7 @@ sub create_pledge {
     return;
 }
 
-# sign_pledge WHO SHOW_SIGNATURE LOGIN_ACTION EXPECTED
+# sign_pledge WHO SHOW_SIGNATURE LOGIN_ACTION EXPECTED [BYAREA]
 # Adds a signer to a pledge, assumes browser is already pointing to pledge
 # signup page.  Adds person number WHO.  SHOW_SIGNATURE is 1 for their
 # signature to be public, undef for private.  LOGIN_ACTION is passed
@@ -412,17 +425,30 @@ sub create_pledge {
 #   'already' - failed signing, because you've already signed.
 #   'ownpledge' - failed signing, because you're the pledge creator.
 sub sign_pledge {
-    my ($who, $show_signature, $login_options, $expected) = @_;
+    my ($who, $show_signature, $login_options, $expected, $byarea) = @_;
     my $login_action = $login_options->{'action'};
 
     # Sign up now, unless we are resuming abandoned signup
     if ($login_action ne "resume") {
         $wth->browser_check_contents("Sign up now");
+        my $fields = { name => name_n($who), email => email_n($who), showname => $show_signature };
+        if ($byarea) {
+            $wth->browser_check_contents("sign up to the pledge in my local area");
+            $fields->{'country'} = location_n($who)->{'country'};
+            $fields->{'place'} = location_n($who)->{'place'};
+        }
         $wth->browser_submit_form(form_name => 'pledge',
-            fields => { 
-                name => name_n($who), email => email_n($who), showname => $show_signature 
-                },
+            fields => $fields,
             button => 'submit') or die "Failed to submit signing form";
+
+        # Choose specific location
+        if ($byarea && location_n($who)->{'gaze_place'}) {
+            $wth->browser_check_contents("Now please select one of the possible places");
+            $fields->{gaze_place} = location_n($who)->{'gaze_place'};
+            $wth->browser_submit_form(form_name => 'pledge',
+                fields => $fields,
+                button => 'submit') or die "Failed to submit signing form, place selection stage";
+        }
     }
 
     # Perform appropriate login action
@@ -446,7 +472,7 @@ sub sign_pledge {
     }
 }
 
-# find_and_sign_pledge FIND_TYPE FIND_STRING WHO SHOW_SIGNATURE LOGIN_ACTION EXPECTED
+# find_and_sign_pledge FIND_TYPE FIND_STRING WHO SHOW_SIGNATURE LOGIN_ACTION EXPECTED BYAREA
 # Finds a public pledge depending on FIND_TYPE
 #   'frontpage' - find listing via string FIND_STRING on front page
 #   'list_open' - find listing via string FIND_STRING on all pledges page
@@ -455,7 +481,7 @@ sub sign_pledge {
 # se text FIND_STRING.  Then calls
 # sign_pledge.
 sub find_and_sign_pledge {
-    my ($find_type, $find_string, $who, $show_signature, $login_options, $expected) = @_;
+    my ($find_type, $find_string, $who, $show_signature, $login_options, $expected, $byarea) = @_;
     my $login_action = $login_options->{'action'};
     die "Find type '$find_type' not known" if $find_type ne 'frontpage' && $find_type ne 'list_open' && $find_type ne 'list_succeeded_open' && $find_type ne 'ref';
 
@@ -473,7 +499,7 @@ sub find_and_sign_pledge {
             $wth->browser_follow_link(text_regex => qr/$find_string/) or die "Failed to find '$find_string' link";
         }
     }
-    sign_pledge($who, $show_signature, $login_options, $expected);
+    sign_pledge($who, $show_signature, $login_options, $expected, $byarea);
 }
 
 # Change the date that all parts of PledgeBank think is today.  Call with no
@@ -1330,6 +1356,42 @@ sub do_category_tests {
     # Change to normal pages again
     $wth->browser_get($base_url);
     lock_locale_url();
+}
+
+#############################################################################
+sub do_byarea_tests {
+    set_pb_date('1984-09-01');
+    $wth->browser_get($base_url);
+    lock_locale_url();
+
+    # Make a by area pledge
+    my $pledge_action_boo = 'start a local group for people who like to shout "boo!"';
+    my $pledge_ref_boo = "boogroup";
+    create_pledge(400, 
+        { title => $pledge_action_boo, 
+            target => '2', type => 'surprisers', signup => 'come to the first meeting',
+            date => 'oct 8', ref => $pledge_ref_boo },
+        { country => 'GB', 'local' => 0 }, 
+        { },
+        { action => "viaemail", setpassword => 1 }
+    );
+    set_pledge_prominence($pledge_ref_boo, 'frontpage');
+    call_frequentupdate(); # update prominence cache
+    # For now, make it a byarea one directly in the database
+    dbh()->do('update pledges set target_type = ? where ref = ?', {}, 'byarea', $pledge_ref_boo);
+    dbh()->commit();
+
+    # Sign it in a few places
+    find_and_sign_pledge("ref", $pledge_ref_boo, 401, 1, 
+        {action=>"viaemail",setpassword=>1}, "signed", 1);
+    find_and_sign_pledge("ref", $pledge_ref_boo, 402, 1, 
+        {action=>"viaemail",setpassword=>1}, "signed", 1);
+    find_and_sign_pledge("ref", $pledge_ref_boo, 403, 1, 
+        {action=>"viaemail",setpassword=>1}, "signed", 1);
+    find_and_sign_pledge("ref", $pledge_ref_boo, 404, 1, 
+        {action=>"viaemail",setpassword=>1}, "signed", 1);
+    find_and_sign_pledge("ref", $pledge_ref_boo, 405, 1, 
+        {action=>"viaemail",setpassword=>1}, "signed", 1);
 }
 
 #############################################################################

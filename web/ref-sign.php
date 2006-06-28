@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.39 2006-06-27 17:27:28 francis Exp $
+// $Id: ref-sign.php,v 1.40 2006-06-28 13:54:41 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -28,9 +28,11 @@ if (is_array($errors)) {
     if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == 'NOTICE') {
         unset($errors['gaze_place']); # remove NOTICE
     }
-    print '<div id="errors"><ul><li>';
-    print join ('</li><li>', $errors);
-    print '</li></ul></div>';
+    if ($errors) {
+        print '<div id="errors"><ul><li>';
+        print join ('</li><li>', $errors);
+        print '</li></ul></div>';
+    }
     $p->render_box(array('showdetails'=>false));
     $p->sign_box($errors, $location);
 }
@@ -90,23 +92,37 @@ function do_sign(&$location) {
 
         $byarea_location_id = null;
         if ($pledge->byarea()) {
-            $byarea_location_id = db_getOne("select nextval('location_id_seq')");
             list($lat, $lon, $desc) = explode('|', $location['gaze_place'], 3);
             $location['wgs84_lat'] = $lat;
             $location['wgs84_lon'] = $lon;
             $location['description'] = $desc;
             $location['input'] = $location['place'];
             $location['method'] = "Gaze";
-            db_query("
-                    insert into location
-                        (id, country, state, method, input, latitude, longitude, description)
-                    values (?, ?, ?, ?, ?, ?, ?, ?)", array(
-                        $byarea_location_id,
-                        $location['country'], $location['state'],
-                        $location['method'], $location['input'],
-                        $location['wgs84_lat'], $location['wgs84_lon'],
-                        $location['description']
+
+            $already_id = db_getOne("select location.id from signers 
+                    left join location on signers.byarea_location_id = location.id
+                    where signers.pledge_id = ? and
+                        country = ? 
+                        and latitude = ? and longitude = ?",
+                    array($pledge->id(),
+                    $location['country'], /* deliberately no state, as can be null */
+                    $location['wgs84_lat'], $location['wgs84_lon'],
                     ));
+            if ($already_id) {
+                $byarea_location_id = $already_id;
+            } else {
+                $byarea_location_id = db_getOne("select nextval('location_id_seq')");
+                db_query("
+                        insert into location
+                            (id, country, state, method, input, latitude, longitude, description)
+                        values (?, ?, ?, ?, ?, ?, ?, ?)", array(
+                            $byarea_location_id,
+                            $location['country'], $location['state'],
+                            $location['method'], $location['input'],
+                            $location['wgs84_lat'], $location['wgs84_lon'],
+                            $location['description']
+                        ));
+            }
         }
         
         db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge->id(), ($P->has_name() ? $P->name() : null), $P->id(), $q_showname ? 't' : 'f', $_SERVER['REMOTE_ADDR'], $byarea_location_id));

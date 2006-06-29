@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.173 2006-06-28 13:54:40 francis Exp $
+ * $Id: pledge.php,v 1.174 2006-06-29 13:36:31 francis Exp $
  * 
  */
 
@@ -34,7 +34,7 @@ class Pledge {
                                '$pb_today' <= pledges.date AS open,
                                (SELECT count(*) FROM signers WHERE 
                                     signers.pledge_id = pledges.id) AS signers,
-                               person.email AS email,
+                                person.email AS email,
                                country, state, description, method, latitude, longitude
                            FROM pledges
                            LEFT JOIN person ON person.id = pledges.person_id 
@@ -150,6 +150,27 @@ class Pledge {
     function target() { return $this->data['target']; }
     function signers() { return $this->data['signers']; }
     function left() { return $this->data['left']; }
+
+    function byarea_successes() { 
+        if (!array_key_exists('successful_areas', $this->data)) {
+            $this->data['successful_areas'] = 
+                    db_getOne("SELECT count(*) FROM byarea_location 
+                    WHERE byarea_location.pledge_id = ?
+                    AND whensucceeded IS NOT NULL
+                    ", $this->id());
+        }
+        return $this->data['successful_areas']; 
+    }
+    function byarea_signups() { 
+        if (!array_key_exists('signup_areas', $this->data)) {
+            $this->data['signup_areas'] = 
+                    db_getOne("SELECT count(*) FROM byarea_location 
+                    WHERE byarea_location.pledge_id = ?
+                    ", $this->id());
+        }
+        return $this->data['signup_areas']; 
+    }
+
 
     function probable_will_reach() { 
         if (!array_key_exists('probable_will_reach', $this->data)) {
@@ -446,14 +467,11 @@ class Pledge {
     <input type="hidden" name="add_signatory" value="1">
     <input type="hidden" name="pledge" value="<?=htmlspecialchars($this->ref()) ?>">
     <input type="hidden" name="ref" value="<?=htmlspecialchars($this->ref()) ?>">
-    <?  print h2(_('Sign up now'));
+    <?  print h2($this->byarea() ? _('Sign up where you live') : _('Sign up now'));
         if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
         $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
         print '<p><strong>';
-        if ($this->byarea())
-            printf(_('I, %s, sign up to the pledge in my local area.'), $namebox);
-        else 
-            printf(_('I, %s, sign up to the pledge.'), $namebox);
+        printf(_('I, %s, sign up to the pledge.'), $namebox);
         print '</strong><br></p>';
         print '<p>
     <small>

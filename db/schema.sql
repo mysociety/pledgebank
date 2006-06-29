@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.190 2006-06-27 17:27:27 francis Exp $
+-- $Id: schema.sql,v 1.191 2006-06-29 13:36:31 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -213,6 +213,17 @@ create table pledges (
         cached_prominence = 'backpage'
     )
 );
+
+-- Contains an entry for each town for which a pledge with target "by area" has
+-- been created
+create table byarea_location (
+    pledge_id integer not null references pledges(id),
+    byarea_location_id integer references location(id),
+
+    whensucceeded timestamp
+);
+
+create unique index byarea_location_pledge_id_byarea_location_id_idx on byarea_location(pledge_id, byarea_location_Id);
 
 -- Create a trigger to update the last-change-time for the pledge on any
 -- update to the table. This should cover manual edits only; anything else
@@ -987,6 +998,9 @@ create table message (
     sendtocreator boolean not null,
     sendtosigners boolean not null,
     sendtolatesigners boolean not null,
+    -- if set, then messages only go to signers who signed with given location
+    -- (this is for byarea type pledges)
+    byarea_location_id integer references location(id),
 
     -- content of message
     emailtemplatename text,

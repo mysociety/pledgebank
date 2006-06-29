@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.40 2006-06-28 13:54:41 francis Exp $
+// $Id: ref-sign.php,v 1.41 2006-06-29 13:36:31 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -99,11 +99,10 @@ function do_sign(&$location) {
             $location['input'] = $location['place'];
             $location['method'] = "Gaze";
 
-            $already_id = db_getOne("select location.id from signers 
-                    left join location on signers.byarea_location_id = location.id
-                    where signers.pledge_id = ? and
-                        country = ? 
-                        and latitude = ? and longitude = ?",
+            $already_id = db_getOne("select byarea_location_id from byarea_location 
+                    left join location on location.id = byarea_location.byarea_location_id
+                    where pledge_id = ? and
+                        country = ? and latitude = ? and longitude = ?",
                     array($pledge->id(),
                     $location['country'], /* deliberately no state, as can be null */
                     $location['wgs84_lat'], $location['wgs84_lon'],
@@ -112,8 +111,7 @@ function do_sign(&$location) {
                 $byarea_location_id = $already_id;
             } else {
                 $byarea_location_id = db_getOne("select nextval('location_id_seq')");
-                db_query("
-                        insert into location
+                db_query("insert into location
                             (id, country, state, method, input, latitude, longitude, description)
                         values (?, ?, ?, ?, ?, ?, ?, ?)", array(
                             $byarea_location_id,
@@ -122,6 +120,11 @@ function do_sign(&$location) {
                             $location['wgs84_lat'], $location['wgs84_lon'],
                             $location['description']
                         ));
+                db_query("insert into byarea_location
+                            (pledge_id, byarea_location_id)
+                            values (?, ?)", array(
+                            $pledge->id(),
+                            $byarea_location_id));
             }
         }
         

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.71 2006-03-23 13:37:50 chris Exp $
+ * $Id: frequentupdate,v 1.72 2006-06-29 13:36:30 francis Exp $
  *
  */
 
@@ -56,13 +56,13 @@ Usage: frequentupdate [--verbose]
 
 // Main code at end.
 
-/* mark_pledges_successful
- * Mark pledges which have exceeded their target as successful, and dispatch
- * automatic success messages. */
-function mark_pledges_successful() {
+/* mark_overall_pledges_successful
+ * Mark normal pledges which have exceeded their target as successful, and
+ * dispatch automatic success messages. */
+function mark_overall_pledges_successful() {
     global $pb_today, $pb_timestamp;
 
-    verbose("finding newly successful pledges");
+    verbose("finding newly successful overall pledges");
 
     /* Do a query for completed pledges on the unlocked table -- no point in
      * locking the table just to test this, since the later queries are
@@ -72,7 +72,8 @@ function mark_pledges_successful() {
             where whensucceeded is null
                 and '$pb_today' <= date
                 and (select count(id) from signers
-                    where pledge_id = pledges.id) >= target")) {
+                    where pledge_id = pledges.id) >= target
+                and target_type = 'overall'")) {
         verbose("... no newly successful pledges");
         return;
     }
@@ -84,6 +85,7 @@ function mark_pledges_successful() {
                 and '$pb_today' <= date
                 and (select count(id) from signers
                     where pledge_id = pledges.id) >= target
+                and target_type = 'overall'
             for update");
 
     while ($pledge = db_fetch_array($q)) {
@@ -119,7 +121,85 @@ function mark_pledges_successful() {
     }
 
     db_commit();
-    verbose("finished newly successful pledges");
+    verbose("finished newly successful overall pledges");
+}
+
+/* mark_byarea_pledges_successful
+ * Mark byarea pledges which have exceeded their target in a new town as
+ * successful, and dispatch automatic success messages. */
+function mark_byarea_pledges_successful() {
+    global $pb_today, $pb_timestamp;
+
+    verbose("finding newly successful byarea pledges");
+
+    /* Do a query for completed pledges on the unlocked table -- no point in
+     * locking the table just to test this, since the later queries are
+     * idempotent anyway. */
+    if (!db_getOne("
+            select pledges.id, byarea_location_id from pledges, byarea_location
+            where byarea_location.pledge_id = pledges.id
+                and byarea_location.whensucceeded is null
+                and '$pb_today' <= date
+                and (select count(id) from signers
+                    where pledge_id = pledges.id 
+                    and signers.byarea_location_id = byarea_location.byarea_location_id)
+                    >= target
+                and target_type = 'byarea'
+                ")) {
+        verbose("... no newly successful byarea pledges");
+        return;
+    }
+    
+    db_query("lock table message in exclusive mode");
+    $q = db_query("
+            select pledges.*, byarea_location_id from pledges, byarea_location
+            where byarea_location.pledge_id = pledges.id
+                and byarea_location.whensucceeded is null
+                and '$pb_today' <= date
+                and (select count(id) from signers
+                    where pledge_id = pledges.id 
+                    and signers.byarea_location_id = byarea_location.byarea_location_id)
+                    >= target
+                and target_type = 'byarea'
+            for update");
+
+    while ($pledge = db_fetch_array($q)) {
+        verbose("pledge #${pledge['id']} (${pledge['ref']}) for area ${pledge['byarea_location_id']} has succeeded");
+    
+        db_query("
+                update byarea_location
+                set whensucceeded = '$pb_timestamp'
+                where pledge_id = ? and byarea_location_id = ?", 
+                array($pledge['id'], $pledge['byarea_location_id']));
+        
+        /* Set up messages to go to creator and signers. */
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendtolatesigners,
+                    emailtemplatename
+                ) values (
+                    ?, 'success-auto-creator',
+                    true, false, false,
+                    'succeeded-creator'
+                )", $pledge['id']);
+
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendtolatesigners,
+                    byarea_location_id,
+                    emailtemplatename
+                ) values (
+                    ?, 'success-auto-signers',
+                    false, true, false,
+                    ?,
+                    'succeeded-signer'
+                )", $pledge['id'], $pledge['byarea_location_id']);
+    }
+
+    db_commit();
+    verbose("finished newly successful byarea pledges");
 }
 
 /* send_pledge_success_reminder
@@ -181,11 +261,11 @@ function send_pledge_success_reminder() {
     verbose("finished finding pledges with no announcement messages for reminder");
 }
 
-/* send_automatic_failure_messages
- * Send automatic pledge failure messages for pledges which have failed
- * (passed their deadline without the number of signers reaching the
- * threshold) and for which no such message has previously been sent. */
-function send_automatic_failure_messages() {
+/* send_automatic_failure_messages_overall
+ * Send automatic pledge failure messages for normal pledges which have failed
+ * (passed their deadline without the number of signers reaching the threshold)
+ * and for which no such message has previously been sent. */
+function send_automatic_failure_messages_overall() {
     global $pb_today;
 
     verbose("finding newly failed pledges");
@@ -199,6 +279,7 @@ function send_automatic_failure_messages() {
                         from message
                         where pledge_id = pledges.id
                         and circumstance = 'failure-auto-creator') is null
+                    and target_type = 'overall'
                 for update")) {
         verbose("... no newly failed pledges");
         return;
@@ -213,6 +294,7 @@ function send_automatic_failure_messages() {
                         from message
                         where pledge_id = pledges.id
                         and circumstance = 'failure-auto-creator') is null
+                    and target_type = 'overall'
                 for update");
 
     while ($pledge = db_fetch_array($q)) {
@@ -509,6 +591,8 @@ function send_pending_messages() {
                         from message_signer_recipient
                         where message_id = message.id
                             and signer_id = signers.id) is null
+                    and (message.byarea_location_id is null or 
+                         message.byarea_location_id = signers.byarea_location_id)
                 order by whencreated desc');
         /* XXX ugly. For a raw email we will transmit the (possibly large)
          * body of the mail over the wire once for each row. Should do a
@@ -651,8 +735,9 @@ function compute_prominences() {
 db_connect();
 
 compute_prominences();
-mark_pledges_successful();
-send_automatic_failure_messages();
+mark_overall_pledges_successful();
+mark_byarea_pledges_successful();
+send_automatic_failure_messages_overall();
 chivvy_creators_early();
 chivvy_creators_lowrate();
 send_pledge_success_reminder();

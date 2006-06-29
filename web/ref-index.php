@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.77 2006-06-27 17:27:28 francis Exp $
+// $Id: ref-index.php,v 1.78 2006-06-29 13:36:31 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -60,7 +60,18 @@ function draw_status_plaque($p) {
         print '<p id="finished">' . _('This pledge is now closed, as its deadline has passed.') . '</p>';
     }
     if ($p->byarea()) {
-        // TODO: Show number of times, and places, of success for "by area" pledges
+        if ($p->byarea_successes() > 0) {
+            print '<p id="success">';
+            print sprintf(
+                ngettext('This pledge has been successful in <strong>%d place</strong>!',
+                        'This pledge has been successful in <strong>%d places</strong>!',
+                        $p->byarea_successes()), 
+                $p->byarea_successes());
+            if (!$p->finished()) {
+                print '<br>' . _('<strong>You can still sign up</strong>, to help make it successful where you live.');
+            }
+            print '</p>';
+        }
     } else if ($p->left() <= 0) {
         if ($p->exactly()) {
             print '<p id="finished">' . _('This pledge is now closed, as its target has been reached.') . '</p>';
@@ -148,24 +159,53 @@ function draw_signatories($p) {
                 . sprintf(_('%s, the Pledge Creator, joined by:'), htmlspecialchars($p->creator_name()))
                 . '</p>';
 
-    $out .= "<ul>";
-  
     $anon = 0;
     $unknownname = 0;
-
-    $query = "SELECT signers.*, location.description as location_description, location.country as location_country
-        from signers LEFT JOIN location on location.id = signers.byarea_location_id WHERE pledge_id = ? ORDER BY id";
+    
+    $order_by = "ORDER BY id";
+    $extra_select = "";
+    $extra_join = "";
+    if ($p->byarea()) {
+        $order_by = "ORDER BY signers.byarea_location_id, id";
+        $extra_select = ", byarea_location.whensucceeded";
+        $extra_join = "LEFT JOIN byarea_location ON byarea_location.byarea_location_id = signers.byarea_location_id AND byarea_location.pledge_id = signers.pledge_id";
+    }
+    $query = "SELECT signers.*, 
+            location.description as location_description, location.country as location_country
+            $extra_select
+        from signers 
+        LEFT JOIN location on location.id = signers.byarea_location_id 
+        $extra_join
+        WHERE signers.pledge_id = ? $order_by";
     if ($limit) {
         $query .= " LIMIT " . MAX_PAGE_SIGNERS . " OFFSET " . ($nsigners - MAX_PAGE_SIGNERS);
     }
     $q = db_query($query, $p->id());
+    $last_location_description = "";
+    $in_ul = false;
     while ($r = db_fetch_array($q)) {
         $showname = ($r['showname'] == 't');
         if ($showname) {
             if (isset($r['name'])) {
+                if ($p->byarea() && $last_location_description != $r['location_description']) {
+                    if ($in_ul)  {
+                        $out .= "</ul>";
+                        $in_ul = false;
+                    }
+                    $out .= "<h3>" . $r['location_description'] . "</h3>";
+                    if ($r['whensucceeded']) {
+                        $out .= '<p id="success">';
+                        $out .= sprintf(_("This pledge succeeded for %s on %s."), $r['location_description'], prettify($r['whensucceeded']));
+                        $out .= '</p>';
+                    }
+                    $last_location_description = $r['location_description'];
+                }
+                if (!$in_ul) {
+                    $out .= "<ul>";
+                    $in_ul = true;
+                }
                 $out .= '<li>'
                         . htmlspecialchars($r['name'])
-                        . ($p->byarea() ? ' ('.$r['location_description'].')' : '')
                         . '</li>';
             } else {
                 ++$unknownname;
@@ -188,9 +228,16 @@ function draw_signatories($p) {
                 $extra .= sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $unknownname), $unknownname);
             }
         }
+        if (!$in_ul) {
+            print "<ul>";
+            $in_ul = true;
+        }
         print "<li>$extra</li>";
     }
-    print '</ul>';
+    if ($in_ul) {
+        print "</ul>";
+        $in_ul = false;
+    }
     if ($showall_para) {
         print p($showall_nav);
         print p($showall_para);

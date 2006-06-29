@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.179 2006-06-28 13:54:39 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.180 2006-06-29 13:36:30 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -434,7 +434,9 @@ sub sign_pledge {
         my $fields = { name => name_n($who), email => email_n($who), showname => $show_signature };
         if ($byarea) {
             $wth->browser_check_contents("sign up to the pledge in my local area");
-            $fields->{'country'} = location_n($who)->{'country'};
+            # This gives warnings about read only when it is a hidden field,
+            # need to do something neater to know if the pledge requires it or not.
+            #$fields->{'country'} = location_n($who)->{'country'};
             $fields->{'place'} = location_n($who)->{'place'};
         }
         $wth->browser_submit_form(form_name => 'pledge',
@@ -1365,11 +1367,11 @@ sub do_byarea_tests {
     lock_locale_url();
 
     # Make a by area pledge
-    my $pledge_action_boo = 'start a local group for people who like to shout "boo!"';
+    my $pledge_action_boo = 'start a group for people who like to shout "boo!"';
     my $pledge_ref_boo = "boogroup";
     create_pledge(400, 
         { title => $pledge_action_boo, 
-            target => '2', type => 'surprisers', signup => 'come to the first meeting',
+            target => '3', type => 'other surprisers from my town', signup => 'come to the first meeting',
             date => 'oct 8', ref => $pledge_ref_boo },
         { country => 'GB', 'local' => 0 }, 
         { },
@@ -1392,6 +1394,8 @@ sub do_byarea_tests {
         {action=>"viaemail",setpassword=>1}, "signed", 1);
     find_and_sign_pledge("ref", $pledge_ref_boo, 405, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", 1);
+    print "EARLY EXIT";
+    exit;
 }
 
 #############################################################################

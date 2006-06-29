@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.2 2006-06-27 17:27:27 francis Exp $
+// $Id: gaze-controls.php,v 1.3 2006-06-29 23:05:06 francis Exp $
 
 // TODO: 
 // - Alter new.php to call these functions, rather than have its own,
@@ -228,6 +228,7 @@ function pb_gaze_get_location() {
         $location['postcode'] = $location['place'];
         $location['place'] = null;
     }
+    $location['places'] = null;
     return $location;
 }
 

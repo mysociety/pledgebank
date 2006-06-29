@@ -77,12 +77,25 @@ Sent to creator 3 days after a pledge succeeds, if they haven't sent a success
 announce message.
   - actual, exceeded_or_met as above
 
+* succeeded-creator-byarea
+Sent to creator when a pledge with a target by area succeeds. Parameters
+as for succeed-creator, with additionally:
+  - location_description, name of town where success has happened
+  - byarea_success_count, how many successful towns there are 
+
 * succeeded-signer
 Sent to each signer when a pledge succeeds.
   - execeeded_or_met, either the word "met" or "exceeded" according to whether
     pledge went over target or not.
   - signer_name, name of the signer this email is going to.
   - local_alert_url, for signup to local email alerts
+
+* succeeded-signer-byarea
+Sent to each signer when a by area pledge succeeds. Parameters as for
+succeeded-signer, with additionally:
+  - location_description, name of town where success has happened
+  - byarea_success_count, how many successful towns there are (note that
+    this can increase for late signers, if other town succeed in between)
 
 ***************************************************************************
 

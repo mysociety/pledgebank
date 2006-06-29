@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.180 2006-06-29 13:36:30 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.181 2006-06-29 17:12:29 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -136,9 +136,13 @@ sub name_n { my $n = shift; return ($n % 100  == 0) ? "Peter Setter $n" : "Siegf
 sub mobile_n { my $n = shift; return "9876543$n"; }
 sub password_n { my $n = shift; return "mypass$n"; }
 sub location_n { my $n = shift; 
-    return ($n % 2 == 0) ? 
-        { country => 'GB', place => 'Hexham' } 
-        : { country => 'GB', place => 'Liverpool' } 
+    if ($n % 3 == 0) {
+        return { country => 'GB', place => 'Hexham' }
+    } elsif ($n % 3 == 1) {
+        return { country => 'GB', place => 'Liverpool' } 
+    } else {
+        return { country => 'GB', place => 'Southampton' } 
+    }
 } # for byarea pledge signing
 our $login_count; # reference to hash of person number => how many times they've logged in
 our $name_admin = "\"PledgeBank.com\"";
@@ -430,10 +434,14 @@ sub sign_pledge {
 
     # Sign up now, unless we are resuming abandoned signup
     if ($login_action ne "resume") {
-        $wth->browser_check_contents("Sign up now");
+        if ($byarea) {
+            $wth->browser_check_contents("Sign up where you live");
+        } else { 
+            $wth->browser_check_contents("Sign up now");
+        }
         my $fields = { name => name_n($who), email => email_n($who), showname => $show_signature };
         if ($byarea) {
-            $wth->browser_check_contents("sign up to the pledge in my local area");
+            $wth->browser_check_contents("Your town:");
             # This gives warnings about read only when it is a hidden field,
             # need to do something neater to know if the pledge requires it or not.
             #$fields->{'country'} = location_n($who)->{'country'};
@@ -1369,9 +1377,9 @@ sub do_byarea_tests {
     # Make a by area pledge
     my $pledge_action_boo = 'start a group for people who like to shout "boo!"';
     my $pledge_ref_boo = "boogroup";
-    create_pledge(400, 
+    create_pledge(600, 
         { title => $pledge_action_boo, 
-            target => '3', type => 'other surprisers from my town', signup => 'come to the first meeting',
+            target => '2', type => 'other surprisers from my town', signup => 'come to the first meeting',
             date => 'oct 8', ref => $pledge_ref_boo },
         { country => 'GB', 'local' => 0 }, 
         { },
@@ -1384,16 +1392,46 @@ sub do_byarea_tests {
     dbh()->commit();
 
     # Sign it in a few places
-    find_and_sign_pledge("ref", $pledge_ref_boo, 401, 1, 
+    find_and_sign_pledge("ref", $pledge_ref_boo, 601, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", 1);
-    find_and_sign_pledge("ref", $pledge_ref_boo, 402, 1, 
+    find_and_sign_pledge("ref", $pledge_ref_boo, 602, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", 1);
-    find_and_sign_pledge("ref", $pledge_ref_boo, 403, 1, 
+    find_and_sign_pledge("ref", $pledge_ref_boo, 603, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", 1);
-    find_and_sign_pledge("ref", $pledge_ref_boo, 404, 1, 
+    call_frequentupdate();
+    $wth->email_check_none_left();
+    $wth->log_watcher_check();
+
+    # This will provoke success in Liverpool
+    find_and_sign_pledge("ref", $pledge_ref_boo, 604, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", 1);
-    find_and_sign_pledge("ref", $pledge_ref_boo, 405, 1, 
+    call_frequentupdate();
+    my $success_email = $wth->email_get_containing( '%To: '.email_n(600).'%We are pleased to tell you that your pledge%Liverpool%');
+    die "Success email link not found\n" if ($success_email !~ m#^\s*(http://.*$)#m);
+    my $announce_link = $1;
+    $wth->email_get_containing( '%To: '.email_n(601).'%We are pleased to tell you that the pledge%Liverpool%');
+    $wth->email_get_containing( '%To: '.email_n(604).'%We are pleased to tell you that the pledge%Liverpool%');
+    $wth->email_check_none_left();
+    $wth->log_watcher_check();
+
+    # This will provoke success in Southampton
+    find_and_sign_pledge("ref", $pledge_ref_boo, 605, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", 1);
+    call_frequentupdate();
+    my $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%We are pleased to tell you that your pledge%Southampton%');
+    die "Success email link not found\n" if ($success_email_1 !~ m#^\s*(http://.*$)#m);
+    my $announce_link_1 = $1;
+    $wth->email_get_containing( '%To: '.email_n(602).'%We are pleased to tell you that the pledge%Southampton%');
+    $wth->email_get_containing( '%To: '.email_n(605).'%We are pleased to tell you that the pledge%Southampton%');
+    $wth->email_check_none_left();
+    $wth->log_watcher_check();
+
+    # Check display on pledge page
+    $wth->browser_get($locale_url . "/$pledge_ref_boo");
+    $wth->browser_check_contents("This pledge has been successful in <strong>2 places</strong>!");
+    $wth->log_watcher_check();
+
+
     print "EARLY EXIT";
     exit;
 }

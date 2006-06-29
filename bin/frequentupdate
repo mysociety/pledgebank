@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.72 2006-06-29 13:36:30 francis Exp $
+ * $Id: frequentupdate,v 1.73 2006-06-29 17:12:28 francis Exp $
  *
  */
 
@@ -177,12 +177,14 @@ function mark_byarea_pledges_successful() {
                 insert into message (
                     pledge_id, circumstance,
                     sendtocreator, sendtosigners, sendtolatesigners,
+                    byarea_location_id,
                     emailtemplatename
                 ) values (
-                    ?, 'success-auto-creator',
+                    ?, 'success-auto-creator-byarea',
                     true, false, false,
-                    'succeeded-creator'
-                )", $pledge['id']);
+                    ?,
+                    'succeeded-creator-byarea'
+                )", $pledge['id'], $pledge['byarea_location_id']);
 
         db_query("
                 insert into message (
@@ -191,10 +193,10 @@ function mark_byarea_pledges_successful() {
                     byarea_location_id,
                     emailtemplatename
                 ) values (
-                    ?, 'success-auto-signers',
+                    ?, 'success-auto-signers-byarea',
                     false, true, false,
                     ?,
-                    'succeeded-signer'
+                    'succeeded-signer-byarea'
                 )", $pledge['id'], $pledge['byarea_location_id']);
     }
 
@@ -515,6 +517,7 @@ function send_pending_messages() {
          * later on we'll need to move it into message, so that we can send
          * reminders. */
         if ($msg['circumstance'] == 'success-auto-creator' or
+            $msg['circumstance'] == 'success-auto-creator-byarea' or
             $msg['circumstance'] == 'success-auto-creator-reminder' or
             $msg['circumstance'] == 'failure-auto-creator' or
             $msg['circumstance'] == 'announce-post') {
@@ -529,6 +532,17 @@ function send_pending_messages() {
                     " . pb_chivvy_probable_will_reach_clause() . "
                     from pledges where id = ?", $pledge->id());
             $data['probable_will_reach'] = $probable_will_reach;
+        }
+        // Description of town that success is for
+        if ($msg['circumstance'] == 'success-auto-creator-byarea') {
+            list($location_description, $byarea_success_count) = 
+                    db_getRow("select description,
+                    (select count(*) from byarea_location where byarea_location.pledge_id = ?
+                    and whensucceeded is not null) as byarea_successes
+                    from location where location.id = ?", 
+                    $pledge->id(), $msg['byarea_location_id']);
+            $data['location_description'] = $location_description;
+            $data['byarea_success_count'] = $byarea_success_count;
         }
 
         // Case when it is a copy sent to creator
@@ -642,11 +656,23 @@ function send_pending_messages() {
             locale_push($pledge->lang());
             /* Local alert signup link */
             $data = $pledge->data;
-            if ($r['emailtemplatename'] == 'succeeded-signer') {
+            if ($r['emailtemplatename'] == 'succeeded-signer' ||
+                $r['emailtemplatename'] == 'succeeded-signer-byarea' ) {
                 $data['local_alert_url'] = pb_person_make_signon_url(null, $r['signer_email'], "GET", 
                         pb_domain_url(array('path'=>"/alert")), array());
             }
-            /* Send email template. */
+            // Description of town that success is for
+            if ($r['emailtemplatename'] == 'succeeded-signer-byarea') {
+                list($location_description, $byarea_success_count) = 
+                        db_getRow("select description,
+                        (select count(*) from byarea_location where byarea_location.pledge_id = ?
+                        and whensucceeded is not null) as byarea_successes
+                        from location where location.id = ?", 
+                        $pledge->id(), $r['byarea_location_id']);
+                $data['location_description'] = $location_description;
+                $data['byarea_success_count'] = $byarea_success_count;
+            }
+                /* Send email template. */
             verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
             $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $data, $headers);
             locale_pop();

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.78 2006-06-29 13:36:31 francis Exp $
+// $Id: ref-index.php,v 1.79 2006-06-29 17:12:30 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -61,7 +61,7 @@ function draw_status_plaque($p) {
     }
     if ($p->byarea()) {
         if ($p->byarea_successes() > 0) {
-            print '<p id="success">';
+            print '<p class="success">';
             print sprintf(
                 ngettext('This pledge has been successful in <strong>%d place</strong>!',
                         'This pledge has been successful in <strong>%d places</strong>!',
@@ -76,7 +76,7 @@ function draw_status_plaque($p) {
         if ($p->exactly()) {
             print '<p id="finished">' . _('This pledge is now closed, as its target has been reached.') . '</p>';
         } else {
-            print '<p id="success">' . _('This pledge has been successful!');
+            print '<p class="success">' . _('This pledge has been successful!');
             if (!$p->finished()) {
                 print '<br>' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');
             }
@@ -194,7 +194,7 @@ function draw_signatories($p) {
                     }
                     $out .= "<h3>" . $r['location_description'] . "</h3>";
                     if ($r['whensucceeded']) {
-                        $out .= '<p id="success">';
+                        $out .= '<p class="success">';
                         $out .= sprintf(_("This pledge succeeded for %s on %s."), $r['location_description'], prettify($r['whensucceeded']));
                         $out .= '</p>';
                     }

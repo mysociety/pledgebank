@@ -1,0 +1,21 @@
+Subject: Pledge successful in <?=$values['location_description']?> - '<?=$values['title']?>' at PledgeBank.com
+
+Congratulations!
+
+We are pleased to tell you that your pledge <?=$values['exceeded_or_met']?> its
+target for people in <?=$values['location_description']?> in the required time.
+Your pledge reads: '<?=$values['sentence_first']?>'
+
+Next, please click on the link below and write a message to tell everyone who
+signed the pledge in <?=$values['location_description']?> what you want them to
+do next.
+
+<?=$values['url']?>
+
+There are now <?=$values['byarea_success_count']?> places where your pledge has
+been successful.
+
+wE LOve getting photos of people fulfilling their pledges, so why not
+ask them to take some pics?
+
+<?=$values['signature']?>

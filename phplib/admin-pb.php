@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.128 2006-06-21 19:33:10 francis Exp $
+ * $Id: admin-pb.php,v 1.129 2006-07-03 09:51:24 francis Exp $
  * 
  */
 
@@ -258,7 +258,7 @@ class ADMIN_PAGE_PB_MAIN {
             print '<input type="hidden" name="update_country" value="1">';
             print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
             print _('Country:') . ' ';
-            pb_view_gaze_country_choice($pdata['country'], $pdata['state'], array(), array());
+            gaze_controls_print_country_choice($pdata['country'], $pdata['state'], array(), array());
             print '<input name="update" type="submit" value="Update">';
             if (array_key_exists('description', $pdata) && $pdata['description'])
                 print '<br>Place: <b>' . $pdata['description'].'</b>';

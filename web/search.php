@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.50 2006-06-07 15:56:13 chris Exp $
+// $Id: search.php,v 1.51 2006-07-03 09:51:24 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -173,7 +173,8 @@ function search($search) {
     global $countries_code_to_name;
     $change_country = pb_get_change_country_link();
     if (microsites_site_country()) {
-        $places = pb_gaze_find_places(microsites_site_country(), null, $search, 5, 70);
+        $places = gaze_find_places(microsites_site_country(), null, $search, 5, 70);
+        gaze_check_error($places);
         if (count($places) > 0) {
             $success = 1;
             $out = "";

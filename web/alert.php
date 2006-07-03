@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.56 2006-06-27 17:27:28 francis Exp $
+// $Id: alert.php,v 1.57 2006-07-03 09:51:24 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -17,7 +17,7 @@ require_once '../../phplib/gaze.php';
 
 // Get any inputs and process a bit
 $email = get_http_var('email');
-$location = pb_gaze_get_location();
+$location = gaze_controls_get_location();
 
 $track = get_http_var('track');
 
@@ -58,7 +58,7 @@ function do_local_alert_subscribe(&$location) {
     $errors = array();
     if (!$email) $errors['email'] = _("Please enter your email address");
     if (!validate_email($email)) $errors['email'] = _("Please enter a valid email address");
-    pb_gaze_validate_location($location, $errors);
+    gaze_controls_validate_location($location, $errors);
 
     if (count($errors))
         return $errors;
@@ -126,12 +126,12 @@ function local_alert_subscribe_box($location, $errors = array()) {
 </p>
 
 <p><strong><?=_('Country:') ?></strong>
-<? pb_view_gaze_country_choice($location['country'], $location['state'], $errors, array('noglobal'=>true, 'gazeonly'=>true)); ?>
+<? gaze_controls_print_country_choice($location['country'], $location['state'], $errors, array('noglobal'=>true, 'gazeonly'=>true)); ?>
 </p>
 
 <div id="ifyes_line">
 <strong><?=_("Where in that country?")?></strong>
-<? pb_view_gaze_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode']); ?>
+<? gaze_controls_print_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode']); ?>
 </div>
 
 <p><input type="submit" name="submit" value="<?=_('Subscribe') ?>"></p>

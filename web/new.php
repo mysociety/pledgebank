@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.136 2006-06-27 17:27:28 francis Exp $
+// $Id: new.php,v 1.137 2006-07-03 09:51:24 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -284,10 +284,10 @@ function pledge_form_two($data, $errors = array()) {
     $places = null;
     if ($place) {
         # Look up nearby places
-        $places = pb_gaze_find_places($country, $state, $place, 10, 0);
+        $places = gaze_controls_find_places($country, $state, $place, 10, 0);
         if (array_key_exists('gaze_place', $errors)) {
             if (count($places) > 0) {
-                # message printed in pb_view_gaze_place_choice
+                # message printed in gaze_controls_print_place_choice
             } else {
                 $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
                 htmlspecialchars($place));
@@ -321,7 +321,7 @@ is fulfilled?
 </p> */?>
 
 <p><?=_('Which country does your pledge apply to?') ?>
-<? pb_view_gaze_country_choice($country, $state, $errors); ?>
+<? gaze_controls_print_country_choice($country, $state, $errors); ?>
 </p>
 
 <p id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?>
@@ -338,7 +338,7 @@ print _('If yes, choose where.');
 $gaze_with_state = $data['gaze_place'];
 if ($state)
     $gaze_with_state .= ", " . $state;
-pb_view_gaze_place_choice($place, $gaze_with_state, $places, $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null); 
+gaze_controls_print_place_choice($place, $gaze_with_state, $places, $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null); 
 ?>
 
 <p style="text-align: right;">
@@ -650,10 +650,10 @@ function step2_error_check(&$data) {
             else if ($data['local']) {
                 // Find exact matches
                 if ($data['place']) {
-                    $places = pb_gaze_find_places($country, $state, $data['place'], 10, 0);
-                    $have_exact = have_exact_gaze_match($places, $data['place']);
+                    $places = gaze_controls_find_places($country, $state, $data['place'], 10, 0);
+                    $have_exact = _gaze_controls_exact_match($places, $data['place']);
                     if ($have_exact) {
-                        list($desc, $radio_name) = pb_get_gaze_place_details($have_exact);
+                        list($desc, $radio_name) = gaze_controls_get_place_details($have_exact);
                         $data['gaze_place'] = $radio_name;
                         $data['prev_place'] = $data['place'];
                         $data['prev_country'] = $data['country'];

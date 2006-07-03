@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.140 2006-06-27 17:27:27 francis Exp $
+// $Id: fns.php,v 1.141 2006-07-03 09:51:24 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -476,7 +476,7 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 <input type="hidden" name="country" value="<?=$force_country?>">
 <span style="white-space: nowrap"><?=_('Postcode:')?>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <? } else { ?>
-<span style="white-space: nowrap"><?=_('Country:') ?> <? pb_view_gaze_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
+<span style="white-space: nowrap"><?=_('Country:') ?> <? gaze_controls_print_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
 <span style="white-space: nowrap"><span id="place_postcode_label<?=($place_postcode_label ? $place_postcode_label : '')?>"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <? } ?>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>

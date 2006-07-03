@@ -6,24 +6,24 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.3 2006-06-29 23:05:06 francis Exp $
+// $Id: gaze-controls.php,v 1.4 2006-07-03 09:51:24 francis Exp $
 
 // TODO: 
 // - Alter new.php to call these functions, rather than have its own,
 // slightly differently behaving, copy of the code.
 // - Probably remove the get_http_var calls for prev_country and prev_place
-// in pb_gaze_validate_location
+// in gaze_controls_validate_location
 // - Rename functions to be gaze_controls_ or something as a prefix
 // - Adapt this so it can be in global phplib for use on other sites
 
-function pb_gaze_find_places($country, $state, $query, $maxresults = null, $minscore = null) {
+function gaze_controls_find_places($country, $state, $query, $maxresults = null, $minscore = null) {
     $ret = gaze_find_places($country, $state, $query, $maxresults, $minscore);
     gaze_check_error($ret);
     return $ret;
 }
 
 // Given a row returned from gaze, returns a list of (description, radio button value)
-function pb_get_gaze_place_details($p) {
+function gaze_controls_get_place_details($p) {
     list($name, $in, $near, $lat, $lon, $st, $score) = $p;
     $desc = $name;
     if ($in) $desc .= ", $in";
@@ -37,11 +37,11 @@ function pb_get_gaze_place_details($p) {
 }
 
 // Prints HTML for radio buttons to select a list of places drawn from Gaze
-function pb_view_gaze_places_choice($places, $place, $selected_gaze_place) {
+function gaze_controls_print_places_choice($places, $place, $selected_gaze_place) {
     print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
     $nn = 0;
     foreach ($places as $p) {
-        list($desc, $t) = pb_get_gaze_place_details($p);
+        list($desc, $t) = gaze_controls_get_place_details($p);
         $checked = '';
         if ($t == $selected_gaze_place) {
             $checked = 'checked';
@@ -52,19 +52,14 @@ function pb_view_gaze_places_choice($places, $place, $selected_gaze_place) {
     print "<strong>"._("If it isn't any of those, try a different spelling, or the name of another nearby town:")."</strong>";
 }
 
-function country_sort($a, $b) {
-    global $countries_code_to_name;
-    return strcoll($countries_code_to_name[$a], $countries_code_to_name[$b]);
-}
-
-/* pb_view_gaze_country_choice
+/* gaze_controls_print_country_choice
  * Draws a drop down box for choice of country. $selected_country and $selected_state are
  * which items to select by default. $errors array is used to highlight in red
  * if countains key 'country'.  params can contain
  *      'noglobal' - don't offer "any country" choice
  *      'gazeonly' - only list countries for which we have local gaze place
  */
-function pb_view_gaze_country_choice($selected_country, $selected_state, $errors, $params = array()) {
+function gaze_controls_print_country_choice($selected_country, $selected_state, $errors, $params = array()) {
     global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name, $ip_country;
 
     /* Save previous value of country, so that we can detect if it's changed after
@@ -121,10 +116,10 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
         # Ignore errors, so outages in gaze don't stop every page rendering
         if (rabx_is_error($countries_list))
             $countries_list = array();
-        usort($countries_list, "country_sort");
+        usort($countries_list, "countries_sort");
     } else {
         $countries_list = array_values($countries_name_to_code);
-        usort($countries_list, "country_sort");
+        usort($countries_list, "countries_sort");
     }
 
     foreach ($countries_list as $opt_code) {
@@ -151,7 +146,7 @@ function pb_view_gaze_country_choice($selected_country, $selected_state, $errors
 /* pb_view_gaze_place_choice
  * Display options for choosing a local place
  */
-function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $places, $errors, $postcode) {
+function gaze_controls_print_place_choice($selected_place, $selected_gaze_place, $places, $errors, $postcode) {
 
     $select_place = false;
     if (!(!$selected_place || array_key_exists('place', $errors) || count($places) == 0)) {
@@ -179,7 +174,7 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
            <?=_('Place name:') ?>
         <?
     } else {
-        pb_view_gaze_places_choice($places, $selected_place, $selected_gaze_place);
+        gaze_controls_print_places_choice($places, $selected_place, $selected_gaze_place);
     }
 
     ?>
@@ -195,8 +190,10 @@ function pb_view_gaze_place_choice($selected_place, $selected_gaze_place, $place
     <?
 }
 
-# pb_gaze_get_location
-function pb_gaze_get_location() {
+# gaze_controls_get_location
+# Looks up the country, state, place, postcode etc. from HTTP variables,
+# partially validates it and returns one $location data array.
+function gaze_controls_get_location() {
     $location = array();
     $location['country'] = get_http_var('country');
     $location['state'] = null;
@@ -232,9 +229,11 @@ function pb_gaze_get_location() {
     return $location;
 }
 
-# pb_gaze_validate_location
-# Validates a location entered for a form.
-function pb_gaze_validate_location(&$location, &$errors) {
+# gaze_controls_validate_location &LOCATION &ERRORS
+# Validates a location entered for a form. The LOCATION associative
+# array is updated, for example if an exact place match was found.
+# Error messages are added to the ERRORS array.
+function gaze_controls_validate_location(&$location, &$errors) {
     if (!$location['country']) $errors['country'] = _("Please choose a country");
     if ($location['country'] == 'GB') {
         if ($location['postcode'] && $location['place'])
@@ -265,10 +264,10 @@ function pb_gaze_validate_location(&$location, &$errors) {
         $errors['gaze_place'] = "NOTICE";
     }
     if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == "NOTICE") {
-        $places = pb_gaze_find_places($location['country'], $location['state'], $location['place'], 10, 0);
-        $have_exact = have_exact_gaze_match($places, $location['place']);
+        $places = gaze_controls_find_places($location['country'], $location['state'], $location['place'], 10, 0);
+        $have_exact = _gaze_controls_exact_match($places, $location['place']);
         if ($have_exact) {
-            list($desc, $radio_name) = pb_get_gaze_place_details($have_exact);
+            list($desc, $radio_name) = gaze_controls_get_place_details($have_exact);
             $location['gaze_place'] = $radio_name;
             unset($errors['gaze_place']);
             #print "have exact $desc $radio_name\n"; exit;
@@ -288,10 +287,10 @@ function pb_gaze_validate_location(&$location, &$errors) {
     $location['places'] = null;
     if ($location['place']) {
         // Look up nearby places
-        $location['places'] = pb_gaze_find_places($location['country'], $location['state'], $location['place'], 10, 0);
+        $location['places'] = gaze_controls_find_places($location['country'], $location['state'], $location['place'], 10, 0);
         if (array_key_exists('gaze_place', $errors)) {
             if (count($location['places']) > 0) {
-                // message printed in pb_view_gaze_place_choice
+                // message printed in gaze_controls_print_place_choice
             } else {
                 $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
                 htmlspecialchars($location['place']));
@@ -302,7 +301,7 @@ function pb_gaze_validate_location(&$location, &$errors) {
 }
 
 // Is this match from gaze exact?
-function have_exact_gaze_match($places, $typed_place) {
+function _gaze_controls_exact_match($places, $typed_place) {
     if (count($places) < 1)
         return;
     $gotcount = 0;

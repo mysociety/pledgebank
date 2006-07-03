@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.174 2006-06-29 13:36:31 francis Exp $
+ * $Id: pledge.php,v 1.175 2006-07-03 09:51:24 francis Exp $
  * 
  */
 
@@ -484,9 +484,9 @@ class Pledge {
             if ($this->is_global()) {
                 ?> <p><strong><?=_('Your country:') ?></strong>&nbsp;<? 
                 if ($location)
-                    pb_view_gaze_country_choice($location['country'], $location['state'], $errors, array('noglobal'=>true, 'gazeonly'=>true)); 
+                    gaze_controls_print_country_choice($location['country'], $location['state'], $errors, array('noglobal'=>true, 'gazeonly'=>true)); 
                 else
-                    pb_view_gaze_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true));
+                    gaze_controls_print_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true));
             } else {
 ?>            <p><input type="hidden" name="prev_country" value="<?=$this->country_code()?>"> 
               <input type="hidden" name="country" value="<?=$this->country_code()?>"> <?
@@ -498,7 +498,7 @@ class Pledge {
 
 <div id="ifyes_line">
 <strong><?=_("Where in that country?")?></strong>
-<?              pb_view_gaze_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode']); ?>
+<?              gaze_controls_print_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode']); ?>
 </div>
 <?
 

@@ -4,12 +4,13 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.192 2006-06-29 17:12:29 francis Exp $
+-- $Id: schema.sql,v 1.193 2006-07-04 19:11:32 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
---       (for simplicity, for now, names of people have not be marked like this,
---       even though they theoretically should be, e.g. Chinese vs. Western name)
+--       (for simplicity, for now, names of people have not been marked like
+--       this, even though they theoretically should be, e.g. Chinese vs.
+--       Western name)
 
 -- secret
 -- A random secret.

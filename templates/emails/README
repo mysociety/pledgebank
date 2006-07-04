@@ -94,6 +94,10 @@ Sent to creator when a pledge with a target by area succeeds in one area.
 Parameters as for succeed-creator, with the extra ones as for
 failed-creator-byarea.
 
+* succeeded-creator-reminder-byarea
+As succeeded-creator-reminder, only for byarea pledges, with extra parameters
+as for failed-creator-byarea.
+
 * succeeded-signer
 Sent to each signer when a pledge succeeds.
   - execeeded_or_met, either the word "met" or "exceeded" according to whether

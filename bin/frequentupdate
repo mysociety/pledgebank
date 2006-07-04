@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.74 2006-07-04 10:11:42 francis Exp $
+ * $Id: frequentupdate,v 1.75 2006-07-04 17:00:51 francis Exp $
  *
  */
 
@@ -205,9 +205,9 @@ function mark_byarea_pledges_successful() {
 }
 
 /* send_pledge_success_reminder
- * Send message to creators of successful pledges reminding them
- * to send an announce message, if they haven't yet.  This happens
- * 3 days after the original was sent. */
+ * Send message to creators of successful normalpledges reminding them to send
+ * an announce message, if they haven't yet.  This happens 3 days after the
+ * original was sent. */
 function send_pledge_success_reminder() {
     global $pb_timestamp;
 
@@ -262,6 +262,76 @@ function send_pledge_success_reminder() {
     db_commit();
     verbose("finished finding pledges with no announcement messages for reminder");
 }
+
+/* send_byarea_pledge_success_reminder
+ * Send message to creators of successful byarea pledges reminding them to send
+ * an announce message for the town, if they haven't yet.  This happens 3 days
+ * after the original was sent. */
+function send_byarea_pledge_success_reminder() {
+    global $pb_timestamp;
+
+    verbose("finding byarea pledges with no announcement messages for reminder");
+
+    if (!db_getOne("
+                select pledges.id, pledges.ref, byarea_location_id from pledges, byarea_location
+                where byarea_location.pledge_id = pledges.id
+                    and byarea_location.whensucceeded is not null
+                    and '$pb_timestamp'::timestamp > byarea_location.whensucceeded + '3 day'::interval
+                    and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
+                    and (select id from message where pledge_id = pledges.id
+                        and byarea_location_id = byarea_location.byarea_location_id
+                        and circumstance = 'success-auto-creator-reminder-byarea') is null
+                    and (select id from message where pledge_id = pledges.id
+                        and byarea_location_id = byarea_location.byarea_location_id
+                        and circumstance = 'success-auto-creator-byarea') is not null
+                    and (select id from message where pledge_id = pledges.id
+                        and byarea_location_id = byarea_location.byarea_location_id
+                        and circumstance = 'success-announce') is null")) {
+        verbose("... no such pledges found");
+        return;
+    }
+
+    
+    db_query("lock table message in exclusive mode");
+    $q = db_query("
+                select pledges.id, pledges.ref, byarea_location_id from pledges, byarea_location
+                where byarea_location.pledge_id = pledges.id
+                    and byarea_location.whensucceeded is not null
+                    and '$pb_timestamp'::timestamp > byarea_location.whensucceeded + '3 day'::interval
+                    and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
+                    and (select id from message where pledge_id = pledges.id
+                        and byarea_location_id = byarea_location.byarea_location_id
+                        and circumstance = 'success-auto-creator-reminder-byarea') is null
+                    and (select id from message where pledge_id = pledges.id
+                        and byarea_location_id = byarea_location.byarea_location_id
+                        and circumstance = 'success-auto-creator-byarea') is not null
+                    and (select id from message where pledge_id = pledges.id
+                        and byarea_location_id = byarea_location.byarea_location_id
+                        and circumstance = 'success-announce') is null
+                for update");
+
+    while ($pledge = db_fetch_array($q)) {
+        verbose("pledge #${pledge['id']} (${pledge['ref']}) for area ${pledge['byarea_location_id']} creator being sent reminder success email");
+        
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendtolatesigners,
+                    byarea_location_id,
+                    emailtemplatename
+                ) values (
+                    ?, 'success-auto-creator-reminder-byarea',
+                    true, false, false,
+                    ?,
+                    'succeeded-creator-reminder-byarea'
+                )", $pledge['id'], $pledge['byarea_location_id']);
+
+    }
+    
+    db_commit();
+    verbose("finished finding byarea pledges with no announcement messages for reminder");
+}
+
 
 /* send_automatic_failure_messages_overall
  * Send automatic pledge failure messages for normal pledges which have failed
@@ -434,6 +504,7 @@ function send_automatic_failure_messages_byarea() {
  * - at least 4 days have passed since the pledge was created
  * - and not marked by admin as backpage (it will obviously be backpage in the
  *   pb_pledge_prominence algorithm)
+ * This applies to either 'overall' or 'byarea' target type pledges.
  */
 function chivvy_creators_early() {
     global $pb_today, $pb_timestamp;
@@ -501,6 +572,7 @@ function chivvy_creators_early() {
  * - are not backpage 
  * - in the last week had a signup rate that, if continued until pledge
  *   deadline, would not have sufficient signers for success
+ * - is 'overall', not 'byarea'
  */
 function chivvy_creators_lowrate() {
     global $pb_today, $pb_timestamp;
@@ -519,7 +591,8 @@ function chivvy_creators_lowrate() {
                     and (select id
                         from message
                         where pledge_id = pledges.id
-                        and circumstance = 'chivvy-creator-lowrate') is null")) {
+                        and circumstance = 'chivvy-creator-lowrate') is null
+                    and target_type = 'overall'")) {
         verbose("... no such pledges found");
         return;
     }
@@ -538,6 +611,7 @@ function chivvy_creators_lowrate() {
                         from message
                         where pledge_id = pledges.id
                         and circumstance = 'chivvy-creator-lowrate') is null
+                    and target_type = 'overall' 
                 for update
                 ");
 
@@ -604,6 +678,7 @@ function send_pending_messages() {
         if ($msg['circumstance'] == 'success-auto-creator' or
             $msg['circumstance'] == 'success-auto-creator-byarea' or
             $msg['circumstance'] == 'success-auto-creator-reminder' or
+            $msg['circumstance'] == 'success-auto-creator-reminder-byarea' or
             $msg['circumstance'] == 'failure-auto-creator' or
             $msg['circumstance'] == 'failure-auto-creator-byarea' or
             $msg['circumstance'] == 'announce-post') {
@@ -621,6 +696,7 @@ function send_pending_messages() {
         }
         // Description of town that success is for
         if ($msg['circumstance'] == 'success-auto-creator-byarea' or
+            $msg['circumstance'] == 'success-auto-creator-reminder-byarea' or
             $msg['circumstance'] == 'failure-auto-creator-byarea') {
             $data['location_description'] = db_getOne("select description from
                 location where location.id = ?", $msg['byarea_location_id']);
@@ -856,5 +932,6 @@ send_automatic_failure_messages_byarea();
 chivvy_creators_early();
 chivvy_creators_lowrate();
 send_pledge_success_reminder();
+send_byarea_pledge_success_reminder();
 send_pending_messages();
 

@@ -1,0 +1,17 @@
+Subject: Reminder - Please send a message to your pledge signers in <?=$values['location_description']?> - '<?=$values['title']?>'
+
+Congratulations!
+
+Your pledge reached its target in <?=$values['location_description']?> three
+days ago.
+
+However, you haven't sent a message yet to all your signers in
+<?=$values['location_description']?> to tell them what to do. Hit the link
+below to talk to them.
+
+<?=$values['url']?>
+
+Why not ask your signers to take some photos of themselves fulfilling their
+pledge - we love to see PledgeBank in action.
+
+<?=$values['signature']?>

@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.182 2006-07-04 10:11:42 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.183 2006-07-04 17:00:51 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1434,6 +1434,13 @@ sub do_byarea_tests {
     $wth->browser_check_contents("This pledge has been successful in <strong>2 places</strong>!");
     $wth->log_watcher_check();
 
+    # Success reminder messages
+    set_pb_date('1984-09-10');
+    call_frequentupdate();
+    $success_email = $wth->email_get_containing( '%To: '.email_n(600).'%However, you haven\'t sent a message yet%Liverpool%');
+    die "Success reminder email link not found\n" if ($success_email !~ m#^\s*(http://.*$)#m);
+    $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%However, you haven\'t sent a message yet%Southampton%');
+    die "Success reminder email link not found\n" if ($success_email_1 !~ m#^\s*(http://.*$)#m);
 
     # Cause failure of pledge for other towns
     set_pb_date('1984-10-10');

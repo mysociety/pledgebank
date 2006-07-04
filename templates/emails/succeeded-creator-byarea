@@ -15,7 +15,7 @@ do next.
 There are now <?=$values['byarea_success_count']?> places where your pledge has
 been successful.
 
-wE LOve getting photos of people fulfilling their pledges, so why not
+We love getting photos of people fulfilling their pledges, so why not
 ask them to take some pics?
 
 <?=$values['signature']?>

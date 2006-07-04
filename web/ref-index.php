@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.79 2006-06-29 17:12:30 francis Exp $
+// $Id: ref-index.php,v 1.80 2006-07-04 17:05:38 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -185,20 +185,25 @@ function draw_signatories($p) {
     $in_ul = false;
     while ($r = db_fetch_array($q)) {
         $showname = ($r['showname'] == 't');
+        $loc_desc_with_country = $r['location_description'];
+        if ($r['location_country'] && (!$p->country_code() || ($p->country_code() != $r['location_country']))) {
+            global $countries_code_to_name;
+            $loc_desc_with_country .= ", ". $countries_code_to_name[$r['location_country']];
+        }
         if ($showname) {
             if (isset($r['name'])) {
-                if ($p->byarea() && $last_location_description != $r['location_description']) {
+                if ($p->byarea() && $last_location_description != $loc_desc_with_country) {
                     if ($in_ul)  {
                         $out .= "</ul>";
                         $in_ul = false;
                     }
-                    $out .= "<h3>" . $r['location_description'] . "</h3>";
+                    $out .= "<h3>" . $loc_desc_with_country . "</h3>";
                     if ($r['whensucceeded']) {
                         $out .= '<p class="success">';
-                        $out .= sprintf(_("This pledge succeeded for %s on %s."), $r['location_description'], prettify($r['whensucceeded']));
+                        $out .= sprintf(_("This pledge succeeded for %s on %s."), $loc_desc_with_country, prettify($r['whensucceeded']));
                         $out .= '</p>';
                     }
-                    $last_location_description = $r['location_description'];
+                    $last_location_description = $loc_desc_with_country;
                 }
                 if (!$in_ul) {
                     $out .= "<ul>";

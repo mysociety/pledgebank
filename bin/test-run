@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.181 2006-06-29 17:12:29 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.182 2006-07-04 10:11:42 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1326,7 +1326,7 @@ sub do_category_tests {
     create_pledge(300, 
         { title => $pledge_action_portuguese, 
             target => '3', type => 'other monoglots', signup => 'do the same',
-            date => 'Tomorrow', ref => $pledge_ref_portugese },
+            date => '1988-12-31', ref => $pledge_ref_portugese },
         { country => 'PT', 'local' => 0 },
         { },
         { action => "viaemail", setpassword => 0 }
@@ -1341,7 +1341,7 @@ sub do_category_tests {
     create_pledge(300, 
         { title => $pledge_action_english, 
             target => '3', type => 'other polyglots', signup => 'do the same',
-            date => 'Tomorrow', ref => $pledge_ref_english },
+            date => '1988-12-31', ref => $pledge_ref_english },
         { country => 'PT', 'local' => 0 }, 
         { },
         { action => "loggedin", setpassword => 0 }
@@ -1366,6 +1366,9 @@ sub do_category_tests {
     # Change to normal pages again
     $wth->browser_get($base_url);
     lock_locale_url();
+
+    # We never go past 1988-12-31 later, so these pledges stay
+    # neither failures nor successes until the end.
 }
 
 #############################################################################
@@ -1432,8 +1435,13 @@ sub do_byarea_tests {
     $wth->log_watcher_check();
 
 
-    print "EARLY EXIT";
-    exit;
+    # Cause failure of pledge for other towns
+    set_pb_date('1984-10-10');
+    call_frequentupdate();
+    my $failure_email = $wth->email_get_containing('%Subject: Sorry, your pledge failed in Hexham%To: '.email_n(600).  '%');
+    die "Failure email link not found\n" if ($failure_email !~ m#^\s*(http://.*$)#m);
+    my $announce_link_failure = $1;
+    $wth->email_get_containing('%Subject: Pledge failed%To: '.email_n(603).  '%');
 }
 
 #############################################################################

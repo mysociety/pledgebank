@@ -1,0 +1,19 @@
+Subject: Sorry, your pledge failed in <?=$values['location_description']?> - '<?=$values['title']?>' at PledgeBank.com.
+
+We are sorry to have to tell you that your pledge did not meet its target 
+for people in <?=$values['location_description']?> in the required time.  You
+required <?=$values['target']?> <?=$values['type']?>, but achieved only
+<?=$values['location_signers']?>.
+
+The pledge read: '<?=$values['sentence_first']?>'
+
+Bad luck, but don't be disheartened! This link will enable you to write to all
+your signers in <?=$values['location_description']?>. Ask them what they'd like
+to do next, how you could do better next time, and whether they'd like to
+create a new pledge.
+
+<?=$values['url']?>
+
+Go on, get writing!
+
+<?=$values['signature']?>

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.73 2006-06-29 17:12:28 francis Exp $
+ * $Id: frequentupdate,v 1.74 2006-07-04 10:11:42 francis Exp $
  *
  */
 
@@ -270,7 +270,7 @@ function send_pledge_success_reminder() {
 function send_automatic_failure_messages_overall() {
     global $pb_today;
 
-    verbose("finding newly failed pledges");
+    verbose("finding newly failed overall pledges");
 
     /* Do a query before locking the table. */
     if (!db_getOne("
@@ -336,8 +336,93 @@ function send_automatic_failure_messages_overall() {
     
     db_commit();
 
-    verbose("finished newly failed pledges");
+    verbose("finished newly failed overall pledges");
 }
+
+/* send_automatic_failure_messages_byarea
+ * Send automatic pledge failure messages for byarea pledges which have failed
+ * and for which no such message has previously been sent. */
+function send_automatic_failure_messages_byarea() {
+    global $pb_today;
+
+    verbose("finding newly failed byarea pledges");
+
+    /* Do a query before locking the table. */
+    if (!db_getOne("
+                select id from pledges, byarea_location
+                where byarea_location.whensucceeded is null
+                    and '$pb_today' > date
+                    and (select id
+                        from message
+                        where pledge_id = pledges.id
+                        and message.byarea_location_id = byarea_location.byarea_location_id
+                        and circumstance = 'failure-auto-creator-byarea'
+                        ) is null
+                    and target_type = 'byarea'
+                for update")) {
+        verbose("... no newly failed byarea pledges");
+        return;
+    }
+    
+    db_query("lock table message in exclusive mode");
+    $q = db_query("
+                select pledges.*, byarea_location.byarea_location_id 
+                from pledges, byarea_location
+                where byarea_location.whensucceeded is null
+                    and '$pb_today' > date
+                    and (select id
+                        from message
+                        where message.pledge_id = pledges.id
+                        and message.byarea_location_id = byarea_location.byarea_location_id
+                        and circumstance = 'failure-auto-creator-byarea'
+                        ) is null
+                    and target_type = 'byarea'
+                for update");
+
+    while ($pledge = db_fetch_array($q)) {
+        verbose("pledge #${pledge['id']} (${pledge['ref']}) for area ${pledge['byarea_location_id']} has failed");
+
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendtolatesigners,
+                    byarea_location_id,
+                    emailtemplatename
+                ) values (
+                    ?, 'failure-auto-creator-byarea',
+                    true, false, false,
+                    ?, 
+                    'failed-creator-byarea'
+                )", $pledge['id'], $pledge['byarea_location_id']);
+
+        $pledge_obj = new Pledge(intval($pledge['id']));
+
+        /* Unlike automatic success messages, automatic failure messages go
+         * by SMS too, because there's no other way for SMS signers to hear
+         * about them. */
+        locale_push($pledge_obj->lang());
+        $sms = sprintf(_("PledgeBank here. Sorry, the %s pledge has failed. Better luck next time!"), $pledge['ref']);
+        locale_pop();
+
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendtolatesigners,
+                    byarea_location_id,
+                    emailtemplatename, sms
+                ) values (
+                    ?, 'failure-auto-signers-byarea',
+                    false, true, false,
+                    ?,
+                    'failed-signer-byarea', ?
+                )", array($pledge['id'], $pledge['byarea_location_id'], $sms));
+    }
+    
+    db_commit();
+
+    verbose("finished newly failed byarea pledges");
+}
+
 
 /* chivvy_creators_early
  * Send message to pledge creators who haven't managed to get many signers.
@@ -520,6 +605,7 @@ function send_pending_messages() {
             $msg['circumstance'] == 'success-auto-creator-byarea' or
             $msg['circumstance'] == 'success-auto-creator-reminder' or
             $msg['circumstance'] == 'failure-auto-creator' or
+            $msg['circumstance'] == 'failure-auto-creator-byarea' or
             $msg['circumstance'] == 'announce-post') {
             locale_push($pledge->lang());
             $data['url'] = pb_person_make_signon_url(null, $pledge->creator_email(), 
@@ -534,15 +620,16 @@ function send_pending_messages() {
             $data['probable_will_reach'] = $probable_will_reach;
         }
         // Description of town that success is for
-        if ($msg['circumstance'] == 'success-auto-creator-byarea') {
-            list($location_description, $byarea_success_count) = 
-                    db_getRow("select description,
-                    (select count(*) from byarea_location where byarea_location.pledge_id = ?
-                    and whensucceeded is not null) as byarea_successes
-                    from location where location.id = ?", 
-                    $pledge->id(), $msg['byarea_location_id']);
-            $data['location_description'] = $location_description;
-            $data['byarea_success_count'] = $byarea_success_count;
+        if ($msg['circumstance'] == 'success-auto-creator-byarea' or
+            $msg['circumstance'] == 'failure-auto-creator-byarea') {
+            $data['location_description'] = db_getOne("select description from
+                location where location.id = ?", $msg['byarea_location_id']);
+            $data['byarea_success_count'] = db_getOne("select count(*) from
+                byarea_location where byarea_location.pledge_id = ?  and
+                whensucceeded is not null", $pledge->id());
+            $data['location_signers'] = db_getOne("select count(*) from
+                signers where pledge_id = ? and byarea_location_id = ?", 
+                $pledge->id(), $msg['byarea_location_id']);
         }
 
         // Case when it is a copy sent to creator
@@ -662,15 +749,16 @@ function send_pending_messages() {
                         pb_domain_url(array('path'=>"/alert")), array());
             }
             // Description of town that success is for
-            if ($r['emailtemplatename'] == 'succeeded-signer-byarea') {
-                list($location_description, $byarea_success_count) = 
-                        db_getRow("select description,
-                        (select count(*) from byarea_location where byarea_location.pledge_id = ?
-                        and whensucceeded is not null) as byarea_successes
-                        from location where location.id = ?", 
-                        $pledge->id(), $r['byarea_location_id']);
-                $data['location_description'] = $location_description;
-                $data['byarea_success_count'] = $byarea_success_count;
+            if ($r['emailtemplatename'] == 'succeeded-signer-byarea' ||
+                $r['emailtemplatename'] == 'failed-signer-byarea') {
+                $data['location_description'] = db_getOne("select description from
+                    location where location.id = ?", $r['byarea_location_id']);
+                $data['byarea_success_count'] = db_getOne("select count(*) from
+                    byarea_location where byarea_location.pledge_id = ?  and
+                    whensucceeded is not null", $pledge->id());
+                $data['location_signers'] = db_getOne("select count(*) from
+                    signers where pledge_id = ? and byarea_location_id = ?", 
+                    $pledge->id(), $r['byarea_location_id']);
             }
                 /* Send email template. */
             verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
@@ -764,6 +852,7 @@ compute_prominences();
 mark_overall_pledges_successful();
 mark_byarea_pledges_successful();
 send_automatic_failure_messages_overall();
+send_automatic_failure_messages_byarea();
 chivvy_creators_early();
 chivvy_creators_lowrate();
 send_pledge_success_reminder();

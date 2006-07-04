@@ -59,10 +59,22 @@ are not logged in, and we need to confirm their email address.
 Sent to creator when a pledge fails.
   - actual, number of people who signed up.
 
+* failed-creator-byarea
+Sent to creator when a pledge with a target by area fails in one area.
+Parameters as for failed-creator, with additionally:
+  - location_description, name of town where success has happened
+  - location_signers, number of people who signed up in the area
+  - byarea_success_count, how many successful towns there are 
+
 * failed-signer
 Sent to each signer when a pledge fails.
   - actual, number of people who signed up.
   - signer_name, name of the signer this email is going to.
+
+* failed-signer-byarea
+Sent to each signer when a pledge with a target by area fails in one area.
+Parameters as for failed-signer, with the extra ones as for
+failed-creator-byarea.
 
 **************************************************************************
 
@@ -78,10 +90,9 @@ announce message.
   - actual, exceeded_or_met as above
 
 * succeeded-creator-byarea
-Sent to creator when a pledge with a target by area succeeds. Parameters
-as for succeed-creator, with additionally:
-  - location_description, name of town where success has happened
-  - byarea_success_count, how many successful towns there are 
+Sent to creator when a pledge with a target by area succeeds in one area.
+Parameters as for succeed-creator, with the extra ones as for
+failed-creator-byarea.
 
 * succeeded-signer
 Sent to each signer when a pledge succeeds.
@@ -91,11 +102,10 @@ Sent to each signer when a pledge succeeds.
   - local_alert_url, for signup to local email alerts
 
 * succeeded-signer-byarea
-Sent to each signer when a by area pledge succeeds. Parameters as for
-succeeded-signer, with additionally:
-  - location_description, name of town where success has happened
-  - byarea_success_count, how many successful towns there are (note that
-    this can increase for late signers, if other town succeed in between)
+Sent to each signer when a by area pledge succeeds in one area. Parameters as
+for succeeded-signer, with additionally those as for failed-creator-byarea.
+Note that byarea_success_count can increase for late signers, if other town
+succeed in between)
 
 ***************************************************************************
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.175 2006-07-03 09:51:24 francis Exp $
+ * $Id: pledge.php,v 1.176 2006-07-04 13:54:45 francis Exp $
  * 
  */
 
@@ -106,6 +106,8 @@ class Pledge {
         $this->data['left'] = $this->data['target'] - $this->data['signers'];
         $this->data['open'] = ($this->data['open'] == 't');
         $this->h_ref = htmlspecialchars($this->data['ref']);
+        global $pb_today;
+        $this->data['daysleft'] = (strtotime($this->data['date']) - strtotime($pb_today)) / (60*60*24);
 
         // "Finished" means closed to new signers
         $finished = false;
@@ -150,6 +152,7 @@ class Pledge {
     function target() { return $this->data['target']; }
     function signers() { return $this->data['signers']; }
     function left() { return $this->data['left']; }
+    function daysleft() { return $this->data['daysleft']; }
 
     function byarea_successes() { 
         if (!array_key_exists('successful_areas', $this->data)) {
@@ -361,8 +364,12 @@ class Pledge {
                 printf(ngettext('%s person signed up', '%s people signed up', $this->signers()), prettify($this->signers()));
             else
                 printf(ngettext('%s person has signed up', '%s people have signed up', $this->signers()), prettify($this->signers()));
-        if ($this->byarea()) {
-                // TODO: Work out how many areas success has occurred in, and display here
+            if ($this->byarea()) {
+                print ', ';
+                print sprintf(
+                    ngettext('successful in %d place', 'successful in %d places',
+                            $this->byarea_successes()), 
+                    $this->byarea_successes());
             } else {
                 if ($this->left() < 0) {
                     print ' ';
@@ -518,6 +525,65 @@ class Pledge {
     <p><input type="submit" name="submit" value="' . _('Sign Pledge') . '"></p>
     </form>';
     }
+
+    /* summary PLEDGE PARAMS
+     * Return pledge text in a format suitable for a (long) summary on a list of
+     * pledges, such as the front page.  PLEDGE is an array of info about the
+     * pledge.  PARAMS are passed to pledge_sentence, and also:
+     * 'showcountry' - display country as well
+     */
+    function summary($params) {
+        $text = '';
+        if (array_key_exists('showcountry', $params) && $params['showcountry'] && $this->country_code()) {
+            global $countries_code_to_name;
+            $text .= $countries_code_to_name[$this->country_code()] . ": ";
+        }
+        $text .= $this->sentence($params) . ' ';
+        if ($this->byarea()) {
+            if ($this->daysleft() > 0) $text .= '(';
+            if ($this->byarea_successes() == 0) 
+                $text .= _('Target met nowhere');
+            else
+                $text .= sprintf(ngettext('Target met in %d place', 'Target met in %d places',
+                        $this->byarea_successes()), $this->byarea_successes());
+            $text .= ', ';
+            if ($this->daysleft() == 0)
+                $text .= 'pledge open until midnight tonight, London time.';
+            elseif ($this->daysleft() < 0) {
+                $text .= 'pledge closed.';
+            } else {
+                if ($this->daysleft() <= 3) {
+                    $text .= sprintf(ngettext('just %d day left', 'just %d days left', $this->daysleft()), $this->daysleft());
+                } else {
+                    $text .= sprintf(ngettext('%d day left', '%d days left', $this->daysleft()), $this->daysleft());
+                }
+            }
+            if ($this->daysleft() > 0) $text .= ')';
+        } elseif ($this->left() <= 0) {
+            if ($this->daysleft() == 0)
+                $text .= _('Target met, pledge open until midnight tonight, London time.');
+            elseif ($this->daysleft() < 0)
+                $text .= _('Target met, pledge closed.');
+            else
+                $text .= sprintf(ngettext('Target met, pledge still open for %d day.', 'Target met, pledge still open for %d days.', $this->daysleft()), $this->daysleft());
+        } else {
+            if ($this->daysleft() == 0)
+                $text .= sprintf(_("(needs %d more by midnight tonight, London time)"), $this->left());
+            elseif ($this->daysleft() < 0)
+                $text .= _('Deadline expired, pledge failed.');
+            else {
+                $text .= "(";
+                if ($this->daysleft() <= 3) {
+                    $text .= sprintf(ngettext('just %d day left', 'just %d days left', $this->daysleft()), $this->daysleft());
+                } else {
+                    $text .= sprintf(ngettext('%d day left', '%d days left', $this->daysleft()), $this->daysleft());
+                }
+                $text .= sprintf(ngettext(', %d more signature needed)', ', %d more signatures needed)', $this->left()), $this->left());
+            }
+        }
+        return $text;
+    }
+
 }
 
 /* PLEDGE_...
@@ -627,46 +693,6 @@ function pledge_sentence($r, $params = array()) {
 
     locale_pop();
     return $s;
-}
-
-
-/* pledge_summary PLEDGE PARAMS
- * Return pledge text in a format suitable for a (long) summary on a list of
- * pledges, such as the front page.  PLEDGE is an array of info about the
- * pledge.  PARAMS are passed to pledge_sentence, and also:
- * 'showcountry' - display country as well
- */
-function pledge_summary($r, $params) {
-    $text = '';
-    if (array_key_exists('showcountry', $params) && $params['showcountry'] && $r['country']) {
-        global $countries_code_to_name;
-        $text .= $countries_code_to_name[$r['country']] . ": ";
-    }
-    $text .= pledge_sentence($r, $params) . ' ';
-    if ($r['target'] - $r['signers'] <= 0) {
-        if ($r['daysleft'] == 0)
-            $text .= _('Target met, pledge open until midnight tonight, London time.');
-        elseif ($r['daysleft'] < 0)
-            $text .= _('Target met, pledge closed.');
-        else
-            $text .= sprintf(ngettext('Target met, pledge still open for %d day.', 'Target met, pledge still open for %d days.', $r['daysleft']), $r['daysleft']);
-    } else {
-        $left = $r['target'] - $r['signers'];
-        if ($r['daysleft'] == 0)
-            $text .= sprintf(_("(needs %d more by midnight tonight, London time)"), $left);
-        elseif ($r['daysleft'] < 0)
-            $text .= _('Deadline expired, pledge failed.');
-        else {
-            $text .= "(";
-            if ($r['daysleft'] <= 3) {
-                $text .= sprintf(ngettext('just %d day left', 'just %d days left', $r['daysleft']), $r['daysleft']);
-            } else {
-                $text .= sprintf(ngettext('%d day left', '%d days left', $r['daysleft']), $r['daysleft']);
-            }
-            $text .= sprintf(ngettext(', %d more signature needed)', ', %d more signatures needed)', $left), $left);
-        }
-    }
-    return $text;
 }
 
 /* pledge_is_successful PLEDGE [LOCK]

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.16 2005-11-27 18:00:25 matthew Exp $
+// $Id: your.php,v 1.17 2006-07-04 13:54:45 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -23,8 +23,7 @@ page_header(_("Your Pledges"), array('id'=>"yourpledges"));
 
 // Pledges you might like (people who signed pledges you created/signed also signed these...)
 $s = db_query("
-        SELECT some_pledges.id, SUM(some_pledges.strength) AS sum, 
-               max(some_pledges.date) - '$pb_today' AS daysleft FROM
+        SELECT some_pledges.id, SUM(some_pledges.strength) AS sum FROM
         (
             SELECT pledges.id, strength, date
             FROM pledges, pledge_connection
@@ -60,13 +59,10 @@ $s = db_query("
 if (0 != db_num_rows($s)) {
     print "\n\n" . '<div id="yourconnections"><h2><a name="connections">' . _('Suggested pledges') . '</a></h2><ol>' . "\n\n";
     print p(_("People who signed the pledges you created or signed also signed these..."));
-    while (list($id, $strength, $daysleft) = db_fetch_row($s)) {
+    while (list($id, $strength) = db_fetch_row($s)) {
         $p2 = new Pledge(intval($id));
         print '<li>';
-    #    print '<a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
-        $data = $p2->data;
-        $data['daysleft' ] = $daysleft;
-        print pledge_summary($data, array('html'=>true, 'href'=>$p2->url_main()));
+        print $p2->summary(array('html'=>true, 'href'=>$p2->url_main()));
         print '</li>';
         print "<!-- strength $strength -->\n";
     }
@@ -119,7 +115,7 @@ alert_list_pledges_local($P->id());
 
 // Open pledges you made
 $qrows = db_query("
-                SELECT pledges.*, date - '$pb_today' AS daysleft
+                SELECT pledges.*
                 FROM pledges
                 WHERE pledges.person_id = ?
                 AND '$pb_today' <= pledges.date
@@ -139,7 +135,7 @@ if (db_num_rows($qrows) > 0) {
 
 // Closed pledges you made
 $qrows = db_query("
-                SELECT pledges.*, date - '$pb_today' AS daysleft
+                SELECT pledges.*
                 FROM pledges
                 WHERE pledges.person_id = ?
                 AND '$pb_today' > pledges.date
@@ -157,7 +153,7 @@ if (db_num_rows($qrows) > 0) {
 
 // Pledges you have signed
 $qrows = db_query("
-                SELECT pledges.*, date - '$pb_today' AS daysleft
+                SELECT pledges.*
                 FROM pledges, signers
                 WHERE pledges.id = signers.pledge_id
                 AND signers.person_id = ?

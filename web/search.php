@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.51 2006-07-03 09:51:24 francis Exp $
+// $Id: search.php,v 1.52 2006-07-04 13:54:45 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -127,7 +127,7 @@ function search($search) {
     // General query
     $pledge_select = "SELECT pledges.*, '$pb_today' <= pledges.date as open,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                date - '$pb_today' AS daysleft, latitude, longitude";
+                latitude, longitude";
 
     // Exact pledge reference match
     if (!$rss) {
@@ -136,9 +136,10 @@ function search($search) {
         if (db_num_rows($q)) {
             $success = 1;
             $r = db_fetch_array($q);
+            $pledge = new Pledge($r);
             print sprintf(p(_('Result <strong>exactly matching</strong> pledge <strong>%s</strong>:')), htmlspecialchars($search) );
             print '<ul><li>';
-            print pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+            print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
             $pledges_output[$r['ref']] = 1;
             print '</li></ul>';
         }
@@ -236,9 +237,10 @@ function search($search) {
         while ($r = db_fetch_array($q)) {
             if (array_key_exists($r['ref'], $pledges_output))
                 continue;
+            $pledge = new Pledge($r);
         
             $text = '<li>';
-            $text .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+            $text .= $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
             $pledges_output[$r['ref']] = 1;
             $text .= '</li>';
             if ($r['open']=='t') {
@@ -247,7 +249,6 @@ function search($search) {
                 $closed .= $text;
             }
             if ($rss && $r['open'] == 't') {
-                $pledge = new Pledge($r);
                 $rss_items[] = $pledge->rss_entry();
             }
         }

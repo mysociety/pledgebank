@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.238 2006-06-02 12:24:42 chris Exp $
+// $Id: index.php,v 1.239 2006-07-04 13:54:45 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -81,8 +81,7 @@ can make your pledge succeed &raquo;') ?>"></a></div>
 # 'showcountry' - whether to display country name in summary
 function get_pledges_list($where, $params) {
     global $site_country, $pb_today;
-    $query = "SELECT pledges.*, pledges.ref, pledges.date - '$pb_today' AS daysleft,
-                     country
+    $query = "SELECT pledges.*, pledges.ref, country
             FROM pledges LEFT JOIN location ON location.id = pledges.location_id
             WHERE ";
     $sql_params = array();
@@ -101,8 +100,9 @@ function get_pledges_list($where, $params) {
     $pledges = array();
     while ($r = db_fetch_array($q)) {
         $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
+        $pledge = new Pledge($r);
         $pstring = '<li>';
-        $pstring .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref'], 'showcountry'=>$params['showcountry']));
+        $pstring .= $pledge->summary(array('html'=>true, 'href'=>$r['ref'], 'showcountry'=>$params['showcountry']));
         
         $pstring .= '</li>';
         $pledges[] = $pstring;

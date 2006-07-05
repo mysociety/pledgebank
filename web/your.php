@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.18 2006-07-05 12:14:59 francis Exp $
+// $Id: your.php,v 1.19 2006-07-05 13:12:23 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -168,7 +168,7 @@ if (db_num_rows($qrows) > 0) {
         $pledge = new Pledge($r['ref']);
         $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
         print '<li>';
-        print $pledge->summary($r, array('html'=>true, 'href'=>$r['ref']));
+        print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
         
         print '</li>';
         if ($r['whensucceeded']) 

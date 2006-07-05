@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.193 2006-07-04 19:11:32 francis Exp $
+-- $Id: schema.sql,v 1.194 2006-07-05 15:02:12 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -284,15 +284,13 @@ select case
 create function R_e()
     returns double precision as 'select 6372.8::double precision;' language sql;
 
-create type pledge_nearby_match as (
-    pledge_id integer,
+create type location_nearby_match as (
+    location_id integer,
     distance double precision   -- km
 );
 
--- pledge_find_nearby LATITUDE LONGITUDE DISTANCE
--- Find pledges within DISTANCE (km) of (LATITUDE, LONGITUDE).
-create function pledge_find_nearby(double precision, double precision, double precision)
-    returns setof pledge_nearby_match as
+create or replace function location_find_nearby(double precision, double precision, double precision)
+    returns setof location_nearby_match as
     -- Write as SQL function so that we don't have to construct a temporary
     -- table or results set in memory. That means we can't check the values of
     -- the parameters, sadly.
@@ -304,13 +302,13 @@ create function pledge_find_nearby(double precision, double precision, double pr
     -- on the amount of work we have to do.
 '
     -- trunc due to inaccuracies in floating point arithmetic
-    select pledges.id,
-            R_e() * acos(trunc(
+    select location.id,
+           R_e() * acos(trunc(
                 (sin(radians($1)) * sin(radians(latitude))
                 + cos(radians($1)) * cos(radians(latitude))
                     * cos(radians($2 - longitude)))::numeric, 14)
             ) as distance
-        from pledges left join location on location.id = pledges.location_id
+        from location
         where
             longitude is not null and latitude is not null
             and radians(latitude) > radians($1) - ($3 / R_e())
@@ -326,6 +324,23 @@ create function pledge_find_nearby(double precision, double precision, double pr
                 ) < $3
         order by distance desc
 ' language sql;
+
+create type pledge_nearby_match as (
+    pledge_id integer,
+    distance double precision   -- km
+);
+
+-- pledge_find_nearby LATITUDE LONGITUDE DISTANCE
+-- Find pledges within DISTANCE (km) of (LATITUDE, LONGITUDE).
+create or replace function pledge_find_nearby(double precision, double precision, double precision)
+    returns setof pledge_nearby_match as
+'
+    select pledges.id, nearby.distance
+        from location_find_nearby($1, $2, $3) as nearby, pledges 
+        where nearby.location_id = pledges.location_id
+
+' language sql;
+
 
 -- index of pledge reference
 create table pledge_ref_part (

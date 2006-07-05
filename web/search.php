@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.52 2006-07-04 13:54:45 francis Exp $
+// $Id: search.php,v 1.53 2006-07-05 12:14:59 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -63,15 +63,15 @@ function get_location_results($pledge_select, $lat, $lon) {
         $success = 1;
         $ret .= '<ul>';
         while ($r = db_fetch_array($q)) {
+            $pledge = new Pledge($r['ref']);
             $ret .= '<li>';
             $distance_line = pb_pretty_distance($r['distance'], microsites_site_country());
             $ret .= preg_replace('#^(.*)( away)$#', '<strong>$1</strong>$2: ', $distance_line);
             #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
-            $ret .= pledge_summary($r, array('html'=>true, 'href'=>$r['ref']));
+            $ret .= $pledge->summary($r, array('html'=>true, 'href'=>$r['ref']));
             $pledges_output[$r['ref']] = 1;
 
             if ($rss) {
-                $pledge = new Pledge($r['ref']);
                 $rss_items[] = $pledge->rss_entry();
             }
 

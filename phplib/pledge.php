@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.176 2006-07-04 13:54:45 francis Exp $
+ * $Id: pledge.php,v 1.177 2006-07-07 10:33:34 francis Exp $
  * 
  */
 
@@ -266,6 +266,13 @@ class Pledge {
             return htmlspecialchars($this->data['description']);
         else 
             return 'Whole country';
+    }
+    
+    function latitude() {
+        return $this->data['latitude'];
+    }
+    function longitude() {
+        return $this->data['longitude'];
     }
 
     // Links. The semantics here is that the URLs are all escaped, but didn't

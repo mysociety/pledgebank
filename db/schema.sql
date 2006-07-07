@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.194 2006-07-05 15:02:12 francis Exp $
+-- $Id: schema.sql,v 1.195 2006-07-07 10:33:33 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -289,6 +289,8 @@ create type location_nearby_match as (
     distance double precision   -- km
 );
 
+-- location_find_nearby LATITUDE LONGITUDE DISTANCE
+-- Find locations within DISTANCE (km) of (LATITUDE, LONGITUDE).
 create or replace function location_find_nearby(double precision, double precision, double precision)
     returns setof location_nearby_match as
     -- Write as SQL function so that we don't have to construct a temporary
@@ -297,7 +299,7 @@ create or replace function location_find_nearby(double precision, double precisi
     -- Through sheer laziness, just use great-circle distance; that'll be off
     -- by ~0.1%:
     --  http://www.ga.gov.au/nmd/geodesy/datums/distance.jsp
-    -- We index pledges on lat/lon so that we can select the pledges which lie
+    -- We index locations on lat/lon so that we can select the locations which lie
     -- within a wedge of side about 2 * DISTANCE. That cuts down substantially
     -- on the amount of work we have to do.
 '

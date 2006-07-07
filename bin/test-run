@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.183 2006-07-04 17:00:51 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.184 2006-07-07 10:33:33 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1404,6 +1404,8 @@ sub do_byarea_tests {
     call_frequentupdate();
     $wth->email_check_none_left();
     $wth->log_watcher_check();
+
+print "early exit";exit;
 
     # This will provoke success in Liverpool
     find_and_sign_pledge("ref", $pledge_ref_boo, 604, 1, 

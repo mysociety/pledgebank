@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: interface.css,v 1.4 2005-12-08 20:33:09 francis Exp $
+ * $Id: interface.css,v 1.5 2006-07-07 15:37:12 matthew Exp $
  * 
  */
 
@@ -348,7 +348,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 .pledge .c {
     text-align: center;
 }
-.pledge, #pledgeaction, #otherdetails {
+.pledge, #pledgeaction {
     border: solid 2px #8f8f8f;
     margin: 0 auto 1em;
     padding: 10px;
@@ -398,13 +398,6 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 
 #spreadword a {
     font-weight: bold;
-}
-
-#otherdetails {
-    width: 45%;
-    float: left;
-    clear: left;
-    margin: 1em auto;
 }
 
 #signatories ul, #connections ul, #yourconnections ul {

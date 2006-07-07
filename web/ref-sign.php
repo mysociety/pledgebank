@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.43 2006-07-07 10:33:34 francis Exp $
+// $Id: ref-sign.php,v 1.44 2006-07-07 16:44:36 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -109,8 +109,9 @@ function do_sign(&$location) {
                     from location_find_nearby(?, ?, ?) as nearby, byarea_location 
                     left join location on location.id = byarea_location.byarea_location_id
                     where nearby.location_id = byarea_location.byarea_location_id
-                    and byarea_location.pledge_id = ? order by distance
-            ', array($pledge->id(), $lat, $lon, 200, $pledge->id()));
+                    and byarea_location.pledge_id = ? order by distance limit 8
+            ', array($pledge->id(), $lat, $lon, 100000 /* arbitary large number to catch all */, 
+            $pledge->id()));
             if (db_num_rows($q) > 0) {
                 // Display form with choice of signers
                 $pledge->render_box(array('showdetails'=>false));
@@ -144,7 +145,13 @@ function do_sign(&$location) {
                     $c++;
 ?>
                 <input type="radio" name="byarea_location_id" value="<?=$r['byarea_location_id']?>" id="byarea_location_id_<?=$c?>" <?=($already_id == $r['byarea_location_id']) ? 'checked' : ''?>>
-                <label for="byarea_location_id_<?=$c?>"><?=$r['description']?> (<?=pb_pretty_distance($r['distance'], $location['country'])?>, <?=$r['count']?> <?=ngettext('person', 'people', $r['count'])?>)</label><br>
+                <label for="byarea_location_id_<?=$c?>"><?=$r['description']?><?
+                    if ($r['country'] && ($location['country'] != $r['country'])) {
+                        global $countries_code_to_name;
+                        print ", ". $countries_code_to_name[$r['country']];
+                }?>
+ 
+                (<?=pb_pretty_distance($r['distance'], $location['country'])?>, <?=$r['count']?> <?=ngettext('person', 'people', $r['count'])?>)</label><br>
 <?
                 }
 ?>

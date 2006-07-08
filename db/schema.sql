@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.195 2006-07-07 10:33:33 francis Exp $
+-- $Id: schema.sql,v 1.196 2006-07-08 02:00:18 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -224,7 +224,7 @@ create table byarea_location (
     whensucceeded timestamp
 );
 
-create unique index byarea_location_pledge_id_byarea_location_id_idx on byarea_location(pledge_id, byarea_location_Id);
+create unique index byarea_location_pledge_id_byarea_location_id_idx on byarea_location(pledge_id, byarea_location_id);
 
 -- Create a trigger to update the last-change-time for the pledge on any
 -- update to the table. This should cover manual edits only; anything else
@@ -291,7 +291,7 @@ create type location_nearby_match as (
 
 -- location_find_nearby LATITUDE LONGITUDE DISTANCE
 -- Find locations within DISTANCE (km) of (LATITUDE, LONGITUDE).
-create or replace function location_find_nearby(double precision, double precision, double precision)
+create function location_find_nearby(double precision, double precision, double precision)
     returns setof location_nearby_match as
     -- Write as SQL function so that we don't have to construct a temporary
     -- table or results set in memory. That means we can't check the values of
@@ -334,7 +334,7 @@ create type pledge_nearby_match as (
 
 -- pledge_find_nearby LATITUDE LONGITUDE DISTANCE
 -- Find pledges within DISTANCE (km) of (LATITUDE, LONGITUDE).
-create or replace function pledge_find_nearby(double precision, double precision, double precision)
+create function pledge_find_nearby(double precision, double precision, double precision)
     returns setof pledge_nearby_match as
 '
     select pledges.id, nearby.distance

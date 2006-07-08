@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.179 2006-07-08 10:04:21 francis Exp $
+ * $Id: pledge.php,v 1.180 2006-07-08 11:38:38 francis Exp $
  * 
  */
 
@@ -134,10 +134,26 @@ class Pledge {
     function open() { return $this->data['open']; } // not gone past the deadline date
     function finished() { return $this->data['finished']; } // can take no more signers, for whatever reason
 
-    /* succeeded [LOCK]
-     * Wraps pledge_is_successful. */
+    /* succeeded PLEDGE [LOCK]
+     * Has PLEDGE completed successfully? That is, has it as many signers as its
+     * target? If LOCK is true then the pledge row is locked (FOR UPDATE) in the
+     * query, ensuring that the value of this function will not change for the
+     * remainder of this transaction. */
     function succeeded($lock = false) {
-        return pledge_is_successful($this->id(), $lock);
+        // TODO: use internal data structures instead of looking up
+        // this stuff again, but work out what to do with $lock
+        $target = db_getOne('
+                        select target
+                        from pledges
+                        where id = ?
+                        ' . ($lock ? 'for update' : ''),
+                        $this->id());
+        $num = db_getOne('
+                        select count(id)
+                        from signers
+                        where pledge_id = ?', $this->id());
+
+        return $num >= $target;
     }
 
     function failed() {
@@ -702,26 +718,6 @@ function pledge_sentence($r, $params = array()) {
 
     locale_pop();
     return $s;
-}
-
-/* pledge_is_successful PLEDGE [LOCK]
- * Has PLEDGE completed successfully? That is, has it as many signers as its
- * target? If LOCK is true then the pledge row is locked (FOR UPDATE) in the
- * query, ensuring that the value of this function will not change for the
- * remainder of this transaction. */
-function pledge_is_successful($pledge_id, $lock = false) {
-    $target = db_getOne('
-                    select target
-                    from pledges
-                    where id = ?
-                    ' . ($lock ? 'for update' : ''),
-                    $pledge_id);
-    $num = db_getOne('
-                    select count(id)
-                    from signers
-                    where pledge_id = ?', $pledge_id);
-
-    return $num >= $target;
 }
 
 /* pledge_dbresult_to_code RESULT

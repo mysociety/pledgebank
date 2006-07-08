@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.5 2006-06-26 10:35:33 matthew Exp $
+ * $Id: ref-plain.php,v 1.6 2006-07-08 10:04:21 francis Exp $
  * 
  */
 
@@ -72,6 +72,7 @@ $out = array(
         'sentence_third' => pledge_sentence($p->data, array('firstperson'=>false)),
         'title' => $title,
         'target' => $p->target(),
+        'byarea' => $p->byarea(),
         'deadline' => $p->date() . 'T24:00:00Z',
         'detail' => $p->data['detail'],
         'creator_name' => $p->creator_name(),
@@ -97,6 +98,10 @@ $out = array(
         'cached_prominence' => $p->data['cached_prominence'],
     )
 );
+if ($p->byarea()) {
+    $out['data']['byarea_signups'] = $p->byarea_signups();
+    $out['data']['byarea_successes'] = $p->byarea_successes();
+}
 
 if ($q_output == 'xml') {
     header("Content-Type: text/xml");
@@ -130,17 +135,37 @@ function add_signatories($p) {
     if ($nsigners == 0) {
         return;
     }
-    $names = array();
+    $signers = array();
     $anon = 0;
     $unknownname = 0;
 
-    $query = "SELECT * FROM signers WHERE pledge_id = ? ORDER BY id";
+    $order_by = "ORDER BY id";
+    $extra_select = "";
+    $extra_join = "";
+    if ($p->byarea()) {
+        $order_by = "ORDER BY signers.byarea_location_id, id";
+        $extra_select = ", byarea_location.whensucceeded";
+        $extra_join = "LEFT JOIN byarea_location ON byarea_location.byarea_location_id = signers.byarea_location_id AND byarea_location.pledge_id = signers.pledge_id";
+    }
+    $query = "SELECT signers.*, 
+            location.description as location_description, location.country as location_country
+            $extra_select
+        from signers 
+        LEFT JOIN location on location.id = signers.byarea_location_id 
+        $extra_join
+        WHERE signers.pledge_id = ? $order_by";
+
     $q = db_query($query, $p->id());
     while ($r = db_fetch_array($q)) {
         $showname = ($r['showname'] == 't');
         if ($showname) {
             if (isset($r['name'])) {
-                $names[] = $r['name'];
+                $signer = array('name'=>$r['name']);
+                if ($p->byarea()) {
+                    $signer['place'] = $r['location_description'];
+                    $signer['country'] = $r['location_country'];
+                }
+                $signers[] = $signer;
             } else {
                 ++$unknownname;
             }
@@ -150,13 +175,19 @@ function add_signatories($p) {
     }
     if ($q_output == 'xml') {
         print "<signerslist>\n";
-        print "  <signer>" . join("</signer>\n  <signer>", array_map('htmlspecialchars', $names)) . "</signer>\n";;
+        foreach ($signers as $signer) {
+            print "<signer>";
+            print "<name>".htmlspecialchars($signer['name'])."</name>";
+            if (array_key_exists('place', $signer)) print "<place>".htmlspecialchars($signer['place'])."</place>";
+            if (array_key_exists('country', $signer)) print "<country>".htmlspecialchars($signer['country'])."</country>";
+            print "</signer>\n";
+        }
         print "</signerslist>\n";
         print "<anonymous_signers>$anon</anonymous_signers>\n";
         print "<mobile_signers>$unknownname</mobile_signers>\n";
     } elseif ($q_output == 'rabx') {
         global $out;
-        $out['signers']['list'] = $names;
+        $out['signers']['list'] = $signers;
         $out['data']['anonymous_signers'] = $anon;
         $out['data']['mobile_signers'] = $unknownname;
     }

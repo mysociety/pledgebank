@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.178 2006-07-08 08:46:20 francis Exp $
+ * $Id: pledge.php,v 1.179 2006-07-08 10:04:21 francis Exp $
  * 
  */
 
@@ -155,6 +155,8 @@ class Pledge {
     function daysleft() { return $this->data['daysleft']; }
 
     function byarea_successes() { 
+        if (!$this->byarea())
+            return null;
         if (!array_key_exists('successful_areas', $this->data)) {
             $this->data['successful_areas'] = 
                     db_getOne("SELECT count(*) FROM byarea_location 
@@ -165,6 +167,8 @@ class Pledge {
         return $this->data['successful_areas']; 
     }
     function byarea_signups() { 
+        if (!$this->byarea())
+            return null;
         if (!array_key_exists('signup_areas', $this->data)) {
             $this->data['signup_areas'] = 
                     db_getOne("SELECT count(*) FROM byarea_location 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.81 2006-07-07 15:37:12 matthew Exp $
+// $Id: ref-index.php,v 1.82 2006-07-08 08:46:20 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -197,12 +197,12 @@ function draw_signatories($p) {
                         $out .= "</ul>";
                         $in_ul = false;
                     }
-                    $out .= "<h3>" . $loc_desc_with_country . "</h3>";
                     if ($r['whensucceeded']) {
                         $out .= '<p class="success">';
                         $out .= sprintf(_("This pledge succeeded for %s on %s."), $loc_desc_with_country, prettify($r['whensucceeded']));
                         $out .= '</p>';
                     }
+                    $out .= "<h3>" . $loc_desc_with_country . "</h3>";
                     $last_location_description = $loc_desc_with_country;
                 }
                 if (!$in_ul) {

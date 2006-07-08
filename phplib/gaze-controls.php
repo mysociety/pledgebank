@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.4 2006-07-03 09:51:24 francis Exp $
+// $Id: gaze-controls.php,v 1.5 2006-07-08 08:46:20 francis Exp $
 
 // TODO: 
 // - Alter new.php to call these functions, rather than have its own,
@@ -15,6 +15,9 @@
 // in gaze_controls_validate_location
 // - Rename functions to be gaze_controls_ or something as a prefix
 // - Adapt this so it can be in global phplib for use on other sites
+
+// The parameter "townonly" indicates that a location must be entered by
+// the name of a town/place rather than a postcode.
 
 function gaze_controls_find_places($country, $state, $query, $maxresults = null, $minscore = null) {
     $ret = gaze_find_places($country, $state, $query, $maxresults, $minscore);
@@ -146,7 +149,7 @@ function gaze_controls_print_country_choice($selected_country, $selected_state, 
 /* pb_view_gaze_place_choice
  * Display options for choosing a local place
  */
-function gaze_controls_print_place_choice($selected_place, $selected_gaze_place, $places, $errors, $postcode) {
+function gaze_controls_print_place_choice($selected_place, $selected_gaze_place, $places, $errors, $postcode, $params = array()) {
 
     $select_place = false;
     if (!(!$selected_place || array_key_exists('place', $errors) || count($places) == 0)) {
@@ -181,11 +184,14 @@ function gaze_controls_print_place_choice($selected_place, $selected_gaze_place,
     <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if ($selected_place) print htmlspecialchars($selected_place) ?>">
 </p></li>
 
+<? if (!array_key_exists('townonly', $params) || !$params['townonly']) { ?>
     <li><p id="postcode_line">
     <?=_('Or, UK only, you can give a postcode area:') ?>
     <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if ($postcode) print htmlspecialchars($postcode) ?>">
     <br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
     </p></li>
+<? } ?>
+
     </ul>
     <?
 }
@@ -193,7 +199,7 @@ function gaze_controls_print_place_choice($selected_place, $selected_gaze_place,
 # gaze_controls_get_location
 # Looks up the country, state, place, postcode etc. from HTTP variables,
 # partially validates it and returns one $location data array.
-function gaze_controls_get_location() {
+function gaze_controls_get_location($params = array()) {
     $location = array();
     $location['country'] = get_http_var('country');
     $location['state'] = null;
@@ -217,7 +223,6 @@ function gaze_controls_get_location() {
     }
     $location['gaze_place'] = get_http_var('gaze_place');
     $location['postcode'] = get_http_var('postcode');
-    if ($location['country'] && $location['country'] != 'GB') $location['postcode'] = '';
     if ($location['country'] && $location['country'] == '(choose one)') $location['country'] = null;
     if ($location['country'] && $location['country'] == '(separator)') $location['country'] = null;
 
@@ -225,16 +230,26 @@ function gaze_controls_get_location() {
         $location['postcode'] = $location['place'];
         $location['place'] = null;
     }
+
+    # Only allow postcode in the UK, and don't allow it if in townonly mode (for byarea pledges)
+    if ($location['country'] && $location['country'] != 'GB') $location['postcode'] = '';
+    if (array_key_exists('townonly', $params) && $params['townonly']) $location['postcode'] = '';
+
     $location['places'] = null;
+
     return $location;
 }
 
-# gaze_controls_validate_location &LOCATION &ERRORS
+# gaze_controls_validate_location &LOCATION &ERRORS [PARAMS]
 # Validates a location entered for a form. The LOCATION associative
 # array is updated, for example if an exact place match was found.
-# Error messages are added to the ERRORS array.
-function gaze_controls_validate_location(&$location, &$errors) {
+# Error messages are added to the ERRORS array. PARAMS can
+# contain the following parameters:
+#   'townonly' - if true only allows lookup by town name, not by postcode.
+function gaze_controls_validate_location(&$location, &$errors, $params = array()) {
     if (!$location['country']) $errors['country'] = _("Please choose a country");
+    if (array_key_exists('townonly', $params) && $params['townonly'] && $location['postcode'])
+        $errors['postcode'] = _("Please enter a place rather than a postcode for location based pledge signups");
     if ($location['country'] == 'GB') {
         if ($location['postcode'] && $location['place'])
             $errors['place'] = _("Please enter either a place name or a postcode area, but not both");
@@ -255,7 +270,10 @@ function gaze_controls_validate_location(&$location, &$errors) {
         }
     } else {
         if ($location['country'] == 'GB') {
-            $errors['place'] = _("Please enter either a place name or a postcode area");
+            if (array_key_exists('townonly', $params) && $params['townonly'])
+                $errors['place'] = _("Please enter a place name. Choose a specific town where you will carry out the pledge, rather than a postcode.");
+            else
+                $errors['place'] = _("Please enter either a place name or a postcode area");
         } else {
             $errors['place'] = _("Please enter a place name");
         }

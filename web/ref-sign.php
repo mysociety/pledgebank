@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.45 2006-07-07 21:42:13 francis Exp $
+// $Id: ref-sign.php,v 1.46 2006-07-08 08:46:20 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -18,7 +18,7 @@ page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));
 $location = array();
 if ($p->byarea())
-    $location = gaze_controls_get_location();
+    $location = gaze_controls_get_location(array('townonly'=>true));
 
 $title = _('Signature addition');
 $extra = null;
@@ -72,7 +72,7 @@ function do_sign(&$location) {
     if ($pledge->byarea()) {
         if (!$errors)
             $errors = array();
-        gaze_controls_validate_location($location, $errors);
+        gaze_controls_validate_location($location, $errors, array('townonly'=>true));
     }
 
     if ($errors)
@@ -133,7 +133,7 @@ function do_sign(&$location) {
             print "</p><p>";
         } else {
             print "<p>";
-            printf(_('You can be the first to sign in %s, or join other people making the pledge in a town nearby.'), $desc);
+            printf(_('You can be the first to sign in %s, or join other people making the pledge in a place nearby.'), $desc);
             print "</p><p>";
     ?>
                 <input type="radio" name="byarea_location_id" value="new" id="byarea_location_id_0" checked>

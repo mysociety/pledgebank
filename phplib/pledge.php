@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.177 2006-07-07 10:33:34 francis Exp $
+ * $Id: pledge.php,v 1.178 2006-07-08 08:46:20 francis Exp $
  * 
  */
 
@@ -505,14 +505,12 @@ class Pledge {
 ?>            <p><input type="hidden" name="prev_country" value="<?=$this->country_code()?>"> 
               <input type="hidden" name="country" value="<?=$this->country_code()?>"> <?
             }
-
             if ($location) {
-?>
-</p>
+?></p>
 
 <div id="ifyes_line">
 <strong><?=_("Where in that country?")?></strong>
-<?              gaze_controls_print_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode']); ?>
+<?              gaze_controls_print_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode'], array('townonly'=>true)); ?>
 </div>
 <?
 

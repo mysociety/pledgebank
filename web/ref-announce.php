@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.41 2006-06-21 17:30:59 francis Exp $
+ * $Id: ref-announce.php,v 1.42 2006-07-10 10:03:00 francis Exp $
  * 
  */
 
@@ -96,25 +96,26 @@ else if (!is_null(db_getOne('select id from message where id = ?', $q_message_id
 
 /* Figure out which circumstance we should do a message for, and hence the
  * subject of the email. */
-if ($p->failed()) {
-    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'failure-announce'", $p->id());
-    if (!is_null($n))
-        /* Only get to send one announcement on failure. */
-        refuse_announce($p, 'failure-announce');
-    else {
-        $circumstance = 'failure-announce';
-        $email_subject = sprintf(_("Sorry - pledge failed - '%s'"), $p->title() );
+$circumstance = 'general-announce';
+$email_subject = sprintf(_("Update on pledge - '%s' at PledgeBank.com"), $p->title() );
+if (!$p->byarea()) {
+    if ($p->failed()) {
+        $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'failure-announce'", $p->id());
+        if (!is_null($n))
+            /* Only get to send one announcement on failure. */
+            refuse_announce($p, 'failure-announce');
+        else {
+            $circumstance = 'failure-announce';
+            $email_subject = sprintf(_("Sorry - pledge failed - '%s'"), $p->title() );
+        }
+    } else if ($p->succeeded()) {
+        $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $p->id());
+        if (is_null($n))
+            $circumstance = 'success-announce'; /* also send SMS */
+        else
+            $circumstance = 'success-followup'; /* do not send SMS */
+        $email_subject = sprintf(_("Pledge success! - '%s' at PledgeBank.com"), $p->title() );
     }
-} else if ($p->succeeded()) {
-    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $p->id());
-    if (is_null($n))
-        $circumstance = 'success-announce'; /* also send SMS */
-    else
-        $circumstance = 'success-followup'; /* do not send SMS */
-    $email_subject = sprintf(_("Pledge success! - '%s' at PledgeBank.com"), $p->title() );
-} else {
-    $circumstance = 'general-announce';
-    $email_subject = sprintf(_("Update on pledge - '%s' at PledgeBank.com"), $p->title() );
 }
 
 $circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $circumstance));
@@ -135,15 +136,16 @@ page_header(sprintf(_("Send %s to signers of '%s'"), $descr[$circumstance], $p->
 $sentence = $p->sentence(array('firstperson'=>'includename'));
 
 $name = $p->creator_name();
-if ($p->succeeded()) {
-    $default_message = sprintf(_("\nHello, and thank you for signing our successful pledge!\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
-    $default_sms = sprintf(_("%s here. The %s pledge has been successful! <%s>."), $name, $p->ref(), $fill_in);
-} elseif ($p->failed()) {
-    $default_message = sprintf(_("\nHello, and sorry that our pledge has failed.\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
-    $default_sms = sprintf(_("%s here. The %s pledge has failed. <%s>."), $name, $p->ref(), $fill_in);
-} else {
-    $default_message = sprintf(_("\nHello,\n\n<%s>\n\nYours sincerely,\n\n%s\n\nPledge says: '%s'\n\n"), $fill_in, $name, $sentence);
-    $default_sms = null;
+$default_message = sprintf(_("\nHello,\n\n<%s>\n\nYours sincerely,\n\n%s\n\nPledge says: '%s'\n\n"), $fill_in, $name, $sentence);
+$default_sms = null;
+if (!$p->byarea()) {
+    if ($p->succeeded()) {
+        $default_message = sprintf(_("\nHello, and thank you for signing our successful pledge!\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
+        $default_sms = sprintf(_("%s here. The %s pledge has been successful! <%s>."), $name, $p->ref(), $fill_in);
+    } elseif ($p->failed()) {
+        $default_message = sprintf(_("\nHello, and sorry that our pledge has failed.\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
+        $default_sms = sprintf(_("%s here. The %s pledge has failed. <%s>."), $name, $p->ref(), $fill_in);
+    } 
 }
 
 $err = importparams(

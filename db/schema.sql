@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.196 2006-07-08 02:00:18 francis Exp $
+-- $Id: schema.sql,v 1.197 2006-07-10 10:20:52 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1134,50 +1134,10 @@ create index alert_sent_comment_id_idx on alert_sent(comment_id);
 create unique index alert_sent_pledge_unique_idx on alert_sent(alert_id, pledge_id);
 create unique index alert_sent_comment_unique_idx on alert_sent(alert_id, comment_id);
 
--- table of abuse reports on comments, pledges and signers.
-create table abusereport (
-    id serial not null primary key,
-    what_id integer not null,
-    what text not null check (
-        what = 'comment' or what = 'pledge' or what = 'signer'
-    ),
-    reason text,
-    whenreported timestamp not null default ms_current_timestamp(),
-    ipaddr text,
-    email text
-);
-
-create index abusereport_what_id_idx on abusereport(what_id);
-create index abusereport_what_idx on abusereport(what);
-
 create table translator (
     lang text not null,
     email text not null
 );
-
-create function abusereport_id_check()
-    returns trigger as '
-    begin
-        -- cannot use execute for a select in this version so go through each
-        -- case manually
-        if new.what = ''comment'' then
-            perform id from comment where id = new.what_id;
-        elsif new.what = ''pledge'' then
-            perform id from pledges where id = new.what_id;
-        elsif new.what = ''signer'' then
-            perform id from signers where id = new.what_id;
-        else
-            raise exception ''attempt to insert with unknown value of "%" for what'', new.what;
-        end if;
-        if not found then
-            raise exception ''attempt to insert with invalid what_id % for "%"'', new.what_id, new.what;
-        end if;
-        return new;
-    end;
-' language 'plpgsql';
-
-create trigger abusereport_insert_trigger before insert on abusereport
-    for each row execute procedure abusereport_id_check();
 
 create table requeststash (
     key varchar(16) not null primary key check (length(key) = 8 or length(key) = 16),
@@ -1202,7 +1162,6 @@ create index requeststash_whensaved_idx on requeststash(whensaved);
 create function pb_delete_pledge(integer)
     returns void as '
     begin
-        delete from abusereport where what_id = $1 and what = ''pledge'';
         -- messages
         delete from message_signer_recipient
             where signer_id in (select id from signers where pledge_id = $1);
@@ -1237,7 +1196,6 @@ create function pb_delete_pledge(integer)
 create function pb_delete_signer(integer)
     returns void as '
     begin
-        delete from abusereport where what_id = $1 and what = ''signer'';
         delete from message_signer_recipient where signer_id = $1;
         delete from smssubscription where signer_id = $1;
         update pledges set changetime = ms_current_timestamp()
@@ -1255,7 +1213,6 @@ create function pb_delete_person(integer)
     begin
         -- comments made by the person
         delete from alert_sent where comment_id in (select id from comment where person_id = $1);
-        delete from abusereport where what_id in (select id from comment where person_id = $1) and what = ''comment'';
         update pledges set changetime = ms_current_timestamp()
             where id in (select pledge_id from comment where person_id = $1);
         delete from comment where person_id = $1;
@@ -1265,7 +1222,6 @@ create function pb_delete_person(integer)
         delete from alert where person_id = $1;
 
         -- pledges the person has signed
-        delete from abusereport where what_id in (select id from signers where person_id = $1) and what = ''signer'';
         delete from message_signer_recipient where signer_id in (select id from signers where person_id = $1);
         delete from smssubscription where signer_id in (select id from signers where person_id = $1);
         update pledges set changetime = ms_current_timestamp()
@@ -1286,7 +1242,6 @@ create function pb_delete_comment(integer)
     begin
         update pledges set changetime = ms_current_timestamp()
             where id = (select pledge_id from comment where id = $1);
-        delete from abusereport where what_id = $1 and what = ''comment'';
         delete from alert_sent where comment_id = $1;
         delete from comment where id = $1;
         return;

@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.186 2006-07-10 09:39:50 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.187 2006-07-10 10:20:52 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1517,14 +1517,6 @@ sub do_admin_tests {
     $wth->browser_get($admin_url);
     $wth->browser_follow_link(text_regex => qr/Timeline/);
     $wth->browser_check_contents("1st December 1980");
-
-    # Check abuse reports page
-    $wth->browser_get($admin_url);
-    $wth->browser_follow_link(text_regex => qr/Abuse reports/);
-    $wth->browser_check_contents(qr/pledges \(0\)/);
-    $wth->browser_check_contents(qr/comments \(0\)/);
-    $wth->browser_follow_link(text_regex => qr/pledges \(0\)/);
-    $wth->browser_follow_link(text_regex => qr/comments \(0\)/);
 
     # Delete a signer
     $wth->browser_get($admin_url . "/?page=pb&pledge=smsspoof");

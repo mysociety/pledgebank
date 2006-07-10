@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.54 2006-07-05 13:12:23 francis Exp $
+// $Id: search.php,v 1.55 2006-07-10 12:33:41 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,6 +15,9 @@ require_once "../../phplib/votingarea.php";
 
 $search = trim(get_http_var('q', true));
 if (!$search) $search = trim(get_http_var('s', true));
+$backpage_clause = " AND pledges.cached_prominence <> 'backpage' ";
+if (get_http_var('backpage'))
+    $backpage_clause = '';
 $rss = get_http_var('rss') ? true : false;
 $rss_items = array();
 $pledges_output = array();
@@ -40,7 +43,7 @@ else
     page_footer();
 
 function get_location_results($pledge_select, $lat, $lon) {
-    global $pb_today, $rss_items, $rss, $pledges_output;
+    global $pb_today, $rss_items, $rss, $pledges_output, $backpage_clause;
     if (get_http_var("far")) {
         $radius = intval(get_http_var("far"));
     } else {
@@ -53,9 +56,9 @@ function get_location_results($pledge_select, $lat, $lon) {
                 LEFT JOIN pledges ON nearby.pledge_id = pledges.id
                 LEFT JOIN location ON location.id = pledges.location_id 
                 WHERE 
-                    pin IS NULL AND
-                    pledges.cached_prominence <> 'backpage' AND 
-                    '$pb_today' <= pledges.date 
+                    pin IS NULL 
+                    $backpage_clause
+                    AND '$pb_today' <= pledges.date 
                 ORDER BY distance", array($lat, $lon, $radius)); 
     locale_pop();
     $ret = "";
@@ -159,7 +162,7 @@ function search($search) {
         } else {
             list($location_results, $radius) = get_location_results($pledge_select, $location['wgs84_lat'], $location['wgs84_lon']);
             if (!$rss) {
-                print sprintf(p(_('Results for <strong>open pledges</strong> within %s %s of UK postcode <strong>%s</strong>:')), pb_pretty_distance($radius, 'GB', false), get_change_radius_link($search, $radius), htmlspecialchars(strtoupper($search)) );
+                print sprintf(p(_('Results for <strong>open pledges</strong> within %s %s of UK postcode <strong>%s</strong>:')), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars(strtoupper($search)) );
                 if ($location_results) {
                     print $location_results;
                 } else {
@@ -193,7 +196,7 @@ function search($search) {
                         $out .= "<li>$desc";
                     else
                         # TRANS: For example: "Results for <strong>open pledges</strong> near places matching <strong>Bolton</strong>, United Kingdom (<a href="....">change country</a>):"
-			$out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s (%s):"), pb_pretty_distance($radius,microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()], $change_country));
+			$out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s (%s):"), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()], $change_country));
                     if ($location_results) {
                         $out .= $location_results;
                     } else {
@@ -220,10 +223,11 @@ function search($search) {
     }
 
     // Searching for text in pledges - stored in strings $open, $closed printed later
+    global $backpage_clause;
     $q = db_query($pledge_select . ' FROM pledges 
                 LEFT JOIN location ON location.id = pledges.location_id 
                 WHERE pin IS NULL 
-                    AND pledges.cached_prominence <> \'backpage\'
+                    '.$backpage_clause.'
                     AND (title ILIKE \'%\' || ? || \'%\' OR 
                          detail ILIKE \'%\' || ? || \'%\' OR 
                          identity ILIKE \'%\' || ? || \'%\' OR 

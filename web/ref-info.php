@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.40 2006-06-21 17:30:59 francis Exp $
+ * $Id: ref-info.php,v 1.41 2006-07-10 09:39:51 francis Exp $
  * 
  */
 
@@ -86,7 +86,10 @@ debug_timestamp(true, "pledge info box");
 <tr>
     <th><?=_('Status') ?></th>
     <td><?
-    if ($p->open())
+    if ($p->byarea()) {
+        print sprintf(ngettext('successful in %d area', 'successful in %d areas', $p->byarea_successes()),
+            $p->byarea_successes());
+    } elseif ($p->open())
         print _('open for signers; ')
 	        # TRANS: "successful" is only ever used in singular context
                 . ($p->succeeded() ? _('successful') : _('not yet successful'));
@@ -98,15 +101,20 @@ debug_timestamp(true, "pledge info box");
 </tr>
 <tr>
     <th><?=_('Number of signers') ?></th>
-    <td><?= $p->signers() ?> / <?= $p->target() ?>
+    <td><?= $p->signers() ?> 
+        <? if (!$p->byarea()) { ?>
+        / <?= $p->target() ?>
         <?= sprintf(_('(%.1f%% of target)'), 100. * $p->signers() / $p->target()) ?>
+        <? } ?>
     </td>
 </tr>
 <? debug_timestamp(true); ?>
 <tr>
     <th><?=_('Estimated signers by deadline') ?></th>
     <td><?= $p->probable_will_reach() ?> 
+        <? if (!$p->byarea()) { ?>
         <?= sprintf(_('(%.1f%% of target)<br><small>if signup rate continues as in last week</small>'), 100. * $p->probable_will_reach() / $p->target()) ?>
+        <? } ?>
     </td>
 </tr>
 <? debug_timestamp(true); ?>

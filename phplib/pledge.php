@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.180 2006-07-08 11:38:38 francis Exp $
+ * $Id: pledge.php,v 1.181 2006-07-10 09:39:51 francis Exp $
  * 
  */
 
@@ -140,6 +140,11 @@ class Pledge {
      * query, ensuring that the value of this function will not change for the
      * remainder of this transaction. */
     function succeeded($lock = false) {
+        if ($this->byarea()) {
+            // Only parts of byarea pledges succeed, never the whole pledge
+            return false;
+        }
+
         // TODO: use internal data structures instead of looking up
         // this stuff again, but work out what to do with $lock
         $target = db_getOne('

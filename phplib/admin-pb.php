@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.131 2006-07-11 18:37:51 francis Exp $
+ * $Id: admin-pb.php,v 1.132 2006-07-11 19:39:51 francis Exp $
  * 
  */
 
@@ -381,7 +381,8 @@ class ADMIN_PAGE_PB_MAIN {
         
         // Messages
         print h2(_("Messages"));
-        $q = db_query('select * from message 
+        $q = db_query('select message.*, location.description as location_description from message 
+                left join location on location.id = message.byarea_location_id
                 where pledge_id = ? order by whencreated', $pdata['id']);
 
         $n = 0;
@@ -400,8 +401,11 @@ class ADMIN_PAGE_PB_MAIN {
             print "<p>";
             print "<strong>". $r['circumstance'] . ' ' . $r['circumstance_count'] . '</strong>';
             print " created on ". prettify(substr($r['whencreated'], 0, 19));
-            print " to be sent from <strong>" . $r['fromaddress'] . "</strong> to <strong>";
+            print " to be sent from <strong>" . $r['fromaddress'] . "</strong> to ";
+            print "<strong>";
             print join(", ", $whom) . "</strong>";
+            if ($r['byarea_location_id']) 
+                print " for " . $r['location_description'] . " ";
             print "<br>has been queued to evel for ";
             print "<strong>$got_creator_count creators</strong>";
             print " and <strong>$got_signer_count signers</strong>";

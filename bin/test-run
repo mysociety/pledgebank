@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.189 2006-07-11 09:55:20 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.190 2006-07-11 18:33:21 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1437,8 +1437,7 @@ sub do_byarea_tests {
     $wth->browser_get($announce_link);
     $wth->browser_check_contents("Send success announcement message for Liverpool");
     $wth->browser_submit_form(form_name => 'pledge',
-                fields => { message_body => "It all works in Liverpool. Go to it guys. " . name_n(600),
-                            message_sms => "Blah blah."},
+                fields => { message_body => "It all works in Liverpool. Go to it guys. " . name_n(600) },
         button => 'submit') or die "Failed to submit Liverpool email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Liverpool");
     $wth->log_watcher_check();
@@ -1476,8 +1475,7 @@ sub do_byarea_tests {
     $wth->browser_get($announce_link_2);
     $wth->browser_check_contents("Send success announcement message for Southampton");
     $wth->browser_submit_form(form_name => 'pledge',
-                fields => { message_body => "It all rocks in Southampton. Go go to it guys. " . name_n(600),
-                            message_sms => "Blah blah."},
+                fields => { message_body => "It all rocks in Southampton. Go go to it guys. " . name_n(600) },
         button => 'submit') or die "Failed to submit Southampton email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Southampton");
     $wth->log_watcher_check();
@@ -1499,8 +1497,7 @@ sub do_byarea_tests {
     $wth->browser_get($announce_link_failure);
     $wth->browser_check_contents("Send failure announcement message for Hexham");
     $wth->browser_submit_form(form_name => 'pledge',
-                fields => { message_body => "Boohoo! It went badly in Hexham. I'm very sorry." . name_n(600),
-                            message_sms => "Nah nah nah nah."},
+                fields => { message_body => "Boohoo! It went badly in Hexham. I'm very sorry." . name_n(600) },
         button => 'submit') or die "Failed to submit Hexham email failure form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Hexham");
     $wth->log_watcher_check();

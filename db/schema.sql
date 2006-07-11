@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.197 2006-07-10 10:20:52 francis Exp $
+-- $Id: schema.sql,v 1.198 2006-07-11 10:16:10 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -276,13 +276,15 @@ select case
     when abs($1 - $2) > pi() then 2 * pi() - abs($1 - $2)
     else abs($1 - $2)
     end;
-' language sql;
+' language sql immutable;
 
 -- R_e
 -- Radius of the earth, in km. This is something like 6372.8 km:
 --  http://en.wikipedia.org/wiki/Earth_radius
 create function R_e()
-    returns double precision as 'select 6372.8::double precision;' language sql;
+    returns double precision as '
+select 6372.8::double precision;
+' language sql immutable;
 
 create type location_nearby_match as (
     location_id integer,
@@ -325,7 +327,7 @@ create function location_find_nearby(double precision, double precision, double 
                     * cos(radians($2 - longitude)))::numeric, 14)
                 ) < $3
         order by distance desc
-' language sql;
+' language sql; -- should be "stable" rather than volatile per default?
 
 create type pledge_nearby_match as (
     pledge_id integer,
@@ -966,7 +968,7 @@ select case
     when $1 < ($3 * 0.025) then ''backpage''
     else ''normal''
     end;
-' language sql;
+' language sql immutable;
 
 -- pb_pledge_prominence ID
 -- Return the effective prominence of the pledge with the given ID.
@@ -986,7 +988,7 @@ select case
     else -- calculated
         pb_pledge_prominence_calculated( (select count(id) from signers where pledge_id = $1)::integer, (select longitude from pledges, location where pledges.location_id = location.id and pledges.id = $1) is not null, (select target from pledges where id = $1) )
     end;
-' language sql;
+' language sql stable;
 
 
 -- Stores randomly generated tokens and serialised hash arrays associated

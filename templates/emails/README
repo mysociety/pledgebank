@@ -65,6 +65,7 @@ Parameters as for failed-creator, with additionally:
   - location_description, name of town where success has happened
   - location_signers, number of people who signed up in the area
   - byarea_success_count, how many successful towns there are 
+Also, exceeded_or_met doesn't work for -byarea messages.
 
 * failed-signer
 Sent to each signer when a pledge fails.

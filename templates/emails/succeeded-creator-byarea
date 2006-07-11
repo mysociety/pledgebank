@@ -2,9 +2,9 @@ Subject: Pledge successful in <?=$values['location_description']?> - '<?=$values
 
 Congratulations!
 
-We are pleased to tell you that your pledge <?=$values['exceeded_or_met']?> its
-target for people in <?=$values['location_description']?> in the required time.
-Your pledge reads: '<?=$values['sentence_first']?>'
+We are pleased to tell you that your pledge reached its target for people in
+<?=$values['location_description']?> in the required time.  Your pledge reads:
+'<?=$values['sentence_first']?>'
 
 Next, please click on the link below and write a message to tell everyone who
 signed the pledge in <?=$values['location_description']?> what you want them to

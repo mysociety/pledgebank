@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.29 2006-06-06 12:19:18 chris Exp $
+// $Id: list.php,v 1.30 2006-07-11 15:18:52 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -36,20 +36,34 @@ if ($rss && get_http_var('postcode')) {
 $original_sort = preg_replace("#/$#", "", $q_sort);
 if ($q_type == 'failed') {
     $open = '<'; $succeeded = '<';
+    $open_byarea = '<'; $succeeded_byarea = ' = 0';
     if ($q_sort == "default") $q_sort = "creationtime";
 } elseif ($q_type == 'succeeded_closed') {
     $open = '<'; $succeeded = '>=';
+    $open_byarea = '<'; $succeeded_byarea = ' > 0';
     if ($q_sort == "default") $q_sort = $rss ? "whensucceeded" : "creationtime";
 } elseif ($q_type == 'succeeded_open') {
     $open = '>='; $succeeded = '>=';
+    $open_byarea = '>='; $succeeded_byarea = ' < 0'; # never allowed
     if ($q_sort == "default") $q_sort = $rss ? "whensucceeded" : "date";
 } elseif ($q_type == 'succeeded') {
     $open = null; $succeeded = '>=';
+    $open_byarea = null; $succeeded_byarea = ' > 0';
     if ($q_sort == "default") $q_sort = $rss ? "whensucceeded" : "creationtime";
 } else {
     $open = '>='; $succeeded = '<';
+    $open_byarea = '>='; $succeeded_byarea = null;
     if ($q_sort == "default") $q_sort = $rss ? "creationtime" : "percentcomplete";
 }
+$date_range_clause = ($open ? " AND date $open '$pb_today' " : "");
+$signers_range_clause = "(SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) 
+                         $succeeded target";
+$byarea_clause = ($open_byarea ? " date $open_byarea '$pb_today' AND " : "") 
+                . ($succeeded_byarea ? "(SELECT count(*) FROM byarea_location WHERE 
+                    byarea_location.pledge_id = pledges.id AND byarea_location.whensucceeded IS NOT NULL) 
+                    $succeeded_byarea" : " (1=1)");
+$page_clause = "AND ( (pledges.target_type = 'overall' AND $signers_range_clause $date_range_clause)
+                OR (pledges.target_type = 'byarea' AND $byarea_clause) )";
 
 $sql_params = array();
 $locale_clause = "(".
@@ -59,10 +73,10 @@ $locale_clause = "(".
 $query = "
                 SELECT count(pledges.id)
                 FROM pledges LEFT JOIN location ON location.id = pledges.location_id
-                WHERE $locale_clause AND pin IS NULL ".
-                ($open ? " AND date $open '$pb_today' " : ""). 
-                " AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target
-                    AND cached_prominence <> 'backpage'";
+                WHERE $locale_clause AND pin IS NULL 
+                $page_clause
+                AND cached_prominence <> 'backpage'";
+#print $query;exit;
 $ntotal = db_getOne($query , $sql_params);
 if ($ntotal < $q_offset) {
     $q_offset = $ntotal - PAGE_SIZE;
@@ -92,10 +106,9 @@ $qrows = db_query("
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
-            WHERE $locale_clause".
-            ($open ? " AND date $open '$pb_today' " : ""). 
-           "AND pin IS NULL
-            AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target 
+            WHERE $locale_clause
+            AND pin IS NULL
+            $page_clause
             AND cached_prominence <> 'backpage'
             ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", $sql_params);
 /* PG bug: mustn't quote parameter of offset */

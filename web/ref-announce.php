@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.44 2006-07-11 09:55:21 francis Exp $
+ * $Id: ref-announce.php,v 1.45 2006-07-11 15:18:52 francis Exp $
  * 
  */
 
@@ -32,7 +32,13 @@ $p = new Pledge($q_ref);
 $p->lock();
 
 /* For success/failure in one place for a byarea type pledge */
-$byarea_location_id = get_http_var('location');
+$byarea_location_id = intval(get_http_var('location'));
+if ($byarea_location_id)
+    $byarea_location_test = " byarea_location_id =  " . $byarea_location_id;
+else {
+    $byarea_location_id = null;
+    $byarea_location_test = " byarea_location_id is null ";
+}
 $succeeded = $p->succeeded();
 $failed = $p->failed();
 if ($p->byarea()) {
@@ -41,7 +47,7 @@ if ($p->byarea()) {
         $byarea_location_description = db_getOne("select description from
                     location where location.id = ?", $byarea_location_id);
         $byarea_location_whensucceeded = db_getOne("select whensucceeded from
-                    byarea_location where pledge_id = ? and byarea_location_id = ?", $p->id(), $byarea_location_id);
+                    byarea_location where pledge_id = ? and $byarea_location_test", $p->id());
         if ($byarea_location_whensucceeded) {
             $succeeded = true;
         } else {
@@ -87,10 +93,10 @@ $has_sms = array(
 
 /* refuse_announce PLEDGE CIRCUMSTANCE
  * Page explaining that punter may not send another message of this type. */
-function refuse_announce($p, $c, $l) {
-    global $descr;
+function refuse_announce($p, $c) {
+    global $descr, $byarea_location_test;
     page_header(_("Send announcement"));
-    $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and byarea_location_id = ?', array($p->id(), $c, $l));
+    $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and '.$byarea_location_test, array($p->id(), $c));
     print "<strong>";
     printf(ngettext('You have already sent %d %s, which is all that you\'re allowed.', 'You have already sent %d %s, which is all that you\'re allowed.', $n), $n, $descr[$c]);
     print "</strong> ";
@@ -124,10 +130,10 @@ else if (!is_null(db_getOne('select id from message where id = ?', $q_message_id
 /* Figure out which circumstance we should do a message for, and hence the
  * subject of the email. */
 if ($failed) {
-    $n = db_getOne("select id from message where PLEDGe_id = ? and circumstance = 'failure-announce' and byarea_location_id = ?", $p->id(), $byarea_location_id);
+    $n = db_getOne("select id from message where PLEDGe_id = ? and circumstance = 'failure-announce' and $byarea_location_test", $p->id());
     if (!is_null($n))
         /* Only get to send one announcement on failure. */
-        refuse_announce($p, 'failure-announce', $byarea_location_id);
+        refuse_announce($p, 'failure-announce');
     else {
         $circumstance = 'failure-announce';
         if ($byarea_location_id)
@@ -136,7 +142,7 @@ if ($failed) {
             $email_subject = sprintf(_("Sorry - pledge failed - '%s'"), $p->title() );
     }
 } else if ($succeeded) {
-    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce' and byarea_location_id = ?", $p->id(), $byarea_location_id);
+    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce' and $byarea_location_test", $p->id());
     if (is_null($n))
         $circumstance = 'success-announce'; /* also send SMS */
     else
@@ -153,7 +159,7 @@ if ($failed) {
         $email_subject = sprintf(_("Update on pledge - '%s' at PledgeBank.com"), $p->title() );
 }
 
-$circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and byarea_location_id = ?', array($p->id(), $circumstance, $byarea_location_id));
+$circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and '.$byarea_location_test, array($p->id(), $circumstance));
 
 $do_sms = array_key_exists($circumstance, $has_sms) ? true : false;
 if ($do_sms) {

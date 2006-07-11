@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.121 2006-06-28 11:18:35 francis Exp $
+// $Id: page.php,v 1.122 2006-07-11 15:18:52 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -114,7 +114,11 @@ function page_header($title, $params = array()) {
             header('Cache-Control: max-age=' . $params['cache-max-age']);
     }
 
-    $P = person_if_signed_on(true); /* Don't renew any login cookie. */
+    /* On an error page don't do anything complicated like check login */
+    global $err_handling_error;
+    $P = null;
+    if (!$err_handling_error) 
+        $P = person_if_signed_on(true); /* Don't renew any login cookie. */
 
     $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

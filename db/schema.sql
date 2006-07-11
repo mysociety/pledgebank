@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.198 2006-07-11 10:16:10 chris Exp $
+-- $Id: schema.sql,v 1.199 2006-07-11 15:45:07 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -38,7 +38,7 @@ create function ms_current_date()
         end if;
 
     end;
-' language 'plpgsql';
+' language 'plpgsql' stable;
 
 -- Returns the timestamp of current time, but with possibly overriden "today".
 create function ms_current_timestamp()

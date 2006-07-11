@@ -1,11 +1,11 @@
 <?
-// ref-index.php:
+// ref-sign.php:
 // Main pledge page, for URLs http://www.pledgebank.com/REF/
 //
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.47 2006-07-11 00:26:53 francis Exp $
+// $Id: ref-sign.php,v 1.48 2006-07-11 17:45:19 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -124,8 +124,10 @@ function do_sign(&$location) {
     <input type="hidden" name="email" value="<?=htmlspecialchars($q_email) ?>">
     <input type="hidden" name="showname" value="<?=htmlspecialchars($q_showname) ?>">
     <input type="hidden" name="country" value="<?=$location['country']?>">
+    <input type="hidden" name="prev_country" value="<?=$location['country']?>">
     <input type="hidden" name="gaze_place" value="<?=$location['gaze_place']?>">
     <input type="hidden" name="place" value="<?=$location['place']?>">
+    <input type="hidden" name="prev_place" value="<?=$location['place']?>">
     <h2><?=_('Signers near you')?></h2>
     <?  if ($already_id) {
             print "<p>";
@@ -212,7 +214,13 @@ function do_sign(&$location) {
         db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge->id(), ($P->has_name() ? $P->name() : null), $P->id(), $q_showname ? 't' : 'f', $_SERVER['REMOTE_ADDR'], $byarea_location_id));
         db_commit();
         print '<p class="noprint loudmessage" align="center">';
-        print _('Thanks for signing up to this pledge!');
+        if ($byarea_location_id) {
+            $byarea_location_description = db_getOne("select description from
+                    location where location.id = ?", $byarea_location_id);
+            printf(_('Thanks for signing up to this pledge in %s!'), $byarea_location_description);
+        } else
+            print _('Thanks for signing up to this pledge!');
+
         print '</p>';
 
         /* Grab the row again so the check is current. */

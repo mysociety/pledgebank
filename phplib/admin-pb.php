@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.130 2006-07-10 10:20:53 francis Exp $
+ * $Id: admin-pb.php,v 1.131 2006-07-11 18:37:51 francis Exp $
  * 
  */
 
@@ -121,7 +121,8 @@ class ADMIN_PAGE_PB_MAIN {
                 <a href="?page=pblatest&amp;ref='.$r['ref'].'">timeline</a>';
             $row .= '</td>';
             $row .= '<td>'.trim_characters(htmlspecialchars($r['title']),0,100).'</td>';
-            $row .= '<td>'.htmlspecialchars($r['signers']) . ' / '.htmlspecialchars($r['target'])./*' '.htmlspecialchars($r['type']).*/'</td>';
+            $row .= '<td>'.htmlspecialchars($r['signers']) . ' / '.htmlspecialchars($r['target']).
+            ' '.htmlspecialchars($r['target_type']).'</td>';
             $row .= '<td>' . str_replace('.00', '', round($r['signers']/$r['target']*100,0)) . '%</td>';
             $row .= '<td>'.$r['date'].'</td>';
 
@@ -234,7 +235,9 @@ class ADMIN_PAGE_PB_MAIN {
         print "<p>Set by: <b>" . htmlspecialchars($pdata['name']) . " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</b>";
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
-        print " Target: <b>" . $pdata['target'] . " " .  htmlspecialchars($pdata['type']) . "</b>";
+        print "<br>Target: <b>" . $pdata['target'] . " " .  htmlspecialchars($pdata['type']) . "</b>";
+        if ($pdata['target_type'] == "byarea") 
+            print " (target is byarea)";
 
         global $langs;
         print '<form name="languageform" method="post" action="'.$this->self_link.'">';
@@ -296,9 +299,11 @@ class ADMIN_PAGE_PB_MAIN {
         $query = 'SELECT signers.name as signname,person.email as signemail,
                          signers.mobile as signmobile,
                          date_trunc(\'second\',signtime) AS signtime,
-                         showname, signers.id AS signid 
+                         showname, signers.id AS signid,
+                         location.description AS location_description
                    FROM signers 
                    LEFT JOIN person ON person.id = signers.person_id
+                   LEFT JOIN location ON location.id = signers.byarea_location_id
                    WHERE pledge_id=?';
         if ($sort=='t') $query .= ' ORDER BY signtime DESC';
         elseif ($sort=='n') $query .= ' ORDER BY showname DESC';
@@ -318,6 +323,8 @@ class ADMIN_PAGE_PB_MAIN {
                 array_push($e, $r['signemail']);
             if ($r['signmobile'])
                 array_push($e, $r['signmobile']);
+            if ($r['location_description'])
+                array_push($e, $r['location_description']);
             $e = join("<br>", $e);
             $out[$e] = '<td>'.$e.'</td>';
             $out[$e] .= '<td>'.prettify($r['signtime']).'</td>';

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.182 2006-07-11 00:26:53 francis Exp $
+ * $Id: pledge.php,v 1.183 2006-07-11 19:11:43 francis Exp $
  * 
  */
 
@@ -569,7 +569,7 @@ class Pledge {
     <p><strong>' . _('Your email') . '</strong>: <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
     _('(we need this so we can tell you when the pledge is completed and let the pledge creator get in touch)') . '</small> </p>
 
-    <p><input type="submit" name="submit" value="' . _('Sign Pledge') . '"></p>
+    <p><input type="submit" name="submit" value="' . ($this->byarea() ? _('Sign Pledge &gt;&gt;&gt;') : _('Sign Pledge')) . '"></p>
     </form>';
     }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.48 2006-07-11 17:45:19 francis Exp $
+// $Id: ref-sign.php,v 1.49 2006-07-11 19:11:44 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -158,7 +158,7 @@ function do_sign(&$location) {
                 }
 ?>
     </p>
-    <p><input type="submit" name="submit" value="<?=_('Sign Pledge')?>"></p>
+    <p><input type="submit" name="submit" value="<?=_('Sign Pledge &gt;&gt;&gt;')?>"></p>
     </form>
 <?
                 return array('location_choice' => true);

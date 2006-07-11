@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.42 2006-07-10 10:03:00 francis Exp $
+ * $Id: ref-announce.php,v 1.43 2006-07-11 00:26:53 francis Exp $
  * 
  */
 
@@ -30,6 +30,29 @@ $p = new Pledge($q_ref);
 
 /* Lock the pledge here, before we do any other checks. */
 $p->lock();
+
+/* For success/failure in one place for a byarea type pledge */
+$byarea_location_id = get_http_var('location');
+$succeeded = $p->succeeded();
+$failed = $p->failed();
+if ($p->byarea()) {
+    if ($byarea_location_id) {
+        $p->byarea_validate_location($byarea_location_id);
+        $byarea_location_description = db_getOne("select description from
+                    location where location.id = ?", $byarea_location_id);
+        $byarea_location_whensucceeded = db_getOne("select whensucceeded from
+                    byarea_location where pledge_id = ? and byarea_location_id = ?", $p->id(), $byarea_location_id);
+        if ($byarea_location_whensucceeded) {
+            $succeeded = true;
+        } else {
+            $succeeded = false;
+        }
+    } else {
+        $failed = false;
+        $succeeded = false;
+    }
+}
+
 
 $P = person_if_signed_on();
 if (!$P) {
@@ -64,10 +87,10 @@ $has_sms = array(
 
 /* refuse_announce PLEDGE CIRCUMSTANCE
  * Page explaining that punter may not send another message of this type. */
-function refuse_announce($p, $c) {
+function refuse_announce($p, $c, $l) {
     global $descr;
-    page_header(_("Send Announcement"));
-    $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $c));
+    page_header(_("Send announcement"));
+    $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and byarea_location_id', array($p->id(), $c, $l));
     print "<strong>";
     printf(ngettext('You have already sent %d %s, which is all that you\'re allowed.', 'You have already sent %d %s, which is all that you\'re allowed.', $n), $n, $descr[$c]);
     print "</strong> ";
@@ -78,9 +101,13 @@ function refuse_announce($p, $c) {
 
 /* message_success
  * Page thanking punter for sending message. */
-function message_success() {
+function message_success($p) {
+    global $byarea_location_id, $byarea_location_description;
     page_header(_("Announcement sent"));
-    print p(_("<strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge. A copy will also be sent to you for your records."));
+    if ($byarea_location_id) 
+        printf(p(_("<strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge in %s. A copy will also be sent to you for your records.")), $byarea_location_description);
+    else
+        print p(_("<strong>Thank you!</strong> Your message will now be sent to all the people who signed your pledge. A copy will also be sent to you for your records."));
     page_footer();
     exit();
 }
@@ -92,30 +119,38 @@ if (is_null($q_message_id))
     $q_message_id = $q_h_message_id = db_getOne("select nextval('message_id_seq')");
 else if (!is_null(db_getOne('select id from message where id = ?', $q_message_id)))
     /* Message already sent. */
-    message_success();
+    message_success($p);
 
 /* Figure out which circumstance we should do a message for, and hence the
  * subject of the email. */
-$circumstance = 'general-announce';
-$email_subject = sprintf(_("Update on pledge - '%s' at PledgeBank.com"), $p->title() );
-if (!$p->byarea()) {
-    if ($p->failed()) {
-        $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'failure-announce'", $p->id());
-        if (!is_null($n))
-            /* Only get to send one announcement on failure. */
-            refuse_announce($p, 'failure-announce');
-        else {
-            $circumstance = 'failure-announce';
+if ($failed) {
+    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'failure-announce'", $p->id());
+    if (!is_null($n))
+        /* Only get to send one announcement on failure. */
+        refuse_announce($p, 'failure-announce', $byarea_location_id);
+    else {
+        $circumstance = 'failure-announce';
+        if ($byarea_location_id)
+            $email_subject = sprintf(_("Sorry - pledge failed in %s - '%s'"), $byarea_location_description, $p->title() );
+        else 
             $email_subject = sprintf(_("Sorry - pledge failed - '%s'"), $p->title() );
-        }
-    } else if ($p->succeeded()) {
-        $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $p->id());
-        if (is_null($n))
-            $circumstance = 'success-announce'; /* also send SMS */
-        else
-            $circumstance = 'success-followup'; /* do not send SMS */
-        $email_subject = sprintf(_("Pledge success! - '%s' at PledgeBank.com"), $p->title() );
     }
+} else if ($succeeded) {
+    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $p->id());
+    if (is_null($n))
+        $circumstance = 'success-announce'; /* also send SMS */
+    else
+        $circumstance = 'success-followup'; /* do not send SMS */
+    if ($byarea_location_id)
+        $email_subject = sprintf(_("Pledge success in %s! - '%s' at PledgeBank.com"), $byarea_location_description, $p->title() );
+    else
+        $email_subject = sprintf(_("Pledge success! - '%s' at PledgeBank.com"), $p->title() );
+} else {
+    $circumstance = 'general-announce';
+    if ($byarea_location_id)
+        $email_subject = sprintf(_("Update on pledge - '%s' at PledgeBank.com"), $p->title() );
+    else 
+        $email_subject = sprintf(_("Update on pledge in %s - '%s' at PledgeBank.com"), $byarea_location_description, $p->title() );
 }
 
 $circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $circumstance));
@@ -129,6 +164,8 @@ if ($do_sms) {
 }
 
 $fill_in = _("ADD INSTRUCTIONS FOR PLEDGE SIGNERS HERE, INCLUDING YOUR CONTACT INFO");
+if ($byarea_location_id) 
+    $fill_in = sprintf(_("ADD INSTRUCTIONS FOR PLEDGE SIGNERS IN %s HERE, INCLUDING YOUR CONTACT INFO"), strtoupper($byarea_location_description));
 
 /* All OK. */
 page_header(sprintf(_("Send %s to signers of '%s'"), $descr[$circumstance], $p->title()), array('ref'=>$p->ref(),'pref'=>$p->url_typein()));
@@ -136,16 +173,15 @@ page_header(sprintf(_("Send %s to signers of '%s'"), $descr[$circumstance], $p->
 $sentence = $p->sentence(array('firstperson'=>'includename'));
 
 $name = $p->creator_name();
-$default_message = sprintf(_("\nHello,\n\n<%s>\n\nYours sincerely,\n\n%s\n\nPledge says: '%s'\n\n"), $fill_in, $name, $sentence);
-$default_sms = null;
-if (!$p->byarea()) {
-    if ($p->succeeded()) {
-        $default_message = sprintf(_("\nHello, and thank you for signing our successful pledge!\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
-        $default_sms = sprintf(_("%s here. The %s pledge has been successful! <%s>."), $name, $p->ref(), $fill_in);
-    } elseif ($p->failed()) {
-        $default_message = sprintf(_("\nHello, and sorry that our pledge has failed.\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
-        $default_sms = sprintf(_("%s here. The %s pledge has failed. <%s>."), $name, $p->ref(), $fill_in);
-    } 
+if ($succeeded) {
+    $default_message = sprintf(_("\nHello, and thank you for signing our successful pledge!\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
+    $default_sms = sprintf(_("%s here. The %s pledge has been successful! <%s>."), $name, $p->ref(), $fill_in);
+} elseif ($failed) {
+    $default_message = sprintf(_("\nHello, and sorry that our pledge has failed.\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
+    $default_sms = sprintf(_("%s here. The %s pledge has failed. <%s>."), $name, $p->ref(), $fill_in);
+} else {
+    $default_message = sprintf(_("\nHello,\n\n<%s>\n\nYours sincerely,\n\n%s\n\nPledge says: '%s'\n\n"), $fill_in, $name, $sentence);
+    $default_sms = null;
 }
 
 $err = importparams(
@@ -203,20 +239,20 @@ if (!sizeof($errors) && $q_submit) {
      * and let the frequentupdate script pass it to the signers. */
     db_query("
         insert into message
-            (id, pledge_id, circumstance, circumstance_count, fromaddress,
+            (id, pledge_id, circumstance, circumstance_count, fromaddress, byarea_location_id,
             sendtocreator, sendtosigners, sendtolatesigners,
             emailsubject, emailbody, sms)
         values
-            (?, ?, ?, ?, 'creator',
+            (?, ?, ?, ?, 'creator', ?,
             true, true, true,
             ?, ?, ?)",
         array(
-            $q_message_id, $p->id(), $circumstance, $circumstance_count,
+            $q_message_id, $p->id(), $circumstance, $circumstance_count, $byarea_location_id,
             $q_message_subject, $q_message_body, $do_sms ? $q_message_sms : null));
 
     db_commit();
 
-    message_success();
+    message_success($p);
 } else {
  
 
@@ -236,17 +272,27 @@ if (!sizeof($errors) && $q_submit) {
 ?>
 
 <form action="announce" accept-charset="utf-8" class="pledge" name="pledge" id="pledgeaction" method="post">
-<h2><?=_('Send') . ' ' . $descr[$circumstance]?></h2>
+<h2><?=_('Send') . ' ' . $descr[$circumstance] . ($byarea_location_id ? " for " . $byarea_location_description : '')?></h2>
 <input type="hidden" name="message_id" value="<?=$q_h_message_id?>">
+<input type="hidden" name="location" value="<?=$byarea_location_id?>">
 <p>
 <?
-    if ($p->succeeded()) {
-        printf(_('Write a message to tell the %d %s who have signed your pledge what to do next.'), $howmany, htmlspecialchars($p->type()));
+    if ($succeeded) {
+        if ($byarea_location_id) 
+            printf(_('Write a message to tell the %d %s who have signed your pledge in %s what to do next.'), $howmany, htmlspecialchars($p->type()), $byarea_location_description);
+        else
+            printf(_('Write a message to tell the %d %s who have signed your pledge what to do next.'), $howmany, htmlspecialchars($p->type()));
     } else {
-        printf(_('Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
+        if ($byarea_location_id) 
+            printf(_('Write a message to the %d %s who have signed your pledge in %s.'), $howmany, htmlspecialchars($p->type()), $byarea_location_description);
+        else
+            printf(_('Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
     }
     if ($p->open()) {
-        printf(' '._('A copy of your message will also be sent to anybody who signs your pledge later.'));
+        if ($byarea_location_id) 
+            printf(' '._('A copy of your message will also be sent to anybody who signs your pledge there later.'));
+        else
+            printf(' '._('A copy of your message will also be sent to anybody who signs your pledge later.'));
     }
 ?>
 </p>
@@ -300,7 +346,7 @@ count_sms_characters();
         }
     }
 
-    print _('<h3>Send Announcement</h3>');
+    print _('<h3>Send announcement</h3>');
     print '<p>';
     print _('(Remember, when you send this message <strong>your email address will be given to everyone</strong> who has already, or who will in the future, sign up to your pledge by email)');
     print ' <input type="submit" name="submit" value="' . _('Send') . ' &gt;&gt;"></p>';

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.46 2006-07-08 08:46:20 francis Exp $
+// $Id: ref-sign.php,v 1.47 2006-07-11 00:26:53 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -185,12 +185,7 @@ function do_sign(&$location) {
                 $byarea_location_id = null;
             if ($byarea_location_id) {
                 // check byarea_location is valid if already set from form choice
-                $check = db_getOne("select count(*) from byarea_location 
-                        where pledge_id = ? and byarea_location_id = ?",
-                        array($pledge->id(), $byarea_location_id));
-                if ($check != 1) {
-                    err(_("byarea_location_id must already have signers for the pledge"));
-                }
+                $pledge->byarea_validate_location($byarea_location_id);
             } else if ($already_id) {
                 $byarea_location_id = $already_id;
             } else {

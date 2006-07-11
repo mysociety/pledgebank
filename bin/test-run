@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.187 2006-07-10 10:20:52 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.188 2006-07-11 00:26:52 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -735,7 +735,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_follow_link(text_regex => qr/message to signers/);
     perform_login_action(0, {action=>"viaemail", giveemail=>1}, ["send a message to everyone"]);
-    $wth->browser_check_contents("Send Announcement");
+    $wth->browser_check_contents("Send announcement");
     $wth->browser_check_no_contents("successful");
     $wth->browser_submit_form(form_name => 'pledge',
                 fields => { message_body => "Hey, please mail all your friends and get them to sign the pledge.  It's sure to work then! Love and kisses, " . name_n(0),
@@ -796,7 +796,7 @@ sub do_public_succeeding_pledge {
     die "Failed to find announcements link" if !$announce_link;
     display_url("Announce URL", $announce_link);
     $wth->browser_get($announce_link);
-    $wth->browser_check_contents("Send Announcement");
+    $wth->browser_check_contents("Send announcement");
     $wth->browser_submit_form(form_name => 'pledge',
                 fields => { message_body => "By merely partaking you have fulfilled your part in the pledge.  You rule!  This is my favourite pledge in the world and it has a lot more text these days.  Yes, it goes on and on and on for many many lines, and hopefully even word wraps in the email that it generates later.\n\nHopefully.\n\nYours sincerely, \n\n" . name_n(0),
                             message_sms => "U rul. " . (split(m/ /,name_n(0)))[0]. " x"},
@@ -1009,7 +1009,7 @@ sub do_private_failing_pledge {
     die "Failed to find announcements link" if !$announce_link;
     display_url("Announce URL", $announce_link);
     $wth->browser_get($announce_link);
-    $wth->browser_check_contents("Send Announcement");
+    $wth->browser_check_contents("Send announcement");
     $wth->browser_submit_form(form_name => 'pledge',
                 fields => { message_body => "What a hassle.  It is so very irksome when a pledge doesn't work.  Please sign all my other pledges instead!\n\nYours sincerely, \n\n" . name_n(0),
                             message_sms => "U suk. " . (split(m/ /,name_n(0)))[0]. " x"},
@@ -1173,7 +1173,7 @@ sub do_sms_pledge {
     $wth->email_get_containing( '%To: '.email_n(105).'%We are pleased to tell you%');
     # Send announce message
     $wth->browser_get($announce_link);
-    $wth->browser_check_contents("Send Announcement");
+    $wth->browser_check_contents("Send announcement");
     $wth->browser_submit_form(form_name => 'pledge',
                 fields => { message_body => "It all worked, hurrah! Things are good when they work, especially messages to people when a pledge has been completed. Blah blah blah blah blah blah. " . name_n(100),
                             message_sms => "Yippee! All the £ are yours!" . (split(m/ /,name_n(100)))[0]. " x"},
@@ -1432,6 +1432,20 @@ sub do_byarea_tests {
     $wth->email_get_containing( '%To: '.email_n(604).'%We are pleased to tell you that the pledge%Liverpool%');
     $wth->email_check_none_left();
     $wth->log_watcher_check();
+    
+    # Send success announce to Liverpool
+    $wth->browser_get($announce_link);
+    $wth->browser_check_contents("Send success announcement message for Liverpool");
+    $wth->browser_submit_form(form_name => 'pledge',
+                fields => { message_body => "It all works in Liverpool. Go to it guys. " . name_n(600),
+                            message_sms => "Blah blah."},
+        button => 'submit') or die "Failed to submit Liverpool email success form";
+    $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Liverpool");
+    $wth->log_watcher_check();
+    call_frequentupdate();
+    $wth->email_get_containing( '%To: '.email_n(601).  '%From: '.name_n(600). '%It all works in Liverpool%');
+    $wth->email_get_containing( '%To: '.email_n(604).  '%From: '.name_n(600). '%It all works in Liverpool%');
+    $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all works in Liverpool%');
 
     # This will provoke success in Southampton
     find_and_sign_pledge("ref", $pledge_ref_boo, 605, 1, 
@@ -1454,10 +1468,23 @@ sub do_byarea_tests {
     # Success reminder messages
     set_pb_date('1984-09-10');
     call_frequentupdate();
-    $success_email = $wth->email_get_containing( '%To: '.email_n(600).'%However, you haven\'t sent a message yet%Liverpool%');
-    die "Success reminder email link not found\n" if ($success_email !~ m#^\s*(http://.*$)#m);
     $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%However, you haven\'t sent a message yet%Southampton%');
     die "Success reminder email link not found\n" if ($success_email_1 !~ m#^\s*(http://.*$)#m);
+    my $announce_link_2 = $1;
+
+    # Send success announce to Southampton
+    $wth->browser_get($announce_link_2);
+    $wth->browser_check_contents("Send success announcement message for Southampton");
+    $wth->browser_submit_form(form_name => 'pledge',
+                fields => { message_body => "It all rocks in Southampton. Go go to it guys. " . name_n(600),
+                            message_sms => "Blah blah."},
+        button => 'submit') or die "Failed to submit Southampton email success form";
+    $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Southampton");
+    $wth->log_watcher_check();
+    call_frequentupdate();
+    $wth->email_get_containing( '%To: '.email_n(602).  '%From: '.name_n(600). '%It all rocks in Southampton%');
+    $wth->email_get_containing( '%To: '.email_n(605).  '%From: '.name_n(600). '%It all rocks in Southampton%');
+    $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all works in Southampton%');
 
     # Cause failure of pledge for other towns
     set_pb_date('1984-10-10');
@@ -1467,6 +1494,21 @@ sub do_byarea_tests {
     my $announce_link_failure = $1;
     display_url("Announce failure URL", $announce_link_failure);
     $wth->email_get_containing('%Subject: Pledge failed%To: '.email_n(603).  '%');
+
+    # Send failure announce to Hexham places
+    $wth->browser_get($announce_link_failure);
+    $wth->browser_check_contents("Send failure announcement message for Hexham");
+    $wth->browser_submit_form(form_name => 'pledge',
+                fields => { message_body => "Boohoo! It went badly in Hexham. " . name_n(600),
+                            message_sms => "Nah nah."},
+        button => 'submit') or die "Failed to submit Hexham email failure form";
+    $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Hexham");
+    $wth->log_watcher_check();
+    call_frequentupdate();
+    $wth->email_get_containing( '%To: '.email_n(603).'%From: '.name_n(600).'%It went badly in Hexham%');
+    $wth->email_get_containing( '%To: '.email_n(600).'%From: '.$name_admin.'%[ This is a copy of the message%It went badly in Hexham%');
+
+    $wth->email_check_none_left();
 }
 
 #############################################################################

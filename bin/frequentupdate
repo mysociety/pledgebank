@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.75 2006-07-04 17:00:51 francis Exp $
+ * $Id: frequentupdate,v 1.76 2006-07-11 00:26:52 francis Exp $
  *
  */
 
@@ -683,8 +683,14 @@ function send_pending_messages() {
             $msg['circumstance'] == 'failure-auto-creator-byarea' or
             $msg['circumstance'] == 'announce-post') {
             locale_push($pledge->lang());
+            $announce_url = $pledge->url_announce();
+            $params = array();
+            if ($msg['byarea_location_id']) {
+                if (!$pledge->byarea()) err('Only byarea pledges can have byarea_location_id');
+                $params['location'] = $msg['byarea_location_id'];
+            }
             $data['url'] = pb_person_make_signon_url(null, $pledge->creator_email(), 
-                "GET", $pledge->url_announce(), array());
+                "GET", $pledge->url_announce(), $params);
             locale_pop();
         }
         // Number of signers reached at current probably rate
@@ -710,7 +716,12 @@ function send_pending_messages() {
 
         // Case when it is a copy sent to creator
         if ($msg['sendtosigners'] == 't' && in_array($msg['circumstance'], array('failure-announce', 'success-announce', 'success-followup', 'general-announce') )) {
-            $msg['emailbody'] = sprintf(_("[ This is a copy of the message you have just sent to everyone who signed your pledge %s ]\n\n%s"), $pledge->url_main(), $msg['emailbody']);
+            if ($msg['byarea_location_id']) {
+                $byarea_location_description = db_getOne("select description from
+                    location where location.id = ?", $msg['byarea_location_id']);
+                $msg['emailbody'] = sprintf(_("[ This is a copy of the message you have just sent to everyone in %s who signed your pledge %s ]\n\n%s"), $byarea_location_description, $pledge->url_main(), $msg['emailbody']);
+            } else
+                $msg['emailbody'] = sprintf(_("[ This is a copy of the message you have just sent to everyone who signed your pledge %s ]\n\n%s"), $pledge->url_main(), $msg['emailbody']);
         }
 
         // Make any extra headers

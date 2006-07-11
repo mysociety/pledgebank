@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.181 2006-07-10 09:39:51 francis Exp $
+ * $Id: pledge.php,v 1.182 2006-07-11 00:26:53 francis Exp $
  * 
  */
 
@@ -101,6 +101,7 @@ class Pledge {
                 $this->data['country'] = null;
             }
         }
+        if (!array_key_exists('target_type', $this->data)) $this->data['target_type'] = 'overall';
 
         // Some calculations 
         $this->data['left'] = $this->data['target'] - $this->data['signers'];
@@ -118,6 +119,8 @@ class Pledge {
                 $finished = true;
         if ($this->is_cancelled())
             $finished = true;
+        if ($this->byarea())
+            $finished = !$this->open();
         $this->data['finished'] = $finished;
 
         // Check we know the language of the pledge, otherwise set to default
@@ -132,7 +135,10 @@ class Pledge {
     function ref() { return $this->data['ref']; }
     function id() { return $this->data['id']; }
     function open() { return $this->data['open']; } // not gone past the deadline date
-    function finished() { return $this->data['finished']; } // can take no more signers, for whatever reason
+    // can take no more signers, for whatever reason
+    function finished() { 
+        return $this->data['finished']; 
+    } 
 
     /* succeeded PLEDGE [LOCK]
      * Has PLEDGE completed successfully? That is, has it as many signers as its
@@ -164,7 +170,7 @@ class Pledge {
     function failed() {
         return $this->finished() && !$this->succeeded();
     }
-    
+
     function exactly() { return ($this->data['comparison'] == 'exactly'); }
     function byarea() { return ($this->data['target_type'] == 'byarea'); }
     function has_details() { return $this->data['detail'] ? true : false; }
@@ -198,7 +204,18 @@ class Pledge {
         }
         return $this->data['signup_areas']; 
     }
-
+    // Checks if the location id is a signup location for the pledge
+    function byarea_validate_location($byarea_location_id) {
+        if (!$this->byarea()) {
+            err("byarea_validate can only be called for byarea pledges");
+        }   
+        $check = db_getOne("select count(*) from byarea_location 
+                where pledge_id = ? and byarea_location_id = ?",
+                array($this->id(), $byarea_location_id));
+        if ($check != 1) {
+            err(_("byarea_location_id not valid"));
+        }
+    }
 
     function probable_will_reach() { 
         if (!array_key_exists('probable_will_reach', $this->data)) {

@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.188 2006-07-11 00:26:52 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.189 2006-07-11 09:55:20 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1484,7 +1484,7 @@ sub do_byarea_tests {
     call_frequentupdate();
     $wth->email_get_containing( '%To: '.email_n(602).  '%From: '.name_n(600). '%It all rocks in Southampton%');
     $wth->email_get_containing( '%To: '.email_n(605).  '%From: '.name_n(600). '%It all rocks in Southampton%');
-    $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all works in Southampton%');
+    $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all rocks in Southampton%');
 
     # Cause failure of pledge for other towns
     set_pb_date('1984-10-10');
@@ -1499,8 +1499,8 @@ sub do_byarea_tests {
     $wth->browser_get($announce_link_failure);
     $wth->browser_check_contents("Send failure announcement message for Hexham");
     $wth->browser_submit_form(form_name => 'pledge',
-                fields => { message_body => "Boohoo! It went badly in Hexham. " . name_n(600),
-                            message_sms => "Nah nah."},
+                fields => { message_body => "Boohoo! It went badly in Hexham. I'm very sorry." . name_n(600),
+                            message_sms => "Nah nah nah nah."},
         button => 'submit') or die "Failed to submit Hexham email failure form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Hexham");
     $wth->log_watcher_check();

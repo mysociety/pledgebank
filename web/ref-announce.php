@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.43 2006-07-11 00:26:53 francis Exp $
+ * $Id: ref-announce.php,v 1.44 2006-07-11 09:55:21 francis Exp $
  * 
  */
 
@@ -90,7 +90,7 @@ $has_sms = array(
 function refuse_announce($p, $c, $l) {
     global $descr;
     page_header(_("Send announcement"));
-    $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and byarea_location_id', array($p->id(), $c, $l));
+    $n = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and byarea_location_id = ?', array($p->id(), $c, $l));
     print "<strong>";
     printf(ngettext('You have already sent %d %s, which is all that you\'re allowed.', 'You have already sent %d %s, which is all that you\'re allowed.', $n), $n, $descr[$c]);
     print "</strong> ";
@@ -124,7 +124,7 @@ else if (!is_null(db_getOne('select id from message where id = ?', $q_message_id
 /* Figure out which circumstance we should do a message for, and hence the
  * subject of the email. */
 if ($failed) {
-    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'failure-announce'", $p->id());
+    $n = db_getOne("select id from message where PLEDGe_id = ? and circumstance = 'failure-announce' and byarea_location_id = ?", $p->id(), $byarea_location_id);
     if (!is_null($n))
         /* Only get to send one announcement on failure. */
         refuse_announce($p, 'failure-announce', $byarea_location_id);
@@ -136,7 +136,7 @@ if ($failed) {
             $email_subject = sprintf(_("Sorry - pledge failed - '%s'"), $p->title() );
     }
 } else if ($succeeded) {
-    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce'", $p->id());
+    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce' and byarea_location_id = ?", $p->id(), $byarea_location_id);
     if (is_null($n))
         $circumstance = 'success-announce'; /* also send SMS */
     else
@@ -148,12 +148,12 @@ if ($failed) {
 } else {
     $circumstance = 'general-announce';
     if ($byarea_location_id)
-        $email_subject = sprintf(_("Update on pledge - '%s' at PledgeBank.com"), $p->title() );
-    else 
         $email_subject = sprintf(_("Update on pledge in %s - '%s' at PledgeBank.com"), $byarea_location_description, $p->title() );
+    else 
+        $email_subject = sprintf(_("Update on pledge - '%s' at PledgeBank.com"), $p->title() );
 }
 
-$circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ?', array($p->id(), $circumstance));
+$circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and byarea_location_id = ?', array($p->id(), $circumstance, $byarea_location_id));
 
 $do_sms = array_key_exists($circumstance, $has_sms) ? true : false;
 if ($do_sms) {

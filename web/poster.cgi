@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.78 2006-06-26 17:03:55 matthew Exp $
+# $Id: poster.cgi,v 1.79 2006-07-11 17:00:03 francis Exp $
 #
 
 import sys
@@ -122,6 +122,9 @@ def format_integer(i):
 def has_sms(pledge):
     # Private pledges have no SMS for now
     if pledge['pin']:
+        return False
+    # Nor do byarea pledges (too hard to do interface to choose place)
+    if pledge['target_type'] == 'byarea':
         return False
     # Global pledges, we do show SMS (but will flag UK only)
     if not pledge['country']:
@@ -556,11 +559,11 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, signup, pin, identity, detail, country, lang FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE ref ILIKE %s', ref)
+        q.execute('SELECT title, date, name, type, target, target_type, signup, pin, identity, detail, country, lang FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE ref ILIKE %s', ref)
         row = q.fetchone()
         if not row:
             raise Exception, "Unknown ref '%s'" % ref
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang']) = row
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['target_type'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang']) = row
         q.close()
 
         # Set language to that of the pledge

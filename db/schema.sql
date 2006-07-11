@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.199 2006-07-11 15:45:07 francis Exp $
+-- $Id: schema.sql,v 1.200 2006-07-11 17:00:02 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -493,6 +493,8 @@ create table pledge_category (
 --      finished    pledge has expired
 --      full        pledge is full
 --      signed      signer has already signed this pledge
+--      byarea      pledge requires selection of a place during signing, 
+--                  not supported yet for mobile signing
 create function pledge_is_valid_to_sign(integer, text, text)
     returns text as '
     declare
@@ -528,6 +530,9 @@ create function pledge_is_valid_to_sign(integer, text, text)
 
         -- check for signed by mobile
         if $3 is not null then
+            if p.target_type = ''byarea'' then
+                return ''byarea'';
+            end if;
             perform id from signers where pledge_id = $1 and mobile = $3 for update;
             if found then
                 return ''signed'';

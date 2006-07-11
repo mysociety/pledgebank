@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.28 2005-06-29 08:51:50 francis Exp $
+# $Id: SMS.pm,v 1.29 2006-07-11 17:00:03 francis Exp $
 #
 
 package PB::SMS;
@@ -182,7 +182,8 @@ sub receive_sms ($$$$$$) {
             } elsif ($r ne 'ok') {
                 my %errormsg = (
                     finished => "Sorry, in between your texting us and our reply reaching you, that pledge finished. Better luck next time!",
-                    full => "Sorry, in between your texting us and our reply reaching you, the last place on that pledge was taken. Better luck next time!"
+                    full => "Sorry, in between your texting us and our reply reaching you, the last place on that pledge was taken. Better luck next time!",
+                    byarea => "Sorry, you need to choose a town when you sign this pledge. Please sign up on the web site to do this."
                         # we've already tested for 'none' and 'signed'
                     );
                 die "smssubscription returned unexpected result '$r' for $sender on pledge $pledge_id"

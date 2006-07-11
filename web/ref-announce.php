@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.45 2006-07-11 15:18:52 francis Exp $
+ * $Id: ref-announce.php,v 1.46 2006-07-11 17:00:03 francis Exp $
  * 
  */
 
@@ -162,6 +162,8 @@ if ($failed) {
 $circumstance_count = db_getOne('select count(id) from message where pledge_id = ? and circumstance = ? and '.$byarea_location_test, array($p->id(), $circumstance));
 
 $do_sms = array_key_exists($circumstance, $has_sms) ? true : false;
+if ($byarea_location_id) // byarea pledges don't do SMS at the moment
+    $do_sms = false;
 if ($do_sms) {
     if ($p->is_global()) 
         $country_has_sms = true;

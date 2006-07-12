@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.137 2006-07-03 09:51:24 francis Exp $
+// $Id: new.php,v 1.138 2006-07-12 08:11:25 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -559,8 +559,21 @@ function step1_error_check($data) {
     elseif (preg_match('/[^a-z0-9-]/i',$data['ref'])) $errors['ref2'] = _('The short name must only contain letters, numbers, or a hyphen.  Spaces are not allowed.');
     elseif (!preg_match('/[a-z]/i',$data['ref'])) $errors['ref2'] = _('The short name must contain at least one letter.');
 
-    $dupe = db_getOne('SELECT id FROM pledges WHERE ref ILIKE ?', array($data['ref']));
-    if ($dupe) $errors['ref'] = _('That short name is already taken!');
+    list ($dupe, $existing_creator_email) = db_getRow('SELECT pledges.id, person.email FROM pledges 
+        LEFT JOIN person on person.id = pledges.person_id
+        WHERE ref ILIKE ?', array($data['ref']));
+    if ($dupe) {
+        $P = person_if_signed_on();
+        // Note that for privacy reasons, we check against the logged in email
+        // (rather than the email that they have entered in the form, which
+        // could be anyone)
+        if ($P && $P->email() == $existing_creator_email)  {
+            // If somebody clicks the pledge confirmation URL a second time, they end up here
+            $errors['ref'] = sprintf(_("You've already made a pledge with short name '%s'. Either go to your <a href=\"/%s\">existing pledge</a>, or edit the short name below to make a new pledge."), 
+                htmlspecialchars($data['ref']), htmlspecialchars($data['ref']));
+        } else 
+            $errors['ref'] = _('That short name is already taken!');
+    }
     if (!$data['title']) $errors['title'] = _('Please enter a pledge');
 
     $pb_today_arr = explode('-', $pb_today);

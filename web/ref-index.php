@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.84 2006-07-12 07:59:05 francis Exp $
+// $Id: ref-index.php,v 1.85 2006-07-12 14:30:03 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -216,15 +216,18 @@ function draw_signatories($p) {
         if ($p->byarea() && $last_location_description != $loc_desc_with_country) {
             display_anonymous_signers($anon, $unknownname, $in_ul);
             if ($in_ul)  {
-                print "</ul>";
+                print "</ul></div>";
                 $in_ul = false;
             }
+            print '<div class="location';
+            if ($r['whensucceeded']) print '_success';
+	    print '">';
             if ($r['whensucceeded']) {
-                print '<p class="success">';
-                printf(_("This pledge succeeded for %s on %s."), $loc_desc_with_country, prettify($r['whensucceeded']));
+		print '<p>';
+                printf(_("Succeeded on %s"), prettify($r['whensucceeded']));
                 print '</p>';
             }
-            print "<h3>" . $loc_desc_with_country . "</h3>";
+	    print '<h3>' . $loc_desc_with_country . "</h3>";
             $last_location_description = $loc_desc_with_country;
         }
         if (!$in_ul) {
@@ -245,7 +248,7 @@ function draw_signatories($p) {
     }
     display_anonymous_signers($anon, $unknownname, $in_ul);
     if ($in_ul) {
-        print "</ul>";
+        print "</ul></div>";
         $in_ul = false;
     }
     if ($showall_para) {

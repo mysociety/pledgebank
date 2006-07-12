@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.27 2006-06-26 16:34:32 matthew Exp $
+ * $Id: ref-picture.php,v 1.28 2006-07-12 08:20:31 francis Exp $
  * 
  */
 
@@ -130,7 +130,13 @@ function upload_picture() {
        $newheight = $height * $fraction;
        // Resize image
        $dest = imagecreatetruecolor($newwidth, $newheight);
-       $source = imagecreatefromjpeg($tmp_name);
+       if ($picture_type == IMAGETYPE_GIF) {
+            $source = imagecreatefromgif($tmp_name);
+       } elseif ($picture_type == IMAGETYPE_JPEG) {
+            $source = imagecreatefromjpeg($tmp_name);
+       } elseif ($picture_type == IMAGETYPE_PNG) {
+            $source = imagecreatefrompng($tmp_name);
+       }
        imagecopyresized($dest, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
        imagejpeg($dest, $tmp_name);
        $ext = "jpeg";

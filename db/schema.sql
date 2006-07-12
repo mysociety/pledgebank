@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.200 2006-07-11 17:00:02 francis Exp $
+-- $Id: schema.sql,v 1.201 2006-07-12 15:35:11 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -714,7 +714,7 @@ create table signers (
     -- if target_type for the pledge is 'byarea' then this is the id
     -- of the location which the signature is for
     byarea_location_id integer references location(id),
-      
+    foreign key (pledge_id, byarea_location_id) references byarea_location (pledge_id, byarea_location_id), 
     -- when they signed
     signtime timestamp not null,
 
@@ -1026,7 +1026,7 @@ create table message (
     -- if set, then messages only go to signers who signed with given location
     -- (this is for byarea type pledges)
     byarea_location_id integer references location(id),
-
+    foreign key (pledge_id, byarea_location_id) references byarea_location (pledge_id, byarea_location_id), 
     -- content of message
     emailtemplatename text,
     emailsubject text, -- LLL

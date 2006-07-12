@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.31 2006-06-27 17:27:27 francis Exp $
+// $Id: alert.php,v 1.32 2006-07-12 08:44:33 francis Exp $
 
 require_once '../../phplib/mapit.php';
 require_once "../../phplib/votingarea.php";
@@ -196,5 +196,32 @@ function alert_list_pledges_local($person_id) {
         pb_view_local_alert_quick_signup("localsignupyourpage", array('newflash'=>false));
     }
     print '<p>';
+}
+
+/* alert_list_pledges_local PERSON_ID
+ * Displays list of all local pledge alerts person has with unsubscribe button.
+ */
+function alert_list_comments($person_id) {
+    $s = db_query('SELECT alert.* from alert where 
+            person_id = ? and event_code=\'comments/ref\'
+            and whendisabled is null', $person_id);
+    if (0 != db_num_rows($s)) {
+        print h2(_("Comment alerts"));
+        print _("You will get email when there are:<ul>");
+        while ($row = db_fetch_array($s)) {
+            $description = ucfirst(alert_h_description($row['id']));
+    ?>
+    <li>
+    <?=$description?>
+    <form style="display: inline" accept-charset="utf-8" name="alertsetup" action="/alert" method="post">
+    <input type="hidden" name="direct_unsubscribe" value="<?=$row['id']?>">
+    <input type="submit" name="submit" value="<?=_('Unsubscribe') ?>">
+    </form>
+    </li>
+    <?
+        }
+        print "</ul>";
+        print '<p>';
+    }
 }
 

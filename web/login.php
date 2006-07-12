@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.69 2006-03-04 18:33:32 matthew Exp $
+ * $Id: login.php,v 1.70 2006-07-12 08:00:53 francis Exp $
  * 
  */
 
@@ -241,7 +241,7 @@ function login_page() {
 <?=_("We've sent you an email, and you'll need to click the link in it before you can
 continue") ?>
 <p class="loudmessage">
-<small><?=_('If you use <acronym title="Web based email">Webmail</acronym> or have
+<small><?=_('If you use web-based email or have
 "junk mail" filters, you may wish to check your bulk/spam mail folders:
 sometimes, our messages are marked that way.') ?></small>
 </p>

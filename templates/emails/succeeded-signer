@@ -16,4 +16,4 @@ photos of you fulfilling your pledge - we love pics :)
 
 KEEP UP TO DATE - Sign up to get emails when people create new pledges in your
 area (Max one email a day).  Click here and enter your postcode:
-<?=$Values['local_alert_url']?>
+<?=$values['local_alert_url']?>

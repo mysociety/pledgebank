@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.83 2006-07-11 18:33:21 francis Exp $
+// $Id: ref-index.php,v 1.84 2006-07-12 07:59:05 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -117,6 +117,31 @@ function draw_spreadword($p) { ?>
 
 define('MAX_PAGE_SIGNERS', '500');
 
+// Internal
+function display_anonymous_signers(&$anon, &$unknownname, &$in_ul) {
+    if ($anon || $unknownname) {
+        $extra = '';
+        if ($anon)
+            $extra .= sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon);
+        if ($unknownname) {
+            if ($anon) {
+                /* XXX shouldn't assume we can split sentences like this --
+                 * make it two bullet points? */
+                $extra .= sprintf(ngettext(', and %d who signed up via mobile', ', and %d who signed up via mobile', $unknownname), $unknownname);
+            } else {
+                $extra .= sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $unknownname), $unknownname);
+            }
+        }
+        if (!$in_ul) {
+            print "<ul>";
+            $in_ul = true;
+        }
+        print "<li>$extra</li>";
+        $anon = 0;
+        $unknownname = 0;
+    }
+}
+
 function draw_signatories($p) {
     $nsigners = db_getOne('select count(id) from signers where pledge_id = ?', $p->id());
     ?>
@@ -152,10 +177,8 @@ function draw_signatories($p) {
         }
     }
    
-    $out = '';
-
     if (!$limit)
-        $out = '<p>'
+        print '<p>'
                 . sprintf(_('%s, the Pledge Creator, joined by:'), htmlspecialchars($p->creator_name()))
                 . '</p>';
 
@@ -190,26 +213,27 @@ function draw_signatories($p) {
             global $countries_code_to_name;
             $loc_desc_with_country .= ", ". $countries_code_to_name[$r['location_country']];
         }
+        if ($p->byarea() && $last_location_description != $loc_desc_with_country) {
+            display_anonymous_signers($anon, $unknownname, $in_ul);
+            if ($in_ul)  {
+                print "</ul>";
+                $in_ul = false;
+            }
+            if ($r['whensucceeded']) {
+                print '<p class="success">';
+                printf(_("This pledge succeeded for %s on %s."), $loc_desc_with_country, prettify($r['whensucceeded']));
+                print '</p>';
+            }
+            print "<h3>" . $loc_desc_with_country . "</h3>";
+            $last_location_description = $loc_desc_with_country;
+        }
+        if (!$in_ul) {
+            print "<ul>";
+            $in_ul = true;
+        }
         if ($showname) {
             if (isset($r['name'])) {
-                if ($p->byarea() && $last_location_description != $loc_desc_with_country) {
-                    if ($in_ul)  {
-                        $out .= "</ul>";
-                        $in_ul = false;
-                    }
-                    if ($r['whensucceeded']) {
-                        $out .= '<p class="success">';
-                        $out .= sprintf(_("This pledge succeeded for %s on %s."), $loc_desc_with_country, prettify($r['whensucceeded']));
-                        $out .= '</p>';
-                    }
-                    $out .= "<h3>" . $loc_desc_with_country . "</h3>";
-                    $last_location_description = $loc_desc_with_country;
-                }
-                if (!$in_ul) {
-                    $out .= "<ul>";
-                    $in_ul = true;
-                }
-                $out .= '<li>'
+                print '<li>'
                         . htmlspecialchars($r['name'])
                         . '</li>';
             } else {
@@ -219,32 +243,7 @@ function draw_signatories($p) {
             $anon++;
         }
     }
-    print $out;
-    if ($anon || $unknownname) {
-        $extra = '';
-        if ($anon)
-            $extra .= sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon);
-        if ($unknownname) {
-            if ($anon) {
-                /* XXX shouldn't assume we can split sentences like this --
-                 * make it two bullet points? */
-                $extra .= sprintf(ngettext(', and %d who signed up via mobile', ', and %d who signed up via mobile', $unknownname), $unknownname);
-            } else {
-                $extra .= sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $unknownname), $unknownname);
-            }
-        }
-        if ($in_ul)  {
-            print "</ul>";
-            $in_ul = false;
-        }
-        if ($p->byarea())
-            print "<h3>" . _("Anonymous signers") . "</h3>";
-        if (!$in_ul) {
-            print "<ul>";
-            $in_ul = true;
-        }
-        print "<li>$extra</li>";
-    }
+    display_anonymous_signers($anon, $unknownname, $in_ul);
     if ($in_ul) {
         print "</ul>";
         $in_ul = false;

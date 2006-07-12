@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.85 2006-07-12 14:30:03 matthew Exp $
+// $Id: ref-index.php,v 1.86 2006-07-12 15:40:52 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -221,13 +221,13 @@ function draw_signatories($p) {
             }
             print '<div class="location';
             if ($r['whensucceeded']) print '_success';
-	    print '">';
+            print '">';
             if ($r['whensucceeded']) {
-		print '<p>';
+                print '<p>';
                 printf(_("Succeeded on %s"), prettify($r['whensucceeded']));
                 print '</p>';
             }
-	    print '<h3>' . $loc_desc_with_country . "</h3>";
+            print '<h3>' . $loc_desc_with_country . "</h3>";
             $last_location_description = $loc_desc_with_country;
         }
         if (!$in_ul) {
@@ -248,7 +248,9 @@ function draw_signatories($p) {
     }
     display_anonymous_signers($anon, $unknownname, $in_ul);
     if ($in_ul) {
-        print "</ul></div>";
+        print "</ul>";
+        if ($p->byarea())
+            print "</div>";
         $in_ul = false;
     }
     if ($showall_para) {

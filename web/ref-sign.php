@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.49 2006-07-11 19:11:44 francis Exp $
+// $Id: ref-sign.php,v 1.50 2006-07-17 08:23:58 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -110,7 +110,7 @@ function do_sign(&$location) {
                     left join location on location.id = byarea_location.byarea_location_id
                     where nearby.location_id = byarea_location.byarea_location_id
                     and byarea_location.pledge_id = ? order by distance limit 8
-            ', array($pledge->id(), $lat, $lon, 100000 /* arbitary large number to catch all */, 
+            ', array($pledge->id(), $lat, $lon, 150,  /* 150 km is an arbitary large range here */
             $pledge->id()));
             if (db_num_rows($q) > 0) {
                 // Display form with choice of signers
@@ -128,7 +128,7 @@ function do_sign(&$location) {
     <input type="hidden" name="gaze_place" value="<?=$location['gaze_place']?>">
     <input type="hidden" name="place" value="<?=$location['place']?>">
     <input type="hidden" name="prev_place" value="<?=$location['place']?>">
-    <h2><?=_('Signers near you')?></h2>
+    <h2><?=_('Which local pledge would you like to join?')?></h2>
     <?  if ($already_id) {
             print "<p>";
             printf(_('You can join other people making the pledge, either in %s, or another place nearby.'), $desc);

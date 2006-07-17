@@ -6,14 +6,11 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.5 2006-07-08 08:46:20 francis Exp $
+// $Id: gaze-controls.php,v 1.6 2006-07-17 12:33:07 francis Exp $
 
 // TODO: 
-// - Alter new.php to call these functions, rather than have its own,
-// slightly differently behaving, copy of the code.
 // - Probably remove the get_http_var calls for prev_country and prev_place
 // in gaze_controls_validate_location
-// - Rename functions to be gaze_controls_ or something as a prefix
 // - Adapt this so it can be in global phplib for use on other sites
 
 // The parameter "townonly" indicates that a location must be entered by

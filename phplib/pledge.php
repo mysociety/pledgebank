@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.184 2006-07-11 19:39:51 francis Exp $
+ * $Id: pledge.php,v 1.185 2006-07-17 12:33:07 francis Exp $
  * 
  */
 
@@ -97,7 +97,7 @@ class Pledge {
                 $this->data['description'] = $desc;
                 $this->data['method'] = 'Gaze';
             }
-            if ($this->data['country'] == 'Global') {
+            if ($this->data['country'] == 'Global' || strlen($this->data['country']) == '') {
                 $this->data['country'] = null;
             }
         }
@@ -704,8 +704,10 @@ function pledge_sentence($r, $params = array()) {
     if (!$r)
         err(pledge_strerror(PLEDGE_NONE));
 
-    if ($html)
+    if ($html) {
+        $r['places'] = null; // is an array during pledge creation
         $r = array_map('htmlspecialchars', $r);
+    }
         
     global $lang, $langs;
     if (!array_key_exists($r['lang'], $langs)) {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.138 2006-07-12 08:11:25 francis Exp $
+// $Id: new.php,v 1.139 2006-07-17 12:33:07 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -256,44 +256,8 @@ function pledge_form_two($data, $errors = array()) {
         $comparison = "atleast";
     else
         $comparison = $data['comparison'];
-
-    /* The 'country' parameter may give a (country, state) pair. */
-    $country = null;
-    $state = null;
-    if (isset($data['country'])) {
-        $a = array();
-        if (preg_match('/^([A-Z]{2}),(.+)$/', $data['country'], $a))
-            list($x, $country, $state) = $a;
-        else
-            $country = $data['country'];
-    }
-
-    $place = null;
-    if (array_key_exists('place', $data))
-        $place = $data['place'];
-    if ($country && $country == 'Global')
-        $place = null;
-    else {
-        # Check gaze has this country
-        $countries_with_gazetteer = gaze_get_find_places_countries();
-        gaze_check_error($countries_with_gazetteer);
-        if (!in_array($country, $countries_with_gazetteer)) {
-            $place = null;
-        }
-    }
-    $places = null;
-    if ($place) {
-        # Look up nearby places
-        $places = gaze_controls_find_places($country, $state, $place, 10, 0);
-        if (array_key_exists('gaze_place', $errors)) {
-            if (count($places) > 0) {
-                # message printed in gaze_controls_print_place_choice
-            } else {
-                $errors['place'] = sprintf(_("Unfortunately, we couldn't find anywhere with a name like '%s'.  Please try a different spelling, or another nearby village, town or city."),
-                htmlspecialchars($place));
-            }
-            unset($errors['gaze_place']); # remove NOTICE
-        } 
+    if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == 'NOTICE') {
+        unset($errors['gaze_place']); # remove NOTICE
     }
 
     if (sizeof($errors)) {
@@ -321,7 +285,7 @@ is fulfilled?
 </p> */?>
 
 <p><?=_('Which country does your pledge apply to?') ?>
-<? gaze_controls_print_country_choice($country, $state, $errors); ?>
+<? gaze_controls_print_country_choice($data['country'], $data['state'], $errors); ?>
 </p>
 
 <p id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?>
@@ -336,9 +300,9 @@ print _('If yes, choose where.');
 // State is in the gaze_place list for selection, but stored with country later on
 // :( See code commented "split out state" elsewhere in this file
 $gaze_with_state = $data['gaze_place'];
-if ($state)
+if ($data['state'])
     $gaze_with_state .= ", " . $state;
-gaze_controls_print_place_choice($place, $gaze_with_state, $places, $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null); 
+gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places'], $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null); 
 ?>
 
 <p style="text-align: right;">
@@ -459,11 +423,10 @@ function pledge_form_submitted() {
         $data['postcode'] = ''; 
         $data['place'] = ''; 
     }
-    if (array_key_exists('country', $data) && $data['country'] != 'GB') $data['postcode'] = '';
-    if (array_key_exists('country', $data) && $data['country'] == '(choose one)') unset($data['country']);
-    if (array_key_exists('country', $data) && $data['country'] == '(separator)') unset($data['country']);
-    if (!array_key_exists('gaze_place', $data)) $data['gaze_place'] = '';
     if (!array_key_exists('local', $data)) $data['local'] = '';
+    $location = gaze_controls_get_location();
+    if ($location['country'] || !array_key_exists('country', $data))
+        $data = array_merge($data, $location);
 
     # Step 1, main pledge details
     if (get_http_var('tostep1')) {
@@ -500,12 +463,9 @@ function pledge_form_submitted() {
         pledge_form_two($data, $errors);
         return;
     }
-    if ($data['local'] == 1 && $data['country'] != 'Global' &&
-             ((array_key_exists('prev_country', $data) && $data['prev_country'] != $data['country']) ||
-              (array_key_exists('prev_place', $data) && $data['prev_place'] != $data['place']))
-         ) {
+    if ($data['local'] == 1 && $data['country'] != 'Global' && 
+            array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == 'NOTICE') {
         $data['gaze_place'] = ''; 
-        $errors['gaze_place'] = 'NOTICE';
         pledge_form_two($data, $errors);
         return;
     }
@@ -633,7 +593,8 @@ function step2_error_check(&$data) {
     $errors = array();
     if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly')
         $errors[] = _('Please select either "at least" or "exactly" number of people');
-    if (!array_key_exists('country', $data) || !$data['country']) 
+
+    if (!array_key_exists('country', $data) || !$data['country'])
         $errors['country'] = _('Please choose which country your pledge applies to');
     elseif ($data['country'] != 'Global') {
         $a = array();
@@ -645,8 +606,8 @@ function step2_error_check(&$data) {
         /* Validate country and/or state. */
         if (!array_key_exists($country, $countries_code_to_name))
             # TRANS: Ideally "none" will be translated here, but I can't see it as an entry in this .po file. How is this resolved? (Tim Morley, 2005-11-23)
-	    # It's the entry "None &mdash; applies anywhere"; I guess this message could be reworded to mirror that, but as it says it directly afterward... (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
-	    $errors['country'] = _('Please choose a country, or "none" if your pledge applies anywhere');
+           # It's the entry "None &mdash; applies anywhere"; I guess this message could be reworded to mirror that, but as it says it directly afterward... (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
+           $errors['country'] = _('Please choose a country, or "none" if your pledge applies anywhere');
         else if ($state && !array_key_exists($state, $countries_statecode_to_name[$country]))
             $errors['country'] = _('Please choose a valid state within that country, or the country name itself');
         else {
@@ -661,56 +622,7 @@ function step2_error_check(&$data) {
             if (!array_key_exists('local', $data) || ($data['local'] != '1' && $data['local'] != '0'))
                 $errors['local'] = _('Please choose whether the pledge is local or not');
             else if ($data['local']) {
-                // Find exact matches
-                if ($data['place']) {
-                    $places = gaze_controls_find_places($country, $state, $data['place'], 10, 0);
-                    $have_exact = _gaze_controls_exact_match($places, $data['place']);
-                    if ($have_exact) {
-                        list($desc, $radio_name) = gaze_controls_get_place_details($have_exact);
-                        $data['gaze_place'] = $radio_name;
-                        $data['prev_place'] = $data['place'];
-                        $data['prev_country'] = $data['country'];
-                        # print "new: have exact $desc $radio_name\n";
-                    }
-                }
-
-                if ($data['postcode'] && $data['place'])
-                    $errors['nohighlight'] = _("Please enter either a postcode or a place name, but not both");
-                else if ($data['postcode']) {
-                    if (!validate_postcode($data['postcode']) && !validate_partial_postcode($data['postcode']))
-                        $errors['postcode'] = _('Please enter a valid postcode or first part of a postcode; for example, OX1 3DR or WC1.');
-                    else if (mapit_get_error(mapit_get_location($data['postcode'], 1)))
-                        $errors['postcode'] = _("We couldn't recognise that postcode or part of a postcode; please re-check it");
-                    else
-                        $data['postcode'] = canonicalise_partial_postcode($data['postcode']);
-                } else if (($data['place'] && 
-                            array_key_exists('prev_place', $data) && $data['prev_place'] == $data['place'] && 
-                            array_key_exists('prev_country', $data) && $data['prev_country'] == $data['country'] && 
-                            !$data['gaze_place'])
-                           || !preg_match('/^-?(0|[1-9]\d*)((?:\.|,)\d*|)\|-?(0|[1-9]\d*)((?:\.|,)\d*|)\|.+$/', $data['gaze_place'])) { # XXX: Too inflexible for other locales?
-                    if (!$data['place'])
-                        $errors['place'] = _("Please enter a place name");
-                    else 
-                        $errors['gaze_place'] = "NOTICE"; # here to make it an error, overriden in form display code
-                } else if (!$data['postcode'] && !$data['place']) {
-                    $errors['place'] = ($data['country'] == 'GB'
-                                        ? _("For a local pledge, please type a postcode or place name")
-                                        : _("Please type a place name for your local pledge"));
-                } else {
-                    // Have gaze_place
-                    if (array_key_exists($data['country'], $countries_statecode_to_name)) {
-                        // Split out state in case where they picked US from dropdown, but place with state from gaze
-                        $a = array();
-                        if (preg_match('/^(.+), ([^,]+)$/', $data['gaze_place'], $a)) {
-                            list($x, $data['gaze_place'], $state) = $a;
-                            if ($data['prev_country'] == $data['country'])
-                                $data['prev_country'] .= ",$state";
-                            $data['country'] .= ",$state";
-                        }
-                    }
-                }
-                if ($data['postcode'] && $data['country'] != 'GB')
-                    $errors['postcode'] = _("You can only enter a postcode if your pledge applies to the UK");
+                gaze_controls_validate_location($data, $errors);
             }
         }
     }

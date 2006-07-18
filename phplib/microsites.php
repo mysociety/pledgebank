@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.19 2006-07-03 23:44:58 timsk Exp $
+ * $Id: microsites.php,v 1.20 2006-07-18 16:29:00 francis Exp $
  * 
  */
 
@@ -17,7 +17,13 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'london' => 'London',
                          '365act' => '365 Ways',
                          'glastonbury' => 'Glastonbury',
-                         'interface' => 'Interface');
+                         'interface' => 'Interface',
+                         'global-cool' => 'Global Cool');
+
+/* Other domains which refer to microsites */
+$microsites_extra_domains = array('pledge.global-cool.com' => 'global-cool',
+                                  'pledge.global-cool' => 'global-cool' // FAI testing domain domain
+);
 
 /* These are listed on /where */
 $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countries in all languages'),
@@ -123,6 +129,8 @@ function microsites_other_people() {
         return 'other Interfacers'; // deliberately not translated
     elseif ($microsite == 'london')
         return 'other Londoners'; // deliberately not translated
+    elseif ($microsite == 'global-cool')
+        return 'other cool people'; // deliberately not translated
     else
         return _('other local people');
 }

@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.69 2006-06-28 10:37:25 matthew Exp $
+ * $Id: pb.php,v 1.70 2006-07-18 16:29:00 francis Exp $
  * 
  */
 
@@ -139,7 +139,10 @@ if (!array_key_exists($ip_country, $countries_code_to_name))
 
 # Decide which country or microsite to use
 $microsite = null;
-if (array_key_exists(strtolower($domain_country), $microsites_list)) {
+
+if (array_key_exists(strtolower($_SERVER['HTTP_HOST']), $microsites_extra_domains)) {
+    $microsite = $microsites_extra_domains[strtolower($_SERVER['HTTP_HOST'])];
+} elseif (array_key_exists(strtolower($domain_country), $microsites_list)) {
     $microsite = strtolower($domain_country);
 }
 $site_country = isset($_COOKIE['country']) ? $_COOKIE['country'] : null;

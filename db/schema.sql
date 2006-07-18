@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.201 2006-07-12 15:35:11 francis Exp $
+-- $Id: schema.sql,v 1.202 2006-07-18 16:48:09 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -166,12 +166,6 @@ create table pledges (
     pin text check (pin <> ''),
 
     -- XXX optionally, add a flag which prohibits signup by SMS?
-
-    -- "at least" vs. "exactly"
-    comparison text not null check (
-            comparison = 'atleast' 
-            -- or comparison = 'exactly' -- exactly is disabled for now, as not clear we need it
-        ),
 
     -- Human language the pledge is in 
     lang text not null check(length(lang) = 2 or length(lang) = 5),
@@ -543,17 +537,6 @@ create function pledge_is_valid_to_sign(integer, text, text)
             return ''finished'';
         end if;
         
-        -- Lock the signers table, so that a later insert within this
-        -- transaction would succeed.
-        -- NOTE that "exactly" is disabled for now, so this code is not used
-        -- lock table signers in share mode;
-        -- if p.comparison = ''exactly'' then 
-        --     if p.target <=
-        --         (select count(id) from signers where pledge_id = $1) then
-        --         return ''full'';
-        --     end if;
-        -- end if;
-
         return ''ok'';
     end;
     ' language 'plpgsql';

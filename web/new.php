@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.139 2006-07-17 12:33:07 francis Exp $
+// $Id: new.php,v 1.140 2006-07-18 16:48:09 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -252,10 +252,6 @@ function pledge_form_two($data, $errors = array()) {
     $local = (array_key_exists('local', $data)) && $data['local'] == '1';
     $notlocal = (array_key_exists('local', $data)) && $data['local'] == '0';
     $isodate = $data['parseddate']['iso'];
-    if (!isset($data['comparison']))
-        $comparison = "atleast";
-    else
-        $comparison = $data['comparison'];
     if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == 'NOTICE') {
         unset($errors['gaze_place']); # remove NOTICE
     }
@@ -276,13 +272,6 @@ function pledge_form_two($data, $errors = array()) {
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
 <h2><?=_('New Pledge &#8211; Step 2 of 4') ?></h2>
-
-<input type="hidden" name="comparison" value="atleast">
-<? /* <p>Should the pledge stop accepting new subscribers when it
-is fulfilled?
-<input type="radio" name="comparison" value="exactly"<?=($comparison == 'exactly') ? ' checked' : '' ?>> Yes
-<input type="radio" name="comparison" value="atleast"<?=($comparison == 'atleast') ? ' checked' : '' ?>> No
-</p> */?>
 
 <p><?=_('Which country does your pledge apply to?') ?>
 <? gaze_controls_print_country_choice($data['country'], $data['state'], $errors); ?>
@@ -591,8 +580,6 @@ function step2_error_check(&$data) {
     global $countries_code_to_name, $countries_statecode_to_name;
 
     $errors = array();
-    if ($data['comparison'] != 'atleast' && $data['comparison'] != 'exactly')
-        $errors[] = _('Please select either "at least" or "exactly" number of people');
 
     if (!array_key_exists('country', $data) || !$data['country'])
         $errors['country'] = _('Please choose which country your pledge applies to');
@@ -650,10 +637,6 @@ function preview_pledge($data, $errors) {
     }
     $local = (isset($data['local'])) ? $data['local'] : '0';
     $isodate = $data['parseddate']['iso'];
-    if (!isset($data['comparison']))
-        $comparison = "atleast";
-    else
-        $comparison = $data['comparison'];
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -794,7 +777,6 @@ function create_new_pledge($P, $data) {
                     person_id, name, ref, 
                     creationtime,
                     detail,
-                    comparison,
                     lang, location_id, microsite,
                     pin, identity, 
                     prominence
@@ -804,7 +786,6 @@ function create_new_pledge($P, $data) {
                     ?, ?, ?, 
                     ms_current_timestamp(),
                     ?,
-                    ?,
                     ?, ?, ?,
                     ?, ?,
                     ?
@@ -813,7 +794,6 @@ function create_new_pledge($P, $data) {
                     $data['type'], $data['signup'], $isodate, $data['date'],
                     $P->id(), $data['name'], $data['ref'], 
                     $data['detail'],
-                    $data['comparison'],
                     $data['lang'], $location_id, $data['microsite'],
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity'],
                     $prominence

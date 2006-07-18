@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.185 2006-07-17 12:33:07 francis Exp $
+ * $Id: pledge.php,v 1.186 2006-07-18 16:48:09 francis Exp $
  * 
  */
 
@@ -114,9 +114,6 @@ class Pledge {
         $finished = false;
         if (!$this->open())
             $finished = true;
-        if ($this->left() <= 0)
-            if ($this->exactly())
-                $finished = true;
         if ($this->is_cancelled())
             $finished = true;
         if ($this->byarea())
@@ -171,7 +168,6 @@ class Pledge {
         return $this->finished() && !$this->succeeded();
     }
 
-    function exactly() { return ($this->data['comparison'] == 'exactly'); }
     function byarea() { return ($this->data['target_type'] == 'byarea'); }
     function has_details() { return $this->data['detail'] ? true : false; }
     function is_cancelled() { return $this->data['cancelled'] ? true : false; }

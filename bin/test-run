@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.190 2006-07-11 18:33:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.191 2006-07-18 08:06:53 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -431,7 +431,7 @@ sub create_pledge {
 # PARAMS contains more parameters.
 #   'byarea' - if present and true, then this is a byarea (geocascading) type pledge
 #              being signed
-#   'byarea_near' - selection to make in the "Signers near you" form
+#   'byarea_near' - selection to make in the "Which local pledge would you like to join?" form
 sub sign_pledge {
     my ($who, $show_signature, $login_options, $expected, $params) = @_;
     my $login_action = $login_options->{'action'};
@@ -466,7 +466,7 @@ sub sign_pledge {
 
         # And choose from list of locations which already have signers
         if ($params->{byarea_near}) {
-            $wth->browser_check_contents("Signers near you");
+            $wth->browser_check_contents("Which local pledge would you like to join?");
             my $fields = undef;
             if ($params->{byarea_near} ne 'default') {
                 $fields = { byarea_location_id => $params->{byarea_near} };

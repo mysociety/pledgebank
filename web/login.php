@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.71 2006-07-18 16:29:01 francis Exp $
+ * $Id: login.php,v 1.72 2006-07-19 17:28:38 chris Exp $
  * 
  */
 
@@ -47,6 +47,7 @@ require_once '../phplib/fns.php';
 require_once '../phplib/page.php';
 require_once '../../phplib/person.php';
 require_once '../../phplib/stash.php';
+require_once '../../phplib/rabx.php';
 
 require_once '../../phplib/importparams.php';
 
@@ -223,7 +224,7 @@ function login_page() {
                     ));
         db_commit();
         $url = pb_domain_url(array("path" => "/L/$token"));
-        $template_data = unserialize(stash_get_extra($q_stash));
+        $template_data = rabx_unserialise(stash_get_extra($q_stash));
         $template_data['url'] = $url;
         $template_data['user_name'] = $q_name;
         if (is_null($template_data['user_name']))
@@ -268,7 +269,7 @@ function login_form($errors = array()) {
     if (is_null($q_name))
         $q_name = $q_h_name = '';   /* shouldn't happen */
 
-    $template_data = unserialize(stash_get_extra($q_stash));
+    $template_data = rabx_unserialise(stash_get_extra($q_stash));
     $reason = htmlspecialchars($template_data['reason_web']);
 
     if (sizeof($errors)) {

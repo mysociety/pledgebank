@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.191 2006-07-18 08:06:53 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.192 2006-07-20 09:30:42 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -141,7 +141,7 @@ sub location_n { my $n = shift;
     } elsif ($n % 3 == 1) {
         return { country => 'GB', place => 'Liverpool' } 
     } else {
-        return { country => 'GB', place => 'Southampton' } 
+        return { country => 'GB', place => 'Birkenhead' } 
     }
 } # for byarea pledge signing
 our $login_count; # reference to hash of person number => how many times they've logged in
@@ -1415,7 +1415,7 @@ sub do_byarea_tests {
     find_and_sign_pledge("ref", $pledge_ref_boo, 602, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", {byarea=>1, byarea_near=>'new'});
     find_and_sign_pledge("ref", $pledge_ref_boo, 603, 1, 
-        {action=>"viaemail",setpassword=>1}, "signed", {byarea=>1, byarea_near=>'new'});
+        {action=>"viaemail",setpassword=>1}, "signed", {byarea=>1});
     call_frequentupdate();
     $wth->email_check_none_left();
     $wth->log_watcher_check();
@@ -1446,16 +1446,16 @@ sub do_byarea_tests {
     $wth->email_get_containing( '%To: '.email_n(604).  '%From: '.name_n(600). '%It all works in Liverpool%');
     $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all works in Liverpool%');
 
-    # This will provoke success in Southampton
+    # This will provoke success in Birkenhead
     find_and_sign_pledge("ref", $pledge_ref_boo, 605, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", {byarea=>1, byarea_near=>'default'});
     call_frequentupdate();
-    my $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%We are pleased to tell you that your pledge%Southampton%');
+    my $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%We are pleased to tell you that your pledge%Birkenhead%');
     die "Success email link not found\n" if ($success_email_1 !~ m#^\s*(http://.*$)#m);
     my $announce_link_1 = $1;
-    display_url("Announce Southampton URL", $announce_link_1);
-    $wth->email_get_containing( '%To: '.email_n(602).'%We are pleased to tell you that the pledge%Southampton%');
-    $wth->email_get_containing( '%To: '.email_n(605).'%We are pleased to tell you that the pledge%Southampton%');
+    display_url("Announce Birkenhead URL", $announce_link_1);
+    $wth->email_get_containing( '%To: '.email_n(602).'%We are pleased to tell you that the pledge%Birkenhead%');
+    $wth->email_get_containing( '%To: '.email_n(605).'%We are pleased to tell you that the pledge%Birkenhead%');
     $wth->email_check_none_left();
     $wth->log_watcher_check();
 
@@ -1467,22 +1467,22 @@ sub do_byarea_tests {
     # Success reminder messages
     set_pb_date('1984-09-10');
     call_frequentupdate();
-    $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%However, you haven\'t sent a message yet%Southampton%');
+    $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%However, you haven\'t sent a message yet%Birkenhead%');
     die "Success reminder email link not found\n" if ($success_email_1 !~ m#^\s*(http://.*$)#m);
     my $announce_link_2 = $1;
 
-    # Send success announce to Southampton
+    # Send success announce to Birkenhead
     $wth->browser_get($announce_link_2);
-    $wth->browser_check_contents("Send success announcement message for Southampton");
+    $wth->browser_check_contents("Send success announcement message for Birkenhead");
     $wth->browser_submit_form(form_name => 'pledge',
-                fields => { message_body => "It all rocks in Southampton. Go go to it guys. " . name_n(600) },
-        button => 'submit') or die "Failed to submit Southampton email success form";
-    $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Southampton");
+                fields => { message_body => "It all rocks in Birkenhead. Go go to it guys. " . name_n(600) },
+        button => 'submit') or die "Failed to submit Birkenhead email success form";
+    $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Birkenhead");
     $wth->log_watcher_check();
     call_frequentupdate();
-    $wth->email_get_containing( '%To: '.email_n(602).  '%From: '.name_n(600). '%It all rocks in Southampton%');
-    $wth->email_get_containing( '%To: '.email_n(605).  '%From: '.name_n(600). '%It all rocks in Southampton%');
-    $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all rocks in Southampton%');
+    $wth->email_get_containing( '%To: '.email_n(602).  '%From: '.name_n(600). '%It all rocks in Birkenhead%');
+    $wth->email_get_containing( '%To: '.email_n(605).  '%From: '.name_n(600). '%It all rocks in Birkenhead%');
+    $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all rocks in Birkenhead%');
 
     # Cause failure of pledge for other towns
     set_pb_date('1984-10-10');

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.140 2006-07-18 16:48:09 francis Exp $
+// $Id: new.php,v 1.141 2006-07-20 09:30:43 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -291,7 +291,7 @@ print _('If yes, choose where.');
 $gaze_with_state = $data['gaze_place'];
 if ($data['state'])
     $gaze_with_state .= ", " . $state;
-gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places'], $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null); 
+gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places'], $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null, array('midformnote'=>true)); 
 ?>
 
 <p style="text-align: right;">

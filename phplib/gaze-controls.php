@@ -6,12 +6,14 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.6 2006-07-17 12:33:07 francis Exp $
+// $Id: gaze-controls.php,v 1.7 2006-07-20 09:30:43 francis Exp $
 
 // TODO: 
 // - Probably remove the get_http_var calls for prev_country and prev_place
 // in gaze_controls_validate_location
 // - Adapt this so it can be in global phplib for use on other sites
+// - All the NOTICE stuff in other files is a bit messy - replace at least with 
+//   gaze_control_ functions here which check $errors arrays
 
 // The parameter "townonly" indicates that a location must be entered by
 // the name of a town/place rather than a postcode.
@@ -38,7 +40,16 @@ function gaze_controls_get_place_details($p) {
 
 // Prints HTML for radio buttons to select a list of places drawn from Gaze
 function gaze_controls_print_places_choice($places, $place, $selected_gaze_place) {
-    print "<strong>" . sprintf(_("There are several possible places which match '%s'. Please choose one:"),$place) . "</strong><br>";
+    // TODO: Maybe pass country through to here (or all of $location) and display 
+    // country name in this sentence
+
+    list($have_exact, $anymatches) = _gaze_controls_exact_match($places, $place);
+    print "<strong>";
+    if ($anymatches)
+        printf(_("There is more than one place called '%s'. Please choose which one you mean, or which place with a similar name:"), $place);
+    else 
+        printf(_("Sorry, we don't know where '%s' is. We know about these places with similar names, please choose one if it is right:"), $place);
+    print "</strong><br>";
     $nn = 0;
     foreach ($places as $p) {
         list($desc, $t) = gaze_controls_get_place_details($p);
@@ -150,9 +161,11 @@ function gaze_controls_print_place_choice($selected_place, $selected_gaze_place,
 
     $select_place = false;
     if (!(!$selected_place || array_key_exists('place', $errors) || count($places) == 0)) {
-        print '<p></p><div id="formnote">';
-        print _('Now please select one of the possible places; if none of them is right, please type the name of another nearby place');
-        print '</div>';
+        if (array_key_exists('midformnote', $params) && $params['midformnote']) {
+            print '<p></p><div id="formnote">';
+            print _('Now please select one of the possible places; if none of them is right, please type the name of another nearby place');
+            print '</div>';
+        }
         $select_place = true;
     }
 
@@ -280,7 +293,7 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
     }
     if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == "NOTICE") {
         $places = gaze_controls_find_places($location['country'], $location['state'], $location['place'], 10, 0);
-        $have_exact = _gaze_controls_exact_match($places, $location['place']);
+        list ($have_exact, $anymatches) = _gaze_controls_exact_match($places, $location['place']);
         if ($have_exact) {
             list($desc, $radio_name) = gaze_controls_get_place_details($have_exact);
             $location['gaze_place'] = $radio_name;
@@ -321,16 +334,18 @@ function _gaze_controls_exact_match($places, $typed_place) {
         return;
     $gotcount = 0;
     $got = null;
+    $anymatches = false;
     foreach ($places as $place) {
         if (trim(strtolower($place['0'])) == trim(strtolower($typed_place))) {
             $got = $place;
             $gotcount++;
+            $anymatches = true;
         }
     }
     if ($gotcount == 1)
-        return $got;
+        return array($got, $anymatches);
     else
-        return null;
+        return array(null, $anymatches);
 }
 
 

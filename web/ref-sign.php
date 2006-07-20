@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.50 2006-07-17 08:23:58 francis Exp $
+// $Id: ref-sign.php,v 1.51 2006-07-20 09:30:43 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -16,26 +16,38 @@ require_once '../../phplib/importparams.php';
 
 page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));
-$location = array();
-if ($p->byarea())
-    $location = gaze_controls_get_location(array('townonly'=>true));
 
 $title = _('Signature addition');
 $extra = null;
 page_header($title, array('ref'=>$p->ref(),'pref'=>$p->url_typein()));
+$location = array();
+if ($p->byarea())
+    $location = gaze_controls_get_location(array('townonly'=>true));
 $errors = do_sign($location);
+
 if (is_array($errors) && !array_key_exists('location_choice', $errors)) {
-    if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == 'NOTICE') {
+    $disambiguate_form = false;
+    if ($errors == array('gaze_place' => 'NOTICE')) {
+        $disambiguate_form = true;
         unset($errors['gaze_place']); # remove NOTICE
     }
+
     if ($errors) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
     }
     $p->render_box(array('showdetails'=>false));
-    $p->sign_box($errors, $location);
+
+    if ($disambiguate_form) {
+        // Display location disambiguate form
+        sign_location_choose($p, $errors, $location);
+    } else {
+        // Display email/name form
+        $p->sign_box($errors);
+    }
 }
+
 $params = array('extra'=>$extra);
 # if ($extra=='signer-confirm-advert=local-alerts')
 $params['nolocalsignup'] = true;
@@ -245,5 +257,46 @@ function do_sign(&$location) {
                 . ".</strong></p>";
     }
 }
+
+function sign_location_choose($p, $errors = array(), $location = array()) {
+    if (get_http_var('add_signatory'))
+        $showname = get_http_var('showname') ? ' checked' : '';
+    else
+        $showname = ' checked';
+
+    $email = get_http_var('email');
+    $name = get_http_var('name', true);
+
+    // error_log("$email $name");
+?>
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=htmlspecialchars($p->ref()) ?>/sign" method="post">
+<input type="hidden" name="add_signatory" value="1">
+<input type="hidden" name="pledge" value="<?=htmlspecialchars($p->ref()) ?>">
+<input type="hidden" name="ref" value="<?=htmlspecialchars($p->ref()) ?>">
+<input type="hidden" name="name" value="<?=htmlspecialchars($name) ?>">
+<input type="hidden" name="email" value="<?=htmlspecialchars($email) ?>">
+<input type="hidden" name="showname" value="<?=htmlspecialchars($showname) ?>">
+<?  if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">'; 
+    if ($p->byarea()) {
+        // Pledges where target is per town, rather than overall
+        if ($p->is_global()) {
+?>     <p><input type="hidden" name="prev_country" value="<?=$location['country']?>"> 
+          <input type="hidden" name="country" value="<?=$location['country']?>"> <?
+        } else {
+?>     <p><input type="hidden" name="prev_country" value="<?=$p->country_code()?>"> 
+          <input type="hidden" name="country" value="<?=$p->country_code()?>"> <?
+        }
+?></p>
+
+<div id="ifyes_line">
+<?              gaze_controls_print_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode'], array('townonly'=>true)); ?>
+</div>
+<?
+    }
+    print '<p><input type="submit" name="submit" value="' . ($p->byarea() ? _('Sign Pledge &gt;&gt;&gt;') : _('Sign Pledge')) . '"></p>
+</form>';
+}
+
+
 
 ?>

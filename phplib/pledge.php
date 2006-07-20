@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.186 2006-07-18 16:48:09 francis Exp $
+ * $Id: pledge.php,v 1.187 2006-07-20 09:30:43 francis Exp $
  * 
  */
 
@@ -494,7 +494,7 @@ class Pledge {
     }
 
     /* Display form for pledge signing. */
-    function sign_box($errors = array(), $location = array()) {
+    function sign_box($errors = array()) {
         if (get_http_var('add_signatory'))
             $showname = get_http_var('showname') ? ' checked' : '';
         else
@@ -535,31 +535,17 @@ class Pledge {
             // Pledges where target is per town, rather than overall
             if ($this->is_global()) {
                 ?> <p><strong><?=_('Your country:') ?></strong>&nbsp;<? 
-                if ($location)
-                    gaze_controls_print_country_choice($location['country'], $location['state'], $errors, array('noglobal'=>true, 'gazeonly'=>true)); 
-                else
-                    gaze_controls_print_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true));
+                gaze_controls_print_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true));
             } else {
 ?>            <p><input type="hidden" name="prev_country" value="<?=$this->country_code()?>"> 
               <input type="hidden" name="country" value="<?=$this->country_code()?>"> <?
             }
-            if ($location) {
-?></p>
-
-<div id="ifyes_line">
-<strong><?=_("Where in that country?")?></strong>
-<?              gaze_controls_print_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode'], array('townonly'=>true)); ?>
-</div>
-<?
-
-            } else {
 ?>
 <span style="white-space: nowrap"><strong><?=_('Your town:')?>
-&nbsp;<input type="text" size="20" name="place" value=""></strong></span>
+&nbsp;<input type="text" size="20" name="place" value="<?=htmlspecialchars(get_http_var("place"))?>" <?=array_key_exists('place', $errors) ? ' class="error"' : ''?> ></strong></span>
                 <? if (!$this->is_global()) { ?>
 <br><small><?=sprintf(_('(%s only)'), $this->h_country_no_state())?></small>
                 <? } 
-            }
         }
         print '
     <p><strong>' . _('Your email') . '</strong>: <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.

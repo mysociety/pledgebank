@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.57 2006-07-03 09:51:24 francis Exp $
+// $Id: alert.php,v 1.58 2006-07-20 09:30:43 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -99,7 +99,9 @@ function local_alert_subscribe_box($location, $errors = array()) {
             $email = $P->email();
     }
 
-    if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == 'NOTICE') {
+    $disambiguate_form = false;
+    if ($errors == array('gaze_place' => 'NOTICE')) {
+        $disambiguate_form = true;
         unset($errors['gaze_place']); # remove NOTICE
     }
 
@@ -108,7 +110,7 @@ function local_alert_subscribe_box($location, $errors = array()) {
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
     }
-    
+
  ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/alert">
@@ -116,23 +118,27 @@ function local_alert_subscribe_box($location, $errors = array()) {
 <?  if ($track)
         print '<input type="hidden" name="track" value="' . htmlentities($track) . '">';
 ?>
+<?    if ($disambiguate_form) { ?>
+<input type="hidden" name="email" value="<?=htmlspecialchars($email)?>"> 
+<input type="hidden" name="country" value="<?=$location['country']?>">
+<input type="hidden" name="prev_country" value="<?=$location['country']?>">
+<?    } else { ?>
 <h2><?=_('Get emails about local pledges') ?></h2>
 <p><?=_("Fill in the form, and we'll email you when someone creates a new pledge near you.") ?></p>
-<p>
 
 <p>
 <label for="email"><strong><?=_('Email:') ?></strong></label> 
 <input <? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="20" name="email" id="email" value="<?=htmlspecialchars($email) ?>">
 </p>
-
 <p><strong><?=_('Country:') ?></strong>
 <? gaze_controls_print_country_choice($location['country'], $location['state'], $errors, array('noglobal'=>true, 'gazeonly'=>true)); ?>
 </p>
 
-<div id="ifyes_line">
+<p>
 <strong><?=_("Where in that country?")?></strong>
+<?    } ?>
+
 <? gaze_controls_print_place_choice($location['place'], $location['gaze_place'], $location['places'], $errors, $location['postcode']); ?>
-</div>
 
 <p><input type="submit" name="submit" value="<?=_('Subscribe') ?>"></p>
 

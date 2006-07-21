@@ -1,0 +1,26 @@
+#!/bin/bash
+# get-global-cool:
+# Update template style files from Global Cool website
+#
+# Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
+# Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+# 
+# $Id: get-global-cool,v 1.1 2006-07-21 12:00:42 francis Exp $
+
+BINPATH=`dirname $0`
+cd $BINPATH
+cd ../web
+mkdir -p global-cool
+cd global-cool
+
+function get_xhtml_to_html {
+    TEMPFILE=`tempfile`
+    wget -qN --output-document - http://blog.global-cool.com/wp-content/themes/gc_en/$1 | sed "s/\/>/>/g;" >$1
+    rm -f $TEMPFILE
+}
+
+# Get new versions of cache files if Last-Modified of remote file has changed.
+get_xhtml_to_html thirdPartyHeader.html
+get_xhtml_to_html thirdPartyLeftNav.html
+get_xhtml_to_html thirdPartyFooter.html
+

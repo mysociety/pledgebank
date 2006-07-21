@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.122 2006-07-11 15:18:52 francis Exp $
+// $Id: page.php,v 1.123 2006-07-21 12:00:42 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/person.php';
@@ -35,7 +35,7 @@ function page_send_vary_header() {
 /* page_header TITLE [PARAMS]
  * Print top part of HTML page, with the given TITLE, which should be in HTML
  * with special characters encoded as entities. This prints up to the
- * start of the "content" <div>. Optionally, PARAMS specifies other featurs
+ * start of the "pbcontent" <div>. Optionally, PARAMS specifies other featurs
  * of the page; possible keys in PARAMS are:
  *  nonav
  *      If true, suppresses display of the top title and navigation.
@@ -157,18 +157,27 @@ function page_header($title, $params = array()) {
     //if (array_key_exists('gazejs', $params)) { ?>
 <script type="text/javascript" src="/gaze.js"></script>
 <? //} ?>
-</head>
-<body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
-<?
-    // On the "print flyers from in-page image" page, these top parts are hidden from printing
-    if (array_key_exists('noprint', $params) and $params['noprint'])
-        print '<div class="noprint">';
+<?  if (!$microsite || $microsite != 'global-cool') { ?>
+        </head>
+        <body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
+        <?
+        // On the "print flyers from in-page image" page, these top parts are hidden from printing
+        if (array_key_exists('noprint', $params) and $params['noprint'])
+            print '<div class="noprint">';
 
-    // Display title bar
-    if (!array_key_exists('nonav', $params) or !$params['nonav']) {
-?>
-<?=microsites_logo()?>
-<hr class="v"><?
+        // Display title bar
+        if (!array_key_exists('nonav', $params) or !$params['nonav']) {
+        ?>
+        <?=microsites_logo()?>
+        <hr class="v"><?
+        }
+    } else {
+        // TODO: factor this if and include out into phplib/microsites.php.
+        // Not clear how best to structure this stuff - e.g. here the include
+        // has tohappen instead of </head><body> which is perhaps eccentrically
+        // particular to global-cool's template html files.
+        include "global-cool/thirdPartyHeader.html";
+        include "global-cool/thirdPartyLeftNav.html";
     }
 
     // Display link to main pledge page
@@ -205,7 +214,7 @@ function page_header($title, $params = array()) {
     }
 
 ?>
-<div id="content"><?    
+<div id="pbcontent"><?    
 
     // Warn that we are on a testing site
     $devwarning = array();
@@ -225,7 +234,7 @@ function page_header($title, $params = array()) {
 }
 
 /* page_footer [PARAMS]
- * Print bottom of HTML page. This closes the "content" <div>. Possible keys in
+ * Print bottom of HTML page. This closes the "pbcontent" <div>. Possible keys in
  * PARAMS are:
  *  nonav
  *      If true, don't display footer navigation.
@@ -236,12 +245,13 @@ function page_header($title, $params = array()) {
  *      to pass to track_event.
  */
 function page_footer($params = array()) {
-    global $contact_ref;
-?></div><? # id="content"
-    static $footer_outputted = 0; 
-    if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
-        $footer_outputted = 1;
-        debug_timestamp(true, "begin footer");
+    global $contact_ref, $microsite;
+?></div><? # id="pbcontent"
+    if (!$microsite || $microsite != 'global-cool') {
+        static $footer_outputted = 0; 
+        if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
+            $footer_outputted = 1;
+            debug_timestamp(true, "begin footer");
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
@@ -265,7 +275,8 @@ function page_footer($params = array()) {
 <div id="footer"><? pb_print_change_language_links(); ?> <br> <a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
 </div>
 <?
-        debug_timestamp(true, "change language links");
+            debug_timestamp(true, "change language links");
+        }
     }
 
     /* User-tracking. */
@@ -273,9 +284,14 @@ function page_footer($params = array()) {
     if (array_key_exists('extra', $params) && $params['extra'])
         $extra = $params['extra'];
     track_event($extra);
+
+    if (!$microsite || $microsite != 'global-cool') {
 ?>
 </body></html>
 <?  
+    } else {
+        include "global-cool/thirdPartyFooter.html";
+    }
     header('Content-Length: ' . ob_get_length());
 }
 

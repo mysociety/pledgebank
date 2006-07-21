@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.192 2006-07-20 09:30:42 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.193 2006-07-21 16:45:58 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -799,7 +799,8 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Send announcement");
     $wth->browser_submit_form(form_name => 'pledge',
                 fields => { message_body => "By merely partaking you have fulfilled your part in the pledge.  You rule!  This is my favourite pledge in the world and it has a lot more text these days.  Yes, it goes on and on and on for many many lines, and hopefully even word wraps in the email that it generates later.\n\nHopefully.\n\nYours sincerely, \n\n" . name_n(0),
-                            message_sms => "U rul. " . (split(m/ /,name_n(0)))[0]. " x"},
+                           # no message_sms, as US pledges don't support SMS
+                           },
         button => 'submit') or die "Failed to submit email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
     $wth->log_watcher_check();

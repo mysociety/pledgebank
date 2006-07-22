@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.141 2006-07-20 09:30:43 francis Exp $
+// $Id: new.php,v 1.142 2006-07-22 16:24:47 chris Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -286,11 +286,9 @@ function pledge_form_two($data, $errors = array()) {
 <p id="ifyes_line"><?
 print _('If yes, choose where.');
 
-// State is in the gaze_place list for selection, but stored with country later on
-// :( See code commented "split out state" elsewhere in this file
 $gaze_with_state = $data['gaze_place'];
 if ($data['state'])
-    $gaze_with_state .= ", " . $state;
+    $gaze_with_state .= ", " . $data['state'];
 gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places'], $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null, array('midformnote'=>true)); 
 ?>
 

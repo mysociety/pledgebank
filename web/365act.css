@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: 365act.css,v 1.4 2006-07-20 10:43:06 matthew Exp $
+ * $Id: 365act.css,v 1.5 2006-07-24 10:29:04 matthew Exp $
  * 
  */
 
@@ -77,7 +77,6 @@ h1 {
     margin: 0;
     padding: 0.4em 10px;
     text-align: left;
-    margin: 0;
     color: #ffffff;
     background-color: #9c7bbd;
     border-bottom: solid 2px #522994;
@@ -116,7 +115,7 @@ h1 span#countrytitle {
     margin: 0;
 }
 
-#content {
+#pbcontent {
     clear: both;
     text-align: left;
     padding: 5px 5% 10px;
@@ -205,6 +204,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     border: solid 2px #522994;
     background-color: #f6e5ff;
     padding: 10px;
+/*    -moz-border-radius: 8px 8px; */
 }
 #start {
     margin: 0;
@@ -358,9 +358,21 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     margin-bottom: 0;
 }
 #pledgeaction {
+    margin: 1em 0 0.5em 0;
     float: right;
     width: 45%;
-    margin: 1em 0 0.5em 0;
+}
+#col2 #pledgeaction {
+    float: none;
+    width: auto;
+}
+#col2 .comments {
+    float: none;
+    width: auto;
+}
+
+#pledgeaction select {
+    width: 12em;
 }
 #tips, #pledge, #all .pledge, #yourpledges .pledge {
     border: solid 2px #522994;
@@ -374,6 +386,16 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 }
 
 /* An individual pledge page */
+
+#col1 {
+    float: left;
+    clear: left;
+    width: 45%;
+}
+#col2 {
+    float: right;
+    width: 47%;
+}
 
 #pledge {
     text-align: center;
@@ -395,7 +417,6 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     margin: 0;
     padding: 0 0 0 1.5em;
 }
-
 #spreadword a {
     font-weight: bold;
 }
@@ -404,16 +425,39 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     margin: 0;
     padding: 0 0 0 1.5em;
 }
-#signatories, #connections {
-    clear: left;
-    float: left;
+#signatories, #connections, .comments, #spreadword {
     margin-top: 1em;
-    width: 45%;
 }
-.comments, #spreadword {
+
+.location {
+    padding-bottom: 0.5em;
+    border-bottom: dotted 1px #999999;
+}
+.location h3 {
+    margin: 0.5em 0;
+}
+.location_success {
+    padding: 4px;
+    background-color: #eeffee;
+    border: solid 1px #009900;
     margin-top: 1em;
-    clear: right;
+}
+.location_success h3 {
+    margin: 0 0 0.5em 0;
+}
+.location_success p {
+    float: right; 
+    text-align: right;
+    font-size: smaller;
+    margin: 0;
+}
+#signatories .location_success ul {
+    clear: left;
+}
+
+.comments {
     float: right;
+    clear: right;
     width: 45%;
 }
 #preview .comments {
@@ -513,6 +557,7 @@ ul#nav li {
     display: inline;
     border: solid 1px #522994;
     border-width: 2px 2px 0 2px;
+/*    -moz-border-radius: 8px 8px 0 0; */
 }
 
 /* For example, to tell people to check their email */
@@ -577,7 +622,7 @@ span.greyed {
     float: left; 
     width: 33%; 
 }
-.wherespecial {
+.wherespecial, .wheremakepledge {
     clear: both;
 }
 

@@ -18,9 +18,12 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.23 2006-07-26 19:13:05 francis Exp $
+ * $Id: microsites.php,v 1.24 2006-07-26 19:45:46 francis Exp $
  * 
  */
+
+#############################################################################
+# Name and domain information
 
 /* Codes of microsites, and name displayed next to PledgeBank logo */
 $microsites_list = array('everywhere' => _('Everywhere'),
@@ -51,6 +54,51 @@ function microsites_get_name() {
         return $microsites_list[$microsite];
     return null;
 }
+
+/* microsites_redirect
+ * When going to some pledges, a redirect is done so the URL is
+ * that of a particular microsite. */
+function microsites_redirect($p) {
+    global $microsite;
+    $redirect_microsite = $microsite;
+
+    # Specific pledges which redirect to certain microsite
+    if ($p->ref() == 'Sportclubpatrons') {
+        $redirect_microsite = 'london';
+    }
+
+    # Microsites for which all pledges marked in the database as belonging to
+    # that microsite do a redirect
+    $redirect_microsites = array('global-cool');
+    if (in_array($p->microsite(), $redirect_microsites)) {
+        $redirect_microsite = $p->microsite();
+    }
+    # TODO: redirect back again, if on a non-global-cool pledge on global-cool
+    # domain
+
+    # If necessary, do the redirect
+    if ($microsite != $redirect_microsite) {
+        $newurl = pb_domain_url(array('path' => $_SERVER['REQUEST_URI'], 'microsite' => $redirect_microsite));
+        header("Location: $newurl");
+        exit;
+    }
+}
+
+/* microsites_site_country
+ * Default country for microsite.  Used for search, and for default country on
+ * alerts / new pledge form */
+function microsites_site_country() {
+    global $site_country, $microsite;
+    if ($microsite) {
+        if ($microsite == 'london')
+            return 'GB';
+        return null;
+    }
+    return $site_country;
+}
+
+#############################################################################
+# Styling
 
 /* microsites_logo
  * Returns HTML to use for logo of microsite, or country. */
@@ -111,43 +159,6 @@ function microsites_css_file() {
         return "/globalcool.css";
     }
     return "/pb.css";
-}
-
-/* microsites_private_allowed
- * Returns whether private pledges are offered in new pledge dialog */
-function microsites_private_allowed() {
-    global $microsite;
-    if ($microsite == 'interface' || $microsite == 'global-cool')
-        return false;
-    else
-        return true;
-}
-
-/* microsites_new_pledges_frontpage 
- * Returns true if new pledges are to be made 'frontpage' rather 
- * than 'calculated' by default */
-function microsites_new_pledges_frontpage() {
-    global $microsite;
-    if ($microsite == 'interface')
-        return true;
-    else
-        return false;
-}
-
-/* microsites_other_people 
- * Returns text to describe other people by default when making
- * a new pledge
- */
-function microsites_other_people() {
-    global $microsite;
-    if ($microsite == 'interface')
-        return 'other Interfacers'; // deliberately not translated
-    elseif ($microsite == 'london')
-        return 'other Londoners'; // deliberately not translated
-    elseif ($microsite == 'global-cool')
-        return 'other cool people'; // deliberately not translated
-    else
-        return _('other local people');
 }
 
 /* microsites_syndication_warning
@@ -256,6 +267,57 @@ function microsites_frontpage_has_offline_secrets() {
     return true;
 }
 
+/* microsites_credit_footer
+ * Display extra text at the bottom of the page.
+ */
+function microsites_credit_footer() {
+    global $microsite;
+    if ($microsite == 'london') {
+?>
+<div id="sponsor"><img src="/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
+<?  }
+}
+
+#############################################################################
+# Features
+
+/* microsites_private_allowed
+ * Returns whether private pledges are offered in new pledge dialog */
+function microsites_private_allowed() {
+    global $microsite;
+    if ($microsite == 'interface' || $microsite == 'global-cool')
+        return false;
+    else
+        return true;
+}
+
+/* microsites_new_pledges_frontpage 
+ * Returns true if new pledges are to be made 'frontpage' rather 
+ * than 'calculated' by default */
+function microsites_new_pledges_frontpage() {
+    global $microsite;
+    if ($microsite == 'interface')
+        return true;
+    else
+        return false;
+}
+
+/* microsites_other_people 
+ * Returns text to describe other people by default when making
+ * a new pledge
+ */
+function microsites_other_people() {
+    global $microsite;
+    if ($microsite == 'interface')
+        return 'other Interfacers'; // deliberately not translated
+    elseif ($microsite == 'london')
+        return 'other Londoners'; // deliberately not translated
+    elseif ($microsite == 'global-cool')
+        return 'other cool people'; // deliberately not translated
+    else
+        return _('other local people');
+}
+
 /* microsites_frontpage_comments_allowed
  * Whether or not comments are displayed for the microsite.
  */
@@ -265,6 +327,9 @@ function microsites_comments_allowed() {
         return false;
     return true;
 }
+
+#############################################################################
+# Pledge indices
 
 /* microsites_filter_main
  * Criteria for most important pledges to show on front page / list pages.
@@ -300,59 +365,6 @@ function microsites_filter_foreign(&$sql_params) {
         return "(1=0)"; # Show nothing else on global cool site
     $sql_params[] = $microsite;
     return "(microsite <> ?)";
-}
-
-/* microsites_site_country
- * Default country for microsite.  Used for search, and for default country on
- * alerts / new pledge form */
-function microsites_site_country() {
-    global $site_country, $microsite;
-    if ($microsite) {
-        if ($microsite == 'london')
-            return 'GB';
-        return null;
-    }
-    return $site_country;
-}
-
-/* microsites_redirect
- * When going to some pledges, a redirect is done so the URL is
- * that of a particular microsite. */
-function microsites_redirect($p) {
-    global $microsite;
-    $redirect_microsite = $microsite;
-
-    # Specific pledges which redirect to certain microsite
-    if ($p->ref() == 'Sportclubpatrons') {
-        $redirect_microsite = 'london';
-    }
-
-    # Microsites for which all pledges marked in the database as belonging to
-    # that microsite do a redirect
-    $redirect_microsites = array('global-cool');
-    if (in_array($p->microsite(), $redirect_microsites)) {
-        $redirect_microsite = $p->microsite();
-    }
-    # TODO: redirect back again, if on a non-global-cool pledge on global-cool
-    # domain
-
-    # If necessary, do the redirect
-    if ($microsite != $redirect_microsite) {
-        $newurl = pb_domain_url(array('path' => $_SERVER['REQUEST_URI'], 'microsite' => $redirect_microsite));
-        header("Location: $newurl");
-        exit;
-    }
-}
-
-/* microsites_credit_footer
- * Display extra text at the bottom of the page.
- */
-function microsites_credit_footer() {
-    global $microsite;
-    if ($microsite == 'london') {
-?>
-<div id="sponsor"><img src="/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
-<?  }
 }
 
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.28 2006-07-12 08:20:31 francis Exp $
+ * $Id: ref-picture.php,v 1.29 2006-07-26 22:46:12 francis Exp $
  * 
  */
 
@@ -31,18 +31,18 @@ if (!is_null($err))
 page_check_ref(get_http_var('ref'));
 $pledge = new Pledge($q_ref);
 
-$P = person_if_signed_on();
+$P = pb_person_if_signed_on();
 if (!$P) {
     if ($pledge->has_picture()) {
         $reason_clause = "change the pledge's picture";
         $reason_clause_you = "change your pledge's picture";
-        $P = person_signon(array(
+        $P = pb_person_signon(array(
                     "reason_web" => _("Before you can change the pledge's picture, we need to check that you created the pledge."),
                     "reason_email" => _("Then you will be able to change your pledge's picture."),
                     "reason_email_subject" => _("Change your pledge's picture at PledgeBank.com"))
                 );
     } else {
-        $P = person_signon(array(
+        $P = pb_person_signon(array(
                     "reason_web" => _("Before you can add a picture to the pledge, we need to check that you created the pledge."),
                     "reason_email" => _("Then you will be able to add a picture to your pledge."),
                     "reason_email_subject" => _('Add a picture to your pledge at PledgeBank.com'))
@@ -51,7 +51,7 @@ if (!$P) {
 }
 
 if ($P->id() != $pledge->creator_id()) {
-    page_header("Add picture to pledge", array('ref'=>$p->ref(), 'pref' => $pledge->url_typein()) );
+    page_header("Add picture to pledge", array('ref'=>$pledge->ref(), 'pref' => $pledge->url_typein()) );
     print _("You must be the pledge creator to add a picture to a pledge.  Please
         <a href=\"/logout\">log out</a> and log in again as them.");
     page_footer();

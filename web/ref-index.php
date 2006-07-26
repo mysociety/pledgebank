@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.87 2006-07-18 16:48:09 francis Exp $
+// $Id: ref-index.php,v 1.88 2006-07-26 12:08:01 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -27,13 +27,23 @@ require_once '../phplib/comments.php';
 require_once '../../phplib/utility.php';
 
 $ref = get_http_var('ref');
-if (($microsite != 'london' && strcasecmp($ref, 'sportclubpatrons') == 0) ||
-    strcasecmp($ref, 'sportsclubpatrons') == 0) {
-    header('Location: http://london.pledgebank.com/Sportclubpatrons');
+
+/* Reference aliases */
+if (strcasecmp($ref, 'sportsclubpatrons') == 0) 
+    $ref = 'Sportclubpatrons';
+
+/* Look up pledge */
+page_check_ref($ref);
+$p = new Pledge($ref);
+
+/* Redirect to canonical case spelling of the pledge ref */
+if ($ref != $p->ref()) {
+    header("Location: /" . $p->ref());
     exit;
 }
-page_check_ref($ref);
-$p  = new Pledge($ref);
+
+/* Redirect to correct microsite */
+microsites_redirect($p);
 
 /* Do this again because it's possible we'll reach here with a non-canonical
  * ref (e.g. different case from that entered by the creator). */

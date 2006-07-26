@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.141 2006-07-03 09:51:24 francis Exp $
+// $Id: fns.php,v 1.142 2006-07-26 12:08:00 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -60,17 +60,24 @@ function pb_domain_url($params = array('path'=>'/')) {
     
     $url = 'http://';
 
-    if ($c)
-        $url .= strtolower("$c.");
-    else
-        $url .= 'www.';
-    if ($l)
-        $url .= "$l.";
-    if (OPTION_WEB_HOST != 'www') {
-        $url .= OPTION_WEB_HOST.'.';
+    global $microsites_to_extra_domains;
+    if (array_key_exists($c, $microsites_to_extra_domains)) {
+        # For example, pledge.global-cool.com
+        $url .= $microsites_to_extra_domains[$c];
+    } else {
+        # Construct URL using microsite/country and/or language
+        if ($c)
+            $url .= strtolower("$c.");
+        else
+            $url .= 'www.';
+        if ($l)
+            $url .= "$l.";
+        if (OPTION_WEB_HOST != 'www') {
+            $url .= OPTION_WEB_HOST.'.';
+        }
+        $url .= OPTION_WEB_DOMAIN;
     }
 
-    $url .= OPTION_WEB_DOMAIN;
     if (array_key_exists('path', $params) && $params['path'])
         $url .= htmlspecialchars($params['path']);
     else

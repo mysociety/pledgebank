@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.142 2006-07-22 16:24:47 chris Exp $
+// $Id: new.php,v 1.143 2006-07-26 12:08:01 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -498,7 +498,7 @@ function step1_error_check($data) {
     if (!$data['target']) $errors['target'] = _('Please enter a target');
     elseif (!ctype_digit($data['target']) || $data['target'] < 1) $errors['target'] = _('The target must be a positive number');
 
-    $disallowed_refs = array('contact', 'translate', 'posters', 'graphs');
+    $disallowed_refs = array('contact', 'translate', 'posters', 'graphs', 'sportsclubpatrons');
     if (!$data['ref']) $errors['ref'] = _('Please enter a short name for your pledge');
     elseif (strlen($data['ref'])<6) $errors['ref'] = _('The short name must be at least six characters long');
     elseif (strlen($data['ref'])>16) $errors['ref'] = _('The short name can be at most 20 characters long');

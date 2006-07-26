@@ -1,14 +1,24 @@
 <?php
 /*
  * microsites.php:
- * Microsites are special sub-sites for Glastonbury festival etc.
+ * Microsites are special sub-sites for London, Global Cool etc.
  * This file contains lots of functions which return the values appropriate
- * to each microsite.
+ * to each microsite. 
+ *  
+ * The idea is that you can create a new microsite by entirely editing this
+ * file, and the rest of the code just has hooks calling functions here, rather
+ * than lots of messy if statements. 
+ * 
+ * In practice, there are some if statements elsewhere for really special
+ * cases. For example, page.php has some if statements for the Global Cool
+ * style, because it requires inclusion of templates after our headers,
+ * in a very particular place, which would be hard to understand if partly
+ * explained in functions here.
  * 
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.20 2006-07-18 16:29:00 francis Exp $
+ * $Id: microsites.php,v 1.21 2006-07-26 12:08:01 francis Exp $
  * 
  */
 
@@ -21,9 +31,12 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'global-cool' => 'Global Cool');
 
 /* Other domains which refer to microsites */
-$microsites_extra_domains = array('pledge.global-cool.com' => 'global-cool',
-                                  'pledge.global-cool' => 'global-cool' // FAI testing domain domain
-);
+if (OPTION_PB_STAGING) {
+    $microsites_from_extra_domains = array('pledge.global-cool' => 'global-cool'); # Francis's local test domain
+} else {
+    $microsites_from_extra_domains = array('pledge.global-cool.com' => 'global-cool');
+}
+$microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 
 /* These are listed on /where */
 $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countries in all languages'),
@@ -102,7 +115,7 @@ function microsites_css_file() {
  * Returns whether private pledges are offered in new pledge dialog */
 function microsites_private_allowed() {
     global $microsite;
-    if ($microsite == 'interface')
+    if ($microsite == 'interface' || $microsite == 'global-cool')
         return false;
     else
         return true;
@@ -113,7 +126,7 @@ function microsites_private_allowed() {
  * than 'calculated' by default */
 function microsites_new_pledges_frontpage() {
     global $microsite;
-    if ($microsite == 'interface')
+    if ($microsite == 'interface' || $microsite == 'global-cool')
         return true;
     else
         return false;
@@ -146,6 +159,9 @@ function microsites_syndication_warning() {
         return true;
 }
 
+/* microsites_frontpage_intro 
+ * Introduction text to show on front page of site.
+ */
 function microsites_frontpage_intro() {
     global $microsite, $site_country;
     $tom = null;
@@ -207,6 +223,9 @@ works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
 <?
 }
 
+/* microsites_filter_main
+ * Criteria for most important pledges to show on front page / list pages.
+ */
 function microsites_filter_main(&$sql_params) {
     global $microsite;
     if ($microsite == 'everywhere')
@@ -217,21 +236,32 @@ function microsites_filter_main(&$sql_params) {
     return "(microsite = ?)";
 }
 
+/* microsites_filter_general
+ * Criteria for pledges to show on list pages, in addition to the 
+ * microsites_filter_main ones above
+ */
 function microsites_filter_general(&$sql_params) {
     return "(1=0)";
 }
 
+/* microsites_filter_foreign
+ * Criteria for other pledges to show, if there aren't enough main/general
+ * ones for the front page to look busy. */
 function microsites_filter_foreign(&$sql_params) {
     global $microsite;
     if ($microsite == 'everywhere')
         return "(1=0)";
     if ($microsite == 'london')
         return "(pledges.id not in (select pledge_id from pledge_find_nearby(51.5,-0.1166667, 25)))";
+    if ($microsite == 'global-cool')
+        return "(1=0)"; # Show nothing else on global cool site
     $sql_params[] = $microsite;
     return "(microsite <> ?)";
 }
 
-# Used for search, and for default country on alerts / new pledge form
+/* microsites_site_country
+ * Default country for microsite.  Used for search, and for default country on
+ * alerts / new pledge form */
 function microsites_site_country() {
     global $site_country, $microsite;
     if ($microsite) {
@@ -241,5 +271,33 @@ function microsites_site_country() {
     }
     return $site_country;
 }
+
+/* microsites_redirect
+ * When going to some pledges, a redirect is done so the URL is
+ * that of a particular microsite. */
+function microsites_redirect($p) {
+    global $microsite;
+    $redirect_microsite = null;
+
+    # Specific pledges which redirect to certain microsite
+    if ($p->ref() == 'Sportclubpatrons') {
+        $redirect_microsite = 'london';
+    }
+
+    # Microsites for which all pledges marked in the database as belonging to
+    # that microsite do a redirect
+    if (in_array($p->microsite(), array('global-cool'))) {
+        $redirect_microsite = $p->microsite();
+    }
+
+    # If necessary, do the redirect
+    if ($microsite != $redirect_microsite) {
+        $newurl = pb_domain_url(array('path' => $_SERVER['REQUEST_URI'], 'microsite' => $redirect_microsite));
+        header("Location: $newurl");
+        exit;
+    }
+}
+
+
 
 ?>

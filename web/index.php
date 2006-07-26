@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.239 2006-07-04 13:54:45 francis Exp $
+// $Id: index.php,v 1.240 2006-07-26 16:20:32 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -32,14 +32,19 @@ function front_page() {
     debug_comment_timestamp("in front_page()");
     pb_view_local_alert_quick_signup("localsignupfrontpage");
     debug_comment_timestamp("after pb_view_local_alert_quick_signup()");
+
+    if (microsites_frontpage_has_intro()) {
 ?>
 <div id="tellworld">
 <?
     microsites_frontpage_intro();
-    debug_comment_timestamp("after microsites_frontpage_intro()");
 ?>
 </div>
+<?  }
+    debug_comment_timestamp("after microsites_frontpage_intro()");
 
+    if (microsites_frontpage_has_start_your_own()) {
+?>
 <div id="startblurb">
 <h2><?=_('Start your own pledge') ?></h2>
 <p><?=_('Pledgebank is free and easy to use. Once you\'ve thought of something you\'d like
@@ -47,7 +52,10 @@ to do, just <a href="/new">create a pledge</a> which says "I\'ll do this, but
 only if 5 other people will do the same".') ?>
 <p id="start"><a href="./new"><?=_('Start your own pledge') ?>&nbsp;&raquo;</a></p>
 </div>
+<?
+    }
 
+?>
 <div id="currentpledges">
 <?
     list_frontpage_pledges();
@@ -58,22 +66,23 @@ only if 5 other people will do the same".') ?>
 </div>
 
 <? global $lang;
-   if ($lang == 'en-gb') { ?>
+   if (microsites_frontpage_has_offline_secrets()) {
+       if ($lang == 'en-gb') { ?>
 <div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-text-275px.jpg" alt="<?=_('How scissors, a phone and some printouts
 can make your pledge succeed &raquo;') ?>"></a></div>
-<? } else { ?>
+    <? } else { ?>
 <div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-275px.jpg" alt="<?=_('Scissors, a phone and some printouts &mdash; ') ?>"></a></div>
 <div id="photocaption"><a href="/offline"><?=_("Find out why these things are the secret of a successful pledge")?> &raquo;</a></div>
-<? }?>
-
-<?  comments_show_latest();
-    debug_comment_timestamp("after comments_show_latest()");
-    global $microsite;
-    if ($microsite == 'london') {
-?>
-<div id="sponsor"><img src="/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
+    <? }?>
 <?  }
+    if (microsites_comments_allowed()) {
+        comments_show_latest();
+        debug_comment_timestamp("after comments_show_latest()");
+    }
+
+    microsites_credit_footer();
 }
+
 # params must have:
 # 'global' - true or false, whether global pledges to be included
 # 'main' - true or false, whether site country pledges to be included

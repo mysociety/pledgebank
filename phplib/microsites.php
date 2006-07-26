@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.21 2006-07-26 12:08:01 francis Exp $
+ * $Id: microsites.php,v 1.22 2006-07-26 16:20:31 francis Exp $
  * 
  */
 
@@ -107,6 +107,8 @@ function microsites_css_file() {
         return "/365act.css";
     } elseif ($microsite && $microsite == 'london') {
         return "/london.css";
+    } elseif ($microsite && $microsite == 'global-cool') {
+        return "/globalcool.css";
     }
     return "/pb.css";
 }
@@ -157,6 +159,17 @@ function microsites_syndication_warning() {
         return false;
     else
         return true;
+}
+
+/* microsites_frontpage_has_intro
+ * Whether or not the "tell the world" motivation intro box is present on the
+ * front page.
+ */
+function microsites_frontpage_has_intro() {
+    global $microsite;
+    if ($microsite == 'global-cool')
+        return false;
+    return true;
 }
 
 /* microsites_frontpage_intro 
@@ -223,6 +236,36 @@ works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
 <?
 }
 
+/* microsites_frontpage_has_start_your_own
+ * Whether or not the "start your own pledge" box is present on the front page.
+ */
+function microsites_frontpage_has_start_your_own() {
+    global $microsite;
+    if ($microsite == 'global-cool')
+        return false;
+    return true;
+}
+
+/* microsites_frontpage_has_offline_secrets
+ * Whether or not the "scissors and phone" box is present on the front page.
+ */
+function microsites_frontpage_has_offline_secrets() {
+    global $microsite;
+    if ($microsite == 'global-cool')
+        return false;
+    return true;
+}
+
+/* microsites_frontpage_comments_allowed
+ * Whether or not comments are displayed for the microsite.
+ */
+function microsites_comments_allowed() {
+    global $microsite;
+    if ($microsite == 'global-cool')
+        return false;
+    return true;
+}
+
 /* microsites_filter_main
  * Criteria for most important pledges to show on front page / list pages.
  */
@@ -277,7 +320,7 @@ function microsites_site_country() {
  * that of a particular microsite. */
 function microsites_redirect($p) {
     global $microsite;
-    $redirect_microsite = null;
+    $redirect_microsite = $microsite;
 
     # Specific pledges which redirect to certain microsite
     if ($p->ref() == 'Sportclubpatrons') {
@@ -286,9 +329,12 @@ function microsites_redirect($p) {
 
     # Microsites for which all pledges marked in the database as belonging to
     # that microsite do a redirect
-    if (in_array($p->microsite(), array('global-cool'))) {
+    $redirect_microsites = array('global-cool');
+    if (in_array($p->microsite(), $redirect_microsites)) {
         $redirect_microsite = $p->microsite();
     }
+    # TODO: redirect back again, if on a non-global-cool pledge on global-cool
+    # domain
 
     # If necessary, do the redirect
     if ($microsite != $redirect_microsite) {
@@ -298,6 +344,16 @@ function microsites_redirect($p) {
     }
 }
 
+/* microsites_credit_footer
+ * Display extra text at the bottom of the page.
+ */
+function microsites_credit_footer() {
+    global $microsite;
+    if ($microsite == 'london') {
+?>
+<div id="sponsor"><img src="/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
+<?  }
+}
 
 
 ?>

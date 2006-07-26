@@ -7,4 +7,5 @@ cd $BINPATH
 ./make_glastonbury_css
 ./make_interface_css
 ./make_london_css
+./make_globalcool_css
 

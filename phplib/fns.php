@@ -5,10 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.142 2006-07-26 12:08:00 francis Exp $
+// $Id: fns.php,v 1.143 2006-07-26 16:20:31 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
+require_once '../phplib/microsites.php';
 require_once "../../phplib/evel.php";
 require_once '../../phplib/person.php';
 require_once '../../phplib/utility.php';

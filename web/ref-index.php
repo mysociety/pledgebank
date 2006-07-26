@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.88 2006-07-26 12:08:01 francis Exp $
+// $Id: ref-index.php,v 1.89 2006-07-26 16:20:32 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -341,13 +341,16 @@ function draw_connections($p) {
 locale_push($p->lang());
 $title = "'" . _('I will') . ' ' . $p->h_title() . "'";
 locale_pop();
-page_header($title, array(
+$params = array(
             'ref'=>$p->ref(),
             'pref' => $p->url_typein(),
             'noreflink' => 1,
-            'rss' => array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss()),
             'last-modified' => $p->last_change_time()
-        ));
+        );
+if (microsites_comments_allowed())
+    $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());
+    
+page_header($title, $params);
 debug_comment_timestamp("after page_header()");
 draw_status_plaque($p);
 debug_comment_timestamp("after draw_status_plaque()");
@@ -357,7 +360,8 @@ print '<div id="col2">';
 if (!$p->finished()) { $p->sign_box(); } 
 draw_spreadword($p);
 debug_comment_timestamp("after draw_spreadword()");
-draw_comments($p);
+if (microsites_comments_allowed())
+    draw_comments($p);
 print '</div>';
 debug_comment_timestamp("after draw_comments()");
 print '<div id="col1">';

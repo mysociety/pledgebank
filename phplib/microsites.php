@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.26 2006-07-27 17:24:42 francis Exp $
+ * $Id: microsites.php,v 1.27 2006-07-27 18:07:06 francis Exp $
  * 
  */
 
@@ -387,11 +387,23 @@ function microsites_read_external_auth() {
         return true;
 
     if ($microsite == 'global-cool') {
+        // Read cookie
         if (!array_key_exists('auth', $_COOKIE))
-            return true;
-        #$cool_cookie = $_COOKIE['auth'];
-        $cool_cookie = "email=mouse@flourish.org|name=Mouse Irving|signedIn=yes";
-        # $cool_cookie = mcrypt_decrypt( , OPTION_GLOBALCOOL_SECRET, $cool_cookie, )
+             return true;
+        $cool_cookie = $_COOKIE['auth'];
+        #$cool_cookie = "email=mouse@flourish.org|name=Mouse Irving|signedIn=yes";
+        #$cool_cookie = mcrypt_decrypt( , OPTION_GLOBALCOOL_SECRET, $cool_cookie, )
+        #$cool_cookie = "4epV%2BNEniJN5Cr66iVoIAIb%2FSu0Y5EkU9Bs8rTCOH%2BVI3GaEUUk4gX01GYEUXzEr2o%2BubcEUWne9N5AssvjVQlP0rJM%2B0G3b7XofHyUUPNF551%2B4EWyd6Q%3D%3D";
+
+        // Decrypt cookie
+        $td = mcrypt_module_open('tripledes', '', 'ecb', '');
+        if (!$td) err('Failed to mcrypt_module_open');
+        $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+        mcrypt_generic_init($td, OPTION_GLOBALCOOL_SECRET, $iv);
+        $cool_cookie = mdecrypt_generic($td, $cool_cookie);
+        mcrypt_generic_deinit($td);
+        mcrypt_module_close($td);
+#        print $cool_cookie; exit;
 
         // Read parameters out of Global Cool cookie
         $raw_params = split("\|", $cool_cookie);
@@ -422,17 +434,19 @@ function microsites_read_external_auth() {
 }
 
 /* microsites_redirect_external_login
- * Return true if auth has been redirected.
+ * Return true if auth has been redirected to elsewhere.
  * Return false if normal auth is to be used.*/
 function microsites_redirect_external_login() {
     global $microsite;
     if ($microsite == 'global-cool') {
+        // See if we are on redirect back from Global Cool login system
         if (get_http_var('stashpost')) {
             if (!pb_person_if_signed_on())
                 err('Sorry! Something went wrong while logging into Global Cool. Please check that you have cookies enabled on your browser.');
             stash_redirect(get_http_var('stashpost'));
             exit;
         }
+        // Otherwise, redirect to Global Cool login system, with stash key to get back here
         $url = "http://".$_SERVER['SERVER_NAME'].$_SERVER["REQUEST_URI"];
         $st = stash_new_request('POST', $url, $_POST);
         db_commit();
@@ -440,13 +454,11 @@ function microsites_redirect_external_login() {
             $url .= "&stashpost=$st";
         else
             $url .= "?stashpost=$st";
-        header("Location: http://dev1.global-cool.com/auth/?next=" . urlencode($url));
+        header("Location: http://www.global-cool.com:8080/auth/?next=" . urlencode($url));
         return true;
     }
     return false;
 }
-
-
 
 
 

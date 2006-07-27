@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.27 2006-07-27 18:07:06 francis Exp $
+ * $Id: microsites.php,v 1.28 2006-07-27 23:25:38 francis Exp $
  * 
  */
 
@@ -170,6 +170,17 @@ function microsites_syndication_warning() {
         return false;
     else
         return true;
+}
+
+/* microsites_frontpage_has_local_emails
+ * Whether or not the local alert signup box is present on the
+ * top of the front page.
+ */
+function microsites_frontpage_has_local_emails() {
+    global $microsite;
+    if ($microsite == 'global-cool')
+        return false;
+    return true;
 }
 
 /* microsites_frontpage_has_intro
@@ -391,9 +402,8 @@ function microsites_read_external_auth() {
         if (!array_key_exists('auth', $_COOKIE))
              return true;
         $cool_cookie = $_COOKIE['auth'];
+        $cool_cookie = base64_decode($cool_cookie);
         #$cool_cookie = "email=mouse@flourish.org|name=Mouse Irving|signedIn=yes";
-        #$cool_cookie = mcrypt_decrypt( , OPTION_GLOBALCOOL_SECRET, $cool_cookie, )
-        #$cool_cookie = "4epV%2BNEniJN5Cr66iVoIAIb%2FSu0Y5EkU9Bs8rTCOH%2BVI3GaEUUk4gX01GYEUXzEr2o%2BubcEUWne9N5AssvjVQlP0rJM%2B0G3b7XofHyUUPNF551%2B4EWyd6Q%3D%3D";
 
         // Decrypt cookie
         $td = mcrypt_module_open('tripledes', '', 'ecb', '');
@@ -403,7 +413,6 @@ function microsites_read_external_auth() {
         $cool_cookie = mdecrypt_generic($td, $cool_cookie);
         mcrypt_generic_deinit($td);
         mcrypt_module_close($td);
-#        print $cool_cookie; exit;
 
         // Read parameters out of Global Cool cookie
         $raw_params = split("\|", $cool_cookie);

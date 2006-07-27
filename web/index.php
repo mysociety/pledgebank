@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.241 2006-07-27 11:14:53 francis Exp $
+// $Id: index.php,v 1.242 2006-07-27 23:25:38 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -30,7 +30,9 @@ page_footer(array('nolocalsignup'=>true));
 
 function front_page() {
     debug_comment_timestamp("in front_page()");
-    pb_view_local_alert_quick_signup("localsignupfrontpage");
+    if (microsites_frontpage_has_local_emails()) {
+        pb_view_local_alert_quick_signup("localsignupfrontpage");
+    }
     debug_comment_timestamp("after pb_view_local_alert_quick_signup()");
 
     if (microsites_frontpage_has_intro()) {

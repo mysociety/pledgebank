@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.72 2006-07-19 17:28:38 chris Exp $
+ * $Id: login.php,v 1.73 2006-07-27 11:14:53 francis Exp $
  * 
  */
 
@@ -45,7 +45,7 @@ require_once '../phplib/pb.php';
 require_once '../../phplib/auth.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/page.php';
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 require_once '../../phplib/stash.php';
 require_once '../../phplib/rabx.php';
 
@@ -96,7 +96,7 @@ if ($q_name==_('<Enter your name>')) {
 
 /* General purpose login, asks for email also. */
 if (get_http_var("now")) {
-    $P = person_signon(array(
+    $P = pb_person_signon(array(
                     'reason_web' => _("To log into PledgeBank, we need to check your email address."),
                     'reason_email' => _("Then you will be logged into PledgeBank, and can set or change your password."),
                     'reason_email_subject' => _('Log into PledgeBank.com')
@@ -149,7 +149,7 @@ if (!is_null($q_t)) {
     /* NOTREACHED */
 }
 
-$P = person_if_signed_on();
+$P = pb_person_if_signed_on();
 if (!is_null($P)) {
     /* Person is already signed in. */
     if ($q_SetPassword)
@@ -262,7 +262,7 @@ sometimes, our messages are marked that way.') ?></small>
  * was processed. */
 function login_form($errors = array()) {
     /* Just render the form. */
-    global $q_h_stash, $q_h_email, $q_h_name, $q_stash, $q_email, $q_name;
+    global $q_h_stash, $q_h_email, $q_h_name, $q_stash, $q_email, $q_name, $q_rememberme;
 
     page_header(_('Checking Your Email Address'));
 
@@ -321,7 +321,7 @@ function login_form($errors = array()) {
 <input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
 <input type="submit" name="LogIn" value="<?=_('Let me in') ?> &gt;&gt;"></p>
 
-<input type="checkbox" name="rememberme" id="rememberme" value="1"><strong><label for="rememberme"><?=_('Remember me') ?></label></strong>
+<input type="checkbox" name="rememberme" id="rememberme" <?=$q_rememberme ? "checked" : ""?>><strong><label for="rememberme"><?=_('Remember me') ?></label></strong>
 <small><?=_("(don't use this on a public or shared computer)") ?></small>
 
 </li>

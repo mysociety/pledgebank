@@ -6,18 +6,18 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: logout.php,v 1.10 2005-11-28 23:28:23 matthew Exp $
+ * $Id: logout.php,v 1.11 2006-07-27 11:14:53 francis Exp $
  * 
  */
 
 require_once '../phplib/pb.php';
 
 require_once '../phplib/page.php';
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 
 header('Cache-Control: no-cache');
 
-if (person_if_signed_on(true)) {
+if (pb_person_if_signed_on(true)) {
     person_signoff();
     header("Location: /logout");
     exit;

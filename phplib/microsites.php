@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.24 2006-07-26 19:45:46 francis Exp $
+ * $Id: microsites.php,v 1.25 2006-07-27 11:14:52 francis Exp $
  * 
  */
 
@@ -366,6 +366,35 @@ function microsites_filter_foreign(&$sql_params) {
     $sql_params[] = $microsite;
     return "(microsite <> ?)";
 }
+
+#############################################################################
+# Login
+
+function microsites_read_external_auth() {
+    global $microsite;
+    if ($microsite == 'global-cool') {
+        $cool_cookie = $_COOKIE['auth'];
+        $raw_params = split("|", $cool_cookie);
+        $params = array();
+        foreach ($raw_params as $raw_param) {
+            list($param, $value) = split("=", $raw_param, 2);
+            $params[$param] = $value;
+        }
+        print "microsites_read_external_auth: ";
+        print_r($params);
+        exit;
+        return;
+    }
+}
+
+function microsites_redirect_external_login() {
+
+}
+
+
+
+
+
 
 
 ?>

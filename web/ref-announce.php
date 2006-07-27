@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.47 2006-07-15 09:18:21 timsk Exp $
+ * $Id: ref-announce.php,v 1.48 2006-07-27 11:14:53 francis Exp $
  * 
  */
 
@@ -14,7 +14,7 @@ require_once "../../phplib/db.php";
 require_once "../phplib/pb.php";
 require_once "../phplib/fns.php";
 require_once "../phplib/pledge.php";
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 
 require_once "../../phplib/importparams.php";
 require_once "../../phplib/evel.php";
@@ -60,9 +60,9 @@ if ($p->byarea()) {
 }
 
 
-$P = person_if_signed_on();
+$P = pb_person_if_signed_on();
 if (!$P) {
-    $P = person_signon(array(
+    $P = pb_person_signon(array(
                     "reason_web" => _("Before you can send a message to all the signers, we need to check that you created the pledge."),
                     "reason_email" => _("Then you will be able to send a message to everyone who has signed your pledge."),
                     "reason_email_subject" => _("Send a message to your pledge signers at PledgeBank.com"))

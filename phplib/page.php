@@ -5,12 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.123 2006-07-21 12:00:42 francis Exp $
+// $Id: page.php,v 1.124 2006-07-27 11:14:52 francis Exp $
 
 require_once '../../phplib/conditional.php';
-require_once '../../phplib/person.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/tracking.php';
+require_once 'pbperson.php';
 require_once 'pledge.php';
 
 // Do NOT include microsites.php here, or it won't get translated.
@@ -118,7 +118,7 @@ function page_header($title, $params = array()) {
     global $err_handling_error;
     $P = null;
     if (!$err_handling_error) 
-        $P = person_if_signed_on(true); /* Don't renew any login cookie. */
+        $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
 
     $header_outputted = 1;
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -260,7 +260,7 @@ function page_footer($params = array()) {
 </form>
 <!-- remove all extraneous whitespace to avoid IE bug -->
 <ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/list"><?=_('All Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>"><?=_('FAQ') ?></acronym></a></li><li><a href="/contact<?=$contact_ref?>"><?=_('Contact') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><?
-        $P = person_if_signed_on(true); /* Don't renew any login cookie. */
+        $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
         debug_timestamp(true, "retrieved person record");
         if ($P) {
 ?><li><a href="/logout"><?=_('Logout') ?></a></li><?

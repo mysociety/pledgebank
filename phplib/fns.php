@@ -5,13 +5,13 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.143 2006-07-26 16:20:31 francis Exp $
+// $Id: fns.php,v 1.144 2006-07-27 11:14:52 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
 require_once '../phplib/microsites.php';
+require_once '../phplib/pbperson.php';
 require_once "../../phplib/evel.php";
-require_once '../../phplib/person.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/gaze.php';
 require_once '../../phplib/datetime.php';
@@ -84,11 +84,6 @@ function pb_domain_url($params = array('path'=>'/')) {
     else
         $url .= htmlspecialchars($_SERVER['REQUEST_URI']);
     return $url;
-}
-
-// Special version of person_make_signon_url which uses fancy PledgeBank domain URLs
-function pb_person_make_signon_url($data, $email, $method, $url, $params) {
-     return person_make_signon_url($data, $email, $method, $url, $params, pb_domain_url(array('path'=>'/')));
 }
 
 // $to can be one recipient address in a string, or an array of addresses
@@ -181,7 +176,7 @@ function parse_date($date) {
 function view_friends_form($p, $errors = array(), $track=null) {
     $name = get_http_var('fromname', true);
     $email = get_http_var('fromemail');
-    $P = person_if_signed_on();
+    $P = pb_person_if_signed_on();
     if (!is_null($P)) {
         if (is_null($name) || !$name)
             $name = $P->name_or_blank();
@@ -448,7 +443,7 @@ global $place_postcode_label; # ids must be unique (this will break
 function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>true)) {
     global $place_postcode_label, $microsite;
     $email = '';
-    $P = person_if_signed_on();
+    $P = pb_person_if_signed_on();
     if (!is_null($P)) {
         $email = $P->email();
     } 

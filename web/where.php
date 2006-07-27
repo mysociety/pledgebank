@@ -5,12 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.12 2006-03-27 17:05:14 francis Exp $
+// $Id: where.php,v 1.13 2006-07-27 11:14:53 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/alert.php';
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/gaze.php';
 

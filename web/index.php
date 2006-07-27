@@ -5,15 +5,15 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.240 2006-07-26 16:20:32 francis Exp $
+// $Id: index.php,v 1.241 2006-07-27 11:14:53 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
+require_once '../phplib/pbperson.php';
 require_once '../../phplib/utility.php';
-require_once '../../phplib/person.php';
 
 page_header(null, 
             array('rss'=> array(

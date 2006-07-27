@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announcearchive.php,v 1.5 2006-06-21 17:30:59 francis Exp $
+ * $Id: ref-announcearchive.php,v 1.6 2006-07-27 11:14:53 francis Exp $
  * 
  */
 
@@ -14,7 +14,7 @@ require_once '../phplib/pb.php';
 
 require_once '../phplib/comments.php';
 require_once '../phplib/page.php';
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 require_once '../../phplib/utility.php';
 require_once '../phplib/pledge.php';
 
@@ -36,7 +36,7 @@ if ($pin_box) {
     exit;
 }
 
-$P = person_signon(array(
+$P = pb_person_signon(array(
                      'reason_web' => _('To view announcement messages for a pledge, we need to check you have signed it.'),
                      'reason_email' => _('Then you will be able to view announcement messages.'),
                      'reason_email_subject' => _('View pledge announcements archive on PledgeBank.com'),

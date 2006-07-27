@@ -6,15 +6,15 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.190 2006-07-26 12:08:01 francis Exp $
+ * $Id: pledge.php,v 1.191 2006-07-27 11:14:52 francis Exp $
  * 
  */
 
 require_once 'fns.php';
 require_once 'gaze-controls.php'; // for sign_box
+require_once 'pbperson.php';
 
 require_once '../../phplib/db.php';
-require_once '../../phplib/person.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/rabx.php';
 require_once '../../phplib/countries.php';
@@ -400,7 +400,7 @@ class Pledge {
     <? if ($this->url_translate_pledge()) { ?>
     (<a title="<?=_("Roughly translate the pledge into your language (using Altavista's Babel Fish machine translator)")?>" href="<?=htmlspecialchars($this->url_translate_pledge())?>"><?=_("translate")?></a>)
     <? } ?>
-    <? $P = person_if_signed_on();
+    <? $P = pb_person_if_signed_on();
        if (!is_null($P) && !is_null($P->email()) && preg_match('/(@mysociety.org$)|(^francis@flourish.org$)/', $P->email())) { ?>
     (<a href="<?=OPTION_ADMIN_URL?>?page=pb&amp;pledge=<?=$this->ref()?>"><?=_("admin")?></a>)
     <? } ?>
@@ -509,7 +509,7 @@ class Pledge {
         $email = get_http_var('email');
         $name = get_http_var('name', true);
 
-        $P = person_if_signed_on();
+        $P = pb_person_if_signed_on();
         if (!is_null($P)) {
             if (is_null($email) || !$email)
                 $email = $P->email();

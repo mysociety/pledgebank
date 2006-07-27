@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.36 2006-06-21 19:33:10 francis Exp $
+ * $Id: comment.php,v 1.37 2006-07-27 11:14:53 francis Exp $
  * 
  */
 
@@ -13,7 +13,7 @@ require_once('../phplib/pb.php');
 
 require_once('../../phplib/importparams.php');
 
-require_once '../../phplib/person.php';
+require_once('../phplib/pbperson.php');
 require_once('../phplib/pledge.php');
 require_once('../phplib/comments.php');
 require_once('../phplib/alert.php');
@@ -105,7 +105,7 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     $r['reason_web'] = _('Before adding your comment to the pledge, we need to check that your email is working.');
     $r['reason_email'] = _('Your comment will then be displayed on the pledge page.');
     $r['reason_email_subject'] = _('Adding your comment to a pledge at PledgeBank.com');
-    $P = person_signon($r, $q_author_email, $q_author_name);
+    $P = pb_person_signon($r, $q_author_email, $q_author_name);
     $P->set_website($q_author_website);
 
     /* Actually post the comment. Guard against double-insertion. */

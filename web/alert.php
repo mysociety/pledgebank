@@ -5,13 +5,13 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.58 2006-07-20 09:30:43 francis Exp $
+// $Id: alert.php,v 1.59 2006-07-27 11:14:53 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/gaze.php';
 
@@ -32,7 +32,7 @@ if (get_http_var('subscribe_local_alert')) {
 } elseif (get_http_var('direct_unsubscribe')) {
     // Clicked from email to unsubscribe
     $alert_id = get_http_var('direct_unsubscribe');
-    $P = person_if_signed_on();
+    $P = pb_person_if_signed_on();
     if (!$P) 
         err(_('Unexpectedly not signed on after following unsubscribe link'));
     $desc = alert_h_description($alert_id);
@@ -68,7 +68,7 @@ function do_local_alert_subscribe(&$location) {
     $r['reason_web'] = _('Before subscribing you to local pledge email alerts, we need to confirm your email address.');
     $r['reason_email'] = _("You'll then be emailed whenever a new pledge appears in your area.");
     $r['reason_email_subject'] = _("Subscribe to local pledge alerts at PledgeBank.com");
-    $person = person_signon($r, $email);
+    $person = pb_person_signon($r, $email);
     $params = $location;
     alert_signup($person->id(), "pledges/local", $params);
     db_commit();
@@ -93,7 +93,7 @@ function do_local_alert_subscribe(&$location) {
 function local_alert_subscribe_box($location, $errors = array()) {
     global $email, $track;
 
-    $P = person_if_signed_on();
+    $P = pb_person_if_signed_on();
     if (!is_null($P)) {
         if (is_null($email) || !$email)
             $email = $P->email();

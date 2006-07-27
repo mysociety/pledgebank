@@ -5,11 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.143 2006-07-26 12:08:01 francis Exp $
+// $Id: new.php,v 1.144 2006-07-27 11:14:53 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../phplib/alert.php';
@@ -110,7 +110,7 @@ about. If they don't, you need to rewrite it.") ?></li>
     }
 
     global $pb_time;
-    $P = person_if_signed_on();
+    $P = pb_person_if_signed_on();
     if (!is_null($P)) {
         if (!array_key_exists('email', $data))
             $data['email'] = $P->email();
@@ -486,7 +486,7 @@ function pledge_form_submitted() {
     /* User must have an account to do this. */
     $data['reason_web'] = _('Before creating your new pledge, we need to check that your email is working.');
     $data['template'] = 'pledge-confirm';
-    $P = person_signon($data, $data['email'], $data['name']);
+    $P = pb_person_signon($data, $data['email'], $data['name']);
 
     create_new_pledge($P, $data);
 }
@@ -510,7 +510,7 @@ function step1_error_check($data) {
         LEFT JOIN person on person.id = pledges.person_id
         WHERE ref ILIKE ?', array($data['ref']));
     if ($dupe) {
-        $P = person_if_signed_on();
+        $P = pb_person_if_signed_on();
         // Note that for privacy reasons, we check against the logged in email
         // (rather than the email that they have entered in the form, which
         // could be anyone)

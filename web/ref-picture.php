@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.29 2006-07-26 22:46:12 francis Exp $
+ * $Id: ref-picture.php,v 1.30 2006-07-27 11:14:53 francis Exp $
  * 
  */
 
@@ -14,7 +14,7 @@ require_once '../phplib/pb.php';
 require_once '../../phplib/db.php';
 
 require_once '../phplib/page.php';
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 require_once '../phplib/pledge.php';
 
 require_once '../../phplib/importparams.php';

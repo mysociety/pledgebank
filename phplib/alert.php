@@ -5,11 +5,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.32 2006-07-12 08:44:33 francis Exp $
+// $Id: alert.php,v 1.33 2006-07-27 11:14:52 francis Exp $
 
+require_once '../phplib/pbperson.php';
 require_once '../../phplib/mapit.php';
 require_once "../../phplib/votingarea.php";
-require_once '../../phplib/person.php';
 
 /* alert_signup PERSON EVENT PARAMS
  * Signs PERSON up to receive alerts to an event. EVENT may be:

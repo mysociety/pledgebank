@@ -5,15 +5,15 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.20 2006-07-12 08:44:33 francis Exp $
+// $Id: your.php,v 1.21 2006-07-27 11:14:53 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
-require_once '../../phplib/person.php';
+require_once '../phplib/pbperson.php';
 
 require_once '../../phplib/importparams.php';
 
-$P = person_signon(array(
+$P = pb_person_signon(array(
                 'reason_web' => _("To view your pledges, we need to check your email address."),
                 'reason_email' => _("Then you will be able to view your pledges."),
                 'reason_email_subject' => _('View your pledges at PledgeBank.com')

@@ -5,14 +5,14 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.44 2006-07-10 10:20:53 francis Exp $
+// $Id: contact.php,v 1.45 2006-07-27 11:14:53 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
+require_once '../phplib/pbperson.php';
 require_once '../../phplib/utility.php';
-require_once '../../phplib/person.php';
 
 $params = array();
 if (get_http_var('ref') || get_http_var('pledge_id') || get_http_var('comment_id'))
@@ -36,7 +36,7 @@ function contact_form($errors = array()) {
     $referrer = get_http_var('referrer');
     if (!$referrer && array_key_exists('HTTP_REFERER', $_SERVER) && isset($_SERVER['HTTP_REFERER']))
         $referrer = $_SERVER['HTTP_REFERER'];
-    $P = person_if_signed_on();
+    $P = pb_person_if_signed_on();
     if (!is_null($P)) {
         if (is_null($name) || !$name)
             $name = $P->name_or_blank();

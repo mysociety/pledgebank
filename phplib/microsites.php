@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.25 2006-07-27 11:14:52 francis Exp $
+ * $Id: microsites.php,v 1.26 2006-07-27 17:24:42 francis Exp $
  * 
  */
 
@@ -368,27 +368,82 @@ function microsites_filter_foreign(&$sql_params) {
 }
 
 #############################################################################
-# Login
+# Login - some microsites get authentication from other sites
 
+/* Person object, stores logged in user who is externally authenticated */
+$microsites_external_auth_person = null;
+
+/* microsites_read_external_auth
+ * Peform any authentication for microsite. Should create appropriate person
+ * record in the database using person_get_or_create, if the authentication
+ * succeeds. And store the person object in $microsites_external_auth_person.
+ * Return true if authentication is overriden for this microsite.
+ * Return false if normal PledgeBank should be used if external one fails.
+ */ 
 function microsites_read_external_auth() {
-    global $microsite;
+    global $microsite, $microsites_external_auth_person;
+
+    if ($microsites_external_auth_person)
+        return true;
+
     if ($microsite == 'global-cool') {
-        $cool_cookie = $_COOKIE['auth'];
-        $raw_params = split("|", $cool_cookie);
+        if (!array_key_exists('auth', $_COOKIE))
+            return true;
+        #$cool_cookie = $_COOKIE['auth'];
+        $cool_cookie = "email=mouse@flourish.org|name=Mouse Irving|signedIn=yes";
+        # $cool_cookie = mcrypt_decrypt( , OPTION_GLOBALCOOL_SECRET, $cool_cookie, )
+
+        // Read parameters out of Global Cool cookie
+        $raw_params = split("\|", $cool_cookie);
         $params = array();
         foreach ($raw_params as $raw_param) {
             list($param, $value) = split("=", $raw_param, 2);
             $params[$param] = $value;
         }
-        print "microsites_read_external_auth: ";
-        print_r($params);
-        exit;
-        return;
+
+        if ($params['signedIn'] != "yes") {
+            // They have logged out from Global Cool
+            return true;
+        }
+        if (!validate_email($params['email'])) {
+            error_log("Invalid email '" . $params['email']. "' in global-cool cookie");
+            return true;
+        }
+
+        // Create user, or get existing user from database
+        $microsites_external_auth_person = person_get_or_create($params['email'], $params['name']);
+        // TODO: record that a login via global cool auth happened here (something analogous to like $P->inc_numlogins())
+        db_commit();
+        return true;
     }
+
+    // Use normal authentication
+    return false;
 }
 
+/* microsites_redirect_external_login
+ * Return true if auth has been redirected.
+ * Return false if normal auth is to be used.*/
 function microsites_redirect_external_login() {
-
+    global $microsite;
+    if ($microsite == 'global-cool') {
+        if (get_http_var('stashpost')) {
+            if (!pb_person_if_signed_on())
+                err('Sorry! Something went wrong while logging into Global Cool. Please check that you have cookies enabled on your browser.');
+            stash_redirect(get_http_var('stashpost'));
+            exit;
+        }
+        $url = "http://".$_SERVER['SERVER_NAME'].$_SERVER["REQUEST_URI"];
+        $st = stash_new_request('POST', $url, $_POST);
+        db_commit();
+        if (strstr($_SERVER["REQUEST_URI"], '?'))
+            $url .= "&stashpost=$st";
+        else
+            $url .= "?stashpost=$st";
+        header("Location: http://dev1.global-cool.com/auth/?next=" . urlencode($url));
+        return true;
+    }
+    return false;
 }
 
 

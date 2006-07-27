@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.37 2006-07-27 15:28:38 chris Exp $
+// $Id: faq.php,v 1.38 2006-07-27 15:29:50 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -46,17 +46,17 @@ print dd(_("PledgeBank allows users to set up pledges and then encourages other
 people to sign up to them. A pledge is a statement of the form 'I will
 do something, if a certain number of people will help me do it'. The
 creator of the pledge then publicises their pledge and encourages
-people to sign up. One of two possible outcomes is possible - either
+people to sign up. One of two possible outcomes is possible&mdash;either
 the pledge fails to get enough subscribers before it expires. In that
 case, we contact everyone and tell them 'better luck next time'. But
 the better possibility is that a pledge attracts enough people that
-they are all sent a message saying 'Well done - now get going!' "));
+they are all sent a message saying 'Well done&mdash;now get going!'"));
 
 print dt(_('What can I ask people to pledge?'));
 
 print dd(_("Pretty much anything which isn't illegal, and which doesn't incite
 people to commit illegal actions. Anything too obscene might also be
-taken down - this is a family friendly site!"));
+taken down&mdash;this is a family friendly site!"));
 
 print dt(_('How can you be sure people will bother to carry out the pledge?'));
 
@@ -73,7 +73,7 @@ print dt(_('What do I get out of it?'));
 print dd(_("As a well intentioned subscriber, you get insurance against being the
 only person to show up to the demo in the freezing rain or against being
 the parent who discovers they've just volunteered to run the entire
-school play on their own. As a pledge creator - you get a greatly
+school play on their own. As a pledge creator&mdash;you get a greatly
 improved chance of achieving whatever change it is you want."));
 
 print dt(_('Is it free?'));
@@ -282,7 +282,7 @@ us</a> if you'd like to help get more people in your country using PledgeBank.")
 print dt(_('Why do you only have UK postcodes?'));
 
 print dd(_("We'd be happy to talk to anyone who could help us extend
-the postcode search overseas - please <a
+the postcode search overseas&mdash;please <a
 href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
 email list</a> to help us out.
 "));
@@ -314,7 +314,8 @@ creator of your pledge, unless we are obliged to by law. We do let the pledge
 creators send emails to pledge subscribers to explain what's going on, to
 motivate them etc. However, we don't show the pledge creator the addresses of
 the subscribers getting his email. If you reply to an email from the pledge
-creator yourself, you will give them your email address - please be aware!"));
+creator yourself, you will give them your email address&mdash;please be
+aware!"));
 
 print dt(_('Will you send nasty, brutish spam to my email address?'));
 

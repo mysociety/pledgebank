@@ -7,7 +7,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbperson.php,v 1.2 2006-07-27 17:24:42 francis Exp $
+// $Id: pbperson.php,v 1.3 2006-07-27 18:25:01 francis Exp $
 
 require_once 'microsites.php';
 
@@ -31,7 +31,7 @@ function pb_person_if_signed_on($norenew = false) {
 }
 // Special version of person_signon for microsite remote authentication hooks
 function pb_person_signon($template_data, $email = null, $name = null) {
-    $P = pb_person_if_signed_on();
+    $P = person_already_signed_on($email, $name, "pb_person_if_signed_on");
     if ($P)
         return $P;
 

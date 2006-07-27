@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.36 2006-06-20 14:52:48 francis Exp $
+// $Id: faq.php,v 1.37 2006-07-27 15:28:38 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -310,19 +310,19 @@ view the pledge page."), sms_countries_description()));
 print dt(_('Who gets to see my email address?'));
 
 print dd(_("We will never disclose your email address to anyone, including the
-creator of your pledge. We do let the pledge creators send emails to pledge
-subscribers to explain what's going on, to motivate them etc. However, we don't
-show the pledge creator the addresses of the subscribers getting his email. If
-you reply to an email from the pledge creator yourself, you will give them your
-email address - please be aware!"));
+creator of your pledge, unless we are obliged to by law. We do let the pledge
+creators send emails to pledge subscribers to explain what's going on, to
+motivate them etc. However, we don't show the pledge creator the addresses of
+the subscribers getting his email. If you reply to an email from the pledge
+creator yourself, you will give them your email address - please be aware!"));
 
 print dt(_('Will you send nasty, brutish spam to my email address?'));
 
 print dd(_("Nope. After you sign up to a pledge we will send you emails in
 relation to your pledge. These will be a mixture of status emails from
 PledgeBank itself, and missives from the pledge creator, trying to chivvy you
-into greater support.  It goes without saying that we'd never give or sell your
-email addresses to anyone else."));
+into greater support. We will never give or sell your email addresses to anyone
+else, unless we are obliged to by law."));
 
 print "</dl>\n";
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.144 2006-07-27 11:14:53 francis Exp $
+// $Id: new.php,v 1.145 2006-07-28 00:08:26 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -764,8 +764,8 @@ function create_new_pledge($P, $data) {
                 list($x, $country, $state) = $a;
             db_query("insert into location (id, country, state) values (?, ?, ?)", array($location_id, $country, $state));
         }
-        $prominence = 'calculated';
-        if (microsites_new_pledges_frontpage() || $data['lang']=='eo') {
+        $prominence = microsites_new_pledges_prominence();
+        if ($data['lang']=='eo') {
             $prominence = 'frontpage';
         }
         db_query('

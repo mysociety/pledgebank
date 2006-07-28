@@ -16,9 +16,12 @@ while(<MAINCSS>) {
     s/pb.css/globalcool.css/;
     s/Top-level style sheet for PledgeBank.com/Custom style sheet for Global Cool version of PledgeBank/;
     if ($selector eq "#pbcontent") {
-    s/padding: 5px 5% 10px;/padding: 5px 0% 10px;/;
+        s/padding: 5px 5% 10px;/padding: 5px 0% 10px;/;
     }
-
+    if ($selector eq "#currentpledges, #successfulpledges, #yoursignedpledges") {
+        s/width: 59%;/width: 100%;/;
+    }
+ 
     print COOLCSS $_;
 }
 

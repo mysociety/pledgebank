@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.242 2006-07-27 23:25:38 francis Exp $
+// $Id: index.php,v 1.243 2006-07-28 00:08:26 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -156,7 +156,7 @@ function list_frontpage_pledges() {
         // If too few, show a few of the normal pledges for the country
         $more = $pledges_required_n - count($pledges);
         $normal_pledges = get_pledges_list("
-                    cached_prominence = 'normal' AND
+                    ".microsites_normal_prominences()." AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
@@ -169,7 +169,7 @@ function list_frontpage_pledges() {
         // If too few, show some global normal pledges
         $more =$pledges_required_n - count($pledges);
         $global_normal_pledges = get_pledges_list("
-                    cached_prominence = 'normal' AND
+                    ".microsites_normal_prominences()." AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
@@ -217,7 +217,7 @@ function list_successful_pledges() {
     print h2(_('Recent successful pledges'));
 
     $pledges = get_pledges_list("
-                cached_prominence <> 'backpage' AND
+                (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
                 pin IS NULL AND 
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC

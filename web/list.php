@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.30 2006-07-11 15:18:52 francis Exp $
+// $Id: list.php,v 1.31 2006-07-28 00:08:26 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -75,7 +75,7 @@ $query = "
                 FROM pledges LEFT JOIN location ON location.id = pledges.location_id
                 WHERE $locale_clause AND pin IS NULL 
                 $page_clause
-                AND cached_prominence <> 'backpage'";
+                AND (".microsites_normal_prominences()." OR cached_prominence = 'frontpage')";
 #print $query;exit;
 $ntotal = db_getOne($query , $sql_params);
 if ($ntotal < $q_offset) {
@@ -109,7 +109,7 @@ $qrows = db_query("
             WHERE $locale_clause
             AND pin IS NULL
             $page_clause
-            AND cached_prominence <> 'backpage'
+            AND (".microsites_normal_prominences()." OR cached_prominence = 'frontpage')
             ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", $sql_params);
 /* PG bug: mustn't quote parameter of offset */
 

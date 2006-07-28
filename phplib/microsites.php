@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.28 2006-07-27 23:25:38 francis Exp $
+ * $Id: microsites.php,v 1.29 2006-07-28 00:08:26 francis Exp $
  * 
  */
 
@@ -302,15 +302,17 @@ function microsites_private_allowed() {
         return true;
 }
 
-/* microsites_new_pledges_frontpage 
- * Returns true if new pledges are to be made 'frontpage' rather 
- * than 'calculated' by default */
-function microsites_new_pledges_frontpage() {
+/* microsites_new_pledges_prominence
+ * Returns prominence that new pledges have by default
+ */
+function microsites_new_pledges_prominence() {
     global $microsite;
     if ($microsite == 'interface')
-        return true;
+        return 'frontpage';
+    elseif ($microsite == 'global-cool')
+        return 'backpage';
     else
-        return false;
+        return 'calculated';
 }
 
 /* microsites_other_people 
@@ -376,6 +378,17 @@ function microsites_filter_foreign(&$sql_params) {
         return "(1=0)"; # Show nothing else on global cool site
     $sql_params[] = $microsite;
     return "(microsite <> ?)";
+}
+
+/* microsites_normal_prominences
+ * Returns SQL fragment which selects normal prominence pledges. Normally
+ * this is just 'normal', but for some microsites may want to include 'backpage'.
+ */
+function microsites_normal_prominences() {
+    global $microsite;
+#    if ($microsite == 'global-cool')
+        return " (cached_prominence = 'normal' or cached_prominence = 'backpage') ";
+    return " (cached_prominence = 'normal') ";
 }
 
 #############################################################################

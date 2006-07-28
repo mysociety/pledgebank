@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.55 2006-07-10 12:33:41 francis Exp $
+// $Id: search.php,v 1.56 2006-07-28 00:08:26 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,7 +15,7 @@ require_once "../../phplib/votingarea.php";
 
 $search = trim(get_http_var('q', true));
 if (!$search) $search = trim(get_http_var('s', true));
-$backpage_clause = " AND pledges.cached_prominence <> 'backpage' ";
+$backpage_clause = " AND (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') ";
 if (get_http_var('backpage'))
     $backpage_clause = '';
 $rss = get_http_var('rss') ? true : false;

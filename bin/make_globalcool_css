@@ -21,6 +21,14 @@ while(<MAINCSS>) {
     if ($selector eq "#currentpledges, #successfulpledges, #yoursignedpledges") {
         s/width: 59%;/width: 100%;/;
     }
+
+    s/#522994/#3399cc/gi;  # link colour
+    s/#7b52a5/#6699cc/gi;  # visited link colour
+    s/#21004a/#21004a/gi;  # purple lettering/thin-borders 
+#    s/#9c7bbd/#9c7bbd/gi;  # darker purple background (at top of page)
+    s/#f6e5ff/#efefef/gi;  # lighter pink plaque background
+    s/#c6b5de/#ecf7ff/gi;  # darker pink plaque background
+
  
     print COOLCSS $_;
 }

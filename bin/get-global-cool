@@ -5,7 +5,7 @@
 # Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 # 
-# $Id: get-global-cool,v 1.2 2006-07-27 23:25:37 francis Exp $
+# $Id: get-global-cool,v 1.3 2006-07-28 02:13:57 francis Exp $
 
 BINPATH=`dirname $0`
 cd $BINPATH
@@ -15,7 +15,7 @@ cd global-cool
 
 function get_xhtml_to_html {
     TEMPFILE=`tempfile`
-    wget -qN --output-document - http://www.global-cool.com:8080/en/wp-content/themes/gc_en/$1 | sed "s/\/>/>/g;" >$1
+    wget -qN --output-document - http://www.global-cool.com/en/wp-content/themes/gc_en/$1 | sed "s/\/>/>/g;" >$1
     rm -f $TEMPFILE
 }
 

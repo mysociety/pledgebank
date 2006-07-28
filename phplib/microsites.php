@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.34 2006-07-28 02:02:49 francis Exp $
+ * $Id: microsites.php,v 1.35 2006-07-28 02:13:57 francis Exp $
  * 
  */
 
@@ -476,7 +476,7 @@ function microsites_redirect_external_login() {
             $url .= "&stashpost=$st";
         else
             $url .= "?stashpost=$st";
-        header("Location: http://www.global-cool.com:8080/auth/?next=" . urlencode($url));
+        header("Location: http://www.global-cool.com/auth/?next=" . urlencode($url));
         exit;
     }
     return false;

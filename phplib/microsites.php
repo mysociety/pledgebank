@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.33 2006-07-28 01:44:02 francis Exp $
+ * $Id: microsites.php,v 1.34 2006-07-28 02:02:49 francis Exp $
  * 
  */
 
@@ -432,7 +432,7 @@ function microsites_read_external_auth() {
         $params = array();
         foreach ($raw_params as $raw_param) {
             list($param, $value) = split("=", $raw_param, 2);
-            $params[$param] = $value;
+            $params[$param] = trim($value);
         }
 
         if ($params['signedIn'] != "yes") {

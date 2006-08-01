@@ -36,7 +36,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.193 2006-07-21 16:45:58 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.194 2006-08-01 11:54:15 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1556,7 +1556,7 @@ sub do_admin_tests {
     # Check timeline page
     $wth->browser_get($admin_url);
     $wth->browser_follow_link(text_regex => qr/Timeline/);
-    $wth->browser_check_contents("1st December 1980");
+    $wth->browser_check_contents("10th October 1984");
 
     # Delete a signer
     $wth->browser_get($admin_url . "/?page=pb&pledge=smsspoof");

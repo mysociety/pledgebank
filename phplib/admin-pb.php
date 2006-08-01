@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.136 2006-08-01 09:36:58 francis Exp $
+ * $Id: admin-pb.php,v 1.137 2006-08-01 11:54:16 francis Exp $
  * 
  */
 
@@ -638,7 +638,8 @@ class ADMIN_PAGE_PB_LATEST {
     function show_latest_changes() {
         $time = array();
 
-        $backto_unix = time() - 60*60*24*$this->daylimit; 
+        global $pb_time;
+        $backto_unix = $pb_time - 60*60*24*$this->daylimit; 
         $backto_iso = strftime("%Y-%m-%d", $backto_unix);
 
         # Get all pledge ids to refs for pledge_link function

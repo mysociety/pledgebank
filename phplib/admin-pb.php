@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.133 2006-08-01 07:37:23 francis Exp $
+ * $Id: admin-pb.php,v 1.134 2006-08-01 07:40:27 francis Exp $
  * 
  */
 
@@ -685,7 +685,7 @@ class ADMIN_PAGE_PB_LATEST {
     
         $q = db_query("SELECT pledges.*,extract(epoch from creationtime) as epoch, person.email as email
                          FROM pledges LEFT JOIN person ON person.id = pledges.person_id
-                         WHERE creationtime > '$backto_iso'
+                         WHERE creationtime >= '$backto_iso'
                      ORDER BY pledges.id DESC");
         $this->pledgeref = array();
         while ($r = db_fetch_array($q)) {
@@ -698,13 +698,13 @@ class ADMIN_PAGE_PB_LATEST {
         }
         if (!get_http_var('onlysigners')) {
             $q = db_query("SELECT *
-                             FROM incomingsms WHERE whenreceived > $backto_unix
+                             FROM incomingsms WHERE whenreceived >= $backto_unix
                          ORDER BY whenreceived DESC");
             while ($r = db_fetch_array($q)) {
                 $time[$r['whenreceived']][] = $r;
             }
             $q = db_query("SELECT *
-                             FROM outgoingsms WHERE lastsendattempt > $backto_unix
+                             FROM outgoingsms WHERE lastsendattempt >= $backto_unix
                          ORDER BY lastsendattempt DESC LIMIT 10");
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref) {
@@ -713,7 +713,7 @@ class ADMIN_PAGE_PB_LATEST {
             }
             $q = db_query("SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch, pledges.id
                              FROM message, pledges
-                            WHERE message.pledge_id = pledges.id AND whencreated > '$backto_iso'
+                            WHERE message.pledge_id = pledges.id AND whencreated >= '$backto_iso'
                          ORDER BY whencreated DESC");
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['id']) {
@@ -724,7 +724,7 @@ class ADMIN_PAGE_PB_LATEST {
                                   person.email as author_email
                              FROM comment
                              LEFT JOIN person ON person.id = comment.person_id
-                             WHERE not ishidden AND whenposted > '$backto_iso'
+                             WHERE not ishidden AND whenposted >= '$backto_iso'
                          ORDER BY whenposted DESC");
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['pledge_id']) {
@@ -741,7 +741,7 @@ class ADMIN_PAGE_PB_LATEST {
                              LEFT JOIN pledges ON alert_sent.pledge_id = pledges.id
                              LEFT JOIN location ON alert.location_id = location.id
                              WHERE event_code = 'pledges/local'
-                             AND whenqueued > '$backto_iso'
+                             AND whenqueued >= '$backto_iso'
                          ORDER BY whenqueued DESC");
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['pledge_id']) {

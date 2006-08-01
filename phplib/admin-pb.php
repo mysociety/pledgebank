@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.132 2006-07-11 19:39:51 francis Exp $
+ * $Id: admin-pb.php,v 1.133 2006-08-01 07:37:23 francis Exp $
  * 
  */
 
@@ -617,10 +617,10 @@ class ADMIN_PAGE_PB_LATEST {
         $this->id = 'pblatest';
         $this->navname = 'Timeline';
 
-        if (get_http_var('linelimit')) {
-            $this->linelimit = get_http_var('linelimit');
+        if (get_http_var('daylimit')) {
+            $this->daylimit = get_http_var('daylimit');
         } else {
-            $this->linelimit = 250;
+            $this->daylimit = 7;
         }
 
         $this->ref = null;
@@ -638,14 +638,17 @@ class ADMIN_PAGE_PB_LATEST {
     function show_latest_changes() {
         $time = array();
 
-        $q = db_query('SELECT signers.name, signer_person.email,
+        $backto_unix = time() - 60*60*24*$this->daylimit; 
+        $backto_iso = strftime("%Y-%m-%d", $backto_unix);
+
+        $q = db_query("SELECT signers.name, signer_person.email,
                               signers.mobile, signtime, showname, pledges.title,
                               pledges.ref, pledges.id,
                               extract(epoch from signtime) as epoch
                          FROM pledges, signers
                          LEFT JOIN person AS signer_person ON signer_person.id = signers.person_id
-                        WHERE signers.pledge_id = pledges.id
-                     ORDER BY signtime DESC');
+                        WHERE signers.pledge_id = pledges.id AND signtime >= '$backto_iso'
+                     ORDER BY signtime DESC");
         while ($r = db_fetch_array($q)) {
             if (!$this->ref || $this->ref==$r['id']) {
                 $signed[$r['id']][$r['email']] = 1;
@@ -680,9 +683,10 @@ class ADMIN_PAGE_PB_LATEST {
         }
         */
     
-        $q = db_query('SELECT pledges.*,extract(epoch from creationtime) as epoch, person.email as email
+        $q = db_query("SELECT pledges.*,extract(epoch from creationtime) as epoch, person.email as email
                          FROM pledges LEFT JOIN person ON person.id = pledges.person_id
-                     ORDER BY pledges.id DESC');
+                         WHERE creationtime > '$backto_iso'
+                     ORDER BY pledges.id DESC");
         $this->pledgeref = array();
         while ($r = db_fetch_array($q)) {
             if (!$this->ref || $this->ref==$r['id']) {
@@ -693,41 +697,41 @@ class ADMIN_PAGE_PB_LATEST {
             }
         }
         if (!get_http_var('onlysigners')) {
-            $q = db_query('SELECT *
-                             FROM incomingsms
-                         ORDER BY whenreceived DESC');
+            $q = db_query("SELECT *
+                             FROM incomingsms WHERE whenreceived > $backto_unix
+                         ORDER BY whenreceived DESC");
             while ($r = db_fetch_array($q)) {
                 $time[$r['whenreceived']][] = $r;
             }
-            $q = db_query('SELECT *
-                             FROM outgoingsms
-                         ORDER BY lastsendattempt DESC LIMIT 10');
+            $q = db_query("SELECT *
+                             FROM outgoingsms WHERE lastsendattempt > $backto_unix
+                         ORDER BY lastsendattempt DESC LIMIT 10");
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref) {
                     $time[$r['lastsendattempt']][] = $r;
                 }
             }
-            $q = db_query('SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch, pledges.id
+            $q = db_query("SELECT whencreated, circumstance, ref,extract(epoch from whencreated) as epoch, pledges.id
                              FROM message, pledges
-                            WHERE message.pledge_id = pledges.id
-                         ORDER BY whencreated DESC');
+                            WHERE message.pledge_id = pledges.id AND whencreated > '$backto_iso'
+                         ORDER BY whencreated DESC");
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['id']) {
                     $time[$r['epoch']][] = $r;
                 }
             }
-            $q = db_query('SELECT comment.*, extract(epoch from whenposted) as commentposted,
+            $q = db_query("SELECT comment.*, extract(epoch from whenposted) as commentposted,
                                   person.email as author_email
                              FROM comment
                              LEFT JOIN person ON person.id = comment.person_id
-                             WHERE not ishidden
-                         ORDER BY whenposted DESC');
+                             WHERE not ishidden AND whenposted > '$backto_iso'
+                         ORDER BY whenposted DESC");
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['pledge_id']) {
                     $time[$r['commentposted']][] = $r;
                 }
             }
-            $q = db_query('SELECT location.description as alertdescription, 
+            $q = db_query("SELECT location.description as alertdescription, 
                                     extract(epoch from whenqueued) as whenqueued,
                                   person.email as email, person.name as name,
                                   pledges.ref as ref, pledges.id as pledge_id
@@ -736,17 +740,14 @@ class ADMIN_PAGE_PB_LATEST {
                              LEFT JOIN person ON person.id = alert.person_id
                              LEFT JOIN pledges ON alert_sent.pledge_id = pledges.id
                              LEFT JOIN location ON alert.location_id = location.id
-                             WHERE event_code = \'pledges/local\'
-                         ORDER BY whenqueued DESC');
+                             WHERE event_code = 'pledges/local'
+                             AND whenqueued > '$backto_iso'
+                         ORDER BY whenqueued DESC");
             while ($r = db_fetch_array($q)) {
                 if (!$this->ref || $this->ref==$r['pledge_id']) {
                     $time[$r['whenqueued']][] = $r;
                 }
             }
-        }
-        if (count($time) < 1) {
-            print(_(p('No events have happened yet')));
-            return;
         }
         krsort($time);
 
@@ -762,12 +763,6 @@ class ADMIN_PAGE_PB_LATEST {
         $linecount = 0;
         print "<div class=\"timeline\">";
         foreach ($time as $epoch => $datas) {
-            $linecount++;
-            if ($linecount > $this->linelimit) {
-                print '<dt><br><a href="'.$this->self_link.
-                        '&linelimit='.htmlspecialchars($this->linelimit + 250).'">Expand timeline...</a></dt>';
-                break;
-            }
             $curdate = date('l, jS F Y', $epoch);
             if ($date != $curdate) {
                 if ($date <> "")
@@ -839,6 +834,11 @@ class ADMIN_PAGE_PB_LATEST {
             }
             print "</dd>\n";
         }
+        if (count($time) < 1) {
+            print("<br><dt>"._('No events have happened yet')."</dt>");
+        }
+        print '<dt><br><a href="'.$this->self_link.
+                '&daylimit='.htmlspecialchars($this->daylimit + 7).'">Expand timeline by a week...</a> (currently '.htmlspecialchars($this->daylimit).' days)</dt>';
         print '</dl>';
         print "</div>";
     }

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.134 2006-08-01 07:40:27 francis Exp $
+ * $Id: admin-pb.php,v 1.135 2006-08-01 07:45:37 francis Exp $
  * 
  */
 
@@ -641,6 +641,15 @@ class ADMIN_PAGE_PB_LATEST {
         $backto_unix = time() - 60*60*24*$this->daylimit; 
         $backto_iso = strftime("%Y-%m-%d", $backto_unix);
 
+        # Get all pledge ids to refs for pledge_link function
+        $q = db_query("SELECT pledges.* FROM pledges ORDER BY pledges.id DESC");
+        $this->pledgeref = array();
+        while ($r = db_fetch_array($q)) {
+            if (!$this->ref || $this->ref==$r['id']) {
+                $this->pledgeref[$r['id']] = $r['ref'];
+            }
+        }
+ 
         $q = db_query("SELECT signers.name, signer_person.email,
                               signers.mobile, signtime, showname, pledges.title,
                               pledges.ref, pledges.id,
@@ -682,18 +691,17 @@ class ADMIN_PAGE_PB_LATEST {
             }
         }
         */
-    
+
+       
         $q = db_query("SELECT pledges.*,extract(epoch from creationtime) as epoch, person.email as email
                          FROM pledges LEFT JOIN person ON person.id = pledges.person_id
                          WHERE creationtime >= '$backto_iso'
                      ORDER BY pledges.id DESC");
-        $this->pledgeref = array();
         while ($r = db_fetch_array($q)) {
             if (!$this->ref || $this->ref==$r['id']) {
                 if (!get_http_var('onlysigners')) {
                     $time[$r['epoch']][] = $r;
                 }
-                $this->pledgeref[$r['id']] = $r['ref'];
             }
         }
         if (!get_http_var('onlysigners')) {

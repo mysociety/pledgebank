@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.135 2006-08-01 07:45:37 francis Exp $
+ * $Id: admin-pb.php,v 1.136 2006-08-01 09:36:58 francis Exp $
  * 
  */
 
@@ -842,12 +842,15 @@ class ADMIN_PAGE_PB_LATEST {
             }
             print "</dd>\n";
         }
+        if (!$date)
+            print "<dl>";
+        print "<dt>";
         if (count($time) < 1) {
-            print("<br><dt>"._('No events have happened yet')."</dt>");
+            print(_('No events have happened yet.') . " ");
         }
-        print '<dt><br><a href="'.$this->self_link.
-                '&daylimit='.htmlspecialchars($this->daylimit + 7).'">Expand timeline by a week...</a> (currently '.htmlspecialchars($this->daylimit).' days)</dt>';
-        print '</dl>';
+        print '<br><a href="'.$this->self_link.
+                '&amp;daylimit='.htmlspecialchars($this->daylimit + 7).'">Expand timeline by a week...</a> (currently '.htmlspecialchars($this->daylimit).' days)';
+        print '</dt></dl>';
         print "</div>";
     }
 

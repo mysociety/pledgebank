@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.38 2006-07-27 15:29:50 chris Exp $
+// $Id: faq.php,v 1.39 2006-08-02 17:11:23 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -283,7 +283,7 @@ print dt(_('Why do you only have UK postcodes?'));
 
 print dd(_("We'd be happy to talk to anyone who could help us extend
 the postcode search overseas&mdash;please <a
-href=\"http://www.mysociety.org/mailman/listinfo/mysociety-i18n\">join this
+href=\"https://secure.mysociety.org/admin/lists/mailman/listinfo/internationalisation\">join this
 email list</a> to help us out.
 "));
 

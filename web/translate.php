@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: translate.php,v 1.6 2005-12-16 00:45:07 matthew Exp $
+// $Id: translate.php,v 1.7 2006-08-02 17:11:23 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../../phplib/utility.php';
@@ -27,7 +27,7 @@ We've hopefully made it relatively straightforward.") ?></p>
 <p><?=_('Firstly, do <a href="/contact">contact us</a> so we
 can keep track of things, and perhaps put you in touch
 with other people translating into the same language.
-Also, <a href="http://www.mysociety.org/mailman/listinfo/mysociety-i18n">sign up to our mailing list</a> to discuss translations.') ?></p>
+Also, <a href="https://secure.mysociety.org/admin/lists/mailman/listinfo/internationalisation">sign up to our mailing list</a> to discuss translations.') ?></p>
 
 <p><?=_('Do let us know if there\'s anything below
 that is hard to understand. The instructions assume you\'re running

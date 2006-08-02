@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.48 2006-07-27 11:14:53 francis Exp $
+ * $Id: ref-announce.php,v 1.49 2006-08-02 13:17:03 francis Exp $
  * 
  */
 
@@ -189,7 +189,7 @@ if ($succeeded) {
     $default_message = sprintf(_("\nHello, and sorry that our pledge has failed.\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
     $default_sms = sprintf(_("%s here. The %s pledge has failed. <%s>."), $name, $p->ref(), $fill_in);
 } else {
-    $default_message = sprintf(_("\nHello,\n\n<%s>\n\nYours sincerely,\n\n%s\n\nPledge says: '%s'\n\n"), $fill_in, $name, $sentence);
+    $default_message = sprintf(_("\nHello,\n\n<%s>\n\nYours sincerely,\n\n%s\n\nPledge says: '%s'\n\n%s\n\n"), $fill_in, $name, $sentence, $p->url_main());
     $default_sms = null;
 }
 

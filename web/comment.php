@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.37 2006-07-27 11:14:53 francis Exp $
+ * $Id: comment.php,v 1.38 2006-08-03 02:13:06 francis Exp $
  * 
  */
 
@@ -93,6 +93,11 @@ if (strlen($q_author_name) == 0)
 
 if (strlen($q_text) == 0)
     array_push($err, _("Please enter a message"));
+if (strlen($q_text) > 3000)
+    array_push($err, _("Your comment is far too long, please keep it short and sweet."));
+elseif (strlen($q_text) > 2000)
+    array_push($err, _("Your comment is a bit too long, please keep it short and sweet."));
+print strlen($q_text);
 
 if ($q_author_website && !preg_match('#^https?://.+#', $q_author_website))
     $q_author_website = 'http://' . $q_author_website;

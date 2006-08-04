@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.125 2006-07-28 01:08:55 francis Exp $
+// $Id: page.php,v 1.126 2006-08-04 09:20:22 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -176,8 +176,8 @@ function page_header($title, $params = array()) {
         // Not clear how best to structure this stuff - e.g. here the include
         // has tohappen instead of </head><body> which is perhaps eccentrically
         // particular to global-cool's template html files.
-        include "global-cool/thirdPartyHeader.html";
-        include "global-cool/thirdPartyLeftNav.html";
+        include "microsites/autogen/global-cool/thirdPartyHeader.html";
+        include "microsites/autogen/global-cool/thirdPartyLeftNav.html";
     }
 
     // Display link to main pledge page
@@ -290,7 +290,7 @@ function page_footer($params = array()) {
 </body></html>
 <?  
     } else {
-        include "global-cool/thirdPartyFooter.html";
+        include "microsites/autogen/global-cool/thirdPartyFooter.html";
     }
     header('Content-Length: ' . ob_get_length());
 }

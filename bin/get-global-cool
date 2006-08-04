@@ -5,17 +5,28 @@
 # Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 # 
-# $Id: get-global-cool,v 1.3 2006-07-28 02:13:57 francis Exp $
+# $Id: get-global-cool,v 1.4 2006-08-04 09:20:22 francis Exp $
+
+# Quit on error (particularly from wget), so we don't overwrite files
+set -e
 
 BINPATH=`dirname $0`
 cd $BINPATH
-cd ../web
+cd ../web/microsites
+mkdir -p autogen
+cd autogen
 mkdir -p global-cool
 cd global-cool
 
 function get_xhtml_to_html {
+    OUTPUT=$1
     TEMPFILE=`tempfile`
-    wget -qN --output-document - http://www.global-cool.com/en/wp-content/themes/gc_en/$1 | sed "s/\/>/>/g;" >$1
+    TEMPFILE2=`tempfile`
+    # This is even quiet on errors, but that is OK for updating a cache
+    wget -qN --output-document - HTTP://www.global-cool.com/en/wp-content/themes/gc_en/$1 >$TEMPFILE
+    cat $TEMPFILE | sed "s/\/>/>/g;" > $TEMPFILE2
+    chmod a+r $TEMPFILE2
+    mv $TEMPFILE2 $OUTPUT
     rm -f $TEMPFILE
 }
 

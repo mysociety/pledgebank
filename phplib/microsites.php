@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.35 2006-07-28 02:13:57 francis Exp $
+ * $Id: microsites.php,v 1.36 2006-08-04 09:02:05 francis Exp $
  * 
  */
 
@@ -31,9 +31,10 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          '365act' => '365 Ways',
                          'glastonbury' => 'Glastonbury',
                          'interface' => 'Interface',
-                         'global-cool' => 'Global Cool');
+                         'global-cool' => 'Global Cool',
+                         'catcomm' => 'Catalytics Communities');
 
-/* Other domains which refer to microsites */
+/* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 if (OPTION_PB_STAGING) {
     $microsites_from_extra_domains = array('pledge.global-cool' => 'global-cool'); # Francis's local test domain
 } else {
@@ -107,12 +108,12 @@ function microsites_logo() {
     if ($microsite && $microsite == 'interface') {
         return '
 <h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
-<span id="countrytitle"><img src="/interface-logo.gif" alt="interface">
+<span id="countrytitle"><img src="/microsites/interface-logo.gif" alt="interface">
 <a href="/where">' . _('(change)') . '</a></span></h1>';
 
     } elseif ($microsite && $microsite == '365act') {
         return '
-<a href="http://www.365act.com"><img src="/365-logo-small.png" alt="365 Act" align="left"
+<a href="http://www.365act.com"><img src="/microsites/365-logo-small.png" alt="365 Act" align="left"
     style="
     margin-top: -10px; 
     margin-left: -0.4em 
@@ -147,16 +148,16 @@ function microsites_logo() {
  * Return path and filename of URL for CSS file */
 function microsites_css_file() {
     global $microsite;
-    if ($microsite && $microsite == 'interface') {
-        return "/interface.css";
-    } elseif ($microsite && $microsite == 'glastonbury') {
-        return "/glastonbury.css";
-    } elseif ($microsite && $microsite == '365act') {
-        return "/365act.css";
-    } elseif ($microsite && $microsite == 'london') {
-        return "/london.css";
-    } elseif ($microsite && $microsite == 'global-cool') {
-        return "/globalcool.css";
+    if ($microsite) {
+        if (in_array($microsite, array(
+                'interface', 
+                'glastonbury', 
+                '365act', 
+                'london', 
+                'global-cool'
+            ))) {
+            return "/microsites/autogen/$microsite.css";
+        }
     }
     return "/pb.css";
 }
@@ -285,7 +286,7 @@ function microsites_credit_footer() {
     global $microsite;
     if ($microsite == 'london') {
 ?>
-<div id="sponsor"><img src="/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
+<div id="sponsor"><img src="/microsites/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
 <?  }
 }
 

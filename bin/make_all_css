@@ -2,6 +2,7 @@
 
 BINPATH=`dirname $0`
 cd $BINPATH
+mkdir -p ../web/microsites/autogen
 
 ./make_365act_css
 ./make_glastonbury_css

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.191 2006-07-27 11:14:52 francis Exp $
+ * $Id: pledge.php,v 1.192 2006-08-04 15:45:28 francis Exp $
  * 
  */
 
@@ -435,25 +435,42 @@ class Pledge {
             }
             print '</i>';
         }
-?>
-<? if ($this->is_global()) { ?>
-    <!-- global -->
-<? } else { ?>
-    <? if ($this->is_local()) { ?>
-        <p> <?=$this->h_local_type()?>:
-        <strong><?=$this->h_description()?></strong>
-        <? if ($this->url_place_map()) { ?>
-        (<a title="<?=_("Show where exactly this place is (using Google Maps)")?>" href="<?=htmlspecialchars($this->url_place_map())?>"><?=_("view map")?></a>)
-        <? } ?>
-        <br><?=_('Country:')?>
-        <strong><?=$this->h_country()?></strong>
-    <? } else { ?>
-        <p> <?=_('Country:')?>
-        <strong><?=$this->h_country()?></strong>
-    <? } ?>
-<? } ?>
-<?
-        print '</p>';
+
+        $place_lines = array();
+        // Microsite
+        global $microsite, $microsites_list;
+        // TODO: special case this to link to London if location is in correct area
+        if ($this->microsite() and $this->microsite() != $microsite) { 
+            $microsite_long_name = $microsites_list[$this->microsite()];
+            $place_line = sprintf(_('This is a %s pledge'), "<strong>".$microsite_long_name."</strong>");
+            $url = pb_domain_url(array('microsite'=>$this->microsite(), 'path'=>'/'));
+            $place_line .= ' (<a title="'.sprintf(_("Show all of the %s pledges"), $microsite_long_name)
+                    .'" href="'.htmlspecialchars($url).
+                        '">'._("show more").'</a>)';
+            $place_lines[] = $place_line;
+        }
+        // Geographical location
+        if ($this->is_global()) { 
+            // global
+        } else { 
+            $place_lines[] = _('Country:')." <strong>".$this->h_country()."</strong>";
+            if ($this->is_local()) { 
+                $place_line = $this->h_local_type();
+                $place_line .= ": <strong>".$this->h_description()."</strong>";
+                if ($this->url_place_map()) {
+                    $place_line .= ' (<a title="'._("Show where exactly this place is (using Google Maps)")
+                            .'" href="'.htmlspecialchars($this->url_place_map()).
+                                '">'._("view map").'</a>)';
+                } 
+                $place_lines[] = $place_line;
+            } 
+        }
+        if ($place_lines) {
+            print '<p>';
+            print join("<br>", $place_lines);
+            print '</p>';
+        }
+
         if (array_key_exists('showdetails', $params) && $params['showdetails'] && isset($this->data['detail']) && $this->data['detail']) {
             $det = htmlspecialchars($this->data['detail']);
             $det = ms_make_clickable($det, array('contract'=>true));

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.137 2006-08-01 11:54:16 francis Exp $
+ * $Id: admin-pb.php,v 1.138 2006-08-04 15:45:28 francis Exp $
  * 
  */
 
@@ -238,6 +238,24 @@ class ADMIN_PAGE_PB_MAIN {
         print "<br>Target: <b>" . $pdata['target'] . " " .  htmlspecialchars($pdata['type']) . "</b>";
         if ($pdata['target_type'] == "byarea") 
             print " (target is byarea)";
+
+        // Microsite
+        global $microsites_list;
+        print '<form name="micrositeform" method="post" action="'.$this->self_link.'">';
+        print '<input type="hidden" name="update_microsite" value="1">';
+        print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+        print _('Microsite:') . ' ';
+        print '<select id="microsite" name="microsite">';
+        print ' <option value="(none)">(none)</option>';
+        foreach ($microsites_list as $ms => $ms_name) {
+            $sel = '';
+            if ($ms == $pledge_obj->microsite())
+                $sel = ' selected';
+            print ' <option value="'.$ms.'"'.$sel.'>'.$ms_name.'</option>';
+        }
+        print '</select>';
+        print '<input name="update" type="submit" value="Update">';
+        print '</form>';
 
         global $langs;
         print '<form name="languageform" method="post" action="'.$this->self_link.'">';
@@ -497,6 +515,21 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         print p(_("<em>Change to pledge prominence saved</em>"));
     }
 
+    function update_microsite($pledge_id) {
+        global $microsites_list;
+        $new_microsite = get_http_var('microsite');
+        if (!$new_microsite) {
+            db_query('UPDATE pledges set microsite = null where id = ?', array($pledge_id));
+        } else {
+            if (!array_key_exists($new_microsite, $microsites_list)) {
+                err('Unknown microsite code: ' . htmlspecialchars($new_microsite));
+            }
+            db_query('UPDATE pledges set microsite = ? where id = ?', array($new_microsite, $pledge_id));
+        }
+        db_commit();
+        print p(_("<em>Change to pledge microsite saved</em>"));
+    }
+
     function update_country($pledge_id) {
         $country = get_http_var('country');
         $state = null;
@@ -560,6 +593,9 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         if (get_http_var('update_prom')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_prominence($pledge_id);
+        } elseif (get_http_var('update_microsite')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_microsite($pledge_id);
         } elseif (get_http_var('update_country')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_country($pledge_id);

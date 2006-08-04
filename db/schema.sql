@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.202 2006-07-18 16:48:09 francis Exp $
+-- $Id: schema.sql,v 1.203 2006-08-04 15:45:27 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -171,8 +171,8 @@ create table pledges (
     lang text not null check(length(lang) = 2 or length(lang) = 5),
     -- Where the pledge is. Null means that it is not in any specific location.
     location_id integer references location(id),
-    -- Microsite, for example Glastonbury. Null means not a microsite, but main site.
-    microsite text,
+    -- Microsite, for example 'global-cool'. Null means not a microsite, but main site.
+    microsite text check (microsite is null or (microsite <> '' and microsite <> 'everywhere')),
 
     -- It's possible (hopefully rare) for subscribers to be removed from a
     -- pledge after it's been marked as successful. But once a pledge has

@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.36 2006-08-04 09:02:05 francis Exp $
+ * $Id: microsites.php,v 1.37 2006-08-04 15:45:28 francis Exp $
  * 
  */
 
@@ -32,7 +32,7 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'glastonbury' => 'Glastonbury',
                          'interface' => 'Interface',
                          'global-cool' => 'Global Cool',
-                         'catcomm' => 'Catalytics Communities');
+                         'catcomm' => 'CatComm');
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 if (OPTION_PB_STAGING) {
@@ -45,7 +45,16 @@ $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 /* These are listed on /where */
 $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countries in all languages'),
                                 'london' => _('London (United Kingdom)'),
-                                '365act' => _('365 Ways to Change the World'));
+                                'global-cool' => _('Global Cool (One by One, Ton by Ton)'),
+                                'catcomm' => _('Catalytic Communities')
+                                );
+
+/* Pledges made from these microsites are not marked as such in the microsite
+ * field in the pledges table. */
+$microsites_no_pledge_field = array(
+    'everywhere', 
+    'london' // London pledges are those in a certain geographical area, they aren't marked in this field
+);
 
 /* microsites_get_name 
  * Returns display name of microsite if we are on one. e.g. Glastonbury */
@@ -135,6 +144,23 @@ function microsites_logo() {
 <h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a>
 <span id="countrytitle"><a href="/where">' . _('(change)') . '</a></span></h1>';
 
+    } elseif ($microsite && $microsite == 'catcomm') {
+        return '
+<a href="http://www.catcomm.com"><img src="/microsites/catcomm-logo.png" alt="Catalytic Communities" align="left"
+    style="
+    margin-top: -10px; 
+    margin-left: -0.4em 
+    background-color: #ffffff;
+    float: left;
+    border: solid 2px #21004a;
+    padding: 0px;
+    margin: 10px;
+    "></a>
+<h1>
+<a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<span id="countrytitle"><a href="/where">' . _('(other PledgeBanks)') . '</a></span>
+</h1>
+';
     } else {
         $country_name = pb_site_country_name();
         return '
@@ -154,23 +180,13 @@ function microsites_css_file() {
                 'glastonbury', 
                 '365act', 
                 'london', 
-                'global-cool'
+                'global-cool',
+                'catcomm',
             ))) {
             return "/microsites/autogen/$microsite.css";
         }
     }
     return "/pb.css";
-}
-
-/* microsites_syndication_warning
- * Do terms and conditions need to warn that we'll syndicate?
- */
-function microsites_syndication_warning() {
-    global $microsite;
-    if ($microsite == 'interface')
-        return false;
-    else
-        return true;
 }
 
 /* microsites_frontpage_has_local_emails
@@ -181,12 +197,14 @@ function microsites_frontpage_has_local_emails() {
     global $microsite;
     if ($microsite == 'global-cool')
         return false;
+    if ($microsite == 'catcomm')
+        return false;
     return true;
 }
 
 /* microsites_frontpage_has_intro
  * Whether or not the "tell the world" motivation intro box is present on the
- * front page.
+ * front page. That page is defined by microsites_frontpage_intro below.
  */
 function microsites_frontpage_has_intro() {
     global $microsite;
@@ -196,7 +214,8 @@ function microsites_frontpage_has_intro() {
 }
 
 /* microsites_frontpage_intro 
- * Introduction text to show on front page of site.
+ * Introduction text to show on front page of site. The is only
+ * called if microsites_frontpage_has_intro() above returns true.
  */
 function microsites_frontpage_intro() {
     global $microsite, $site_country;
@@ -223,11 +242,53 @@ function microsites_frontpage_intro() {
         <?
     } elseif ($microsite == 'london') {
 	?><h2>Tell Londoners &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
-	In the summer of 2012 the eyes of the world will be on London for a
+	<p>In the summer of 2012 the eyes of the world will be on London for a
 	fortnight as the Olympics games return to the capital for the third
 	time in its history. This site is collecting pledges encouraging
 	Londoners to work together on projects to turn London from a great city
-	to the greatest city in the world by 2012.
+	to the greatest city in the world by 2012.</p>
+	<?
+    } elseif ($microsite == 'catcomm') {
+	?><h2>Tell the world &#8220;I&#8217;ll support communities working to solve local problems, but only if you&#8217;ll help me!&#8221;</h2>
+     <p>Catalytic Communities (CatComm) is a Brazilian charitable organization
+     (also founded in the USA) to develop, inspire and empower communities
+     worldwide to generate and share their own local solutions.  Over six
+     years working closely with 950+ local leaders in over 150
+     neighborhoods and squatter communities across Rio de Janeiro, we have
+     developed a local network of community solutions and exchange through
+     our "Casa" community technology hub.  Located in downtown Rio, the
+     "Casa" is CatComm's space for local leaders to come together, host
+     workshops, explore partnerships, share contacts, ideas, and resources,
+     and utilize the Internet in support of local efforts.</p>
+     <p>Learning from these community leaders, CatComm has, during this period,
+     developed an online presence through <a
+     href="http://www.catcomm.org">www.catcomm.org</a>, where we host our
+     unique Community Solutions Database.  Any community, anywhere in the
+     world, can share what it's doing to address local problems through the
+     CSD, simply by clicking through and filling out our questionnaire.  A
+     network of volunteer translators then translates these projects between
+     English, Portuguese and Spanish.  Over 22,000 people from 65 countries
+     visit our website monthly to learn from community projects now posted from
+     countries on 4 continents.</p> 
+     <p>Constantly working to improve our site
+     and the Casa so that they may serve an increasing number of communities in
+     creative and powerful ways, CatComm has launched this page, thanks to a
+     partnership with PledgeBank, where you can post your own pledge in support
+     of communities working to solve local problems, worldwide!</p>
+     <ul>
+     <li> Pledge your financial commitment to grow this effort and leverage
+     your pledge to get others to join you! (Be a CatComm Champion!)
+     <li> Pledge to provide tools and build capacity in support of specific
+     community projects that excite you, but only if others do, too!
+     <li> Pledge to bring exposure to local solutions from your area by
+     posting them in the Community Solutions Database, if others will, too!
+     <li> Pledge to research and reach out to community solutions in regions
+     still uncovered by the CatComm site, if others will join you!
+     <li> Pledge to translate community projects into languages where they
+     could be inspirational, , if others do, too!
+     </ul>
+     <p>Be creative!  Go nuts!
+
 	<?
     } else {
         # Main site
@@ -293,6 +354,17 @@ function microsites_credit_footer() {
 #############################################################################
 # Features
 
+/* microsites_syndication_warning
+ * Do terms and conditions need to warn that we'll syndicate?
+ */
+function microsites_syndication_warning() {
+    global $microsite;
+    if ($microsite == 'interface')
+        return false;
+    else
+        return true;
+}
+
 /* microsites_private_allowed
  * Returns whether private pledges are offered in new pledge dialog */
 function microsites_private_allowed() {
@@ -328,6 +400,8 @@ function microsites_other_people() {
         return 'other Londoners'; // deliberately not translated
     elseif ($microsite == 'global-cool')
         return 'other cool people'; // deliberately not translated
+    elseif ($microsite == 'catcomm')
+        return 'other CatComm supporters'; // deliberately not translated
     else
         return _('other local people');
 }
@@ -387,7 +461,7 @@ function microsites_filter_foreign(&$sql_params) {
  */
 function microsites_normal_prominences() {
     global $microsite;
-    if ($microsite == 'global-cool')
+    if ($microsite == 'global-cool' || $microsite == 'catcomm')
         return " (cached_prominence = 'normal' or cached_prominence = 'backpage') ";
     return " (cached_prominence = 'normal') ";
 }

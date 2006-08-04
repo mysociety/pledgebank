@@ -9,4 +9,5 @@ mkdir -p ../web/microsites/autogen
 ./make_interface_css
 ./make_london_css
 ./make_globalcool_css
+./make_catcomm_css
 

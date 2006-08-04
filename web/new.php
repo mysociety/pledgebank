@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.146 2006-08-01 07:07:57 francis Exp $
+// $Id: new.php,v 1.147 2006-08-04 15:45:28 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -498,7 +498,7 @@ function step1_error_check($data) {
     if (!$data['target']) $errors['target'] = _('Please enter a target');
     elseif (!ctype_digit($data['target']) || $data['target'] < 1) $errors['target'] = _('The target must be a positive number');
 
-    $disallowed_refs = array('contact', 'translate', 'posters', 'graphs', 'sportsclubpatrons');
+    $disallowed_refs = array('contact', 'translate', 'posters', 'graphs', 'sportsclubpatrons', 'microsites');
     if (!$data['ref']) $errors['ref'] = _('Please enter a short name for your pledge');
     elseif (strlen($data['ref'])<6) $errors['ref'] = _('The short name must be at least six characters long');
     elseif (strlen($data['ref'])>16) $errors['ref'] = _('The short name can be at most 20 characters long');
@@ -767,6 +767,10 @@ function create_new_pledge($P, $data) {
         $prominence = microsites_new_pledges_prominence();
         if ($data['lang']=='eo') {
             $prominence = 'frontpage';
+        }
+        global $microsites_no_pledge_field;
+        if (in_array($data['microsite'], $microsites_no_pledge_field)) {
+            $data['microsite'] = null;
         }
         db_query('
                 insert into pledges (

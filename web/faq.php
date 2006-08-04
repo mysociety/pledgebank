@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.39 2006-08-02 17:11:23 matthew Exp $
+// $Id: faq.php,v 1.40 2006-08-04 15:45:28 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -254,6 +254,17 @@ print dt(_('How do I add a picture to my pledge?'));
 print dd(_("Go to your pledge page and click 'Add a picture to your pledge
 (creator only)' under 'Spread the word on and offline'. Either find a picture
 of something to do with your pledge, or even just use a photo of yourself!"));
+
+print dt(_('Can you make a special version of PledgeBank for my organisation?'));
+
+print dd(_("Yes. We can group your pledges together, and alter the logo,
+colours or complete style to match your branding. We can intimately
+link PledgeBank with the rest of your site in any way you imagine. 
+We can make it public to the world, or private just for you.
+We normally charge for doing this, via our commercial subsidiary (any profits
+go back into mySociety). <a href=\"/contact\">Contact us</a> saying a bit about
+what you are thinking of doing. There's a list of example special sites at the
+bottom of <A href=\"/where\">this page</a>."));
 
 print "</dl>\n";
 

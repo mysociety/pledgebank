@@ -26,6 +26,7 @@
 #   Categories
 #   Fuzzy pledge ref match
 #   Deleting comments
+#   Microsites
 
 #   PDF and RTF stuff from poster.cgi
 #   SMS on failure
@@ -36,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.194 2006-08-01 11:54:15 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.195 2006-08-04 15:45:27 francis Exp $';
 
 use strict;
 require 5.8.0;

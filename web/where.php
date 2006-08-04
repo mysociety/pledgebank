@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.13 2006-07-27 11:14:53 francis Exp $
+// $Id: where.php,v 1.14 2006-08-04 15:45:28 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -92,6 +92,7 @@ foreach ($microsites_public_list as $code => $name) {
     print "<a href=\"".$url."\">".$name."</a>";
     print "<br>";
 }
+print p(_('If you would like your own special PledgeBank site, then <a href="/contact">email us</a> for details.'));
 print "</div>";
 
 page_footer();

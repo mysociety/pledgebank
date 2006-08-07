@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 
-my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.2 2005-10-08 00:22:52 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.3 2006-08-07 10:41:42 chris Exp $';
 
 use strict;
 require 5.8.0;
@@ -34,9 +34,9 @@ my %CONF = ( number_of_comments => 20,
 
 my $W = new mySociety::WatchUpdate();
 our $request;
-while ($request = new CGI::Fast() ) {
-    $W->exit_if_changed();
+while ($request = new CGI::Fast()) {
     run();
+    $W->exit_if_changed();
 }
 
 sub run {

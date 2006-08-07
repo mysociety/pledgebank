@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.138 2006-08-04 15:45:28 francis Exp $
+ * $Id: admin-pb.php,v 1.139 2006-08-07 13:32:34 francis Exp $
  * 
  */
 
@@ -54,7 +54,7 @@ class ADMIN_PAGE_PB_MAIN {
             'o'=>'%',
             'd'=>'Deadline', 
             'p'=>'Promin.', 
-            'l'=>'Place',
+            'l'=>'Microsite<br>Place',
             'g'=>'Lang',
             'e'=>'Creator', 
             'c'=>'Creation Time', 
@@ -134,9 +134,18 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '</td>';
 
             $row .= '<td>';
-            if ($r['country']) 
-                $row .= htmlspecialchars($r['country']) . ($r['description'] ? (" (<span title=\"".htmlspecialchars($r['description'])."\">" . substr(htmlspecialchars($r['description']),0,20).(strlen(htmlspecialchars($r['description'])) > 20 ? "..." : "")."</span>)") : '');
-            else
+            if ($r['microsite']) {
+                global $microsites_list;
+                $row .= $microsites_list[$r['microsite']] . '<br>';
+            }
+            if ($r['country']) {
+                global $countries_code_to_name;
+                if (array_key_exists('country', $countries_code_to_name))
+                    $dcountry = htmlspecialchars($countries_code_to_name[$r['country']]);
+                else
+                    $dcountry = htmlspecialchars($r['country']);
+                $row .= $dcountry . ($r['description'] ? (" (<span title=\"".htmlspecialchars($r['description'])."\">" . substr(htmlspecialchars($r['description']),0,20).(strlen(htmlspecialchars($r['description'])) > 20 ? "..." : "")."</span>)") : '');
+            } else
                 $row .= 'Global';
             $row .= '</td>';
             $row .= '<td>' . htmlspecialchars($r['lang']) . '</td>';

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.243 2006-07-28 00:08:26 francis Exp $
+// $Id: index.php,v 1.244 2006-08-07 12:08:54 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -57,6 +57,8 @@ only if 5 other people will do the same".') ?>
 <?
     }
 
+    microsites_frontpage_extra_blurb();
+
 ?>
 <div id="currentpledges">
 <?
@@ -77,10 +79,12 @@ can make your pledge succeed &raquo;') ?>"></a></div>
 <div id="photocaption"><a href="/offline"><?=_("Find out why these things are the secret of a successful pledge")?> &raquo;</a></div>
     <? }?>
 <?  }
+
     if (microsites_comments_allowed()) {
         comments_show_latest();
         debug_comment_timestamp("after comments_show_latest()");
     }
+
 
     microsites_credit_footer();
 }

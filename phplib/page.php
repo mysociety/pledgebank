@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.126 2006-08-04 09:20:22 francis Exp $
+// $Id: page.php,v 1.127 2006-08-07 18:30:18 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -376,6 +376,7 @@ function page_check_ref($ref) {
         /* XXX should redirect to the page with the correctly-capitalised
          * ref so that we never do the slow query */
         return;
+    header('HTTP/1.1 404 Not found');
     page_header(_("We couldn't find that pledge"));
     $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);
     if (db_num_rows($s) == 0) {

@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.38 2006-08-07 12:08:54 francis Exp $
+ * $Id: microsites.php,v 1.39 2006-08-07 13:10:38 francis Exp $
  * 
  */
 
@@ -338,7 +338,7 @@ increasing number of communities in creative and powerful ways, CatComm has
 launched this page, thanks to a partnership with PledgeBank, where you can post
 your own pledge in support of communities working to solve local
 problems, worldwide!
-<ol>
+<ul>
    <li>         Pledge your financial commitment to grow this effort
 and leverage your pledge to get others to join you! (Be a CatComm Champion!)
    <li>         Pledge to provide tools and build capacity in support
@@ -351,7 +351,7 @@ solutions in regions still uncovered by the CatComm site, if others
 will join you!
    <li>         Pledge to translate community projects into languages
 where they could be inspirational, , if others do, too!
-</ol>
+</ul>
    Be creative!  Go nuts!
 </div>
 

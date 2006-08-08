@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.128 2006-08-07 22:14:02 francis Exp $
+// $Id: page.php,v 1.129 2006-08-08 14:46:58 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -272,7 +272,9 @@ function page_footer($params = array()) {
         debug_timestamp(true, "local alert quick timestamp");
         ?>
 <hr class="v">
-<div id="pbfooter"><? pb_print_change_language_links(); ?> <br> <a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
+<div id="pbfooter"><? pb_print_change_language_links(); ?> <br>
+<a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.
+<a href="http://www.easynet.net/publicsector/"><?=_('Powered by Easynet')?></a>.</div>
 </div>
 <?
             debug_timestamp(true, "change language links");

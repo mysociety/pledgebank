@@ -11,7 +11,7 @@
 var translation = {
 "(choose one)":"(eins auswählen)",
 "Town:":"Stadt",
-"other local people":"andere in der Nähe wohnende Menschen",
+"other local people":"andere Menschen aus dem gleichen Ort",
 "<Enter your name>":"<IHR NAME>",
 "<Enter your pledge>":"<Geben Sie Ihr Versprechen ein>",
 "<Enter town or keyword>":"<Ort oder Suchbegriff eingeben>",

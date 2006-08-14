@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.73 2006-07-27 11:14:53 francis Exp $
+ * $Id: login.php,v 1.74 2006-08-14 08:22:14 matthew Exp $
  * 
  */
 
@@ -309,7 +309,7 @@ function login_form($errors = array()) {
 
 
 <li>
-<input type="submit" name="SendEmail" value="<?=_("I've never used PledgeBank before") ?> &gt;&gt;">
+<input type="submit" name="SendEmail" value="<?=_("I've never used PledgeBank before") ?>">
 <br>
 <small><?=_("(we'll send an email, click the link in it to confirm your email is working)") ?></small>
 
@@ -319,7 +319,7 @@ function login_form($errors = array()) {
 <p><?=_("I have a PledgeBank <strong>password</strong>")?>:
 
 <input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
-<input type="submit" name="LogIn" value="<?=_('Let me in') ?> &gt;&gt;"></p>
+<input type="submit" name="LogIn" value="<?=_('Let me in') ?>"></p>
 
 <input type="checkbox" name="rememberme" id="rememberme" <?=$q_rememberme ? "checked" : ""?>><strong><label for="rememberme"><?=_('Remember me') ?></label></strong>
 <small><?=_("(don't use this on a public or shared computer)") ?></small>
@@ -327,7 +327,7 @@ function login_form($errors = array()) {
 </li>
 
 <li><p>
-<input type="submit" name="SendEmail" value="<?=_("I've forgotten or didn't set a password") ?> &gt;&gt;">
+<input type="submit" name="SendEmail" value="<?=_("I've forgotten or didn't set a password") ?>">
 <br>
 <small><?=_("(we'll send an email, click the link in it to confirm your email)") ?></small>
 </p>
@@ -398,7 +398,7 @@ You don't have to set a password if you don't want to."));
 <input type="hidden" name="email" value="<?=$q_h_email?>">
 <input type="hidden" name="name" value="<?=$q_h_name?>">
 <?=_("No, I don't want to think of a password right now.") ?>
- <input type="submit" name="NoPassword" value="<?=_('Click here to continue') ?> &gt;&gt;">
+ <input type="submit" name="NoPassword" value="<?=_('Click here to continue') ?>">
 <br><small><?=_('(you can set a password another time)') ?></small>
 </form><p></p></li>
 
@@ -412,7 +412,7 @@ You don't have to set a password if you don't want to."));
 <br>
     <strong><?=_('Password:') ?></strong> <input type="password" name="pw1" id="pw1" size="15">
     <strong><?=_('Password (again):') ?></strong> <input type="password" name="pw2" size="15">
-    <input type="submit" name="SetPassword" value="<?=_('Set password') ?> &gt;&gt;">
+    <input type="submit" name="SetPassword" value="<?=_('Set password') ?>">
 </form>
 </li>
 

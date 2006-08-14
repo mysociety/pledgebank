@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.49 2006-08-02 13:17:03 francis Exp $
+ * $Id: ref-announce.php,v 1.50 2006-08-14 08:22:14 matthew Exp $
  * 
  */
 
@@ -358,7 +358,7 @@ count_sms_characters();
     print _('<h3>Send announcement</h3>');
     print '<p>';
     print _('(Remember, when you send this message <strong>your email address will be given to everyone</strong> who has already, or who will in the future, sign up to your pledge by email)');
-    print ' <input type="submit" name="submit" value="' . _('Send') . ' &gt;&gt;"></p>';
+    print ' <input type="submit" name="submit" value="' . _('Send') . '"></p>';
     print '</form>';
 }
 

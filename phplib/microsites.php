@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.39 2006-08-07 13:10:38 francis Exp $
+ * $Id: microsites.php,v 1.40 2006-08-14 09:29:58 francis Exp $
  * 
  */
 
@@ -515,28 +515,31 @@ function microsites_read_external_auth() {
         return true;
 
     if ($microsite == 'global-cool') {
-        // Read cookie
-        if (!array_key_exists('auth', $_COOKIE))
-             return true;
-        $cool_cookie = $_COOKIE['auth'];
-        $cool_cookie = base64_decode($cool_cookie);
-        #$cool_cookie = "email=mouse@flourish.org|name=Mouse Irving|signedIn=yes";
+        if (false) {
+            $params = array('email' => 'francis@flourish.org', 'name' => 'Francis Irving', 'remember' => 'yes', 'signedIn' => 'yes'); // for testing
+        } else {
+            // Read cookie
+            if (!array_key_exists('auth', $_COOKIE))
+                 return true;
+            $cool_cookie = $_COOKIE['auth'];
+            $cool_cookie = base64_decode($cool_cookie);
 
-        // Decrypt cookie
-        $td = mcrypt_module_open('tripledes', '', 'ecb', '');
-        if (!$td) err('Failed to mcrypt_module_open');
-        $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-        mcrypt_generic_init($td, OPTION_GLOBALCOOL_SECRET, $iv);
-        $cool_cookie = mdecrypt_generic($td, $cool_cookie);
-        mcrypt_generic_deinit($td);
-        mcrypt_module_close($td);
+            // Decrypt cookie
+            $td = mcrypt_module_open('tripledes', '', 'ecb', '');
+            if (!$td) err('Failed to mcrypt_module_open');
+            $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+            mcrypt_generic_init($td, OPTION_GLOBALCOOL_SECRET, $iv);
+            $cool_cookie = mdecrypt_generic($td, $cool_cookie);
+            mcrypt_generic_deinit($td);
+            mcrypt_module_close($td);
 
-        // Read parameters out of Global Cool cookie
-        $raw_params = split("\|", $cool_cookie);
-        $params = array();
-        foreach ($raw_params as $raw_param) {
-            list($param, $value) = split("=", $raw_param, 2);
-            $params[$param] = trim($value);
+            // Read parameters out of Global Cool cookie
+            $raw_params = split("\|", $cool_cookie);
+            $params = array();
+            foreach ($raw_params as $raw_param) {
+                list($param, $value) = split("=", $raw_param, 2);
+                $params[$param] = trim($value);
+            }
         }
 
         if ($params['signedIn'] != "yes") {
@@ -586,7 +589,18 @@ function microsites_redirect_external_login() {
     return false;
 }
 
-
+/* microsites_display_login
+ * Return whether or not to display the "Hello, Victor Papanek" message at
+ * the top of the page. If you are overriding the login functions above,
+ * the microsite header may be displaying this, so shouldn't be duplicated
+ * in the PledgeBank header.
+ */
+function microsites_display_login() {
+    global $microsite;
+    if ($microsite == 'global-cool')
+        return false;
+    return true;
+}
 
 
 

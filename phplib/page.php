@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.129 2006-08-08 14:46:58 chris Exp $
+// $Id: page.php,v 1.130 2006-08-14 09:29:58 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -201,7 +201,7 @@ function page_header($title, $params = array()) {
         print '</div> <!-- noprint -->';
 
     // Display who is logged in 
-    if ($P) {
+    if (microsites_display_login() && $P) {
         print '<p id="signedon" class="noprint">';
         print _('Hello, ');
         if ($P->has_name())

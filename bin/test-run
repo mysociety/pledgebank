@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.195 2006-08-04 15:45:27 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.196 2006-08-14 11:47:26 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -46,6 +46,7 @@ use Data::Dumper;
 use Storable;
 use FindBin;
 use Getopt::Long;
+use Encode;
 
 use mySociety::Config;
 mySociety::Config::set_file('../conf/general');
@@ -667,8 +668,12 @@ sub do_public_succeeding_pledge {
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("It cost £0 to make and was mainly done in a café");
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(0).  '%It cost £0 to make and was mainly done in a%café%');
-    my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  '%It cost £0 to make and was mainly done in a%café%');
+    $wth->email_get_containing(
+        '%Content-Type: text/plain; charset%iso-8859-1%' .
+        '%To: '.email_n(0).  
+        encode("iso-8859-1", decode("UTF-8", '%It cost £0 to make and was mainly done in a%café%')));
+    my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  
+        encode("iso-8859-1", decode("UTF-8", '%It cost £0 to make and was mainly done in a%café%')));
     $wth->email_check_none_left();
     die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\b(http://.*/L/.*)\b#m);
     my $comment_unsubscribe_url = $1;

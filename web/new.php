@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.148 2006-08-14 08:22:14 matthew Exp $
+// $Id: new.php,v 1.149 2006-08-14 09:02:50 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -175,8 +175,8 @@ else
     print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
 } ?>
 <p style="text-align: center">
-<?=_("Did you read the tips at the top of the page? They'll help you make a successful pledge") ?> 
-<input type="submit" name="tostep2" value="<?=_('Next') ?>"></p>
+<?=_("Did you read the tips at the top of the page? They'll help you make a successful pledge.") ?> 
+<input type="submit" name="tostep2" value="<?=_('Next step') ?>"></p>
 </form>
 <? 
 }
@@ -238,8 +238,7 @@ them to help you with something bigger.') ?></p>
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 
-<input class="topbutton" type="submit" name="donetargetwarning" value="<?=_('Next') ?>">
-<br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
+<input class="topbutton" type="submit" name="donetargetwarning" value="<?=_('Next step') ?>"><br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
 </p>
 
 </form>
@@ -294,8 +293,7 @@ gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="tostep3" value="<?=_('Next') ?>">
-<br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
+<input class="topbutton" type="submit" name="tostep3" value="<?=_('Next step') ?>"><br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
 </p>
 
 </form>
@@ -363,8 +361,7 @@ function pledge_form_three($data, $errors = array()) {
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?>">
-<br><input type="submit" name="tostep2" value="<?=_('Back to step 2') ?>">
+<input class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?>"><br><input type="submit" name="tostep2" value="<?=_('Back to step 2') ?>">
 </p>
 
 </form>
@@ -668,16 +665,14 @@ longer be valid."))?>
 </div>
 
 <p style="text-align: right;">
-<input type="submit" name="tostep1" value="<?=_('Change pledge text') ?>">
-<br><input type="submit" name="tostep2" value="<?=_('Change location') ?>">
-<br><input type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
+<input type="submit" name="tostep1" value="<?=_('Change pledge text') ?>"><br><input type="submit" name="tostep2" value="<?=_('Change location') ?>"><br><input type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
 </p>
 
 <?
     print '<p>' . _('When you\'re happy with your pledge, <strong>click "Create"</strong> to confirm that you wish PledgeBank.com to display the pledge at the top of this page in your name, and that you agree to the terms and conditions below.');
 ?>
 <p style="text-align: right;">
-<input type="submit" name="tocreate" value="<?=_('Create') ?>">
+<input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
 </p>
 <?
     print h3(_('The Dull Terms and Conditions'));

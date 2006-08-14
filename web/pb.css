@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.114 2006-08-08 18:51:56 matthew Exp $
+ * $Id: pb.css,v 1.115 2006-08-14 09:02:50 matthew Exp $
  * 
  */
 
@@ -46,12 +46,12 @@ form {
 form.buttonform {
     padding: 0;
 }
-input[type=text], input[type=password], input[type=submit], textarea {
+input[type=text], input[type=password], textarea {
     background-color: #ffffff;
     color: #000000;
     border: solid 2px #9c7bbd;
 }
-textarea:hover, textarea:focus, input[type=text]:hover, input[type=submit]:hover, input[type=password]:hover, input[type=text]:focus, input[type=submit]:focus, input[type=password]:focus {
+textarea:hover, textarea:focus, input[type=text]:hover, input[type=password]:hover, input[type=text]:focus, input[type=password]:focus {
     border: solid 2px #522994;
 }
 input.topbutton {

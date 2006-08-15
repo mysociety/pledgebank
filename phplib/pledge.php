@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.195 2006-08-15 11:49:01 francis Exp $
+ * $Id: pledge.php,v 1.196 2006-08-15 17:31:31 francis Exp $
  * 
  */
 
@@ -531,7 +531,7 @@ class Pledge {
                 $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], $signup);
             }
         } else {
-            $s = sprintf(_("%s will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
+            $s = sprintf(_("%s says: \"I will %s but only if <strong>%s</strong> %s will %s.\""), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
         }
 
         if (!$html or array_key_exists('href', $params))

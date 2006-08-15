@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.194 2006-08-14 08:22:14 matthew Exp $
+ * $Id: pledge.php,v 1.195 2006-08-15 11:49:01 francis Exp $
  * 
  */
 
@@ -395,7 +395,7 @@ class Pledge {
 ?>
 <p style="margin-top: 0">
 <? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
-&quot;<?=pledge_sentence($this->data, $sentence_params) ?>&quot;
+&quot;<?=$this->sentence($sentence_params) ?>&quot;
     <? if ($this->url_translate_pledge()) { ?>
     (<a title="<?=_("Roughly translate the pledge into your language (using Altavista's Babel Fish machine translator)")?>" href="<?=htmlspecialchars($this->url_translate_pledge())?>"><?=_("translate")?></a>)
     <? } ?>
@@ -487,13 +487,67 @@ class Pledge {
 <?
     }
 
+    /* sentence PLEDGE PARAMS
+     * Return a sentence describing what each signer agrees to do ("$pledgecreator
+     * will ...  if ...").  PLEDGE is either a pledge id number, or an array of
+     * pledge data from the database.  
+     * If PARAMS['firstperson'] is true, then the sentence is "I will...", if
+     * it is 'includename', says "I, $pledgecreator, will..."
+     * If PARAMS['html'] is true, encode entities and add <strong> tags around
+     * strategic bits. 
+     * If PARAMS['href'] contains a URL, then the main part of the returned
+     * sentence will be a link to that URL escaped.
+     * XXX i18n -- this won't work at all in other languages */
     function sentence($params = array()) {
-        return pledge_sentence($this->data, $params);
+        $r = $this->data;
+    
+        $html = array_key_exists('html', $params) ? $params['html'] : false;
+        $firstperson = array_key_exists('firstperson', $params) ? $params['firstperson'] : false;
+        
+        if ($html) {
+            $r['places'] = null; // is an array during pledge creation
+            $r = array_map('htmlspecialchars', $r);
+        }
+            
+        global $lang, $langs;
+        if (!array_key_exists($r['lang'], $langs)) {
+            $r['lang'] = $lang;
+        }
+        locale_push($r['lang']);
+
+        if (array_key_exists('href', $params)) {
+            $title = sprintf("<a href=\"%s\">%s</a>", $params['href'], $r['title']);
+        } else {
+            $title = sprintf("<strong>%s</strong>", $r['title']);
+        }
+
+        $signup = $r['signup'] == 'do the same' ? 'too' : trim($r['signup']);
+        if ($html)
+            $signup = ms_make_clickable($signup);
+        if ($firstperson) {
+            if ($firstperson === "includename") {
+                $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
+            } else {
+                $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], $signup);
+            }
+        } else {
+            $s = sprintf(_("%s will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
+        }
+
+        if (!$html or array_key_exists('href', $params))
+            $s = preg_replace('#</?strong>#', '', $s);
+
+        // Tidy up
+        $s = preg_replace('#\.\.#', '.', $s);
+
+        locale_pop();
+        return $s;
     }
+
 
     function h_sentence($params = array()) {
         $params['html'] = true;
-        return pledge_sentence($this->data, $params);
+        return $this->sentence($params);
     }
 
     function rss_entry() {
@@ -580,7 +634,7 @@ class Pledge {
     /* summary PLEDGE PARAMS
      * Return pledge text in a format suitable for a (long) summary on a list of
      * pledges, such as the front page.  PLEDGE is an array of info about the
-     * pledge.  PARAMS are passed to pledge_sentence, and also:
+     * pledge.  PARAMS are passed to sentence, and also:
      * 'showcountry' - display country as well
      */
     function summary($params) {
@@ -686,66 +740,6 @@ function pledge_strerror($e) {
  * away by itself). */
 function pledge_is_permanent_error($e) {
     return ($e > PLEDGE_ERROR);
-}
-
-/* pledge_sentence PLEDGE PARAMS
- * Return a sentence describing what each signer agrees to do ("$pledgecreator
- * will ...  if ...").  PLEDGE is either a pledge id number, or an array of
- * pledge data from the database.  
- * If PARAMS['firstperson'] is true, then the sentence is "I will...", if
- * it is 'includename', says "I, $pledgecreator, will..."
- * If PARAMS['html'] is true, encode entities and add <strong> tags around
- * strategic bits. 
- * If PARAMS['href'] contains a URL, then the main part of the returned
- * sentence will be a link to that URL escaped.
- * XXX i18n -- this won't work at all in other languages */
-function pledge_sentence($r, $params = array()) {
-    $html = array_key_exists('html', $params) ? $params['html'] : false;
-    $firstperson = array_key_exists('firstperson', $params) ? $params['firstperson'] : false;
-    
-    if (!is_array($r))
-        $r = db_getRow('select * from pledges where id = ?', $r);
-    if (!$r)
-        err(pledge_strerror(PLEDGE_NONE));
-
-    if ($html) {
-        $r['places'] = null; // is an array during pledge creation
-        $r = array_map('htmlspecialchars', $r);
-    }
-        
-    global $lang, $langs;
-    if (!array_key_exists($r['lang'], $langs)) {
-        $r['lang'] = $lang;
-    }
-    locale_push($r['lang']);
-
-    if (array_key_exists('href', $params)) {
-        $title = sprintf("<a href=\"%s\">%s</a>", $params['href'], $r['title']);
-    } else {
-        $title = sprintf("<strong>%s</strong>", $r['title']);
-    }
-
-    $signup = $r['signup'] == 'do the same' ? 'too' : trim($r['signup']);
-    if ($html)
-        $signup = ms_make_clickable($signup);
-    if ($firstperson) {
-        if ($firstperson === "includename") {
-            $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
-        } else {
-            $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], $signup);
-        }
-    } else {
-        $s = sprintf(_("%s will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
-    }
-
-    if (!$html or array_key_exists('href', $params))
-        $s = preg_replace('#</?strong>#', '', $s);
-
-    // Tidy up
-    $s = preg_replace('#\.\.#', '.', $s);
-
-    locale_pop();
-    return $s;
 }
 
 /* pledge_dbresult_to_code RESULT

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.144 2006-07-27 11:14:52 francis Exp $
+// $Id: fns.php,v 1.145 2006-08-15 11:49:01 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -91,14 +91,16 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
 #    print "here<pre>"; print_r(debug_backtrace()); exit;
 
     if (array_key_exists('id', $values)) {
-        $values['sentence_first'] = pledge_sentence($values['id'], array('firstperson' => true));
-        $values['sentence_third'] = pledge_sentence($values['id'], array('firstperson' => false));
+        $p = new Pledge($values['id']);
+        $values['sentence_first'] = $p->sentence(array('firstperson' => true));
+        $values['sentence_third'] = $p->sentence(array('firstperson' => false));
         $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
         if ($values['actual'] >= $values['target'])
             $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? _('exceeded') : _('met'));
     } elseif (array_key_exists('title', $values)) {
-        $values['sentence_first'] = pledge_sentence($values, array('firstperson' => true));
-        $values['sentence_third'] = pledge_sentence($values, array('firstperson' => false));
+        $p = new Pledge($values);
+        $values['sentence_first'] = $p->sentence(array('firstperson' => true));
+        $values['sentence_third'] = $p->sentence(array('firstperson' => false));
     }
     if (array_key_exists('ref', $values)) {
         $values['pledge_url'] = pb_domain_url(array('path'=> "/" . $values['ref']));

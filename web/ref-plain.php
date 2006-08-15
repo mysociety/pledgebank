@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.6 2006-07-08 10:04:21 francis Exp $
+ * $Id: ref-plain.php,v 1.7 2006-08-15 11:49:01 francis Exp $
  * 
  */
 
@@ -67,9 +67,9 @@ $out = array(
     'data' => array(
         'url'=> $p->url_main(),
         'ref' => $p->ref(),
-        'sentence_first' => pledge_sentence($p->data, array('firstperson'=>true)),
-        'sentence_first_withname' => pledge_sentence($p->data, array('firstperson'=>'includename')),
-        'sentence_third' => pledge_sentence($p->data, array('firstperson'=>false)),
+        'sentence_first' => $p->sentence(array('firstperson'=>true)),
+        'sentence_first_withname' => $p->sentence(array('firstperson'=>'includename')),
+        'sentence_third' => $p->sentence(array('firstperson'=>false)),
         'title' => $title,
         'target' => $p->target(),
         'byarea' => $p->byarea(),

@@ -21,7 +21,7 @@ Values which are available in all emails are:
   - detail, extra description of the pledge;
 
   - sentence_first, full pledge sentence in first person ("I...");
-  - sentence_third, full pledge sentence in third person ("Pledge Setter...")
+  - sentence_first_withname, full pledge sentence in first person with name ("I, Pledge Setter, ...")
   - pledge_url, of the pledge page.
 
   - pledgebank_url, URL of localised site, including trailing slash (http://br.pledgebank.com/)

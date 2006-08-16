@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.131 2006-08-15 15:05:17 francis Exp $
+// $Id: page.php,v 1.132 2006-08-16 08:23:08 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -400,7 +400,8 @@ function page_check_ref($ref) {
                         . htmlspecialchars($p->ref()) . '">'
                         . htmlspecialchars($p->ref()) . '</a>'
                     . '</dt><dd>'
-                    . $p->h_sentence()
+                    . '"' . $p->h_sentence(array('firstperson'=>true)) . '"'
+                    . " &mdash; " . $p->h_name()
                     . '</dd>';
         }
         print '</dl>';

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.196 2006-08-15 17:31:31 francis Exp $
+ * $Id: pledge.php,v 1.197 2006-08-16 08:23:08 francis Exp $
  * 
  */
 
@@ -502,7 +502,9 @@ class Pledge {
         $r = $this->data;
     
         $html = array_key_exists('html', $params) ? $params['html'] : false;
-        $firstperson = array_key_exists('firstperson', $params) ? $params['firstperson'] : false;
+        if (!array_key_exists('firstperson', $params))
+            err('Explicitly set "firstperson"');
+        $firstperson = $params['firstperson'];
         
         if ($html) {
             $r['places'] = null; // is an array during pledge creation
@@ -531,7 +533,8 @@ class Pledge {
                 $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], $signup);
             }
         } else {
-            $s = sprintf(_("%s says: \"I will %s but only if <strong>%s</strong> %s will %s.\""), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
+            err('Third person pledge sentence not available');
+            #$s = sprintf(_("%s will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
         }
 
         if (!$html or array_key_exists('href', $params))
@@ -643,6 +646,7 @@ class Pledge {
             global $countries_code_to_name;
             $text .= $countries_code_to_name[$this->country_code()] . ": ";
         }
+        $params['firstperson'] = 'includename';
         $text .= $this->sentence($params) . ' ';
         if ($this->byarea()) {
             if ($this->daysleft() > 0) $text .= '(';

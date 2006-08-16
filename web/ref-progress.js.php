@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-progress.js.php,v 1.3 2005-07-22 11:48:59 matthew Exp $
+ * $Id: ref-progress.js.php,v 1.4 2006-08-16 08:23:09 francis Exp $
  * 
  */
 
@@ -25,7 +25,7 @@ $html = <<<EOF
 <ul class="pledgebank_blurb">
 <li class="pledgebank_pledgetext">
 EOF;
-$html .= $p->h_sentence() . "</li>";
+$html .= $p->h_sentence(array('firstperson'=>true)) . "</li>";
 $signers = $p->signers();
 $target = $p->target();
 $html .= <<<EOF

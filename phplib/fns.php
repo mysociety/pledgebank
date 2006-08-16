@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.146 2006-08-16 08:23:08 francis Exp $
+// $Id: fns.php,v 1.147 2006-08-16 10:20:20 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -88,19 +88,23 @@ function pb_domain_url($params = array('path'=>'/')) {
 
 // $to can be one recipient address in a string, or an array of addresses
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
-#    print "here<pre>"; print_r(debug_backtrace()); exit;
-
-    if (array_key_exists('id', $values)) {
+    // TODO: perhaps these days, this pb_send_email_template should take a pledge
+    // object as a parameter, and the $values should only be extra values
+    $p = null;
+    if (array_key_exists('id', $values))
         $p = new Pledge($values['id']);
+    elseif (array_key_exists('title', $values))
+        $p = new Pledge($values);
+
+    if ($p) {
         $values['sentence_first'] = $p->sentence(array('firstperson' => true));
         $values['sentence_first_withname'] = $p->sentence(array('firstperson' => 'includename'));
+    }
+
+    if (array_key_exists('id', $values)) {
         $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
         if ($values['actual'] >= $values['target'])
             $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? _('exceeded') : _('met'));
-    } elseif (array_key_exists('title', $values)) {
-        $p = new Pledge($values);
-        $values['sentence_first'] = $p->sentence(array('firstperson' => true));
-        $values['sentence_first_withname'] = $p->sentence(array('firstperson' => 'includename'));
     }
     if (array_key_exists('ref', $values)) {
         $values['pledge_url'] = pb_domain_url(array('path'=> "/" . $values['ref']));

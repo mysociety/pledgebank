@@ -26,6 +26,8 @@ Values which are available in all emails are:
 
   - pledgebank_url, URL of localised site, including trailing slash (http://br.pledgebank.com/)
 
+  - sms_number, the short code phone number for SMS
+
 The text of each message should be pre-formatted as an email.
 
 Emails and the available variables are:
@@ -120,6 +122,9 @@ Sent to creator when admin gives them an announcement to signers.
 
 * chivvy-creator
 Sent 2 days after creation of a new pledge if it doesn't have many signups.
+
+* chivvy-creator-nosms
+As chivvy-creator, only for countries/pledges where SMS is not supported.
 
 * chivvy-creator-lowrate
 Sent if the rate of signups of a pledge seems too low.

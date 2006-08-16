@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.197 2006-08-16 08:23:08 francis Exp $
+ * $Id: pledge.php,v 1.198 2006-08-16 10:20:20 francis Exp $
  * 
  */
 
@@ -316,6 +316,24 @@ class Pledge {
     }
     function longitude() {
         return $this->data['longitude'];
+    }
+
+    // Also update has_sms in web/poster.cgi
+    function has_sms() {
+        // Private pledges have no SMS for now
+        if ($this->pin())
+            return false;
+        // Nor do byarea pledges (too hard to do interface to choose place)
+        if ($this->byarea())
+            return false;
+        // Global pledges, we do show SMS (but will flag UK only)
+        if (!$this->country_code())
+            return true;
+        // Non-UK countries have no SMS
+        if ($this->country_code != 'GB')
+            return false;
+        // UK countries have SMS
+        return true;
     }
 
     // Links. The semantics here is that the URLs are all escaped, but didn't
@@ -905,25 +923,6 @@ go out to the shops or your pledge is unlikely to succeed.');
     if (!$r['pin']) { ?>
 <p align="center"><a href="<?=$png_flyers8_url?>"><img width="595" height="842" src="<?=$png_flyers8_url?>" border="0" alt="<?=_('Graphic of flyers for printing') ?>"></a></p>
 <?  }
-}
-
-/* post_confirm_advertise_sms PLEDGE_ROW
- * Prints some stuff about SMS for PLEDGE.
- * Only for PINless pledges, since private pledges can't be signed by SMS. */
-function post_confirm_advertise_sms($r) {
-    if (!$r['pin']) {
-        printf(_('<p class="noprint"><strong>Take your Pledge to the pub</strong> &ndash; next time you\'re out and about,
-get your friends to sign up by having them text
-<strong>pledge&nbsp;%s</strong> to <strong>60022</strong>.
-The text costs your normal rate, and we\'ll keep them updated about progress via their
-mobile.</p>'), htmlspecialchars($r['ref']) );
-# Below not needed as we're currently not charging premium rate
-/* <p class="noprint" style="text-align: center;"><small>The small print: operated by
-mySociety, a project of UK Citizens Online Democracy. Sign-up message costs
-your normal text rate. Further messages from us are free.
-Questions about this SMS service? Call us on 08453&nbsp;330&nbsp;160 or
-email <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</small></p> */
-    }
 }
 
 /* pledge_delete_pledge ID

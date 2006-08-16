@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.79 2006-07-11 17:00:03 francis Exp $
+# $Id: poster.cgi,v 1.80 2006-08-16 10:20:21 francis Exp $
 #
 
 import sys
@@ -119,6 +119,7 @@ def ordinal(day):
 def format_integer(i):
     return locale.format("%d", i, 1)
 
+# Also update has_sms in phplib/pledge.php
 def has_sms(pledge):
     # Private pledges have no SMS for now
     if pledge['pin']:

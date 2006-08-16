@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.79 2006-07-27 11:14:52 francis Exp $
+ * $Id: frequentupdate,v 1.80 2006-08-16 10:20:20 francis Exp $
  *
  */
 
@@ -546,6 +546,7 @@ function chivvy_creators_early() {
     while ($pledge = db_fetch_array($q)) {
         verbose("pledge #${pledge['id']} (${pledge['ref']}) creator being sent chivvy email");
 
+        $pledge_obj = new Pledge($pledge);
         db_query("
                 insert into message (
                     pledge_id, circumstance,
@@ -554,8 +555,10 @@ function chivvy_creators_early() {
                 ) values (
                     ?, 'chivvy-creator',
                     true, false, false,
-                    'chivvy-creator'
-                )", $pledge['id']);
+                    ?
+                )", $pledge['id'],
+                    $pledge_obj->has_sms() ? 'chivvy-creator' : 'chivvy-creator-nosms'
+                );
     }
     
     db_commit();

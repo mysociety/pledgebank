@@ -11,9 +11,10 @@
 
 # TODO: Polyline simplification to speed up Canada
 #       http://geometryalgorithms.com/Archive/algorithm_0205/
-# Cope with wrap around - US shouldn't be rendered everywhere
+# Cope with wrap around - US shouldn't be rendered everywhere e.g. Vietnam
+# Albania has loads of overlaps
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.2 2006-08-18 21:27:26 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.3 2006-08-18 22:05:01 francis Exp $';
 
 my $bitmap_size = 500;
 my $margin_extra = 0.05;
@@ -125,7 +126,7 @@ sub load_countries {
 
 # Expand range to fit this country fully in view
 my ($x_min, $x_max, $y_min, $y_max);
-sub include_extents {
+sub include_extents_country {
     my ($country) = @_;
 
     # Loop through shapes
@@ -138,6 +139,20 @@ sub include_extents {
             $y_min = $y if (!$y_min || $y < $y_min);
             $y_max = $y if (!$y_max || $y > $y_max);
         }
+    }
+}
+
+# Expand range to fit these signer pins
+sub include_extents_pins {
+    my ($pins) = @_;
+    foreach my $pin (@$pins) {
+        my ($lat, $lon, $succ, $count) = @$pin;
+        my $x = $lon;
+        my $y = mercator($lat);
+        $x_min = $x if (!$x_min || $x < $x_min);
+        $x_max = $x if (!$x_max || $x > $x_max);
+        $y_min = $y if (!$y_min || $y < $y_min);
+        $y_max = $y if (!$y_max || $y > $y_max);
     }
 }
 
@@ -185,6 +200,7 @@ sub plot_country {
     }
 }
 
+# Draw marks where the signers are
 sub plot_pins {
     my ($cr, $pins, $sscale) = @_;
     foreach my $pin (@$pins) {
@@ -208,8 +224,9 @@ sub create_image {
     #load_countries('europe');
     load_countries('cntry00');
 
-    my $main_country = "Canada";
-    include_extents($countries->{$main_country});
+    my $main_country = "Albania";
+    include_extents_country($countries->{$main_country});
+#    include_extents_pins($pins);
 
     # Calculate scale and margins
     my $bitmap_w = $bitmap_size;
@@ -256,8 +273,8 @@ sub create_image {
     # Plot stuff
     foreach my $country (keys %$countries) {
         my $extents = $country_extents->{$country};
-        if (!($extents->{x_max} < $x_min) && !($x_max < $extents->{x_min}) &&
-            !($extents->{y_max} < $y_min) && !($y_max < $extents->{y_min}))
+        if (!(($extents->{x_max} < $x_min) || ($x_max < $extents->{x_min})) &&
+            !(($extents->{y_max} < $y_min) || ($y_max < $extents->{y_min})))
         {
             warn "overlaps: " . $country . "\n";
             plot_country($cr, $countries->{$country}, ($country eq $main_country) ? 1 : 0);

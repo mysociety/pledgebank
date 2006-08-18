@@ -9,12 +9,14 @@
 # Country shape data files from Centers for Disease Control and Prevention (CDC): 
 # http://www.cdc.gov/epiinfo/shape.htm
 
-# TODO: catch PB::Error
+# TODO: Polyline simplification to speed up Canada
+#       http://geometryalgorithms.com/Archive/algorithm_0205/
+# Cope with wrap around - US shouldn't be rendered everywhere
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.1 2006-08-18 17:30:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.2 2006-08-18 21:27:26 francis Exp $';
 
 my $bitmap_size = 500;
-my $margin_extra = 0.1;
+my $margin_extra = 0.05;
 
 use strict;
 
@@ -29,6 +31,7 @@ use Geo::ShapeFile;
 use Cairo;
 use POSIX;
 use Math::Trig qw(pi);
+use Math::Round;
 use File::stat;
 use Error qw(:try);
 use utf8;
@@ -43,59 +46,170 @@ die "graph output directory '$graph_dir' does not exist and cannot be created"
 # Transform latitude to mercator projection y coordinate
 sub mercator {
     my $lat = shift;
-    return Math::Trig::rad2deg(log(Math::Trig::tan(
-            Math::Trig::deg2rad($lat)) + Math::Trig::sec(Math::Trig::deg2rad($lat)
-        )));
+    my $val = Math::Trig::tan(
+            Math::Trig::deg2rad($lat)) + Math::Trig::sec(Math::Trig::deg2rad($lat));
+    # XXX not really sure what the best thing to do here is
+    # this happens only with World, not Europe - presumably artic
+    if ($val == 0) {
+        return $lat;
+    }
+    return Math::Trig::rad2deg(log($val));
+}
+
+sub r {
+    my $num = shift;
+#    return Math::Round::round($num * 10) / 10;
+    return $num;
 }
 
 # Load in country boundary data from shape file
-my $shape_filename = "/home/francis/fiddle/cdc/uk";
-my $sh = new Geo::ShapeFile($shape_filename);
-if (!$sh) {
-    warn "$_: $!\n";
-    next;
-}
-my $country;
-my ($x_min, $x_max, $y_min, $y_max);
-# loop through shapes
-for (my $i = 1; $i <= $sh->shapes(); ++$i) {
-    #print STDERR ".";
-    my $S = $sh->get_shp_record($i);
-    my $D = $sh->get_dbf_record($i);
-    #print STDERR "$i:\n";
-    #foreach (keys %$D) {
-    #    print STDERR "  '$_' -> '$D->{$_}'\n";
-    #}
-    #print STDERR "$i: number of parts: ", $S->num_parts(), "\n";
-    #print STDERR $S->dump(), "\n\n";
+my $countries;
+my $country_extents;
+sub load_countries {
+    my $cn = shift;
+    my $shape_filename = "/home/francis/fiddle/cdc/$cn";
+    my $sh = new Geo::ShapeFile($shape_filename);
+    if (!$sh) {
+        warn "$_: $!\n";
+        next;
+    }
+    # loop through shapes
+    my $linec;
+    for (my $i = 1; $i <= $sh->shapes(); ++$i) {
+        #print STDERR ".";
+        my $S = $sh->get_shp_record($i);
+        my $D = $sh->get_dbf_record($i);
+        #print STDERR "$i:\n";
+        #print STDERR $D->{CNTRY_NAME} . "\n";
+        #next if $D->{CNTRY_NAME} ne 'United Kingdom';
+        #foreach (keys %$D) {
+        #    print STDERR "  '$_' -> '$D->{$_}'\n";
+        #}
+        #print STDERR "$i: number of parts: ", $S->num_parts(), "\n";
+        #print STDERR $S->dump(), "\n\n";
 
-    # Loop through parts of shape
-    my $shape;
-    for(1 .. $S->num_parts) {
-        my @part = $S->get_part($_);
-#        print STDERR Dumper(\@part);
-                        
-        my $first = 0;
-        my $part;
-        foreach my $point (@part) {
-            my $x = $point->X;
-            my $y = mercator($point->Y);
+        # Loop through parts of shape
+        my $shape;
+        my $extents;
+        for(1 .. $S->num_parts) {
+            my @part = $S->get_part($_);
+                            
+            my $first = 0;
+            my $part;
+            my ($p_x, $p_y);
+            foreach my $point (@part) {
+                my $x = $point->X;
+                my $y = mercator($point->Y);
+                push @$part, [$x, $y];
+                if (defined($p_x) && defined($p_y)) {
+                    $linec->{pack('ffff', r($p_x), r($p_y), r($x), r($y))}++;
+                    #warn "$p_x $p_y $x $y got";
+                    $extents->{x_min} = $x if (!$extents->{x_min} || $x < $extents->{x_min});
+                    $extents->{x_max} = $x if (!$extents->{x_max} || $x > $extents->{x_max});
+                    $extents->{y_min} = $y if (!$extents->{y_min} || $y < $extents->{y_min});
+                    $extents->{y_max} = $y if (!$extents->{y_max} || $y > $extents->{y_max});
+                }
+                $p_x = $x;
+                $p_y = $y;
+            }
+            #warn "new part";
+            push @$shape, $part;
+        }
+        $countries->{$D->{CNTRY_NAME}} = $shape;
+        $country_extents->{$D->{CNTRY_NAME}} = $extents;
+    }
+    #print Dumper($countries);
+    #print Dumper($country_extents);
+    return $countries;
+}
+
+# Expand range to fit this country fully in view
+my ($x_min, $x_max, $y_min, $y_max);
+sub include_extents {
+    my ($country) = @_;
+
+    # Loop through shapes
+    foreach my $part (@$country) {
+        foreach my $line (@$part) {
+            my $x = $line->[0];
+            my $y = $line->[1];
             $x_min = $x if (!$x_min || $x < $x_min);
             $x_max = $x if (!$x_max || $x > $x_max);
             $y_min = $y if (!$y_min || $y < $y_min);
             $y_max = $y if (!$y_max || $y > $y_max);
-            push @$part, [$x, $y]
         }
-        push @$shape, $part;
     }
-    push @$country, $shape;
 }
-print STDERR "x $x_min $x_max\n";
-print STDERR "y $y_min $y_max\n";
+
 
 # Draw the map, making a PNG file
+sub plot_country {
+    my ($cr, $country, $main) = @_;
+
+    # Loop through shapes
+    foreach my $part (@$country) {
+        my $first = 1;
+        my ($p_x, $p_y);
+        foreach my $line (@$part) {
+            if ($first) {
+                $cr->move_to($line->[0], $line->[1]);
+                $first = 0;
+            } else {
+                #my $rep_count = $linec->{pack('ffff', r($p_x), r($p_y), r($line->[0]), r($line->[1]))};
+                my $rep_count = 1;
+                #warn "$p_x $p_y " . $line->[0] . " " . $line->[1] . " draw";
+                if (!$rep_count) {
+                    warn "failed to find linec: $p_x $p_y " . $line->[0] . " " . $line->[1];
+                } else {
+                    if ($rep_count > 1) {
+                        #print STDERR "> 1";
+                        $cr->stroke();
+                        $cr->move_to($line->[0], $line->[1]);
+                    } else {
+                        #print STDERR "= 1";
+                        $cr->line_to($line->[0], $line->[1]);
+                    }
+                }
+            }
+            $p_x = $line->[0];
+            $p_y = $line->[1];
+        }
+        if ($main) {
+            $cr->set_source_rgb(1.0, 0.94, 0.87);
+        } else {
+            $cr->set_source_rgb(0.94, 0.86, 0.72);
+        }
+        $cr->fill_preserve();
+        $cr->set_source_rgb(0, 0.71, 0.93);
+        $cr->stroke();
+    }
+}
+
+sub plot_pins {
+    my ($cr, $pins, $sscale) = @_;
+    foreach my $pin (@$pins) {
+        my ($lat, $lon, $succ, $count) = @$pin;
+        if ($succ) {
+            $cr->set_source_rgb(0, 1, 0);
+        } else {
+            $cr->set_source_rgb(1, 0, 0);
+        }
+        $cr->arc($lon, mercator($lat), 3*sqrt($count)/$sscale, 0, 2*pi);
+        #print "ll ", $lon, " ", $lat, "\n";
+        $cr->fill_preserve();
+        $cr->stroke();
+        #print "$lat $lon $succ $count\n";
+    }
+}
+    
 sub create_image {
     my ($output, $pledge, $pins) = @_;
+
+    #load_countries('europe');
+    load_countries('cntry00');
+
+    my $main_country = "Canada";
+    include_extents($countries->{$main_country});
 
     # Calculate scale and margins
     my $bitmap_w = $bitmap_size;
@@ -116,51 +230,41 @@ sub create_image {
     } else {
         $sscale = $bitmap_h / $all_height;
     }
-    $all_width *= $sscale;
-    $all_height *= $sscale;
+    $bitmap_w = $sscale * $all_width;
+    $bitmap_h = $sscale * $all_height;
+    #warn "all $all_width $all_height - bitmap $bitmap_w $bitmap_h";
 
     # Create a new image
     my $surface = Cairo::ImageSurface->create('argb32', $bitmap_w, $bitmap_h);
     my $cr = Cairo::Context->create ($surface);
+    #$cr->set_antialias('none');
 
-    # Put a black frame around the picture
+    # Set up scale
     $cr->set_line_width(1/$sscale);
-    $cr->translate(0, $all_height);
+    $cr->translate(0, $bitmap_h);
     $cr->scale(1, -1);
     $cr->scale($sscale, $sscale);
     $cr->translate(-$all_left, -$all_top);
 
-    # Loop through shapes
-    for my $shape (@$country) {
-        foreach my $part (@$shape) {
-            my $first = 0;
-            foreach my $line (@$part) {
-                if ($first) {
-                    $cr->set_source_rgb(1, 1, 1);
-                    $cr->move_to($line->[0], $line->[1]);
-                    $first = 0;
-                } else {
-                    $cr->line_to($line->[0], $line->[1]);
-                }
-            }
-            $cr->stroke();
+    # Draw the sea
+    $cr->set_source_rgb(0.78, 0.91, 0.94);
+    #warn "rect: " . ($x_min - $margin_x) . " ". ($y_min - $margin_y) . " $all_width  $all_height";
+    $cr->rectangle($x_min - $margin_x, $y_min - $margin_y, $all_width, $all_height);
+    $cr->fill_preserve();
+    $cr->stroke();
+
+    # Plot stuff
+    foreach my $country (keys %$countries) {
+        my $extents = $country_extents->{$country};
+        if (!($extents->{x_max} < $x_min) && !($x_max < $extents->{x_min}) &&
+            !($extents->{y_max} < $y_min) && !($y_max < $extents->{y_min}))
+        {
+            warn "overlaps: " . $country . "\n";
+            plot_country($cr, $countries->{$country}, ($country eq $main_country) ? 1 : 0);
         }
     }
 
-    foreach my $pin (@$pins) {
-        my ($lat, $lon, $succ, $count) = @$pin;
-        if ($succ) {
-            $cr->set_source_rgb(0, 1, 0);
-        } else {
-            $cr->set_source_rgb(1, 0, 0);
-        }
-        $cr->arc($lon, mercator($lat), 3*sqrt($count)/$sscale, 0, 2*pi);
-        #print "ll ", $lon, " ", $lat, "\n";
-        $cr->fill_preserve();
-        $cr->stroke();
-        #print "$lat $lon $succ $count\n";
-    }
-    
+    plot_pins($cr, $pins, $sscale);
     $cr->show_page;
     $surface->write_to_png($output) or die "failed to write_to_png";
 }

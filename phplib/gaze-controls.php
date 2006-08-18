@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.7 2006-07-20 09:30:43 francis Exp $
+// $Id: gaze-controls.php,v 1.8 2006-08-18 11:38:39 francis Exp $
 
 // TODO: 
 // - Probably remove the get_http_var calls for prev_country and prev_place
@@ -82,7 +82,7 @@ function gaze_controls_print_country_choice($selected_country, $selected_state, 
 <select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> name="country" onchange="update_place_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
 <? if (!array_key_exists('noglobal', $params)) { ?>
-  <option value="Global"<? if ($selected_country=='Global') print ' selected'; ?>><?=_('None &mdash; applies anywhere') ?></option>
+  <option value="Global"<? if ($selected_country=='Global') print ' selected'; ?>><?=_('Not specific to any location') ?></option>
 <? } ?>
   <!-- needs explicit values for IE Javascript -->
 <?

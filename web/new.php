@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.149 2006-08-14 09:02:50 matthew Exp $
+// $Id: new.php,v 1.150 2006-08-18 11:38:38 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -588,8 +588,7 @@ function step2_error_check(&$data) {
         /* Validate country and/or state. */
         if (!array_key_exists($country, $countries_code_to_name))
             # TRANS: Ideally "none" will be translated here, but I can't see it as an entry in this .po file. How is this resolved? (Tim Morley, 2005-11-23)
-           # It's the entry "None &mdash; applies anywhere"; I guess this message could be reworded to mirror that, but as it says it directly afterward... (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
-           $errors['country'] = _('Please choose a country, or "none" if your pledge applies anywhere');
+           $errors['country'] = _('Please choose a country, or "not specific to any location" if your pledge applies everywhere');
         else if ($state && !array_key_exists($state, $countries_statecode_to_name[$country]))
             $errors['country'] = _('Please choose a valid state within that country, or the country name itself');
         else {

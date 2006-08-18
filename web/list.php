@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.31 2006-07-28 00:08:26 francis Exp $
+// $Id: list.php,v 1.32 2006-08-18 09:44:08 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -71,13 +71,15 @@ $locale_clause = "(".
     ' OR ' . pb_site_pledge_filter_general($sql_params).
     ")";
 $query = "
-                SELECT count(pledges.id)
+                SELECT count(pledges.id), extract(epoch from max(pledge_last_change_time(pledges.id)))
                 FROM pledges LEFT JOIN location ON location.id = pledges.location_id
                 WHERE $locale_clause AND pin IS NULL 
                 $page_clause
                 AND (".microsites_normal_prominences()." OR cached_prominence = 'frontpage')";
-#print $query;exit;
-$ntotal = db_getOne($query , $sql_params);
+list($ntotal, $last_modified) = db_getRow($query , $sql_params);
+if (cond_maybe_respond($last_modified))
+    exit();
+
 if ($ntotal < $q_offset) {
     $q_offset = $ntotal - PAGE_SIZE;
     if ($q_offset < 0)
@@ -129,13 +131,16 @@ if ($q_type == 'open') {
     err('Unknown type ' . $q_type);
 }
 if ($rss) 
-    rss_header($heading, $heading, array());
+    rss_header($heading, $heading, array(
+        'last-modified' => $last_modified
+    ));
 else {
     page_header($heading, array('id'=>'all',
             'rss'=> array(
                     $heading => pb_domain_url(array('explicit'=>true, 'path'=>'/rss'.$_SERVER['REQUEST_URI']))
                     ),
-            'cache-max-age' => 60
+            'cache-max-age' => 60,
+            'last-modified' => $last_modified,
     ));
 }
 

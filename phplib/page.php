@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.132 2006-08-16 08:23:08 francis Exp $
+// $Id: page.php,v 1.133 2006-08-18 09:44:08 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -94,25 +94,7 @@ function page_header($title, $params = array()) {
     // header by default as on live server, and FireFox was defaulting to
     // latin-1 -- Francis)
     header('Content-Type: text/html; charset=utf-8');
-
-    page_send_vary_header();
-
-    if (OPTION_PB_CACHE_HEADERS) {
-        /* Send Last-Modified: and ETag: headers, if we have enough information to
-         * do so. */
-        $lm = null;
-        $etag = null;
-        if (array_key_exists('last-modified', $params))
-            $lm = $params['last-modified'];
-        if (array_key_exists('etag', $params))
-            $etag = $params['etag'];
-        if (isset($lm) || isset($etag))
-            cond_headers($lm, $etag);
-
-        /* Ditto a max-age if specified. */
-        if (array_key_exists('cache-max-age', $params))
-            header('Cache-Control: max-age=' . $params['cache-max-age']);
-    }
+    page_cache_headers($params);
 
     /* On an error page don't do anything complicated like check login */
     global $err_handling_error;
@@ -320,6 +302,7 @@ function rss_header($title, $description, $params) {
     $country_name = pb_site_country_name();
     $main_page = pb_domain_url(array("explicit"=>true, 'path'=>str_replace('rss/', '', $_SERVER['REQUEST_URI'])));
     header('Content-Type: application/xml; charset=utf-8');
+    page_cache_headers($params);
     print '<?xml version="1.0" encoding="UTF-8"?>';
 ?>
 
@@ -368,6 +351,26 @@ function rss_footer($items) {
 <? } ?>
 </rdf:RDF>
 <?
+}
+
+function page_cache_headers($params) {
+    page_send_vary_header();
+    if (OPTION_PB_CACHE_HEADERS) {
+        /* Send Last-Modified: and ETag: headers, if we have enough information to
+         * do so. */
+        $lm = null;
+        $etag = null;
+        if (array_key_exists('last-modified', $params))
+            $lm = $params['last-modified'];
+        if (array_key_exists('etag', $params))
+            $etag = $params['etag'];
+        if (isset($lm) || isset($etag))
+            cond_headers($lm, $etag);
+
+        /* Ditto a max-age if specified. */
+        if (array_key_exists('cache-max-age', $params))
+            header('Cache-Control: max-age=' . $params['cache-max-age']);
+    }
 }
 
 

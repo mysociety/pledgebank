@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.8 2006-08-18 11:38:39 francis Exp $
+// $Id: gaze-controls.php,v 1.9 2006-08-18 15:18:15 matthew Exp $
 
 // TODO: 
 // - Probably remove the get_http_var calls for prev_country and prev_place
@@ -210,6 +210,7 @@ function gaze_controls_print_place_choice($selected_place, $selected_gaze_place,
 # Looks up the country, state, place, postcode etc. from HTTP variables,
 # partially validates it and returns one $location data array.
 function gaze_controls_get_location($params = array()) {
+    global $site_country;
     $location = array();
     $location['country'] = get_http_var('country');
     $location['state'] = null;

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.244 2006-08-07 12:08:54 francis Exp $
+// $Id: index.php,v 1.245 2006-08-18 15:18:16 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -95,7 +95,6 @@ can make your pledge succeed &raquo;') ?>"></a></div>
 # 'foreign' - true or false, whether pledges from other countries (or all countries if no site country) to be included
 # 'showcountry' - whether to display country name in summary
 function get_pledges_list($where, $params) {
-    global $site_country, $pb_today;
     $query = "SELECT pledges.*, pledges.ref, country
             FROM pledges LEFT JOIN location ON location.id = pledges.location_id
             WHERE ";

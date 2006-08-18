@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.41 2006-08-15 15:05:17 francis Exp $
+ * $Id: microsites.php,v 1.42 2006-08-18 15:18:15 matthew Exp $
  * 
  */
 
@@ -232,7 +232,7 @@ function microsites_frontpage_has_intro() {
  * called if microsites_frontpage_has_intro() above returns true.
  */
 function microsites_frontpage_intro() {
-    global $microsite, $site_country;
+    global $microsite;
     $tom = null;
     if ($microsite == 'interface') {
         $tom = "Hello, and welcome to the demo version of PledgeBank we've built for

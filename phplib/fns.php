@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.147 2006-08-16 10:20:20 francis Exp $
+// $Id: fns.php,v 1.148 2006-08-18 15:18:15 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -56,9 +56,15 @@ function pb_domain_url($params = array('path'=>'/')) {
     $c = $microsite;
     if (array_key_exists('country', $params))
         $c = ($params['country'] == "explicit") ? $site_country : $params['country'];
-    if (array_key_exists('microsite', $params))
-        $c = ($params['microsite'] == "explicit") ? $microsite : $params['microsite'];
-    
+    if (array_key_exists('microsite', $params)) {
+        if ($params['microsite'] == 'explicit') {
+            if ($microsite)
+                $c = $microsite;
+        } else {
+            $c = $params['microsite'];
+        }
+    }
+
     $url = 'http://';
 
     global $microsites_to_extra_domains;
@@ -259,7 +265,6 @@ function pb_get_change_country_link() {
 }
 
 function pb_get_change_language_link() {
-    global $site_country;
     $change = '<a href="/lang?r='.urlencode($_SERVER['REQUEST_URI']).'">';
     $change .= _("change language");
     $change .= '</a>';
@@ -387,7 +392,6 @@ function pb_print_filter_link_main_general($attrs = "") {
 }
 
 function pb_print_no_featured_link() {
-    global $site_country;
     $change = pb_get_change_country_link();
     print '<p>' . sprintf(_('There are no featured pledges for %s (%s) at the moment.'),pb_site_country_name(), $change);
     print '</p>';

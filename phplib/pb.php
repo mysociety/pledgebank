@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.72 2006-07-27 11:14:52 francis Exp $
+ * $Id: pb.php,v 1.73 2006-08-18 15:18:15 matthew Exp $
  * 
  */
 
@@ -106,16 +106,20 @@ require_once '../../phplib/stash.php';
 require_once "../../phplib/utility.php";
 require_once "../../phplib/gaze.php";
 
+$site_country = null;
 if ($domain_country) {
     if (array_key_exists('UK', $countries_code_to_name)) 
         err('UK in countries_code_to_name');
     if ($domain_country == 'UK')
         $domain_country = 'GB';
     if (array_key_exists($domain_country, $countries_code_to_name)) {
-        $url = pb_domain_url(array());
-        setcookie('country', $domain_country, 0, '/', '.' . OPTION_WEB_DOMAIN);
-        header('Location: ' . $url);
-        exit;
+    	if (!get_http_var('rss')) {
+            $url = pb_domain_url(array());
+            setcookie('country', $domain_country, 0, '/', '.' . OPTION_WEB_DOMAIN);
+            header('Location: ' . $url);
+            exit;
+	}
+	$site_country = $domain_country;
     }
 } 
 
@@ -145,18 +149,18 @@ if (array_key_exists(strtolower($_SERVER['HTTP_HOST']), $microsites_from_extra_d
 } elseif (array_key_exists(strtolower($domain_country), $microsites_list)) {
     $microsite = strtolower($domain_country);
 }
-$site_country = isset($_COOKIE['country']) ? $_COOKIE['country'] : null;
-if (!array_key_exists($site_country, $countries_code_to_name))
-    $site_country = null;
+if (!$site_country) {
+    $site_country = isset($_COOKIE['country']) ? $_COOKIE['country'] : null;
+    if (!array_key_exists($site_country, $countries_code_to_name))
+        $site_country = null;
+}
 
-if (!$site_country && !$microsite) {
+if (!$site_country)
     $site_country = $ip_country;
-}
 
-if ($site_country == null && $microsite == null) {
-    # Without this, would go to 'Global' (only global pledges)
+# Without this, would go to 'Global' (only global pledges)
+if ($site_country == null && $microsite == null)
     $microsite = "everywhere";
-}
 
 /* POST redirects */
 stash_check_for_post_redirect();

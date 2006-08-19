@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.198 2006-08-16 10:20:20 francis Exp $
+ * $Id: pledge.php,v 1.199 2006-08-19 20:45:25 matthew Exp $
  * 
  */
 
@@ -327,10 +327,11 @@ class Pledge {
         if ($this->byarea())
             return false;
         // Global pledges, we do show SMS (but will flag UK only)
-        if (!$this->country_code())
+	$cc = $this->country_code();
+        if (!$cc)
             return true;
         // Non-UK countries have no SMS
-        if ($this->country_code != 'GB')
+        if ($cc != 'GB')
             return false;
         // UK countries have SMS
         return true;

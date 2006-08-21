@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.39 2006-07-27 17:24:42 francis Exp $
+ * $Id: general-example,v 1.40 2006-08-21 08:28:08 francis Exp $
  * 
  */
 
@@ -76,8 +76,12 @@ define('OPTION_GNUPLOT_PATH', '/software/bin/gnuplot');
 define('OPTION_GNUPLOT_FONT', '/usr/X11R6/lib/X11/fonts/TTF/arial.ttf');
 // Where cache of rendered graphs should go, and where it appears on the
 // web. No trailing '/', in either case.
-define('OPTION_PB_GRAPH_DIR', "/path/to/somehwere/graphs");
+define('OPTION_PB_GRAPH_DIR', "/path/to/somehere/graphs");
 define('OPTION_PB_GRAPH_URL', "http://www.pledgebank.com/g");
+// Where cache of maps should go. No trailing '/'.
+define('OPTION_PB_MAP_DIR', "/path/to/somehere/graphs");
+// Shapefile of world boundaries
+define('OPTION_PB_MAP_SHAPEFILE_WORLD', "/path/to/somewhere");
 
 // Log file (used in test harness, and later in admin scripts)
 define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');

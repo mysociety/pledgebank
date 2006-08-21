@@ -12,7 +12,7 @@
 # TODO: Polyline simplification to speed up Canada
 #       http://geometryalgorithms.com/Archive/algorithm_0205/
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.4 2006-08-21 08:28:09 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.5 2006-08-21 09:01:27 francis Exp $';
 
 my $bitmap_size = 500;
 my $margin_extra = 0.05;
@@ -23,21 +23,22 @@ BEGIN {
     use mySociety::Config;
     mySociety::Config::set_file('../conf/general');
 }
+use mySociety::Util;
+use mySociety::DBHandle qw(dbh);
+use PB;
 
 use CGI::Fast;
 use Data::Dumper;
 use Geo::ShapeFile;
 use Cairo;
-use POSIX;
 use Math::Trig qw(pi);
 use Math::Round;
 use File::stat;
+use POSIX;
+use File::Temp qw(tempfile);
 use Error qw(:try);
 use Storable;
 use utf8;
-
-use mySociety::DBHandle qw(dbh);
-use PB;
 
 my $map_dir = mySociety::Config::get('PB_MAP_DIR');
 die "map output directory '$map_dir' does not exist and cannot be created"
@@ -221,7 +222,7 @@ sub plot_pins {
 sub create_image {
     my ($output, $pledge, $pins) = @_;
 
-    my $main_country = "Denmark";
+    my $main_country = "United Kingdom";
     include_extents_country($main_country);
 #    include_extents_pins($pins);
 
@@ -278,17 +279,18 @@ sub create_image {
     $surface->write_to_png($output) or die "failed to write_to_png";
 }
 
-# Preload data
-my $t = time();
-if ($#ARGV >= 0 && $ARGV[0] eq "--store") {
-    load_countries();
-    store $countries, "$map_dir/countries.storable";
-    store $country_part_extents, "$map_dir/countries_extents.storable";
-} else {
+# Preload country boundary data
+if (-e "$map_dir/countries.storable" && -e "$map_dir/countries_extents.storable") {
     $countries = retrieve("$map_dir/countries.storable");
     $country_part_extents = retrieve("$map_dir/countries_extents.storable");
+} else {
+    my ($fh, $temp) = tempfile("newstorableXXXXXX", DIR => $map_dir);
+    load_countries();
+    store $countries, $temp;
+    rename $temp, "$map_dir/countries.storable";
+    store $country_part_extents, $temp;
+    rename $temp, "$map_dir/countries_extents.storable";
 }
-print STDERR "load_countries: " . (time() - $t) . "\n"; $t = time();
 
 # Main FastCGI loop
 while (my $q = new CGI::Fast()) {
@@ -330,12 +332,13 @@ while (my $q = new CGI::Fast()) {
         where byarea_location.pledge_id = ?
         group by byarea_location.byarea_location_id', {}, $pledge_id);
 
-    my $filename = "out.png";
+    my $filename = $P->{ref} . ".png";
     my $f = new IO::File("$map_dir/$filename", O_RDONLY);
-    $f = new IO::File("nonexistent", O_RDONLY);
     
     if (!$f && $!{ENOENT}) {
-        create_image("$map_dir/$filename", $P, $pins);
+        my ($fh, $temp) = tempfile($P->{ref} . "XXXXXX", DIR => $map_dir);
+        create_image($temp, $P, $pins);
+        rename $temp, "$map_dir/$filename";
         $f = new IO::File("$map_dir/$filename", O_RDONLY)
                 or die "$map_dir/$filename: $! (after drawing map)";
     } elsif (!$f) {

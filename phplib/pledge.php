@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.199 2006-08-19 20:45:25 matthew Exp $
+ * $Id: pledge.php,v 1.200 2006-08-21 12:34:47 francis Exp $
  * 
  */
 
@@ -423,7 +423,9 @@ class Pledge {
     (<a href="<?=OPTION_ADMIN_URL?>?page=pb&amp;pledge=<?=$this->ref()?>"><?=_("admin")?></a>)
     <? } ?>
 </p>
+<? if (!$this->byarea()) { ?>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
+<? } ?>
 <p>
 <?=_('Deadline to sign up by:') ?> <strong><?=$this->h_pretty_date()?></strong>
 <br>
@@ -496,6 +498,10 @@ class Pledge {
             print '<p id="moredetails"><strong>' . _('More details') . '</strong><br>' . $det . '</p>';
         }
 ?>
+
+<? if ($this->byarea()) { ?>
+<p class="byareamadeby"><?=sprintf(_("Pledge orginally made by %s"), $this->h_name_and_identity()) ?></p>
+<? } ?>
 
 <? if (array_key_exists('reportlink', $params) && $params['reportlink']) { 
     global $contact_ref; ?>

@@ -12,9 +12,9 @@
 # TODO: Polyline simplification to speed up Canada
 #       http://geometryalgorithms.com/Archive/algorithm_0205/
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.6 2006-08-21 10:03:53 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.7 2006-08-21 12:34:48 francis Exp $';
 
-my $bitmap_size = 500;
+my $bitmap_size = 300;
 my $margin_extra = 0.05;
 
 use strict;

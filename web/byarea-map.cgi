@@ -12,7 +12,7 @@
 # TODO: Polyline simplification to speed up Canada
 #       http://geometryalgorithms.com/Archive/algorithm_0205/
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.5 2006-08-21 09:01:27 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.6 2006-08-21 10:03:53 francis Exp $';
 
 my $bitmap_size = 500;
 my $margin_extra = 0.05;
@@ -171,7 +171,7 @@ sub plot_country {
         if (!(($extents->{x_max} < $x_min) || ($x_max < $extents->{x_min})) &&
             !(($extents->{y_max} < $y_min) || ($y_max < $extents->{y_min})))
         {
-            warn "overlaps: $country_name part: $partno\n";
+            #warn "overlaps: $country_name part: $partno\n";
         } else {
             next;
         }
@@ -295,81 +295,85 @@ if (-e "$map_dir/countries.storable" && -e "$map_dir/countries_extents.storable"
 # Main FastCGI loop
 while (my $q = new CGI::Fast()) {
     try {
-    my $pledge_id = $q->param('pledge_id');
-    $pledge_id = 2042;
+        my $pledge_id = $q->param('pledge_id');
 
-    throw PB::Error("No pledge_id specified")
-        if (!defined($pledge_id));
-    throw PB::Error("Invalid pledge_id '$pledge_id'")
-        if ($pledge_id !~ /^[1-9]\d*$/);
+        throw PB::Error("No pledge_id specified")
+            if (!defined($pledge_id));
+        throw PB::Error("Invalid pledge_id '$pledge_id'")
+            if ($pledge_id !~ /^[1-9]\d*$/);
 
-    my $P = dbh()->selectrow_hashref('
-                    select *,
-                        case
-                            when date < ms_current_date() then date
-                            else ms_current_date()
-                        end as graph_date
-                    from pledges
-                    where id = ?', {}, $pledge_id);
+        my $P = dbh()->selectrow_hashref('
+                        select *,
+                            extract(epoch from pledge_last_change_time(pledges.id)) as lastchange,
+                            case
+                                when date < ms_current_date() then date
+                                else ms_current_date()
+                            end as graph_date
+                        from pledges
+                        where id = ?', {}, $pledge_id);
 
-    throw PB::Error("Unknown pledge_id '$pledge_id'") 
-    if (!$P);
-    if (defined($P->{pin})) {
-        # Don't bother producing the graph: it's only of use as an inline
-        # image, and we don't want to expose the PIN in that.
-        # XXX if you remove this, then add an actual check for the PIN as
-        # well!
-        throw PB::Error("Permission denied");
-    }
-    throw PB::Error("Pledge '$pledge_id' is not byarea pledge") 
-        if ($P->{'target_type'} ne 'byarea');
-
-    my $pins = dbh()->selectall_arrayref('
-        select max(latitude) as lat, max(longitude) as lon, max(whensucceeded) as succeeded, count(*) as count
-        from byarea_location 
-        left join location on byarea_location.byarea_location_id = location.id
-        left join signers on byarea_location.byarea_location_id = signers.byarea_location_id
-        where byarea_location.pledge_id = ?
-        group by byarea_location.byarea_location_id', {}, $pledge_id);
-
-    my $filename = $P->{ref} . ".png";
-    my $f = new IO::File("$map_dir/$filename", O_RDONLY);
-    
-    if (!$f && $!{ENOENT}) {
-        my ($fh, $temp) = tempfile($P->{ref} . "XXXXXX", DIR => $map_dir);
-        create_image($temp, $P, $pins);
-        rename $temp, "$map_dir/$filename";
-        $f = new IO::File("$map_dir/$filename", O_RDONLY)
-                or die "$map_dir/$filename: $! (after drawing map)";
-    } elsif (!$f) {
-        die "$map_dir/$filename: $!";
-    }
-
-    # Map already exists, so emit it. We can't redirect as we may be
-    # running on >1 server.
-    my $st = stat($f);
-
-    print $q->header(
-                -type => 'image/png',
-                -content_length => $st->size(),
-                -expires => '+20m'
-            );
-    binmode(STDOUT, ':bytes');
-    binmode($f, ':bytes');
-    my $buf;
-    my $n = 0;
-    while ($n < $st->size()) {
-        my $m = $f->read($buf, 65536, 0);
-        if (!defined($m)) {
-            die "$map_dir/$filename: $!";
-        } elsif ($m == 0) {
-            last;
-        } else {
-            $n += $m;
+        throw PB::Error("Unknown pledge_id '$pledge_id'") 
+        if (!$P);
+        if (defined($P->{pin})) {
+            # Don't bother producing the graph: it's only of use as an inline
+            # image, and we don't want to expose the PIN in that.
+            # XXX if you remove this, then add an actual check for the PIN as
+            # well!
+            throw PB::Error("Permission denied");
         }
-        print $buf;
-    }
-    $f->close();
+        throw PB::Error("Pledge '$pledge_id' is not byarea pledge") 
+            if ($P->{'target_type'} ne 'byarea');
+
+        my $pins = dbh()->selectall_arrayref('
+            select 
+                max(latitude) as lat, 
+                max(longitude) as lon, 
+                max(whensucceeded) as succeeded, 
+                count(*) as count
+            from byarea_location 
+            left join location on byarea_location.byarea_location_id = location.id
+            left join signers on byarea_location.byarea_location_id = signers.byarea_location_id
+            where byarea_location.pledge_id = ?
+            group by byarea_location.byarea_location_id', {}, $pledge_id);
+
+        my $filename = $P->{ref} . "-" . $P->{lastchange} . ".png";
+        my $f = new IO::File("$map_dir/$filename", O_RDONLY);
+        
+        if (!$f && $!{ENOENT}) {
+            my ($fh, $temp) = tempfile($P->{ref} . "XXXXXX", DIR => $map_dir);
+            create_image($temp, $P, $pins);
+            rename $temp, "$map_dir/$filename";
+            $f = new IO::File("$map_dir/$filename", O_RDONLY)
+                    or die "$map_dir/$filename: $! (after drawing map)";
+        } elsif (!$f) {
+            die "$map_dir/$filename: $!";
+        }
+
+        # Map already exists, so emit it. We can't redirect as we may be
+        # running on >1 server.
+        my $st = stat($f);
+
+        print $q->header(
+                    -type => 'image/png',
+                    -content_length => $st->size(),
+                    -expires => '+20m'
+                );
+        binmode(STDOUT, ':bytes');
+        binmode($f, ':bytes');
+        my $buf;
+        my $n = 0;
+        while ($n < $st->size()) {
+            my $m = $f->read($buf, 65536, 0);
+            if (!defined($m)) {
+                die "$map_dir/$filename: $!";
+            } elsif ($m == 0) {
+                last;
+            } else {
+                $n += $m;
+            }
+            print $buf;
+        }
+        $f->close();
     } catch PB::Error with {
         my $E = shift;
         my $t = $E->text();

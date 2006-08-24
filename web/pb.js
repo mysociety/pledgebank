@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.32 2005-12-13 18:56:37 matthew Exp $
+ * $Id: pb.js,v 1.33 2006-08-24 11:11:15 francis Exp $
  * 
  */
 
@@ -227,4 +227,26 @@ function toggleNewModifyFAQ() {
     } else
         return true
 }
+
+function byarea_town_keypress(thi) {
+    if (!document)
+        return
+    c = document.getElementById('country')
+    if (!c)
+        return
+    xmlhttp = mySociety.asyncRequest("GET", "http://pledgebank.owl/ajax-gaze.php?" + 
+                "country=" + encodeURIComponent(c.value) + 
+                "&place=" + encodeURIComponent(thi.value), 
+        function() {
+            if (xmlhttp.readyState==4) {
+                var d = document.getElementById('byarea_town_ajax');
+                if (d)
+                    d.innerHTML = xmlhttp.responseText;
+                else
+                    alert('not found byarea_town_ajax')
+            }
+        });
+}
+
+
 

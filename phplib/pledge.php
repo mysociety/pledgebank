@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.200 2006-08-21 12:34:47 francis Exp $
+ * $Id: pledge.php,v 1.201 2006-08-24 11:11:14 francis Exp $
  * 
  */
 
@@ -642,14 +642,15 @@ class Pledge {
                 gaze_controls_print_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true));
             } else {
 ?>            <p><input type="hidden" name="prev_country" value="<?=$this->country_code()?>"> 
-              <input type="hidden" name="country" value="<?=$this->country_code()?>"> <?
+              <input type="hidden" name="country" id="country" value="<?=$this->country_code()?>"> <?
             }
 ?>
 <span style="white-space: nowrap"><strong><?=_('Your town:')?>
-&nbsp;<input type="text" size="20" name="place" value="<?=htmlspecialchars(get_http_var("place"))?>" <?=array_key_exists('place', $errors) ? ' class="error"' : ''?> ></strong></span>
+&nbsp;<input <? /* onkeypress="byarea_town_keypress(this)" */?> type="text" size="20" name="place" value="<?=htmlspecialchars(get_http_var("place"))?>" <?=array_key_exists('place', $errors) ? ' class="error"' : ''?> ></strong></span>
                 <? if (!$this->is_global()) { ?>
 <br><small><?=sprintf(_('(%s only)'), $this->h_country_no_state())?></small>
                 <? } 
+?> <div id="byarea_town_ajax"></div> <?
         }
         print '
     <p><strong>' . _('Your email') . '</strong>: <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.

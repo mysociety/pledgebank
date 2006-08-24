@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.9 2006-08-18 15:18:15 matthew Exp $
+// $Id: gaze-controls.php,v 1.10 2006-08-24 11:11:14 francis Exp $
 
 // TODO: 
 // - Probably remove the get_http_var calls for prev_country and prev_place
@@ -17,6 +17,8 @@
 
 // The parameter "townonly" indicates that a location must be entered by
 // the name of a town/place rather than a postcode.
+
+$gaze_controls_nearby_distance = 10;
 
 function gaze_controls_find_places($country, $state, $query, $maxresults = null, $minscore = null) {
     $ret = gaze_find_places($country, $state, $query, $maxresults, $minscore);
@@ -79,7 +81,7 @@ function gaze_controls_print_country_choice($selected_country, $selected_state, 
         printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($selected_country));
 
 ?>
-<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> name="country" onchange="update_place_local(this, true)">
+<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> name="country" id="country" onchange="update_place_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
 <? if (!array_key_exists('noglobal', $params)) { ?>
   <option value="Global"<? if ($selected_country=='Global') print ' selected'; ?>><?=_('Not specific to any location') ?></option>
@@ -293,7 +295,7 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
         $errors['gaze_place'] = "NOTICE";
     }
     if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == "NOTICE") {
-        $places = gaze_controls_find_places($location['country'], $location['state'], $location['place'], 10, 0);
+        $places = gaze_controls_find_places($location['country'], $location['state'], $location['place'], $gaze_controls_nearby_distance, 0);
         list ($have_exact, $anymatches) = _gaze_controls_exact_match($places, $location['place']);
         if ($have_exact) {
             list($desc, $radio_name) = gaze_controls_get_place_details($have_exact);
@@ -316,7 +318,7 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
     $location['places'] = null;
     if ($location['place']) {
         // Look up nearby places
-        $location['places'] = gaze_controls_find_places($location['country'], $location['state'], $location['place'], 10, 0);
+        $location['places'] = gaze_controls_find_places($location['country'], $location['state'], $location['place'], $gaze_controls_nearby_distance, 0);
         if (array_key_exists('gaze_place', $errors)) {
             if (count($location['places']) > 0) {
                 // message printed in gaze_controls_print_place_choice

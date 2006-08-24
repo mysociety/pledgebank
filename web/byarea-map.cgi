@@ -8,12 +8,14 @@
 
 # Country shape data files from Centers for Disease Control and Prevention (CDC): 
 # http://www.cdc.gov/epiinfo/shape.htm
+# To be exact, this file:
+# http://www.cdc.gov/epiinfo/shape/Cntry00.zip
 
 # TODO: Polyline simplification to speed up Canada
 #       http://geometryalgorithms.com/Archive/algorithm_0205/
 # Cross reference country names to ISO codes http://ws.geonames.org/countryInfo?
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.8 2006-08-24 11:11:15 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.9 2006-08-24 12:44:51 francis Exp $';
 
 my $bitmap_size = 300;
 my $margin_extra = 0.05;

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.201 2006-08-24 11:11:14 francis Exp $
+ * $Id: pledge.php,v 1.202 2006-08-24 12:17:12 francis Exp $
  * 
  */
 
@@ -642,7 +642,7 @@ class Pledge {
                 gaze_controls_print_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true));
             } else {
 ?>            <p><input type="hidden" name="prev_country" value="<?=$this->country_code()?>"> 
-              <input type="hidden" name="country" id="country" value="<?=$this->country_code()?>"> <?
+              <input type="hidden" name="country" value="<?=$this->country_code()?>"> <?
             }
 ?>
 <span style="white-space: nowrap"><strong><?=_('Your town:')?>

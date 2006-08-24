@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.10 2006-08-24 11:11:14 francis Exp $
+// $Id: gaze-controls.php,v 1.11 2006-08-24 12:17:12 francis Exp $
 
 // TODO: 
 // - Probably remove the get_http_var calls for prev_country and prev_place
@@ -81,7 +81,7 @@ function gaze_controls_print_country_choice($selected_country, $selected_state, 
         printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($selected_country));
 
 ?>
-<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> name="country" id="country" onchange="update_place_local(this, true)">
+<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> name="country" onchange="update_place_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
 <? if (!array_key_exists('noglobal', $params)) { ?>
   <option value="Global"<? if ($selected_country=='Global') print ' selected'; ?>><?=_('Not specific to any location') ?></option>
@@ -260,6 +260,8 @@ function gaze_controls_get_location($params = array()) {
 # contain the following parameters:
 #   'townonly' - if true only allows lookup by town name, not by postcode.
 function gaze_controls_validate_location(&$location, &$errors, $params = array()) {
+    global $gaze_controls_nearby_distance;
+
     if (!$location['country']) $errors['country'] = _("Please choose a country");
     if (array_key_exists('townonly', $params) && $params['townonly'] && $location['postcode'])
         $errors['postcode'] = _("Please enter a place rather than a postcode for location based pledge signups");

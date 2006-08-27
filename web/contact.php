@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.46 2006-08-09 23:50:00 matthew Exp $
+// $Id: contact.php,v 1.47 2006-08-27 10:41:01 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -148,7 +148,7 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
     $headers = array();
     $headers['From'] = array($email, $name);
 #print "<pre>";    print_r($message . "\n\n" . $postfix);exit;
-    $success = pb_send_email($to, $subject, $message . "\n\n" . $postfix, $headers);
+    $success = pb_send_email($to, $subject, $message . "\n\n-- \n" . $postfix, $headers);
     if (!$success)
         err(_("Failed to send message.  Please try again, or <a href=\"mailto:team@pledgebank.com\">email us</a>."));
     if ($comment_id) 

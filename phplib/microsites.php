@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.42 2006-08-18 15:18:15 matthew Exp $
+ * $Id: microsites.php,v 1.43 2006-08-29 07:51:38 francis Exp $
  * 
  */
 
@@ -263,14 +263,16 @@ function microsites_frontpage_intro() {
 	to the greatest city in the world by 2012.</p>
 	<?
     } elseif ($microsite == 'catcomm') {
-	?><h2>Tell the world &#8220;I&#8217;ll support communities working to solve local problems, but only if you will too!&#8221;</h2>
-    Catalytic Communities (CatComm) develops, inspires and empowers communities
-    worldwide to generate and share their own local solutions.  In front of us
-    we envision a world where community-generated solutions are just a
-    mouse-click away, where anyone, anywhere, confronting a local problem, can
-    find the inspiration and tools they need to implement the solution,
-    learning from their peers. This site is to bring people together, to form a
-    network of support for building this work...
+	?><h2>
+    
+    Tell the world &#8220;I&#8217;ll support communities working to solve local problems, but only if you will too!&#8221;</h2>
+    Catalytic Communities (CatComm) develops, inspires and empowers
+    communities worldwide to generate and share their own local
+    solutions. Imagine a world where community-generated solutions are
+    just a mouse-click away, where anyone, anywhere, confronting a local
+    problem, can find the inspiration and tools they need to implement
+    the solution, learning from their peers. This site brings people
+    together, forming a network of support for building this work...
 	<?
     } else {
         # Main site
@@ -326,47 +328,42 @@ function microsites_frontpage_extra_blurb() {
 ?>
 <div id="extrablurb">
 <h2>About CatComm</h2>
-<p>Catalytic Communities (CatComm) is a Brazilian charitable
-organization (also founded in the USA) to develop, inspire and
-empower communities worldwide to generate and share their own local
-solutions.  Over six years working closely with 950+ local leaders in
-over 150 neighborhoods and squatter communities across Rio de
-Janeiro, we have developed a local network of community solutions and
-exchange through our "Casa" community technology hub.  Located in
-downtown Rio, the "Casa" is CatComm's space for local leaders to come
-together, host workshops, explore partnerships, share contacts,
-ideas, and resources, and utilize the Internet in support of local
-efforts.  Learning from these community leaders, CatComm has, during
-this period, developed an online presence through <a
-href="http://www.catcomm.org/">www.catcomm.org</a>, where we host our unique
-Community Solutions Database.  Any community, anywhere in the world, can share
-what it's doing to address local problems through the CSD,
-simply by clicking through and filling out our questionnaire.  A
-network of volunteer translators then translates these projects
-between English, Portuguese and Spanish.  Over 22,000 people from 65
-countries visit our website monthly to learn from community projects
-now posted from countries on 4 continents."
+<p>Catalytic Communities (www.catcomm.org) leverages peer-to-peer
+support by gathering community leaders together to make change in
+communities around the world. The organization offers, online and in
+three languages (Portuguese, English and Spanish) a unique Community
+Solutions Database, featuring over 125 community programs from 9
+countries and visited by over 20,000 people each month. "Leaders in
+squatter communities around the world don't have to reinvent the
+wheel if they can locate and learn from peers elsewhere who've
+tackled significant challenges like sewerage, unemployment, and HIV,"
+explains Executive Director Theresa Williamson. They also run a
+community technology center, the "Casa" in downtown Rio de Janeiro
+that serves as a space for exchange among local leaders.</p>
+
+<p>To learn more: visit our <a href="http://www.catcomm.org/">homepage</a>,
+<a href="http://casacomcat.blogspot.com/">Casa Blog</a>, and latest
+<a href="http://www.comcat.org/articles/e-news/english/02.htm">e-newsletter</a>.
+</p>
+
 <h2>You can help!</h2>
-Constantly working to improve our site and the Casa so that they may serve an
-increasing number of communities in creative and powerful ways, CatComm has
-launched this page, thanks to a partnership with PledgeBank, where you can post
-your own pledge in support of communities working to solve local
-problems, worldwide!
+
+<p>Thanks to a partnership with PledgeBank,  you can post your own
+pledge in support of communities working to solve local problems, worldwide!</p>
+
 <ul>
-   <li>         Pledge your financial commitment to grow this effort
-and leverage your pledge to get others to join you! (Be a CatComm Champion!)
-   <li>         Pledge to provide tools and build capacity in support
-of specific community projects that excite you, but only if others do, too!
-   <li>         Pledge to bring exposure to local solutions from your
-area by posting them in the Community Solutions Database, if others will,
-too!
-   <li>         Pledge to research and reach out to community
-solutions in regions still uncovered by the CatComm site, if others
-will join you!
-   <li>         Pledge to translate community projects into languages
-where they could be inspirational, , if others do, too!
+<li> Pledge your financial commitment to grow this effort and
+leverage your pledge to get others to join you! (Be a CatComm Champion!)</li>
+<li> Pledge to provide tools and build capacity in support of
+specific community projects that excite you, but only if others do, too!</li>
+<li> Pledge to bring exposure to local solutions from your area by
+posting them in the Community Solutions Database, if others will, too!</li>
+<li> Pledge to research and reach out to community solutions in
+regions still uncovered by the CatComm site, if others will join you!</li>
+<li> Pledge to translate community projects into languages where
+they could be inspirational, if others do, too!</li>
 </ul>
-   Be creative!  Go nuts!
+
 </div>
 
 <?

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.150 2006-08-18 11:38:38 francis Exp $
+// $Id: new.php,v 1.151 2006-08-30 14:09:10 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -623,8 +623,6 @@ function preview_error_check($data) {
 }
 
 function preview_pledge($data, $errors) {
-    global $countries_code_to_name, $countries_statecode_to_name;
-
     $v = 'all';
     if (isset($data['visibility'])) {
         $v = $data['visibility']; if ($v!='pin') $v = 'all';

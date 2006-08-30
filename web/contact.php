@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.47 2006-08-27 10:41:01 matthew Exp $
+// $Id: contact.php,v 1.48 2006-08-30 13:57:36 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -17,6 +17,15 @@ require_once '../../phplib/utility.php';
 $params = array();
 if (get_http_var('ref') || get_http_var('pledge_id') || get_http_var('comment_id'))
     $params['robots']='noindex,nofollow';
+
+$pledge_id = get_http_var('pledge_id');
+$comment_id = get_http_var('comment_id');
+if (isset($pledge_id) && !preg_match('/^[1-9]\d*$/', $pledge_id)
+    || isset($comment_id) && !preg_match('/^[1-9]\d*$/', $comment_id)) {
+    header("Location: /");
+    exit();
+}
+    
 page_header(_("Contact Us"), $params);
 
 if (get_http_var('contactpost')) {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.148 2006-08-18 15:18:15 matthew Exp $
+// $Id: fns.php,v 1.149 2006-08-30 17:23:32 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -377,34 +377,47 @@ function pb_print_filter_link_main_general($attrs = "") {
     $langname = $langs[$lang];
 
     if ($microsite) {
+        print "<p $attrs>";
         if ($microsite == 'everywhere') 
-            print "<p $attrs>". sprintf(_('%s (%s) pledges listed'), microsites_get_name(), $change_country). "</p>";
+            printf(_('%s (%s) pledges listed'), microsites_get_name(), $change_country);
         else 
-            print "<p $attrs>". sprintf(_('%s (%s) pledges only listed'), microsites_get_name(), $change_country). "</p>";
+            printf(_('%s (%s) pledges only listed'), microsites_get_name(), $change_country);
+        print '</p>';
     }
     else {
+        print "<p $attrs>";
         # TRANS: Worth thinking about word order here. The English reads e.g. "UK (change country) pledges and global English (change language) pledges listed. Even in English, and certainly in other languages, it'd probably be clearer as something like: "Listed below are pledges for the UK (change country) and global pledges written in English (change language)." (Tim Morley, 2005-11-27)
         if ($site_country)
-            print "<p $attrs>".sprintf(_('%s (%s) pledges and global %s (%s) pledges listed'), pb_site_country_name(), $change_country, $langname, $change_language) . "</p>";
+            printf(_('%s (%s) pledges and global %s (%s) pledges listed'), pb_site_country_name('in'), $change_country, $langname, $change_language);
         else
-            print "<p $attrs>".sprintf(_('%s (%s) pledges in %s (%s) only listed'), pb_site_country_name(), $change_country, $langname, $change_language) . "</p>";
+            printf(_('%s (%s) pledges in %s (%s) only listed'), pb_site_country_name('in'), $change_country, $langname, $change_language);
+        print '</p>';
     }
 }
 
 function pb_print_no_featured_link() {
     $change = pb_get_change_country_link();
-    print '<p>' . sprintf(_('There are no featured pledges for %s (%s) at the moment.'),pb_site_country_name(), $change);
+    print '<p>';
+    printf(_('There are no featured pledges for %s (%s) at the moment.'), pb_site_country_name('to'), $change);
     print '</p>';
 }
 
 /* pb_site_country_name
  * Returns name of site/microsite to display next to PledgeBank logo. */
-function pb_site_country_name() {
+function pb_site_country_name($fr_prep = '') {
     global $countries_code_to_name, $site_country, $microsite; 
     if ($microsite)
         return microsites_get_name();
-    else
-        return $site_country ? $countries_code_to_name[$site_country] : 'Global';
+    elseif (!$site_country)
+        return 'Global';
+    else {
+        if ($fr_prep == 'to')
+            return countries_with_to($site_country);
+	elseif ($fr_prep == 'in')
+            return countries_with_in($site_country);
+	else
+            return $countries_code_to_name[$site_country];
+    }
 }
 
 // Return SQL fragment which guesses as to what the number of signers will

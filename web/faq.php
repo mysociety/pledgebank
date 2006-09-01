@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.42 2006-08-24 10:49:00 matthew Exp $
+// $Id: faq.php,v 1.43 2006-09-01 22:13:00 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -135,7 +135,6 @@ Edmund von der Burg,
 James Cronin,
 Francis Irving,
 Chris Lightfoot,
-Tom Loosemore, 
 Etienne Pollard,
 Richard Pope,
 Matthew Somerville,

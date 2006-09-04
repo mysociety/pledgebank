@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.139 2006-08-07 13:32:34 francis Exp $
+ * $Id: admin-pb.php,v 1.140 2006-09-04 09:16:21 francis Exp $
  * 
  */
 
@@ -527,7 +527,7 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
     function update_microsite($pledge_id) {
         global $microsites_list;
         $new_microsite = get_http_var('microsite');
-        if (!$new_microsite) {
+        if (!$new_microsite || $new_microsite == '(none)') {
             db_query('UPDATE pledges set microsite = null where id = ?', array($pledge_id));
         } else {
             if (!array_key_exists($new_microsite, $microsites_list)) {

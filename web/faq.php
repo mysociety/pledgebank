@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.43 2006-09-01 22:13:00 timsk Exp $
+// $Id: faq.php,v 1.44 2006-09-05 14:39:45 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -201,7 +201,7 @@ set this cap of maximum subscribers. We can raise the cap for individuals and
 organisations who ask - just contact us if you want to launch a bigger pledge."));
 */
 
-print dt(_('Why does my new pledge not appear on the All Pledges page?'));
+print dt('<a name="allpledges">'._('Why does my new pledge not appear on the All Pledges page?').'</a>');
 
 print dd(_("New pledges have just their own page, and are not shown elsewhere on
 the site, until a few people have signed up to them. This is to make

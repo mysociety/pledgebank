@@ -4,14 +4,13 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.10 2006-07-27 18:07:06 francis Exp $
+# $Id: crontab.ugly,v 1.11 2006-09-10 22:34:22 francis Exp $
 
 PATH=/usr/local/bin:/usr/bin:/bin
 MAILTO=team@pledgebank.com
 
 # Frequently
 0-59/20 * * * * !!(*= $user *)!! !!(*= $randomly *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate || echo "stalled?"
-0-59/15 * * * * !!(*= $user *)!! !!(*= $randomly *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts || echo "stalled?"
 
 # Once an hour
 33 * * * * !!(*= $user *)!! !!(*= $only_one *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "stalled?" )
@@ -20,4 +19,5 @@ MAILTO=team@pledgebank.com
 
 # Once a day, early morning
 0 7 * * * !!(*= $user *)!! !!(*= $only_one *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts
+0 8 * * * !!(*= $user *)!! !!(*= $randomly *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts || echo "stalled?"
 

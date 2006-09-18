@@ -9,8 +9,8 @@
  */
 
 var translation = {
-"(choose one)":"(elektu unu)",
 "Town:":"Urbo:",
+"(choose one)":"(elektu unu)",
 "other local people":"aliaj lokaj personoj",
 "<Enter your name>":"<Entajpu vian nomon>",
 "<Enter your pledge>":"<Entajpu vian promeson>",

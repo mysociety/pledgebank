@@ -9,8 +9,8 @@
  */
 
 var translation = {
-"(choose one)":"(dewiswch un)",
 "Town:":"Tref:",
+"(choose one)":"(dewiswch un)",
 "other local people":"o bobl lleol eraill",
 "<Enter your name>":"<Rhowch eich enw yma>",
 "<Enter your pledge>":"<Rhowch eich addewid yma>",

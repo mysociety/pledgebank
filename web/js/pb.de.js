@@ -9,8 +9,8 @@
  */
 
 var translation = {
-"(choose one)":"(eins auswählen)",
 "Town:":"Stadt",
+"(choose one)":"(eins auswählen)",
 "other local people":"andere Menschen aus dem gleichen Ort",
 "<Enter your name>":"<IHR NAME>",
 "<Enter your pledge>":"<Geben Sie Ihr Versprechen ein>",

@@ -6,11 +6,9 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.11 2006-08-24 12:17:12 francis Exp $
+// $Id: gaze-controls.php,v 1.12 2006-09-18 22:07:52 matthew Exp $
 
 // TODO: 
-// - Probably remove the get_http_var calls for prev_country and prev_place
-// in gaze_controls_validate_location
 // - Adapt this so it can be in global phplib for use on other sites
 // - All the NOTICE stuff in other files is a bit messy - replace at least with 
 //   gaze_control_ functions here which check $errors arrays
@@ -293,7 +291,10 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
             $errors['place'] = _("Please enter a place name");
         }
     }
-    if ($location['place'] && ($location['country'] != get_http_var('prev_country') || $location['place'] != get_http_var('prev_place'))) {
+
+    $prev_country = isset($location['prev_country']) ? $location['prev_country'] : get_http_var('prev_country');
+    $prev_place = isset($location['prev_place']) ? $location['prev_place'] : get_http_var('prev_place');
+    if ($location['place'] && ($location['country'] != $prev_country || $location['place'] != $prev_place)) {
         $errors['gaze_place'] = "NOTICE";
     }
     if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == "NOTICE") {

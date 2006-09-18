@@ -2,12 +2,12 @@
 /* 
  * pbcli.php:
  * Include file for PHP CLI scripts for PledgeBank.
- # Use pb.php instead for web pages.
+ * Use pb.php instead for web pages.
  *
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: pbcli.php,v 1.3 2006-08-14 11:32:21 francis Exp $
+ * $Id: pbcli.php,v 1.4 2006-09-18 12:37:18 francis Exp $
  *
  */
 

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.203 2006-08-04 15:45:27 francis Exp $
+-- $Id: schema.sql,v 1.204 2006-09-19 14:22:35 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -237,6 +237,7 @@ create trigger pledges_changetime_trigger after update on pledges
 
 -- Index by reference.
 create unique index pledges_ref_idx on pledges(ref);
+create unique index pledges_lower_ref_idx on pledges(lower(ref));
 
 -- Make connections-finding faster.
 create index pledges_person_id_idx on pledges(person_id);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.135 2006-08-24 11:11:14 francis Exp $
+// $Id: page.php,v 1.136 2006-09-19 14:27:25 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -382,7 +382,7 @@ function page_cache_headers($params) {
 function page_check_ref($ref) {
     if (!is_null(db_getOne('select ref from pledges where ref = ?', $ref)))
         return;
-    else if (!is_null(db_getOne('select ref from pledges where ref ilike ?', $ref)))
+    else if (!is_null(db_getOne('select ref from pledges where lower(ref) = ?', strtolower($ref))))
         /* Note that this fuzzy match will only happen when the alternative
          * case is first typed in , as ref-index.php does a redirect to the
          * URL with the correct case. */

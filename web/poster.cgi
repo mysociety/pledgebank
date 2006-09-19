@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.80 2006-08-16 10:20:21 francis Exp $
+# $Id: poster.cgi,v 1.81 2006-09-19 14:27:26 chris Exp $
 #
 
 import sys
@@ -560,7 +560,7 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, target_type, signup, pin, identity, detail, country, lang FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE ref ILIKE %s', ref)
+        q.execute('SELECT title, date, name, type, target, target_type, signup, pin, identity, detail, country, lang FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE lower(ref) = %s', ref)
         row = q.fetchone()
         if not row:
             raise Exception, "Unknown ref '%s'" % ref

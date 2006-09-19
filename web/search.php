@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.57 2006-08-16 08:37:06 francis Exp $
+// $Id: search.php,v 1.58 2006-09-19 14:27:26 chris Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -234,7 +234,7 @@ function search($search) {
                          identity ILIKE \'%\' || ? || \'%\' OR 
                          type ILIKE \'%\' || ? || \'%\' OR 
                          ref ILIKE \'%\' || ? || \'%\')
-                    AND ref NOT ILIKE ?
+                    AND lower(ref) <> ?
                 ORDER BY date DESC', array($search, $search, $search, $search, $search, $search));
     $closed = ''; $open = '';
     if (db_num_rows($q)) {

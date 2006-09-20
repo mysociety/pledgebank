@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.44 2006-08-30 17:23:32 matthew Exp $
+ * $Id: microsites.php,v 1.45 2006-09-20 12:09:59 francis Exp $
  * 
  */
 
@@ -327,7 +327,7 @@ function microsites_frontpage_extra_blurb() {
 ?>
 <div id="extrablurb">
 <h2>About CatComm</h2>
-<p>Catalytic Communities (www.catcomm.org) leverages peer-to-peer
+<p>Catalytic Communities (<a href="http://www.catcomm.org">www.catcomm.org</a>) leverages peer-to-peer
 support by gathering community leaders together to make change in
 communities around the world. The organization offers, online and in
 three languages (Portuguese, English and Spanish) a unique Community

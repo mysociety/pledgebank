@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.198 2006-09-21 09:15:23 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.199 2006-09-21 10:40:05 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -133,7 +133,8 @@ our $sms_in_url = mySociety::Config::get('PB_SMS_C360_INCOMING_URL');
 our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
 our $email_domain = mySociety::Config::get('EMAIL_DOMAIN');
 our $contact_email = mySociety::Config::get('CONTACT_EMAIL');
-sub email_n { my $n = shift; return "pbharness+$n\@$email_domain"; }
+our $test_email_prefix = mySociety::Config::get('TEST_EMAIL_PREFIX');
+sub email_n { my $n = shift; return "$test_email_prefix+$n\@$email_domain"; }
 sub name_n { my $n = shift; return ($n % 100  == 0) ? "Peter Setter $n" : "Siegfried Signer $n"; }
 sub mobile_n { my $n = shift; return "9876543$n"; }
 sub password_n { my $n = shift; return "mypass$n"; }

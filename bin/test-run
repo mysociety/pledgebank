@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.197 2006-08-18 13:06:40 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.198 2006-09-21 09:15:23 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -170,7 +170,9 @@ $wth->database_connect('PB_');
 $wth->database_drop_reload('../db/schema.sql');
 $wth->database_load_schema('../db/ican-categories.sql');
 $wth->database_cycle_sequences(200);
-$wth->email_setup({ eveld_bin => "$FindBin::Bin/../../services/EvEl/bin/eveld",
+my $eveld_bin = "$FindBin::Bin/../../services/EvEl/bin/eveld";
+$eveld_bin = undef if ! -e $eveld_bin; # when running on servers rely on EvEl daemon, rather than calling EvEl binary directly XXX need more explicit way of distinguishing this case, than just checking evel isn't checked out in the same tree
+$wth->email_setup({ eveld_bin => $eveld_bin,
                     eveld_multispawn => $multispawn,
                     log_mailbox => "log_mailbox" });
 $wth->browser_set_validator("/usr/bin/validate");

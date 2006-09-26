@@ -1,0 +1,86 @@
+Geocascading pledges
+====================
+
+1. Pledge page comprehensibility
+--------------------------------
+
+Work on way pledges are worded, so what they mean (i.e. that they template
+across areas) is immediately clear
+
+Finish the map display on ref-index (country code cross lookup, mainly)
+
+
+2. Place selection
+------------------
+
+Experiment more with AJAX gaze search while typing
+Try offering mixed list of matching places and nearby signed up places
+Maybe show list of nearby places when given postcode
+Generally - make it possible to browse places so you can find the suitable one you want to choose
+(this stuff is hard in London, as there are lots of possible places, and Gaze doesn't have them all)
+
+Generally - make it easy to hunt for a place near you if you can't find one immediately. 
+Specifically, make it possible to undo a wrong choice (if you enter "Highbury" it takes
+you straight through, even though you were just experimenting to see if it was right)
+
+
+3. What happens on success / failure
+------------------------------------
+
+Extra announce message - must give choice of sending to successful or failed towns?
+Make creator not get zillions of failure message
+Preserve text for second and subsequent success message fields
+
+Upon failure, tell signers which nearby towns succeeded
+
+Brainstorm better way of linking people up upon success
+
+In "Pledge failed in Highbury" text, add link to local part of pledge so 
+can see who else signed it there (if anyone did)
+
+Success email to signers, it is not clear:
+1) How many other people signed it locally for the pledge to have
+reached the success threshold.
+2) What the total number of signers (15) has to do with the local success.
+
+
+Other things to do
+------------------
+
+Add to "new pledges" interface
+* Don't allow local pledges to be byarea, although country ones can be
+
+send-local-alerts can be mega fancy, alerting to new signers of pledges near you
+
+Check how pledges with a PIN behave
+
+Someone asked to be signed up in two areas at once (with same email)
+
+
+Bugs
+----
+
+If you enter Holloway, and you are logged in, it signs the thing immediately
+without the option of you choosing.
+
+It says NOTICE in the local alert signup box when you enter really silly
+place name with no matches e.g. lkj
+
+Make signing instantly change whensucceeded?
+    and do vice versa for the normal pledges
+
+Say explicitly that your place will be made public 
+
+Show country in top message (TODO in gaze_controls_print_places_choice)
+
+Sorting:
+    it's the number 1 pledge on http://www.pledgebank.com/list - presumably because the target is 0?
+
+Close to in name of place gets stored rather than translated 
+e.g. "Bolton, Bolton (proksime al Bromley)"
+
+"This is a copy of the message you have just sent to everyone=0A= who signed your pledge"
+     should say "in $town" for byarea messages
+
+chris: also, why isn't the local alerts ad on ref-sign pre-filled with the location info i've just entered?
+

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.49 2006-08-30 14:09:10 matthew Exp $
+// $Id: contact.php,v 1.50 2006-09-27 10:13:06 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -72,7 +72,8 @@ function contact_form($errors = array()) {
         print _('Was it useful?  How could it be better?
     We make PledgeBank and thrive off feedback, good and bad.
     Use this form to contact us.');
-        printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . OPTION_CONTACT_EMAIL . '">' . OPTION_CONTACT_EMAIL . '</a>');
+        $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
+        printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
         print "</p>";
     }
 
@@ -159,7 +160,7 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
 #print "<pre>";    print_r($message . "\n\n" . $postfix);exit;
     $success = pb_send_email($to, $subject, $message . "\n\n-- \n" . $postfix, $headers);
     if (!$success)
-        err(_("Failed to send message.  Please try again, or <a href=\"mailto:team@pledgebank.com\">email us</a>."));
+        err(_("Failed to send message.  Please try again, or <a href=\"mailto:team&#64;pledgebank.com\">email us</a>."));
     if ($comment_id) 
         print p(_('<strong>Thank you!</strong> One of our team will investigate that comment as soon as possible'));
     else 

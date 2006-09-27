@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.151 2006-08-30 14:09:10 matthew Exp $
+// $Id: new.php,v 1.152 2006-09-27 10:13:06 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -530,7 +530,7 @@ function step1_error_check($data) {
         $errors['date'] = sprintf(_('Please change your deadline so it is less than %d years into the
         future. You must change the deadline in order to proceed with creating
         your pledge. If you want a longer deadline, please create your pledge
-        with a short deadline, and drop us an email to <a href="mailto:team@pledgebank.com">team@pledgebank.com</a>
+        with a short deadline, and drop us an email to <a href="mailto:team&#64;pledgebank.com">team&#64;pledgebank.com</a>
         asking for an alteration.'), $deadline_limit_years);
 
     if (!$data['name']) $errors['name'] = _('Please enter your name');

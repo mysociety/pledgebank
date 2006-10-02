@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.83 2006-10-02 08:34:20 matthew Exp $
+# $Id: poster.cgi,v 1.84 2006-10-02 09:08:41 matthew Exp $
 #
 
 import sys
@@ -158,6 +158,9 @@ def rtf_repr(s):
     for i in re.findall('\u([0-9a-f]{4})', s):
         dec = int(i, 16)
         s = re.sub('\\\u%s' % i, '\u%s?' % dec, s) # I don't quite understand why so many slashes, but it works
+    for i in re.findall(r'\\x([0-9a-f]{2})', s):
+        dec = int(i, 16)
+	s = re.sub(r'\\x%s' % i, '\u%s?' % dec, s)
     return s
 
 def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):

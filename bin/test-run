@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.201 2006-10-03 17:23:41 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.202 2006-10-03 17:30:37 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -165,13 +165,15 @@ $wth->log_watcher_setup($httpd_error_log);
 # Specify URL as first parameter, will browse to it and store it as the new
 # locale base URL to use. Otherwise specify no URL, and the current one
 # is used.
-our $locale_url = $base_url;
+our $locale_url = $base_url; # including country code
+our $locale_url_redirected = $base_url; # after country codes are redirected out into cookie
 sub lock_locale_url { 
     my $new_url = shift;
     $wth->browser_get($new_url) if $new_url;
     $new_url = $wth->browser_uri() if !$new_url;
     print "lock_locale_url browser URL is $new_url\n" if $verbose > 1;
     $locale_url = $new_url;
+    $locale_url_redirected = $wth->browser_uri();
 }
 
 $wth->database_connect('PB_');
@@ -726,7 +728,7 @@ sub do_public_succeeding_pledge {
     $wth->log_watcher_check();
     for (my $i = 10; $i <= 13; $i++) {
         my $content = $wth->email_get_containing('%To: '.email_n($i).'%thought%you%would%be%');
-        $content =~ m#$locale_url/$pledge_ref# or die "Failed to find pledge link $locale_url in friend email";
+        $content =~ m#$locale_url_redirected/$pledge_ref# or die "Failed to find pledge link $locale_url_redirected in friend email";
         $content =~ m#$friend_message# or die "Failed to find message in friend email";
         $content =~ m## or die "Failed to find pledge link in friend email";
     }

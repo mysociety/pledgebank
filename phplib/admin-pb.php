@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.141 2006-09-19 14:27:25 chris Exp $
+ * $Id: admin-pb.php,v 1.142 2006-10-03 13:51:36 matthew Exp $
  * 
  */
 
@@ -225,7 +225,7 @@ class ADMIN_PAGE_PB_MAIN {
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id 
             LEFT JOIN location ON location.id = pledges.location_id
-            WHERE lower(ref) = ?', $pledge);
+            WHERE lower(ref) = ?', strtolower($pledge));
         $pdata = db_fetch_array($q);
         if (!$pdata) {
             print sprintf("Pledge '%s' not found", htmlspecialchars($pledge));

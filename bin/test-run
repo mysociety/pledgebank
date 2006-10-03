@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.200 2006-10-03 14:58:22 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.201 2006-10-03 17:23:41 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -162,12 +162,16 @@ print "Set up web test harness...\n" if $verbose > 0;
 our $wth = new mySociety::WebTestHarness();
 $wth->log_watcher_setup($httpd_error_log);
 
+# Specify URL as first parameter, will browse to it and store it as the new
+# locale base URL to use. Otherwise specify no URL, and the current one
+# is used.
 our $locale_url = $base_url;
 sub lock_locale_url { 
-    print "lock_locale_url browser URL is " . $wth->browser_uri() . "\n" if $verbose > 1;
-    $wth->browser_uri() =~ m#^(http://[^/]+)/?#; 
-    $locale_url = $1;
-    print "lock_locale_url URL is " . $locale_url . "\n" if $verbose > 1;
+    my $new_url = shift;
+    $wth->browser_get($new_url) if $new_url;
+    $new_url = $wth->browser_uri() if !$new_url;
+    print "lock_locale_url browser URL is $new_url\n" if $verbose > 1;
+    $locale_url = $new_url;
 }
 
 $wth->database_connect('PB_');
@@ -600,9 +604,8 @@ sub do_unconfirmed_pledge {
 #############################################################################
 sub do_public_succeeding_pledge {
     # Change to US (link on /where not there yet, as no pledges)
-    $wth->browser_get("http://us.$stub_url");
+    lock_locale_url("http://us.$stub_url");
     $wth->browser_follow_link(text_regex => qr/Home/);
-    lock_locale_url();
 
     # Sign up to local alert
     $wth->browser_get($locale_url);
@@ -868,8 +871,7 @@ sub do_public_succeeding_pledge {
     $wth->email_check_none_left();
 
     # Change back to global
-    $wth->browser_get($base_url);
-    lock_locale_url();
+    lock_locale_url($base_url);
 }
 
 #############################################################################
@@ -1342,15 +1344,14 @@ sub do_login_tests {
 #############################################################################
 sub do_category_tests {
     set_pb_date('1984-01-01');
-    $wth->browser_get($base_url);
-    lock_locale_url();
+    lock_locale_url($base_url);
 
     # Make Portuguese language pledge
     my $pledge_action_portuguese = 'learn to speak Portuguese';
     my $pledge_ref_portugese = "portuguese";
     $wth->browser_get($locale_url);
-    $wth->browser_follow_link(text_regex => qr/Portugu/);
     lock_locale_url();
+    $wth->browser_follow_link(text_regex => qr/Portugu/);
     create_pledge(300, 
         { title => $pledge_action_portuguese, 
             target => '3', type => 'other monoglots', signup => 'do the same',
@@ -1402,8 +1403,7 @@ sub do_category_tests {
 #############################################################################
 sub do_byarea_tests {
     set_pb_date('1984-09-01');
-    $wth->browser_get($base_url);
-    lock_locale_url();
+    lock_locale_url($base_url);
 
     # Make a by area pledge
     my $pledge_action_boo = 'start a group for people who like to shout "boo!"';

@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.202 2006-10-03 17:30:37 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.203 2006-10-04 09:58:21 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -171,9 +171,11 @@ sub lock_locale_url {
     my $new_url = shift;
     $wth->browser_get($new_url) if $new_url;
     $new_url = $wth->browser_uri() if !$new_url;
-    print "lock_locale_url browser URL is $new_url\n" if $verbose > 1;
-    $locale_url = $new_url;
-    $locale_url_redirected = $wth->browser_uri();
+    $new_url =~ m#^(http://[^/]+)/?#; 
+    $locale_url = $1;
+    $wth->browser_base() =~ m#^(http://[^/]+)/?#; 
+    $locale_url_redirected = $1;
+    print "lock_locale_url browser URL is $locale_url, redirected $locale_url_redirected\n" if $verbose > 1;
 }
 
 $wth->database_connect('PB_');

@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.203 2006-10-04 09:58:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.204 2006-10-05 10:27:28 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -161,6 +161,7 @@ our $name_admin = "\"PledgeBank.com\"";
 print "Set up web test harness...\n" if $verbose > 0;
 our $wth = new mySociety::WebTestHarness();
 $wth->log_watcher_setup($httpd_error_log);
+$wth->log_watcher_self_test($base_url . "/test.php?error=1", "deliberate_error_to_test_error_handling");
 
 # Specify URL as first parameter, will browse to it and store it as the new
 # locale base URL to use. Otherwise specify no URL, and the current one
@@ -194,13 +195,6 @@ sms_setup();
 print "Syntax check all PHP files...\n" if $verbose > 0;
 $wth->php_check_syntax("../../pb/");
 $wth->php_check_syntax("../../pb/templates/emails/", qr//);
-
-# Check that we can detect PHP errors
-print "Confirm we can detect errors...\n" if $verbose > 0;
-$wth->log_watcher_check();
-$wth->browser_get($base_url . "/test.php?error=1" );
-my $errors = $wth->log_watcher_get_errors();
-die "Unable to detect errors from PHP" if ($errors !~ m/deliberate_error_to_test_error_handling/);
 
 # Run some pledges through life cycle
 if ($action{'all'}) {
@@ -302,7 +296,6 @@ sub perform_login_action {
                 fields => $login_fields,
                 button => 'SendEmail') or die "Failed to request confirmation email";
             $wth->browser_check_contents(qr/(you'll need to click the link|precisa clicar para poder)/);
-            $wth->log_watcher_check();
         }
 
         # Wait for it to arrive, and extract the link (unless we are suspending request)
@@ -313,7 +306,6 @@ sub perform_login_action {
             die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^\s*(http://.*$)#m);
             $confirmation_url = $1;
             display_url("Email confirmation URL", $confirmation_url);
-            $wth->log_watcher_check();
         }
 
         if ($login_action eq "viaemail" || $login_action eq "resume") {
@@ -333,7 +325,6 @@ sub perform_login_action {
                     button => 'NoPassword') or die "Failed to submit no make password form";
                 }
             }
-            $wth->log_watcher_check();
         } elsif ($login_action eq "abandon" || $login_action eq "suspend") {
             # Deliberately stop without following link
             return; 
@@ -348,7 +339,6 @@ sub perform_login_action {
         $wth->browser_submit_form(form_name => 'login',
             fields => $login_fields,
             button => 'LogIn') or die "Failed to log in with password";
-        $wth->log_watcher_check();
     } elsif ($login_action eq "wrongpassword") {
         $wth->browser_check_contents("I have a PledgeBank <strong>password</strong>");
         $login_fields->{'password'} = "thispassswordisnonsense";
@@ -356,7 +346,6 @@ sub perform_login_action {
             fields => $login_fields,
             button => 'LogIn') or die "Failed to try to log in with password";
         $wth->browser_check_contents("Either your email or password weren't recognised");
-        $wth->log_watcher_check();
     } elsif ($login_action eq "resume") {
         die "Calling function should handle resumes";
     } else {
@@ -393,7 +382,6 @@ sub create_pledge {
 
     # Step 2
     $wth->browser_check_contents(qr/(Step 2|Passo 2)/);
-    $wth->log_watcher_check();
     my $gaze_place;
     if ($page2->{gaze_place}) {
         $gaze_place = $page2->{gaze_place};
@@ -412,7 +400,6 @@ sub create_pledge {
 
     # Step 3
     $wth->browser_check_contents(qr/(Step 3|Passo 3)/);
-    $wth->log_watcher_check();
     $wth->browser_submit_form(form_name => 'pledge',
         fields => $page3,
         button => 'topreview') or die "Failed to submit creating form step 3";
@@ -727,7 +714,6 @@ sub do_public_succeeding_pledge {
             },
         button => 'submit') or die "Failed to submit friend emailing form";
     $wth->browser_check_contents("Thanks very much for spreading the word");
-    $wth->log_watcher_check();
     for (my $i = 10; $i <= 13; $i++) {
         my $content = $wth->email_get_containing('%To: '.email_n($i).'%thought%you%would%be%');
         $content =~ m#$locale_url_redirected/$pledge_ref# or die "Failed to find pledge link $locale_url_redirected in friend email";
@@ -761,7 +747,6 @@ sub do_public_succeeding_pledge {
                 },
         button => 'submit') or die "Failed to submit email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
-    $wth->log_watcher_check();
     call_frequentupdate();
     # Check they all arrived
     $wth->email_get_containing( '%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%Love and kisses%');
@@ -802,7 +787,6 @@ sub do_public_succeeding_pledge {
         # Check got success emails
         my $success_email = $wth->email_get_containing( '%To: '.email_n($i).'%We are pleased to tell you%');
     }
-    $wth->log_watcher_check();
 
     # Wait for reminder message
     set_pb_date('1982-02-04');
@@ -822,7 +806,6 @@ sub do_public_succeeding_pledge {
                            },
         button => 'submit') or die "Failed to submit email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
-    $wth->log_watcher_check();
     call_frequentupdate();
     # Check they all arrived
     for (my $i = 1; $i <= 3; ++$i) {
@@ -922,14 +905,12 @@ sub do_private_failing_pledge {
     # Try to sign up by SMS and fail, as it isn't allowed for private pledges
     sms_fake_to_pledgebank(10, "pledge $pledge_ref");
     die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
-    $wth->log_watcher_check();
     call_smsd();
     my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
     print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
     # Try to sign up by SMS, with partial pledge identifier
     sms_fake_to_pledgebank(10, "pledge rivatepl");
     die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
-    $wth->log_watcher_check();
     call_smsd();
     $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
     print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
@@ -938,14 +919,12 @@ sub do_private_failing_pledge {
     set_pb_date('1980-12-02');
     call_smsd();  # delivery notification
     call_smsd();  # cull done with message
-    $wth->log_watcher_check();
     # Check we don't get any information leaks
     sms_check_none_left();
     # ... in particular there are no new signups
     &$goto_private_pledge_page();
     $wth->browser_check_contents("<i>1 person has signed up");
     $wth->browser_check_no_contents("This pledge is now closed");
-    $wth->log_watcher_check();
  
     print "Checking no leaks of private pledge..." if $verbose > 1;
 
@@ -962,7 +941,6 @@ sub do_private_failing_pledge {
     $wth->browser_get($locale_url . "/rss");
     $wth->browser_check_no_contents($pledge_ref);
     $wth->browser_check_no_contents($pledge_action_private);
-    $wth->log_watcher_check();
 
     # And all its pages require PIN to get to
     # ... email friends page
@@ -976,21 +954,15 @@ sub do_private_failing_pledge {
     # ... individual poster
     $wth->browser_get("$locale_url/flyers/${pledge_ref}_A4_flyers8.pdf");
     $wth->browser_check_contents("Correct PIN needed");
-    $wth->log_watcher_check();
 
     # ... ical calendar entry
-    $wth->browser_get("$locale_url/$pledge_ref/ical");
+    $wth->log_watcher_self_test("$locale_url/$pledge_ref/ical", "Correct PIN required");
     $wth->browser_check_contents("Correct PIN required");
     $wth->browser_check_no_contents($pledge_action_private);
-    my $errors = $wth->log_watcher_get_errors();
-    die if ($errors !~ m/Correct PIN required/);
     # ... sign page
-    $wth->browser_get("$locale_url/$pledge_ref/sign");
+    $wth->log_watcher_self_test("$locale_url/$pledge_ref/sign", "Permission denied");
     $wth->browser_check_contents("Permission denied");
     $wth->browser_check_no_contents($pledge_action_private);
-    $errors = $wth->log_watcher_get_errors();
-    die if ($errors !~ m/Permission denied/);
-    $wth->log_watcher_check();
 
     # Provoke chivvy too few signers email
     set_pb_date('1980-12-07');
@@ -1034,7 +1006,6 @@ sub do_private_failing_pledge {
                             message_sms => "U suk. " . (split(m/ /,name_n(0)))[0]. " x"},
         button => 'submit') or die "Failed to submit email failure form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
-    $wth->log_watcher_check();
     call_frequentupdate();
     my $success_email = $wth->email_get_containing('%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%What a hassle%');
     $success_email = $wth->email_get_containing('%To: '.email_n(1).  '%From: '.name_n(0).  '%What a hassle%');
@@ -1132,7 +1103,6 @@ sub do_sms_pledge {
     for (my $who = 101; $who <= 103; ++$who) {
         sms_fake_to_pledgebank($who, "pledge smsspoof");
         die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
-        $wth->log_watcher_check();
         call_smsd();
         # All first person, as sign up simultaneously
         my $conversion_sms = sms_get_containing(mobile_n($who), "%You are the 1st person to pledge%", 0);
@@ -1145,7 +1115,6 @@ sub do_sms_pledge {
     set_pb_date('1982-03-02');
     call_smsd();  # delivery notification
     call_smsd();  # cull done with message
-    $wth->log_watcher_check();
     # Check signup now appears
     $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_check_contents("<i>3 people have signed up");
@@ -1153,7 +1122,6 @@ sub do_sms_pledge {
     # SMS signup with conversion
     sms_fake_to_pledgebank(105, "pledge smsspoof");
     die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
-    $wth->log_watcher_check();
     call_smsd();
     my $conversion_sms = sms_get_containing(mobile_n(105), "%You are the 4th person to pledge%", 0);
     print "SMS text: $conversion_sms\n" if $verbose > 1;
@@ -1198,7 +1166,6 @@ sub do_sms_pledge {
                             message_sms => "Yippee! All the £ are yours!" . (split(m/ /,name_n(100)))[0]. " x"},
         button => 'submit') or die "Failed to submit SMS/email announce form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
-    $wth->log_watcher_check();
     call_frequentupdate();
     call_smsd();
     # Check they all arrived
@@ -1435,7 +1402,6 @@ sub do_byarea_tests {
         {action=>"viaemail",setpassword=>1}, "signed", {byarea=>1});
     call_frequentupdate();
     $wth->email_check_none_left();
-    $wth->log_watcher_check();
 
     # This will provoke success in Liverpool
     find_and_sign_pledge("ref", $pledge_ref_boo, 604, 1, 
@@ -1448,7 +1414,6 @@ sub do_byarea_tests {
     $wth->email_get_containing( '%To: '.email_n(601).'%We are pleased to tell you that the pledge%Liverpool%');
     $wth->email_get_containing( '%To: '.email_n(604).'%We are pleased to tell you that the pledge%Liverpool%');
     $wth->email_check_none_left();
-    $wth->log_watcher_check();
     
     # Send success announce to Liverpool
     $wth->browser_get($announce_link);
@@ -1457,7 +1422,6 @@ sub do_byarea_tests {
                 fields => { message_body => "It all works in Liverpool. Go to it guys. " . name_n(600) },
         button => 'submit') or die "Failed to submit Liverpool email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Liverpool");
-    $wth->log_watcher_check();
     call_frequentupdate();
     $wth->email_get_containing( '%To: '.email_n(601).  '%From: '.name_n(600). '%It all works in Liverpool%');
     $wth->email_get_containing( '%To: '.email_n(604).  '%From: '.name_n(600). '%It all works in Liverpool%');
@@ -1474,12 +1438,10 @@ sub do_byarea_tests {
     $wth->email_get_containing( '%To: '.email_n(602).'%We are pleased to tell you that the pledge%Birkenhead%');
     $wth->email_get_containing( '%To: '.email_n(605).'%We are pleased to tell you that the pledge%Birkenhead%');
     $wth->email_check_none_left();
-    $wth->log_watcher_check();
 
     # Check display on pledge page
     $wth->browser_get($locale_url . "/$pledge_ref_boo");
     $wth->browser_check_contents("This pledge has been successful in <strong>2 places</strong>!");
-    $wth->log_watcher_check();
 
     # Success reminder messages
     set_pb_date('1984-09-10');
@@ -1495,7 +1457,6 @@ sub do_byarea_tests {
                 fields => { message_body => "It all rocks in Birkenhead. Go go to it guys. " . name_n(600) },
         button => 'submit') or die "Failed to submit Birkenhead email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Birkenhead");
-    $wth->log_watcher_check();
     call_frequentupdate();
     $wth->email_get_containing( '%To: '.email_n(602).  '%From: '.name_n(600). '%It all rocks in Birkenhead%');
     $wth->email_get_containing( '%To: '.email_n(605).  '%From: '.name_n(600). '%It all rocks in Birkenhead%');
@@ -1517,7 +1478,6 @@ sub do_byarea_tests {
                 fields => { message_body => "Boohoo! It went badly in Hexham. I'm very sorry." . name_n(600) },
         button => 'submit') or die "Failed to submit Hexham email failure form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Hexham");
-    $wth->log_watcher_check();
     call_frequentupdate();
     $wth->email_get_containing( '%To: '.email_n(603).'%From: '.name_n(600).'%It went badly in Hexham%');
     $wth->email_get_containing( '%To: '.email_n(600).'%From: '.$name_admin.'%[ This is a copy of the message%It went badly in Hexham%');
@@ -1592,9 +1552,6 @@ sub do_admin_tests {
             fields => { }, button => 'remove_pledge') or die "Failed to remove pledge";
     $wth->browser_check_contents("pledge has been successfully removed");
     $wth->browser_check_no_contents("smsspoof");
-
-    # Check there were no errors
-    $wth->log_watcher_check();
 }
 
 #############################################################################
@@ -1608,8 +1565,5 @@ sub do_final_checks {
     $wth->browser_get($locale_url . "/rss");
     $wth->browser_check_contents(qr/make multiple pledges using the magic of login/);
     $wth->browser_check_no_contents("privatepledge");
-
-    # Check there were no errors
-    $wth->log_watcher_check();
 }
 

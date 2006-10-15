@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.42 2006-09-21 10:40:06 francis Exp $
+ * $Id: general-example,v 1.43 2006-10-15 23:45:22 francis Exp $
  * 
  */
 
@@ -95,6 +95,7 @@ define('OPTION_PB_TARGET_WARNING', '20');
 define('OPTION_PB_SEARCH_POPULATION', '200000');
 
 // i18n
+define('OPTION_PB_GETTEXT_DOMAIN', 'PledgeBank');
 define('OPTION_PB_LANGUAGES', 'en-gb,English,en_GB|pt-br,Portugu&ecirc;s (Brasil),pt_BR');
 
 // Tracking

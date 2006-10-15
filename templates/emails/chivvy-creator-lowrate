@@ -1,6 +1,6 @@
 Subject: Your pledge is doing well but it needs a boost! - '<?=$values['title']?>' at PledgeBank.com
 
-Hello, we've noticed that the pledge you created on pledgebank
+Hello, we've noticed that the pledge you created on PledgeBank
 <?=$values['pledge_url']?> isn't growing fast enough to succeed.
 
 At the rate of growth you've had over the last week we only expect you to get

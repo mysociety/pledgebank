@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.74 2006-09-27 10:13:06 matthew Exp $
+ * $Id: pb.php,v 1.75 2006-10-15 23:45:22 francis Exp $
  * 
  */
 
@@ -95,7 +95,7 @@ if (OPTION_WEB_HOST == 'www') {
 # Language negotiation
 locale_negotiate_language(OPTION_PB_LANGUAGES, $domain_lang);
 locale_change();
-locale_gettext_domain('PledgeBank');
+locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
 
 # Do includes after language negotiation, so translated globals
 # are translated in them

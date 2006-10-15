@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.21 2006-07-27 11:14:53 francis Exp $
+// $Id: your.php,v 1.22 2006-10-15 23:45:23 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -188,7 +188,7 @@ function show_your_signed_pledges() {
         print p(_('You have signed no pledges.'));
     }
     if ($successful_ever)
-        print p(_("Why not <a href=\"mailto:team@pledgebank.com\">send us photos</a> of yourself carrying out successful pledges?"));
+        print p(sprintf(_("Why not <a href=\"mailto:%s\">send us photos</a> of yourself carrying out successful pledges?"), str_replace("@", "&#64;", OPTION_CONTACT_EMAIL)));
     print '</div>';
 }
 

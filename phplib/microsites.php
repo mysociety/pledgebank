@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.46 2006-10-15 10:29:02 francis Exp $
+ * $Id: microsites.php,v 1.47 2006-10-15 23:45:22 francis Exp $
  * 
  */
 
@@ -80,7 +80,7 @@ function microsites_user_tracking() {
     return false;
 }
 
-/* microsites_redirect
+/* microsites_redirect PLEDGE
  * When going to some pledges, a redirect is done so the URL is
  * that of a particular microsite. */
 function microsites_redirect($p) {
@@ -121,6 +121,7 @@ function microsites_site_country() {
     }
     return $site_country;
 }
+
 
 #############################################################################
 # Styling

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.152 2006-09-27 10:13:06 matthew Exp $
+// $Id: new.php,v 1.153 2006-10-15 23:45:23 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -155,7 +155,7 @@ else
 
 <p><?=_('Choose a short name for your pledge (6 to 16 letters):') ?>
 <input<? if (array_key_exists('ref', $errors) || array_key_exists('ref2', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
-<br><small><?=_('This gives your pledge an easy web address. e.g. www.pledgebank.com/tidyupthepark') ?></small>
+<br><small><?=sprintf(_('This gives your pledge an easy web address. e.g. %s/tidyupthepark'), OPTION_WEB_HOST.".".OPTION_WEB_DOMAIN) ?></small>
 </p>
 
 <p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically spotted, no markup needed)') ?></small>
@@ -530,8 +530,9 @@ function step1_error_check($data) {
         $errors['date'] = sprintf(_('Please change your deadline so it is less than %d years into the
         future. You must change the deadline in order to proceed with creating
         your pledge. If you want a longer deadline, please create your pledge
-        with a short deadline, and drop us an email to <a href="mailto:team&#64;pledgebank.com">team&#64;pledgebank.com</a>
-        asking for an alteration.'), $deadline_limit_years);
+        with a short deadline, and drop us an email to <a href="mailto:%s">%s</a>
+        asking for an alteration.'), $deadline_limit_years, str_replace("@", "&#64;", OPTION_CONTACT_EMAIL),
+        str_replace("@", "&#64;", OPTION_CONTACT_EMAIL));
 
     if (!$data['name']) $errors['name'] = _('Please enter your name');
     if (!$data['email']) $errors['email'] = _('Please enter your email address');

@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: pbcli.php,v 1.4 2006-09-18 12:37:18 francis Exp $
+ * $Id: pbcli.php,v 1.5 2006-10-15 23:45:22 francis Exp $
  *
  */
 
@@ -25,6 +25,7 @@ $pb_time = strtotime($pb_timestamp);
 /* Language negotiation */
 locale_negotiate_language(OPTION_PB_LANGUAGES, 'en-gb');
 locale_change();
-locale_gettext_domain('PledgeBank');
+locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
+
 
 

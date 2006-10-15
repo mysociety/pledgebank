@@ -37,7 +37,7 @@ How will people publicise their pledges?
 
 Is there any role for geographic technologies here? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Often, when I explain Pledgebank to people, I find myself using geographic identities. In particular, I say "On my street", or "In my town". Arguably, it is enough for these to be in the text of the pledge. But if we had proper postcode systems working, we could do things like allow people to find pledges near them, or limit participants in a pledge to people within a certain radius. I suppose with the MaPit component, we could probably also let people pick electoral areas. But would they want to? 
+Often, when I explain PledgeBank to people, I find myself using geographic identities. In particular, I say "On my street", or "In my town". Arguably, it is enough for these to be in the text of the pledge. But if we had proper postcode systems working, we could do things like allow people to find pledges near them, or limit participants in a pledge to people within a certain radius. I suppose with the MaPit component, we could probably also let people pick electoral areas. But would they want to? 
 
 Should we allow pledgees to communicate/organise? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

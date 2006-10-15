@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.245 2006-08-18 15:18:16 matthew Exp $
+// $Id: index.php,v 1.246 2006-10-15 10:29:02 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -49,7 +49,7 @@ function front_page() {
 ?>
 <div id="startblurb">
 <h2><?=_('Start your own pledge') ?></h2>
-<p><?=_('Pledgebank is free and easy to use. Once you\'ve thought of something you\'d like
+<p><?=_('PledgeBank is free and easy to use. Once you\'ve thought of something you\'d like
 to do, just <a href="/new">create a pledge</a> which says "I\'ll do this, but
 only if 5 other people will do the same".') ?>
 <p id="start"><a href="./new"><?=_('Start your own pledge') ?>&nbsp;&raquo;</a></p>

@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.45 2006-09-20 12:09:59 francis Exp $
+ * $Id: microsites.php,v 1.46 2006-10-15 10:29:02 francis Exp $
  * 
  */
 
@@ -32,7 +32,8 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'glastonbury' => 'Glastonbury',
                          'interface' => 'Interface',
                          'global-cool' => 'Global Cool',
-                         'catcomm' => 'CatComm');
+                         'catcomm' => 'CatComm',
+                         'livesimply' => 'Live Simply Promise');
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 if (OPTION_PB_STAGING) {
@@ -174,6 +175,17 @@ function microsites_logo() {
 <span id="countrytitle"><a href="/where">' . _('(other PledgeBanks)') . '</a></span>
 </h1>
 ';
+    } elseif ($microsite && $microsite == 'livesimply') {
+        return '
+<a href="http://www.catcomm.org"><img src="/microsites/livesimply/promise_banner.jpg" alt="Live Simply Promise" align="left"
+    style="
+    background-color: #ffffff;
+    float: center;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    "></a>
+';
     } else {
         $country_name = pb_site_country_name();
         return '
@@ -183,23 +195,35 @@ function microsites_logo() {
     }
 }
 
-/* microsites_css_file
- * Return path and filename of URL for CSS file */
-function microsites_css_file() {
+/* microsites_css_files
+ * Return array of URLs for CSS files */
+function microsites_css_files() {
     global $microsite;
-    if ($microsite) {
-        if (in_array($microsite, array(
+
+    $styles = array();
+    // Microsite PledgeBank style sheet
+    if ($microsite && in_array($microsite, array(
                 'interface', 
                 'glastonbury', 
                 '365act', 
                 'london', 
                 'global-cool',
                 'catcomm',
+                'livesimply',
             ))) {
-            return "/microsites/autogen/$microsite.css";
+        $styles[] = "/microsites/autogen/$microsite.css";
+    } else {
+        $styles[] = "/pb.css";
+    }
+
+    // Microsite cobranding style sheet
+    if ($microsite) {
+        if ($microsite == 'XXX') { // example, remove if you use this
+            $styles[] = "/microsites/XXX/YYY.css";
         }
     }
-    return "/pb.css";
+
+    return $styles;
 }
 
 /* microsites_frontpage_has_local_emails
@@ -265,14 +289,20 @@ function microsites_frontpage_intro() {
 	?><h2>
     
     Tell the world &#8220;I&#8217;ll support communities working to solve local problems, but only if you will too!&#8221;</h2>
-    Catalytic Communities (CatComm) develops, inspires and empowers
+    <p>Catalytic Communities (CatComm) develops, inspires and empowers
     communities worldwide to generate and share their own local
     solutions. Imagine a world where community-generated solutions are
     just a mouse-click away, where anyone, anywhere, confronting a local
     problem, can find the inspiration and tools they need to implement
     the solution, learning from their peers. This site brings people
-    together, forming a network of support for building this work...
+    together, forming a network of support for building this work...</p>
 	<?
+    } elseif ($microsite == 'livesimply') {
+        ?><h2>Promise to live simply!</h2>
+        <p>Text needed here</p>
+
+        <?
+        $tom = false;
     } else {
         # Main site
         $tom = _('"We all know what it is like to feel powerless, that our own
@@ -291,7 +321,7 @@ alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid
 <?  
     }
 
-    # Always give how it works explanation
+    # Give how it works explanation
     global $lang; if ($lang == 'en-gb') { ?>
 <p><a href="tom-on-pledgebank-vbr.mp3"><?=_('Listen to how PledgeBank
 works</a>, as explained by mySociety\'s director Tom Steinberg.
@@ -366,7 +396,15 @@ they could be inspirational, if others do, too!</li>
 </div>
 
 <?
+    } elseif ($microsite == 'livesimply') {
+?>
+<div id="extrablurb">
+<h2>About Live Simply</h2>
+<p>Text needed here</p>
+</div>
+<?
     }
+
 }
 
 /* microsites_frontpage_has_offline_secrets
@@ -398,7 +436,7 @@ function microsites_credit_footer() {
  */
 function microsites_syndication_warning() {
     global $microsite;
-    if ($microsite == 'interface')
+    if ($microsite == 'interface' || $microsite == 'livesimply')
         return false;
     else
         return true;
@@ -408,7 +446,7 @@ function microsites_syndication_warning() {
  * Returns whether private pledges are offered in new pledge dialog */
 function microsites_private_allowed() {
     global $microsite;
-    if ($microsite == 'interface' || $microsite == 'global-cool')
+    if ($microsite == 'interface' || $microsite == 'global-cool' || $microsite == 'livesimply')
         return false;
     else
         return true;
@@ -419,7 +457,7 @@ function microsites_private_allowed() {
  */
 function microsites_new_pledges_prominence() {
     global $microsite;
-    if ($microsite == 'interface')
+    if ($microsite == 'interface' || $microsite == 'livesimply')
         return 'frontpage';
     elseif ($microsite == 'global-cool')
         return 'backpage';
@@ -441,6 +479,8 @@ function microsites_other_people() {
         return 'other cool people'; // deliberately not translated
     elseif ($microsite == 'catcomm')
         return 'other CatComm supporters'; // deliberately not translated
+    elseif ($microsite == 'livesimply')
+        return 'other people who want to live simply'; // deliberately not translated
     else
         return _('other local people');
 }

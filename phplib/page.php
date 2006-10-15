@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.136 2006-09-19 14:27:25 chris Exp $
+// $Id: page.php,v 1.137 2006-10-15 10:29:02 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -116,7 +116,13 @@ function page_header($title, $params = array()) {
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
 ?> PledgeBank<?if (!$title) print " - " . _("Tell the world \"I'll do it, but only if you'll help\"") ?></title>
-<style type="text/css" media="all">@import url('<?=microsites_css_file()?>');</style>
+<?
+    foreach (microsites_css_files() as $microsite_file) {
+?>
+<style type="text/css" media="all">@import url('<?=$microsite_file?>');</style>
+<?
+    }
+?>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <?
 

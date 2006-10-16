@@ -35,6 +35,9 @@ while(<MAINPO>) {
     if (m/"Language-Team: LANGUAGE/) {
         $_ = '"Language-Team: Live Simply Promise\\n"'."\n";
     }
+    if (m/"Plural-Forms: nplurals=/) {
+        $_ = '"Plural-Forms: nplurals=2; plural=n != 1;\\n"'."\n";
+    }
 
     if (m/^#/) {
         # comment or blank line
@@ -44,10 +47,16 @@ while(<MAINPO>) {
         $start = 1;
         $buffer = "";
         print LIVESIMPLYPO $_;
-    } elsif ($start && m/^msgstr ""/) {
+    } elsif ($start && (m/^msgstr ""/ || m/^msgstr\[0\] ""/)) {
         # start of translated text - translate English into Live Simple Promise
         # langauage
-        $buffer =~ s/^msgid "/msgstr "/;
+        if (m/^msgstr\[0\] ""/) {
+            $buffer =~ s/^msgid "/msgstr[0] "/m;
+            $buffer =~ s/^msgid_plural "/msgstr[1] "/m;
+            <MAINPO>; # skip untranslated plural
+        } else {
+            $buffer =~ s/^msgid "/msgstr "/;
+        }
         $buffer =~ s/PledgeBank/Live Simply Promise/g;
         $buffer =~ s/\bpledge\b/promise/g;
         $buffer =~ s/\bPledge\b/Promise/g;

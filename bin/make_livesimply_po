@@ -57,6 +57,7 @@ while(<MAINPO>) {
         } else {
             $buffer =~ s/^msgid "/msgstr "/;
         }
+        $buffer =~ s/PledgeBank.com/Live Simply Promise/g;
         $buffer =~ s/PledgeBank/Live Simply Promise/g;
         $buffer =~ s/\bpledge\b/promise/g;
         $buffer =~ s/\bPledge\b/Promise/g;

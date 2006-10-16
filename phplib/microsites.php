@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.48 2006-10-16 11:28:13 francis Exp $
+ * $Id: microsites.php,v 1.49 2006-10-16 18:43:11 francis Exp $
  * 
  */
 
@@ -98,8 +98,11 @@ function microsites_redirect($p) {
     if (in_array($p->microsite(), $redirect_microsites)) {
         $redirect_microsite = $p->microsite();
     }
-    # TODO: redirect back again, if on a non-global-cool pledge on global-cool
-    # domain
+    # Redirect back again, if on, for example, a non-global-cool pledge on
+    # global-cool domain
+    if ($microsite && in_array($microsite, $redirect_microsites)) {
+        $redirect_microsite = $p->microsite();
+    }
 
     # If necessary, do the redirect
     if ($microsite != $redirect_microsite) {

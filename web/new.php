@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.153 2006-10-15 23:45:23 francis Exp $
+// $Id: new.php,v 1.154 2006-10-16 11:45:13 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -331,6 +331,7 @@ function pledge_form_three($data, $errors = array()) {
     $s = db_query('select id, parent_category_id, name from category
         where parent_category_id is null
         order by id');
+    $out = array();
     while ($a = db_fetch_row($s)) {
         list($id, $parent_id, $name) = $a;
         $out[_($name)] = sprintf("<option value=\"%s\"%s>%s%s</option>",

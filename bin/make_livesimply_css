@@ -20,6 +20,9 @@ while(<MAINCSS>) {
 
     s/#ffffff/#888888/gi if ($selector eq "h1 span#logo_pledge");
     s/#ffffff/#000000/gi if ($selector eq "h1 span#beta");
+    s/top: 2px; right: 2px;/top: 4px; right: 4px;/ if ($selector eq "#search");
+    s/top: 2.75em;/top: 120px;/ if ($selector eq "ul#nav");
+    s/margin: 0 1em 0 0;/margin: -1.2em 0.5em 0 0;/ if ($selector eq "ul#nav");
 
     s/#522994/#0000ff/gi if (!m/border/);  # link colour
     s/#7b52a5/#0000aa/gi;  # visited link colour

@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.47 2006-10-15 23:45:22 francis Exp $
+ * $Id: microsites.php,v 1.48 2006-10-16 11:28:13 francis Exp $
  * 
  */
 
@@ -178,14 +178,14 @@ function microsites_logo() {
 ';
     } elseif ($microsite && $microsite == 'livesimply') {
         return '
-<a href="http://www.catcomm.org"><img src="/microsites/livesimply/promise_banner.jpg" alt="Live Simply Promise" align="left"
-    style="
-    background-color: #ffffff;
-    float: center;
-    padding: 0px;
-    margin: 0px;
-    border: none;
-    "></a>
+<div style="background-color: #2aaaad; height: 120px;">
+<a href="/"><img src="/microsites/livesimply/promise_banner_left.jpg" alt="Live Simply Promise" 
+    style="background-color: #ffffff; padding: 0px; margin: 0px; border: none; position: absolute;
+    top: 0px; left: 0px; "></a>
+<img src="/microsites/livesimply/promise_banner_right.jpg" alt="" 
+    style="background-color: #ffffff; padding: 0px; margin: 0px; border: none; float: right;
+">
+</div>
 ';
     } else {
         $country_name = pb_site_country_name();

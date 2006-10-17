@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.41 2006-07-10 09:39:51 francis Exp $
+ * $Id: ref-info.php,v 1.42 2006-10-17 10:08:53 francis Exp $
  * 
  */
 
@@ -39,6 +39,7 @@ if (!is_null($err))
 
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
+microsites_redirect($p);
 
 /* Do this again because it's possible we'll reach here with a non-canonical
  * ref (e.g. different case from that entered by the creator). */

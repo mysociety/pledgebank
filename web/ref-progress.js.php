@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-progress.js.php,v 1.4 2006-08-16 08:23:09 francis Exp $
+ * $Id: ref-progress.js.php,v 1.5 2006-10-17 10:08:53 francis Exp $
  * 
  */
 
@@ -17,6 +17,7 @@ require_once '../../phplib/utility.php';
 
 page_check_ref(get_http_var('ref'));
 $p  = new Pledge(get_http_var('ref'));
+microsites_redirect($p);
 if (defined($p->pin()) && $p->pin() != '')
     err("Permission denied");
 

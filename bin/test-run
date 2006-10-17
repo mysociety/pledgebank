@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.204 2006-10-05 10:27:28 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.205 2006-10-17 10:08:52 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1321,8 +1321,8 @@ sub do_category_tests {
     my $pledge_action_portuguese = 'learn to speak Portuguese';
     my $pledge_ref_portugese = "portuguese";
     $wth->browser_get($locale_url);
-    lock_locale_url();
     $wth->browser_follow_link(text_regex => qr/Portugu/);
+    lock_locale_url();
     create_pledge(300, 
         { title => $pledge_action_portuguese, 
             target => '3', type => 'other monoglots', signup => 'do the same',

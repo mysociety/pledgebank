@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.50 2006-08-14 08:22:14 matthew Exp $
+ * $Id: ref-announce.php,v 1.51 2006-10-17 10:08:53 francis Exp $
  * 
  */
 
@@ -27,6 +27,7 @@ if (!is_null($err))
 
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
+microsites_redirect($p);
 
 /* Lock the pledge here, before we do any other checks. */
 $p->lock();

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.92 2006-08-24 17:02:47 francis Exp $
+// $Id: ref-index.php,v 1.93 2006-10-17 10:00:52 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -279,7 +279,8 @@ function draw_signatories($p) {
 define('MAX_PAGE_COMMENTS', '50');
 function draw_comments($p) {
     print "\n\n" . '<div class="comments">';
-    print '<a href="' . $p->url_comments_rss() . '"><img align="right" border="0" src="rss.gif" alt="' . _('RSS feed of comments on this pledge') . '"></a>';
+    if (!$p->pin())
+        print '<a href="' . $p->url_comments_rss() . '"><img align="right" border="0" src="rss.gif" alt="' . _('RSS feed of comments on this pledge') . '"></a>';
     print '<h2><a name="comments">' . _('Comments on this pledge') . '</a></h2>';
 
     $limit = 0;
@@ -355,7 +356,7 @@ $params = array(
             'noreflink' => 1,
             'last-modified' => $p->last_change_time()
         );
-if (microsites_comments_allowed())
+if (microsites_comments_allowed() && $p->pin())
     $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());
     
 page_header($title, $params);

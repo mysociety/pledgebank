@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 
-my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.3 2006-08-07 10:41:42 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.4 2006-10-17 10:00:52 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -43,7 +43,7 @@ sub run {
     my $ref = $request->param('ref') || '';
     my $rss = new XML::RSS (version => '1');
 
-    my $query= dbh()->prepare("select id,title,detail from pledges where ref=?");
+    my $query= dbh()->prepare("select id,title,detail from pledges where ref=? and pin is null");
     $query->execute($ref);
     my ($pledge_id, $title, $detail) = $query->fetchrow_array;
     $title ||= '';

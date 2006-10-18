@@ -13,6 +13,8 @@ my $selector = "";
 while(<MAINCSS>) {
     if (m/^(.*) {/) { $selector = $1 }
 
+    next if ($selector =~ m/ul#nav/);
+
     s/pb.css/livesimply.css/;
     s/Top-level style sheet for PledgeBank.com/Custom style sheet for Live Simply version of PledgeBank/;
 
@@ -23,6 +25,7 @@ while(<MAINCSS>) {
     s/top: 2px; right: 2px;/top: 4px; right: 4px;/ if ($selector eq "#search");
     s/top: 2.75em;/top: 120px;/ if ($selector eq "ul#nav");
     s/margin: 0 1em 0 0;/margin: -1.2em 0.5em 0 0;/ if ($selector eq "ul#nav");
+    s/margin: 1em auto 0;/margin: 1em 0 0 16em;/ if ($selector eq "#pbcontent");
 
     s/#522994/#0000ff/gi if (!m/border/);  # link colour
     s/#7b52a5/#0000aa/gi;  # visited link colour
@@ -37,9 +40,122 @@ while(<MAINCSS>) {
     s/#ffff99/#ffffee/gi;  # "spread the word" yellow
     s/#ff8429/#ffbb88/gi;  # 'spread the word' orange border
 
+    print LIVESIMPLYCSS "    font-size: 0.8em;\n" if (m/^}/ && $selector eq 'body');
+
     print LIVESIMPLYCSS $_;
 }
 
 print LIVESIMPLYCSS "\nh2 { color: #000000; }\n";
 
+print LIVESIMPLYCSS <<END;
+
+/* From Partnerbasic.css */
+
+#nav ul{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    background-color:#ffffff;
+    color: black;
+}
+
+#nav {
+    font-size: 90%;
+    position: absolute;
+    top: 120px;
+    left: 0px; 
+    clear: right;
+}
+
+/* From Partnerlevel2.css */
+
+/* NAVIGATION */
+/* Left nav */
+.Line{
+	border-bottom: 2px solid white;
+}
+
+ul#nav{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+    width: 17em;
+}
+
+ul#nav li{
+	list-style-type: none;
+	vertical-align: text-top;
+    text-align: left;
+    text-transform: lowercase;
+    padding-bottom: 2px;
+}
+
+ul#nav a{
+	color: white;
+	display: block;
+	padding: 3px 3px 3px 8px;
+	background-color: #9C9A9C;
+	font-weight: bold;
+	vertical-align: text-top;
+    text-decoration: none;
+}
+
+ul#nav strong{
+	display: block;
+	padding: 3px 3px 3px 8px;
+	color: white;
+	vertical-align: text-top;
+	background-color: #636563;
+}
+
+ul#nav a:hover{
+	background-color: #636563;
+	text-decoration: none;
+	color: white;
+}
+
+ul#nav ul{
+	margin: 0 0 0 22px;
+	padding: 0;
+}
+
+ul#nav li{
+	list-style-image: url(/images/sub/Disc_Bullet.gif);
+}
+
+ul#nav li.Plus{
+	list-style-image: url(/images/sub/Plus_Bullet.gif);
+}
+
+ul#nav li.Arrow{
+	list-style-image: url(/images/sub/Arrow_Bullet.gif);
+}
+
+ul#nav ul a{
+	font-weight: normal;
+}
+
+ul#nav ul a,  ul#nav ul strong{
+	color: black;
+	width: 100%;
+	padding: 3px 3px 3px 0;
+	background-color: white;
+}
+
+ul#nav ul a:hover{
+	background-color: white;
+	text-decoration: underline;
+	color: black;
+}
+
+ul#nav ul ul{
+	margin-left: 16px;
+}
+
+/* END NAVIGATION */
+END
+
+	
+	
+	
 

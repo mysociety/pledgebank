@@ -153,6 +153,18 @@ ul#nav ul ul{
 }
 
 /* END NAVIGATION */
+
+#simplycounter {
+    position: absolute;
+    right: 4px;
+    top: 120px;
+    width: 12em;
+    margin-top: -4em;
+    font-size: 125%;
+    background-color: white;
+    border: solid 2px #000000;
+}
+
 END
 
 	

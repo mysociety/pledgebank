@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.50 2006-10-18 16:37:14 francis Exp $
+ * $Id: microsites.php,v 1.51 2006-10-18 17:07:29 francis Exp $
  * 
  */
 
@@ -261,7 +261,8 @@ function microsites_frontpage_has_intro() {
  */
 function microsites_frontpage_intro() {
     global $microsite;
-    $tom = null;
+    $tom = false;
+    $audio_intro = true;
     if ($microsite == 'interface') {
         $tom = "Hello, and welcome to the demo version of PledgeBank we've built for
             internal use at Interface. PledgeBank is a handy tool which is good at
@@ -308,6 +309,7 @@ function microsites_frontpage_intro() {
 
         <?
         $tom = false;
+        $audio_intro = false;
     } else {
         # Main site
         $tom = _('"We all know what it is like to feel powerless, that our own
@@ -327,14 +329,16 @@ alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid
     }
 
     # Give how it works explanation
-    global $lang; if ($lang == 'en-gb') { ?>
-<p><a href="tom-on-pledgebank-vbr.mp3"><?=_('Listen to how PledgeBank
-works</a>, as explained by mySociety\'s director Tom Steinberg.
-Or <a href="/explain">read a full transcript') ?></a>.</p>
-<? } else { ?>
-<p><?=_('<a href="/explain">Find out how PledgeBank
-works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
-<? }  
+    if ($audio_intro) {
+        global $lang; if ($lang == 'en-gb') { ?>
+    <p><a href="tom-on-pledgebank-vbr.mp3"><?=_('Listen to how PledgeBank
+    works</a>, as explained by mySociety\'s director Tom Steinberg.
+    Or <a href="/explain">read a full transcript') ?></a>.</p>
+    <? } else { ?>
+    <p><?=_('<a href="/explain">Find out how PledgeBank
+    works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
+    <? }  
+    }
     
     # Extra end text
     if ($microsite == 'catcomm') {
@@ -348,7 +352,7 @@ works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
  */
 function microsites_frontpage_has_start_your_own() {
     global $microsite;
-    if ($microsite == 'global-cool')
+    if ($microsite == 'global-cool' || $microsite == 'livesimply')
         return false;
     return true;
 }
@@ -417,7 +421,7 @@ they could be inspirational, if others do, too!</li>
  */
 function microsites_frontpage_has_offline_secrets() {
     global $microsite;
-    if ($microsite == 'global-cool')
+    if ($microsite == 'global-cool' || $microsite == 'livesimply')
         return false;
     return true;
 }
@@ -430,7 +434,12 @@ function microsites_credit_footer() {
     if ($microsite == 'london') {
 ?>
 <div id="sponsor"><img src="/microsites/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
-<?  }
+<?  } elseif ($microsite == 'livesimply') {
+    $n = db_getOne('select count(distinct person_id) from signers');
+?>
+<div id="simplycounter"><?=$n?> people have made their promises, what's yours?</div>
+<?
+    }
 }
 
 #############################################################################

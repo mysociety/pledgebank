@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.51 2006-10-18 17:07:29 francis Exp $
+ * $Id: microsites.php,v 1.52 2006-10-24 09:42:32 francis Exp $
  * 
  */
 
@@ -517,6 +517,9 @@ function microsites_comments_allowed() {
  */
 function microsites_filter_main(&$sql_params) {
     global $microsite;
+    if (!$microsite)
+        die("Internal error, microsites_filter_main should only be called for microsite");
+
     if ($microsite == 'everywhere')
         return "(1=1)";
     if ($microsite == 'london')
@@ -530,6 +533,10 @@ function microsites_filter_main(&$sql_params) {
  * microsites_filter_main ones above
  */
 function microsites_filter_general(&$sql_params) {
+    global $microsite;
+    if (!$microsite)
+        die("Internal error, microsites_filter_general should only be called for microsite");
+
     return "(1=0)";
 }
 
@@ -538,6 +545,9 @@ function microsites_filter_general(&$sql_params) {
  * ones for the front page to look busy. */
 function microsites_filter_foreign(&$sql_params) {
     global $microsite;
+    if (!$microsite)
+        die("Internal error, microsites_filter_foreign should only be called for microsite");
+
     if ($microsite == 'everywhere')
         return "(1=0)";
     if ($microsite == 'london')
@@ -545,7 +555,7 @@ function microsites_filter_foreign(&$sql_params) {
     if ($microsite == 'global-cool')
         return "(1=0)"; # Show nothing else on global cool site
     $sql_params[] = $microsite;
-    return "(microsite <> ?)";
+    return "(microsite <> ? || microsite is null)";
 }
 
 /* microsites_normal_prominences

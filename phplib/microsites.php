@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.53 2006-10-24 09:44:48 francis Exp $
+ * $Id: microsites.php,v 1.54 2006-10-24 09:46:53 francis Exp $
  * 
  */
 
@@ -450,7 +450,7 @@ function microsites_credit_footer() {
  */
 function microsites_syndication_warning() {
     global $microsite;
-    if ($microsite == 'interface' || $microsite == 'livesimply')
+    if ($microsite == 'livesimply')
         return false;
     else
         return true;
@@ -471,7 +471,7 @@ function microsites_private_allowed() {
  */
 function microsites_new_pledges_prominence() {
     global $microsite;
-    if ($microsite == 'interface' || $microsite == 'livesimply')
+    if ($microsite == 'livesimply')
         return 'frontpage';
     elseif ($microsite == 'global-cool')
         return 'backpage';

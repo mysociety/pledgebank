@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.55 2006-10-25 12:45:19 francis Exp $
+ * $Id: microsites.php,v 1.56 2006-10-25 16:10:53 francis Exp $
  * 
  */
 
@@ -475,12 +475,15 @@ function microsites_credit_footer() {
     global $microsite;
     if ($microsite == 'london') {
 ?>
-<div id="sponsor"><img src="/microsites/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
+        <div id="sponsor"><img src="/microsites/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
 <?  } elseif ($microsite == 'livesimply') {
-    $n = db_getOne('select count(distinct person_id) from signers');
-?>
-<div id="simplycounter"><?=$n?> people have made their promises, what's yours?</div>
-<?
+        # Count the number of signatures, including pledge creators.
+        # (We don't try to count distinct people using person_id as that can
+        # give privacy leaks, as indeed could doing it my distinct person.name
+        # since some signers' names are hidden)
+        $na = db_getOne('select count(*) from signers');
+        $nb = db_getOne('select count(*) from pledges');
+        ?> <div id="simplycounter">Together, we've made <?=$na + $nb?> promises. What are you going to promise?</div> <?
     }
 }
 

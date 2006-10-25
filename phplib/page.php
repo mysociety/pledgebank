@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.137 2006-10-15 10:29:02 francis Exp $
+// $Id: page.php,v 1.138 2006-10-25 12:45:19 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -247,14 +247,19 @@ function page_footer($params = array()) {
 <p><label for="q"><?=_('Search') ?>:</label>
 <input type="text" id="q" name="q" size="25" value="" onblur="fadeout(this)" onfocus="fadein(this)"> <input type="submit" value="<?=_('Go') ?>"></p>
 </form>
-<!-- remove all extraneous whitespace to avoid IE bug -->
-<ul id="nav"><li><a href="/"><?=_('Home') ?></a></li><li><a href="/list"><?=_('All Pledges') ?></a></li><li><a href="/new"><?=_('Start a Pledge') ?></a></li><li><a href="/faq"><acronym title="<?=_('Frequently Asked Questions') ?>"><?=_('FAQ') ?></acronym></a></li><li><a href="/contact<?=$contact_ref?>"><?=_('Contact') ?></a></li><li><a href="/your"><?=_('Your Pledges') ?></a></li><?
-        $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
-        debug_timestamp(true, "retrieved person record");
-        if ($P) {
-?><li><a href="/logout"><?=_('Logout') ?></a></li><?
-        }
-?></ul>
+<?
+    $menu = microsites_navigation_menu($contact_ref);
+    # remove all extraneous whitespace to avoid IE bug
+    print '<ul id="nav">';
+    foreach ($menu as $text => $link) {
+        print "<li>";
+        print '<a href="'.$link.'">';
+        print $text;
+        print "</a>";
+        print "</li>";
+    }
+    print '</ul>';
+?>
 <div class="noprint">
 <?  if (!array_key_exists('nolocalsignup', $params) or !$params['nolocalsignup']) 
         pb_view_local_alert_quick_signup("localsignupeverypage");

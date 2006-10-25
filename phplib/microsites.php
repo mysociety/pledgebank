@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.54 2006-10-24 09:46:53 francis Exp $
+ * $Id: microsites.php,v 1.55 2006-10-25 12:45:19 francis Exp $
  * 
  */
 
@@ -231,6 +231,30 @@ function microsites_css_files() {
     return $styles;
 }
 
+/* microsites_navigation_menu
+ * Returns array of text to links for the main site navigation menu.
+ */
+function microsites_navigation_menu($contact_ref) {
+    global $microsite;
+
+    $menu = array();
+    $menu[_('Home')] = "/";
+    if ($microsite && $microsite == 'livesimply') 
+        $menu['How does Live Simply work?'] = "/explain";
+    $menu[_('All Pledges')] = "/list";
+    $menu[_('Start a Pledge')] = "/new";
+    $menu['<acronym title="'._('Frequently Asked Questions').'">'._('FAQ').'</acronym>'] = "/faq";
+    $menu[_('Contact')] = "/contact<?=$contact_ref?>";
+    $menu[_('Your Pledges')] = "/your";
+    $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
+    debug_timestamp(true, "retrieved person record");
+    if ($P) {
+        $menu[_('Logout')] = "/logout";
+    }
+
+    return $menu;
+}
+
 /* microsites_frontpage_has_local_emails
  * Whether or not the local alert signup box is present on the
  * top of the front page.
@@ -304,8 +328,19 @@ function microsites_frontpage_intro() {
     together, forming a network of support for building this work...</p>
 	<?
     } elseif ($microsite == 'livesimply') {
-        ?><h2>Promise to live simply!</h2>
-        <p>Text needed here</p>
+        ?>
+
+    <p>Tired of a world of consumerism, hype and selfishness? Wishing the world
+    that is just.... and simple. Live Simply Promise is your opportunity to
+    do something about it. Start by changing a thing in your life and get
+    others involved.</p>
+
+    <p>Live Simply is challenging us to live simply, sustainably and in
+    solidarity with the poor. It's a call to reflect on our lifestyles,
+    understand how they impact on the lives of the poor and take action for
+    justice.</p>
+
+    <p><a href="/explain">How does Live Simply Promise work?</a>
 
         <?
         $tom = false;
@@ -405,15 +440,22 @@ they could be inspirational, if others do, too!</li>
 </div>
 
 <?
-    } elseif ($microsite == 'livesimply') {
-?>
-<div id="extrablurb">
-<h2>About Live Simply</h2>
-<p>Text needed here</p>
-</div>
-<?
     }
 
+}
+
+/* microsites_frontpage_sign_invitation_text
+ * Title text above the list of current pledges */
+function microsites_frontpage_sign_invitation_text() {
+    global $microsite;
+
+    print "<h2>";
+    if ($microsite == 'livesimply') {
+        print 'Act now. Sign up to a promise.';
+    } else {
+        print _('Why not sign a live pledge?');
+    }
+    print "</h2>";
 }
 
 /* microsites_frontpage_has_offline_secrets

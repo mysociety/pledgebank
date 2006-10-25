@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.246 2006-10-15 10:29:02 francis Exp $
+// $Id: index.php,v 1.247 2006-10-25 12:45:19 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -127,7 +127,7 @@ function get_pledges_list($where, $params) {
 function list_frontpage_pledges() {
     global $pb_today;
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of new pledges') ?>"></a>
-<h2><?=_('Why not sign a live pledge?') ?></h2><?
+<?=microsites_frontpage_sign_invitation_text()?><?
     $pledges_required_fp = 8 + 1; // number of pledges to show on main part of front page if frontpaged
     $pledges_required_n = 6 + 1; // number of pledges below which we show normal pledges, rather than just frontpaged ones
     $more_threshold = $pledges_required_fp;

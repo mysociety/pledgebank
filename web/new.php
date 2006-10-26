@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.155 2006-10-25 12:45:19 francis Exp $
+// $Id: new.php,v 1.156 2006-10-26 10:46:28 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -385,12 +385,15 @@ function pledge_form_submitted() {
     
     if (array_key_exists('data', $data)) {
         $alldata = unserialize(base64_decode($data['data']));
-        if (!$alldata) $errors[] = _('Transferring the data from previous page failed :(');
+        if (!$alldata) err(_('Transferring the data from previous page failed :('));
         unset($data['data']);
         $data = array_merge($alldata, $data);
     }
 
     # Step 1 fixes
+    foreach (array('title', 'target', 'type', 'signup', 'date', 'ref', 'detail', 'name', 'email', 'identity') as $v) {
+        if (!isset($data[$v])) $data[$v] = '';
+    }
     $data['microsite'] = $microsite;
     if ($data['title']==_('<Enter your pledge>')) $data['title'] = '';
     if ($data['name']==_('<Enter your name>')) $data['name'] = '';
@@ -402,6 +405,7 @@ function pledge_form_submitted() {
     $data['target'] = str_replace($locale_info['thousands_sep'], '', $data['target']);
     $data['title'] = preg_replace('#^' . _('I will') . ' #i', '', $data['title']);
     $data['title'] = preg_replace('#^' . _('will') . ' #i', '', $data['title']);
+
     # Step 2 fixes
     if (array_key_exists('local', $data) && !$data['local']) { 
         $data['gaze_place'] = ''; 

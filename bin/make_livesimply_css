@@ -20,6 +20,7 @@ while(<MAINCSS>) {
 
     $_ = "    font-family: verdana, arial, helvetica, sans-serif;\n" if m/font-family/;
 
+    # Overall look
     s/#ffffff/#888888/gi if ($selector eq "h1 span#logo_pledge");
     s/#ffffff/#000000/gi if ($selector eq "h1 span#beta");
     s/top: 2px; right: 2px;/top: 4px; right: 4px;/ if ($selector eq "#search");
@@ -27,19 +28,26 @@ while(<MAINCSS>) {
     s/margin: 0 1em 0 0;/margin: -1.2em 0.5em 0 0;/ if ($selector eq "ul#nav");
     s/margin: 1em auto 0;/margin: 1em 0 0 16em;/ if ($selector eq "#pbcontent");
 
+    # Link colours
     s/#522994/#0000ff/gi if (!m/border/);  # link colour
     s/#7b52a5/#0000aa/gi;  # visited link colour
     s/#21004a/#000000/gi;  # purple lettering/thin-borders 
     s/#522994/#000000/gi if (m/border/);  # border colour
 
+    # Pledge box etc. colours and borders
     s/#9c7bbd/#000000/gi if ($selector =~ m/input/);
-    #s/#9c7bbd/#ffffff/gi;  # darker purple background (at top of page)
     s/background-color: #9c7bbd;/background-image: url(\/livesimply-body.gif);/i;
     s/#f6e5ff/#cecfce/gi;  # lighter pink plaque background
     s/#c6b5de/#00aab5/gi;  # darker pink plaque background
     s/#ffff99/#ffffee/gi;  # "spread the word" yellow
     s/#ff8429/#ffbb88/gi;  # 'spread the word' orange border
+    
+    # Headings
+    s/font-size: 200%;/font-size: 130%;/ if ($selector eq "h1");
+    print LIVESIMPLYCSS "    font-size: 120%;\n" if (m/^}/ && $selector eq 'h2');
+    print LIVESIMPLYCSS "    font-size: 100%;\n" if (m/^}/ && $selector eq 'h3');
 
+    # Body
     print LIVESIMPLYCSS "    font-size: 0.8em;\n" if (m/^}/ && $selector eq 'body');
 
     print LIVESIMPLYCSS $_;

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.204 2006-09-19 14:22:35 chris Exp $
+-- $Id: schema.sql,v 1.205 2006-10-26 17:51:23 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1051,6 +1051,15 @@ create table message_signer_recipient (
 
 create unique index message_signer_recipient_message_id_signer_id_idx
     on message_signer_recipient(message_id, signer_id);
+
+-- Check for sending chivvy messages
+create table pledge_chivvy (
+    pledge_id integer not null references pledges(id),
+    chivvy_id integer not null,
+    whencreated timestamp not null default ms_current_timestamp()
+);
+create index pledge_chivvy_pledge_id on pledge_chivvy(pledge_id);
+create index pledge_chivvy_chivvy_id on pledge_chivvy(chivvy_id);
 
 -- Comments/q&a on pledges.
 create table comment (

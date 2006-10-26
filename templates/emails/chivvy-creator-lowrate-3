@@ -1,0 +1,20 @@
+Subject: A suggestion to help your pledge succeed
+
+Hello,
+
+We're sorry to tell you that your pledge still isn't growing fast
+enough to succeed. Here's a feature you might not have been aware of
+to help your pledge grow faster.
+
+We provide printable flyers for all pledges - yours are right here:
+
+<?=$values['pledge_url_flyers']?>
+
+Why not print out a few right now, and post them up at work, in your
+window, or on a communal noticeboard?
+
+You can see and print the flyers here <?=$values['pledge_url_flyers']?>
+
+all the best,
+
+The PledgeBank Team

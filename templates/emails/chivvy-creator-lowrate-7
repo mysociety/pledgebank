@@ -1,0 +1,23 @@
+Subject: Bribe your friends to help spread your pledge.
+
+Hello again,
+
+At PledgeBank we're always keen to help people make their pledges
+succeed. We've calculated that unless you do something then your
+pledge isn't going to grow fast enough to get the number of people it
+needs.
+
+We have a suggestion though - bribe your friends with food!
+
+Write an email right now and tell 5 or 6 people you know really well
+that you'll make them a slap up meal, but only if they help make your
+pledge succeed.
+
+They can help by printing our flyers from <?=$values['pledge_url_flyers']?>
+or simply by sending the pledge URL to their friends - <?=$values['pledge_url']?>
+
+Go on, if they're real friends they'll want to help!
+
+best,
+
+The PledgeBank team

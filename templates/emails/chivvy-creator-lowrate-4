@@ -1,0 +1,18 @@
+Subject: Your pledge needs to grow faster to suceed - here's a suggestion to help.
+
+Hi,
+
+We've noticed that your pledge is still not growing fast enough to
+succeed. We've got a really simply suggestion that works.
+
+Grab a pen, and scribble PLEDGE onto the back of your hand.
+
+Then for the next couple of days when you meet people it will help to
+remind to you ask them to sign. Remember, the web page address is
+really easy:
+
+<?=$values['pledge_url']?>
+
+Good luck!
+
+The PledgeBank Team

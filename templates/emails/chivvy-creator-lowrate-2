@@ -1,0 +1,20 @@
+Subject: Your pledge isn't growing fast enough - here's a tip
+
+Hi,
+
+We've noticed that your pledge still is growing too slowly to succeed.
+Why not forward the following text to some friends to encourage them
+to sign up?
+
+------
+
+Hi there,
+
+I created this pledge a few days ago, and I need you guys to help me
+make it succeed.
+
+It'll only take a moment to sign up, so please go to <?=$values['pledge_url']?>
+
+yours,
+
+<?=$values['creator_name']?>

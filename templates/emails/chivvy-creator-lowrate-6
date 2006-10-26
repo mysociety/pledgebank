@@ -1,0 +1,23 @@
+Subject: Your local politicians can help your pledge to grow
+
+Howdy,
+
+We're sorry to report that your pledge still isn't going to succeed
+unless you do something to encourage more people to sign up.
+
+Have you thought about writing to your local politicians about it?
+
+If you're in the UK , you can go straight to www.writetothem.com right
+now, and write to any of your politicians - we make it really easy.
+
+If you're not in Britain, why not try using a search engine to look
+for local politicians.
+
+Remember, the all important part is an explanation of why you think
+your pledge matters, and the web address, which is:
+
+<?=$values['pledge_url']?>
+
+Best of luck,
+
+the PledgeBank Team

@@ -63,6 +63,7 @@ while(<MAINPO>) {
         $buffer =~ s/\bPledge\b/Promise/g;
         $buffer =~ s/\bpledges\b/promises/g;
         $buffer =~ s/\bPledges\b/Promises/g;
+        #$buffer =~ s/but only if/
         print LIVESIMPLYPO $buffer;
         $buffer = "";
     } else {

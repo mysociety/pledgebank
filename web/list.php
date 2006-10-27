@@ -1,11 +1,11 @@
 <?
-// all.php:
+// list.php:
 // List all pledges.
 //
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.34 2006-09-16 17:28:11 matthew Exp $
+// $Id: list.php,v 1.35 2006-10-27 19:53:00 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -231,7 +231,7 @@ if ($ntotal > 0) {
 if ($rss) {
     rss_footer($rss_items);
 } else {
-    print p('<small>'._('New pledges are not shown here. <a href="/faq#allpledges">Read our FAQ</a> for details of when they appear.').'</small>');
+    print '<p style="clear: both" align="center"><small>'._('New pledges are not shown here. <a href="/faq#allpledges">Read our FAQ</a> for details of when they appear.').'</small></p>';
     page_footer();
 }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.35 2006-10-27 19:53:00 francis Exp $
+// $Id: list.php,v 1.36 2006-10-27 19:55:47 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -170,9 +170,9 @@ if (!$rss) {
         $n = $q_offset + PAGE_SIZE;
         $next = "<a href=\"?offset=$n$sort\">"._('Next page')." &raquo;</a>";
     }
-    $navlinks = '<p align="center">' . $views . "</p>\n";
+    $navlinks1 = '<p align="center">' . $views . "</p>\n";
     if ($ntotal > 0) {
-        $navlinks .= '<p align="center" style="font-size: 89%">' . _('Sort by'). ': ';
+        $navlinks2 = '<p align="center" style="font-size: 89%">' . _('Sort by'). ': ';
         $arr = array(
                      'creationtime'=>_('Start date'), 
                      /* 'target'=>_('Target'), */
@@ -183,16 +183,17 @@ if (!$rss) {
         # Removed as not useful (search is better for these): 'ref'=>'Short name',
         # 'title'=>'Title', 'name'=>'Creator'
         foreach ($arr as $s => $desc) {
-            if ($q_sort != $s) $navlinks .= "<a href=\"?sort=$s$off\">$desc</a>"; else $navlinks .= $desc;
-            if ($s != 'category') $navlinks .= ' | ';
+            if ($q_sort != $s) $navlinks2 .= "<a href=\"?sort=$s$off\">$desc</a>"; else $navlinks2 .= $desc;
+            if ($s != 'category') $navlinks2 .= ' | ';
         }
-        $navlinks .= '</p> <p align="center">';
-        $navlinks .= $prev . ' | '._('Pledges'). ' ' . ($q_offset + 1) . ' &ndash; ' . 
+        $navlinks2 .= '</p>';
+        $navlinks3 = '<p align="center">';
+        $navlinks3 .= $prev . ' | '._('Pledges'). ' ' . ($q_offset + 1) . ' &ndash; ' . 
             ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
             $ntotal . ' | ' . $next;
-        $navlinks .= '</p>';
+        $navlinks3 .= '</p>';
     }
-    print $navlinks;
+    print $navlinks1.$navlinks2.$navlinks3;
 }
 
 $rss_items = array();
@@ -222,7 +223,7 @@ if ($ntotal > 0) {
         $c++;
     }
     if (!$rss && $ntotal > PAGE_SIZE)
-        print "<br style=\"clear: both;\">$navlinks";
+        print "<br style=\"clear: both;\">$navlinks3$navlinks2$navlinks1";
 } else {
     if (!$rss)
         print p(_('There are currently none.'));

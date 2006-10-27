@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.83 2006-10-26 17:51:23 matthew Exp $
+ * $Id: frequentupdate,v 1.84 2006-10-27 18:29:55 francis Exp $
  *
  */
 
@@ -26,7 +26,7 @@ require_once '../../phplib/utility.php';
 function verbose($str) {
     global $verbose;
     if ($verbose) 
-        fwrite(STDERR, "frequentupdate: $str\n");
+        fwrite(STDERR, "frequentupdate ".posix_getpid().": $str\n");
 }
 function error($str) {
     fwrite(STDERR, "frequentupdate: ERROR: $str\n");
@@ -494,7 +494,80 @@ function send_automatic_failure_messages_byarea() {
     verbose("finished newly failed byarea pledges");
 }
 
-/* chivvy_creators_lowrate
+/* chivvy_creators_lowrate_old
+ * Send message to pledge creators whose signup rate is too low.
+ * This message is sent once to any pledge which:
+ * - has target of at least 8
+ * - has not passed the deadline yet
+ * - has not succeeded yet
+ * - at least 8 days have passed since the pledge was created
+ * - at least 2 days are left
+ * - are not backpage 
+ * - in the last week had a signup rate that, if continued until pledge
+ *   deadline, would not have sufficient signers for success
+ * - is 'overall', not 'byarea'
+ */
+function chivvy_creators_lowrate_old() {
+    global $pb_today, $pb_timestamp;
+
+    verbose("old finding pledges with too low a signup rate to succeed");
+
+    if (!db_getOne("
+                select id from pledges
+                where target >= 8
+                    and '$pb_today' <= date
+                    and whensucceeded is null
+                    and '$pb_timestamp'::timestamp > creationtime + '8 day'::interval
+                    and '$pb_today'::date < date - '2 day'::interval
+                    and cached_prominence <> 'backpage'
+                    and " . pb_chivvy_probable_will_reach_clause() . " < target
+                    and (select id
+                        from message
+                        where pledge_id = pledges.id
+                        and circumstance = 'chivvy-creator-lowrate') is null
+                    and target_type = 'overall'")) {
+        verbose("... no such pledges found");
+        return;
+    }
+
+    db_query("lock table message in exclusive mode");
+    $q = db_query("
+                select * from pledges
+                where target >= 8
+                    and '$pb_today' <= date
+                    and whensucceeded is null
+                    and '$pb_timestamp'::timestamp > creationtime + '8 day'::interval
+                    and '$pb_today'::date < date - '2 day'::interval
+                    and pb_pledge_prominence(pledges.id) <> 'backpage' 
+                    and " . pb_chivvy_probable_will_reach_clause() . " < target
+                    and (select id
+                        from message
+                        where pledge_id = pledges.id
+                        and circumstance = 'chivvy-creator-lowrate') is null
+                    and target_type = 'overall' 
+                for update
+                ");
+
+    while ($pledge = db_fetch_array($q)) {
+        verbose("pledge #${pledge['id']} (${pledge['ref']}) creator being sent chivvy lowrate email");
+
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendtolatesigners,
+                    emailtemplatename
+                ) values (
+                    ?, 'chivvy-creator-lowrate',
+                    true, false, false,
+                    'chivvy-creator-lowrate'
+                )", $pledge['id']);
+    }
+    db_commit();
+    verbose("finished old finding pledges with too low a signup rate to succeed");
+}
+
+
+/* chivvy_creators_lowrate_new
  * Send chivvy messages to pledge creators whose signup rate is too low.
  * Each chivvy message can be sent once to any pledge which:
  * - has target of at least 8
@@ -513,10 +586,10 @@ function send_automatic_failure_messages_byarea() {
  * 
  * Don't send more than one chivvy a day, somehow...
  */
-function chivvy_creators_lowrate() {
+function chivvy_creators_lowrate_new() {
     global $pb_today, $pb_timestamp;
 
-    verbose("finding pledges with too low a signup rate to succeed");
+    verbose("new finding pledges with too low a signup rate to succeed");
     $days_sofar = "('$pb_today'::date - creationtime::date)";
     $days_duration = "(date - creationtime::date)";
     $days_left = "(date - '$pb_today'::date)";
@@ -590,7 +663,7 @@ function chivvy_creators_lowrate() {
         }
 #        db_commit();
     }
-    verbose("finished finding pledges with too low a signup rate to succeed");
+    verbose("finished new finding pledges with too low a signup rate to succeed");
 }
 
 /* send_pending_messages
@@ -902,7 +975,8 @@ mark_overall_pledges_successful();
 mark_byarea_pledges_successful();
 send_automatic_failure_messages_overall();
 send_automatic_failure_messages_byarea();
-chivvy_creators_lowrate();
+chivvy_creators_lowrate_old();
+//chivvy_creators_lowrate_new();
 send_pledge_success_reminder();
 send_byarea_pledge_success_reminder();
 send_pending_messages();

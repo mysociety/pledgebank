@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.209 2006-10-30 15:58:33 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.210 2006-10-30 17:22:09 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -132,6 +132,8 @@ if (mySociety::Config::get('WEB_HOST') ne 'www') {
     $stub_url = mySociety::Config::get('WEB_HOST') . "." . $stub_url;
 }
 our $admin_url = mySociety::Config::get('ADMIN_URL');
+our $admin_auth_user = mySociety::Config::get('ADMIN_AUTH_USER');
+our $admin_auth_password = mySociety::Config::get('ADMIN_AUTH_PASSWORD');
 our $sms_in_url = mySociety::Config::get('PB_SMS_C360_INCOMING_URL');
 our $httpd_error_log = mySociety::Config::get('HTTPD_ERROR_LOG');
 our $email_domain = mySociety::Config::get('EMAIL_DOMAIN');
@@ -160,7 +162,8 @@ our $name_admin = "\"PledgeBank.com\"";
 # Configure test harness class
 print "Set up web test harness...\n" if $verbose > 0;
 our $wth = new mySociety::WebTestHarness();
-$wth->log_watcher_setup($httpd_error_log);
+$base_url =~ m#^http://(.+)/?$#;
+$wth->browser_credentials("$1:80", "$stub_url admin pages", $admin_auth_user, $admin_auth_password);
 
 # Specify URL as first parameter, will browse to it and store it as the new
 # locale base URL to use. Otherwise specify no URL, and the current one
@@ -195,7 +198,8 @@ print "Syntax check all PHP files...\n" if $verbose > 0;
 $wth->php_check_syntax("../../pb/");
 $wth->php_check_syntax("../../pb/templates/emails/", qr//);
 
-# Check error handling works
+# Setup error log watching
+$wth->log_watcher_setup($httpd_error_log);
 $wth->log_watcher_self_test($base_url . "/test.php?error=1", "deliberate_error_to_test_error_handling");
 
 # Run some pledges through life cycle

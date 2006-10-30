@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.36 2006-10-27 19:55:47 francis Exp $
+// $Id: list.php,v 1.37 2006-10-30 13:03:14 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -171,6 +171,8 @@ if (!$rss) {
         $next = "<a href=\"?offset=$n$sort\">"._('Next page')." &raquo;</a>";
     }
     $navlinks1 = '<p align="center">' . $views . "</p>\n";
+    $navlinks2 = '';
+    $navlinks3 = '';
     if ($ntotal > 0) {
         $navlinks2 = '<p align="center" style="font-size: 89%">' . _('Sort by'). ': ';
         $arr = array(

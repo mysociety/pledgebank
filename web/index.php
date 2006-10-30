@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.247 2006-10-25 12:45:19 francis Exp $
+// $Id: index.php,v 1.248 2006-10-30 15:07:01 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -110,6 +110,7 @@ function get_pledges_list($where, $params) {
     $query .= '(' . join(" OR ", $queries) . ')';
 
     $query .= " AND " . $where;
+#print "<p>query: $query</p>"; print_r($sql_params);
     $q = db_query($query, $sql_params);
     $pledges = array();
     while ($r = db_fetch_array($q)) {

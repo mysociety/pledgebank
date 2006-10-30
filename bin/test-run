@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.207 2006-10-30 11:56:00 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.208 2006-10-30 15:07:00 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -161,7 +161,6 @@ our $name_admin = "\"PledgeBank.com\"";
 print "Set up web test harness...\n" if $verbose > 0;
 our $wth = new mySociety::WebTestHarness();
 $wth->log_watcher_setup($httpd_error_log);
-$wth->log_watcher_self_test($base_url . "/test.php?error=1", "deliberate_error_to_test_error_handling");
 
 # Specify URL as first parameter, will browse to it and store it as the new
 # locale base URL to use. Otherwise specify no URL, and the current one
@@ -195,6 +194,9 @@ sms_setup();
 print "Syntax check all PHP files...\n" if $verbose > 0;
 $wth->php_check_syntax("../../pb/");
 $wth->php_check_syntax("../../pb/templates/emails/", qr//);
+
+# Check error handling works
+$wth->log_watcher_self_test($base_url . "/test.php?error=1", "deliberate_error_to_test_error_handling");
 
 # Run some pledges through life cycle
 if ($action{'all'}) {
@@ -768,7 +770,9 @@ sub do_public_succeeding_pledge {
     find_and_sign_pledge("list_succeeded_open", $pledge_action_completion, 4, 1, {action=>"suspend"}, "signed");
 
     # Check pledge has completed
+#print "Press RETURN to continue"; readline(*STDIN);
     call_frequentupdate();
+#print "Press RETURN to continue"; readline(*STDIN);
     $wth->browser_get($locale_url);
     $wth->browser_check_contents("Target met, pledge still open for 9 days");
     $wth->browser_follow_link(text_regex => qr/$pledge_action_completion/);

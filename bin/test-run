@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.206 2006-10-17 17:38:37 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.207 2006-10-30 11:56:00 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -71,7 +71,7 @@ extra smaller tests.
 Options are:
     --verbose=n    Choose 0 (no progress), 1 (basic actions), 2 (full debug)
     --pause        Pause after displaying URLs read from emails
-    --multispawn=n Test concurrency by calling scripts this many times at once (default 2)
+    --multispawn=n Test concurrency by calling scripts this many times at once (default 1)
 
 END
 }
@@ -79,7 +79,7 @@ END
 # Parse command line
 our $verbose = 0; # currently 3 levels: 0, 1 and 2
 our $pause = 0;
-our $multispawn = 2;
+our $multispawn = 1; # now crontab just runs on one machines anyway, gave up
 our $help;
 if (!GetOptions(
         'verbose=i' => \$verbose,

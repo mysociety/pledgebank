@@ -4,7 +4,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.12 2006-10-25 16:22:44 francis Exp $
+# $Id: crontab.ugly,v 1.13 2006-10-30 11:55:09 francis Exp $
 
 PATH=/usr/local/bin:/usr/bin:/bin
 !!(* if ($vhost eq "matthew.pledgebank.com") { *)!!
@@ -13,15 +13,28 @@ MAILTO=matthew@mysociety.org
 MAILTO=team@pledgebank.com
 !!(* } *)!!
 
-# Frequently
-0-59/20 * * * * !!(*= $user *)!! !!(*= $randomly *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate || echo "stalled?"
 
-# Once an hour
-33 * * * * !!(*= $user *)!! !!(*= $only_one *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "stalled?" )
-32 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
-35 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/get-global-cool
+## These scripts are pretty well concurrent, but we get lots of deadlocks when they
+## are run on multiple machines, and in the end I gave up 
+!!(* if ($hostname eq "bitter") { *)!!
+# Frequently
+0-59/20 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate || echo "stalled?"
 
 # Once a day, early morning
-0 7 * * * !!(*= $user *)!! !!(*= $only_one *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts
-0 8 * * * !!(*= $user *)!! !!(*= $randomly *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts || echo "stalled?"
+0 8 * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts || echo "stalled?"
+!!(* } *)!!
+
+
+## These scripts definitely aren't concurrent, and should only be run on one machine
+!!(* if ($hostname eq "bitter") { *)!!
+# Once an hour
+33 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "stalled?" )
+# Once a day, early morning
+0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts
+!!(* } *)!!
+
+
+## These scripts run on all machines, as they write to filesystem
+32 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
+35 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/get-global-cool
 

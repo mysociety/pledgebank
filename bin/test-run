@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.211 2006-10-31 14:35:12 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.212 2006-10-31 17:32:19 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -220,7 +220,7 @@ if ($action{'private'}) {
     do_private_failing_pledge();
 }
 if ($action{'chivvy'}) {
-    print "Making pledge and getting lots of chivvies...\n" if $verbose > 1;
+    print "Making pledge and getting lots of chivvies...\n" if $verbose > 0;
     do_chivvy_testing();
 }
 if ($action{'sms'}) {
@@ -1030,6 +1030,9 @@ sub do_private_failing_pledge {
     comment("Try to send second failure, which is not allowed");
     $wth->browser_get($locale_url . "/$pledge_ref/announce");
     $wth->browser_check_contents("You have already sent 1 failure announcement");
+
+    $wth->browser_follow_link(text_regex => qr/Logout/);
+    $wth->browser_check_contents("now logged out");
 }
 
 #############################################################################

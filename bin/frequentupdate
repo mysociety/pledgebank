@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.89 2006-10-31 16:28:08 francis Exp $
+ * $Id: frequentupdate,v 1.90 2006-10-31 16:32:34 francis Exp $
  *
  */
 
@@ -698,7 +698,7 @@ function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_
     ";
     $sql = "
         select pledges.id,target,ref, $will_reach as will_reach,
-            max(pledge_chivvy.chivvy_id) as last_chivvy_sent
+            pledge_chivvy.chivvy_id as last_chivvy_sent
         from pledges
         left join pledge_chivvy on pledges.id = pledge_chivvy.pledge_id
         where target >= 8

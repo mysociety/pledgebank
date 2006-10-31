@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.86 2006-10-30 15:15:26 matthew Exp $
+ * $Id: frequentupdate,v 1.87 2006-10-31 14:35:12 matthew Exp $
  *
  */
 
@@ -644,10 +644,11 @@ function chivvy_creators_lowrate_old() {
  * - has not passed the deadline yet
  * - has not succeeded yet
  * - at least 4 days + interval have passed since the pledge was created
- *   where interval is equal gaps between 4 days in and end of pledge, dependent on number of chivvy messages
+ *   where interval is equal gaps between 4 days in and 2 days before end
+     of pledge, dependent on number of chivvy messages
  * - at least 2 days are left
  * - are not backpage 
- * - in the last week had a signup rate that, if continued until pledge
+ * - in the last interval had a signup rate that, if continued until pledge
  *   deadline, would not have sufficient signers for success
  * - is 'overall', not 'byarea'
  * 
@@ -657,83 +658,76 @@ function chivvy_creators_lowrate_old() {
  * Don't send more than one chivvy a day, somehow...
  */
 function chivvy_creators_lowrate_new() {
-    global $pb_today, $pb_timestamp;
-
+    global $pb_timestamp;
     verbose("new finding pledges with too low a signup rate to succeed");
-    $days_sofar = "('$pb_today'::date - creationtime::date)";
-    $days_duration = "(date - creationtime::date)";
-    $days_left = "(date - '$pb_today'::date)";
+
     $chivvy_messages = 7;
-    $interval = "($days_duration - 4) / ($chivvy_messages + 1)";
-    for ($message = 1; $message <= $chivvy_messages; $message++) {
-        if (!db_getOne("
-                select id from pledges
-		left join pledge_chivvy as c1 on pledges.id = c1.pledge_id and c1.chivvy_id = $message
-		left join pledge_chivvy as c2 on pledges.id = c2.pledge_id and c2.chivvy_id < $message
-                where target >= 8
-                    and '$pb_today' <= date
-                    and whensucceeded is null
-                    and '$pb_timestamp'::timestamp > creationtime + '4 day'::interval + ($interval * $message||' days')::interval
-                    and '$pb_today'::date < date - '2 day'::interval
-                    and cached_prominence <> 'backpage'
-                    and c1.chivvy_id is null
-                    and target_type = 'overall'
-		group by pledges.id
-		having 
-		    (max(c2.whencreated) is null
-		        or max(c2.whencreated) < '$pb_timestamp'::timestamp - '1 day'::interval)
-		")) {
-	    verbose("...no chivvy $message messages");
-            continue;
-        }
+    $interval = "((date - creationtime::date - 6.0) / ($chivvy_messages + 1))";
 
-        db_query("lock table message in exclusive mode");
-        $q = db_query("
-                select id, max(target) as target, max(ref) as ref,
-			(round((select count(*) from signers 
-			    where signers.pledge_id = pledges.id
-			        and signers.signtime > '$pb_timestamp'::timestamp - ($interval||' days')::interval)::numeric 
-			            / $interval * (date - '$pb_today'),0) + 
-			    (select count(*) from signers where signers.pledge_id = pledges.id)) as will_reach
-		from pledges
-		left join pledge_chivvy as c1 on pledges.id = c1.pledge_id and c1.chivvy_id = $message
-		left join pledge_chivvy as c2 on pledges.id = c2.pledge_id and c2.chivvy_id < $message
-                where target >= 8
-                    and '$pb_today' <= date
-                    and whensucceeded is null
-                    and '$pb_timestamp'::timestamp > creationtime + '4 day'::interval + ($interval * $message||' days')::interval
-                    and '$pb_today'::date < date - '2 day'::interval
-                    and pb_pledge_prominence(pledges.id) <> 'backpage' 
-                    and c1.chivvy_id is null
-                    and target_type = 'overall' 
-		group by pledges.id, pledges.date, pledges.creationtime
-		having 
-		    (max(c2.whencreated) is null
-		        or max(c2.whencreated) < '$pb_timestamp'::timestamp - '1 day'::interval)
-                ");
+    db_query("lock table message in exclusive mode");
 
-        while ($pledge = db_fetch_array($q)) {
-	    if ($pledge['will_reach'] < $pledge['target']) {
-                verbose("pledge #${pledge['id']} (${pledge['ref']}) creator being sent chivvy lowrate email $message");
-	        db_query("
-                insert into message (
-                    pledge_id, circumstance,
-                    sendtocreator, sendtosigners, sendtolatesigners,
-                    emailtemplatename
-                ) values (
-                    ?, 'chivvy-creator-sequence',
-                    true, false, false,
-                    'chivvy-creator-lowrate-$message'
-                )", $pledge['id']);
-	    } else {
-	        verbose("pledge #${pledge['id']} (${pledge['ref']}) will reach target!");
-	    }
-	    db_query('insert into pledge_chivvy (pledge_id, chivvy_id) values (?,?)',
-	        $pledge['id'], $message);
-        }
-#        db_commit();
-    }
+    $sign_since = "creationtime";
+    $sign_interval = "($interval + 4)";
+    $whencreated_clause = " c1.whencreated is null ";
+    chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_clause);
+
+    $sign_since = "'$pb_timestamp'::timestamp - ($interval||' days')::interval";
+    $sign_interval = $interval;
+    $whencreated_clause = " c1.whencreated < '$pb_timestamp'::timestamp - '1 day'::interval
+        and c1.whencreated < $sign_since ";
+    chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_clause);
+
+    db_commit();
     verbose("finished new finding pledges with too low a signup rate to succeed");
+}
+
+function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_clause) {
+    global $pb_today, $pb_timestamp;
+    $will_reach = "
+    (round((select count(*) from signers 
+        where signers.pledge_id = pledges.id
+            and signers.signtime > $sign_since)::numeric 
+                / $sign_interval * (date - '$pb_today'),0) + 
+        (select count(*) from signers where signers.pledge_id = pledges.id))
+    ";
+    $sql = "
+        select pledges.id,target,ref, $will_reach as will_reach,
+            max(c1.chivvy_id) as last_chivvy_sent
+        from pledges
+        left join pledge_chivvy as c1 on pledges.id = c1.pledge_id
+        where target >= 8
+            and '$pb_timestamp'::timestamp > creationtime + ($sign_interval||' days')::interval
+            and '$pb_today'::date < date - '2 day'::interval
+            and whensucceeded is null
+            and cached_prominence <> 'backpage'
+            and target_type = 'overall'
+            and $whencreated_clause
+        group by pledges.id, target, ref, date, creationtime
+    ";
+    $q = db_query($sql);
+    while ($pledge = db_fetch_array($q)) {
+        $last_sent = $pledge['last_chivvy_sent'] + 0;
+        $message = $last_sent + 1;
+        if ($pledge['will_reach'] < $pledge['target']) {
+            verbose("pledge #${pledge['id']} (${pledge['ref']}) creator being sent chivvy lowrate email $message (will only reach $pledge[will_reach])");
+            db_query("
+        insert into message (
+            pledge_id, circumstance,
+            sendtocreator, sendtosigners, sendtolatesigners,
+            emailtemplatename
+        ) values (
+            ?, 'chivvy-creator-sequence',
+            true, false, false,
+            'chivvy-creator-lowrate-$message'
+            )", $pledge['id']);
+            $max_sent = $message;
+        } else {
+            verbose("pledge #${pledge['id']} (${pledge['ref']}) will reach target ($pledge[will_reach])");
+            $max_sent = $last_sent;
+        }
+        db_query('delete from pledge_chivvy where pledge_id = ?', $pledge['id']);
+        db_query('insert into pledge_chivvy (pledge_id, chivvy_id) values (?,?)', $pledge['id'], $max_sent);
+    }
 }
 
 /* send_pending_messages
@@ -1045,9 +1039,9 @@ mark_overall_pledges_successful();
 mark_byarea_pledges_successful();
 send_automatic_failure_messages_overall();
 send_automatic_failure_messages_byarea();
-chivvy_creators_early_old();
-chivvy_creators_lowrate_old();
-//chivvy_creators_lowrate_new();
+//chivvy_creators_early_old();
+//chivvy_creators_lowrate_old();
+chivvy_creators_lowrate_new();
 send_pledge_success_reminder();
 send_byarea_pledge_success_reminder();
 send_pending_messages();

@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.210 2006-10-30 17:22:09 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.211 2006-10-31 14:35:12 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -61,6 +61,7 @@ Usage: test-run [OPTION] [ACTION]...
 Actions are a list of tests, run if present in this order:
     public - make a public succeeding pledge
     private - make a private failing pledge
+    chivvy - test sending of chivvy emails
     sms - make a pledge, sign up by SMS and convert
     login - exhaustively test user login / authentication
     category - display of pledges by prominence, category and language
@@ -102,6 +103,8 @@ foreach (@ARGV) {
         $action{'private'} = 1;
     } elsif ($_ eq "sms") {
         $action{'sms'} = 1;
+    } elsif ($_ eq "chivvy") {
+        $action{'chivvy'} = 1;
     } elsif ($_ eq "login") {
         $action{'login'} = 1;
     } elsif ($_ eq "category") {
@@ -119,6 +122,7 @@ if (scalar(@ARGV) == 0) {
     $action{'public'} = 1;
     $action{'private'} = 1;
     $action{'sms'} = 1;
+    $action{'chivvy'} = 1;
     $action{'login'} = 1;
     $action{'category'} = 1;
     $action{'byarea'} = 1;
@@ -214,6 +218,10 @@ if ($action{'public'}) {
 if ($action{'private'}) {
     print "Making private pledge and letting it expire...\n" if $verbose > 0;
     do_private_failing_pledge();
+}
+if ($action{'chivvy'}) {
+    print "Making pledge and getting lots of chivvies...\n" if $verbose > 1;
+    do_chivvy_testing();
 }
 if ($action{'sms'}) {
     print "Testing SMS with pledge...\n" if $verbose > 0;
@@ -973,17 +981,17 @@ sub do_private_failing_pledge {
     $wth->browser_check_contents("Permission denied");
     $wth->browser_check_no_contents($pledge_action_private);
 
-    comment("Provoke chivvy too few signers email");
-    set_pb_date('1980-12-07');
-    call_frequentupdate();
-    $wth->email_get_containing('%Subject: You MUST publicise%To: '.email_n(0).  '%');
-    $wth->email_check_none_left();
-    comment("Provoke chivvy rate too low mail (we get it even though low signers count");
-    comment("as we are 'frontpage')");
-    set_pb_date('1980-12-10');
-    call_frequentupdate();
-    $wth->email_get_containing('%To: '.email_n(0).  '%rate of growth you\'ve had over the last week%');
-    $wth->email_check_none_left();
+    #comment("Provoke chivvy too few signers email");
+    #set_pb_date('1980-12-07');
+    #call_frequentupdate();
+    #$wth->email_get_containing('%Subject: You MUST publicise%To: '.email_n(0).  '%');
+    #$wth->email_check_none_left();
+    #comment("Provoke chivvy rate too low mail (we get it even though low signers count");
+    #comment("as we are 'frontpage')");
+    #set_pb_date('1980-12-10');
+    #call_frequentupdate();
+    #$wth->email_get_containing('%To: '.email_n(0).  '%rate of growth you\'ve had over the last week%');
+    #$wth->email_check_none_left();
 
     comment("Test what happens upon expiry");
     comment("... partially sign the pledge");
@@ -1022,6 +1030,177 @@ sub do_private_failing_pledge {
     comment("Try to send second failure, which is not allowed");
     $wth->browser_get($locale_url . "/$pledge_ref/announce");
     $wth->browser_check_contents("You have already sent 1 failure announcement");
+}
+
+#############################################################################
+
+sub do_chivvy_testing {
+    my $pledge_action = 'check chivvy emails are sent appropriately';
+    my $pledge_ref = "chivvytesting";
+    set_pb_date('1980-12-01');
+    create_pledge(0, 
+        { title => $pledge_action, 
+            target => '10', date => 'Dec 31st', ref => $pledge_ref
+        },
+        { country => 'Global' },
+        { },
+        { action => "viaemail" }
+    );
+    comment("Make frontpage, so that all chivvy emails are sent");
+    set_pledge_prominence($pledge_ref, 'frontpage');
+
+    comment("Provoke chivvy rate too low mails");
+    set_pb_date('1980-12-04'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-05'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-06'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-07'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-08'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-10'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-11'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-13'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-14'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-15'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-17'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-19'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-20'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-22'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-23'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Your local politicians can help your pledge to grow%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-24'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-26'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Bribe your friends to help spread your pledge%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-29'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1981-01-01'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+
+    comment("Now check no more than one a day, even if frequentupdate bombs and isn't run for two weeks");
+    $pledge_action = 'check chivvy emails are sent appropriately again';
+    $pledge_ref = "chivvytesting2";
+    set_pb_date('1980-12-01');
+    create_pledge(0, 
+        { title => $pledge_action, 
+            target => '10', date => 'Dec 31st', ref => $pledge_ref
+        },
+        { country => 'Global' },
+        { },
+        { action => "loggedin" }
+    );
+    set_pledge_prominence($pledge_ref, 'frontpage');
+    set_pb_date('1980-12-15'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-17'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-18'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-19'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-21'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-23'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-24'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-26'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-27'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-29'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1981-01-01'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+
+    comment("Now check nothing sent if there has been some signups!");
+    $pledge_action = 'check chivvy emails are sent appropriately yet again';
+    $pledge_ref = "chivvytesting3";
+    set_pb_date('1980-12-01');
+    create_pledge(0, 
+        { title => $pledge_action, 
+            target => '10', date => 'Dec 31st', ref => $pledge_ref
+        },
+        { country => 'Global' },
+        { },
+        { action => "loggedin" } # loggedin
+    );
+    set_pledge_prominence($pledge_ref, 'frontpage');
+    
+    set_pb_date('1980-12-03');
+    find_and_sign_pledge('ref', $pledge_ref, 101, 1, {action=>'viaemail'}, 'signed');
+    find_and_sign_pledge('ref', $pledge_ref, 102, 1, {action=>'viaemail'}, 'signed');
+    find_and_sign_pledge('ref', $pledge_ref, 103, 1, {action=>'viaemail'}, 'signed');
+    set_pb_date('1980-12-09'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-10'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-12'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-13'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-15'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-17'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-18'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-20'); call_frequentupdate();
+    $wth->email_check_none_left();
+    find_and_sign_pledge('ref', $pledge_ref, 104, 1, {action=>'viaemail'}, 'signed');
+    find_and_sign_pledge('ref', $pledge_ref, 105, 1, {action=>'viaemail'}, 'signed');
+    find_and_sign_pledge('ref', $pledge_ref, 106, 1, {action=>'viaemail'}, 'signed');
+    set_pb_date('1980-12-21'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-23'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-24'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-26'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-27'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: '.email_n(0).  '%');
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-28'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1980-12-31'); call_frequentupdate();
+    $wth->email_check_none_left();
+    set_pb_date('1981-01-01'); call_frequentupdate();
+    $wth->email_get_containing('%Subject: Sorry, your pledge failed%To: '.email_n(0).  '%');
+    for (my $i=101; $i<=106; $i++) {
+        $wth->email_get_containing('%Subject: Pledge failed%To: '.email_n($i).  '%');
+    }
+    $wth->email_check_none_left();
 }
 
 #############################################################################

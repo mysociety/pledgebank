@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.205 2006-10-26 17:51:23 matthew Exp $
+-- $Id: schema.sql,v 1.206 2006-10-31 16:34:01 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1058,7 +1058,7 @@ create table pledge_chivvy (
     chivvy_id integer not null,
     whencreated timestamp not null default ms_current_timestamp()
 );
-create index pledge_chivvy_pledge_id on pledge_chivvy(pledge_id);
+create unique index pledge_chivvy_pledge_id on pledge_chivvy(pledge_id);
 create index pledge_chivvy_chivvy_id on pledge_chivvy(chivvy_id);
 
 -- Comments/q&a on pledges.

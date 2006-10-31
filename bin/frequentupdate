@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.87 2006-10-31 14:35:12 matthew Exp $
+ * $Id: frequentupdate,v 1.88 2006-10-31 16:23:06 matthew Exp $
  *
  */
 
@@ -647,7 +647,7 @@ function chivvy_creators_lowrate_old() {
  *   where interval is equal gaps between 4 days in and 2 days before end
      of pledge, dependent on number of chivvy messages
  * - at least 2 days are left
- * - are not backpage 
+ * - are not marked by admin as backpage 
  * - in the last interval had a signup rate that, if continued until pledge
  *   deadline, would not have sufficient signers for success
  * - is 'overall', not 'byarea'
@@ -699,7 +699,7 @@ function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_
             and '$pb_timestamp'::timestamp > creationtime + ($sign_interval||' days')::interval
             and '$pb_today'::date < date - '2 day'::interval
             and whensucceeded is null
-            and cached_prominence <> 'backpage'
+            and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
             and target_type = 'overall'
             and $whencreated_clause
         group by pledges.id, target, ref, date, creationtime

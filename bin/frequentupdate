@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.88 2006-10-31 16:23:06 matthew Exp $
+ * $Id: frequentupdate,v 1.89 2006-10-31 16:28:08 francis Exp $
  *
  */
 
@@ -651,30 +651,34 @@ function chivvy_creators_lowrate_old() {
  * - in the last interval had a signup rate that, if continued until pledge
  *   deadline, would not have sufficient signers for success
  * - is 'overall', not 'byarea'
+ * - a chivvy hasn't been sent in the last day
  * 
- * This function fetches all pledges that match everything except the target criterion,
- * so can record we've looked at the pledge and don't try and send chivvy message later
- * 
- * Don't send more than one chivvy a day, somehow...
+ * This function fetches all pledges that match everything except the target
+ * criterion, so can record we've looked at the pledge and don't try and send
+ * chivvy message later
  */
 function chivvy_creators_lowrate_new() {
     global $pb_timestamp;
     verbose("new finding pledges with too low a signup rate to succeed");
 
+    // The number of chivvy-creator-lowrate-* templates
     $chivvy_messages = 7;
+    // The 6 here is 4 days from start of pledge, plus 2 days from end
     $interval = "((date - creationtime::date - 6.0) / ($chivvy_messages + 1))";
 
     db_query("lock table message in exclusive mode");
 
+    // Include signers for first 4 days for first message
     $sign_since = "creationtime";
-    $sign_interval = "($interval + 4)";
-    $whencreated_clause = " c1.whencreated is null ";
+    $sign_interval = "($interval + 4)"; // 4 days from start of pledge
+    $whencreated_clause = " pledge_chivvy.whencreated is null ";
     chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_clause);
 
+    // But not for other later messages
     $sign_since = "'$pb_timestamp'::timestamp - ($interval||' days')::interval";
     $sign_interval = $interval;
-    $whencreated_clause = " c1.whencreated < '$pb_timestamp'::timestamp - '1 day'::interval
-        and c1.whencreated < $sign_since ";
+    $whencreated_clause = " pledge_chivvy.whencreated < '$pb_timestamp'::timestamp - '1 day'::interval
+        and pledge_chivvy.whencreated < $sign_since ";
     chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_clause);
 
     db_commit();
@@ -683,6 +687,8 @@ function chivvy_creators_lowrate_new() {
 
 function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_clause) {
     global $pb_today, $pb_timestamp;
+    // The number of signers that will be reached if growth continues as it did in the 
+    // time interval length $sign_interval from $sign_since
     $will_reach = "
     (round((select count(*) from signers 
         where signers.pledge_id = pledges.id
@@ -692,9 +698,9 @@ function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_
     ";
     $sql = "
         select pledges.id,target,ref, $will_reach as will_reach,
-            max(c1.chivvy_id) as last_chivvy_sent
+            max(pledge_chivvy.chivvy_id) as last_chivvy_sent
         from pledges
-        left join pledge_chivvy as c1 on pledges.id = c1.pledge_id
+        left join pledge_chivvy on pledges.id = pledge_chivvy.pledge_id
         where target >= 8
             and '$pb_timestamp'::timestamp > creationtime + ($sign_interval||' days')::interval
             and '$pb_today'::date < date - '2 day'::interval

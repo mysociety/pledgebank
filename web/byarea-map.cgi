@@ -15,7 +15,7 @@
 #       http://geometryalgorithms.com/Archive/algorithm_0205/
 # Cross reference country names to ISO codes http://ws.geonames.org/countryInfo?
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.9 2006-08-24 12:44:51 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.10 2006-11-01 16:14:31 matthew Exp $';
 
 my $bitmap_size = 300;
 my $margin_extra = 0.05;
@@ -227,7 +227,7 @@ sub create_image {
 
     my $main_country = "United Kingdom";
     include_extents_country($main_country);
-#    include_extents_pins($pins);
+    include_extents_pins($pins);
 
     # Calculate scale and margins
     my $bitmap_w = $bitmap_size;
@@ -327,23 +327,22 @@ while (my $q = new CGI::Fast()) {
         throw PB::Error("Pledge '$pledge_id' is not byarea pledge") 
             if ($P->{'target_type'} ne 'byarea');
 
-        my $pins = dbh()->selectall_arrayref('
-            select 
-                max(latitude) as lat, 
-                max(longitude) as lon, 
-                max(whensucceeded) as succeeded, 
-                count(*) as count
-            from byarea_location 
-            left join location on byarea_location.byarea_location_id = location.id
-            left join signers on byarea_location.byarea_location_id = signers.byarea_location_id
-            where byarea_location.pledge_id = ?
-            group by byarea_location.byarea_location_id', {}, $pledge_id);
-
         my $filename = $P->{ref} . "-" . $P->{lastchange} . ".png";
         my $f = new IO::File("$map_dir/$filename", O_RDONLY);
         
         if (!$f && $!{ENOENT}) {
             my ($fh, $temp) = tempfile($P->{ref} . "XXXXXX", DIR => $map_dir);
+            my $pins = dbh()->selectall_arrayref('
+                select 
+                    max(latitude) as lat, 
+                    max(longitude) as lon, 
+                    max(whensucceeded) as succeeded, 
+                    count(*) as count
+                from byarea_location 
+                left join location on byarea_location.byarea_location_id = location.id
+                left join signers on byarea_location.byarea_location_id = signers.byarea_location_id
+                where byarea_location.pledge_id = ?
+                group by byarea_location.byarea_location_id', {}, $pledge_id);
             create_image($temp, $P, $pins);
             rename $temp, "$map_dir/$filename";
             $f = new IO::File("$map_dir/$filename", O_RDONLY)

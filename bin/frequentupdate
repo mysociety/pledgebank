@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.91 2006-10-31 16:42:01 francis Exp $
+ * $Id: frequentupdate,v 1.92 2006-11-01 15:13:53 matthew Exp $
  *
  */
 
@@ -420,7 +420,8 @@ function send_automatic_failure_messages_byarea() {
     /* Do a query before locking the table. */
     if (!db_getOne("
                 select id from pledges, byarea_location
-                where byarea_location.whensucceeded is null
+                where byarea_location.pledge_id = pledges.id
+                    and byarea_location.whensucceeded is null
                     and '$pb_today' > date
                     and (select id
                         from message
@@ -438,7 +439,8 @@ function send_automatic_failure_messages_byarea() {
     $q = db_query("
                 select pledges.*, byarea_location.byarea_location_id 
                 from pledges, byarea_location
-                where byarea_location.whensucceeded is null
+                where byarea_location.pledge_id = pledges.id
+                    and byarea_location.whensucceeded is null
                     and '$pb_today' > date
                     and (select id
                         from message

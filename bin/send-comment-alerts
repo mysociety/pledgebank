@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-comment-alerts,v 1.15 2006-11-02 12:23:58 matthew Exp $
+ * $Id: send-comment-alerts,v 1.16 2006-11-02 12:33:40 matthew Exp $
  *
  */
 
@@ -104,12 +104,6 @@ function send_comment_alerts() {
         db_query("insert into alert_sent (alert_id, comment_id) values (?, ?)", 
                  array($row['alert_id'], $row['comment_id']));
 
-        $data['comments'] .= $row['comment_author_name'] . ' : ' . trim($row['comment_text']) . "\n\n";
-
-        if (!isset($data['title'])) {
-            $data = array_merge($data, $row);
-        }
-
         # Send email
         if (!is_null($last_alert_id) && $last_alert_id != $row['alert_id']) {
                 $pledge = new Pledge($data);
@@ -117,9 +111,8 @@ function send_comment_alerts() {
                 $data['comment_url'] = $pledge->url_comments();
                 $data['unsubscribe_url'] = alert_unsubscribe_link($data['alert_id'], $data['alerted_email']);
                 print_r($data);
-                #$f = pb_send_email_template($data['alerted_email'], 'alert-comment', $data, array());
+                $f = pb_send_email_template($data['alerted_email'], 'alert-comment', $data, array());
                 locale_pop();
-                /*
                 if (!$f) {
                     # Revert record that it has been sent
                     db_rollback();
@@ -128,10 +121,14 @@ function send_comment_alerts() {
                     # Commit that it has been sent
                     db_commit();
                 }
-                */
                 $data = array('comments'=>'');
-                $last_alert_id = $row['alert_id'];
         }
+
+        $data['comments'] .= $row['comment_author_name'] . ' : ' . trim($row['comment_text']) . "\n\n------\n\n";
+        if (!isset($data['title'])) {
+            $data = array_merge($data, $row);
+        }
+        $last_alert_id = $row['alert_id'];
     }
 
     verbose("finished sending comment alerts");

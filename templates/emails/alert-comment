@@ -1,10 +1,10 @@
-Subject: New comment on pledge - '<?=$values['title']?>' at PledgeBank.com
+Subject: New comments on pledge - '<?=$values['title']?>' at PledgeBank.com
 
-<?=$values['comment_author_name']?> has left a comment saying:
+The following comments have been left on the pledge:
 
-'<?=$values['comment_text']?>'
+<?=$values['comments']?>
 
-View or reply to this comment: <?=$values['comment_url']?>
+View or reply to these comment: <?=$values['comment_url']?>
 
 <?=$values['signature']?>
 

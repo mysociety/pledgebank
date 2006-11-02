@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.208 2006-11-01 13:44:12 matthew Exp $
+-- $Id: schema.sql,v 1.209 2006-11-02 12:23:58 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1276,4 +1276,10 @@ create function pledge_last_change_time(integer)
     end;
 ' language 'plpgsql';
 
+create aggregate textcat_all(
+    basetype = text,
+    sfunc    = textcat,
+    stype    = text,
+    initcond = ''
+);
 

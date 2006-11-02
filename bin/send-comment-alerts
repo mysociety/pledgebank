@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-comment-alerts,v 1.14 2006-01-09 23:48:21 francis Exp $
+ * $Id: send-comment-alerts,v 1.15 2006-11-02 12:23:58 matthew Exp $
  *
  */
 
@@ -77,9 +77,12 @@ function send_comment_alerts() {
                     alert_sent.alert_id = alert.id and
                     alert_sent.comment_id = comment.id) is null
                 and comment.person_id <> alert.person_id
-            order by whenposted
+                and not comment.ishidden
+            order by alert.id, whenposted
             ");
 
+    $last_alert_id = null;
+    $data = array('comments'=>'');
     while ($row = db_fetch_array($q)) {
         # Grab a lock, making sure alert hasn't been deleted meanwhile
         $stillthere = db_getOne('select id from alert where id = ? for update', $row['alert_id']);
@@ -101,21 +104,33 @@ function send_comment_alerts() {
         db_query("insert into alert_sent (alert_id, comment_id) values (?, ?)", 
                  array($row['alert_id'], $row['comment_id']));
 
+        $data['comments'] .= $row['comment_author_name'] . ' : ' . trim($row['comment_text']) . "\n\n";
+
+        if (!isset($data['title'])) {
+            $data = array_merge($data, $row);
+        }
+
         # Send email
-        $pledge = new Pledge($row);
-        locale_push($pledge->lang());
-        $row['comment_url'] = $pledge->url_comments();
-        $row['comment_text'] = trim($row['comment_text']);
-        $row['unsubscribe_url'] = alert_unsubscribe_link($row['alert_id'], $row['alerted_email']);
-        $f = pb_send_email_template($row['alerted_email'], 'alert-comment', $row, array());
-        locale_pop();
-        if (!$f) {
-            # Revert record that it has been sent
-            db_rollback();
-            error("Failed to send comment alert to " . $row['alerted_email'] . " alert #" . $row['alert_id'] . " comment #" . $row['comment_id']);
-        } else {
-            # Commit that it has been sent
-            db_commit();
+        if (!is_null($last_alert_id) && $last_alert_id != $row['alert_id']) {
+                $pledge = new Pledge($data);
+                locale_push($pledge->lang());
+                $data['comment_url'] = $pledge->url_comments();
+                $data['unsubscribe_url'] = alert_unsubscribe_link($data['alert_id'], $data['alerted_email']);
+                print_r($data);
+                #$f = pb_send_email_template($data['alerted_email'], 'alert-comment', $data, array());
+                locale_pop();
+                /*
+                if (!$f) {
+                    # Revert record that it has been sent
+                    db_rollback();
+                    error("Failed to send comment alert to " . $data['alerted_email'] . " alert #" . $data['alert_id']);
+                } else {
+                    # Commit that it has been sent
+                    db_commit();
+                }
+                */
+                $data = array('comments'=>'');
+                $last_alert_id = $row['alert_id'];
         }
     }
 

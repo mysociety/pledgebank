@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.57 2006-11-03 16:19:21 francis Exp $
+ * $Id: microsites.php,v 1.58 2006-11-03 18:20:21 francis Exp $
  * 
  */
 
@@ -38,9 +38,11 @@ $microsites_list = array('everywhere' => _('Everywhere'),
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 if (OPTION_PB_STAGING) {
     # Francis's local test domains
-    $microsites_from_extra_domains = array('pledge.global-cool' => 'global-cool'); 
+    $microsites_from_extra_domains = array('pledge.global-cool' => 'global-cool',
+                                           'livesimply.pledgebank.owl' => 'livesimply'); 
 } else {
-    $microsites_from_extra_domains = array('pledge.global-cool.com' => 'global-cool');
+    $microsites_from_extra_domains = array('pledge.global-cool.com' => 'global-cool',
+                                           'livesimply.pledgebank.com' => 'livesimply'); // XXX put real domain in when available
 }
 $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 

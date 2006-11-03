@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.85 2006-10-15 10:29:02 francis Exp $
+# $Id: poster.cgi,v 1.86 2006-11-03 21:55:41 francis Exp $
 #
 
 import sys
@@ -47,6 +47,30 @@ from reportlab.platypus import Paragraph, Frame
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
 boilerplate_sms_smallprint = _("SMS operated by charity UKCOD. Available in UK only. Sign-up message costs your normal text rate. Further messages are free. ")
+
+## Microsite cusomisation (XXX put in pb/pylib/microsites.py I guess)
+# Return True if posters for that microsite look different from default posters
+# This is used to work out what to name the cache files.
+def microsites_poster_different_look(microsite):
+    return microsite in ('london', 'livesimply')
+# Fill colour for background of logo
+def microsites_poster_box_fill_colour():
+    if microsite == 'london':
+        return (0.93, 0.2, 0.22)
+    else:
+        return (0.6, 0.45, 0.7)
+# Colour for key words and numbers in text
+def microsites_poster_html_highlight_colour():
+    if microsite == 'london':
+        return '#31659c'
+    else:
+        return '#522994'
+# Colour on RTF posters
+def microsites_poster_rtf_colour():
+    if microsite == 'london':
+        return PyRTF.Colour('pb', 49, 101, 156) # 31659c
+    else:
+        return PyRTF.Colour('pb', 82, 41, 148) # 522994
 
 # this is a special function to be able to use bold and italic in ttfs
 # see may 2004 reportlab users mailing list
@@ -268,14 +292,10 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 #    size = 0.283
     w = x2 - x1
     h = y2 - y1
+    html_colour = microsites_poster_html_highlight_colour()
 
     # Draw purple bar
-    if microsite == 'london':
-        c.setFillColorRGB(0.93, 0.2, 0.22)
-	html_colour = '#31659c'
-    else:
-        c.setFillColorRGB(0.6, 0.45, 0.7)
-	html_colour = '#522994'
+    c.setFillColorRGB(*microsites_poster_box_fill_colour())
     h_purple = 0.1*h
     c.rect(x1, y1, w, h_purple, fill=1, stroke=0)
 
@@ -543,6 +563,16 @@ while fcgi.isFCGI():
         if not format in formats:
             raise Exception, "Unknown format '%s'" % format
 
+        # Get information from database
+        q = db.cursor()
+        pledge = {}
+        q.execute('SELECT title, date, name, type, target, target_type, signup, pin, identity, detail, country, lang, microsite FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE lower(ref) = %s', ref.lower())
+        row = q.fetchone()
+        if not row:
+            raise Exception, "Unknown ref '%s'" % ref
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['target_type'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang'], pledge['microsite']) = row
+        q.close()
+
         # Work out if we're on a microsite
         http_host = req.env.get('HTTP_HOST')
         if not http_host:
@@ -557,18 +587,14 @@ while fcgi.isFCGI():
             g = re.match('([^.]+)\.(?:..(?:-..)?\.)?'+web_host+'\.', http_host)
             if g:
                 microsite = g.group(1)
-        if microsite != 'london':
+        # ... override with pledge microsite if we didn't find one that looks
+        # different from URL
+        if microsites_poster_different_look(microsite):
             microsite = ''
-
-        # Get information from database
-        q = db.cursor()
-        pledge = {}
-        q.execute('SELECT title, date, name, type, target, target_type, signup, pin, identity, detail, country, lang FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE lower(ref) = %s', ref.lower())
-        row = q.fetchone()
-        if not row:
-            raise Exception, "Unknown ref '%s'" % ref
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['target_type'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang']) = row
-        q.close()
+        if not microsite and pledge['microsite']:
+            microsite = pledge['microsite']
+            if microsites_poster_different_look(microsite):
+                microsite = ''
 
         # Set language to that of the pledge
         iso_lang = 'en_GB'
@@ -657,10 +683,7 @@ while fcgi.isFCGI():
 
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir, prefix='tmp')
             ss = PyRTF.StyleSheet()
-	    if microsite == 'london':
-                ss.Colours.append(PyRTF.Colour('pb', 49, 101, 156)) # 31659c
-	    else:
-                ss.Colours.append(PyRTF.Colour('pb', 82, 41, 148)) # 522994
+            ss.Colours.append(microsites_poster_rtf_colour()) 
 #            if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
 #                heading_font = 'Trebuchet MS'
 #                main_font = 'Georgia'

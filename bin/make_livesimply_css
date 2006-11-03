@@ -87,7 +87,7 @@ ul#nav{
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
-    width: 17em;
+    width: 19em;
 }
 
 ul#nav li{

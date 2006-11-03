@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.9 2006-10-25 12:45:19 francis Exp $
+// $Id: explain.php,v 1.10 2006-11-03 16:19:22 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -73,9 +73,9 @@ function default_explanation() {
 }
 
 function livesimply_explanation() {
-    page_header(_("How does Live Simply work?"));
+    page_header(_("How does Live Simply Promise work?"));
 
-    print h2("How does Live Simply work?");
+    print h2("How does Live Simply Promise work?");
 
     ?>
     <img src="/microsites/livesimply/markwoods.jpg"
@@ -151,7 +151,7 @@ function livesimply_explanation() {
 
     <?
 
-    print '<p><a href="/">' . 'To Live Simply front page' . '</a></p>';
+    print '<p><a href="/">' . 'To Live Simply Promise front page' . '</a></p>';
 
     page_footer();
 }

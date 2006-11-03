@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.56 2006-10-25 16:10:53 francis Exp $
+ * $Id: microsites.php,v 1.57 2006-11-03 16:19:21 francis Exp $
  * 
  */
 
@@ -239,8 +239,10 @@ function microsites_navigation_menu($contact_ref) {
 
     $menu = array();
     $menu[_('Home')] = "/";
-    if ($microsite && $microsite == 'livesimply') 
-        $menu['How does Live Simply work?'] = "/explain";
+    if ($microsite && $microsite == 'livesimply') {
+        $menu['How Live Simply Promise works'] = "/explain";
+        $menu['What is Live Simply?'] = "http://www.livesimply.org.uk/";
+    }
     $menu[_('All Pledges')] = "/list";
     $menu[_('Start a Pledge')] = "/new";
     $menu['<acronym title="'._('Frequently Asked Questions').'">'._('FAQ').'</acronym>'] = "/faq";

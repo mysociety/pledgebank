@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.45 2006-11-01 13:42:42 matthew Exp $
+ * $Id: general-example,v 1.46 2006-11-03 20:59:05 francis Exp $
  * 
  */
 
@@ -91,7 +91,7 @@ define('OPTION_EVEL_URL', 'http://services.mysociety.org/evel');
 define('OPTION_MAPIT_URL', 'http://services.mysociety.org/mapit');
 define('OPTION_GAZE_URL', 'http://gaze.mysociety.org/gaze');
 
-// Limit on new pledges
+// Limit on new pledges, or zero for no limit
 define('OPTION_PB_TARGET_WARNING', '20');
 // Number of people contained in local alert and search radius
 define('OPTION_PB_SEARCH_POPULATION', '200000');

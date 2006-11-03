@@ -127,7 +127,7 @@ ul#nav ul{
 	padding: 0;
 }
 
-ul#nav li{
+/* ul#nav li{
 	list-style-image: url(/images/sub/Disc_Bullet.gif);
 }
 
@@ -137,7 +137,7 @@ ul#nav li.Plus{
 
 ul#nav li.Arrow{
 	list-style-image: url(/images/sub/Arrow_Bullet.gif);
-}
+} */
 
 ul#nav ul a{
 	font-weight: normal;

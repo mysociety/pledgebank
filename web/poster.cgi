@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.87 2006-11-06 21:04:41 francis Exp $
+# $Id: poster.cgi,v 1.88 2006-11-06 22:55:46 francis Exp $
 #
 
 import sys
@@ -190,8 +190,8 @@ def has_sms(pledge):
     return True
 
 def pb_domain_url():
-    if microsite:
-        url = microsite + '.'
+    if domain_microsite:
+        url = domain_microsite + '.'
     else:
         url = 'www.'
     if web_host != 'www':
@@ -292,13 +292,11 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
                     # TRANS: Text is an instruction (verb in the imperative)
                     PyRTF.TEXT(rtf_repr(_('Text')), size=int(small_writing+4)), 
                     ' ', 
-            # TRANS: Do not translate 'pledge' here, it is the SMS shortcode we use
-                    PyRTF.TEXT(rtf_repr(_('pledge %s')) % ref, bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
+                    PyRTF.TEXT(rtf_repr('%s %s') % (mysociety.config.get('PB_SMS_PREFIX'), ref), bold=True, colour=ss.Colours.pb, size=int(small_writing+16)),
             # TRANS: This appears on posters/flyers in the sentence: "Text 'pledge REFERENCE' *to* 60022". (Tim Morley, 2005-11-30)
                     ' ', rtf_repr(_('to')), ' ', 
                     PyRTF.TEXT('%s' % sms_number, colour=ss.Colours.pb, bold=True),
-            # TRANS: I think 'pledge' here means 'sign up to', as part of "text xxxxxxxxxx to 60022 (UK only) or pledge at http://xxxxxxxxx". Is that right? (Tim Morley, 2005-11-23)
-            # Yes, as above. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
+            # TRANS: This is part of "text xxxxxxxxxx to 60022 (UK only) or pledge at http://xxxxxxxxx". Is that right? (Tim Morley, 2005-11-23)
                     rtf_repr(_(' (%s only) or pledge at ') % sms_countries_description), webdomain_text)
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
@@ -431,10 +429,9 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     else:
         pledge_at_text = _("pledge at ").encode('utf-8')
         pin_text = ""
-    # TRANS: Again, please don't translate "pledge" in this one
         sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="%s">
-            <b>pledge %s</b></font> to <font color="%s"><b>%s</b></font> 
-            (%s only) or """).encode('utf-8') % (html_colour, ref, html_colour, sms_number, sms_countries_description.encode('utf-8'))
+            <b>%s %s</b></font> to <font color="%s"><b>%s</b></font> 
+            (%s only) or """).encode('utf-8') % (html_colour, mysociety.config.get('PB_SMS_PREFIX'), ref, html_colour, sms_number, sms_countries_description.encode('utf-8'))
         sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
     story.extend([
@@ -606,10 +603,11 @@ while fcgi.isFCGI():
             g = re.match('([^.]+)\.(?:..(?:-..)?\.)?'+web_host+'\.', http_host)
             if g:
                 microsite = g.group(1)
-        # ... override with pledge microsite if we didn't find one that looks
-        # different from URL
         if not microsites_poster_different_look(microsite):
             microsite = ''
+        domain_microsite = microsite
+        # ... override with pledge microsite if we didn't find one that looks
+        # different from URL
         if not microsite and pledge['microsite']:
             microsite = pledge['microsite']
             if not microsites_poster_different_look(microsite):

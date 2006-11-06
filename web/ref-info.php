@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.42 2006-10-17 10:08:53 francis Exp $
+ * $Id: ref-info.php,v 1.43 2006-11-06 22:35:49 francis Exp $
  * 
  */
 
@@ -119,6 +119,7 @@ debug_timestamp(true, "pledge info box");
     </td>
 </tr>
 <? debug_timestamp(true); ?>
+<? if (microsites_categories_allowed()) { ?>
 <tr>
     <th><?=_('Categories') ?></th>
     <td><?
@@ -130,6 +131,8 @@ debug_timestamp(true, "pledge info box");
         print implode('; ', array_map('htmlspecialchars', array_map('_', $a)));
     }
     ?></td>
+</tr>
+<? } ?>
 </table>
 </div>
 <?

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.37 2006-10-30 13:03:14 francis Exp $
+// $Id: list.php,v 1.38 2006-11-06 22:35:49 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -175,18 +175,22 @@ if (!$rss) {
     $navlinks3 = '';
     if ($ntotal > 0) {
         $navlinks2 = '<p align="center" style="font-size: 89%">' . _('Sort by'). ': ';
-        $arr = array(
-                     'creationtime'=>_('Start date'), 
-                     /* 'target'=>_('Target'), */
-                     'date'=>_('Deadline'), 
-                     'percentcomplete' => _('Percent signed'), 
-                     'category' => _('Category'), 
-                     );
+        $arr = array();
+        $arr['creationtime'] = _('Start date');
+        // $arr['target'] = _('Target');
+        $arr['date'] = _('Deadline');
+        $arr['percentcomplete'] = _('Percent signed');
+        if (microsites_categories_allowed()) {
+            $arr['category'] = _('Category');
+        }
+
         # Removed as not useful (search is better for these): 'ref'=>'Short name',
         # 'title'=>'Title', 'name'=>'Creator'
+        $c = 0;
         foreach ($arr as $s => $desc) {
+            $c ++;
             if ($q_sort != $s) $navlinks2 .= "<a href=\"?sort=$s$off\">$desc</a>"; else $navlinks2 .= $desc;
-            if ($s != 'category') $navlinks2 .= ' | ';
+            if ($c != count($arr)) $navlinks2 .= ' | ';
         }
         $navlinks2 .= '</p>';
         $navlinks3 = '<p align="center">';

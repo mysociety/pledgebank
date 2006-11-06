@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.157 2006-11-03 20:59:06 francis Exp $
+// $Id: new.php,v 1.158 2006-11-06 22:35:49 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -19,6 +19,14 @@ require_once '../../phplib/mapit.php';      # To test validity of postcodes
 require_once "../../phplib/votingarea.php";
 require_once '../../phplib/countries.php';
 require_once '../../phplib/gaze.php';
+
+function has_step_3() {
+    return (microsites_categories_allowed() || microsites_private_allowed());
+}
+$number_of_steps = 3;
+if (has_step_3()) {
+    $number_of_steps = 4;
+}
 
 $page_title = _('Create a New Pledge');
 $page_params = array();
@@ -117,10 +125,12 @@ about. If they don't, you need to rewrite it.") ?></li>
         if (!array_key_exists('name', $data))
             $data['name'] = $P->name_or_blank();
     }
+    
+    global $number_of_steps;
 ?>
 
 <form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
-<h2><?=_('New Pledge &#8211; Step 1 of 4') ?></h2>
+<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), 1, $number_of_steps)?></h2>
 <div class="c">
 
 <h3><?=_('Your Pledge')?></h3>
@@ -267,10 +277,12 @@ function pledge_form_two($data, $errors = array()) {
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
+
+    global $number_of_steps;
 ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
-<h2><?=_('New Pledge &#8211; Step 2 of 4') ?></h2>
+<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), 2, $number_of_steps)?></h2>
 
 <p><?=_('Which country does your pledge apply to?') ?>
 <? gaze_controls_print_country_choice($data['country'], $data['state'], $errors); ?>
@@ -293,7 +305,7 @@ gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="tostep3" value="<?=_('Next step') ?>"><br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
+<input class="topbutton" type="submit" name="<?=has_step_3() ? "tostep3" : "topreview" ?>" value="<?=_('Next step') ?>"><br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
 </p>
 
 </form>
@@ -319,10 +331,14 @@ function pledge_form_three($data, $errors = array()) {
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
+
+    global $number_of_steps;
 ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
-<h2><?=_('New Pledge &#8211; Step 3 of 4') ?></h2>
+<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), 3, $number_of_steps)?></h2>
+
+<? if (microsites_private_allowed()) { ?>
 <p><?=_('Which category does your pledge best fit into?') ?>
 <select name="category">
 <option value="-1"><?=_('(choose one)') ?></option>
@@ -349,6 +365,7 @@ function pledge_form_three($data, $errors = array()) {
 </select>
 <br><small><?=_('(this will be used in future to help more people find your pledge)') ?></small>
 </p>
+<? } ?>
 
 <? if (microsites_private_allowed()) { ?>
 <p><?=_('Who do you want to be able to see your pledge?') ?>
@@ -464,9 +481,12 @@ function pledge_form_submitted() {
         pledge_form_three($data, $errors);
         return;
     }
-    if ($data['visibility'] != 'pin') { 
+    if (!array_key_exists('visibility', $data) || $data['visibility'] != 'pin') { 
         $data['visibility'] = 'all'; 
         $data['pin'] = ''; 
+    }
+    if (!array_key_exists('category', $data)) { 
+        $data['category'] = -1;
     }
     $errors = step3_error_check($data);
     if (sizeof($errors)) {
@@ -645,12 +665,14 @@ function preview_pledge($data, $errors) {
     print '<p>';
     printf(_('Your pledge, with short name <em>%s</em>, will look like this:'), $data['ref']);
     print '</p>';
+
+    global $number_of_steps;
     ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<?  print h2(_('New Pledge &#8211; Step 4 of 4'));
-    print p(sprintf(_('
+<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), $number_of_steps, $number_of_steps)?></h2>
+<?  print p(sprintf(_('
 Now please read your pledge (on the left) and check the details thoroughly.
 <strong>Read carefully</strong> - we can\'t ethically let you %schange the wording%s of your pledge once people have
 started to sign up to it.    
@@ -668,7 +690,10 @@ longer be valid."))?>
 </div>
 
 <p style="text-align: right;">
-<input type="submit" name="tostep1" value="<?=_('Change pledge text') ?>"><br><input type="submit" name="tostep2" value="<?=_('Change location') ?>"><br><input type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
+<input type="submit" name="tostep1" value="<?=_('Change pledge text') ?>"><br><input type="submit" name="tostep2" value="<?=_('Change location') ?>">
+<? if (has_step_3()) { ?>
+<br><input type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
+<? } ?>
 </p>
 
 <?
@@ -705,11 +730,13 @@ greater publicity and a greater chance of succeeding.');
     <div id="otherdetails">
     <?=h3(_("Other Details"))?>
     <ul>
+    <? if (microsites_categories_allowed()) { ?>
     <li><?=_('Category') ?>: <strong><?=
         $data['category'] == -1
             ? _('None')
             : htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))) // XXX show enclosing cat?
     ?></strong></li>
+    <? } ?>
     <li><?=_('Privacy status') ?>: <strong><?
     if ($v=='all') print _('Public');
     if ($v=='pin') print _('Pledge can only be seen by people who I give the PIN to');

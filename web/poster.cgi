@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.86 2006-11-03 21:55:41 francis Exp $
+# $Id: poster.cgi,v 1.87 2006-11-06 21:04:41 francis Exp $
 #
 
 import sys
@@ -57,20 +57,49 @@ def microsites_poster_different_look(microsite):
 def microsites_poster_box_fill_colour():
     if microsite == 'london':
         return (0.93, 0.2, 0.22)
+    elif microsite == 'livesimply':
+        return (0.00, 0.67, 0.71)
     else:
         return (0.6, 0.45, 0.7)
 # Colour for key words and numbers in text
 def microsites_poster_html_highlight_colour():
     if microsite == 'london':
         return '#31659c'
+    elif microsite == 'livesimply':
+        return '#00aab5'
     else:
         return '#522994'
 # Colour on RTF posters
 def microsites_poster_rtf_colour():
     if microsite == 'london':
         return PyRTF.Colour('pb', 49, 101, 156) # 31659c
+    elif microsite == 'livesimply':
+        return PyRTF.Colour('pb', 0, 170, 181) # 00aab5
     else:
         return PyRTF.Colour('pb', 82, 41, 148) # 522994
+# Draw the logo at the bottom - x1 and y1
+def microsites_poster_logo(c, x1, y1, w, h_purple, p_footer):
+    # Draw purple bar
+    c.setFillColorRGB(*microsites_poster_box_fill_colour())
+    c.rect(x1, y1, w, h_purple, fill=1, stroke=0)
+
+    if microsite == "livesimply":
+        # Logo for Live Simply promise
+        # ... left hand text part
+        livesimply_banner_l_w = 672 * (h_purple / 120)
+        c.drawInlineImage("microsites/livesimply/promise_banner_left.jpg", x1, y1, width=livesimply_banner_l_w,height=h_purple)
+        # ... right hand fish part, if it fits
+        livesimply_banner_r_w = 268 * (h_purple / 120)
+        if w - livesimply_banner_r_w > livesimply_banner_l_w:
+            c.drawInlineImage("microsites/livesimply/promise_banner_right.jpg", x1 + w - livesimply_banner_r_w, y1, width=livesimply_banner_r_w,height=h_purple)
+    else:
+        # Logo for main PledgeBank
+        story = [
+            Paragraph(_('<font color="#ffffff">Pledge</font>Bank.com'), p_footer)
+        ]
+        f = Frame(x1, y1+0.1*h_purple, w, h_purple, showBoundary = 0, id='Footer',
+                topPadding = 0, bottomPadding = 0)
+        f.addFromList(story, c)
 
 # this is a special function to be able to use bold and italic in ttfs
 # see may 2004 reportlab users mailing list
@@ -292,13 +321,10 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 #    size = 0.283
     w = x2 - x1
     h = y2 - y1
+    h_purple = 0.1*h
     html_colour = microsites_poster_html_highlight_colour()
 
-    # Draw purple bar
     c.setFillColorRGB(*microsites_poster_box_fill_colour())
-    h_purple = 0.1*h
-    c.rect(x1, y1, w, h_purple, fill=1, stroke=0)
-
     # Draw dotted line round the outside
     c.setDash(3,3)
     # Don't use c.rect, so that the lines are always drawn the same direction,
@@ -355,14 +381,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     f.addFromList(story, c)
     
     # PledgeBank logo
-    story = [
-        Paragraph(_('<font color="#ffffff">Pledge</font>Bank.com'), p_footer)
-    ]
-    dots_body_gap = 0
-    f = Frame(x1, y1+0.1*h_purple, w, h_purple, showBoundary = 0, id='Footer',
-        topPadding = dots_body_gap, bottomPadding = dots_body_gap
-        )
-    f.addFromList(story, c)
+    microsites_poster_logo(c, x1, y1, w, h_purple, p_footer)
 
     # Main body text
     dots_body_gap = w/30
@@ -589,11 +608,11 @@ while fcgi.isFCGI():
                 microsite = g.group(1)
         # ... override with pledge microsite if we didn't find one that looks
         # different from URL
-        if microsites_poster_different_look(microsite):
+        if not microsites_poster_different_look(microsite):
             microsite = ''
         if not microsite and pledge['microsite']:
             microsite = pledge['microsite']
-            if microsites_poster_different_look(microsite):
+            if not microsites_poster_different_look(microsite):
                 microsite = ''
 
         # Set language to that of the pledge

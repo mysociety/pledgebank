@@ -57,9 +57,13 @@ print LIVESIMPLYCSS "\nh2 { color: #000000; }\n";
 
 print LIVESIMPLYCSS <<END;
 
+#pballfooter {
+    margin: 1em 0 0 16em;
+}
+
 /* From Partnerbasic.css */
 
-#nav ul{
+#nav ul {
     margin: 0;
     padding: 0;
     list-style-type: none;

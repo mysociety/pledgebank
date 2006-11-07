@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.10 2006-11-03 16:19:22 francis Exp $
+// $Id: explain.php,v 1.11 2006-11-07 16:16:33 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -76,11 +76,6 @@ function livesimply_explanation() {
     page_header(_("How does Live Simply Promise work?"));
 
     print h2("How does Live Simply Promise work?");
-
-    ?>
-    <img src="/microsites/livesimply/markwoods.jpg"
-    alt="" style="vertical-align: top; float:right; margin:0 0.5em 0 0; padding: 1em">
-    <?
 
     ?>
 

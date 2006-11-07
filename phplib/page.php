@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.139 2006-11-06 22:11:55 francis Exp $
+// $Id: page.php,v 1.140 2006-11-07 23:16:18 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -169,6 +169,8 @@ function page_header($title, $params = array()) {
         include "microsites/autogen/global-cool/thirdPartyLeftNav.html";
     }
 
+?><div id="pballheader"><? 
+
     // Display link to main pledge page
     if (array_key_exists('pref', $params)) {
         $url = $params['pref'];
@@ -202,6 +204,7 @@ function page_header($title, $params = array()) {
         print '</a>)</small></p>';
     }
 
+?></div><? # id="pballheader"
 ?>
 <div id="pbcontent"><?    
 

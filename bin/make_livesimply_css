@@ -58,8 +58,12 @@ print LIVESIMPLYCSS "\nh2 { color: #000000; }\n";
 print LIVESIMPLYCSS <<END;
 
 #pballfooter {
-    margin: 1em 0 0 16em;
+    margin: 0em 0 0 16em;
 }
+#pballheader{
+    margin: 0em 0 0 19.5em;
+}
+
 
 /* From Partnerbasic.css */
 

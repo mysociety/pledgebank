@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.61 2006-11-07 15:18:16 francis Exp $
+ * $Id: microsites.php,v 1.62 2006-11-07 15:39:34 francis Exp $
  * 
  */
 
@@ -333,8 +333,6 @@ function microsites_frontpage_intro() {
 	<?
     } elseif ($microsite == 'livesimply') {
         ?>
-
-    <img src="/microsites/livesimply/photo1.jpg" alt="" width="250px">
 
     <p>Tired of a world of consumerism, hype and selfishness? Wishing the world
     that is just.... and simple. Live Simply Promise is your opportunity to

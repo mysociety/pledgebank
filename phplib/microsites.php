@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.62 2006-11-07 15:39:34 francis Exp $
+ * $Id: microsites.php,v 1.63 2006-11-07 16:23:55 francis Exp $
  * 
  */
 
@@ -33,7 +33,7 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'interface' => 'Interface',
                          'global-cool' => 'Global Cool',
                          'catcomm' => 'CatComm',
-                         'livesimply' => 'Live Simply Promise');
+                         'livesimply' => '<em>live</em>simply:promise');
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 if (OPTION_PB_STAGING) {
@@ -185,7 +185,7 @@ function microsites_logo() {
     } elseif ($microsite && $microsite == 'livesimply') {
         return '
 <div style="background-color: #2aaaad; height: 120px;">
-<a href="/"><img src="/microsites/livesimply/promise_banner_left.jpg" alt="Live Simply Promise" 
+<a href="/"><img src="/microsites/livesimply/promise_banner_left.jpg" alt="livesimply:promise" 
     style="background-color: #ffffff; padding: 0px; margin: 0px; border: none; position: absolute;
     top: 0px; left: 0px; "></a>
 <img src="/microsites/livesimply/promise_banner_right.jpg" alt="" 
@@ -242,8 +242,8 @@ function microsites_navigation_menu($contact_ref) {
     $menu = array();
     $menu[_('Home')] = "/";
     if ($microsite && $microsite == 'livesimply') {
-        $menu['How Live Simply Promise works'] = "/explain";
-        $menu['What is Live Simply?'] = "http://www.livesimply.org.uk/";
+        $menu['How <em>live</em>simply:promise works'] = "/explain";
+        $menu['What is <em>live</em>simply?'] = "http://www.livesimply.org.uk/";
     }
     $menu[_('All Pledges')] = "/list";
     $menu[_('Start a Pledge')] = "/new";
@@ -335,16 +335,16 @@ function microsites_frontpage_intro() {
         ?>
 
     <p>Tired of a world of consumerism, hype and selfishness? Wishing the world
-    that is just.... and simple. Live Simply Promise is your opportunity to
+    that is just.... and simple. <em>live</em>simply:promise is your opportunity to
     do something about it. Start by changing a thing in your life and get
     others involved.</p>
 
-    <p>Live Simply is challenging us to live simply, sustainably and in
+    <p><em>live</em>simply is challenging us to live simply, sustainably and in
     solidarity with the poor. It's a call to reflect on our lifestyles,
     understand how they impact on the lives of the poor and take action for
     justice.</p>
 
-    <p><a href="/explain">How does Live Simply Promise work?</a>
+    <p><a href="/explain">How does <em>live</em>simply:promise work?</a>
 
         <?
         $tom = false;

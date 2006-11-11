@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.63 2006-11-07 16:23:55 francis Exp $
+ * $Id: microsites.php,v 1.64 2006-11-11 23:46:27 francis Exp $
  * 
  */
 
@@ -472,15 +472,24 @@ function microsites_frontpage_has_offline_secrets() {
     return true;
 }
 
-/* microsites_credit_footer
- * Display extra text at the bottom of the page.
+/* microsites_frontpage_credit_footer
+ * Display extra text at the bottom of the front page.
  */
-function microsites_credit_footer() {
+function microsites_frontpage_credit_footer() {
     global $microsite;
     if ($microsite == 'london') {
 ?>
         <div id="sponsor"><img src="/microsites/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
-<?  } elseif ($microsite == 'livesimply') {
+<?  } 
+
+}
+
+/* microsites_allpage_credit_footer
+ * Display extra text at the bottom of every page.
+ */
+function microsites_allpage_credit_footer() {
+    global $microsite;
+    if ($microsite == 'livesimply') {
         # Count the number of signatures, including pledge creators.
         # (We don't try to count distinct people using person_id as that can
         # give privacy leaks, as indeed could doing it my distinct person.name

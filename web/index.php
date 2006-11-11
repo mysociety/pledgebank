@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.248 2006-10-30 15:07:01 francis Exp $
+// $Id: index.php,v 1.249 2006-11-11 23:46:29 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -86,7 +86,7 @@ can make your pledge succeed &raquo;') ?>"></a></div>
     }
 
 
-    microsites_credit_footer();
+    microsites_frontpage_credit_footer();
 }
 
 # params must have:

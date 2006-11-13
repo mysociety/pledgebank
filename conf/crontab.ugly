@@ -4,7 +4,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.13 2006-10-30 11:55:09 francis Exp $
+# $Id: crontab.ugly,v 1.14 2006-11-13 22:57:28 francis Exp $
 
 PATH=/usr/local/bin:/usr/bin:/bin
 !!(* if ($vhost eq "matthew.pledgebank.com") { *)!!
@@ -14,8 +14,9 @@ MAILTO=team@pledgebank.com
 !!(* } *)!!
 
 
-## These scripts are pretty well concurrent, but we get lots of deadlocks when they
-## are run on multiple machines, and in the end I gave up 
+## These scripts are pretty well concurrent, but we get occasional deadlocks when they
+## are run on multiple machines, and in the end I gave up. So they are only run on one
+## machine now.
 !!(* if ($hostname eq "bitter") { *)!!
 # Frequently
 0-59/20 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate || echo "stalled?"

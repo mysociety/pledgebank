@@ -1,10 +1,10 @@
 Subject: New comments on pledge - '<?=$values['title']?>' at PledgeBank.com
 
-The following comments have been left on the pledge:
+The following comments have been left on this pledge:
 
 <?=$values['comments']?>
 
-View or reply to these comment: <?=$values['comment_url']?>
+View or reply to these comments: <?=$values['comment_url']?>
 
 <?=$values['signature']?>
 

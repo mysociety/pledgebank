@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-comment-alerts,v 1.17 2006-11-03 09:04:13 matthew Exp $
+ * $Id: send-comment-alerts,v 1.18 2006-11-13 22:51:42 francis Exp $
  *
  */
 
@@ -51,6 +51,24 @@ Usage: send-comment-alerts [--verbose]
 }
 
 // Main code at end.
+
+// internal
+function _send_aggregated_comment_mail($data) {
+    $pledge = new Pledge($data);
+    locale_push($pledge->lang());
+    $data['comment_url'] = $pledge->url_comments();
+    $data['unsubscribe_url'] = alert_unsubscribe_link($data['alert_id'], $data['alerted_email']);
+    $f = pb_send_email_template($data['alerted_email'], 'alert-comment', $data, array());
+    locale_pop();
+    if (!$f) {
+        # Revert record that it has been sent
+        db_rollback();
+        error("Failed to send comment alert to " . $data['alerted_email'] . " alert #" . $data['alert_id']);
+    } else {
+        # Commit that it has been sent
+        db_commit();
+    }
+}
 
 // send_comment_alerts sends alerts for new comments on a pledge
 function send_comment_alerts() {
@@ -106,21 +124,8 @@ function send_comment_alerts() {
 
         # Send email
         if (!is_null($last_alert_id) && $last_alert_id != $row['alert_id']) {
-                $pledge = new Pledge($data);
-                locale_push($pledge->lang());
-                $data['comment_url'] = $pledge->url_comments();
-                $data['unsubscribe_url'] = alert_unsubscribe_link($data['alert_id'], $data['alerted_email']);
-                $f = pb_send_email_template($data['alerted_email'], 'alert-comment', $data, array());
-                locale_pop();
-                if (!$f) {
-                    # Revert record that it has been sent
-                    db_rollback();
-                    error("Failed to send comment alert to " . $data['alerted_email'] . " alert #" . $data['alert_id']);
-                } else {
-                    # Commit that it has been sent
-                    db_commit();
-                }
-                $data = array('comments'=>'');
+            _send_aggregated_comment_mail($data);
+            $data = array('comments'=>'');
         }
 
         $data['comments'] .= $row['comment_author_name'] . ' : ' . trim($row['comment_text']) . "\n\n------\n\n";
@@ -128,6 +133,10 @@ function send_comment_alerts() {
             $data = array_merge($data, $row);
         }
         $last_alert_id = $row['alert_id'];
+    }
+    # Send email
+    if (!is_null($last_alert_id)) {
+        _send_aggregated_comment_mail($data);
     }
 
     verbose("finished sending comment alerts");

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.209 2006-11-02 12:23:58 matthew Exp $
+-- $Id: schema.sql,v 1.210 2006-11-13 22:58:05 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -120,7 +120,16 @@ create table person (
     email text not null,
     password text,
     website text,
-    numlogins integer not null default 0
+    numlogins integer not null default 0,
+
+    -- extra data, added originally for Live Simply Promise
+    address_1 text,
+    address_2 text,
+    address_3 text,
+    address_town text,
+    address_county text,
+    address_postcode text,
+    address_country char(2) -- ISO country code
 );
 
 create unique index person_email_idx on person(email);

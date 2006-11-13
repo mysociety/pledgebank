@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.158 2006-11-06 22:35:49 francis Exp $
+// $Id: new.php,v 1.159 2006-11-13 22:58:06 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -20,18 +20,26 @@ require_once "../../phplib/votingarea.php";
 require_once '../../phplib/countries.php';
 require_once '../../phplib/gaze.php';
 
+# Whether the category/privacy step is shown
 function has_step_3() {
     return (microsites_categories_allowed() || microsites_private_allowed());
 }
+# Whether the creator's extra address step is shown
+function has_step_addr() {
+    return microsites_postal_address_allowed();
+}
 $number_of_steps = 3;
 if (has_step_3()) {
-    $number_of_steps = 4;
+    $number_of_steps++;
+}
+if (has_step_addr()) {
+    $number_of_steps++;
 }
 
 $page_title = _('Create a New Pledge');
 $page_params = array();
 ob_start();
-if (get_http_var('tostep1') || get_http_var('tostep2') || get_http_var('tostep3') || get_http_var('topreview') || get_http_var('tocreate') || get_http_var('donetargetwarning')) {
+if (get_http_var('tostep1') || get_http_var('tostep2') || get_http_var('tostep3') || get_http_var('tostepaddr') || get_http_var('topreview') || get_http_var('tocreate') || get_http_var('donetargetwarning')) {
     pledge_form_submitted();
 } else {
     pledge_form_one();
@@ -305,7 +313,7 @@ gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places
 
 <p style="text-align: right;">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="<?=has_step_3() ? "tostep3" : "topreview" ?>" value="<?=_('Next step') ?>"><br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
+<input class="topbutton" type="submit" name="<?=has_step_3() ? "tostep3" : (has_step_addr() ? "tostepaddr" : "topreview") ?>" value="<?=_('Next step') ?>"><br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
 </p>
 
 </form>
@@ -385,6 +393,59 @@ function pledge_form_three($data, $errors = array()) {
 </form>
 
 <?
+}
+
+function pledge_form_addr($data = array(), $errors = array()) {
+    global $lang, $langs;
+    $isodate = $data['parseddate']['iso'];
+    if (sizeof($errors)) {
+        print '<div id="errors"><ul><li>';
+        print join ('</li><li>', array_values($errors));
+        print '</li></ul></div>';
+    } else {
+?>
+
+<p><?=_('Your pledge looks like this so far:') ?></p>
+<?  }
+    $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
+    $partial_pledge = new Pledge($row);
+    $partial_pledge->render_box(array('showdetails' => true));
+
+    global $number_of_steps;
+?>
+
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
+<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), has_step_3() ? 4 : 3, $number_of_steps)?></h2>
+<div class="c">
+
+<p>If you would like to become a CAFOD supporter, then please also enter your
+address. TODO: Finish this text.
+
+<p><strong><?=_('Your address:') ?></strong> 
+<br><input<? if (array_key_exists('address_1', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_1" id="address_1" value="<? if (isset($data['address_1'])) print htmlspecialchars($data['address_1']) ?>" size="30">
+<br><input<? if (array_key_exists('address_2', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_2" id="address_2" value="<? if (isset($data['address_2'])) print htmlspecialchars($data['address_2']) ?>" size="30">
+<br><input<? if (array_key_exists('address_3', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_3" id="address_3" value="<? if (isset($data['address_3'])) print htmlspecialchars($data['address_3']) ?>" size="30">
+<br><strong><?=_('Town:') ?></strong> 
+<br><input<? if (array_key_exists('address_town', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_town" id="address_town" value="<? if (isset($data['address_town'])) print htmlspecialchars($data['address_town']) ?>" size="20">
+<br><strong><?=_('County:') ?></strong> 
+<br><input<? if (array_key_exists('address_county', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_county" id="address_county" value="<? if (isset($data['address_county'])) print htmlspecialchars($data['address_county']) ?>" size="20">
+<br><strong><?=_('Postcode:') ?></strong> 
+<br><input<? if (array_key_exists('address_postcode', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_postcode" id="address_postcode" value="<? if (isset($data['address_postcode'])) print htmlspecialchars($data['address_postcode']) ?>" size="20">
+<br><strong><?=_('Country:') ?></strong> 
+<? 
+    gaze_controls_print_country_choice(microsites_site_country(), null, $errors, array('noglobal'=>true)); ?>
+</p>
+
+</div>
+<? if (sizeof($data)) {
+    print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
+} ?>
+<p style="text-align: right;">
+<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
+<input class="topbutton" type="submit" name="topreview" value="<?=_('Next step') ?>"><br><input type="submit" name="<?=(has_step_3() ? "tostep3" : "tostep2") ?>" value="<?=sprintf(_('Back to step %s'), (has_step_3() ? 3 : 2)) ?>">
+</p>
+</form>
+<? 
 }
 
 function pledge_form_submitted() {
@@ -494,6 +555,17 @@ function pledge_form_submitted() {
         return;
     }
 
+    # Step postal address
+    if (get_http_var('tostepaddr')) {
+        pledge_form_addr($data, $errors);
+        return;
+    }
+    $errors = stepaddr_error_check($data);
+    if (sizeof($errors)) {
+        pledge_form_addr($data, $errors);
+        return;
+    }
+
     # Step 4, preview
     if (get_http_var('topreview')) {
         preview_pledge($data, $errors);
@@ -510,6 +582,7 @@ function pledge_form_submitted() {
     $data['template'] = 'pledge-confirm';
     $P = pb_person_signon($data, $data['email'], $data['name']);
 
+    stepaddr_fillin_address($P, $data);
     create_new_pledge($P, $data);
 }
 
@@ -643,6 +716,14 @@ function step3_error_check(&$data) {
     return $errors;
 }
 
+function stepaddr_error_check(&$data) {
+    $errors = array();
+    if (array_key_exists('address_postcode', $data) && $data['address_postcode'] && !validate_postcode($data['address_postcode'])) {
+        $errors['address_postcode'] = _('Please enter a valid postcode');
+    }
+    return $errors;
+}
+
 function preview_error_check($data) {
     $errors = array();
     return $errors;
@@ -694,7 +775,11 @@ longer be valid."))?>
 <? if (has_step_3()) { ?>
 <br><input type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
 <? } ?>
+<? if (has_step_addr()) { ?>
+<br><input type="submit" name="tostepaddr" value="<?=_('Change your postal address') ?>">
+<? } ?>
 </p>
+
 
 <?
     print '<p>' . _('When you\'re happy with your pledge, <strong>click "Create"</strong> to confirm that you wish PledgeBank.com to display the pledge at the top of this page in your name, and that you agree to the terms and conditions below.');
@@ -746,6 +831,35 @@ greater publicity and a greater chance of succeeding.');
 
 <?
     
+}
+
+# Put extra address step information into person record
+# (this originally for Live Simply Promise)
+function stepaddr_fillin_address($P, $data) {
+    foreach (array('1','2','3','town','county','postcode','country') as $item) {
+        if (!array_key_exists("address_$item", $data)) {
+            $data["address_$item"] = null;
+        }
+    }
+    db_query("update person set 
+            address_1 = ?,
+            address_2 = ?,
+            address_3 = ?,
+            address_town = ?,
+            address_county = ?,
+            address_postcode = ?,
+            address_country = ?
+            where id = ?",
+        array(
+            $data['address_1'],
+            $data['address_2'],
+            $data['address_3'],
+            $data['address_town'],
+            $data['address_county'],
+            $data['address_postcode'],
+            $data['address_country'],
+            $P->id()
+        ));
 }
 
 # Someone has submitted a new pledge

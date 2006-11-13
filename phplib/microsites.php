@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.64 2006-11-11 23:46:27 francis Exp $
+ * $Id: microsites.php,v 1.65 2006-11-13 22:58:06 francis Exp $
  * 
  */
 
@@ -121,7 +121,7 @@ function microsites_redirect($p) {
 function microsites_site_country() {
     global $site_country, $microsite;
     if ($microsite) {
-        if ($microsite == 'london')
+        if ($microsite == 'london' || $microsite == 'livesimply')
             return 'GB';
         return null;
     }
@@ -532,6 +532,17 @@ function microsites_categories_allowed() {
         return false;
     else
         return true;
+}
+
+/* microsites_postal_address_allowed
+ * Returns whether the creator's postal address is asked for in new pledge
+ * dialog */
+function microsites_postal_address_allowed() {
+    global $microsite;
+    if ($microsite == 'livesimply')
+        return true;
+    else
+        return false;
 }
 
 /* microsites_new_pledges_prominence

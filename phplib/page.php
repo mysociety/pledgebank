@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.142 2006-11-20 16:33:57 francis Exp $
+// $Id: page.php,v 1.143 2006-11-20 16:50:47 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -115,7 +115,8 @@ function page_header($title, $params = array()) {
         print $title . " - ";
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
-?> PledgeBank<?if (!$title) print " - " . _("Tell the world \"I'll do it, but only if you'll help\"") ?></title>
+        # TRANS: 'PledgeBank' here is the first part of the HTML title which appears on browser windows, and search engines ?>
+?> <?=_('PledgeBank')?><?if (!$title) print " - " . _("Tell the world \"I'll do it, but only if you'll help\"") ?></title>
 <?
     foreach (microsites_css_files() as $microsite_file) {
 ?>
@@ -335,7 +336,7 @@ function rss_header($title, $description, $params) {
 >
 
 <channel rdf:about="<?=$main_page?>">
-<? # TRANS: 'PledgeBank' here is the first part of the HTML title which appears on browser windows, and search engines ?>
+<? # TRANS: 'PledgeBank' here is the second part of the title used in the RSS files ?>
 <title><?=$title?> - <?=_('PledgeBank')?> <?=$country_name?></title>
 <link><?=$main_page?></link>
 <description><?=$description?></description>

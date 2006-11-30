@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.65 2006-11-13 22:58:06 francis Exp $
+ * $Id: microsites.php,v 1.66 2006-11-30 10:45:40 matthew Exp $
  * 
  */
 
@@ -248,7 +248,7 @@ function microsites_navigation_menu($contact_ref) {
     $menu[_('All Pledges')] = "/list";
     $menu[_('Start a Pledge')] = "/new";
     $menu['<acronym title="'._('Frequently Asked Questions').'">'._('FAQ').'</acronym>'] = "/faq";
-    $menu[_('Contact')] = "/contact<?=$contact_ref?>";
+    $menu[_('Contact')] = '/contact' . $contact_ref;
     $menu[_('Your Pledges')] = "/your";
     $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
     debug_timestamp(true, "retrieved person record");

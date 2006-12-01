@@ -8,12 +8,14 @@
  * Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: bogusref.php,v 1.5 2006-12-01 14:50:11 chris Exp $
+ * $Id: bogusref.php,v 1.6 2006-12-01 15:06:07 chris Exp $
  * 
  */
 
 require_once '../conf/general';
+require_once '../phplib/pb.php';
 require_once '../phplib/page.php';
+require_once '../phplib/pledge.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/rabx.php';
 

@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.5 2006-12-01 15:14:31 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.6 2006-12-01 15:23:23 chris Exp $';
 
 use strict;
 
@@ -69,13 +69,13 @@ sub do_index() {
 
 my $last_indexed = 0;
 
-while (my $q = new CGI::Fast()) { if (0) {
+while (my $q = new CGI::Fast()) {
     my $ref = $q->param('ref');
     # only called as a GET and with a ref= param
     if ('GET' ne $q->request_method() || !$ref) {
         print $q->redirect('/');
         next;
-    }} my $ref = 'doesnotexist';
+    }
 
     if ($last_indexed < time() - 600) {
         do_index();

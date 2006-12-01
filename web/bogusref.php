@@ -8,7 +8,7 @@
  * Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: bogusref.php,v 1.3 2006-12-01 14:47:42 chris Exp $
+ * $Id: bogusref.php,v 1.4 2006-12-01 14:49:06 chris Exp $
  * 
  */
 
@@ -41,7 +41,7 @@ $data = rabx_unserialise(substr($ser, 0, strlen($ser) - 20));
 if (rabx_is_error($data))
     oops();
 
-if (!array_key_exists('ref', $data) || !exists('matches', $data))
+if (!array_key_exists('ref', $data) || !array_key_exists('matches', $data))
     oops();
 
 $ref = $_GET['ref'];

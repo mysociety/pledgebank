@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.4 2006-12-01 15:00:06 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.5 2006-12-01 15:14:31 chris Exp $';
 
 use strict;
 
@@ -54,14 +54,20 @@ sub index_pledge ($$) {
     }
 }
 
-my $stmt = dbh()->prepare("
-                select id, ref from pledges
-                    where pin is null and prominence <> 'backpage'");
-$stmt->execute();
-while (my ($id , $ref) = $stmt->fetchrow_array()) {
-    index_pledge($id, $ref);
+sub do_index() {
+    @pledges = ( );
+    %pledge_ref_part = ( );
+    my $stmt = dbh()->prepare("
+                    select id, ref from pledges
+                        where pin is null and prominence <> 'backpage'");
+    $stmt->execute();
+    while (my ($id , $ref) = $stmt->fetchrow_array()) {
+        index_pledge($id, $ref);
+    }
+    $stmt->finish();
 }
-$stmt->finish();
+
+my $last_indexed = 0;
 
 while (my $q = new CGI::Fast()) { if (0) {
     my $ref = $q->param('ref');
@@ -70,6 +76,11 @@ while (my $q = new CGI::Fast()) { if (0) {
         print $q->redirect('/');
         next;
     }} my $ref = 'doesnotexist';
+
+    if ($last_indexed < time() - 600) {
+        do_index();
+        $last_indexed = time();
+    }
 
     my @parts = split_parts($ref);
     my %res = ( );

@@ -8,7 +8,7 @@
  * Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: bogusref.php,v 1.2 2006-12-01 14:20:41 chris Exp $
+ * $Id: bogusref.php,v 1.3 2006-12-01 14:47:42 chris Exp $
  * 
  */
 
@@ -34,7 +34,7 @@ if (!($ser = base64_decode($ser))
 
 $hash = substr($ser, strlen($ser) - 20, 20);
 
-if (sha1(substr($ser, 0, strlen($ser) - 20)) != bin2hex($hash))
+if (sha1(db_secret() . substr($ser, 0, strlen($ser) - 20)) != bin2hex($hash))
     oops();
 
 $data = rabx_unserialise(substr($ser, 0, strlen($ser) - 20));

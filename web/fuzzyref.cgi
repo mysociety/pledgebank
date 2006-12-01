@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.3 2006-12-01 14:38:40 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.4 2006-12-01 15:00:06 chris Exp $';
 
 use strict;
 
@@ -63,38 +63,28 @@ while (my ($id , $ref) = $stmt->fetchrow_array()) {
 }
 $stmt->finish();
 
-sub urlencode ($) {
-    my $t = shift;
-    $t =~ s#([^A-Z0-9,./-])#sprintf('%%%02x', ord($1)#;
-    return $t;
-}
-
-while (my $q = new CGI::Fast()) {
+while (my $q = new CGI::Fast()) { if (0) {
     my $ref = $q->param('ref');
     # only called as a GET and with a ref= param
     if ('GET' ne $q->request_method() || !$ref) {
         print $q->redirect('/');
         next;
-    }
+    }} my $ref = 'doesnotexist';
 
     my @parts = split_parts($ref);
-    my @res = ( );
+    my %res = ( );
     foreach my $part (@parts) {
         next unless (exists($pledge_ref_part{$part}));
         my $sc = 1 / @{$pledge_ref_part{$part}};
         foreach my $id (@{$pledge_ref_part{$part}}) {
-            $res[$id] ||= [$id, 0];
-            $res[$id]->[1] += $sc;
+            $res{$id} += $sc;
         }
     }
 
     # sort by goodness-of-match
-    my @matches
-            = map { $_->[0] }
-                sort { $b->[1] <=> $a->[1] }
-                    grep { defined($_) } @res;
+    my @matches = sort { $res{$b} <=> $res{$a} } keys(%res);
     # limit to five results
-    @matches = @res[0 .. 4] if (@matches > 5);
+    @matches = @matches[0 .. 4] if (@matches > 5);
     my $ser = RABX::serialise({
                     ref => $ref,
                     matches => \@matches,

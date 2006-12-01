@@ -8,7 +8,7 @@
  * Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: bogusref.php,v 1.1 2006-12-01 14:17:22 chris Exp $
+ * $Id: bogusref.php,v 1.2 2006-12-01 14:20:41 chris Exp $
  * 
  */
 
@@ -17,8 +17,7 @@ require_once '../phplib/page.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/rabx.php';
 
-
-oops($ref = null) {
+function oops() {
     header('Location: /');
     exit;
 }
@@ -57,7 +56,7 @@ if (0 == sizeof($matches)) {
 } else {
     printf(p(_("We couldn't find the pledge with reference \"%s\". Did you mean one of these pledges?")), htmlspecialchars($ref) );
     print '<dl>';
-    foreach () {
+    foreach ($matches as $id) {
         $p = new Pledge((int)$id);
         print '<dt><a href="/'
                     /* XXX for the moment, just link to pledge index page,

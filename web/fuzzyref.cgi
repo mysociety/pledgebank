@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -w -I../perllib -I../../perllib
 #
 # fuzzyref.cgi:
 # Bogus pledge ref fuzzy match.
@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.1 2006-12-01 14:00:53 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.2 2006-12-01 14:24:40 chris Exp $';
 
 use strict;
 
@@ -36,7 +36,7 @@ my @pledges;
 my %pledge_ref_part;
 
 sub split_parts ($) {
-    return ( ) if (length($_[0] < 3));
+    return ( ) if (length($_[0]) < 3);
     
     my %res = ( );
     for (my $i = 0; $i < length($_[0]) - 2; ++$i) {
@@ -48,14 +48,16 @@ sub split_parts ($) {
 sub index_pledge ($$) {
     my ($id, $ref) = @_;
     $pledges[$id] = $ref;
-    push(@{$pledge_ref_part{$part}}, split_parts($ref));
+    foreach my $part (split_parts($ref)) {
+        push(@{$pledge_ref_part{$part}}, $id);
+    }
 }
 
 my $stmt = dbh()->prepare("
                 select id, ref from pledges
                     where pin is null and prominence <> 'backpage'");
 $stmt->execute();
-while ((my $id , $ref) = $stmt->fetchrow_array()) {
+while (my ($id , $ref) = $stmt->fetchrow_array()) {
     index_pledge($id, $ref);
 }
 $stmt->finish();
@@ -69,7 +71,7 @@ sub urlencode ($) {
 while (my $q = new CGI::Fast()) {
     my $ref = $q->param('ref');
     # only called as a GET and with a ref= param
-    if ('GET' ne $q->method() || !$ref) {
+    if ('GET' ne $q->request_method() || !$ref) {
         print $q->redirect('/');
         next;
     }
@@ -85,8 +87,12 @@ while (my $q = new CGI::Fast()) {
         }
     }
 
+    # sort by goodness-of-match
     @res = sort { $b->[1] <=> $a->[1] } @res;
+    # limit to five results
     @res = @res[0 .. 4] if (@res > 5);
+    # send only pledge IDs
+    @res = map { $_->[0] } @res;
     my $ser = RABX::serialise({
                     ref => $ref,
                     matches => \@res,

@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.2 2006-12-01 14:24:40 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.3 2006-12-01 14:38:40 chris Exp $';
 
 use strict;
 
@@ -24,7 +24,8 @@ BEGIN {
 
 use CGI;
 use CGI::Fast;
-use Digest::SHA1;
+use Digest::SHA1 qw(sha1);
+use MIME::Base64;
 use POSIX;
 use utf8;
 
@@ -88,14 +89,15 @@ while (my $q = new CGI::Fast()) {
     }
 
     # sort by goodness-of-match
-    @res = sort { $b->[1] <=> $a->[1] } @res;
+    my @matches
+            = map { $_->[0] }
+                sort { $b->[1] <=> $a->[1] }
+                    grep { defined($_) } @res;
     # limit to five results
-    @res = @res[0 .. 4] if (@res > 5);
-    # send only pledge IDs
-    @res = map { $_->[0] } @res;
+    @matches = @res[0 .. 4] if (@matches > 5);
     my $ser = RABX::serialise({
                     ref => $ref,
-                    matches => \@res,
+                    matches => \@matches,
                     salt => int(rand(0xffffffff))
                 });
 

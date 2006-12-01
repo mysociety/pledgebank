@@ -8,7 +8,7 @@
  * Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: bogusref.php,v 1.4 2006-12-01 14:49:06 chris Exp $
+ * $Id: bogusref.php,v 1.5 2006-12-01 14:50:11 chris Exp $
  * 
  */
 
@@ -44,8 +44,8 @@ if (rabx_is_error($data))
 if (!array_key_exists('ref', $data) || !array_key_exists('matches', $data))
     oops();
 
-$ref = $_GET['ref'];
-$matches = $_GET['matches'];
+$ref = $data['ref'];
+$matches = $data['matches'];
 
 header('HTTP/1.1 404 Not found');
 

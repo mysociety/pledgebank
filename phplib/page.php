@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.145 2006-11-30 21:53:55 chris Exp $
+// $Id: page.php,v 1.146 2006-12-01 15:19:27 chris Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -406,44 +406,7 @@ function page_check_ref($ref) {
          * case is first typed in , as ref-index.php does a redirect to the
          * URL with the correct case. */
         return;
-    header('HTTP/1.1 404 Not found');
-    page_header(_("We couldn't find that pledge"));
-//    $s = db_query('select pledge_id from pledge_find_fuzzily(?) limit 5', $ref);
-//    if (db_num_rows($s) == 0) {
-    if (1) {
-        printf(p(_("We couldn't find any pledge with a reference like \"%s\". Try the following: ")), htmlspecialchars($ref) );
-    } else {
-        printf(p(_("We couldn't find the pledge with reference \"%s\". Did you mean one of these pledges?")), htmlspecialchars($ref) );
-        print '<dl>';
-        while ($r = db_fetch_array($s)) {
-            $p = new Pledge((int)$r['pledge_id']);
-            print '<dt><a href="/'
-                        /* XXX for the moment, just link to pledge index page,
-                         * but we should figure out which page the user
-                         * actually wanted and link to that instead. */
-                        . htmlspecialchars($p->ref()) . '">'
-                        . htmlspecialchars($p->ref()) . '</a>'
-                    . '</dt><dd>'
-                    . '"' . $p->h_sentence(array('firstperson'=>true)) . '"'
-                    . " &mdash; " . $p->h_name()
-                    . '</dd>';
-        }
-        print '</dl>';
-        print p(_('If none of those look like what you want, try the following:'));
-    }
-
-    print '<ul>
-        <li>' . _('If you typed in the location, check it carefully and try typing it again.') . '</li>
-        <li>' . _('Look for the pledge on <a href="/all">the list of all pledges</a>.') . '</li>
-        <li>' . _('Search for the pledge you want by entering words below.') . '</ul>';
-    ?>
-<form accept-charset="utf-8" action="/search" method="get" class="pledge">
-<label for="s"><?=_('Search for a pledge') ?>:</label>
-<input type="text" id="s" name="s" size="15" value=""> <input type="submit" value=<?=_('Go') ?>>
-</form>
-<?
-    
-    page_footer();
+    header('Location: /fuzzyref?ref=' . urlencode($ref));
     exit();
 }
 

@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.6 2006-12-01 15:23:23 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.7 2006-12-01 15:27:48 chris Exp $';
 
 use strict;
 
@@ -82,7 +82,8 @@ while (my $q = new CGI::Fast()) {
         $last_indexed = time();
     }
 
-    my @parts = split_parts($ref);
+    my $n = length($ref) < 20 ? length($ref) : 20;
+    my @parts = split_parts(substr($ref, 0, $n));
     my %res = ( );
     foreach my $part (@parts) {
         next unless (exists($pledge_ref_part{$part}));

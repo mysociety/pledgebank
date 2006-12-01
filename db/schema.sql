@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.211 2006-12-01 16:20:25 chris Exp $
+-- $Id: schema.sql,v 1.212 2006-12-01 16:21:12 chris Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1057,8 +1057,6 @@ create function pb_delete_pledge(integer)
         delete from comment where pledge_id = $1;
         -- pledge connections
         delete from pledge_connection where a_pledge_id = $1 or b_pledge_id = $1;
-        -- reference parts
-        delete from pledge_ref_part where pledge_id = $1;
         -- categories
         delete from pledge_category where pledge_id = $1;
         -- chivvies

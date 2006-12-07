@@ -8,8 +8,11 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.88 2006-11-06 22:55:46 francis Exp $
+# $Id: poster.cgi,v 1.89 2006-12-07 09:27:29 francis Exp $
 #
+
+# TODO:
+# Upgrade to Python 2.4
 
 import sys
 sys.path.append("../../pylib")
@@ -47,6 +50,11 @@ from reportlab.platypus import Paragraph, Frame
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
 boilerplate_sms_smallprint = _("SMS operated by charity UKCOD. Available in UK only. Sign-up message costs your normal text rate. Further messages are free. ")
+
+# If you alter this, also alter phplib/microsites.php
+microsites_from_extra_domains = { 'pledge.global-cool.com' : 'global-cool',
+                                  'promise.livesimply.org.uk' : 'livesimply' };
+                                               
 
 ## Microsite cusomisation (XXX put in pb/pylib/microsites.py I guess)
 # Return True if posters for that microsite look different from default posters
@@ -189,14 +197,17 @@ def has_sms(pledge):
     # UK countries have SMS
     return True
 
+domain_microsite = None
+host_microsite = None
 def pb_domain_url():
-    if domain_microsite:
+    if host_microsite:
+        url = host_microsite
+    elif domain_microsite and microsites_poster_different_look(domain_microsite):
         url = domain_microsite + '.'
+        url += mysociety.config.get('WEB_DOMAIN')
     else:
-        url = 'www.'
-    if web_host != 'www':
-        url += web_host + '.'
-    url += mysociety.config.get('WEB_DOMAIN')
+        url = web_host + '.'
+        url += mysociety.config.get('WEB_DOMAIN')
     return url
 
 ############################################################################
@@ -590,22 +601,28 @@ while fcgi.isFCGI():
         q.close()
 
         # Work out if we're on a microsite
+        web_host = mysociety.config.get('WEB_HOST')
         http_host = req.env.get('HTTP_HOST')
+        domain_microsite = None
+        host_microsite = None
         if not http_host:
             http_host = ''
-        microsite = ''
-        web_host = mysociety.config.get('WEB_HOST')
-        if web_host == 'www':
-            g = re.match('([^.]+)\.', http_host)
-            if g:
-                microsite = g.group(1)
+        if http_host in microsites_from_extra_domains:
+            microsite = microsites_from_extra_domains[http_host]
+            host_microsite = http_host
         else:
-            g = re.match('([^.]+)\.(?:..(?:-..)?\.)?'+web_host+'\.', http_host)
-            if g:
-                microsite = g.group(1)
+            microsite = ''
+            if web_host == 'www':
+                g = re.match('([^.]+)\.', http_host)
+                if g:
+                    microsite = g.group(1)
+            else:
+                g = re.match('([^.]+)\.(?:..(?:-..)?\.)?'+web_host+'\.', http_host)
+                if g:
+                    microsite = g.group(1)
+            domain_microsite = microsite
         if not microsites_poster_different_look(microsite):
             microsite = ''
-        domain_microsite = microsite
         # ... override with pledge microsite if we didn't find one that looks
         # different from URL
         if not microsite and pledge['microsite']:

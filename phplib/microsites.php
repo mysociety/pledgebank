@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.66 2006-11-30 10:45:40 matthew Exp $
+ * $Id: microsites.php,v 1.67 2006-12-07 09:27:28 francis Exp $
  * 
  */
 
@@ -41,6 +41,7 @@ if (OPTION_PB_STAGING) {
     $microsites_from_extra_domains = array('pledge.global-cool' => 'global-cool',
                                            'promise.livesimply' => 'livesimply'); 
 } else {
+    # If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
     $microsites_from_extra_domains = array('pledge.global-cool.com' => 'global-cool',
                                            'promise.livesimply.org.uk' => 'livesimply');
 }

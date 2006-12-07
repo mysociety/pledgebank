@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.67 2006-12-07 09:27:28 francis Exp $
+ * $Id: microsites.php,v 1.68 2006-12-07 12:18:17 francis Exp $
  * 
  */
 
@@ -203,6 +203,19 @@ function microsites_logo() {
     }
 }
 
+/* microsites_html_title_slogan
+ * On the front page, slogon to display before site name */
+function microsites_html_title_slogan() {
+    global $microsite;
+
+    if ($microsite == "livesimply") {
+        return "Promise to live simply and get others involved"; # deliberately not translated
+    } else {
+        # TRANS: 'PledgeBank' here is the first part of the HTML title which appears on browser windows, and search engines
+        return _("Tell the world \"I'll do it, but only if you'll help\"");
+    }
+}
+ 
 /* microsites_css_files
  * Return array of URLs for CSS files */
 function microsites_css_files() {

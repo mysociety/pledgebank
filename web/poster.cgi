@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.90 2006-12-08 08:35:00 francis Exp $
+# $Id: poster.cgi,v 1.91 2006-12-08 09:30:21 francis Exp $
 #
 
 # TODO:
@@ -638,8 +638,8 @@ while fcgi.isFCGI():
             (loop_pb_code, loop_name, loop_iso) = available_lang.split(",")
             if pledge['lang'] == loop_pb_code:
                 iso_lang = loop_iso
-        domain = 'PledgeBank'
-        if iso_lang == 'en_GB':
+        domain = mysociety.config.get('PB_GETTEXT_DOMAIN')
+        if iso_lang == 'en_GB' and domain == 'PledgeBank':
             _ = lambda x: x
         else:
             translator = gettext.translation(domain, '../../locale', [iso_lang + '.UTF-8'])

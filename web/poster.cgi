@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.89 2006-12-07 09:27:29 francis Exp $
+# $Id: poster.cgi,v 1.90 2006-12-08 08:35:00 francis Exp $
 #
 
 # TODO:
@@ -274,12 +274,13 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
     story.Footer.append(PyRTF.Paragraph(ss.ParagraphStyles.footer, "PledgeBank.com"))
     story.extend([
         PyRTF.Paragraph(
-            ss.ParagraphStyles.header, 
-            PyRTF.B(rtf_repr(_('If'))), ' ', 
-            PyRTF.TEXT(format_integer(pledge['target']), colour=ss.Colours.pb),
-            rtf_repr(_(''' %s will %s, then ''') % (pledge['type'].decode('utf-8'), pledge['signup'].decode('utf-8'))), 
-            PyRTF.TEXT(rtf_repr(_('I')),colour=ss.Colours.pb),
-            rtf_repr(_(' will %s.') % pledge['title'].decode('utf-8'))),
+                ss.ParagraphStyles.header, 
+                PyRTF.TEXT(rtf_repr(_('I')),colour=ss.Colours.pb),
+                rtf_repr(_(' will %s ') % pledge['title'].decode('utf-8')),
+                PyRTF.B(rtf_repr(_('but only if'))), ' ', 
+                PyRTF.TEXT(format_integer(pledge['target']), colour=ss.Colours.pb),
+                rtf_repr(_(''' %s will %s.''') % (pledge['type'].decode('utf-8'), pledge['signup'].decode('utf-8')))
+            ),
         PyRTF.Paragraph(ss.ParagraphStyles.header, PyRTF.ParagraphPS(alignment=2), '\u8212- ', PyRTF.TEXT(rtf_repr('%s%s' % (pledge['name'].decode('utf-8'), identity.decode('utf-8'))), colour=ss.Colours.pb)),
         PyRTF.Paragraph(ss.ParagraphStyles.detail, ''),
     ])
@@ -410,12 +411,12 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     if pledge['identity']:
         identity = ', ' + pledge['identity']
     story = [
-        Paragraph(_('''
-            <b>If</b> <font color="%s">%s</font> %s will %s, 
-            then <font color="%s">I</font> will %s.
-            ''').encode('utf-8') % (html_colour,
-                format_integer(pledge['target']), pledge['type'], pledge['signup'], html_colour,
-                pledge['title']
+        Paragraph(_(
+                    '''<font color="%s">I</font> will %s <b>but only if</b> <font color="%s">%s</font> %s will %s. '''
+                ).encode('utf-8') % (
+                html_colour, pledge['title'],
+                html_colour, format_integer(pledge['target']), 
+                pledge['type'], pledge['signup']
             ), p_head),
         Paragraph(u'''<para align="right">\u2014 
             <font color="%s">%s%s</font></para>'''.encode('utf-8') 
@@ -715,7 +716,6 @@ while fcgi.isFCGI():
             neededsize = flyers(1, size, detail = True)
             neededsize = neededsize * 1.9 # The MAGIC CONSTANT
 
-            (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir, prefix='tmp')
             ss = PyRTF.StyleSheet()
             ss.Colours.append(microsites_poster_rtf_colour()) 
 #            if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':

@@ -63,7 +63,17 @@ while(<MAINPO>) {
         $buffer =~ s/\bPledge\b/Promise/g;
         $buffer =~ s/\bpledges\b/promises/g;
         $buffer =~ s/\bPledges\b/Promises/g;
-        #$buffer =~ s/msgid "I, \%s, will \%s but only if <strong>\%s<\/strong> \%s will \%s."/;
+
+        if ($buffer =~ m/\bbut only if\b/ && $buffer =~ m/%s will %s/) {
+            $buffer =~ s/\bbut only if\b/but I want/g;
+            $buffer =~ s/%s will %s/%s to %s/g;
+        }
+        $buffer =~ s/"but only if"/"but I want"/;
+        $buffer =~ s/"will"/"to"/;
+        $buffer =~ s/"%s will %s"/"%s to %s"/;
+        $buffer =~ s/"do the same"/"join me"/;
+#        $buffer =~ s#msgid "I, \%s, will \%s but only if <strong>\%s<\/strong> \%s will \%s."#msgid "I, \%s, will \%s but I want <strong>\%s<\/strong> \%s to \%s."#;
+    
 
         #$buffer =~ s/but only if/
         print LIVESIMPLYPO $buffer;

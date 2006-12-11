@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.11 2006-11-07 16:16:33 francis Exp $
+// $Id: explain.php,v 1.12 2006-12-11 17:54:55 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -79,70 +79,65 @@ function livesimply_explanation() {
 
     ?>
 
-    <p>Hello. I'm Mark Woods, the Live Simply network coordinator. I am writing
-    to you directly because I found that explaining Live Simply Promise in
-    person often works better than using the written word.</p>
+    <p>Hello. I'm Mark Woods, part of the livesimply team. The livesimply: promise is
+    a way to really make your faith talk. It works like this: "I promise to live
+    simply, sustainably and in solidarity with the poor by ..., but only if 10 other
+    people will do the same."</p>
 
-    <p>Events like tsunami, Niger drought or Pakistan earthquake expose the
-    poverty that majority of the people in the Southern hemisphere of this
-    planet live in. Last year's MAKEPOVERTYHISTORY campaign taught us that
-    what keeps people poor are also international debt, insufficient aid and
-    unjust trade. MAKEPOVERTHISTORY also taught us that we can do something
-    about this and, hey, did we do it - 8 million people in the UK wore a
-    white band, quarter of a million went to Edinburgh to ask G8 to make
-    poverty history and over 500,000 people emailed Tony Blair asking him to
-    keep his promise to eradicate poverty.</p>
-
-    <p>We've influenced politicians and will keep doing that. But we also need
-    to look at how do our lifestyles impact on the lives of the poor and
-    more importantly how we can use this link to help them.</p>
-
-    <p>Live Simply is challenges you to reflect on your lifestyle, understand
-    how it impacts on the lives of the poor and take action for justice. But
-    that's not all. If you persuade people in your community to do the same
-    the impact of your action will be even more significant.</p>
-
-    <p>Live Simply Promise enables you to do this.</p>
+    <p>You sign up online to the promise you like best, and encourage other people to
+    join the same one as you. Once the target number of people is reached, we let
+    you know so you can all start living your promise.</p>
 
     <h2>Signing up to a promise</h2>
 
-    <p>There is a range of things our supporters said they'd like to change in
-    their lives. So we've pre-set a few promises to reflect this.
+    <p>We have set up a range of promises to get you started.
+    If you sign up to a promise and promote it to others, you'll be helping create
+    a community action. Not only are you being the best you can be, you're
+    encouraging others to do the same. Also, if you're finding your promise hard to
+    keep, you'll know there are others out there you can turn to for support.</p>
 
-    <p>Each of the promises are set up for a group of people to do. If you sign
-    up to a promise and promote it to others, you'll create a nice little
-    community for yourself. So when you hit the wall and feel that you can't
-    do it, there will always be a group of people you can turn to for
-    support, advice and a kind word.</p>
+    <h2>Why make a promise?</h2>
 
-    <h2>Starting your own promise</h2>
+    <p>Our faith tells us the good things of the world were meant for everyone to
+    share. Yet a glance at our world shows that some people have everything, while
+    others have nothing. This isn't right. We can act for justice in simple ways. </p>
 
-    <p>If you have a specific idea of what you need to change in your lifestyle
-    and it's definitely not one of the promises we've pre-set, you can make
-    a promise of your own. You can choose to do it with one more person or
-    with another 50 people. Choose the number wisely though - set the target
-    bearing in mind who you can promote your promise to and how much time
-    you'll have to do this.</p>
+    <p>Last year for example, 8 million ordinary people in the UK showed they wanted
+    to make poverty history by wearing a white band. Politicians had to listen, and
+    they promised to change the structural problems that keep people poor. </p>
+
+    <p>Now livesimply says it's our turn to look at ways we can change things in
+    ourselves and in the world. It's not just about money. It's a challenge to
+    think about how our lifestyles can reflect our solidarity with people who are
+    poor. Make a start, by making a <em>live</em>simply:promise.</p>
 
     <h2>Promoting your promise</h2>
 
-    <p>To get as many people as possible to join you in fulfilling your
-    promise, you need to promote it. Live Simply Promise enables you to
-    create leaflets and posters just by clicking on a link.</p>
+    <p>To get as many people as possible to join you in
+    carrying out the promise you signed up to, you need to promote it. Create
+    personalised leaflets and posters just by clicking on a "Print out customised
+    flyers" link.</p>
 
-    <h2>Sign a promise by SMS</h2>
+    <h2>Starting your own promise</h2>
 
-    <p>Live Simply Promise isn't just limited to people who use the internet a
-    lot. You can sign up to any pledge by sending a two word text message
-    (in the UK only). Ideal for getting your friends in the pub involved,
-    people in your street and so on.</p>
+    <p>If your idea of what you want to change about your lifestyle is not one
+    of the existing promises, make a promise of your own.  Don't pitch your target
+    number of participants too high - bear in mind who you can promote your promise
+    to and how much time you've got. </p>
 
-    <p>That's all I had to say. All you need to do now is to choose your
-    promise, involve others and make sure you fulfil it!</p>
+    <h2>Sign a promise by SMS (in the UK only)</h2>
 
-    <p>Thank you and good luck,</p>
-    <p>Mark</p>
+    <p>You can sign up to any promise by sending a two word text message. You
+    will find the full instructions on the leaflets generated for your promise.
+    Ideal for getting your friends in the pub involved, young people and so on.
+    </p>
 
+    <p>That's all from me. Now just choose your promise, get your friends on board,
+    and carry it out! </p>
+
+    <p>Thanks and good luck, </p>
+
+    <p>Mark and the <em>live</em>simply team</p>
 
     <?
 

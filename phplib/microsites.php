@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.68 2006-12-07 12:18:17 francis Exp $
+ * $Id: microsites.php,v 1.69 2006-12-11 17:54:54 francis Exp $
  * 
  */
 
@@ -348,15 +348,13 @@ function microsites_frontpage_intro() {
     } elseif ($microsite == 'livesimply') {
         ?>
 
-    <p>Tired of a world of consumerism, hype and selfishness? Wishing the world
-    that is just.... and simple. <em>live</em>simply:promise is your opportunity to
-    do something about it. Start by changing a thing in your life and get
-    others involved.</p>
+    <p>Think there's more to life than celebrities and shopping? Want to make the
+    world a better place for everyone? Then start here by taking a <em>live</em>simply:
+    promise. Make a simple change in your life and get others to do the same! </p>
 
-    <p><em>live</em>simply is challenging us to live simply, sustainably and in
-    solidarity with the poor. It's a call to reflect on our lifestyles,
-    understand how they impact on the lives of the poor and take action for
-    justice.</p>
+    <p>livesimply is a challenge to look hard at our lifestyles and to choose
+    to live simply, sustainably and in solidarity with people in poverty. Be
+    the best you can be, and help other people do the same. </p>
 
     <p><a href="/explain">How does <em>live</em>simply:promise work?</a>
 

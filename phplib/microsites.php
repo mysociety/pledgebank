@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.69 2006-12-11 17:54:54 francis Exp $
+ * $Id: microsites.php,v 1.70 2006-12-12 08:06:58 francis Exp $
  * 
  */
 
@@ -261,7 +261,11 @@ function microsites_navigation_menu($contact_ref) {
     }
     $menu[_('All Pledges')] = "/list";
     $menu[_('Start a Pledge')] = "/new";
-    $menu['<acronym title="'._('Frequently Asked Questions').'">'._('FAQ').'</acronym>'] = "/faq";
+    if ($microsite && $microsite == 'livesimply') {
+        $menu['Frequently Asked Questions'] = "/faq";
+    } else {
+        $menu['<acronym title="'._('Frequently Asked Questions').'">'._('FAQ').'</acronym>'] = "/faq";
+    }
     $menu[_('Contact')] = '/contact' . $contact_ref;
     $menu[_('Your Pledges')] = "/your";
     $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
@@ -509,6 +513,61 @@ function microsites_allpage_credit_footer() {
         $na = db_getOne('select count(*) from signers');
         $nb = db_getOne('select count(*) from pledges');
         ?> <div id="simplycounter">Together, we've made <?=$na + $nb?> promises. What are you going to promise?</div> <?
+    }
+}
+
+function microsites_newpledge_toptips() {
+    global $microsite;
+    if ($microsite == 'livesimply') {
+        ?>
+        <div id="tips">
+        <h2>Top Tips for Successful Promises</h2>
+        <ol>
+
+        <li>Keep your targets modest — We recommend you pick a low target, but
+        with enough people to motivate you to carry out your side of the
+        bargain! This makes it most likely your pledge will succeed, and more
+        people than you expected can always sign up. </li>
+
+        <li>Get ready to sell your promise, hard. Promises don't sell
+        themselves just by sitting on this site. In fact your promise won't
+        even appear to general site visitors until you've got a few people to
+        sign up to it yourself. Think hard about whether people you know would
+        want to sign up to your promise! </li>
+
+        <li>Think about how your promise reads. How will it look to someone who
+        picks up a flyer from their doormat? Read your promise to the person
+        next to you, or to your mother, and see if they understand what you're
+        talking about. If they don't, you need to rewrite it. </li>
+
+        </ol>
+        </div>
+        <?
+     } else {
+        $percent_successful_above_100 = percent_success_above(100);
+        ?>
+        <div id="tips">
+        <h2><?=_('Top Tips for Successful Pledges') ?></h2>
+        <ol>
+
+        <li> <?=sprintf(_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
+        to do something when 5 would be enough? Every extra person makes your pledge
+        harder to meet. Only %0.0f%% of pledges asking for more than 100 people succeed.'), $percent_successful_above_100) ?></li>
+
+        <li> <?=_("<strong>Get ready to sell your pledge, hard</strong>. Pledges don't
+        sell themselves just by sitting on this site. In fact your pledge won't even
+        appear to general site visitors until you've got a few people to sign up to it
+        yourself. Think hard about whether people you know would want to sign up to
+        your pledge!") ?></li>
+
+        <li> <?=_("<strong>Think about how your pledge reads.</strong> How will it look to
+        someone who picks up a flyer from their doormat? Read your pledge to the person
+        next to you, or to your mother, and see if they understand what you're talking
+        about. If they don't, you need to rewrite it.") ?></li>
+
+        </ol>
+        </div>
+        <?
     }
 }
 

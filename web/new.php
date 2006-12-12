@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.159 2006-11-13 22:58:06 francis Exp $
+// $Id: new.php,v 1.160 2006-12-12 08:06:58 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -52,35 +52,12 @@ page_footer(array('nolocalsignup'=>true));
 
 function pledge_form_one($data = array(), $errors = array()) {
     global $lang, $langs;
-    $percent_successful_above_100 = percent_success_above(100);
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
     } else {
-?>
-<div id="tips">
-<h2><?=_('Top Tips for Successful Pledges') ?></h2>
-<ol>
-
-<li> <?=sprintf(_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
-to do something when 5 would be enough? Every extra person makes your pledge
-harder to meet. Only %0.0f%% of pledges asking for more than 100 people succeed.'), $percent_successful_above_100) ?></li>
-
-<li> <?=_("<strong>Get ready to sell your pledge, hard</strong>. Pledges don't
-sell themselves just by sitting on this site. In fact your pledge won't even
-appear to general site visitors until you've got a few people to sign up to it
-yourself. Think hard about whether people you know would want to sign up to
-your pledge!") ?></li>
-
-<li> <?=_("<strong>Think about how your pledge reads.</strong> How will it look to
-someone who picks up a flyer from their doormat? Read your pledge to the person
-next to you, or to your mother, and see if they understand what you're talking
-about. If they don't, you need to rewrite it.") ?></li>
-
-</ol>
-</div>
-<?
+        microsites_newpledge_toptips();
     }
 
     if (get_http_var('local') && $ref = get_http_var('ref')) {

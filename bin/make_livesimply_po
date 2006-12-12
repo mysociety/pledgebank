@@ -80,10 +80,9 @@ while(<MAINPO>) {
         $buffer =~ s/"will"/"to"/;
         $buffer =~ s/"%s will %s"/"%s to %s"/;
         $buffer =~ s/"do the same"/"join me"/;
-#        $buffer =~ s#msgid "I, \%s, will \%s but only if <strong>\%s<\/strong> \%s will \%s."#msgid "I, \%s, will \%s but I want <strong>\%s<\/strong> \%s to \%s."#;
     
+        $buffer =~ s#-- the livesimply:promise team#The livesimply:promise team\nhttp://promise.livesimply.org.uk#;
 
-        #$buffer =~ s/but only if/
         print LIVESIMPLYPO $buffer;
         $buffer = "";
     } else {

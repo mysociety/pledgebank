@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.26 2006-10-17 10:08:53 francis Exp $
+// $Id: ref-email.php,v 1.27 2006-12-12 15:28:09 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -59,7 +59,8 @@ if (get_http_var('submit')) {
         foreach ($emails as $email) {
             if (!$email)
                 continue;
-            $success &= pb_send_email_template($email, 'email-friends',
+            global $microsite;
+            $success &= pb_send_email_template($email, ($microsite && $microsite == 'livesimply') ? 'email-friends-livesimply' : 'email-friends', # XXX put condition in microsites.php
                 array_merge($p->data, array(
                     'from_name'=>$fromname, 
                     'from_email' => $fromemail, 

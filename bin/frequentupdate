@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.92 2006-11-01 15:13:53 matthew Exp $
+ * $Id: frequentupdate,v 1.93 2006-12-12 14:58:57 francis Exp $
  *
  */
 
@@ -710,6 +710,7 @@ function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_
             and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
             and target_type = 'overall'
             and $whencreated_clause
+            and (".microsites_chivvy_sql().")
         group by pledges.id, target, ref, date, creationtime
     ";
     $q = db_query($sql);

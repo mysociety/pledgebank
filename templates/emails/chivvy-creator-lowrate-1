@@ -11,6 +11,6 @@ friends right now.
 
 All you need to ask them is to visit <?=$values['pledge_url']?> and sign up.
 
-all the best,
+All the best,
 
-The PledgeBank Team
+<?=$values['signature']?>

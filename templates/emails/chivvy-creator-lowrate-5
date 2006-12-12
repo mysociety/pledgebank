@@ -14,3 +14,5 @@ The address of your pledge is <?=$values['pledge_url']?>
 
 If you're lucky, they might even send a photographer round, and get
 your picture in the papers!
+
+<?=$values['signature']?>

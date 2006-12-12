@@ -20,4 +20,4 @@ your pledge matters, and the web address, which is:
 
 Best of luck,
 
-the PledgeBank Team
+<?=$values['signature']?>

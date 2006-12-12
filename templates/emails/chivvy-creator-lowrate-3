@@ -15,6 +15,6 @@ window, or on a communal noticeboard?
 
 You can see and print the flyers here <?=$values['pledge_url_flyers']?>
 
-all the best,
+All the best,
 
-The PledgeBank Team
+<?=$values['signature']?>

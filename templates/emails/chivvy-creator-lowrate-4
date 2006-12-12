@@ -15,4 +15,4 @@ really easy:
 
 Good luck!
 
-The PledgeBank Team
+<?=$values['signature']?>

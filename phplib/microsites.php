@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.70 2006-12-12 08:06:58 francis Exp $
+ * $Id: microsites.php,v 1.71 2006-12-12 14:58:53 francis Exp $
  * 
  */
 
@@ -571,6 +571,22 @@ function microsites_newpledge_toptips() {
     }
 }
 
+function microsites_contact_intro() {
+    global $microsite;
+    print "<p>";
+    if ($microsite == 'livesimply') {
+        print "If you need help with your promise or you have other questions or comments use this form to contact us. ";
+    } else {
+        print _('Was it useful?  How could it be better?
+    We make PledgeBank and thrive off feedback, good and bad.
+    Use this form to contact us.');
+        $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
+        printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
+  
+    }
+    print "</p>";
+}
+
 #############################################################################
 # Features
 
@@ -657,6 +673,13 @@ function microsites_comments_allowed() {
     if ($microsite == 'global-cool')
         return false;
     return true;
+}
+
+/* microsites_chivvy_sql
+ * SQL fragment for whether a pledge gets any chivvy emails.
+ */
+function microsites_chivvy_sql() {
+    return "microsite is null or microsite <> 'livesimply'";
 }
 
 #############################################################################

@@ -57,8 +57,16 @@ while(<MAINPO>) {
         } else {
             $buffer =~ s/^msgid "/msgstr "/;
         }
-        $buffer =~ s/PledgeBank.com/livesimply:promise/g;
-        $buffer =~ s/PledgeBank/livesimply:promise/g;
+        if ($buffer =~ m/Subject:/ || $buffer =~ m/-- the PledgeBank.com team/) {
+            # emails (ASCII)
+            $buffer =~ s/PledgeBank.com/livesimply:promise/g;
+            $buffer =~ s/PledgeBank/livesimply:promise/g;
+        } else {
+            # website (HTML)
+            $buffer =~ s#PledgeBank.com#<em>live</em>simply:promise#g;
+            $buffer =~ s#PledgeBank#<em>live</em>simply:promise#g;
+        }
+
         $buffer =~ s/\bpledge\b/promise/g;
         $buffer =~ s/\bPledge\b/Promise/g;
         $buffer =~ s/\bpledges\b/promises/g;

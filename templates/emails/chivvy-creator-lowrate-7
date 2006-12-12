@@ -20,4 +20,4 @@ Go on, if they're real friends they'll want to help!
 
 best,
 
-The PledgeBank team
+<?=$values['signature']?>

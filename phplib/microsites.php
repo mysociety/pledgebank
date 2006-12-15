@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.71 2006-12-12 14:58:53 francis Exp $
+ * $Id: microsites.php,v 1.72 2006-12-15 08:32:01 francis Exp $
  * 
  */
 
@@ -585,6 +585,14 @@ function microsites_contact_intro() {
   
     }
     print "</p>";
+}
+
+function microsites_pledge_closed_text() {
+    global $microsite;
+    if ($microsite == 'livesimply') {
+        return "The deadline for this promise has passed. Check if this promise has been set up with a new deadline &mdash; check out the \"All promises list\". You can always carry out your promise anyway. Or why not <a href=\"/new\">start your own promise</a>?";
+    }
+    return _('This pledge is now closed, as its deadline has passed.');
 }
 
 #############################################################################

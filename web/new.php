@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.160 2006-12-12 08:06:58 francis Exp $
+// $Id: new.php,v 1.161 2006-12-18 15:02:10 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -153,7 +153,7 @@ else
 <br><small><?=sprintf(_('This gives your pledge an easy web address. e.g. %s/tidyupthepark'), OPTION_WEB_HOST.".".OPTION_WEB_DOMAIN) ?></small>
 </p>
 
-<p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically spotted, no markup needed)') ?></small>
+<p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically made clickable, no "markup" needed)') ?></small>
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
 <h3><?=_('About You') ?></h3>

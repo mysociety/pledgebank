@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.149 2006-08-30 17:23:32 matthew Exp $
+// $Id: fns.php,v 1.150 2006-12-19 16:15:39 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -241,9 +241,11 @@ function sms_countries() {
 function sms_countries_description() {
     return _("the UK");
 }
-// Return whether site country supports SMS
+// Return whether site country or microsite country supports SMS
 function sms_site_country() {
     global $site_country;
+    if (in_array(microsites_site_country(), sms_countries()))
+        return true;
     if (!$site_country) 
         return false;
     return in_array($site_country, sms_countries());

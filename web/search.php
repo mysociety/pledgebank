@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.58 2006-09-19 14:27:26 chris Exp $
+// $Id: search.php,v 1.59 2006-12-19 23:15:24 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -300,11 +300,16 @@ function search($search) {
 
     // Signers and creators (NOT person table, as we only search for publically visible names)
     $people = array();
-    $q = db_query('SELECT ref, title, name FROM pledges WHERE pin IS NULL AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    $q = db_query('SELECT ref, title, name FROM pledges
+        WHERE pin IS NULL ' . $backpage_clause .
+	' AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
     while ($r = db_fetch_array($q)) {
         $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
     }
-    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges WHERE showname AND pin IS NULL AND signers.pledge_id = pledges.id AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges
+        WHERE showname AND pin IS NULL AND signers.pledge_id = pledges.id
+        ' . $backpage_clause . ' AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name',
+        $search);
     while ($r = db_fetch_array($q)) {
         $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
     }

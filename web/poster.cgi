@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.91 2006-12-08 09:30:21 francis Exp $
+# $Id: poster.cgi,v 1.92 2006-12-19 16:26:07 francis Exp $
 #
 
 # TODO:
@@ -107,6 +107,26 @@ def microsites_poster_logo(c, x1, y1, w, h_purple, p_footer):
         ]
         f = Frame(x1, y1+0.1*h_purple, w, h_purple, showBoundary = 0, id='Footer',
                 topPadding = 0, bottomPadding = 0)
+        f.addFromList(story, c)
+# Draw the background image (a tick by default)
+def microsites_poster_watermark(c, x1, y1, w, h):
+    if microsite == 'livesimply':
+        # Fish watermark for livesimply
+        watersiz = w/2
+        c.drawInlineImage("microsites/livesimply/promise_watermark.jpg", x1 + (w - watersiz) / 2, y1 + (h - watersiz) / 4, width=watersiz,height=watersiz)
+        pass
+    else:
+        # Tick watermark for main PledgeBank
+        if (w<h):
+            ticksize = w*1.2
+        else:
+            ticksize = h
+        p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize)
+        story = [ Paragraph('<font color="#f4f1f8">3</font>', p_tick) ]
+        if (w<h):
+            f = Frame(x1, y1, w, h, showBoundary = 0)
+        else:
+            f = Frame(x1, y1+h/6, w, h, showBoundary = 0)
         f.addFromList(story, c)
 
 # this is a special function to be able to use bold and italic in ttfs
@@ -376,19 +396,9 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         fontSize = h_purple*4/5, leading = 0, fontName = heading_font)
     p_smallprint = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 1, spaceAfter = 0,
         fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font)
-    if (w<h):
-        ticksize = w*1.2
-    else:
-        ticksize = h
-    p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize)
 
     # Big tick
-    story = [ Paragraph('<font color="#f4f1f8">3</font>', p_tick) ]
-    if (w<h):
-        f = Frame(x1, y1, w, h, showBoundary = 0)
-    else:
-        f = Frame(x1, y1+h/6, w, h, showBoundary = 0)
-    f.addFromList(story, c)
+    microsites_poster_watermark(c, x1, y1, w, h)
     
     # PledgeBank logo
     microsites_poster_logo(c, x1, y1, w, h_purple, p_footer)

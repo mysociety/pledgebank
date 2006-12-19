@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.148 2006-12-19 22:58:43 francis Exp $
+// $Id: page.php,v 1.149 2006-12-19 23:13:53 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -30,6 +30,14 @@ function page_send_vary_header() {
      * particular page), and we may wish to optimise this later. */
     header('Vary: Cookie, Accept-Encoding, Accept-Language, X-GeoIP-Country');
     $page_vary_header_sent = true;
+}
+
+// Internal
+function strip_title($title) {
+    // Live Simply Promise, the title needs italics in it removing.
+    $title = str_replace("<em>", "", $title);
+    $title = str_replace("</em>", "", $title);
+    return $title;
 }
 
 /* page_header TITLE [PARAMS]
@@ -112,6 +120,7 @@ function page_header($title, $params = array()) {
 <?  } ?>
 <title><?
     if ($title) 
+        $title = strip_title($title);
         print $title . " - ";
         /* XXX @import url('...') uses single-quotes to hide the style-sheet
          * from Mac IE. Ugly, but it works. */
@@ -336,7 +345,7 @@ function rss_header($title, $description, $params) {
 
 <channel rdf:about="<?=$main_page?>">
 <? # TRANS: 'PledgeBank' here is the second part of the title used in the RSS files ?>
-<title><?=$title?> - <?=_('PledgeBank')?> <?=$country_name?></title>
+<title><?=strip_title($title)?> - <?=_('PledgeBank')?> <?=$country_name?></title>
 <link><?=$main_page?></link>
 <description><?=$description?></description>
 <dc:language><?=$lang?></dc:language>

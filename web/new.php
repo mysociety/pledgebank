@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.161 2006-12-18 15:02:10 francis Exp $
+// $Id: new.php,v 1.162 2006-12-19 09:47:40 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -942,7 +942,7 @@ function create_new_pledge($P, $data) {
     <p class="noprint loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
     <p class="noprint loudmessage" align="center"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
 <?  if (microsites_new_pledges_prominence() != 'backpage') { ?>
-    <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge.') ?></p>
+    <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge &mdash; for ways to do this check out the "Spread the Word" section of your pledge webpage.') ?></p>
 <?  } else { ?>
     <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not be publicised</strong> elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
 <?   } ?>

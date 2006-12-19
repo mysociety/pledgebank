@@ -81,7 +81,7 @@ while(<MAINPO>) {
         $buffer =~ s/"%s will %s"/"%s to %s"/;
         $buffer =~ s/"do the same"/"join me"/;
     
-        $buffer =~ s#-- the livesimply:promise team#The livesimply:promise team\nhttp://promise.livesimply.org.uk#;
+        $buffer =~ s#-- the livesimply:promise team#The livesimply:promise team"\n"http://promise.livesimply.org.uk#;
 
         print LIVESIMPLYPO $buffer;
         $buffer = "";

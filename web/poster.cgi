@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.3
+#!/usr/bin/env python2.4
 #
 # poster.cgi:
 # Creates posters for printing out, caching them in a directory.
@@ -8,11 +8,8 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.92 2006-12-19 16:26:07 francis Exp $
+# $Id: poster.cgi,v 1.93 2006-12-19 19:52:25 francis Exp $
 #
-
-# TODO:
-# Upgrade to Python 2.4
 
 import sys
 sys.path.append("../../pylib")

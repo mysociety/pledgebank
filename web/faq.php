@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.45 2006-12-12 08:06:58 francis Exp $
+// $Id: faq.php,v 1.46 2006-12-19 15:53:36 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -247,11 +247,9 @@ function default_faq() {
     SMS for other countries, please contact us. The flyers for your pledge
     describe how to sign up by SMS. So the easiest way to remember is to print some
     out and carry them with you.  You can find the flyers from the 'Spread the
-    word' section on your pledge's page.  Otherwise tell people to text
-    <strong>pledge REFERENCE</strong> to <strong>%s</strong>.  Here REFERENCE is
-    the short reference for your pledge which you chose when you made it, and which
-    appears at the end of its address."), sms_countries_description(),
-    OPTION_PB_SMS_DISPLAY_NUMBER));
+    word' section on your pledge's page.  Otherwise, for people in %s, it says what to text and
+    where to text it to at the bottom of each relevant pledge signup box."), 
+    sms_countries_description(), sms_countries_description()));
 
     print dt(_('How do I add a picture to my pledge?'));
 

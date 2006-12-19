@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.206 2006-10-26 13:51:06 francis Exp $
+ * $Id: pledge.php,v 1.207 2006-12-19 15:53:36 francis Exp $
  * 
  */
 
@@ -655,8 +655,18 @@ class Pledge {
     <p><strong>' . _('Your email') . '</strong>: <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
     _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>
 
-    <p><input type="submit" name="submit" value="' . ($this->byarea() ? _('Sign Pledge') : _('Sign Pledge')) . '"></p>
-    </form>';
+    <p><input type="submit" name="submit" value="' . ($this->byarea() ? _('Sign Pledge') : _('Sign Pledge')) . '"></p>';
+        // Display SMS if we are sure it makes sense - i.e. we support SMS for
+        // the pledge country (or it is global) and we support SMS for the site
+        // country.
+        if ($this->has_sms() && sms_site_country()) {
+            print '<p>';
+            printf(_("Or, text '<strong>%s %s</strong>' to <strong>%s</strong>"), OPTION_PB_SMS_PREFIX, $this->ref(), OPTION_PB_SMS_DISPLAY_NUMBER);
+            print " ";
+            printf(_("(in %s only)"), sms_countries_description());
+            print '</p>';
+        }
+        print '</form>';
     }
 
     /* summary PLEDGE PARAMS

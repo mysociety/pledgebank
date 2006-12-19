@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.249 2006-11-11 23:46:29 francis Exp $
+// $Id: index.php,v 1.250 2006-12-19 22:58:44 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -18,7 +18,8 @@ require_once '../../phplib/utility.php';
 page_header(null, 
             array('rss'=> array(
                     _('New Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list')),
-                    _('Successful Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list/succeeded'))
+                    _('Successful Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list/succeeded')),
+                    _('Comments on All Pledges PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/comments'))
                     ), 
                 'id'=>'front',
                 'cache-max-age' => 600)

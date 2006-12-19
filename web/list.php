@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.38 2006-11-06 22:35:49 francis Exp $
+// $Id: list.php,v 1.39 2006-12-19 22:58:44 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -118,7 +118,7 @@ $qrows = db_query("
 if ($q_type == 'open') {
     $heading = _("Pledges which need signers");
     if ($rss)
-        $heading = _('New Pledges');
+        $heading = _('New pledges');
 } elseif ($q_type == 'succeeded_open') {
     $heading = _("Successful pledges, open to new signers");
 } elseif ($q_type == 'succeeded_closed') {

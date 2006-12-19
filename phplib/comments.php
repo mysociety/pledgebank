@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.48 2006-07-27 11:14:52 francis Exp $
+ * $Id: comments.php,v 1.49 2006-12-19 22:58:43 francis Exp $
  * 
  */
 
@@ -148,29 +148,50 @@ function comments_summary($r) {
     return sprintf(_('%s by %s, on %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
 }
 
-/* comments_show_latest [NUM]
- * Show a brief summary of the NUM (default 10) most recent comments. */
-function comments_show_latest($comments_to_show = 10) { 
+/* comments_rss_entry COMMENT 
+ * Comment in RSS form. */
+function comments_rss_entry($r) {
+    $text = $r['text'];
+    if (strlen($text) > 250) $text = trim_characters($text, 0, 250);
+    
+    return array(
+          'title' => sprintf(_('Comment on %s pledge by %s'), $r['ref'], htmlspecialchars($r['name'])),
+          'link' => pb_domain_url(array('explicit'=>true, 'path'=>"/". $r['ref'] . '#comment_' . $r['id'])),
+          'description' => $text,
+          'whenposted' => $r['whenposted']
+    );
+
+}
+
+/* comments_show_latest [NUM] [RSS]
+ * Show a brief summary of the NUM (default 10) most recent comments. 
+ * If RSS is set, then instead of printing HTML return an RSS array. */
+function comments_show_latest($comments_to_show = 10, $rss = 0) { 
+    $rss_items = array();
+
     $c = 0;
 
     $sql_params = array();
     $site_limit = pb_site_pledge_filter_main($sql_params);
-    $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit);
+    $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit, $rss, $rss_items);
 
     if ($c == 0) {
         $sql_params = array();
         $site_limit = pb_site_pledge_filter_general($sql_params);
-        $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit);
+        $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit, $rss, $rss_items);
     }
 
     if ($c == 0) {
         $sql_params = array();
         $site_limit = pb_site_pledge_filter_foreign($sql_params);
-        $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit);
+        $c += comments_show_latest_internal($comments_to_show, $sql_params, $site_limit, $rss, $rss_items);
     }
+
+    if ($rss)
+        return $rss_items;
 }
 
-function comments_show_latest_internal($comments_to_show, $sql_params, $site_limit) {
+function comments_show_latest_internal($comments_to_show, $sql_params, $site_limit, $rss, &$rss_items) {
     $sql_params[] = $comments_to_show;
     $q = db_query("
                 SELECT comment.id,
@@ -180,21 +201,29 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
                 WHERE comment.pledge_id = pledges.id
                     AND location.id = pledges.location_id
                     AND NOT ishidden
+                    AND pin IS NULL
                     AND pledges.cached_prominence <> 'backpage'
                     AND ($site_limit)
                 ORDER BY whenposted DESC
                 LIMIT ?", $sql_params);
     $num = db_num_rows($q);
     if ($num > 0) {
-        ?><div class="comments">
-        <?=_('<h2>Latest comments</h2>') ?> <?  
-        print '<ul>';
-        while($r = db_fetch_array($q)) {
-            print '<li>';
-            print comments_summary($r);
-            print '</li>';
+        if ($rss) {
+            while($r = db_fetch_array($q)) {
+                $rss_items[] = comments_rss_entry($r);
+            }
+        } else {
+            ?><div class="comments">
+<a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/comments"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of comments on all pledges') ?>"></a>
+            <?=_('<h2>Latest comments</h2>') ?> <?  
+            print '<ul>';
+            while($r = db_fetch_array($q)) {
+                print '<li>';
+                print comments_summary($r);
+                print '</li>';
+            }
+            print '</ul></div>';
         }
-        print '</ul></div>';
     }
     return $num;
 }

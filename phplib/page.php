@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.149 2006-12-19 23:13:53 francis Exp $
+// $Id: page.php,v 1.150 2006-12-20 00:05:11 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -147,8 +147,16 @@ function page_header($title, $params = array()) {
             print '<link rel="alternate" type="application/rss+xml" title="' . $rss_title . '" href="'.$rss_url.'">' . "\n";
         }
     }
+    // Find appropriate translated Javascript file
+    $js_file = "js/pb.$lang.js";
+    if ($microsite) {
+        $microsite_js_file = "js/pb.$lang.$microsite.js";
+        if (file_exists($microsite_js_file)) {
+            $js_file = $microsite_js_file;
+        }
+    }
 ?>
-<script type="text/javascript" src="/js/pb.<?=$lang ?>.js"></script>
+<script type="text/javascript" src="/<?=$js_file?>"></script>
 <script type="text/javascript" src="/pb.js"></script>
 <script type="text/javascript" src="/jslib/utils.js"></script>
 <?  //this was conditional, but now we need it nearly always for bottom of page local alert signups

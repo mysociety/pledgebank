@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.72 2006-12-15 08:32:01 francis Exp $
+ * $Id: microsites.php,v 1.73 2006-12-22 16:10:24 matthew Exp $
  * 
  */
 
@@ -33,7 +33,9 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'interface' => 'Interface',
                          'global-cool' => 'Global Cool',
                          'catcomm' => 'CatComm',
-                         'livesimply' => '<em>live</em>simply:promise');
+                         'livesimply' => '<em>live</em>simply:promise',
+			 'o2' => 'O2',
+);
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 if (OPTION_PB_STAGING) {
@@ -194,6 +196,10 @@ function microsites_logo() {
 ">
 </div>
 ';
+    } elseif ($microsite && $microsite == 'o2') {
+        return '
+<h1><a href="/"><img src="/microsites/o2/logo.jpg" alt="O2 Promise Bank" border="0" width="386" height="66"></a></h1>
+';
     } else {
         $country_name = pb_site_country_name();
         return '
@@ -231,6 +237,7 @@ function microsites_css_files() {
                 'global-cool',
                 'catcomm',
                 'livesimply',
+		'o2',
             ))) {
         $styles[] = "/microsites/autogen/$microsite.css";
     } else {

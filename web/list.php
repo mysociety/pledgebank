@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.40 2006-12-22 23:19:56 francis Exp $
+// $Id: list.php,v 1.41 2006-12-22 23:36:04 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -17,12 +17,14 @@ define('PAGE_SIZE', 50);
 $err = importparams(
             array('offset', '/^(0|[1-9]\d*)$/', '', 0),
             array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete|category)\/?$/', '', 'default'),
-            array('type', '/^[a-z_]*$/', '', 'open')
+            array('type', '/^[a-z_]*$/', '', 'all')
         );
 if ($err) {
     err(_('Illegal offset or sort parameter passed'));
 }
-if ($q_type == 'all') $q_type = 'open';
+$viewsarray = microsites_list_views();
+$viewsarray_keys = array_keys($viewsarray);
+if ($q_type == 'all') $q_type = $viewsarray_keys[0];
 
 $rss = get_http_var('rss') ? true : false;
 
@@ -164,11 +166,12 @@ if (!$rss) {
 
     pb_print_filter_link_main_general('align="center"');
 
-    $viewsarray = microsites_list_views();
     $views = "";
+    $c = 0;
     foreach ($viewsarray as $s => $desc) {
+        $c++;
         if ($q_type != $s) $views .= "<a href=\"/list/$s\">$desc</a>"; else $views .= $desc;
-        if ($s != 'failed') $views .= ' | ';
+        if ($c != count($viewsarray)) $views .= ' | ';
     }
 
     $sort = ($q_sort) ? '&amp;sort=' . $q_sort : '';

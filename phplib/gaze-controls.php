@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.12 2006-09-18 22:07:52 matthew Exp $
+// $Id: gaze-controls.php,v 1.13 2006-12-22 15:26:01 francis Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -69,17 +69,23 @@ function gaze_controls_print_places_choice($places, $place, $selected_gaze_place
  * if countains key 'country'.  params can contain
  *      'noglobal' - don't offer "any country" choice
  *      'gazeonly' - only list countries for which we have local gaze place
+ *      'fieldname' - HTML form field name to use, defaults to country
  */
 function gaze_controls_print_country_choice($selected_country, $selected_state, $errors, $params = array()) {
     global $countries_name_to_code, $countries_code_to_name, $countries_statecode_to_name, $ip_country;
 
+    $field_name = 'country';
+    if (array_key_exists('fieldname', $params)) {
+        $field_name = $params['fieldname'];
+    }
+
     /* Save previous value of country, so that we can detect if it's changed after
      * one of a list of placenames is selected. */
     if ($selected_country)
-        printf("<input type=\"hidden\" name=\"prev_country\" value=\"%s\">", htmlspecialchars($selected_country));
+        printf("<input type=\"hidden\" name=\"prev_$field_name\" value=\"%s\">", htmlspecialchars($selected_country));
 
 ?>
-<select <? if (array_key_exists('country', $errors)) print ' class="error"' ?> name="country" onchange="update_place_local(this, true)">
+<select <? if (array_key_exists($field_name, $errors)) print ' class="error"' ?> name="<?=$field_name?>" onchange="update_place_local(this, true)">
   <option value="(choose one)"><?=_('(choose one)') ?></option>
 <? if (!array_key_exists('noglobal', $params)) { ?>
   <option value="Global"<? if ($selected_country=='Global') print ' selected'; ?>><?=_('Not specific to any location') ?></option>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: index.php,v 1.14 2006-12-19 15:03:34 francis Exp $
+ * $Id: index.php,v 1.15 2006-12-22 15:26:02 francis Exp $
  * 
  */
 
@@ -16,14 +16,14 @@ require_once "../../phplib/template.php";
 require_once "../../phplib/admin-phpinfo.php";
 require_once "../../phplib/admin-serverinfo.php";
 require_once "../../phplib/admin-configinfo.php";
+require_once "../../phplib/admin-embed.php";
 require_once "../../phplib/admin.php";
 
 $pages = array(
     new ADMIN_PAGE_PB_LATEST,
     new ADMIN_PAGE_PB_MAIN,
     new ADMIN_PAGE_PB_STATS,
-    new ADMIN_PAGE_PB_CSV,
-    # new ADMIN_PAGE_EMBED('pbwebstats', 'Log Analysis', OPTION_ blah ),
+    new ADMIN_PAGE_EMBED('pbcsv', 'User CSV File', str_replace("index.php", "person.csv", OPTION_ADMIN_URL)),
     null, // space separator on menu
     new ADMIN_PAGE_SERVERINFO,
     new ADMIN_PAGE_CONFIGINFO,

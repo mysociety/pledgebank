@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.143 2006-12-19 15:03:33 francis Exp $
+ * $Id: admin-pb.php,v 1.144 2006-12-22 15:26:01 francis Exp $
  * 
  */
 
@@ -1038,39 +1038,5 @@ class ADMIN_PAGE_PB_STATS {
         print '</table>';
     }
 }
-
-// Originally (at least) for Live Simply Promise
-function escape_csv($v) {
-    $v = str_replace('"', '\"', $v);
-    return '"'.$v.'"';
-}
-class ADMIN_PAGE_PB_CSV {
-    function ADMIN_PAGE_PB_CSV() {
-        $this->id = 'csv';
-        $this->navname = 'Person CSV File';
-        $this->contenttype = "Content-Type: application/csv; charset=utf-8";
-    }
-
-    function display() {
-        global $pb_today;
-        // XXX pledge creators only for now
-        $q = db_query("SELECT distinct(person.*) FROM person, pledges 
-            WHERE pledges.person_id = person.id ORDER BY id");
-        print "name,email,address_1,address_2,address_3,town,county,postcode,country\n";
-        while ($r = db_fetch_array($q)) {
-            print escape_csv($r['name']) . ",";
-            print escape_csv($r['email']) . ",";
-            print escape_csv($r['address_1']) . ",";
-            print escape_csv($r['address_2']) . ",";
-            print escape_csv($r['address_3']) . ",";
-            print escape_csv($r['address_town']) . ",";
-            print escape_csv($r['address_county']) . ",";
-            print escape_csv($r['address_postcode']) . ",";
-            print escape_csv($r['address_country']);
-            print "\n";
-        }
-    }
-}
-
 
 ?>

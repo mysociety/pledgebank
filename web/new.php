@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.162 2006-12-19 09:47:40 francis Exp $
+// $Id: new.php,v 1.163 2006-12-22 15:26:02 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -372,6 +372,8 @@ function pledge_form_three($data, $errors = array()) {
 <?
 }
 
+
+# Live Simply only for now, will need updating if using for something else
 function pledge_form_addr($data = array(), $errors = array()) {
     global $lang, $langs;
     $isodate = $data['parseddate']['iso'];
@@ -395,8 +397,9 @@ function pledge_form_addr($data = array(), $errors = array()) {
 <h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), has_step_3() ? 4 : 3, $number_of_steps)?></h2>
 <div class="c">
 
-<p>If you would like to become a CAFOD supporter, then please also enter your
-address. TODO: Finish this text.
+<p>Please take a moment to fill in this form. It's not obligatory but the
+information you provide us will help us in evaluating the success of the
+<em>live</em>simply challenge.
 
 <p><strong><?=_('Your address:') ?></strong> 
 <br><input<? if (array_key_exists('address_1', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_1" id="address_1" value="<? if (isset($data['address_1'])) print htmlspecialchars($data['address_1']) ?>" size="30">
@@ -410,7 +413,7 @@ address. TODO: Finish this text.
 <br><input<? if (array_key_exists('address_postcode', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_postcode" id="address_postcode" value="<? if (isset($data['address_postcode'])) print htmlspecialchars($data['address_postcode']) ?>" size="20">
 <br><strong><?=_('Country:') ?></strong> 
 <? 
-    gaze_controls_print_country_choice(microsites_site_country(), null, $errors, array('noglobal'=>true)); ?>
+    gaze_controls_print_country_choice(microsites_site_country(), null, $errors, array('noglobal'=>true, 'fieldname' => 'address_country')); ?>
 </p>
 
 </div>

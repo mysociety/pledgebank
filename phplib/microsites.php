@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.75 2006-12-22 21:13:57 matthew Exp $
+ * $Id: microsites.php,v 1.76 2006-12-22 23:19:56 francis Exp $
  * 
  */
 
@@ -523,6 +523,9 @@ function microsites_allpage_credit_footer() {
     }
 }
 
+/* microsites_newpledge_toptips
+ * Tips on making a pledge that will work, for top of new pledge page.
+ */
 function microsites_newpledge_toptips() {
     global $microsite;
     if ($microsite == 'livesimply') {
@@ -578,6 +581,9 @@ function microsites_newpledge_toptips() {
     }
 }
 
+/* microsites_contact_intro
+ * Description at top of contact page.
+ */
 function microsites_contact_intro() {
     global $microsite;
     print "<p>";
@@ -600,6 +606,17 @@ function microsites_pledge_closed_text() {
         return "The deadline for this promise has passed. Check if this promise has been set up with a new deadline &mdash; check out the \"All promises list\". You can always carry out your promise anyway. Or why not <a href=\"/new\">start your own promise</a>?";
     }
     return _('This pledge is now closed, as its deadline has passed.');
+}
+
+function microsites_list_views() {
+    global $microsite;
+    if ($microsite == 'livesimply') {
+        return array('all_open'=>_('Open pledges'), 
+        'all_closed'=>_('Closed pledges'));
+    } else {
+        return array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
+        'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
+    }
 }
 
 #############################################################################

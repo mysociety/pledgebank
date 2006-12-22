@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.39 2006-12-19 22:58:44 francis Exp $
+// $Id: list.php,v 1.40 2006-12-22 23:19:56 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -50,19 +50,29 @@ if ($q_type == 'failed') {
     $open = null; $succeeded = '>=';
     $open_byarea = null; $succeeded_byarea = ' > 0';
     if ($q_sort == "default") $q_sort = $rss ? "whensucceeded" : "creationtime";
-} else {
+} elseif ($q_type == 'all_open') {
+    $open = '>='; $succeeded = null;
+    $open_byarea = '>='; $succeeded_byarea = ' < 0'; # never allowed
+    if ($q_sort == "default") $q_sort = $rss ? "creationtime" : "percentcomplete";
+} elseif ($q_type == 'all_closed') {
+    $open = '<'; $succeeded = null;
+    $open_byarea = '>='; $succeeded_byarea = ' < 0'; # never allowed
+    if ($q_sort == "default") $q_sort = "date";
+} else { // open
     $open = '>='; $succeeded = '<';
     $open_byarea = '>='; $succeeded_byarea = null;
     if ($q_sort == "default") $q_sort = $rss ? "creationtime" : "percentcomplete";
 }
 $date_range_clause = ($open ? " AND date $open '$pb_today' " : "");
-$signers_range_clause = "(SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) 
-                         $succeeded target";
+if ($succeeded) 
+    $signers_range_clause = "AND (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) $succeeded target";
+else
+    $signers_range_clause = "";
 $byarea_clause = ($open_byarea ? " date $open_byarea '$pb_today' AND " : "") 
                 . ($succeeded_byarea ? "(SELECT count(*) FROM byarea_location WHERE 
                     byarea_location.pledge_id = pledges.id AND byarea_location.whensucceeded IS NOT NULL) 
                     $succeeded_byarea" : " (1=1)");
-$page_clause = "AND ( (pledges.target_type = 'overall' AND $signers_range_clause $date_range_clause)
+$page_clause = "AND ( (pledges.target_type = 'overall' $signers_range_clause $date_range_clause)
                 OR (pledges.target_type = 'byarea' AND $byarea_clause) )";
 
 $sql_params = array();
@@ -127,6 +137,10 @@ if ($q_type == 'open') {
     $heading = _("Successful pledges");
 } elseif ($q_type == 'failed') {
     $heading = _("Failed pledges");
+} elseif ($q_type == 'all_open') {
+    $heading = _("Open pledges"); # maybe ambiguous name relative to 'open' type, but fine for livesimply
+} elseif ($q_type == 'all_closed') {
+    $heading = _("Closed pledges");
 } else {
     err('Unknown type ' . $q_type);
 }
@@ -150,8 +164,7 @@ if (!$rss) {
 
     pb_print_filter_link_main_general('align="center"');
 
-    $viewsarray = array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
-        'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
+    $viewsarray = microsites_list_views();
     $views = "";
     foreach ($viewsarray as $s => $desc) {
         if ($q_type != $s) $views .= "<a href=\"/list/$s\">$desc</a>"; else $views .= $desc;

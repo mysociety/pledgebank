@@ -20,6 +20,7 @@ while(<MAINCSS>) {
     s/#522994/#000066/gi if ($selector eq 'a:link');
 
     s/top: 2.75em;/top: 48px;/ if ($selector eq "ul#nav");
+    print NEWCSS "    font-weight: bold;\n" if (m/^}/ && $selector eq "ul#nav li");
     s/padding.*;/padding: 0;/ if ($selector eq 'h1');
     print NEWCSS <<EOF if (m/^}/ && $selector eq 'h1');
     background-image: url("/microsites/o2-stretch.jpg");
@@ -73,7 +74,6 @@ h4{
 }
 a{
     color:#006;
-    font-weight:normal;
 }
 a:hover{
     text-decoration:none;

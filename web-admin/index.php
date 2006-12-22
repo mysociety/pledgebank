@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: index.php,v 1.15 2006-12-22 15:26:02 francis Exp $
+ * $Id: index.php,v 1.16 2006-12-22 15:34:39 francis Exp $
  * 
  */
 
@@ -23,7 +23,7 @@ $pages = array(
     new ADMIN_PAGE_PB_LATEST,
     new ADMIN_PAGE_PB_MAIN,
     new ADMIN_PAGE_PB_STATS,
-    new ADMIN_PAGE_EMBED('pbcsv', 'User CSV File', str_replace("index.php", "person.csv", OPTION_ADMIN_URL)),
+    new ADMIN_PAGE_EMBED('pbcsv', 'User CSV File', "person.csv"),
     null, // space separator on menu
     new ADMIN_PAGE_SERVERINFO,
     new ADMIN_PAGE_CONFIGINFO,

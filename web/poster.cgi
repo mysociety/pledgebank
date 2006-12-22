@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.93 2006-12-19 19:52:25 francis Exp $
+# $Id: poster.cgi,v 1.94 2006-12-22 16:08:33 francis Exp $
 #
 
 import sys
@@ -125,6 +125,12 @@ def microsites_poster_watermark(c, x1, y1, w, h):
         else:
             f = Frame(x1, y1+h/6, w, h, showBoundary = 0)
         f.addFromList(story, c)
+# Text that goes at the bottom of the poster
+def microsites_poster_remember_text(pledge):
+    if microsite == 'livesimply':
+        return _(u'''Remember,  if you promote your promise to others, you'll be helping create a community action. Not only are you being the best you can be, you're encouraging others to do the same.''')
+    else:
+        return _(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.') % pledge['target']
 
 # this is a special function to be able to use bold and italic in ttfs
 # see may 2004 reportlab users mailing list
@@ -331,7 +337,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
 
     story.extend([ text_para, 
         PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('This pledge closes on ')), PyRTF.TEXT('%s' % rtf_repr(pledge['date'].decode('utf-8')), colour=ss.Colours.pb), rtf_repr(_('. Thanks!'))),
-        PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.')) % pledge['target'])
+        PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(microsites_poster_remember_text(pledge)) )
 #        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
 #            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
     ])
@@ -459,7 +465,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         Paragraph(_('''
             This pledge closes on <font color="%s">%s</font>. Thanks!
             ''').encode('utf-8') % (html_colour, pledge['date']), p_normal),
-        Paragraph(_(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.').encode('utf-8') % pledge['target'], p_normal)
+        Paragraph(microsites_poster_remember_text(pledge).encode('utf-8'), p_normal)
 #        Paragraph('''
 #            <b>Small print:</b> %s Questions?
 #            08453 330 160 or team@pledgebank.com.

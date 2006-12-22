@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.59 2006-07-27 11:14:53 francis Exp $
+// $Id: alert.php,v 1.60 2006-12-22 21:13:57 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -58,6 +58,8 @@ function do_local_alert_subscribe(&$location) {
     $errors = array();
     if (!$email) $errors['email'] = _("Please enter your email address");
     if (!validate_email($email)) $errors['email'] = _("Please enter a valid email address");
+    if ($email_err = microsites_invalid_email_address($email))
+        $errors['email'] = $email_err;
     gaze_controls_validate_location($location, $errors);
 
     if (count($errors))

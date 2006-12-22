@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.54 2006-10-17 10:08:53 francis Exp $
+// $Id: ref-sign.php,v 1.55 2006-12-22 21:13:57 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -63,6 +63,7 @@ function do_sign(&$location) {
                 array('showname',   '//',               '', 0),
                 array(array('pin',true),        '//',              '', null)
             );
+    if (!$errors) $errors = array();
     if ($q_name==_('<Enter your name>')) {
         $q_name = null;
     }
@@ -70,6 +71,8 @@ function do_sign(&$location) {
         $q_showname = false;
         $q_name = null;
     }
+    if ($email_err = microsites_invalid_email_address($q_email))
+        $errors['email'] = $email_err;
 
     if (!$q_ref)
         /* I don't think this error is likely to occur with real users, (see
@@ -83,8 +86,6 @@ function do_sign(&$location) {
         err(_("Permission denied"));
 
     if ($pledge->byarea()) {
-        if (!$errors)
-            $errors = array();
         gaze_controls_validate_location($location, $errors, array('townonly'=>true));
     }
 

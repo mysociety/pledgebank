@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.39 2006-07-27 11:14:53 francis Exp $
+ * $Id: sms.php,v 1.40 2006-12-22 21:13:57 matthew Exp $
  * 
  */
 
@@ -81,6 +81,8 @@ $errs = importparams(
                             '/^1$/',                        "", 0),
             array('f',      '/^1$/',                        "", 0)
         );
+if (!$errs)
+    $errs = array();
 
 $showform = true;
 
@@ -91,14 +93,14 @@ if (!$phone)
 else if (substr($p, -6) != substr($phone, -6)) {
     /* Compare last few characters of the phone numbers only, so that we avoid
      * having to know anything about their format. */
-    if (!$errs)
-        $errs = array();
     $errs['phone'] = _("That phone number doesn't match our records");
 }
+if ($email_err = microsites_invalid_email_address($q_email))
+    $errs['email'] = $email_err;
 
 page_header(_('SMS'));
 
-if ($errs) {
+if (count($errs)) {
     /* Form to supply info for the subscription */
     conversion_form($q_f ? $errs : null, $pledge_id);
     page_footer(array('nonav' => 1));

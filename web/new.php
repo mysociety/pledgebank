@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.163 2006-12-22 15:26:02 francis Exp $
+// $Id: new.php,v 1.164 2006-12-22 21:13:57 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -615,6 +615,8 @@ function step1_error_check($data) {
     if (!$data['name']) $errors['name'] = _('Please enter your name');
     if (!$data['email']) $errors['email'] = _('Please enter your email address');
     if (!validate_email($data['email'])) $errors['email'] = _('Please enter a valid email address');
+    if ($email_err = microsites_invalid_email_address($data['email']))
+        $errors['email'] = $email_err;
 
     $mystreetmessage = htmlspecialchars(_('Please change <MY STREET> to the name of your street'));
     if (stristr($data['title'], "<MY STREET>")) $errors['title'] = $mystreetmessage;

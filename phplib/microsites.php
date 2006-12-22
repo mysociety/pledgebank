@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.73 2006-12-22 16:10:24 matthew Exp $
+ * $Id: microsites.php,v 1.74 2006-12-22 16:16:20 matthew Exp $
  * 
  */
 
@@ -198,7 +198,7 @@ function microsites_logo() {
 ';
     } elseif ($microsite && $microsite == 'o2') {
         return '
-<h1><a href="/"><img src="/microsites/o2/logo.jpg" alt="O2 Promise Bank" border="0" width="386" height="66"></a></h1>
+<h1><a href="/"><img src="/microsites/o2-logo.jpg" alt="O2 Promise Bank" border="0" width="386" height="66"></a></h1>
 ';
     } else {
         $country_name = pb_site_country_name();

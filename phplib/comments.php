@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.49 2006-12-19 22:58:43 francis Exp $
+ * $Id: comments.php,v 1.50 2006-12-27 17:51:44 francis Exp $
  * 
  */
 
@@ -28,20 +28,24 @@ function comments_format_timestamp($time) {
     return $time;
 }
 
-/* comments_show_one COMMENT [NOABUSE]
+/* comments_show_one COMMENT [NOABUSE] [ADMIN]
  * Given COMMENT, an associative array containing fields 'text', 'name' and
  * 'website' (and optional fields 'id', the comment ID, and 'whenposted', the
  * posting time in seconds since the epoch), print HTML for the comment
  * described. If NOABUSE is true, don't show the link for reporting an abusive
- * comment. */
+ * comment. If ADMIN is true display email address and form for changing hidden
+ * status.
+ */
 function comments_show_one($comment, $noabuse = false, $admin = false) {
     if (isset($comment['id']) && $admin) {
-        print '<td><form name="deletecommentform'.$comment['id'].'" method="post" action="'.OPTION_ADMIN_URL.'?page=pb&amp;pledge_id='.$comment['pledge_id'].'"><input type="hidden" name="deletecomment_comment_id" value="' . $comment['id'] . '">';
+        print '<form name="deletecommentform'.$comment['id'].'" method="post" action="'.OPTION_ADMIN_URL.'?page=pb&amp;pledge_id='.$comment['pledge_id'].'"><input type="hidden" name="deletecomment_comment_id" value="' . $comment['id'] . '">';
     }
 
     $name = htmlspecialchars($comment['name']);
     if (isset($comment['website']))
         $name = '<a href="' . htmlspecialchars($comment['website']) . '">' . $name . '</a>';
+    if ($admin)
+        $name .= " (<a href=\"mailto:" . $comment['email'] . "\">" . $comment['email'] . "</a>)";
 
     print '<div class="commentcontent">';
     if (array_key_exists('ishidden', $comment) && $comment['ishidden'] == 't')
@@ -80,7 +84,7 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
 
     print '</small></div>';
     if (isset($comment['id']) && $admin) {
-        print '</form></td>';
+        print '</form>';
     }
 }
 
@@ -246,9 +250,11 @@ function comments_show_admin($pledge, $limit = 0) {
     else {
         print '<ul class="commentslist">';
 
-        $query = ' select id, extract(epoch from whenposted) as whenposted,
-                        text, name, website, ishidden, pledge_id
+        $query = ' select comment.id, extract(epoch from whenposted) as whenposted,
+                        text, comment.name, comment.website, ishidden, pledge_id,
+                        person.email as email
                     from comment
+                    left join person on comment.person_id = person.id
                     where comment.pledge_id = ?
                     order by whenposted desc';
         if ($limit) {

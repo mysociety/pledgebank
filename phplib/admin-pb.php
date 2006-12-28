@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.144 2006-12-22 15:26:01 francis Exp $
+ * $Id: admin-pb.php,v 1.145 2006-12-28 00:59:17 francis Exp $
  * 
  */
 
@@ -260,7 +260,8 @@ class ADMIN_PAGE_PB_MAIN {
             $sel = '';
             if ($ms == $pledge_obj->microsite())
                 $sel = ' selected';
-            print ' <option value="'.$ms.'"'.$sel.'>'.$ms_name.'</option>';
+            print ' <option value="'.$ms.'"'.$sel.'>'.str_replace('<em>', '', str_replace('</em>', '', $ms_name))
+                .'</option>';
         }
         print '</select>';
         print '<input name="update" type="submit" value="Update">';

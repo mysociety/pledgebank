@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.46 2006-12-19 15:53:36 francis Exp $
+// $Id: faq.php,v 1.47 2006-12-29 18:10:09 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -309,7 +309,7 @@ function default_faq() {
 
     ############################################################################
 
-    print h2(_('Privacy Questions'));
+    print h2('<a name="privacy">'._('Privacy Questions').'</a>');
     print "<dl>\n";
 
     print dt(_("I don't want my name visible to everyone when I sign a pledge!"));
@@ -422,9 +422,10 @@ function livesimply_faq() {
 <dd>Go to your promise page and click 'Add a picture to your promise (creator only)' under 'Spread the word on and offline'. Either find a picture of something to do with your promise, or just use a photo of yourself!</dd>
 
 
-</dl><h2>Privacy Questions</h2><dl>
+</dl><h2><a name="privacy">Privacy Questions</a></h2><dl>
 <dt>I don't want my name visible to everyone when I sign a promise! <dt>
-<dd>You can add yourself secretly to a promise by unchecking the 'Show my name on this promise' box when you sign up. Alternatively, you can sign up by SMS (in the UK only). If you are about to make a sensitive promise, you may want to make it private, which means only people with a PIN you give them can view the promise page.</dd>
+<dd>You can add yourself secretly to a promise by unchecking the 'Show my name on this promise' box when you sign up. Alternatively, you can sign up by SMS (in the UK only). 
+</dd>
 
 <dt>Who gets to see my email address? </dt>
 <dd><em>live</em>simply network will never disclose your email address to anyone,

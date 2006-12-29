@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.55 2006-12-22 21:13:57 matthew Exp $
+// $Id: ref-sign.php,v 1.56 2006-12-29 18:10:09 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -73,6 +73,7 @@ function do_sign(&$location) {
     }
     if ($email_err = microsites_invalid_email_address($q_email))
         $errors['email'] = $email_err;
+    microsites_signup_extra_fields_validate($errors);
 
     if (!$q_ref)
         /* I don't think this error is likely to occur with real users, (see

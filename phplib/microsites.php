@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.76 2006-12-22 23:19:56 francis Exp $
+ * $Id: microsites.php,v 1.77 2006-12-29 18:10:08 francis Exp $
  * 
  */
 
@@ -237,7 +237,7 @@ function microsites_css_files() {
                 'global-cool',
                 'catcomm',
                 'livesimply',
-		'o2',
+                'o2',
             ))) {
         $styles[] = "/microsites/autogen/$microsite.css";
     } else {
@@ -420,11 +420,23 @@ function microsites_frontpage_has_start_your_own() {
 }
 
 /* microsites_frontpage_extra_blurb
- * Extra box of text to put in right hand side */
+ * Extra box of text to put in right hand side. */
 function microsites_frontpage_extra_blurb() {
     global $microsite;
 
-    if ($microsite == 'catcomm') {
+    if ($microsite == 'livesimply') {
+        // Use the "startblurb" here, as we microsites_frontpage_has_start_your_own is false
+        // and we want it in the same place as that. XXX tidy that up by making
+        // microsites_frontpage_has_start_your_own display its content?
+?><div id="startblurb"><?
+        # Count the number of signatures, including pledge creators.
+        # (We don't try to count distinct people using person_id as that can
+        # give privacy leaks, as indeed could doing it my distinct person.name
+        # since some signers' names are hidden)
+        $na = db_getOne('select count(*) from signers');
+        $nb = db_getOne('select count(*) from pledges');
+        ?> <div id="simplycounter">Together, we've made <?=$na + $nb?> promises. What are you going to promise?</div> </div> <?
+    } elseif ($microsite == 'catcomm') {
 ?>
 <div id="extrablurb">
 <h2>About CatComm</h2>
@@ -472,7 +484,7 @@ they could be inspirational, if others do, too!</li>
 }
 
 /* microsites_frontpage_sign_invitation_text
- * Title text above the list of current pledges */
+ * Title text above the list of current pledges. */
 function microsites_frontpage_sign_invitation_text() {
     global $microsite;
 
@@ -512,21 +524,12 @@ function microsites_frontpage_credit_footer() {
  */
 function microsites_allpage_credit_footer() {
     global $microsite;
-    if ($microsite == 'livesimply') {
-        # Count the number of signatures, including pledge creators.
-        # (We don't try to count distinct people using person_id as that can
-        # give privacy leaks, as indeed could doing it my distinct person.name
-        # since some signers' names are hidden)
-        $na = db_getOne('select count(*) from signers');
-        $nb = db_getOne('select count(*) from pledges');
-        ?> <div id="simplycounter">Together, we've made <?=$na + $nb?> promises. What are you going to promise?</div> <?
-    }
 }
 
-/* microsites_newpledge_toptips
+/* microsites_new_pledges_toptips
  * Tips on making a pledge that will work, for top of new pledge page.
  */
-function microsites_newpledge_toptips() {
+function microsites_new_pledges_toptips() {
     global $microsite;
     if ($microsite == 'livesimply') {
         ?>
@@ -600,6 +603,9 @@ function microsites_contact_intro() {
     print "</p>";
 }
 
+/* microsites_pledge_closed_text
+ * Text to display in red box when a pledge is closed.
+ */
 function microsites_pledge_closed_text() {
     global $microsite;
     if ($microsite == 'livesimply') {
@@ -608,33 +614,89 @@ function microsites_pledge_closed_text() {
     return _('This pledge is now closed, as its deadline has passed.');
 }
 
-function microsites_list_views() {
+/* microsites_signup_extra_fields
+ * Add any extra input fields or text to the pledge signup box.
+ */
+function microsites_signup_extra_fields($errors) {
     global $microsite;
     if ($microsite == 'livesimply') {
-        return array('all_open'=>_('Open pledges'), 
-        'all_closed'=>_('Closed pledges'));
-    } else {
-        return array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
-        'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
+        $agreeterms = '';
+        if (get_http_var('agreeterms'))
+            $agreeterms = ' checked';
+?>
+    <strong><input type="checkbox" name="agreeterms" value="1" <?=$agreeterms?> <?=array_key_exists('agreeterms', $errors) ? ' class="error"' : ''?> > 
+    I have read the <a href="/faq#privacy">terms and conditions</a>. I have the
+    permission of my parent, guardian or teacher to sign up, or I am at least
+    16 years old. 
+    </strong>
+<?
     }
+}
+
+/* microsites_signup_extra_fields_validate
+ * Validate the values of any extra fields during signup.
+ */
+function microsites_signup_extra_fields_validate(&$errors) {
+    global $microsite;
+    if ($microsite == 'livesimply') {
+        if (!get_http_var('agreeterms')) {
+            $errors['agreeterms'] = 'Please confirm that you have read the terms and conditions and that you have permission to sign the pledge or are old enough not to need it.';
+        }
+    }
+
+}
+
+function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors) {
+    global $microsite;
+
+    if ($microsite == 'livesimply') {
+        $agreeterms = '';
+        if (get_http_var('agreeterms'))
+            $agreeterms = ' checked';
+?>    
+    <p>When you're happy with your promise, confirm that you agree to the terms
+    and conditions and click "Create promise".</p>
+    <strong><input type="checkbox" name="agreeterms" value="1" <?=$agreeterms?> <?=array_key_exists('agreeterms', $errors) ? ' class="error"' : ''?> > 
+    I have read the <a href="/faq#privacy">terms and conditions</a>. I have the
+    permission of my parent, guardian or teacher to sign up, or I am at least
+    16 years old. </strong>
+<p style="text-align: right;">
+<input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
+</p>
+<?
+        return;
+    }
+
+    print '<p>' . _('When you\'re happy with your pledge, <strong>click "Create"</strong> to confirm that you wish PledgeBank.com to display the pledge at the top of this page in your name, and that you agree to the terms and conditions below.');
+?>
+<p style="text-align: right;">
+<input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
+</p>
+<?
+    print h3(_('The Dull Terms and Conditions'));
+    print '<input type="hidden" name="agreeterms" value="1" checked>';
+
+    print "<p>";
+    if ($v == 'pin') { ?>
+<!-- no special terms for private pledge -->
+<?  } else {
+        print _('By creating your pledge you also consent to the syndication of your pledge to other sites &mdash; this means that other people will be able to display your pledge and your name');
+        if ($data['country'] == "GB" && $local) {
+            print _(', and use (but not display) your postcode to locate your pledge in the right geographic area');
+        }
+        print '. ';
+        print _('The purpose of this is simply to give your pledge
+greater publicity and a greater chance of succeeding.');
+        print ' ';
+    }
+    print _("Rest assured that we won't ever give or sell anyone your email address.");
 }
 
 #############################################################################
 # Features
 
-/* microsites_syndication_warning
- * Do terms and conditions need to warn that we'll syndicate?
- */
-function microsites_syndication_warning() {
-    global $microsite;
-    if ($microsite == 'livesimply')
-        return false;
-    else
-        return true;
-}
-
 /* microsites_private_allowed
- * Returns whether private pledges are offered in new pledge dialog */
+ * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
     global $microsite;
     if ($microsite == 'interface' || $microsite == 'global-cool' || $microsite == 'livesimply')
@@ -644,7 +706,7 @@ function microsites_private_allowed() {
 }
 
 /* microsites_categories_allowed
- * Returns whether categorires are offered in new pledge dialog */
+ * Returns whether categorires are offered in new pledge dialog. */
 function microsites_categories_allowed() {
     global $microsite;
     if ($microsite == 'livesimply')
@@ -655,7 +717,7 @@ function microsites_categories_allowed() {
 
 /* microsites_postal_address_allowed
  * Returns whether the creator's postal address is asked for in new pledge
- * dialog */
+ * dialog. */
 function microsites_postal_address_allowed() {
     global $microsite;
     if ($microsite == 'livesimply')
@@ -665,7 +727,7 @@ function microsites_postal_address_allowed() {
 }
 
 /* microsites_new_pledges_prominence
- * Returns prominence that new pledges have by default
+ * Returns prominence that new pledges have by default.
  */
 function microsites_new_pledges_prominence() {
     global $microsite;
@@ -679,7 +741,7 @@ function microsites_new_pledges_prominence() {
 
 /* microsites_other_people 
  * Returns text to describe other people by default when making
- * a new pledge
+ * a new pledge.
  */
 function microsites_other_people() {
     global $microsite;
@@ -773,6 +835,23 @@ function microsites_normal_prominences() {
         return " (cached_prominence = 'normal' or cached_prominence = 'backpage') ";
     return " (cached_prominence = 'normal') ";
 }
+
+/* microsites_list_views
+ * Return an array of views available on the All Pledges page. Array
+ * is a dictionary with keys the names of pages in list.php, and values the
+ * text to describe them as.
+ */
+function microsites_list_views() {
+    global $microsite;
+    if ($microsite == 'livesimply') {
+        return array('all_open'=>_('Open pledges'), 
+        'all_closed'=>_('Closed pledges'));
+    } else {
+        return array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
+        'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
+    }
+}
+
 
 #############################################################################
 # Login - some microsites get authentication from other sites
@@ -868,6 +947,11 @@ function microsites_redirect_external_login() {
     return false;
 }
 
+/* microsites_invalid_email_address
+ * Returns whether an email address is valid to use for the microsite or not.
+ * Return false if it is valid, or a string containing an error message for the
+ * user if it is invalid.
+ */
 function microsites_invalid_email_address($email) {
     global $microsite;
     if ($microsite != 'o2') return false;

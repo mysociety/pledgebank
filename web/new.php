@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.164 2006-12-22 21:13:57 matthew Exp $
+// $Id: new.php,v 1.165 2006-12-29 18:10:09 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -57,7 +57,7 @@ function pledge_form_one($data = array(), $errors = array()) {
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
     } else {
-        microsites_newpledge_toptips();
+        microsites_new_pledges_toptips();
     }
 
     if (get_http_var('local') && $ref = get_http_var('ref')) {
@@ -708,6 +708,11 @@ function stepaddr_error_check(&$data) {
 
 function preview_error_check($data) {
     $errors = array();
+    // Note that for microsites where there isn't an explicit checkbox,
+    // the entry is there but checked by default.
+    if (!get_http_var('agreeterms')) {
+        $errors['agreeterms'] = "Please confirm you agree to the terms and conditions.";
+    }
     return $errors;
 }
 
@@ -762,29 +767,9 @@ longer be valid."))?>
 <? } ?>
 </p>
 
-
 <?
-    print '<p>' . _('When you\'re happy with your pledge, <strong>click "Create"</strong> to confirm that you wish PledgeBank.com to display the pledge at the top of this page in your name, and that you agree to the terms and conditions below.');
+    microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors);
 ?>
-<p style="text-align: right;">
-<input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
-</p>
-<?
-    print h3(_('The Dull Terms and Conditions'));
-    print "<p>";
-    if ($v == 'pin' || !microsites_syndication_warning()) { ?>
-<!-- no special terms for private pledge, or certain microsites -->
-<?  } else {
-        print _('By creating your pledge you also consent to the syndication of your pledge to other sites &mdash; this means that other people will be able to display your pledge and your name');
-        if ($data['country'] == "GB" && $local) {
-            print _(', and use (but not display) your postcode to locate your pledge in the right geographic area');
-        }
-        print '. ';
-        print _('The purpose of this is simply to give your pledge
-greater publicity and a greater chance of succeeding.');
-        print ' ';
-    }
-    print _("Rest assured that we won't ever give or sell anyone your email address."); ?>
 </p>
 
 </form>

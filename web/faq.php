@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.47 2006-12-29 18:10:09 francis Exp $
+// $Id: faq.php,v 1.48 2006-12-30 13:22:04 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -154,7 +154,7 @@ function default_faq() {
 
     <strong>Thanks also to</strong>
     <a href="http://www.c360uk.com/">c360</a> (for SMS in the UK), 
-    the <a href="http://earth-info.nga.mil/gns/html/cntry_files.html">US military</a> (for the world gazetteer),
+    the <a href="http://earth-info.nga.mil/gns/html/">US military</a> (for the world gazetteer),
     <a href="http://sedac.ciesin.columbia.edu/gpw/">CIESIN</a> (for population density data),
     <a href="http://www.ordnancesurvey.co.uk">Ordnance Survey</a> (for UK postcodes),
     Ben Furber for our favicon, 

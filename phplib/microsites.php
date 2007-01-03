@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.79 2007-01-03 18:58:37 matthew Exp $
+ * $Id: microsites.php,v 1.80 2007-01-03 19:10:00 matthew Exp $
  * 
  */
 
@@ -187,7 +187,7 @@ function microsites_logo() {
 ';
     } elseif ($microsite && $microsite == 'livesimply') {
         return '
-<h1><a href="/"><img width="1014" height="151" src="/microsites/livesimply/livesimplyheader.jpg" alt="livesimply:promise"  border="0"></a></h1>
+<h1 style="padding: 5px;"><a href="/"><img width="1014" height="151" src="/microsites/livesimply/livesimplyheader.jpg" alt="livesimply:promise" border="0"></a></h1>
 ';
     } elseif ($microsite && $microsite == 'o2') {
         return '

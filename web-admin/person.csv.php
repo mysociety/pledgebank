@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: person.csv.php,v 1.3 2007-01-03 19:10:00 matthew Exp $
+ * $Id: person.csv.php,v 1.4 2007-01-03 19:11:54 matthew Exp $
  * 
  */
 
@@ -22,8 +22,9 @@ function escape_csv($v) {
 header("Content-Type: application/csv; charset=utf-8");
 
 // XXX pledge creators only for now
-$q = db_query("SELECT person.name, person.email, address_1, address_2, address_3, town,
-    county, postcode, country, ref, title FROM person, pledges 
+$q = db_query("SELECT person.name, person.email, address_1, address_2, address_3,
+    address_town, address_county, address_postcode, address_country, ref, title
+    FROM person, pledges 
     WHERE pledges.person_id = person.id ORDER BY id");
 print "name,email,address_1,address_2,address_3,town,county,postcode,country,ref,title\n";
 while ($r = db_fetch_row($q)) {

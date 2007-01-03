@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.48 2006-12-30 13:22:04 francis Exp $
+// $Id: faq.php,v 1.49 2007-01-03 20:13:01 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -344,10 +344,12 @@ function default_faq() {
 ############################################################################
 
 function livesimply_faq() {
-    global $microsite;
     print h2(_('Frequently Asked Questions'));
     ?>
-    <dl>
+
+<p>Do also see the <a href="/terms">Terms and Conditions</a>.</p>
+
+<dl>
 
 <dt>What is <em>live</em>simply:promise for? </dt>
 <dd>Making a <em>live</em>simply promise shows that you want to live more simply, sustainably, and in solidarity with people who are poor. This online action helps you join a promise and get other people to carry it out with you. Making a promise is about making the world a better place for all of us. </dd>
@@ -446,6 +448,7 @@ described in the rest of this paragraph.
 
 
 </dl>
+
     <?
 }
 
@@ -453,7 +456,6 @@ described in the rest of this paragraph.
 
 page_header(_("Frequently Asked Questions"), array('cache-max-age' => 600));
 
-global $microsite;
 if ($microsite && $microsite == 'livesimply') {
     livesimply_faq();
 } else {

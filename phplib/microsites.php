@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.80 2007-01-03 19:10:00 matthew Exp $
+ * $Id: microsites.php,v 1.81 2007-01-03 20:13:00 matthew Exp $
  * 
  */
 
@@ -618,7 +618,7 @@ function microsites_signup_extra_fields($errors) {
             $agreeterms = ' checked';
 ?>
     <strong><input type="checkbox" name="agreeterms" value="1" <?=$agreeterms?> <?=array_key_exists('agreeterms', $errors) ? ' class="error"' : ''?> > 
-    I have read the <a href="/faq#privacy">terms and conditions</a>. I have the
+    I have read the <a href="/terms">terms and conditions</a>. I have the
     permission of my parent, guardian or teacher to sign up, or I am at least
     18 years old. 
     </strong>
@@ -650,7 +650,7 @@ function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors)
     <p>When you're happy with your promise, confirm that you agree to the terms
     and conditions and click "Create promise".</p>
     <strong><input type="checkbox" name="agreeterms" value="1" <?=$agreeterms?> <?=array_key_exists('agreeterms', $errors) ? ' class="error"' : ''?> > 
-    I have read the <a href="/faq#privacy">terms and conditions</a>. I have the
+    I have read the <a href="/terms">terms and conditions</a>. I have the
     permission of my parent, guardian or teacher to sign up, or I am at least
     18 years old. </strong>
 <p style="text-align: right;">

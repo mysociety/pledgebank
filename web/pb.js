@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.34 2006-08-24 12:51:14 matthew Exp $
+ * $Id: pb.js,v 1.35 2007-01-03 18:58:38 matthew Exp $
  * 
  */
 
@@ -46,7 +46,7 @@ function fadein(thi) {
     id = thi.id
     for (var j = 0; j < greyed.length; j++) {
         if (greyed[j][0] == id && greyed[j][1] == thi.value) {
-            thi.style.color = '#000000';
+            thi.className = '';
             thi.value = '';
         }
     }
@@ -55,7 +55,7 @@ function fadeout(thi) {
     id = thi.id
     for (var j = 0; j < greyed.length; j++) {
         if (greyed[j][0] == id && thi.value == '') {
-            thi.style.color = '#999999';
+            thi.className = 'greyed';
             thi.value = greyed[j][1];
         }
     }
@@ -68,10 +68,10 @@ function greyOutInputs() {
         for (var j = 0; j < greyed.length; j++) {
             d = document.getElementById(greyed[j][0])
             if (d && d.value == '') d.value = greyed[j][1]
-            if (d && d.value == greyed[j][1]) d.style.color = '#999999'
+            if (d && d.value == greyed[j][1]) d.className = 'greyed';
         }
         d = document.getElementById('ref')
-        if (d && d.value.length<6) d.style.color = '#999999'
+        if (d && d.value.length<6) d.className = 'greyed';
 
     }
 
@@ -88,8 +88,8 @@ function greyOutInputs() {
 
 function checklength(thi) {
     var l = thi.value.length
-    if (l<6) thi.style.color = '#999999'
-    else thi.style.color = '#000000'
+    if (l<6) thi.className = 'greyed';
+    else thi.className = '';
 }
 
 // optionclick is "true" if user just clicked, or "false" during page load
@@ -134,7 +134,7 @@ function grey_postcode(t, optionclick) {
     if (!document || !document.getElementById) return
     d = document.getElementById('postcode_line')
     if (!d) return
-    d.style.color = t ? '#999999' : '#000000'
+    d.className = t ? 'greyed' : '';
     grey_thing(t, 'postcode', optionclick)
 }
 
@@ -142,7 +142,7 @@ function grey_place(t, optionclick) {
     if (!document || !document.getElementById) return
     d = document.getElementById('place_line')
     if (!d) return
-    d.style.color = t ? '#999999' : '#000000'
+    d.className = t ? 'greyed' : '';
     grey_thing(t, 'place', optionclick)
 }
 
@@ -150,7 +150,7 @@ function grey_local(t) {
     if (!document || !document.getElementById) return
     d = document.getElementById('local_line')
     if (!d) return
-    d.style.color = t ? '#999999' : '#000000'
+    d.className = t ? 'greyed' : '';
     grey_thing(t, 'local0', false)
     grey_thing(t, 'local1', false)
 }
@@ -159,7 +159,7 @@ function grey_ifyes(t) {
     if (!document || !document.getElementById) return
     d = document.getElementById('ifyes_line')
     if (!d) return
-    d.style.color = t ? '#999999' : '#000000'
+    d.className = t ? 'greyed' : '';
 }
 
 function grey_pin(t) {
@@ -170,11 +170,11 @@ function grey_thing(t, e, focus) {
     var d = document.getElementById(e)
     if (t) {
         d.disabled = true
-        d.style.color = '#999999'
+        d.className = 'greyed';
         d.style.borderColor = '#999999'
     } else {
         d.disabled = false
-        d.style.color = '#000000'
+        d.className = '';
         d.style.borderColor = '#9c7bbd'
         if (focus) {
             d.focus()

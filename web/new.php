@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.165 2006-12-29 18:10:09 francis Exp $
+// $Id: new.php,v 1.166 2007-01-03 18:58:38 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -119,7 +119,7 @@ function pledge_form_one($data = array(), $errors = array()) {
 <div class="c">
 
 <h3><?=_('Your Pledge')?></h3>
-<?  if (!count($_POST)) { ?>
+<?  if (microsites_show_translate_blurb() && !count($_POST)) { ?>
 <p><small><?=sprintf(_('(if you\'d like your pledge in a language other than %s, <a href="%s">click here</a>)'), $langs[$lang],
     "/lang?r=/new")?></small></p>
 <? } ?>

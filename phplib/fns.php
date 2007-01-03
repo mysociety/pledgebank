@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.151 2007-01-03 15:49:06 matthew Exp $
+// $Id: fns.php,v 1.152 2007-01-03 18:58:37 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -251,18 +251,22 @@ function sms_site_country() {
     return in_array($site_country, sms_countries());
 }
 
-function pb_get_change_country_link() {
+function pb_get_change_country_link($or_site = true) {
     global $site_country, $microsite;
-    $change = '<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">';
-    if ($microsite && ($microsite != 'everywhere')) 
-        # TRANS: i.e. "choose website" or "choose local place where action will be taken?" I've assumed the former. (Tim Morley, 2005-11-21)
-        # Yes, it's choose website. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
-        $change .= _("choose site");
-    elseif ($site_country)
-        $change .= _("change country");
+    $change = '';
+    if ($microsite) {
+        if ($or_site && microsites_change_microsite_allowed()) {
+            # TRANS: i.e. "choose website" or "choose local place where action will be taken?" I've assumed the former. (Tim Morley, 2005-11-21)
+            # Yes, it's choose website. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
+            $change = _("choose site");
+        }
+    } elseif ($site_country)
+        $change = _("change country");
     else
-        $change .= _("choose country");
-    $change .= '</a>';
+        $change = _("choose country");
+    if ($change) {
+        $change = ' (<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">' . $change . '</a>)';
+    }
     return $change;
 }
 
@@ -381,18 +385,18 @@ function pb_print_filter_link_main_general($attrs = "") {
     if ($microsite) {
         print "<p $attrs>";
         if ($microsite == 'everywhere') 
-            printf(_('%s (%s) pledges listed'), microsites_get_name(), $change_country);
-        else 
-            printf(_('%s (%s) pledges only listed'), microsites_get_name(), $change_country);
+            printf(_('%s%s pledges listed'), microsites_get_name(), $change_country);
+        elseif ($change_country)
+            printf(_('%s%s pledges only listed'), microsites_get_name(), $change_country);
         print '</p>';
     }
     else {
         print "<p $attrs>";
         # TRANS: Worth thinking about word order here. The English reads e.g. "UK (change country) pledges and global English (change language) pledges listed. Even in English, and certainly in other languages, it'd probably be clearer as something like: "Listed below are pledges for the UK (change country) and global pledges written in English (change language)." (Tim Morley, 2005-11-27)
         if ($site_country)
-            printf(_('%s (%s) pledges and global %s (%s) pledges listed'), pb_site_country_name('in'), $change_country, $langname, $change_language);
+            printf(_('%s%s pledges and global %s (%s) pledges listed'), pb_site_country_name('in'), $change_country, $langname, $change_language);
         else
-            printf(_('%s (%s) pledges in %s (%s) only listed'), pb_site_country_name('in'), $change_country, $langname, $change_language);
+            printf(_('%s%s pledges in %s (%s) only listed'), pb_site_country_name('in'), $change_country, $langname, $change_language);
         print '</p>';
     }
 }
@@ -400,7 +404,10 @@ function pb_print_filter_link_main_general($attrs = "") {
 function pb_print_no_featured_link() {
     $change = pb_get_change_country_link();
     print '<p>';
-    printf(_('There are no featured pledges for %s (%s) at the moment.'), pb_site_country_name('to'), $change);
+    if ($change)
+        printf(_('There are no featured pledges for %s%s at the moment.'), pb_site_country_name('to'), $change);
+    else
+        print _('There are no featured pledges at the moment.');
     print '</p>';
 }
 

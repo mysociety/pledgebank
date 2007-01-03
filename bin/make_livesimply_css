@@ -30,6 +30,8 @@ while(<MAINCSS>) {
     s/#21004a/#000000/gi;  # purple lettering/thin-borders 
     s/#522994/#000000/gi if (m/border/);  # border colour
 
+    s/#999999/#cccccc/g if ($selector eq '.greyed');
+
     # Pledge box etc. colours and borders
     s/#9c7bbd/#000000/gi if ($selector =~ m/input/);
     #s/background-color: #9c7bbd;/background-image: url(\/livesimply-body.gif);/i;

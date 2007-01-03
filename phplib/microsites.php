@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.78 2007-01-03 15:49:07 matthew Exp $
+ * $Id: microsites.php,v 1.79 2007-01-03 18:58:37 matthew Exp $
  * 
  */
 
@@ -124,7 +124,7 @@ function microsites_redirect($p) {
 function microsites_site_country() {
     global $site_country, $microsite;
     if ($microsite) {
-        if ($microsite == 'london' || $microsite == 'livesimply')
+        if ($microsite == 'london' || $microsite == 'livesimply' || $microsite == 'o2')
             return 'GB';
         return null;
     }
@@ -965,6 +965,26 @@ function microsites_display_login() {
     return true;
 }
 
+/* microsites_change_microsite_allowed
+ * Returns whether or not you should display the "change/choose site"
+ * links around the place.
+ */
+function microsites_change_microsite_allowed() {
+    global $microsite;
+    if ($microsite == 'o2' || $microsite == 'livesimply')
+        return false;
+    return true;
+}
 
+/* microsites_show_translate_blurb()
+ * Returns whether or not we should display the available languages
+ * and "translate into your own language" at the bottom of every page.
+ */
+function microsites_show_translate_blurb() {
+    global $microsite;
+    if ($microsite == 'o2' || $microsite == 'livesimply')
+        return false;
+    return true;
+}
 
 ?>

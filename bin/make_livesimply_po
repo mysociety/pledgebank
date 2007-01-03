@@ -7,6 +7,8 @@ use strict;
 use POSIX;
 use File::Copy;
 
+# XXX: Running from /data/vhost/matthew.pb.com/mysociety/, this passes,
+# as it changes to /data/mysociety/ here! Then the copy fails...
 chdir("../../../mysociety/pb/bin") or die "Run from inside mysociety/pb/bin";
 chdir("../../locale") or die "No locale directory";
 mkdir("en_GB.UTF-8");
@@ -71,6 +73,7 @@ while(<MAINPO>) {
         $buffer =~ s/\bPledge\b/Promise/g;
         $buffer =~ s/\bpledges\b/promises/g;
         $buffer =~ s/\bPledges\b/Promises/g;
+	$buffer =~ s/\bpublically\b/publicly/g;
 
         if ($buffer =~ m/\bbut only if\b/ && $buffer =~ m/%s will %s/) {
             $buffer =~ s/\bbut only if\b/but I want/g;
@@ -81,7 +84,7 @@ while(<MAINPO>) {
         $buffer =~ s/"%s will %s"/"%s to %s"/;
         $buffer =~ s/"do the same"/"join me"/;
     
-        $buffer =~ s#-- the livesimply:promise team#The livesimply:promise team"\n"http://promise.livesimply.org.uk#;
+        $buffer =~ s#-- the livesimply:promise team#The livesimply:promise team\\n"\n"http://promise.livesimply.org.uk#;
 
         print LIVESIMPLYPO $buffer;
         $buffer = "";

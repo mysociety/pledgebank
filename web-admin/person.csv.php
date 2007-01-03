@@ -1,12 +1,12 @@
 <?
 /*
- * index.php:
- * Admin pages for PledgeBank.
+ * person.csv.php:
+ * Admin page for LiveSimply, to output CSV of promise creators
  * 
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: person.csv.php,v 1.1 2006-12-22 15:26:02 francis Exp $
+ * $Id: person.csv.php,v 1.2 2007-01-03 15:49:08 matthew Exp $
  * 
  */
 

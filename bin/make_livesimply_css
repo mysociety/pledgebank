@@ -13,7 +13,7 @@ my $selector = "";
 while(<MAINCSS>) {
     if (m/^(.*) {/) { $selector = $1 }
 
-    next if ($selector =~ m/ul#nav/);
+    next if ($selector =~ m/ul#nav/ || $selector eq 'h1');
 
     s/pb.css/livesimply.css/;
     s/Top-level style sheet for PledgeBank.com/Custom style sheet for Live Simply version of PledgeBank/;
@@ -21,11 +21,7 @@ while(<MAINCSS>) {
     $_ = "    font-family: verdana, arial, helvetica, sans-serif;\n" if m/font-family/;
 
     # Overall look
-    s/#ffffff/#888888/gi if ($selector eq "h1 span#logo_pledge");
-    s/#ffffff/#000000/gi if ($selector eq "h1 span#beta");
     s/top: 2px; right: 2px;/top: 4px; right: 4px;/ if ($selector eq "#search");
-    s/top: 2.75em;/top: 120px;/ if ($selector eq "ul#nav");
-    s/margin: 0 1em 0 0;/margin: -1.2em 0.5em 0 0;/ if ($selector eq "ul#nav");
     s/margin: 1em auto 0;/margin: 1em 0 0 16em;/ if ($selector eq "#pbcontent");
 
     # Link colours
@@ -36,14 +32,13 @@ while(<MAINCSS>) {
 
     # Pledge box etc. colours and borders
     s/#9c7bbd/#000000/gi if ($selector =~ m/input/);
-    s/background-color: #9c7bbd;/background-image: url(\/livesimply-body.gif);/i;
+    #s/background-color: #9c7bbd;/background-image: url(\/livesimply-body.gif);/i;
     s/#f6e5ff/#cecfce/gi;  # lighter pink plaque background
     s/#c6b5de/#00aab5/gi;  # darker pink plaque background
     s/#ffff99/#ffffee/gi;  # "spread the word" yellow
     s/#ff8429/#ffbb88/gi;  # 'spread the word' orange border
     
     # Headings
-    s/font-size: 200%;/font-size: 130%;/ if ($selector eq "h1");
     print LIVESIMPLYCSS "    font-size: 120%;\n" if (m/^}/ && $selector eq 'h2');
     print LIVESIMPLYCSS "    font-size: 100%;\n" if (m/^}/ && $selector eq 'h3');
 
@@ -56,6 +51,12 @@ while(<MAINCSS>) {
 print LIVESIMPLYCSS "\nh2 { color: #000000; }\n";
 
 print LIVESIMPLYCSS <<END;
+
+h1 {
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
 
 #pballfooter {
     margin: 0em 0 0 16em;
@@ -78,8 +79,8 @@ print LIVESIMPLYCSS <<END;
 #nav {
     font-size: 90%;
     position: absolute;
-    top: 120px;
-    left: 0px; 
+    top: 171px;
+    left: 4px; 
     clear: right;
 }
 

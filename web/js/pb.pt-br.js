@@ -13,7 +13,7 @@ var translation = {
 "(choose one)":"(escolha uma)",
 "other local people":"outras pessoas locais",
 "<Enter your name>":"<Digite seu nome>",
-"<Enter your pledge>":"<Digite sua promessa> ",
+"<Enter your pledge>":"<Digite sua promessa>",
 "<Enter town or keyword>":"Digitar cidade ou palavra-chave",
 "<Date>":"<Data>",
 "other local person":"outras pessoas locais",

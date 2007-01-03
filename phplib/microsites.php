@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.77 2006-12-29 18:10:08 francis Exp $
+ * $Id: microsites.php,v 1.78 2007-01-03 15:49:07 matthew Exp $
  * 
  */
 
@@ -187,14 +187,7 @@ function microsites_logo() {
 ';
     } elseif ($microsite && $microsite == 'livesimply') {
         return '
-<div style="background-color: #2aaaad; height: 120px;">
-<a href="/"><img src="/microsites/livesimply/promise_banner_left.jpg" alt="livesimply:promise" 
-    style="background-color: #ffffff; padding: 0px; margin: 0px; border: none; position: absolute;
-    top: 0px; left: 0px; "></a>
-<img src="/microsites/livesimply/promise_banner_right.jpg" alt="" 
-    style="background-color: #ffffff; padding: 0px; margin: 0px; border: none; float: right;
-">
-</div>
+<h1><a href="/"><img width="1014" height="151" src="/microsites/livesimply/livesimplyheader.jpg" alt="livesimply:promise"  border="0"></a></h1>
 ';
     } elseif ($microsite && $microsite == 'o2') {
         return '
@@ -435,7 +428,7 @@ function microsites_frontpage_extra_blurb() {
         # since some signers' names are hidden)
         $na = db_getOne('select count(*) from signers');
         $nb = db_getOne('select count(*) from pledges');
-        ?> <div id="simplycounter">Together, we've made <?=$na + $nb?> promises. What are you going to promise?</div> </div> <?
+        ?> <div id="simplycounter"><strong>Together, we've made <?=$na + $nb?> promises. What are you going to promise?</strong></div> </div> <?
     } elseif ($microsite == 'catcomm') {
 ?>
 <div id="extrablurb">
@@ -627,7 +620,7 @@ function microsites_signup_extra_fields($errors) {
     <strong><input type="checkbox" name="agreeterms" value="1" <?=$agreeterms?> <?=array_key_exists('agreeterms', $errors) ? ' class="error"' : ''?> > 
     I have read the <a href="/faq#privacy">terms and conditions</a>. I have the
     permission of my parent, guardian or teacher to sign up, or I am at least
-    16 years old. 
+    18 years old. 
     </strong>
 <?
     }
@@ -659,7 +652,7 @@ function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors)
     <strong><input type="checkbox" name="agreeterms" value="1" <?=$agreeterms?> <?=array_key_exists('agreeterms', $errors) ? ' class="error"' : ''?> > 
     I have read the <a href="/faq#privacy">terms and conditions</a>. I have the
     permission of my parent, guardian or teacher to sign up, or I am at least
-    16 years old. </strong>
+    18 years old. </strong>
 <p style="text-align: right;">
 <input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
 </p>

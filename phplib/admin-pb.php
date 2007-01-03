@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.145 2006-12-28 00:59:17 francis Exp $
+ * $Id: admin-pb.php,v 1.146 2007-01-03 15:49:06 matthew Exp $
  * 
  */
 
@@ -115,7 +115,7 @@ class ADMIN_PAGE_PB_MAIN {
 
             $row .= '<td>'.$r['surge'].'</td>';
             $row .= '<td><a href="'.
-                pb_domain_url(array('path'=>"/".$r['ref'], 'lang'=>$r['lang'], 'country'=>$r['country'])) .
+                pb_domain_url(array('path'=>"/".$r['ref'], 'lang'=>$r['lang'], 'country'=>$r['country'], 'microsite'=>$r['microsite'])) .
                 '">'.$r['ref'].'</a>'.
                 '<br><a href="'.$this->self_link.'&amp;pledge='.$r['ref'].'">admin</a> |
                 <a href="?page=pblatest&amp;ref='.$r['ref'].'">timeline</a>';
@@ -236,7 +236,7 @@ class ADMIN_PAGE_PB_MAIN {
         $pledge_obj->render_box(array('showdetails' => true));
 
         print "<h2>Pledge '<a href=\"".
-                pb_domain_url(array('path'=>"/".$pledge_obj->ref(), 'lang'=>$pledge_obj->lang(), 'country'=>$pledge_obj->country_code())) .
+                pb_domain_url(array('path'=>"/".$pledge_obj->ref(), 'lang'=>$pledge_obj->lang(), 'country'=>$pledge_obj->country_code(), 'microsite'=>$pledge_obj->microsite())) .
                 "\">" . $pdata['ref'] . "</a>'";
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
         print "</h2>";

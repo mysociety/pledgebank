@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.95 2007-01-03 15:49:06 matthew Exp $
+ * $Id: frequentupdate,v 1.96 2007-01-03 20:22:05 matthew Exp $
  *
  */
 
@@ -372,6 +372,7 @@ function send_automatic_failure_messages_overall() {
     while ($pledge = db_fetch_array($q)) {
         verbose("pledge #${pledge['id']} (${pledge['ref']}) has failed");
 
+        $email_template = ($pledge['microsite'] && $pledge['microsite'] == 'livesimply') ? 'failed-creator-livesimply' : 'failed-creator';
         db_query("
                 insert into message (
                     pledge_id, circumstance,
@@ -380,7 +381,7 @@ function send_automatic_failure_messages_overall() {
                 ) values (
                     ?, 'failure-auto-creator',
                     true, false, false,
-                    'failed-creator'
+                    '$email_template'
                 )", $pledge['id']);
 
         $pledge_obj = new Pledge(intval($pledge['id']));

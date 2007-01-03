@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.120 2007-01-03 19:23:28 matthew Exp $
+ * $Id: pb.css,v 1.121 2007-01-03 19:25:01 matthew Exp $
  * 
  */
 
@@ -610,7 +610,7 @@ ul#nav li {
 .greyed {
     color: #999999;
 }
-input[type=text].greyed, input[type=password].greyed, textarea.greyed {
+input.greyed, textarea.greyed {
     color: #999999;
 }
 #sort {

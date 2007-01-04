@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.35 2007-01-03 18:58:38 matthew Exp $
+ * $Id: pb.js,v 1.36 2007-01-04 13:57:04 matthew Exp $
  * 
  */
 
@@ -134,7 +134,7 @@ function grey_postcode(t, optionclick) {
     if (!document || !document.getElementById) return
     d = document.getElementById('postcode_line')
     if (!d) return
-    d.className = t ? 'greyed' : '';
+    d.style.display = t ? 'none' : 'block';
     grey_thing(t, 'postcode', optionclick)
 }
 
@@ -142,7 +142,7 @@ function grey_place(t, optionclick) {
     if (!document || !document.getElementById) return
     d = document.getElementById('place_line')
     if (!d) return
-    d.className = t ? 'greyed' : '';
+    d.style.display = t ? 'none' : 'block';
     grey_thing(t, 'place', optionclick)
 }
 
@@ -150,7 +150,7 @@ function grey_local(t) {
     if (!document || !document.getElementById) return
     d = document.getElementById('local_line')
     if (!d) return
-    d.className = t ? 'greyed' : '';
+    d.style.display = t ? 'none' : 'block';
     grey_thing(t, 'local0', false)
     grey_thing(t, 'local1', false)
 }
@@ -159,7 +159,7 @@ function grey_ifyes(t) {
     if (!document || !document.getElementById) return
     d = document.getElementById('ifyes_line')
     if (!d) return
-    d.className = t ? 'greyed' : '';
+    d.style.display = t ? 'none' : 'block';
 }
 
 function grey_pin(t) {

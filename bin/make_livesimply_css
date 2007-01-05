@@ -82,7 +82,7 @@ h1 {
 #nav {
     font-size: 90%;
     position: absolute;
-    top: 171px;
+    top: 181px;
     left: 4px; 
     clear: right;
 }

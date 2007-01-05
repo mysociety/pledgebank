@@ -59,7 +59,8 @@ while(<MAINPO>) {
         } else {
             $buffer =~ s/^msgid "/msgstr "/;
         }
-        if ($buffer =~ m/Subject:/ || $buffer =~ m/-- the PledgeBank.com team/) {
+        if ($buffer =~ m/Subject:/ || $buffer =~ m/-- the PledgeBank.com team/
+	    || $buffer =~ m/"PledgeBank.com"/) {
             # emails (ASCII)
             $buffer =~ s/PledgeBank.com/livesimply:promise/g;
             $buffer =~ s/PledgeBank/livesimply:promise/g;

@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.81 2007-01-03 20:13:00 matthew Exp $
+ * $Id: microsites.php,v 1.82 2007-01-05 15:26:44 matthew Exp $
  * 
  */
 
@@ -981,6 +981,17 @@ function microsites_change_microsite_allowed() {
  * and "translate into your own language" at the bottom of every page.
  */
 function microsites_show_translate_blurb() {
+    global $microsite;
+    if ($microsite == 'o2' || $microsite == 'livesimply')
+        return false;
+    return true;
+}
+
+/* microsites_show_alert_advert()
+ * Returns whether or not we should display a HFYMP advert when you've
+ * just signed up for an email alert
+ */
+function microsites_show_alert_advert() {
     global $microsite;
     if ($microsite == 'o2' || $microsite == 'livesimply')
         return false;

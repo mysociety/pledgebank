@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.60 2006-12-22 21:13:57 matthew Exp $
+// $Id: alert.php,v 1.61 2007-01-05 15:26:45 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -83,7 +83,7 @@ function do_local_alert_subscribe(&$location) {
 
 <p class="noisymessage"><?=_("To see all your local pledge alerts, <a href=\"/your\">click here</a>.")?></p>
 
-<? if ($params['country'] == 'GB') { ?>
+<? if ($params['country'] == 'GB' && microsites_show_alert_advert()) { ?>
 <p class="loudmessage"><strong><?=_('Have a <a href="http://www.hearfromyourmp.com">long term relationship</a> with your MP!')?></strong>
 <? } else { ?>
 <p class="loudmessage"><?=_('Make your own <a href="/new/">new pledge</a>! Others in your area will be emailed about it automatically.')?>

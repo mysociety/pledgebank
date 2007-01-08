@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.83 2007-01-05 21:07:44 matthew Exp $
+ * $Id: microsites.php,v 1.84 2007-01-08 16:32:09 matthew Exp $
  * 
  */
 
@@ -306,7 +306,7 @@ function microsites_frontpage_has_intro() {
  * called if microsites_frontpage_has_intro() above returns true.
  */
 function microsites_frontpage_intro() {
-    global $microsite;
+    global $microsite, $lang;
     $tom = false;
     $audio_intro = true;
     if ($microsite == 'interface') {
@@ -352,7 +352,7 @@ function microsites_frontpage_intro() {
     } elseif ($microsite == 'livesimply') {
         ?>
 
-    <p>Think there's more to life than celebrities and shopping? Want to make the
+    <p>Want to make the
     world a better place for everyone? Then start here by taking a <em>live</em>simply:
     promise. Make a simple change in your life and get others to do the same! </p>
 
@@ -363,7 +363,6 @@ function microsites_frontpage_intro() {
     <p><a href="/explain">How does <em>live</em>simply:promise work?</a>
 
         <?
-        $tom = false;
         $audio_intro = false;
     } else {
         # Main site
@@ -375,7 +374,12 @@ function microsites_frontpage_intro() {
     # Quote from Tom, and his photo
     if ($tom) {
 ?><h2><?=_('Tell the world &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;') ?></h2>
-<blockquote class="noindent"><a href="tom-on-pledgebank-vbr.mp3"><img src="tomsteinberg_small.jpg"
+<blockquote class="noindent"><a href="<?
+
+        if ($lang=='en-gb') print 'tom-on-pledgebank-vbr.mp3';
+        else print '/explain';
+
+?>"><img src="tomsteinberg_small.jpg"
 alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;
 "></a>
 <?=$tom?>
@@ -385,7 +389,7 @@ alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid
 
     # Give how it works explanation
     if ($audio_intro) {
-        global $lang; if ($lang == 'en-gb') { ?>
+        if ($lang == 'en-gb') { ?>
     <p><a href="tom-on-pledgebank-vbr.mp3"><?=_('Listen to how PledgeBank
     works</a>, as explained by mySociety\'s director Tom Steinberg.
     Or <a href="/explain">read a full transcript') ?></a>.</p>

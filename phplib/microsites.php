@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.85 2007-01-08 18:19:30 matthew Exp $
+ * $Id: microsites.php,v 1.86 2007-01-09 09:54:24 matthew Exp $
  * 
  */
 
@@ -754,7 +754,7 @@ function microsites_other_people() {
     elseif ($microsite == 'catcomm')
         return 'other CatComm supporters'; // deliberately not translated
     elseif ($microsite == 'livesimply')
-        return 'other people who want to live simply'; // deliberately not translated
+        return 'other people'; // deliberately not translated
     else
         return _('other local people');
 }

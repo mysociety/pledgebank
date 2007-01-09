@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.208 2006-12-29 18:10:08 francis Exp $
+ * $Id: pledge.php,v 1.209 2007-01-09 09:52:46 matthew Exp $
  * 
  */
 
@@ -547,7 +547,7 @@ class Pledge {
             $title = sprintf("<strong>%s</strong>", $r['title']);
         }
 
-        $signup = $r['signup'] == 'do the same' ? 'too' : trim($r['signup']);
+        $signup = trim($r['signup']);
         if ($html)
             $signup = ms_make_clickable($signup);
         if ($firstperson) {

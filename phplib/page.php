@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.152 2007-01-03 18:58:37 matthew Exp $
+// $Id: page.php,v 1.153 2007-01-09 14:42:20 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -161,8 +161,9 @@ function page_header($title, $params = array()) {
 <?  //this was conditional, but now we need it nearly always for bottom of page local alert signups
     //if (array_key_exists('gazejs', $params)) { ?>
 <script type="text/javascript" src="/gaze.js"></script>
-<? //} ?>
-<?  if (!$microsite || $microsite != 'global-cool') { ?>
+<? //}
+    microsites_display_favicon();
+    if (!$microsite || $microsite != 'global-cool') { ?>
         </head>
         <body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
         <?

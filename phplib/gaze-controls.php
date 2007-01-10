@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.13 2006-12-22 15:26:01 francis Exp $
+// $Id: gaze-controls.php,v 1.14 2007-01-10 17:24:22 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -178,7 +178,7 @@ function gaze_controls_print_place_choice($selected_place, $selected_gaze_place,
     print "<ul>";
 
     ?> 
-    <li><p id="place_line"> <?
+    <li id="place_line"> <?
 
     /* Save previous value of 'place' so we can show a new selection list in the
      * case where the user types a different place name after clicking on one of
@@ -198,14 +198,14 @@ function gaze_controls_print_place_choice($selected_place, $selected_gaze_place,
 
     ?>
     <input <? if (array_key_exists('place', $errors)) print ' class="error"' ?> type="text" name="place" id="place" value="<? if ($selected_place) print htmlspecialchars($selected_place) ?>">
-</p></li>
+</li>
 
 <? if (!array_key_exists('townonly', $params) || !$params['townonly']) { ?>
-    <li><p id="postcode_line">
+    <li id="postcode_line">
     <?=_('Or, UK only, you can give a postcode area:') ?>
     <input <? if (array_key_exists('postcode', $errors)) print ' class="error"' ?> type="text" name="postcode" id="postcode" value="<? if ($postcode) print htmlspecialchars($postcode) ?>">
     <br><small><?=_('(just the start of the postcode, such as WC1)') ?></small>
-    </p></li>
+    </li>
 <? } ?>
 
     </ul>

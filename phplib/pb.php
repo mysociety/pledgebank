@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.75 2006-10-15 23:45:22 francis Exp $
+ * $Id: pb.php,v 1.76 2007-01-10 16:13:54 matthew Exp $
  * 
  */
 
@@ -100,6 +100,7 @@ locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
 # Do includes after language negotiation, so translated globals
 # are translated in them
 require_once 'microsites.php';
+microsites_for_locale();
 require_once '../../phplib/countries.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/stash.php';

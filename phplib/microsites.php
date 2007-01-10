@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.88 2007-01-09 18:25:55 matthew Exp $
+ * $Id: microsites.php,v 1.89 2007-01-10 16:13:54 matthew Exp $
  * 
  */
 
@@ -55,6 +55,16 @@ $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countr
                                 'global-cool' => _('Global Cool (One by One, Ton by Ton)'),
                                 'catcomm' => _('Catalytic Communities')
                                 );
+
+/* As sometimes microsites.php is included before the locale is set... 
+ */
+function microsites_for_locale() {
+    global $microsites_list, $microsites_public_list;
+    $microsites_list['everywhere'] = _('Everywhere');
+    foreach ($microsites_public_list as $key => $value) {
+        $microsites_public_list[$key] = _($value);
+    }
+}
 
 /* Pledges made from these microsites are not marked as such in the microsite
  * field in the pledges table. */

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.96 2007-01-03 20:22:05 matthew Exp $
+ * $Id: frequentupdate,v 1.97 2007-01-10 16:13:54 matthew Exp $
  *
  */
 
@@ -20,6 +20,7 @@ require_once "../phplib/pbcli.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once "../phplib/pbperson.php";
+require_once '../phplib/microsites.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/utility.php';
 

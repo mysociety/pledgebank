@@ -5,11 +5,11 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: terms.php,v 1.1 2007-01-03 20:13:01 matthew Exp $
+// $Id: terms.php,v 1.2 2007-01-10 10:52:29 matthew Exp $
 
 require_once "../phplib/pb.php";
 
-page_header(_("Terms and Conditions"), array('cache-max-age' => 600));
+page_header("Terms and Conditions", array('cache-max-age' => 600));
 
 if ($microsite && $microsite == 'livesimply') {
     livesimply_terms();

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.94 2006-12-22 16:08:33 francis Exp $
+# $Id: poster.cgi,v 1.95 2007-01-10 10:52:29 matthew Exp $
 #
 
 import sys
@@ -128,7 +128,7 @@ def microsites_poster_watermark(c, x1, y1, w, h):
 # Text that goes at the bottom of the poster
 def microsites_poster_remember_text(pledge):
     if microsite == 'livesimply':
-        return _(u'''Remember,  if you promote your promise to others, you'll be helping create a community action. Not only are you being the best you can be, you're encouraging others to do the same.''')
+        return u'''Remember,  if you promote your promise to others, you'll be helping create a community action. Not only are you being the best you can be, you're encouraging others to do the same.''' # Not translated
     else:
         return _(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.') % pledge['target']
 

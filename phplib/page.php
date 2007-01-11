@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.153 2007-01-09 14:42:20 matthew Exp $
+// $Id: page.php,v 1.154 2007-01-11 16:17:05 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -35,8 +35,7 @@ function page_send_vary_header() {
 // Internal
 function strip_title($title) {
     // Live Simply Promise, the title needs italics in it removing.
-    $title = str_replace("<em>", "", $title);
-    $title = str_replace("</em>", "", $title);
+    $title = str_replace(array('<em>', '</em>'), '', $title);
     return $title;
 }
 
@@ -357,7 +356,7 @@ function rss_header($title, $description, $params) {
 
 <channel rdf:about="<?=$main_page?>">
 <? # TRANS: 'PledgeBank' here is the second part of the title used in the RSS files ?>
-<title><?=strip_title($title)?> - <?=_('PledgeBank')?> <?=$country_name?></title>
+<title><?=strip_title($title . ' - ' . _('PledgeBank') . ' ' . $country_name) ?></title>
 <link><?=$main_page?></link>
 <description><?=$description?></description>
 <dc:language><?=$lang?></dc:language>

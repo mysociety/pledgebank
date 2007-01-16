@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.209 2007-01-09 09:52:46 matthew Exp $
+ * $Id: pledge.php,v 1.210 2007-01-16 13:12:38 matthew Exp $
  * 
  */
 
@@ -893,20 +893,11 @@ function send_announce_token($pledge_id) {
 
 /* post_confirm_advertise PLEDGE_ROW
    Print relevant advertising */
-function post_confirm_advertise($pledge, $curr_page) {
-    $random = rand(1,2);
-    if ($random==1) {
-        $random = 'friends';
-        print '<p class="noisymessage">'._('Pledges only ever succeed when signers encourage other people to sign them:').'</p>';
-        view_friends_form($pledge, array(), $curr_page);
-    } else {
-        $random = 'local-alerts';
-        print _("<p>PledgeBank can send you email alerts when people
+function post_confirm_advertise() {
+    print _("<p>PledgeBank can send you email alerts when people
         create local pledges in your area. Sign up - you don't know
         what interesting things people might be getting up to.</p>");
-        pb_view_local_alert_quick_signup("localsignupfrontpage", array('track'=>$curr_page));
-    }
-    return "signer-confirm-advert=$random";
+    pb_view_local_alert_quick_signup("localsignupfrontpage", array());
 }
 
 /* post_confirm_advertise_flyers PLEDGE_ROW

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.56 2006-12-29 18:10:09 francis Exp $
+// $Id: ref-sign.php,v 1.57 2007-01-16 13:12:38 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -19,7 +19,6 @@ $p = new Pledge(get_http_var('ref'));
 microsites_redirect($p);
 
 $title = _('Signature addition');
-$extra = null;
 page_header($title, array('ref'=>$p->ref(),'pref'=>$p->url_typein()));
 $location = array();
 if ($p->byarea())
@@ -49,13 +48,12 @@ if (is_array($errors) && !array_key_exists('location_choice', $errors)) {
     }
 }
 
-$params = array('extra'=>$extra);
-# if ($extra=='signer-confirm-advert=local-alerts')
+$params = array();
 $params['nolocalsignup'] = true;
 page_footer($params);
 
 function do_sign(&$location) {
-    global $q_email, $q_name, $q_showname, $q_ref, $q_pin, $extra;
+    global $q_email, $q_name, $q_showname, $q_ref, $q_pin;
     $errors = importparams(
                 array(array('name',true),       '//',        '', null),
                 array('email',      'importparams_validate_email'),
@@ -243,7 +241,7 @@ function do_sign(&$location) {
         if (!$f1 && $pledge->succeeded())
             print '<p><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
 
-        $extra = post_confirm_advertise($pledge, 'signer-confirm');
+        post_confirm_advertise();
     } else if ($R == PLEDGE_SIGNED) {
         /* Either has already signer, or is creator. */
         print '<p><strong>';

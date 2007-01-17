@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.89 2007-01-10 16:13:54 matthew Exp $
+ * $Id: microsites.php,v 1.90 2007-01-17 09:46:32 matthew Exp $
  * 
  */
 
@@ -296,9 +296,8 @@ function microsites_navigation_menu($contact_ref) {
  */
 function microsites_frontpage_has_local_emails() {
     global $microsite;
-    if ($microsite == 'global-cool')
-        return false;
-    if ($microsite == 'catcomm')
+    if ($microsite == 'global-cool' || $microsite == 'catcomm'
+        || $microsite == 'o2')
         return false;
     return true;
 }
@@ -376,6 +375,38 @@ function microsites_frontpage_intro() {
     <p><a href="/explain">How does <em>live</em>simply:promise work?</a>
 
         <?
+        $audio_intro = false;
+    } elseif ($microsite == 'o2') { ?>
+<h2>Welcome to O2&#8217;s Promise Bank!</h2>
+
+<p>The Promise Bank is where we can all make our commitment to making
+O2 a better place. Using Promise Bank you can make your People Promise
+and contribute to making O2 the kind of place we want it to be.</p>
+
+<p>After hundreds of conversations about O2 at its best, we&#8217;ve
+captured all the ideas and come up with the People Promise:</p>
+
+<ul>
+<li>A warm welcome
+<li>Part of something special
+<li>A great place to work
+<li>The opportunity to get on
+<li>Trusted to do a great job
+<li>Managing with a human touch
+<li>Thanks for a job well done
+</ul>
+
+<p>Use the Promise Bank and make your Promise. What are you going to
+do to make the People Promise come alive? </p>
+
+<p>You can make a Promise for yourself or on behalf of your team. The
+most important thing is that you make a Promise and let us know what
+you are going to do. </p>
+
+<p>We&#8217;ll keep you updated about all your Promises and how we 
+can make O2 the best place to work anywhere.</p>
+
+<?
         $audio_intro = false;
     } else {
         # Main site
@@ -512,7 +543,8 @@ function microsites_frontpage_sign_invitation_text() {
  */
 function microsites_frontpage_has_offline_secrets() {
     global $microsite;
-    if ($microsite == 'global-cool' || $microsite == 'livesimply')
+    if ($microsite == 'global-cool' || $microsite == 'livesimply'
+        || $microsite=='o2')
         return false;
     return true;
 }

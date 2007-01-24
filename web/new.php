@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.167 2007-01-16 13:12:38 matthew Exp $
+// $Id: new.php,v 1.168 2007-01-24 18:20:30 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -138,15 +138,24 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 <? }
 ?></p>
 
-<p><?=_('The other people must sign up before') ?> <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(<?=_('e.g.') ?> "<?
-if ($lang=='en-gb')
-    print date('jS F Y', $pb_time+60*60*24*28); // 28 days
-elseif ($lang=='eo')
-    print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
-elseif ($lang=='de')
-    print strftime('%e. %B %Y', $pb_time+60*60*24*28);
-else
-    print strftime('%e %B %Y', $pb_time+60*60*24*28); ?>")</small></p>
+<p><?=_('The other people must sign up before') ?> <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(<?=_('e.g.') ?> <?
+
+if ($special = microsites_example_date())
+    print $special;
+else {
+    print '"';
+    if ($lang=='en-gb')
+        print date('jS F Y', $pb_time+60*60*24*28); // 28 days
+    elseif ($lang=='eo')
+        print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
+    elseif ($lang=='de')
+        print strftime('%e. %B %Y', $pb_time+60*60*24*28);
+    else
+        print strftime('%e %B %Y', $pb_time+60*60*24*28);
+    print '"';
+}
+    
+?>)</small></p>
 
 <p><?=_('Choose a short name for your pledge (6 to 16 letters):') ?>
 <input<? if (array_key_exists('ref', $errors) || array_key_exists('ref2', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
@@ -161,8 +170,14 @@ else
 <strong><?=_('Email:') ?></strong> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
 
+<?
+
+if ($special = microsites_identity_text())
+    print $special;
+else { ?>
 <p><?=_('On flyers and elsewhere, after your name, how would you like to be described? (optional)') ?>
 <br><small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
+<? } ?>
 <input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
 
 </div>

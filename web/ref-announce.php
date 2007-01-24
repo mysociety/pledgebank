@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.51 2006-10-17 10:08:53 francis Exp $
+ * $Id: ref-announce.php,v 1.52 2007-01-24 18:20:30 matthew Exp $
  * 
  */
 
@@ -350,8 +350,8 @@ count_sms_characters();
             // Country is not an SMS one, would be annoying to request SMS text
             // of them just for rare case when a foreigner may have signed up
             // by SMS. So we set a default message. (Keep it short too)
-	    // TRANS: This is part of a standard text message sent to foreign phones. The first %s is the pledge name, and the second is the pledge creator.
-            $foreign_sms_case = sprintf(_("Pledge %s success! Email %s for more"), $p->ref(), $p->creator_email());
+	    // TRANS: This is part of a standard text message sent to mobile phones. The first %s is the pledge name, and the second is the pledge creator.
+            $foreign_sms_case = sprintf("Pledge %s success! Email %s for more", $p->ref(), $p->creator_email());
             print '<input type="hidden" name="message_sms" value="'.htmlspecialchars($foreign_sms_case).'">';
         }
     }

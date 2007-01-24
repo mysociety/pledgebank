@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.42 2007-01-03 11:38:24 matthew Exp $
+// $Id: list.php,v 1.43 2007-01-24 18:20:30 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -16,7 +16,7 @@ define('PAGE_SIZE', 50);
 
 $err = importparams(
             array('offset', '/^(0|[1-9]\d*)$/', '', 0),
-            array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete|category)\/?$/', '', 'default'),
+            array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete|category|signers)\/?$/', '', 'default'),
             array('type', '/^[a-z_]*$/', '', 'all')
         );
 if ($err) {
@@ -97,7 +97,7 @@ if ($ntotal < $q_offset) {
 }
 
 $sort_phrase = $q_sort;
-if ($q_sort == 'creationtime' || $q_sort == 'created' || $q_sort == 'whensucceeded') {
+if ($q_sort == 'creationtime' || $q_sort == 'created' || $q_sort == 'whensucceeded' || $q_sort == 'signers') {
     $sort_phrase .= " DESC";
 }
 if ($q_sort == 'percentcomplete') {
@@ -194,6 +194,8 @@ if (!$rss) {
         if (microsites_categories_allowed()) {
             $arr['category'] = _('Category');
         }
+	if (microsites_sort_by_signers())
+	    $arr['signers'] = 'Signers';
 
         # Removed as not useful (search is better for these): 'ref'=>'Short name',
         # 'title'=>'Title', 'name'=>'Creator'

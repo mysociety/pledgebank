@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.90 2007-01-17 09:46:32 matthew Exp $
+ * $Id: microsites.php,v 1.91 2007-01-24 18:20:30 matthew Exp $
  * 
  */
 
@@ -1054,6 +1054,33 @@ function microsites_display_favicon() {
     global $microsite;
     if ($microsite == 'livesimply')
         print '<link rel="shortcut icon" href="/microsites/livesimply/favicon.ico">';
+}
+
+/* microsites_sort_by_signers
+ * If a microsite has an extra sort-by-signers option on list pages
+ */
+function microsites_sort_by_signers() {
+    global $microsite;
+    if ($microsite == 'o2')
+        return true;
+    return false;
+}
+
+/* For if a microsite has a special example date on the new pledge page
+ */
+function microsites_example_date() {
+    global $microsite, $pb_time;
+    if ($microsite == 'o2')
+        return date('d/m/Y', $pb_time+60*60*24*28);
+    return '';
+}
+
+/* For special identity text on the first new pledge page */
+function microsites_identity_text() {
+    global $microsite;
+    if ($microsite == 'o2')
+        return '<p>If your promise is on behalf of a team, please enter the team name here:';
+    return '';
 }
 
 ?>

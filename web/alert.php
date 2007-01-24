@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.61 2007-01-05 15:26:45 matthew Exp $
+// $Id: alert.php,v 1.62 2007-01-24 17:24:16 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -77,7 +77,7 @@ function do_local_alert_subscribe(&$location) {
     if ($track)
         $track .= '; subscribed'
 ?>
-<p class="loudmessage" align="center"><?=_("Thanks for subscribing!  You'll now get emailed once a day when there are new pledges in your area.") ?> </p>
+<p class="loudmessage" align="center"><?=_("Thanks for subscribing! You'll now receive an email when there are new pledges in your area.") ?> </p>
 
 <p class="noisymessage"><?=_("To add an alert for another place, <a href=\"/alert\">click here</a>.")?></p>
 

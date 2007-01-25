@@ -9,7 +9,7 @@ use File::Copy;
 
 # XXX: Running from /data/vhost/matthew.pb.com/mysociety/, this passes,
 # as it changes to /data/mysociety/ here! Then the copy fails...
-chdir("pb/bin") or die "Run from inside mysociety/pb/bin";
+chdir("../../../mysociety/pb/bin") or die "Run from inside mysociety/pb/bin";
 chdir("../../locale") or die "No locale directory";
 mkdir("en_GB.UTF-8");
 mkdir("en_GB.UTF-8/LC_MESSAGES");

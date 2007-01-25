@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.93 2007-01-25 14:19:49 matthew Exp $
+ * $Id: microsites.php,v 1.94 2007-01-25 14:43:16 matthew Exp $
  * 
  */
 
@@ -793,6 +793,71 @@ function microsites_postal_address_allowed() {
         return true;
     else
         return false;
+}
+
+/* For displaying the address fetching page (LiveSimply and O2 only) */
+function microsites_new_pledges_stepaddr($data, $errors) {
+    global $microsite;
+    if ($microsite == 'o2') {
+        $postcode = isset($data['address_postcode']) ? $data['address_postcode'] : '';
+        $directorate = isset($data['address_1']) ? $data['address_1'] : '';
+?>
+
+<p>Please could you provide your location and directorate:</p>
+
+<p><strong>Location:</strong>
+<select name="address_postcode" style="width:auto">
+<?      $pcs = array(''=>'(choose one)',
+            'BL9 9QL' => 'Bury', 'G3 8EP' => 'Glasgow',
+            'LS11 0NE' => 'Leeds', 'WA7 3QA' => 'Preston Brook',
+	    'SL1 4DX' => 'Slough');
+        foreach ($pcs as $pc => $str) {
+            print '<option';
+            if ($pc == $postcode) print ' selected';
+            print ' value="' . $pc . '">' . $str;
+        }
+?>
+</select></p>
+<p>or other postcode:
+<input type="text" name="address_postcode_override" id="address_postcode_override" value="<? if (isset($data['address_postcode_override'])) print htmlspecialchars($data['address_postcode_override']) ?>" size="20">
+</p>
+
+<p><strong>Directorate:</strong>
+<select name="address_1" style="width:auto">
+<?      $ds = array('(choose one)', 'Capability & Innovation',
+            'COO', 'Customer Directorate', 'Finance',
+            'Human Resources', 'Marketing', 'Sales & Retail');
+        foreach ($ds as $d) {
+            print '<option';
+            if ($d == $directorate) print ' selected';
+	    if ($d == '(choose one)') print ' value=""';
+            print '>' . htmlspecialchars($d);
+        }
+?>
+</select>
+</p>
+
+<?  } else { ?>
+<p>Please take a moment to fill in this form. It's not obligatory but the
+information you provide us will help us in evaluating the success of the
+<em>live</em>simply challenge.
+
+<p><strong><?=_('Your address:') ?></strong> 
+<br><input<? if (array_key_exists('address_1', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_1" id="address_1" value="<? if (isset($data['address_1'])) print htmlspecialchars($data['address_1']) ?>" size="30">
+<br><input<? if (array_key_exists('address_2', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_2" id="address_2" value="<? if (isset($data['address_2'])) print htmlspecialchars($data['address_2']) ?>" size="30">
+<br><input<? if (array_key_exists('address_3', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_3" id="address_3" value="<? if (isset($data['address_3'])) print htmlspecialchars($data['address_3']) ?>" size="30">
+<br><strong><?=_('Town:') ?></strong> 
+<br><input<? if (array_key_exists('address_town', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_town" id="address_town" value="<? if (isset($data['address_town'])) print htmlspecialchars($data['address_town']) ?>" size="20">
+<br><strong><?=_('County:') ?></strong> 
+<br><input<? if (array_key_exists('address_county', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_county" id="address_county" value="<? if (isset($data['address_county'])) print htmlspecialchars($data['address_county']) ?>" size="20">
+<br><strong><?=_('Postcode:') ?></strong> 
+<br><input<? if (array_key_exists('address_postcode', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_postcode" id="address_postcode" value="<? if (isset($data['address_postcode'])) print htmlspecialchars($data['address_postcode']) ?>" size="20">
+<br><strong><?=_('Country:') ?></strong> 
+<? 
+    gaze_controls_print_country_choice(microsites_site_country(), null, $errors, array('noglobal'=>true, 'fieldname' => 'address_country')); ?>
+</p>
+
+<?  }
 }
 
 /* microsites_new_pledges_prominence

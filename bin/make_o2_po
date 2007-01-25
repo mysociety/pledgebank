@@ -78,6 +78,7 @@ while(<MAINPO>) {
 	$buffer =~ s/The other people must sign up before/I will complete my pledge by/;
 	$buffer =~ s/"On flyers.*"/"If your promise is on behalf of a team, please enter the team name here:"/s;
 	$buffer =~ s/\(e.g. \\"resident of Tamilda Road\\"\)/(e.g. Customer Service Finance)/;
+        $buffer =~ s/Change your postal address/Change your location/;
 #$buffer =~ s#-- the livesimply:promise team#The livesimply:promise team\\n"\n"http://promise.livesimply.org.uk#;
 
         print NEWPO $buffer;

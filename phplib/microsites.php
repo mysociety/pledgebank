@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.92 2007-01-25 13:21:43 matthew Exp $
+ * $Id: microsites.php,v 1.93 2007-01-25 14:19:49 matthew Exp $
  * 
  */
 
@@ -34,7 +34,7 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'global-cool' => 'Global Cool',
                          'catcomm' => 'CatComm',
                          'livesimply' => '<em>live</em>simply:promise',
-			 'o2' => 'O2',
+                         'o2' => 'O2',
 );
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
@@ -342,15 +342,15 @@ function microsites_frontpage_intro() {
         See all of the <a href="http://365act.com">365 ways to change the world...</a>
         <?
     } elseif ($microsite == 'london') {
-	?><h2>Tell Londoners &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
-	<p>In the summer of 2012 the eyes of the world will be on London for a
-	fortnight as the Olympics games return to the capital for the third
-	time in its history. This site is collecting pledges encouraging
-	Londoners to work together on projects to turn London from a great city
-	to the greatest city in the world by 2012.</p>
-	<?
+        ?><h2>Tell Londoners &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
+        <p>In the summer of 2012 the eyes of the world will be on London for a
+        fortnight as the Olympics games return to the capital for the third
+        time in its history. This site is collecting pledges encouraging
+        Londoners to work together on projects to turn London from a great city
+        to the greatest city in the world by 2012.</p>
+        <?
     } elseif ($microsite == 'catcomm') {
-	?><h2>
+        ?><h2>
     
     Tell the world &#8220;I&#8217;ll support communities working to solve local problems, but only if you will too!&#8221;</h2>
     <p>Catalytic Communities (CatComm) develops, inspires and empowers
@@ -360,7 +360,7 @@ function microsites_frontpage_intro() {
     problem, can find the inspiration and tools they need to implement
     the solution, learning from their peers. This site brings people
     together, forming a network of support for building this work...</p>
-	<?
+        <?
     } elseif ($microsite == 'livesimply') {
         ?>
 
@@ -601,54 +601,35 @@ function microsites_new_pledges_toptips() {
     } elseif ($microsite == 'o2') {
         /* No top tips at the top */
     } else {
-        $percent_successful_above_100 = percent_success_above(100);
-        ?>
-        <div id="tips">
-        <h2><?=_('Top Tips for Successful Pledges') ?></h2>
-        <ol>
+        print microsites_toptips_normal();
+    }
+}
 
-        <li> <?=sprintf(_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
+function microsites_toptips_normal() {
+    $percent_successful_above_100 = percent_success_above(100);
+    $out = '<div id="tips">';
+    $out .= '<h2>' . _('Top Tips for Successful Pledges') . '</h2>';
+    $out .= '<ol>';
+    $out .= '<li>' . sprintf(_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
         to do something when 5 would be enough? Every extra person makes your pledge
-        harder to meet. Only %0.0f%% of pledges asking for more than 100 people succeed.'), $percent_successful_above_100) ?></li>
-
-        <li> <?=_("<strong>Get ready to sell your pledge, hard</strong>. Pledges don't
+        harder to meet. Only %0.0f%% of pledges asking for more than 100 people succeed.'), $percent_successful_above_100) . '</li>';
+    $out .= '<li>' . _("<strong>Get ready to sell your pledge, hard</strong>. Pledges don't
         sell themselves just by sitting on this site. In fact your pledge won't even
         appear to general site visitors until you've got a few people to sign up to it
         yourself. Think hard about whether people you know would want to sign up to
-        your pledge!") ?></li>
-
-        <li> <?=_("<strong>Think about how your pledge reads.</strong> How will it look to
+        your pledge!") . '</li>';
+    $out .= '<li>' . _("<strong>Think about how your pledge reads.</strong> How will it look to
         someone who picks up a flyer from their doormat? Read your pledge to the person
         next to you, or to your mother, and see if they understand what you're talking
-        about. If they don't, you need to rewrite it.") ?></li>
-
-        </ol>
-        </div>
-        <?
-    }
+        about. If they don't, you need to rewrite it.") . '</li>';
+    $out .= '</ol></div>';
+    return $out;
 }
 
 function microsites_new_pledges_toptips_bottom() {
     global $microsite;
     if ($microsite == 'o2') {
-        $percent_successful_above_100 = percent_success_above(100);
-	$out = '<div id="tips">';
-	$out .= '<h2>' . _('Top Tips for Successful Pledges') . '</h2>';
-	$out .= '<ol>';
-	$out .= '<li>' . sprintf(_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
-        to do something when 5 would be enough? Every extra person makes your pledge
-        harder to meet. Only %0.0f%% of pledges asking for more than 100 people succeed.'), $percent_successful_above_100) . '</li>';
-	$out .= '<li>' . _("<strong>Get ready to sell your pledge, hard</strong>. Pledges don't
-        sell themselves just by sitting on this site. In fact your pledge won't even
-        appear to general site visitors until you've got a few people to sign up to it
-        yourself. Think hard about whether people you know would want to sign up to
-        your pledge!") . '</li>';
-	$out .= '<li>' . _("<strong>Think about how your pledge reads.</strong> How will it look to
-        someone who picks up a flyer from their doormat? Read your pledge to the person
-        next to you, or to your mother, and see if they understand what you're talking
-        about. If they don't, you need to rewrite it.") . '</li>';
-	$out .= '</ol></div>';
-	return $out;
+        return microsites_toptips_normal();
     } else {
         print _("Did you read the tips at the top of the page? They'll help you make a successful pledge.");
     }
@@ -1132,4 +1113,10 @@ function microsites_example_date() {
     }
 }
 
+function microsites_intranet_site() {
+    global $microsite;
+    if ($microsite == 'o2')
+        return true;
+    return false;
+}
 ?>

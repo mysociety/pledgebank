@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.91 2007-01-24 18:20:30 matthew Exp $
+ * $Id: microsites.php,v 1.92 2007-01-25 13:21:43 matthew Exp $
  * 
  */
 
@@ -598,7 +598,9 @@ function microsites_new_pledges_toptips() {
         </ol>
         </div>
         <?
-     } else {
+    } elseif ($microsite == 'o2') {
+        /* No top tips at the top */
+    } else {
         $percent_successful_above_100 = percent_success_above(100);
         ?>
         <div id="tips">
@@ -623,6 +625,32 @@ function microsites_new_pledges_toptips() {
         </ol>
         </div>
         <?
+    }
+}
+
+function microsites_new_pledges_toptips_bottom() {
+    global $microsite;
+    if ($microsite == 'o2') {
+        $percent_successful_above_100 = percent_success_above(100);
+	$out = '<div id="tips">';
+	$out .= '<h2>' . _('Top Tips for Successful Pledges') . '</h2>';
+	$out .= '<ol>';
+	$out .= '<li>' . sprintf(_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
+        to do something when 5 would be enough? Every extra person makes your pledge
+        harder to meet. Only %0.0f%% of pledges asking for more than 100 people succeed.'), $percent_successful_above_100) . '</li>';
+	$out .= '<li>' . _("<strong>Get ready to sell your pledge, hard</strong>. Pledges don't
+        sell themselves just by sitting on this site. In fact your pledge won't even
+        appear to general site visitors until you've got a few people to sign up to it
+        yourself. Think hard about whether people you know would want to sign up to
+        your pledge!") . '</li>';
+	$out .= '<li>' . _("<strong>Think about how your pledge reads.</strong> How will it look to
+        someone who picks up a flyer from their doormat? Read your pledge to the person
+        next to you, or to your mother, and see if they understand what you're talking
+        about. If they don't, you need to rewrite it.") . '</li>';
+	$out .= '</ol></div>';
+	return $out;
+    } else {
+        print _("Did you read the tips at the top of the page? They'll help you make a successful pledge.");
     }
 }
 
@@ -737,21 +765,39 @@ greater publicity and a greater chance of succeeding.');
 #############################################################################
 # Features
 
+function microsites_location_allowed() {
+    global $microsite;
+    if ($microsite == 'o2')
+        return false;
+    else
+        return true;
+}
+
 /* microsites_private_allowed
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
     global $microsite;
-    if ($microsite == 'interface' || $microsite == 'global-cool' || $microsite == 'livesimply')
+    if ($microsite == 'interface' || $microsite == 'global-cool' || $microsite == 'livesimply' || $microsite == 'o2')
         return false;
     else
         return true;
 }
 
 /* microsites_categories_allowed
- * Returns whether categorires are offered in new pledge dialog. */
+ * Returns whether categories are used for this microsite at all */
 function microsites_categories_allowed() {
     global $microsite;
     if ($microsite == 'livesimply')
+        return false;
+    else
+        return true;
+}
+
+/* microsites_categories_page3
+ * Returns whether categories are offered in the usual place in the new pledge dialog. */
+function microsites_categories_page3() {
+    global $microsite;
+    if ($microsite == 'o2')
         return false;
     else
         return true;
@@ -762,7 +808,7 @@ function microsites_categories_allowed() {
  * dialog. */
 function microsites_postal_address_allowed() {
     global $microsite;
-    if ($microsite == 'livesimply')
+    if ($microsite == 'livesimply' || $microsite == 'o2')
         return true;
     else
         return false;
@@ -795,7 +841,7 @@ function microsites_other_people() {
         return 'other cool people'; // deliberately not translated
     elseif ($microsite == 'catcomm')
         return 'other CatComm supporters'; // deliberately not translated
-    elseif ($microsite == 'livesimply')
+    elseif ($microsite == 'livesimply' || $microsite == 'o2')
         return 'other people'; // deliberately not translated
     else
         return _('other local people');
@@ -1069,18 +1115,21 @@ function microsites_sort_by_signers() {
 /* For if a microsite has a special example date on the new pledge page
  */
 function microsites_example_date() {
-    global $microsite, $pb_time;
+    global $microsite, $pb_time, $lang;
     if ($microsite == 'o2')
-        return date('d/m/Y', $pb_time+60*60*24*28);
-    return '';
-}
-
-/* For special identity text on the first new pledge page */
-function microsites_identity_text() {
-    global $microsite;
-    if ($microsite == 'o2')
-        return '<p>If your promise is on behalf of a team, please enter the team name here:';
-    return '';
+        print date('d/m/Y', $pb_time+60*60*24*28);
+    else {
+        print '"';
+        if ($lang=='en-gb')
+            print date('jS F Y', $pb_time+60*60*24*28); // 28 days
+        elseif ($lang=='eo')
+            print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
+        elseif ($lang=='de')
+            print strftime('%e. %B %Y', $pb_time+60*60*24*28);
+        else
+            print strftime('%e %B %Y', $pb_time+60*60*24*28);
+        print '"';
+    }
 }
 
 ?>

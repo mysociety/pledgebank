@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.168 2007-01-24 18:20:30 matthew Exp $
+// $Id: new.php,v 1.169 2007-01-25 13:21:43 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -20,15 +20,23 @@ require_once "../../phplib/votingarea.php";
 require_once '../../phplib/countries.php';
 require_once '../../phplib/gaze.php';
 
+# Whether the pledge location step is shown
+function has_step_2() {
+    return microsites_location_allowed();
+}
+
 # Whether the category/privacy step is shown
 function has_step_3() {
-    return (microsites_categories_allowed() || microsites_private_allowed());
+    return (microsites_categories_page3() || microsites_private_allowed());
 }
 # Whether the creator's extra address step is shown
 function has_step_addr() {
     return microsites_postal_address_allowed();
 }
-$number_of_steps = 3;
+$number_of_steps = 2;
+if (has_step_2()) {
+    $number_of_steps++;
+}
 if (has_step_3()) {
     $number_of_steps++;
 }
@@ -124,6 +132,51 @@ function pledge_form_one($data = array(), $errors = array()) {
     "/lang?r=/new")?></small></p>
 <? } ?>
 
+<?
+    # XXX: Put in microsites.php
+    global $microsite;
+    if ($microsite == 'o2') { ?>
+<p><strong>I</strong>, <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+ at <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
+am promising that</p>
+
+<p><strong>I will</strong>
+<input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
+
+<p>as part of the 
+<select name="category">
+<option value="-1"><?=_('(choose one)') ?></option>
+<?
+    $s = db_query('select id, parent_category_id, name from category
+        where parent_category_id is null
+        order by id');
+    $out = array();
+    while ($a = db_fetch_row($s)) {
+        list($id, $parent_id, $name) = $a;
+        $out[_($name)] = sprintf("<option value=\"%s\"%s>%s%s</option>",
+                    $id,
+                    (array_key_exists('category', $data) && $id == $data['category'] ? ' selected' : ''),
+                    (is_null($parent_id) ? '' : '&nbsp;-&nbsp;'),
+                    htmlspecialchars(_($name)));
+    }
+    uksort($out, 'strcoll');
+    foreach ($out as $n => $s) {
+        print $s;
+    }
+
+?>
+</select>
+part of the People Promise,
+</p>
+
+<p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
+<input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
+
+<p><strong><?=_('will') ?></strong> <input type="text" id="signup" name="signup"
+size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
+</p>
+
+<?   } else { ?>
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
@@ -138,24 +191,14 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 <? }
 ?></p>
 
-<p><?=_('The other people must sign up before') ?> <input<? if (array_key_exists('date', $errors)) print ' class="error"' ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" onfocus="fadein(this)" onblur="fadeout(this)" value="<? if (isset($data['date'])) print htmlspecialchars($data['date']) ?>"> <small>(<?=_('e.g.') ?> <?
+<? } ?>
 
-if ($special = microsites_example_date())
-    print $special;
-else {
-    print '"';
-    if ($lang=='en-gb')
-        print date('jS F Y', $pb_time+60*60*24*28); // 28 days
-    elseif ($lang=='eo')
-        print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
-    elseif ($lang=='de')
-        print strftime('%e. %B %Y', $pb_time+60*60*24*28);
-    else
-        print strftime('%e %B %Y', $pb_time+60*60*24*28);
-    print '"';
-}
-    
-?>)</small></p>
+<p><?=_('The other people must sign up before') ?> <input<?
+    if (array_key_exists('date', $errors)) print ' class="error"';
+?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date"
+onfocus="fadein(this)" onblur="fadeout(this)" value="<?
+    if (isset($data['date'])) print htmlspecialchars($data['date']) ?>">
+<small>(<?=_('e.g.') ?> <? microsites_example_date(); ?>)</small></p>
 
 <p><?=_('Choose a short name for your pledge (6 to 16 letters):') ?>
 <input<? if (array_key_exists('ref', $errors) || array_key_exists('ref2', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
@@ -165,30 +208,34 @@ else {
 <p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically made clickable, no "markup" needed)') ?></small>
 <br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
 
+<? if ($microsite != 'o2') { ?>
 <h3><?=_('About You') ?></h3>
 <p style="margin-bottom: 1em;"><strong><?=_('Your name:') ?></strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 <strong><?=_('Email:') ?></strong> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
+<? } ?>
 
-<?
-
-if ($special = microsites_identity_text())
-    print $special;
-else { ?>
 <p><?=_('On flyers and elsewhere, after your name, how would you like to be described? (optional)') ?>
 <br><small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
-<? } ?>
 <input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
 
 </div>
 <? if (sizeof($data)) {
     print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
-} ?>
-<p style="text-align: center">
-<?=_("Did you read the tips at the top of the page? They'll help you make a successful pledge.") ?> 
-<input type="submit" name="tostep2" value="<?=_('Next step') ?>"></p>
+}
+
+?>
+<p style="text-align: center"><?
+$tips = microsites_new_pledges_toptips_bottom();
+?> <input type="submit" name="<?
+if (has_step_2()) print 'tostep2';
+elseif (has_step_3()) print 'tostep3';
+elseif (has_step_addr()) print 'tostepaddr';
+else print 'topreview';
+?>" value="<?=_('Next step') ?>"></p>
 </form>
 <? 
+if ($tips) print $tips;
 }
 
 function pledge_form_target_warning($data, $errors) {
@@ -338,7 +385,7 @@ function pledge_form_three($data, $errors = array()) {
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
 <h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), 3, $number_of_steps)?></h2>
 
-<? if (microsites_private_allowed()) { ?>
+<? if (microsites_categories_allowed()) { ?>
 <p><?=_('Which category does your pledge best fit into?') ?>
 <select name="category">
 <option value="-1"><?=_('(choose one)') ?></option>
@@ -409,8 +456,53 @@ function pledge_form_addr($data = array(), $errors = array()) {
 ?>
 
 <form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
-<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), has_step_3() ? 4 : 3, $number_of_steps)?></h2>
+<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'),
+    has_step_2() ? (has_step_3() ? 4 : 3) : 2, $number_of_steps)?></h2>
 <div class="c">
+
+<?
+    # XXX: In microsites.php
+    global $microsite;
+    if ($microsite == 'o2') {
+        $postcode = isset($data['address_postcode']) ? $data['address_postcode'] : '';
+        $directorate = isset($data['address_1']) ? $data['address_1'] : '';
+?>
+
+<p>Please could you provide your location and directorate:</p>
+
+<p><strong>Location:</strong>
+<select name="address_postcode" style="width:auto">
+<?      $pcs = array(''=>'(choose one)',
+            'BL9 9QL' => 'Bury', 'G3 8EP' => 'Glasgow',
+            'LS11 0NE' => 'Leeds', 'WA7 3QA' => 'Preston Brook',
+	    'SL1 4DX' => 'Slough');
+        foreach ($pcs as $pc => $str) {
+            print '<option';
+            if ($pc == $postcode) print ' selected';
+            print ' value="' . $pc . '">' . $str;
+        }
+?>
+</select></p>
+<p>or other postcode:
+<input type="text" name="address_postcode_override" id="address_postcode_override" value="<? if (isset($data['address_postcode_override'])) print htmlspecialchars($data['address_postcode_override']) ?>" size="20">
+</p>
+
+<p><strong>Directorate:</strong>
+<select name="address_1" style="width:auto">
+<?      $ds = array('(choose one)', 'Capability & Innovation',
+            'COO', 'Customer Directorate', 'Finance',
+            'Human Resources', 'Marketing', 'Sales & Retail');
+        foreach ($ds as $d) {
+            print '<option';
+            if ($d == $directorate) print ' selected';
+	    if ($d == '(choose one)') print ' value=""';
+            print '>' . htmlspecialchars($d);
+        }
+?>
+</select>
+</p>
+
+<?  } else { ?>
 
 <p>Please take a moment to fill in this form. It's not obligatory but the
 information you provide us will help us in evaluating the success of the
@@ -430,6 +522,8 @@ information you provide us will help us in evaluating the success of the
 <? 
     gaze_controls_print_country_choice(microsites_site_country(), null, $errors, array('noglobal'=>true, 'fieldname' => 'address_country')); ?>
 </p>
+
+<? } ?>
 
 </div>
 <? if (sizeof($data)) {
@@ -519,6 +613,9 @@ function pledge_form_submitted() {
     if (get_http_var('tostep2') || get_http_var('donetargetwarning')) {
         pledge_form_two($data, $errors);
         return;
+    }
+    if (!has_step_2()) {
+        $data['country'] = 'Global';
     }
     $errors = step2_error_check($data);
     if (sizeof($errors)) {
@@ -718,6 +815,20 @@ function stepaddr_error_check(&$data) {
     if (array_key_exists('address_postcode', $data) && $data['address_postcode'] && !validate_postcode($data['address_postcode'])) {
         $errors['address_postcode'] = _('Please enter a valid postcode');
     }
+
+    if (array_key_exists('address_postcode_override', $data)) {
+        if ($data['address_postcode_override'])
+	    $data['address_postcode'] = $data['address_postcode_override'];
+        if (!array_key_exists('address_postcode', $data) || !$data['address_postcode']) {
+	    $errors['address_postcode'] = 'Please pick a location or enter a postcode';
+	} elseif (!validate_postcode($data['address_postcode'])) {
+	    $errors['address_postcode'] = 'Please enter a valid postcode';
+	}
+	if (!array_key_exists('address_1', $data) || !$data['address_1']) {
+	    $errors['address_1'] = 'Please choose a directorate';
+	}
+    }
+
     return $errors;
 }
 
@@ -773,11 +884,14 @@ longer be valid."))?>
 </div>
 
 <p style="text-align: right;">
-<input type="submit" name="tostep1" value="<?=_('Change pledge text') ?>"><br><input type="submit" name="tostep2" value="<?=_('Change location') ?>">
-<? if (has_step_3()) { ?>
+<input type="submit" name="tostep1" value="<?=_('Change pledge text') ?>">
+<? if (has_step_2()) { ?>
+<br><input type="submit" name="tostep2" value="<?=_('Change location') ?>">
+<? }
+   if (has_step_3()) { ?>
 <br><input type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
-<? } ?>
-<? if (has_step_addr()) { ?>
+<? }
+   if (has_step_addr()) { ?>
 <br><input type="submit" name="tostepaddr" value="<?=_('Change your postal address') ?>">
 <? } ?>
 </p>
@@ -803,11 +917,13 @@ longer be valid."))?>
             ? _('None')
             : htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))) // XXX show enclosing cat?
     ?></strong></li>
-    <? } ?>
+    <? }
+    if (microsites_private_allowed()) { ?>
     <li><?=_('Privacy status') ?>: <strong><?
     if ($v=='all') print _('Public');
     if ($v=='pin') print _('Pledge can only be seen by people who I give the PIN to');
     ?></strong></li>
+    <? } ?>
     </ul>
     </div>
 
@@ -864,7 +980,6 @@ function create_new_pledge($P, $data) {
             if (mapit_get_error($location))
                 /* This error should never happen, as earlier postcode validation in form will stop it */
                 err('Invalid postcode while creating pledge; please check and try again.');
-            $data['postcode'] = canonicalise_partial_postcode($data['postcode']);
             $location_id = db_getOne("select nextval('location_id_seq')");
             db_query("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", array($location_id, $data['postcode'], $location['wgs84_lat'], $location['wgs84_lon'], $data['postcode']));
         } else if ($data['gaze_place']) {

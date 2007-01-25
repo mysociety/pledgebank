@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.210 2007-01-16 13:12:38 matthew Exp $
+ * $Id: pledge.php,v 1.211 2007-01-25 13:21:43 matthew Exp $
  * 
  */
 
@@ -628,12 +628,18 @@ class Pledge {
         print '<p><strong>';
         printf(_('I, %s, sign up to the pledge.'), $namebox);
         print '</strong><br></p>';
-        print '<p>
+	# XXX: Put in microsites.php
+	global $microsite;
+	if ($microsite == 'o2') {
+	    print '<input type="hidden" name="showname" value="1">';
+	} else {
+            print '<p>
     <small>
     <strong><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publically on this pledge.') . '</strong>
     '._('People searching for your name on the Internet will be able
     to find your signature, unless you uncheck this box.').'</small>
     </p>';
+    	}
         if ($this->byarea()) {
             // Pledges where target is per town, rather than overall
             if ($this->is_global()) {

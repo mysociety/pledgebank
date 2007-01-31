@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.75 2007-01-03 15:49:07 matthew Exp $
+ * $Id: login.php,v 1.76 2007-01-31 15:48:14 francis Exp $
  * 
  */
 
@@ -137,14 +137,19 @@ if (!is_null($q_t)) {
     }
     $q_h_stash = htmlspecialchars($q_stash = $d['stash']);
 
+    /* Set name if it has changed */
+    if ($q_name && !$P->matches_name($q_name))
+        $P->name($q_name);
+
+    /* PledgeBank now no longer ever shows an interstitial password change page
+     * after login. */
     /* If the 'direct' key exists in the token, don't do any intervening
      * pages. */
-    if (!array_key_exists('direct', $d)) {
-        if ($q_name && !$P->matches_name($q_name))
-            $P->name($q_name);
+    // if (!array_key_exists('direct', $d)) {
         /* Can set this to some condition if you don't want to always offer password */
-        change_password_page($P);
-    }
+    //   change_password_page($P);
+    // }
+
     stash_redirect($q_stash);
     /* NOTREACHED */
 }
@@ -343,6 +348,14 @@ function login_form($errors = array()) {
     page_footer();
 }
 
+/* set_login_cookie PERSON [DURATION]
+ * Set a login cookie for the given PERSON. If set, EXPIRES is the time which
+ * will be set for the cookie to expire; otherwise, a session cookie is set. */
+function set_login_cookie($P, $duration = null) {
+    // error_log('set cookie');
+    setcookie('pb_person_id', person_cookie_token($P->id(), $duration), is_null($duration) ? null : time() + $duration, '/', person_cookie_domain(), false);
+}
+
 /* change_password_page PERSON
  * Show the logged-in PERSON a form to allow them to set or reset a password
  * for their account. */
@@ -424,12 +437,5 @@ You don't have to set a password if you don't want to."));
     exit();
 }
 
-/* set_login_cookie PERSON [DURATION]
- * Set a login cookie for the given PERSON. If set, EXPIRES is the time which
- * will be set for the cookie to expire; otherwise, a session cookie is set. */
-function set_login_cookie($P, $duration = null) {
-    // error_log('set cookie');
-    setcookie('pb_person_id', person_cookie_token($P->id(), $duration), is_null($duration) ? null : time() + $duration, '/', person_cookie_domain(), false);
-}
 
 ?>

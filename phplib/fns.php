@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.152 2007-01-03 18:58:37 matthew Exp $
+// $Id: fns.php,v 1.153 2007-01-31 15:48:13 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -520,5 +520,59 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
     $place_postcode_label++;
 }
 
+# Change/update your personal details
+# (called from phplib/page.php and web/your.php)
+function change_personal_details($yourpage = false) {
+    global $q_UpdateDetails, $q_pw1, $q_pw2, $P;
+    $idclass = "setpassword";
+    if ($yourpage) 
+        $idclass = "";
+    $has_password = $P->has_password();
+    ?>
+    <form id="<?=$idclass?>" action="/your" method="post"><input type="hidden" name="UpdateDetails" value="1">
+    <? if ($yourpage) { ?>
+    <h2><?=$P->has_password() ? _('Change password') : _('Set password') ?></h2>
+    <? } ?>
+    <?
+
+    importparams(
+    #        array('email',          '/./',          '', null),
+            array('pw1',            '/[^\s]+/',     '', null),
+            array('pw2',            '/[^\s]+/',     '', null),
+            array('UpdateDetails',  '/^.+$/',       '', false)
+    );
+
+    $error = null;
+    if ($q_UpdateDetails) {
+        if (is_null($q_pw1) || is_null($q_pw2))
+            $error = _("Please type your new password twice");
+        elseif (strlen($q_pw1)<5 || strlen($q_pw2)<5)
+            $error = _('Your password must be at least 5 characters long');
+        elseif ($q_pw1 != $q_pw2)
+            $error = _("Please type the same password twice");
+        else {
+            $P->password($q_pw1);
+            db_commit();
+            $has_password = true;
+            print '<p class="success">' . ($has_password ? _('Password successfully updated') 
+                : _('Password successfully set'))
+            . '</p>';
+
+        }
+    }
+    if (!is_null($error))
+        print "<p id=\"error\">$error</p>";
+    ?>
+    <p><?=$yourpage ? '' : '<strong>'?><?=$has_password ? _('If you wish to change your password, you can do so here.') 
+        : _('Set a password, and we won\'t need to check your email address each time you use PledgeBank.') ?>
+    <?=$yourpage ? '' : '</strong>'?></p>
+    <p>
+    <?=_('New password:') ?> <input type="password" name="pw1" id="pw1" size="15">
+    <br><?=_('New password, again:') ?> <input type="password" name="pw2" id="pw2" size="10">
+    <input type="submit" value="<?=_('Submit') ?>"></p>
+    </form>
+
+    <?
+}
 
 

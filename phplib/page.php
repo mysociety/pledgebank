@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.154 2007-01-11 16:17:05 matthew Exp $
+// $Id: page.php,v 1.155 2007-01-31 15:48:13 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -254,6 +254,15 @@ function page_header($title, $params = array()) {
  */
 function page_footer($params = array()) {
     global $contact_ref, $microsite;
+
+    // Just logged in, so show password set box if they don't have one
+    global $P;
+    $P = pb_person_if_signed_on();
+    global $stash_in_stashpost;
+    if ($P && $stash_in_stashpost && !$P->has_password()) {
+        change_personal_details();
+    }
+
 ?></div><? # id="pbcontent"
     microsites_allpage_credit_footer();
 ?><div id="pballfooter"><? 

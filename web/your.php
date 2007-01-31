@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.23 2007-01-25 13:21:43 matthew Exp $
+// $Id: your.php,v 1.24 2007-01-31 15:48:14 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -72,48 +72,6 @@ function pledges_you_might_like() {
         print "\n\n";
         print '</ol>';
     }
-}
-
-# Change/update your personal details
-function change_personal_details() {
-    global $q_UpdateDetails, $q_pw1, $q_pw2, $P;
-    ?>
-    <form action="/your" method="post"><input type="hidden" name="UpdateDetails" value="1">
-    <h2><?=_('Change password') ?></h2>
-    <?
-
-    importparams(
-    #        array('email',          '/./',          '', null),
-            array('pw1',            '/[^\s]+/',     '', null),
-            array('pw2',            '/[^\s]+/',     '', null),
-            array('UpdateDetails',  '/^.+$/',       '', false)
-    );
-
-    $error = null;
-    if ($q_UpdateDetails) {
-        if (is_null($q_pw1) || is_null($q_pw2))
-            $error = _("Please type your new password twice");
-        elseif (strlen($q_pw1)<5 || strlen($q_pw2)<5)
-            $error = _('Your password must be at least 5 characters long');
-        elseif ($q_pw1 != $q_pw2)
-            $error = _("Please type the same password twice");
-        else {
-            $P->password($q_pw1);
-            db_commit();
-            print '<p class="success">' . _('Password successfully updated') . '</p>';
-        }
-    }
-    if (!is_null($error))
-        print "<p id=\"error\">$error</p>";
-    ?>
-    <p><?=_('If you wish to change your password, you can do so here.') ?></p>
-    <p>
-    <?=_('New password:') ?> <input type="password" name="pw1" id="pw1" size="15">
-    <br><?=_('New password, again:') ?> <input type="password" name="pw2" id="pw2" size="10">
-    <input type="submit" value="<?=_('Submit') ?>"></p>
-    </form>
-
-    <?
 }
 
 // Open pledges you made
@@ -194,7 +152,7 @@ function show_your_signed_pledges() {
 
 // Display everything
 print '<div id="yourconnections">';
-change_personal_details();
+change_personal_details(true);
 pledges_you_might_like();
 print '</div>';
 

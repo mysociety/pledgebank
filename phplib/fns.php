@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.153 2007-01-31 15:48:13 francis Exp $
+// $Id: fns.php,v 1.154 2007-01-31 16:57:07 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -15,6 +15,7 @@ require_once "../../phplib/evel.php";
 require_once '../../phplib/utility.php';
 require_once '../../phplib/gaze.php';
 require_once '../../phplib/datetime.php';
+require_once '../../phplib/importparams.php';
 require_once "pledge.php";
 
 // HTML shortcuts
@@ -524,12 +525,12 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 # (called from phplib/page.php and web/your.php)
 function change_personal_details($yourpage = false) {
     global $q_UpdateDetails, $q_pw1, $q_pw2, $P;
-    $idclass = "setpassword";
+    $idclass = 'id="setpassword"';
     if ($yourpage) 
         $idclass = "";
     $has_password = $P->has_password();
     ?>
-    <form id="<?=$idclass?>" action="/your" method="post"><input type="hidden" name="UpdateDetails" value="1">
+    <form <?=$idclass?> name="setpassword" action="/your" method="post"><input type="hidden" name="UpdateDetails" value="1">
     <? if ($yourpage) { ?>
     <h2><?=$P->has_password() ? _('Change password') : _('Set password') ?></h2>
     <? } ?>
@@ -553,10 +554,10 @@ function change_personal_details($yourpage = false) {
         else {
             $P->password($q_pw1);
             db_commit();
-            $has_password = true;
             print '<p class="success">' . ($has_password ? _('Password successfully updated') 
                 : _('Password successfully set'))
             . '</p>';
+            $has_password = true;
 
         }
     }
@@ -569,7 +570,7 @@ function change_personal_details($yourpage = false) {
     <p>
     <?=_('New password:') ?> <input type="password" name="pw1" id="pw1" size="15">
     <br><?=_('New password, again:') ?> <input type="password" name="pw2" id="pw2" size="10">
-    <input type="submit" value="<?=_('Submit') ?>"></p>
+    <input name="submit" type="submit" value="<?=_('Submit') ?>"></p>
     </form>
 
     <?

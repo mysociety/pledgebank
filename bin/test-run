@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.214 2006-11-13 22:54:09 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.215 2007-01-31 16:57:07 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -293,7 +293,7 @@ sub display_url {
 #       "resume" means to continue from point of waiting for confirmation mail
 #   "setpassword" which applies for "viaemail" and "resume" types and can have the values:
 #       0 never to set the user's password
-#       1 to set the user's password if second login
+#       1 to set the user's password 
 #   "givemail" applies for every type except "resume" and "loggedin"
 #       0 the login form does not require email (was entered in an earlier form)
 #       1 the login form requires email
@@ -334,15 +334,14 @@ sub perform_login_action {
             $login_count->{$who}++;
             if ($login_count->{$who} > 0) {
                 if ($login_options->{'setpassword'}) {
-                    # We accept the option to set our password
-                    $wth->browser_check_contents("Would you like to set a PledgeBank password?");
-                    $wth->browser_submit_form(form_name => 'loginSetPassword',
+                    # We use the option to set our password
+                    $wth->browser_check_contents("Set a password");
+                    $wth->browser_submit_form(form_name => 'setpassword',
                         fields => { pw1 => password_n($who), pw2 => password_n($who) },
-                        button => 'SetPassword') or die "Failed to submit no make password form";
-                } else {
-                    # We reject the option to set our password
-                    $wth->browser_submit_form(form_name => 'loginNoPassword',
-                    button => 'NoPassword') or die "Failed to submit no make password form";
+                        button => 'submit') or die "Failed to submit no make password form";
+                    $wth->browser_check_contents("Password successfully set");
+                    # And go back to where we were
+                    $wth->browser_back();
                 }
             }
         } elsif ($login_action eq "abandon" || $login_action eq "suspend") {
@@ -1404,7 +1403,7 @@ sub do_login_tests {
     my $pledge_ref_3 = "login3";
     my $pledge_ref_4 = "login4";
 
-    comment("Make first pledge");
+    comment("Make first pledge (and set password)");
     create_pledge(200, 
         { title => $pledge_action_login_1, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
@@ -1421,14 +1420,14 @@ sub do_login_tests {
     $wth->browser_check_contents("now logged out");
     $wth->browser_check_no_contents(name_n(200));
 
-    comment("Second pledge, this will set password (as that is offered second time)");
+    comment("Second pledge, this will set password");
     create_pledge(200, 
         { title => $pledge_action_login_2, 
             target => '3', type => 'automated lines of code', signup => 'do the same',
             date => '1987-01-01', ref => $pledge_ref_2 },
         { country => 'GB', 'local' => 1, place => 'marlborough' },
         { },
-        { action => "viaemail", setpassword => 1 }
+        { action => "password" }
     );
     comment("Log out again");
     $wth->browser_get($locale_url);
@@ -1483,7 +1482,7 @@ sub do_login_tests {
     $wth->browser_follow_link(text_regex => qr/Logout/);
     $wth->browser_check_contents("now logged out");
     comment("... takes a second go to get the set password form");
-    find_and_sign_pledge("ref", $pledge_ref_2, 201, 1, {action=>"viaemail",setpassword=>1}, "signed");
+    find_and_sign_pledge("ref", $pledge_ref_2, 201, 1, {action=>"password"}, "signed");
     comment("Now we can sign as already logged in");
     find_and_sign_pledge("ref", $pledge_ref_3, 201, 1, {action=>"loggedin"}, "signed");
     comment("Logout again (in order to log in with password)");

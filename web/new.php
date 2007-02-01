@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.171 2007-02-01 16:29:07 matthew Exp $
+// $Id: new.php,v 1.172 2007-02-01 18:59:56 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -915,7 +915,7 @@ function create_new_pledge($P, $data) {
                     ?,
                     ?, ?, ?,
                     ?, ?,
-                    ?
+                    ?, ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
                     $data['type'], $data['signup'], $isodate, $data['date'],

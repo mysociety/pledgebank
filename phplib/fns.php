@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.155 2007-02-01 16:16:37 francis Exp $
+// $Id: fns.php,v 1.156 2007-02-01 16:29:06 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -423,9 +423,9 @@ function pb_site_country_name($fr_prep = '') {
     else {
         if ($fr_prep == 'to')
             return countries_with_to($site_country);
-	elseif ($fr_prep == 'in')
+        elseif ($fr_prep == 'in')
             return countries_with_in($site_country);
-	else
+        else
             return $countries_code_to_name[$site_country];
     }
 }

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.98 2007-01-24 17:10:48 francis Exp $
+ * $Id: frequentupdate,v 1.99 2007-02-01 16:29:06 matthew Exp $
  *
  */
 
@@ -904,12 +904,16 @@ function compute_prominences() {
 db_connect();
 
 compute_prominences();
-mark_overall_pledges_successful();
-mark_byarea_pledges_successful();
-send_automatic_failure_messages_overall();
-send_automatic_failure_messages_byarea();
-chivvy_creators_lowrate_new();
-send_pledge_success_reminder();
-send_byarea_pledge_success_reminder();
+if (!microsites_no_target()) {
+    mark_overall_pledges_successful();
+    mark_byarea_pledges_successful();
+    # There could be a reworded failure (ie. closure) message
+    # for non-target pledges, presumably. Need to check
+    send_automatic_failure_messages_overall();
+    send_automatic_failure_messages_byarea();
+    chivvy_creators_lowrate_new();
+    send_pledge_success_reminder();
+    send_byarea_pledge_success_reminder();
+}
 send_pending_messages();
 

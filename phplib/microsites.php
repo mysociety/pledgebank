@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.94 2007-01-25 14:43:16 matthew Exp $
+ * $Id: microsites.php,v 1.95 2007-02-01 16:29:06 matthew Exp $
  * 
  */
 
@@ -271,12 +271,15 @@ function microsites_navigation_menu($contact_ref) {
     }
     $menu[_('All Pledges')] = "/list";
     $menu[_('Start a Pledge')] = "/new";
-    if ($microsite && $microsite == 'livesimply') {
-        $menu['Frequently Asked Questions'] = "/faq";
-    } else {
-        $menu['<acronym title="'._('Frequently Asked Questions').'">'._('FAQ').'</acronym>'] = "/faq";
+    if ($microsite != 'o2') {
+        if ($microsite && $microsite == 'livesimply') {
+            $menu['Frequently Asked Questions'] = "/faq";
+        } else {
+            $menu['<acronym title="'._('Frequently Asked Questions').'">'._('FAQ').'</acronym>'] = "/faq";
+        }
     }
-    $menu[_('Contact')] = '/contact' . $contact_ref;
+    if ($microsite != 'o2')
+        $menu[_('Contact')] = '/contact' . $contact_ref;
     $menu[_('Your Pledges')] = "/your";
     $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
     debug_timestamp(true, "retrieved person record");
@@ -290,6 +293,13 @@ function microsites_navigation_menu($contact_ref) {
     return $menu;
 }
 
+# Whether a site has local alerts at all!
+function microsites_local_alerts() {
+    global $microsite;
+    if ($microsite == 'o2') return false;
+    return true;
+}
+
 /* microsites_frontpage_has_local_emails
  * Whether or not the local alert signup box is present on the
  * top of the front page.
@@ -297,7 +307,7 @@ function microsites_navigation_menu($contact_ref) {
 function microsites_frontpage_has_local_emails() {
     global $microsite;
     if ($microsite == 'global-cool' || $microsite == 'catcomm'
-        || $microsite == 'o2')
+        || !microsites_local_alerts())
         return false;
     return true;
 }
@@ -404,7 +414,7 @@ most important thing is that you make a Promise and let us know what
 you are going to do. </p>
 
 <p>We&#8217;ll keep you updated about all your Promises and how we 
-can make O2 the best place to work anywhere.</p>
+are making O2 the best place to work anywhere.</p>
 
 <?
         $audio_intro = false;
@@ -629,7 +639,21 @@ function microsites_toptips_normal() {
 function microsites_new_pledges_toptips_bottom() {
     global $microsite;
     if ($microsite == 'o2') {
-        return microsites_toptips_normal();
+        return <<<EOF
+<div id="tips">
+<h2>Top Promise Tips</h2>
+<ol>
+<li><strong>Really think about what you can do to make your People Promise
+come alive</strong> &mdash; this is your commitment, promise to do
+something that you think will make O2 a better place to work</li>
+<li><strong>You're not on your own!</strong> Your Promise can be
+individual or you can share it with others. You might agree as a team to
+do something together. It's up to you!</li>
+<li><strong>You can promise more than once</strong> &mdash; there's no
+limit to the number of Promises you make</li>
+</ol>
+</div>
+EOF;
     } else {
         print _("Did you read the tips at the top of the page? They'll help you make a successful pledge.");
     }
@@ -716,6 +740,14 @@ function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors)
 </p>
 <?
         return;
+    } elseif ($microsite == 'o2') { ?>
+<input type="hidden" name="agreeterms" value="1">
+<p>When you're happy with your promise, <strong>click "Create"</strong> to confirm that you wish us to display the promise at the top of this page in your name.
+<p style="text-align: right;">
+<input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
+</p>
+<?
+        return;
     }
 
     print '<p>' . _('When you\'re happy with your pledge, <strong>click "Create"</strong> to confirm that you wish PledgeBank.com to display the pledge at the top of this page in your name, and that you agree to the terms and conditions below.');
@@ -725,7 +757,7 @@ function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors)
 </p>
 <?
     print h3(_('The Dull Terms and Conditions'));
-    print '<input type="hidden" name="agreeterms" value="1" checked>';
+    print '<input type="hidden" name="agreeterms" value="1">';
 
     print "<p>";
     if ($v == 'pin') { ?>
@@ -748,10 +780,8 @@ greater publicity and a greater chance of succeeding.');
 
 function microsites_location_allowed() {
     global $microsite;
-    if ($microsite == 'o2')
-        return false;
-    else
-        return true;
+    if ($microsite == 'o2') return false;
+    return true;
 }
 
 /* microsites_private_allowed
@@ -760,28 +790,23 @@ function microsites_private_allowed() {
     global $microsite;
     if ($microsite == 'interface' || $microsite == 'global-cool' || $microsite == 'livesimply' || $microsite == 'o2')
         return false;
-    else
-        return true;
+    return true;
 }
 
 /* microsites_categories_allowed
  * Returns whether categories are used for this microsite at all */
 function microsites_categories_allowed() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return false;
-    else
-        return true;
+    if ($microsite == 'livesimply') return false;
+    return true;
 }
 
 /* microsites_categories_page3
  * Returns whether categories are offered in the usual place in the new pledge dialog. */
 function microsites_categories_page3() {
     global $microsite;
-    if ($microsite == 'o2')
-        return false;
-    else
-        return true;
+    if ($microsite == 'o2') return false;
+    return true;
 }
 
 /* microsites_postal_address_allowed
@@ -793,6 +818,14 @@ function microsites_postal_address_allowed() {
         return true;
     else
         return false;
+}
+
+function o2_postcode_lookup() {
+    $pcs = array(''=>'(choose one)',
+        'BL9 9QL' => 'Bury', 'G3 8EP' => 'Glasgow',
+        'LS11 0NE' => 'Leeds', 'WA7 3QA' => 'Preston Brook',
+        'SL1 4DX' => 'Slough');
+    return $pcs;
 }
 
 /* For displaying the address fetching page (LiveSimply and O2 only) */
@@ -807,10 +840,7 @@ function microsites_new_pledges_stepaddr($data, $errors) {
 
 <p><strong>Location:</strong>
 <select name="address_postcode" style="width:auto">
-<?      $pcs = array(''=>'(choose one)',
-            'BL9 9QL' => 'Bury', 'G3 8EP' => 'Glasgow',
-            'LS11 0NE' => 'Leeds', 'WA7 3QA' => 'Preston Brook',
-	    'SL1 4DX' => 'Slough');
+<?      $pcs = o2_postcode_lookup();
         foreach ($pcs as $pc => $str) {
             print '<option';
             if ($pc == $postcode) print ' selected';
@@ -830,7 +860,7 @@ function microsites_new_pledges_stepaddr($data, $errors) {
         foreach ($ds as $d) {
             print '<option';
             if ($d == $directorate) print ' selected';
-	    if ($d == '(choose one)') print ' value=""';
+            if ($d == '(choose one)') print ' value=""';
             print '>' . htmlspecialchars($d);
         }
 ?>
@@ -865,7 +895,7 @@ information you provide us will help us in evaluating the success of the
  */
 function microsites_new_pledges_prominence() {
     global $microsite;
-    if ($microsite == 'livesimply')
+    if ($microsite == 'livesimply' || $microsite == 'o2')
         return 'frontpage';
     elseif ($microsite == 'global-cool')
         return 'backpage';
@@ -907,7 +937,7 @@ function microsites_comments_allowed() {
  * SQL fragment for whether a pledge gets any chivvy emails.
  */
 function microsites_chivvy_sql() {
-    return "microsite is null or microsite <> 'livesimply'";
+    return "microsite is null or (microsite <> 'livesimply' and microsite <> 'o2')";
 }
 
 #############################################################################
@@ -977,7 +1007,7 @@ function microsites_normal_prominences() {
  */
 function microsites_list_views() {
     global $microsite;
-    if ($microsite == 'livesimply') {
+    if ($microsite == 'livesimply' || $microsite == 'o2') {
         return array('all_open'=>_('Open pledges'), 
         'all_closed'=>_('Closed pledges'));
     } else {
@@ -986,6 +1016,25 @@ function microsites_list_views() {
     }
 }
 
+# Valid sort options for the All Pledges page
+function microsites_list_sort_options() {
+    global $microsite;
+    $sort = array(
+        'creationtime' => _('Start date'), 
+        'date'=>_('Deadline')
+    );
+    if (!microsites_no_target())
+        $sort['percentcomplete'] = _('Percent signed');
+    if (microsites_categories_allowed())
+        $sort['category'] = _('Category');
+    if (microsites_sort_by_signers())
+        $sort['signers'] = 'Signers';
+    if ($microsite == 'o2') {
+        $sort['site'] = 'Site';
+        $sort['directorate'] = 'Directorate';
+    }
+    return $sort;
+}
 
 #############################################################################
 # Login - some microsites get authentication from other sites
@@ -1093,6 +1142,44 @@ function microsites_invalid_email_address($email) {
     return 'You must enter an email address @o2.com.';
 }
 
+# Display the More Details box during pledge creation
+function microsites_new_pledges_detail_textarea($data) {
+    global $microsite;
+    $detail = isset($data['detail']) ? htmlspecialchars($data['detail']) : '';
+    if ($microsite == 'o2') {
+        return '<input type="text" size="60" name="detail" value="' . $detail . '">';
+    } else {
+        return '<textarea name="detail" rows="10" cols="60">' . $detail . '</textarea>';
+    }
+}
+
+# Extra checks for step 1 of pledge creation for microsites;
+function microsites_step1_error_check($data) {
+    global $microsite;
+    $error = array();
+    if ($email_err = microsites_invalid_email_address($data['email']))
+        $error['email'] = $email_err;
+    $detail = preg_replace('#\W#', '', $data['detail']);
+    if ($microsite == 'o2') {
+        if (strlen($detail)>100)
+            $error['detail'] = 'Please limit your more information to 100 characters';
+        if (!isset($data['category']) || !$data['category'] || $data['category'] == -1)
+            $error['category'] = 'Please select a part of the People Promise';
+    }
+    return $error;
+}
+
+# For displaying extra bits on the preview pledge page
+function microsites_new_pledges_preview_extras($data) {
+    global $microsite;
+    if ($microsite != 'o2') return;
+    $loc = $data['address_postcode'];
+    $lookup = o2_postcode_lookup();
+    if (isset($lookup[$loc])) $loc = $lookup[$loc];
+    print '<li>Location: <strong>' . $loc . '</strong></li>';
+    print '<li>Directorate: <strong>' . $data['address_1'] . '</strong></li>';
+}
+
 /* microsites_display_login
  * Return whether or not to display the "Hello, Victor Papanek" message at
  * the top of the page. If you are overriding the login functions above,
@@ -1153,8 +1240,7 @@ function microsites_display_favicon() {
  */
 function microsites_sort_by_signers() {
     global $microsite;
-    if ($microsite == 'o2')
-        return true;
+    if ($microsite == 'o2') return true;
     return false;
 }
 
@@ -1178,10 +1264,39 @@ function microsites_example_date() {
     }
 }
 
+# Return true if this is an intranet installed site
 function microsites_intranet_site() {
     global $microsite;
-    if ($microsite == 'o2')
-        return true;
+    if ($microsite == 'o2') return true;
     return false;
 }
+
+# Return true if all target functionality should be disabled
+function microsites_no_target() {
+    global $microsite;
+    if ($microsite == 'o2') return true;
+    return false;
+}
+
+# Help for blank searches
+function microsites_search_help() {
+    global $microsite;
+    if ($microsite == 'o2') {
+        print p(_('You can search for:'));
+        print "<ul>";
+        print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
+        print li("The name or email address of <strong>a person</strong>, to find pledges they have made or signed");
+        print "</ul>";
+    } else {
+        print p(_('You can search for:'));
+        print "<ul>";
+        print li(_("The name of a <strong>town or city</strong> near you, to find pledges in your area"));
+        if (!microsites_site_country() || microsites_site_country() == 'GB')
+            print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
+        print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
+        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
+        print "</ul>";
+    }
+}
+
 ?>

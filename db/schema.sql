@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.213 2007-02-01 16:20:01 francis Exp $
+-- $Id: schema.sql,v 1.214 2007-02-01 16:29:06 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -143,7 +143,7 @@ create table pledges (
     -- summary of pledge
     title text not null, -- LLL
     -- number of people to reach
-    target integer not null check (target > 0),
+    target integer not null check (target > 0 or (microsite = 'o2' and target = 0)),
     -- type of target
     target_type text not null default 'overall' check (
         target_type = 'overall' or -- one global target
@@ -355,7 +355,6 @@ create table pledge_category (
     pledge_id integer not null references pledges(id),
     category_id integer not null references category(id)
 );
-
 create index pledge_category_pledge_id_idx on pledge_category(pledge_id);
 
 -- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE

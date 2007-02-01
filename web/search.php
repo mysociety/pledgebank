@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.60 2007-01-03 18:58:38 matthew Exp $
+// $Id: search.php,v 1.61 2007-02-01 16:29:07 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -111,20 +111,10 @@ function search($search) {
         if ($search == _('<Enter town or keyword>'))
             $search = "";
         if (!$search) {
-            print p(_('You can search for:'));
-            print "<ul>";
-            print li(_("The name of a <strong>town or city</strong> near you, to find pledges in your area"));
-            if (!microsites_site_country() || microsites_site_country() == 'GB')
-                print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
-            print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
-            print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
-            print "</ul>";
+            microsites_search_help();
             return;
         }
-    }
        
-    // Link to RSS feed
-    if (!$rss) {
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss".$_SERVER['REQUEST_URI']))?>"><img align="right" border="0" src="/rss.gif" alt="<?=_('RSS feed of search for \'') . htmlspecialchars($search) ."'" ?>"></a><?
     }
 
@@ -197,7 +187,7 @@ function search($search) {
                         $out .= "<li>$desc";
                     else
                         # TRANS: For example: "Results for <strong>open pledges</strong> near places matching <strong>Bolton</strong>, United Kingdom (<a href="....">change country</a>):"
-			$out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s%s:"), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()], $change_country));
+                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s%s:"), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()], $change_country));
                     if ($location_results) {
                         $out .= $location_results;
                     } else {
@@ -207,15 +197,15 @@ function search($search) {
                 }
             }
             if (!$rss && count($places) > 1) {
-		print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s%s:"), get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[microsites_site_country()], $change_country));
+                print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s%s:"), get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[microsites_site_country()], $change_country));
                 print "<ul>";
             }
             print $out;
             if (!$rss) {
                 if (count($places) > 1) print "</ul>";
-                pb_view_local_alert_quick_signup("localsignupsearchpage", 
-                    array('newflash'=>false,
-                          'place'=>$search));
+                if (microsites_local_alerts())
+                    pb_view_local_alert_quick_signup("localsignupsearchpage", 
+                        array('newflash'=>false, 'place'=>$search));
             }
         }
     } elseif ($change_country) {
@@ -300,18 +290,38 @@ function search($search) {
 
     // Signers and creators (NOT person table, as we only search for publically visible names)
     $people = array();
-    $q = db_query('SELECT ref, title, name FROM pledges
+    global $microsite; # XXX
+    if ($microsite == 'o2') {
+        $q = db_query("SELECT ref, title, pledges.name FROM pledges, person
+        WHERE pledges.person_id = person.id $backpage_clause
+          AND (pledges.name ILIKE '%' || ? || '%'
+          OR person.email ILIKE '%' || ? || '%') ORDER BY pledges.name", $search, $search);
+        while ($r = db_fetch_array($q)) {
+            $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
+        }
+        $q = db_query("SELECT ref, title, signers.name FROM signers,pledges, person
+        WHERE showname AND signers.pledge_id = pledges.id
+        AND signers.person_id = person.id
+        $backpage_clause AND (signers.name ILIKE '%' || ? || '%'
+        OR person.email ILIKE '%' || ? || '%') ORDER BY signers.name",
+        $search, $search);
+        while ($r = db_fetch_array($q)) {
+            $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
+        }
+    } else {
+        $q = db_query('SELECT ref, title, name FROM pledges
         WHERE pin IS NULL ' . $backpage_clause .
-	' AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
-    while ($r = db_fetch_array($q)) {
-        $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
-    }
-    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges
+        ' AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+        while ($r = db_fetch_array($q)) {
+            $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
+        }
+        $q = db_query('SELECT ref, title, signers.name FROM signers,pledges
         WHERE showname AND pin IS NULL AND signers.pledge_id = pledges.id
         ' . $backpage_clause . ' AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name',
         $search);
-    while ($r = db_fetch_array($q)) {
-        $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
+        while ($r = db_fetch_array($q)) {
+            $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
+        }
     }
     if (sizeof($people)) {
         $success = 1;

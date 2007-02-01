@@ -15,7 +15,7 @@ var translation = {
 "<Enter your name>":"<Enter your name>",
 "<Enter your pledge>":"<Enter your promise>",
 "<Enter town or keyword>":"<Enter town or keyword>",
-"<Date>":"<Date>",
+"<Date>":"dd/mm/yy",
 "other local person":"other local person",
 "Global":"Global",
 "(separator)":"(separator)",

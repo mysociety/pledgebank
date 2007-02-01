@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.43 2007-01-24 18:20:30 matthew Exp $
+// $Id: list.php,v 1.44 2007-02-01 16:29:07 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -16,7 +16,7 @@ define('PAGE_SIZE', 50);
 
 $err = importparams(
             array('offset', '/^(0|[1-9]\d*)$/', '', 0),
-            array('sort', '/^(title|target|date|name|ref|creationtime|percentcomplete|category|signers)\/?$/', '', 'default'),
+            array('sort', '/^(' . join('|', array_keys(microsites_list_sort_options())) . ')\/?$/', '', 'default'),
             array('type', '/^[a-z_]*$/', '', 'all')
         );
 if ($err) {
@@ -96,25 +96,33 @@ if ($ntotal < $q_offset) {
         $q_offset = 0;
 }
 
-$sort_phrase = $q_sort;
-if ($q_sort == 'creationtime' || $q_sort == 'created' || $q_sort == 'whensucceeded' || $q_sort == 'signers') {
-    $sort_phrase .= " DESC";
-}
-if ($q_sort == 'percentcomplete') {
+if ($q_sort == 'percentcomplete' && microsites_no_target())
+    $q_sort = 'signers';
+
+if ($q_sort == 'creationtime' || $q_sort == 'whensucceeded' || $q_sort == 'signers') {
+    $sort_phrase = "$q_sort DESC";
+} elseif ($q_sort == 'percentcomplete') {
     $sort_phrase = "( 
                 (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id)::numeric
                 / target) DESC";
-}
-if ($q_sort == 'category') {
+} elseif ($q_sort == 'category') {
     $sort_phrase = "coalesce ((SELECT name FROM pledge_category, category WHERE 
             pledge_category.category_id = category.id AND parent_category_id IS NULL AND 
             pledge_category.pledge_id = pledges.id LIMIT 1), '"._("Miscellaneous")."')";
+} elseif ($q_sort == 'site') {
+    $sort_phrase = 'address_1';
+} elseif ($q_sort == 'directorate') {
+    $sort_phrase = 'address_postcode';
+} else {
+    $sort_phrase = $q_sort;
 }
+
 $sql_params[] = PAGE_SIZE;
 $qrows = db_query("
         SELECT pledges.*, '$pb_today' <= pledges.date AS open,
             (SELECT count(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
-            person.email AS email, country, state, description, method, latitude, longitude
+            person.email AS email, address_1, address_postcode,
+            country, state, description, method, latitude, longitude
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
@@ -186,19 +194,7 @@ if (!$rss) {
     $navlinks3 = '';
     if ($ntotal > 0) {
         $navlinks2 = '<p align="center" style="font-size: 89%">' . _('Sort by'). ': ';
-        $arr = array();
-        $arr['creationtime'] = _('Start date');
-        // $arr['target'] = _('Target');
-        $arr['date'] = _('Deadline');
-        $arr['percentcomplete'] = _('Percent signed');
-        if (microsites_categories_allowed()) {
-            $arr['category'] = _('Category');
-        }
-	if (microsites_sort_by_signers())
-	    $arr['signers'] = 'Signers';
-
-        # Removed as not useful (search is better for these): 'ref'=>'Short name',
-        # 'title'=>'Title', 'name'=>'Creator'
+        $arr = microsites_list_sort_options();
         $c = 0;
         foreach ($arr as $s => $desc) {
             $c ++;
@@ -218,7 +214,7 @@ if (!$rss) {
 $rss_items = array();
 if ($ntotal > 0) {
     $c = 0;
-    $lastcategory = 'none';
+    $lastdivision = 'none';
     while ($row = db_fetch_array($qrows)) {
         $pledge = new Pledge($row);
         if ($q_sort == "category") {
@@ -226,15 +222,32 @@ if ($ntotal > 0) {
             $thiscategory = array_pop($categories);
             if ($thiscategory == null) 
                 $thiscategory = _("Miscellaneous");
-            if ($lastcategory <> $thiscategory) {
+            if ($lastdivision <> $thiscategory) {
                 if (!$rss)
                     print "<h2 style=\"clear:both\">"._($thiscategory)."</h2>";
                 $c = 0;
-                $lastcategory = $thiscategory;
+                $lastdivision = $thiscategory;
+            }
+        } elseif ($q_sort == 'site') {
+            $pc = $row['address_postcode'];
+            if ($lastdivision <> $pc) {
+                if (!$rss) {
+                    $lookup = o2_postcode_lookup();
+                    $heading = (isset($lookup[$pc])) ? $lookup[$pc] : $pc;
+                    print '<h2 style="clear:both">'.$heading."</h2>";
+                }
+                $c = 0;
+                $lastdivision = $row['address_postcode'];
+            }
+        } elseif ($q_sort == 'directorate') {
+            if ($lastdivision <> $row['address_1']) {
+                if (!$rss)
+                    print '<h2 style="clear:both">'.$row['address_1']."</h2>";
+                $c = 0;
+                $lastdivision = $row['address_1'];
             }
         }
         $arr = array('class'=>"pledge-".$c%2, 'href' => $pledge->url_main() );
-        if ($q_type == 'succeeded_closed' || $q_type == 'failed') $arr['closed'] = true;
         if ($rss)
             $rss_items[] = $pledge->rss_entry();
         else
@@ -251,7 +264,8 @@ if ($ntotal > 0) {
 if ($rss) {
     rss_footer($rss_items);
 } else {
-    print '<p style="clear: both" align="center"><small>'._('New pledges are not shown here. <a href="/faq#allpledges">Read our FAQ</a> for details of when they appear.').'</small></p>';
+    if (microsites_new_pledges_prominence() != 'frontpage')
+        print '<p style="clear: both" align="center"><small>'._('New pledges are not shown here. <a href="/faq#allpledges">Read our FAQ</a> for details of when they appear.').'</small></p>';
     page_footer();
 }
 

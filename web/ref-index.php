@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.95 2006-12-15 08:32:01 francis Exp $
+// $Id: ref-index.php,v 1.96 2007-02-01 16:29:07 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -82,7 +82,7 @@ function draw_status_plaque($p) {
             }
             print '</p>';
         }
-    } else if ($p->left() <= 0) {
+    } elseif ($p->left() <= 0 && !microsites_no_target()) {
         print '<p class="success">' . _('This pledge has been successful!');
         if (!$p->finished()) {
             print '<br>' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.52 2007-01-18 20:34:23 matthew Exp $
+// $Id: contact.php,v 1.53 2007-02-01 16:29:07 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -61,11 +61,11 @@ function contact_form($errors = array()) {
     if ($comment_id) {
         print p(_('You are reporting the following comment:'));
         print '<blockquote>';
-	$row = db_getRow('select *,extract(epoch from whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
+        $row = db_getRow('select *,extract(epoch from whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
         if ($row)
-	    print comments_show_one($row, true);
-	else
-	    print 'Comment no longer exists';
+            print comments_show_one($row, true);
+        else
+            print 'Comment no longer exists';
         print '</blockquote>';
     } else {
         microsites_contact_intro();
@@ -108,16 +108,16 @@ function contact_form_submitted() {
     $referrer = get_http_var('referrer');
     $comment_id = get_http_var('comment_id');
     $errors = array();
-	if (!$name) $errors[] = _('Please enter your name');
-	if (!$email) $errors[] = _('Please enter your email address');
-	if (!validate_email($email)) $errors[] = _('Please enter a valid email address');
-	if (!$subject) $errors[] = _('Please enter a subject');
-	if (!$message) $errors[] = _('Please enter your message');
-	if (sizeof($errors)) {
-		contact_form($errors);
-	} else {
-		send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id);
-	}
+        if (!$name) $errors[] = _('Please enter your name');
+        if (!$email) $errors[] = _('Please enter your email address');
+        if (!validate_email($email)) $errors[] = _('Please enter a valid email address');
+        if (!$subject) $errors[] = _('Please enter a subject');
+        if (!$message) $errors[] = _('Please enter your message');
+        if (sizeof($errors)) {
+                contact_form($errors);
+        } else {
+                send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id);
+        }
 }
 
 function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id) {

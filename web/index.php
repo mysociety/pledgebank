@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.250 2006-12-19 22:58:44 francis Exp $
+// $Id: index.php,v 1.251 2007-02-01 16:29:07 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -65,7 +65,8 @@ only if 5 other people will do the same".') ?>
 <?
     list_frontpage_pledges();
     debug_comment_timestamp("after list_frontpage_pledges()");
-    list_successful_pledges();
+    if (!microsites_no_target())
+        list_successful_pledges();
     debug_comment_timestamp("after list_successful_pledges()");
 ?>
 </div>

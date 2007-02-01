@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.170 2007-01-25 14:43:16 matthew Exp $
+// $Id: new.php,v 1.171 2007-02-01 16:29:07 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -136,19 +136,17 @@ function pledge_form_one($data = array(), $errors = array()) {
     # XXX: Put in microsites.php
     global $microsite;
     if ($microsite == 'o2') { ?>
-<p><strong>I</strong>, <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
- at <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
-am promising that</p>
+<p><strong>I am</strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">,
+my email address is <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">.
+</p>
 
-<p><strong>I will</strong>
+<p><strong>I promise that I will</strong>
 <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
 <p>as part of the <? display_categories($data); ?> part of the People Promise,</p>
 
 <?  } else { ?>
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
-
-<?  } ?>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
 <input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
@@ -161,6 +159,8 @@ size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
 <? }
 ?></p>
+
+<?  } ?>
 
 <p><?=_('The other people must sign up before') ?> <input<?
     if (array_key_exists('date', $errors)) print ' class="error"';
@@ -175,7 +175,7 @@ onfocus="fadein(this)" onblur="fadeout(this)" value="<?
 </p>
 
 <p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically made clickable, no "markup" needed)') ?></small>
-<br><textarea name="detail" rows="10" cols="60"><? if (isset($data['detail'])) print htmlspecialchars($data['detail']) ?></textarea>
+<br><?=microsites_new_pledges_detail_textarea($data) ?>
 
 <? if ($microsite != 'o2') { ?>
 <h3><?=_('About You') ?></h3>
@@ -209,10 +209,10 @@ if ($tips) print $tips;
 
 function pledge_form_target_warning($data, $errors) {
 
-	if (sizeof($errors)) {
-		print '<div id="errors"><ul><li>';
-		print join ('</li><li>', array_values($errors));
-		print '</li></ul></div>';
+        if (sizeof($errors)) {
+                print '<div id="errors"><ul><li>';
+                print join ('</li><li>', array_values($errors));
+                print '</li></ul></div>';
     }
 
     print '<p>' . _('Your pledge looks like this so far:') . '</p>';
@@ -453,6 +453,7 @@ function pledge_form_submitted() {
     $data['target'] = str_replace($locale_info['thousands_sep'], '', $data['target']);
     $data['title'] = preg_replace('#^' . _('I will') . ' #i', '', $data['title']);
     $data['title'] = preg_replace('#^' . _('will') . ' #i', '', $data['title']);
+    if (microsites_no_target()) { $data['target'] = 0; }
 
     # Step 2 fixes
     if (array_key_exists('local', $data) && !$data['local']) { 
@@ -480,14 +481,16 @@ function pledge_form_submitted() {
     if (get_http_var('donetargetwarning') || OPTION_PB_TARGET_WARNING == 0) {
         $data['skiptargetwarning'] = 1;
     }
-    if ($data['target'] > OPTION_PB_TARGET_WARNING && !array_key_exists('skiptargetwarning',$data)) {
-        pledge_form_target_warning($data, $errors);
-        return;
-    }
-    $errors = target_warning_error_check($data);
-    if (sizeof($errors)) {
-        pledge_form_target_warning($data, $errors);
-        return;
+    if (!array_key_exists('skiptargetwarning', $data)) {
+        if ($data['target'] > OPTION_PB_TARGET_WARNING) {
+            pledge_form_target_warning($data, $errors);
+            return;
+        }
+        $errors = target_warning_error_check($data);
+        if (sizeof($errors)) {
+            pledge_form_target_warning($data, $errors);
+            return;
+        }
     }
     
     # Step 2, location
@@ -563,7 +566,9 @@ function step1_error_check($data) {
     global $pb_today;
 
     $errors = array();
-    if (!$data['target']) $errors['target'] = _('Please enter a target');
+
+    if (microsites_no_target()) { /* Allow no target */ }
+    elseif (!$data['target']) $errors['target'] = _('Please enter a target');
     elseif (!ctype_digit($data['target']) || $data['target'] < 1) $errors['target'] = _('The target must be a positive number');
 
     $disallowed_refs = array('contact', 'translate', 'posters', 'graphs', 'sportsclubpatrons', 'microsites', 'offline', 'explain');
@@ -608,8 +613,6 @@ function step1_error_check($data) {
     if (!$data['name']) $errors['name'] = _('Please enter your name');
     if (!$data['email']) $errors['email'] = _('Please enter your email address');
     if (!validate_email($data['email'])) $errors['email'] = _('Please enter a valid email address');
-    if ($email_err = microsites_invalid_email_address($data['email']))
-        $errors['email'] = $email_err;
 
     $mystreetmessage = htmlspecialchars(_('Please change <MY STREET> to the name of your street'));
     if (stristr($data['title'], "<MY STREET>")) $errors['title'] = $mystreetmessage;
@@ -621,6 +624,7 @@ function step1_error_check($data) {
         $errors['lang'] = _('Unknown language code:') . ' ' . htmlspecialchars($data['lang']);
     }
 
+    $errors = array_merge($errors, microsites_step1_error_check($data));
     return $errors;
 }
 
@@ -698,16 +702,17 @@ function stepaddr_error_check(&$data) {
     }
 
     if (array_key_exists('address_postcode_override', $data)) {
+        # This means it's O2 for now!
         if ($data['address_postcode_override'])
-	    $data['address_postcode'] = $data['address_postcode_override'];
+            $data['address_postcode'] = $data['address_postcode_override'];
         if (!array_key_exists('address_postcode', $data) || !$data['address_postcode']) {
-	    $errors['address_postcode'] = 'Please pick a location or enter a postcode';
-	} elseif (!validate_postcode($data['address_postcode'])) {
-	    $errors['address_postcode'] = 'Please enter a valid postcode';
-	}
-	if (!array_key_exists('address_1', $data) || !$data['address_1']) {
-	    $errors['address_1'] = 'Please choose a directorate';
-	}
+            $errors['address_postcode'] = 'Please pick a location or enter a postcode';
+        } elseif (!validate_postcode($data['address_postcode'])) {
+            $errors['address_postcode'] = 'Please enter a valid postcode';
+        }
+        if (!array_key_exists('address_1', $data) || !$data['address_1']) {
+            $errors['address_1'] = 'Please choose a directorate';
+        }
     }
 
     return $errors;
@@ -783,28 +788,31 @@ longer be valid."))?>
 </p>
 
 </form>
-    <?
+<?
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
-    ?>
+?>
 
     <div id="otherdetails">
     <?=h3(_("Other Details"))?>
     <ul>
-    <? if (microsites_categories_allowed()) { ?>
+<?  if (microsites_categories_allowed() && microsites_categories_page3()) { ?>
     <li><?=_('Category') ?>: <strong><?=
         $data['category'] == -1
             ? _('None')
             : htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))) // XXX show enclosing cat?
     ?></strong></li>
-    <? }
+<?  }
     if (microsites_private_allowed()) { ?>
     <li><?=_('Privacy status') ?>: <strong><?
     if ($v=='all') print _('Public');
     if ($v=='pin') print _('Pledge can only be seen by people who I give the PIN to');
     ?></strong></li>
-    <? } ?>
+<?  }
+
+    microsites_new_pledges_preview_extras($data);
+?>
     </ul>
     </div>
 
@@ -898,7 +906,7 @@ function create_new_pledge($P, $data) {
                     detail,
                     lang, location_id, microsite,
                     pin, identity, 
-                    prominence
+                    prominence, cached_prominence
                 ) values (
                     ?, ?, ?,
                     ?, ?, ?, ?,
@@ -915,7 +923,7 @@ function create_new_pledge($P, $data) {
                     $data['detail'],
                     $data['lang'], $location_id, $data['microsite'],
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity'],
-                    $prominence
+                    $prominence, $prominence
                 ));
 
         if ($data['category'] != -1)

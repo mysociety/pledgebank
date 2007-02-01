@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.156 2007-02-01 15:18:29 francis Exp $
+// $Id: page.php,v 1.157 2007-02-01 16:29:06 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -295,7 +295,7 @@ function page_footer($params = array()) {
     print '</ul>';
 ?>
 <div class="noprint">
-<?  if (!array_key_exists('nolocalsignup', $params) or !$params['nolocalsignup']) 
+<?  if (microsites_local_alerts() && (!array_key_exists('nolocalsignup', $params) || !$params['nolocalsignup']))
         pb_view_local_alert_quick_signup("localsignupeverypage");
         debug_timestamp(true, "local alert quick timestamp");
         ?>
@@ -303,7 +303,7 @@ function page_footer($params = array()) {
 <div id="pbfooter"><?
     if (microsites_show_translate_blurb()) {
         pb_print_change_language_links();
-	print '<br>';
+        print '<br>';
     }?>
 <a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.
 <a href="http://www.easynet.net/publicsector/"><?=_('Powered by Easynet')?></a>.</div>

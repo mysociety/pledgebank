@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.33 2006-07-27 11:14:52 francis Exp $
+// $Id: alert.php,v 1.34 2007-02-01 16:29:06 matthew Exp $
 
 require_once '../phplib/pbperson.php';
 require_once '../../phplib/mapit.php';
@@ -192,7 +192,7 @@ function alert_list_pledges_local($person_id) {
         }
         print "</ul>";
         print _("To add a new place, <a href=\"/alert\">click here</a>.");
-    } else {
+    } elseif (microsites_local_alerts()) {
         pb_view_local_alert_quick_signup("localsignupyourpage", array('newflash'=>false));
     }
     print '<p>';

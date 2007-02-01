@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.212 2007-01-25 14:19:49 matthew Exp $
+ * $Id: pledge.php,v 1.213 2007-02-01 16:29:06 matthew Exp $
  * 
  */
 
@@ -39,6 +39,7 @@ class Pledge {
                            FROM pledges
                            LEFT JOIN person ON person.id = pledges.person_id 
                            LEFT JOIN location ON location.id = pledges.location_id";
+
         if (gettype($ref) == "integer" or (gettype($ref) == "string" and preg_match('/^[1-9]\d*$/', $ref))) {
             $q = db_query("$main_query_part WHERE pledges.id = ?", array($ref));
             if (!db_num_rows($q))
@@ -401,6 +402,7 @@ class Pledge {
     //            the pledge sentence
     //     reportlink - if present and true, show "report this pledge" link
     //     class - adds the given classes (space separated) to the division
+    //     category - passed in during pledge creation to display category within the box
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
         if (array_key_exists('href', $params)) {
@@ -412,25 +414,33 @@ class Pledge {
             print '<div id="pledge">';
 ?>
 <p style="margin-top: 0">
-<? if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
+<?      if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
 &quot;<?=$this->sentence($sentence_params) ?>&quot;
-    <? if ($this->url_translate_pledge()) { ?>
+<?      if ($this->url_translate_pledge()) { ?>
     (<a title="<?=_("Roughly translate the pledge into your language (using Altavista's Babel Fish machine translator)")?>" href="<?=htmlspecialchars($this->url_translate_pledge())?>"><?=_("translate")?></a>)
-    <? } ?>
-    <? $P = pb_person_if_signed_on();
-       if (!is_null($P) && !is_null($P->email()) && preg_match('/(@mysociety.org$)|(^francis@flourish.org$)/', $P->email())) { ?>
+<?      }
+        $P = pb_person_if_signed_on();
+        if (!is_null($P) && !is_null($P->email()) && preg_match('/(@mysociety.org$)|(^francis@flourish.org$)/', $P->email())) { ?>
     (<a href="<?=OPTION_ADMIN_URL?>?page=pb&amp;pledge=<?=$this->ref()?>"><?=_("admin")?></a>)
-    <? } ?>
+<?      } ?>
 </p>
-<? if (!$this->byarea()) { ?>
+<?      if (!$this->byarea()) { ?>
 <p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
-<? } ?>
+<?      }
+
+        global $microsite; # XXX
+        if ($microsite == 'o2' && isset($this->data['category'])) {
+            $cat_name = db_getOne('select name from category where id=?', $this->data['category']);
+            print '<p>My Promise is about <strong>' . $cat_name . '</strong></p>';
+        }
+?>
+
 <p>
 <?=_('Deadline to sign up by:') ?> <strong><?=$this->h_pretty_date()?></strong>
 <br>
 <?      if ($this->signers() >= 0) {
             print '<i>';
-            if (array_key_exists('closed', $params))
+            if ($this->finished())
                 printf(ngettext('%s person signed up', '%s people signed up', $this->signers()), prettify($this->signers()));
             else
                 printf(ngettext('%s person has signed up', '%s people have signed up', $this->signers()), prettify($this->signers()));
@@ -440,13 +450,13 @@ class Pledge {
                     ngettext('successful in %d place', 'successful in %d places',
                             $this->byarea_successes()), 
                     $this->byarea_successes());
-            } else {
+            } elseif (!microsites_no_target()) {
                 if ($this->left() < 0) {
                     print ' ';
                     printf(_('(%d over target)'), -$this->left() );
                 } elseif ($this->left() > 0) {
                     print ', ';
-                    if (array_key_exists('closed', $params))
+                    if ($this->finished())
                         printf(ngettext('%d more was needed', '%d more were needed', $this->left()), $this->left() );
                     else
                         printf(ngettext('%d more needed', '%d more needed', $this->left()), $this->left() );
@@ -526,7 +536,7 @@ class Pledge {
         $r = $this->data;
     
         $html = array_key_exists('html', $params) ? $params['html'] : false;
-        if (!array_key_exists('firstperson', $params))
+        if (!array_key_exists('firstperson', $params) || !$params['firstperson'])
             err('Explicitly set "firstperson"');
         $firstperson = $params['firstperson'];
         
@@ -550,22 +560,23 @@ class Pledge {
         $signup = trim($r['signup']);
         if ($html)
             $signup = ms_make_clickable($signup);
-        if ($firstperson) {
+        if (microsites_no_target()) {
             if ($firstperson === "includename") {
-                $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
+                $s = sprintf(_("I, %s, will %s."), $r['name'], $title);
             } else {
-                $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], $signup);
+                $s = sprintf(_("I will %s."), $title);
             }
+        } elseif ($firstperson === "includename") {
+            $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
         } else {
-            err('Third person pledge sentence not available');
-            #$s = sprintf(_("%s will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
+            $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], $signup);
         }
 
         if (!$html or array_key_exists('href', $params))
             $s = preg_replace('#</?strong>#', '', $s);
 
         // Tidy up
-        $s = preg_replace('#\.\.#', '.', $s);
+        $s = str_replace('..', '.', $s);
 
         locale_pop();
         return $s;
@@ -629,7 +640,8 @@ class Pledge {
         printf(_('I, %s, sign up to the pledge.'), $namebox);
         print '</strong><br></p>';
         if (microsites_intranet_site()) {
-            print '<input type="hidden" name="showname" value="1">';
+            print '<p><input type="hidden" name="showname" value="1">
+    <small>People are able to search for Promises you have signed.</small></p>';
         } else {
             print '<p>
     <small>
@@ -687,7 +699,20 @@ class Pledge {
         }
         $params['firstperson'] = 'includename';
         $text .= $this->sentence($params) . ' ';
-        if ($this->byarea()) {
+        if (microsites_no_target()) {
+            if ($this->daysleft() == 0)
+                $text .= 'Promise open until midnight tonight, London time.';
+            elseif ($this->daysleft() < 0)
+                $text .= 'Promise closed.';
+            else
+                $text .= "(";
+                if ($this->daysleft() <= 3) {
+                    $text .= sprintf(ngettext('just %d day left', 'just %d days left', $this->daysleft()), $this->daysleft());
+                } else {
+                    $text .= sprintf(ngettext('%d day left', '%d days left', $this->daysleft()), $this->daysleft());
+                }
+                $text .= ')';
+        } elseif ($this->byarea()) {
             if ($this->daysleft() > 0) $text .= '(';
             if ($this->byarea_successes() == 0) 
                 $text .= _('Target met nowhere');
@@ -898,6 +923,7 @@ function send_announce_token($pledge_id) {
 /* post_confirm_advertise PLEDGE_ROW
    Print relevant advertising */
 function post_confirm_advertise() {
+    if (!microsites_local_alerts()) return;
     print _("<p>PledgeBank can send you email alerts when people
         create local pledges in your area. Sign up - you don't know
         what interesting things people might be getting up to.</p>");

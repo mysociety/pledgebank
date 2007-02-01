@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.76 2007-01-10 16:13:54 matthew Exp $
+ * $Id: pb.php,v 1.77 2007-02-01 16:29:06 matthew Exp $
  * 
  */
 
@@ -114,13 +114,13 @@ if ($domain_country) {
     if ($domain_country == 'UK')
         $domain_country = 'GB';
     if (array_key_exists($domain_country, $countries_code_to_name)) {
-    	if (!get_http_var('rss')) {
+            if (!get_http_var('rss')) {
             $url = pb_domain_url(array());
             setcookie('country', $domain_country, 0, '/', '.' . OPTION_WEB_DOMAIN);
             header('Location: ' . $url);
             exit;
-	}
-	$site_country = $domain_country;
+        }
+        $site_country = $domain_country;
     }
 } 
 

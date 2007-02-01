@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.212 2006-12-01 16:21:12 chris Exp $
+-- $Id: schema.sql,v 1.213 2007-02-01 16:20:01 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -355,6 +355,8 @@ create table pledge_category (
     pledge_id integer not null references pledges(id),
     category_id integer not null references category(id)
 );
+
+create index pledge_category_pledge_id_idx on pledge_category(pledge_id);
 
 -- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
 -- Whether the given PLEDGE is valid for EMAIL or MOBILE to sign. One of EMAIL

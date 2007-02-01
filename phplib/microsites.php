@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.95 2007-02-01 16:29:06 matthew Exp $
+ * $Id: microsites.php,v 1.96 2007-02-01 18:39:59 matthew Exp $
  * 
  */
 
@@ -134,7 +134,7 @@ function microsites_redirect($p) {
 function microsites_site_country() {
     global $site_country, $microsite;
     if ($microsite) {
-        if ($microsite == 'london' || $microsite == 'livesimply' || $microsite == 'o2')
+        if ($microsite == 'london' || $microsite == 'livesimply') # *not* O2
             return 'GB';
         return null;
     }
@@ -1276,6 +1276,12 @@ function microsites_no_target() {
     global $microsite;
     if ($microsite == 'o2') return true;
     return false;
+}
+
+function microsites_has_sms() {
+    global $microsite;
+    if ($microsite == 'o2') return false;
+    return true;
 }
 
 # Help for blank searches

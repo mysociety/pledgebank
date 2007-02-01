@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.215 2007-02-01 18:13:01 matthew Exp $
+ * $Id: pledge.php,v 1.216 2007-02-01 18:39:59 matthew Exp $
  * 
  */
 
@@ -679,7 +679,7 @@ class Pledge {
         // Display SMS if we are sure it makes sense - i.e. we support SMS for
         // the pledge country (or it is global) and we support SMS for the site
         // country.
-        if ($this->has_sms() && sms_site_country()) {
+        if ($this->has_sms() && sms_site_country() && microsites_has_sms()) {
             print '<p>';
             printf(_("Or, text '<strong>%s %s</strong>' to <strong>%s</strong>"), OPTION_PB_SMS_PREFIX, $this->ref(), OPTION_PB_SMS_DISPLAY_NUMBER);
             print " ";

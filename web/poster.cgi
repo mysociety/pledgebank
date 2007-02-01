@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.96 2007-02-01 18:00:28 matthew Exp $
+# $Id: poster.cgi,v 1.97 2007-02-01 18:39:59 matthew Exp $
 #
 
 import sys
@@ -59,6 +59,10 @@ microsites_from_extra_domains = { 'pledge.global-cool.com' : 'global-cool',
 def microsites_poster_different_look(microsite):
     return microsite in ('london', 'livesimply', 'o2')
 def microsites_has_target():
+    if microsite == 'o2':
+        return False
+    return True
+def microsites_has_sms():
     if microsite == 'o2':
         return False
     return True
@@ -215,6 +219,8 @@ def format_integer(i):
 
 # Also update has_sms in phplib/pledge.php
 def has_sms(pledge):
+    if not microsites_has_sms():
+        return False
     # Private pledges have no SMS for now
     if pledge['pin']:
         return False

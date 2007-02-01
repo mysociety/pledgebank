@@ -1,0 +1,46 @@
+#!/usr/bin/php -q
+<?php
+
+$short_opts = '';
+$long_opts = array('verbose','help');
+
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once '../phplib/fns.php';
+require_once "../phplib/alert.php";
+require_once '../../phplib/db.php';
+require_once '../../phplib/utility.php';
+
+function verbose($str) {
+    global $verbose;
+    if ($verbose) 
+        fwrite(STDERR, "send-comment-alerts: $str\n");
+}
+function error($str) {
+    fwrite(STDERR, "send-comment-alerts: ERROR: $str\n");
+}
+
+$switches = $options[0];
+$args = $options[1];
+$verbose = 0; 
+foreach ($switches as $switch) {
+    if ($switch[0]=='--verbose') $verbose = 1;
+    if ($switch[0]=='--help') {
+        exit;
+    }
+}
+
+db_connect();
+$q = db_query("select *,extract(days from date-creationtime) as duration,(select count(id) from signers where signers.pledge_id=pledges.id) as signers from pledges");
+while ($row = db_fetch_array($q)) {
+	$p = $row['signers'] / $row['target'];
+	$dur = $row['duration'];
+	$data[$dur]['percent'][] = $p;
+	$data[$dur]['target'][] = $row['target'];
+}
+
+ksort($data);
+foreach ($data as $dur => $a) {
+	print $dur . ' : ' . (array_sum($a['target']) / count($a['target']));
+	print ', ' . (array_sum($a['percent']) / count($a['percent']) * 100) . "\n";
+}

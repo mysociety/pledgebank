@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.214 2007-02-01 18:00:27 matthew Exp $
+ * $Id: pledge.php,v 1.215 2007-02-01 18:13:01 matthew Exp $
  * 
  */
 
@@ -428,9 +428,14 @@ class Pledge {
 <?      }
 
         global $microsite; # XXX
-        if ($microsite == 'o2' && isset($this->data['category'])) {
-            $cat_name = db_getOne('select name from category where id=?', $this->data['category']);
-            print '<p>My Promise is about <strong>' . $cat_name . '</strong></p>';
+        if ($microsite == 'o2') {
+	    $cat_name = '';
+            if (isset($this->data['category']))
+                $cat_name = db_getOne('select name from category where id=?', $this->data['category']);
+	    else
+	        $cat_name = join('', $this->categories());
+	    if ($cat_name)
+                print '<p>My Promise is about <strong>' . $cat_name . '</strong></p>';
         }
 ?>
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.155 2007-01-31 15:48:13 francis Exp $
+// $Id: page.php,v 1.156 2007-02-01 15:18:29 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -153,8 +153,11 @@ function page_header($title, $params = array()) {
             $js_file = $microsite_js_file;
         }
     }
-?>
+    if (!file_exists($js_file)) 
+        $js_file = null;
+    if ($js_file) { ?>
 <script type="text/javascript" src="/<?=$js_file?>"></script>
+<? } ?>
 <script type="text/javascript" src="/pb.js"></script>
 <script type="text/javascript" src="/jslib/utils.js"></script>
 <?  //this was conditional, but now we need it nearly always for bottom of page local alert signups
@@ -261,6 +264,7 @@ function page_footer($params = array()) {
     global $stash_in_stashpost;
     if ($P && $stash_in_stashpost && !$P->has_password()) {
         change_personal_details();
+        $params['nolocalsignup'] = true; // don't show local signup form as well
     }
 
 ?></div><? # id="pbcontent"

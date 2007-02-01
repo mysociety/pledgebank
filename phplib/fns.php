@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.154 2007-01-31 16:57:07 francis Exp $
+// $Id: fns.php,v 1.155 2007-02-01 16:16:37 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -530,6 +530,7 @@ function change_personal_details($yourpage = false) {
         $idclass = "";
     $has_password = $P->has_password();
     ?>
+    <div class="noprint">
     <form <?=$idclass?> name="setpassword" action="/your" method="post"><input type="hidden" name="UpdateDetails" value="1">
     <? if ($yourpage) { ?>
     <h2><?=$P->has_password() ? _('Change password') : _('Set password') ?></h2>
@@ -572,6 +573,7 @@ function change_personal_details($yourpage = false) {
     <br><?=_('New password, again:') ?> <input type="password" name="pw2" id="pw2" size="10">
     <input name="submit" type="submit" value="<?=_('Submit') ?>"></p>
     </form>
+    </div>
 
     <?
 }

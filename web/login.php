@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.76 2007-01-31 15:48:14 francis Exp $
+ * $Id: login.php,v 1.77 2007-02-01 16:16:37 francis Exp $
  * 
  */
 
@@ -79,10 +79,7 @@ importparams(
         array('t',              '/^.+$/',           '', null),
         array('rememberme',     '/./',              '', false),
 
-        /* Buttons on login page. */
-        array('LogIn',          '/^.+$/',           '', false),
-        array('SendEmail',      '/^.+$/',           '', false),
-
+        /* Buttons on set password page. */
         array('SetPassword',    '/^.+$/',           '', false),
         array('NoPassword',     '/^.+$/',           '', false),
 
@@ -180,13 +177,13 @@ if (!is_null($P)) {
 /* login_page
  * Render the login page, or respond to a button pressed on it. */
 function login_page() {
-    global $q_stash, $q_email, $q_name, $q_LogIn, $q_SendEmail, $q_rememberme;
+    global $q_stash, $q_email, $q_name, $q_rememberme;
 
     if (is_null($q_stash)) {
         err(_("Required parameter was missing"));
     }
 
-    if ($q_LogIn) {
+    if (get_http_var("loginradio") == 'LogIn') {
         /* User has tried to log in. */
         if (is_null($q_email)) {
             login_form(array('email'=>_('Please enter your email address')));
@@ -212,7 +209,8 @@ function login_page() {
             stash_redirect($q_stash);
             /* NOTREACHED */
         }
-    } else if ($q_SendEmail) {
+    } else if (get_http_var("loginradio") == 'SendEmail' ||
+            get_http_var("loginradio") == 'SendEmailForgotten') {
         /* User has asked to be sent email. */
         if (is_null($q_email)) {
             login_form(array('email'=>_('Please enter your email address')));
@@ -298,7 +296,7 @@ function login_form($errors = array()) {
 
 <ul>
 
-<li> <?=_('Enter your email address:') ?> <input<? if (array_key_exists('email', $errors) || array_key_exists('badpass', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<?=$q_h_email?>">
+<li> <?=_('What is your email address?') ?> <input<? if (array_key_exists('email', $errors) || array_key_exists('badpass', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<?=$q_h_email?>">
 
 </ul>
 
@@ -310,36 +308,32 @@ function login_form($errors = array()) {
 
 <p><strong><?=_('Have you used PledgeBank before?') ?></strong></p>
 
-<ul>
+<div id="loginradio">
 
-
-<li>
-<input type="submit" name="SendEmail" value="<?=strip_tags(_("I've never used PledgeBank before")) ?>">
+<p><input type="radio" name="loginradio" value="SendEmail" id="loginradio1" <?=get_http_var("loginradio") == '' || get_http_var('loginradio') == 'SendEmail' ? 'checked' : ''?>><label for="loginradio1"><?=strip_tags(_("I've never used PledgeBank before")) ?></label>
 <br>
 <small><?=_("(we'll send an email, click the link in it to confirm your email is working)") ?></small>
 
-</li>
-
-<li>
-<p><?=_("I have a PledgeBank <strong>password</strong>")?>:
-
-<input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> >
-<input type="submit" name="LogIn" value="<?=_('Let me in') ?>"></p>
-
-<input type="checkbox" name="rememberme" id="rememberme" <?=$q_rememberme ? "checked" : ""?>><strong><label for="rememberme"><?=_('Remember me') ?></label></strong>
-<small><?=_("(don't use this on a public or shared computer)") ?></small>
-
-</li>
-
-<li><p>
-<input type="submit" name="SendEmail" value="<?=_("I've forgotten or didn't set a password") ?>">
+<p><input type="radio" name="loginradio" id="loginradio2" value="LogIn" <?=get_http_var("loginradio") == 'LogIn' ? 'checked' : ''?>><label for="loginradio2"><?=_('I have a PledgeBank <strong>password</strong>') ?>:</label>
+<input type="password" name="password" id="password" value="" <? if (array_key_exists('badpass', $errors)) print ' class="error"' ?> onchange="check_login_password_radio()">
 <br>
-<small><?=_("(we'll send an email, click the link in it to confirm your email)") ?></small>
+<label for="rememberme"><?=_('Remember me') ?></label>
+<input type="checkbox" name="rememberme" id="rememberme" <?=$q_rememberme ? "checked" : ""?> onchange="check_login_password_radio()"><strong>
+</strong>
+<small><?=_("don't use this on a public or shared computer") ?></small>
 </p>
 
-</li>
+<p>
+<input type="radio" name="loginradio" value="SendEmailForgotten" id="loginradio3" <?=get_http_var("loginradio") == 'SendEmailForgotten' ? 'checked' : ''?>><label for="loginradio3"><?=_("I've forgotten or didn't set a password") ?></label>
+<br>
+<small><?=_("(we'll send an email, click the link in it to confirm your email is working.<br>if you like, you can then set a password on Your Pledges page)") ?></small>
+<br>
+</p>
 
-</ul>
+<p><input type="submit" name="loginsubmit" value="Continue">
+</p>
+
+</div>
 
 </form>
 </div>

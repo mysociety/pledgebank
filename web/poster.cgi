@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.95 2007-01-10 10:52:29 matthew Exp $
+# $Id: poster.cgi,v 1.96 2007-02-01 18:00:28 matthew Exp $
 #
 
 import sys
@@ -57,13 +57,19 @@ microsites_from_extra_domains = { 'pledge.global-cool.com' : 'global-cool',
 # Return True if posters for that microsite look different from default posters
 # This is used to work out what to name the cache files.
 def microsites_poster_different_look(microsite):
-    return microsite in ('london', 'livesimply')
+    return microsite in ('london', 'livesimply', 'o2')
+def microsites_has_target():
+    if microsite == 'o2':
+        return False
+    return True
 # Fill colour for background of logo
 def microsites_poster_box_fill_colour():
     if microsite == 'london':
         return (0.93, 0.2, 0.22)
     elif microsite == 'livesimply':
         return (0.00, 0.67, 0.71)
+    elif microsite == 'o2':
+        return (0.00, 0.00, 0.4)
     else:
         return (0.6, 0.45, 0.7)
 # Colour for key words and numbers in text
@@ -72,6 +78,8 @@ def microsites_poster_html_highlight_colour():
         return '#31659c'
     elif microsite == 'livesimply':
         return '#00aab5'
+    elif microsite == 'o2':
+        return '#000066'
     else:
         return '#522994'
 # Colour on RTF posters
@@ -129,6 +137,8 @@ def microsites_poster_watermark(c, x1, y1, w, h):
 def microsites_poster_remember_text(pledge):
     if microsite == 'livesimply':
         return u'''Remember,  if you promote your promise to others, you'll be helping create a community action. Not only are you being the best you can be, you're encouraging others to do the same.''' # Not translated
+    elif microsite == 'o2':
+        return ''
     else:
         return _(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.') % pledge['target']
 
@@ -423,14 +433,23 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     identity = ''
     if pledge['identity']:
         identity = ', ' + pledge['identity']
-    story = [
-        Paragraph(_(
+    if microsites_has_target():
+        sentence = Paragraph(_(
                     '''<font color="%s">I</font> will %s <b>but only if</b> <font color="%s">%s</font> %s will %s. '''
                 ).encode('utf-8') % (
                 html_colour, pledge['title'],
                 html_colour, format_integer(pledge['target']), 
                 pledge['type'], pledge['signup']
-            ), p_head),
+            ), p_head)
+    else:
+        sentence = Paragraph(_(
+                    '''<font color="%s">I</font> will %s. '''
+                ).encode('utf-8') % (
+                html_colour, pledge['title']
+            ), p_head)
+
+    story = [
+        sentence,
         Paragraph(u'''<para align="right">\u2014 
             <font color="%s">%s%s</font></para>'''.encode('utf-8') 
             % (html_colour, pledge['name'], identity), p_head),
@@ -464,13 +483,17 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
             (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal),
         Paragraph(_('''
             This pledge closes on <font color="%s">%s</font>. Thanks!
-            ''').encode('utf-8') % (html_colour, pledge['date']), p_normal),
-        Paragraph(microsites_poster_remember_text(pledge).encode('utf-8'), p_normal)
+            ''').encode('utf-8') % (html_colour, pledge['date']), p_normal)
+    ])
+    remember = microsites_poster_remember_text(pledge)
+    if remember:
+        story.extend([
+            Paragraph(remember.encode('utf-8'), p_normal)
 #        Paragraph('''
 #            <b>Small print:</b> %s Questions?
 #            08453 330 160 or team@pledgebank.com.
 #            ''' % sms_smallprint, p_smallprint)
-    ])
+        ])
 
     f = Frame(x1, y1, w, h, showBoundary = 0, 
         leftPadding = dots_body_gap, rightPadding = dots_body_gap, 

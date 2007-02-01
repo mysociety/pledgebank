@@ -62,6 +62,7 @@ while(<MAINPO>) {
 
         $buffer =~ s/PledgeBank.com/O2 Promise Bank/g;
         $buffer =~ s/PledgeBank/O2 Promise Bank/g;
+        $buffer =~ s/<font color=\\"#ffffff\\">Pledge<\/font>Bank.com/<font color=\\"#ffffff\\">O2 Promise Bank<\/font>/;
         $buffer =~ s/\bpledge\b/promise/g;
         $buffer =~ s/\bPledge\b/Promise/g;
         $buffer =~ s/\bpledges\b/promises/g;

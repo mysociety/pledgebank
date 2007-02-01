@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.213 2007-02-01 16:29:06 matthew Exp $
+ * $Id: pledge.php,v 1.214 2007-02-01 18:00:27 matthew Exp $
  * 
  */
 
@@ -402,7 +402,6 @@ class Pledge {
     //            the pledge sentence
     //     reportlink - if present and true, show "report this pledge" link
     //     class - adds the given classes (space separated) to the division
-    //     category - passed in during pledge creation to display category within the box
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
         if (array_key_exists('href', $params)) {

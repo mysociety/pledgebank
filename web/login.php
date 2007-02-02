@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.77 2007-02-01 16:16:37 francis Exp $
+ * $Id: login.php,v 1.78 2007-02-02 15:05:20 francis Exp $
  * 
  */
 
@@ -164,9 +164,10 @@ if (!is_null($P)) {
         /* No name change, just pass them through to the page they actually
          * wanted. */
         stash_redirect($q_stash);
-    else {
-        err(_('A required parameter was missing'));
-    }
+    else
+        /* This happens if you are logged in and type (or go in browser history)
+         * to /login. May as well redirect to login as a new person. */
+        header("Location: /login?now=1");
 } elseif (is_null($q_stash)) {
     header("Location: /login?now=1");
 } else {

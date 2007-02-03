@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.78 2007-02-02 15:05:20 francis Exp $
+ * $Id: login.php,v 1.79 2007-02-03 03:24:33 francis Exp $
  * 
  */
 
@@ -77,15 +77,7 @@ importparams(
         array(array('name',true),           '//',               '', null),
         array('password',       '/[^\s]/',          '', null),
         array('t',              '/^.+$/',           '', null),
-        array('rememberme',     '/./',              '', false),
-
-        /* Buttons on set password page. */
-        array('SetPassword',    '/^.+$/',           '', false),
-        array('NoPassword',     '/^.+$/',           '', false),
-
-        /* Buttons on name change page */
-        array('KeepName',       '/^.+$/',            '', false),
-        array('ChangeName',     '/^.+$/',            '', false)
+        array('rememberme',     '/./',              '', false)
     );
 if ($q_name==_('<Enter your name>')) {
     $q_name=null;
@@ -138,15 +130,6 @@ if (!is_null($q_t)) {
     if ($q_name && !$P->matches_name($q_name))
         $P->name($q_name);
 
-    /* PledgeBank now no longer ever shows an interstitial password change page
-     * after login. */
-    /* If the 'direct' key exists in the token, don't do any intervening
-     * pages. */
-    // if (!array_key_exists('direct', $d)) {
-        /* Can set this to some condition if you don't want to always offer password */
-    //   change_password_page($P);
-    // }
-
     stash_redirect($q_stash);
     /* NOTREACHED */
 }
@@ -154,8 +137,6 @@ if (!is_null($q_t)) {
 $P = pb_person_if_signed_on();
 if (!is_null($P)) {
     /* Person is already signed in. */
-    if ($q_SetPassword)
-        change_password_page($P);
     if ($q_name && !$P->matches_name($q_name))
         /* ... but they have specified a name which differs from their recorded
          * name. Change it. */
@@ -194,7 +175,7 @@ function login_page() {
             login_form(array('email'=>_('Please enter a valid email address')));
             exit();
         }
-         global $q_password;
+        global $q_password;
         $P = person_get($q_email);
         if (is_null($P) || !$P->check_password($q_password)) {
             login_form(array('badpass'=>_('Either your email or password weren\'t recognised.  Please try again.')));
@@ -350,87 +331,5 @@ function set_login_cookie($P, $duration = null) {
     // error_log('set cookie');
     setcookie('pb_person_id', person_cookie_token($P->id(), $duration), is_null($duration) ? null : time() + $duration, '/', person_cookie_domain(), false);
 }
-
-/* change_password_page PERSON
- * Show the logged-in PERSON a form to allow them to set or reset a password
- * for their account. */
-function change_password_page($P) {
-    global $q_stash, $q_email, $q_name, $q_SetPassword, $q_NoPassword;
-    global $q_h_stash, $q_h_email, $q_h_name;
-
-    if (is_null($q_name))
-        $q_name = $q_h_name = '';   /* shouldn't happen */
-
-    $error = null;
-    if ($q_SetPassword) {
-        global $q_pw1, $q_pw2;
-        importparams(
-                array('pw1',        '/[^\s]+/',      '', null),
-                array('pw2',        '/[^\s]+/',      '', null)
-            );
-        if (is_null($q_pw1) || is_null($q_pw2))
-            $error = _("Please type your new password twice");
-        elseif (strlen($q_pw1)<5 || strlen($q_pw2)<5)
-            $error = _('Your password must be at least 5 characters long');
-        elseif ($q_pw1 != $q_pw2)
-            $error = _("Please type the same password twice");
-        else {
-            $P->password($q_pw1);
-            db_commit();
-            return;
-        }
-    } else if ($q_NoPassword)
-        return;
-
-    if ($P->has_password()) {
-        page_header(_('Change your password'));
-        print p(_("There is a password set for your email address on PledgeBank. Perhaps
-you've forgotten it? You can set a new password using this form:"));
-    } else {
-        page_header(_('Set a password'));
-        print p(_("On this page you can set a password which you can use to identify yourself
-to PledgeBank, so that you don't have to check your email in the future.
-You don't have to set a password if you don't want to."));
-    }
-
-    if (!is_null($error))
-        print "<div id=\"errors\"><ul><li>$error</li><ul></div>";
-
-    print '<div class="pledge">';
-    print '<p><strong>' . _('Would you like to set a PledgeBank password?') . '</strong></p>'; ?>
-
-<ul>
-
-<li><form action="/login" name="loginNoPassword" class="login" method="POST" accept-charset="utf-8">
-<input type="hidden" name="stash" value="<?=$q_h_stash?>">
-<input type="hidden" name="email" value="<?=$q_h_email?>">
-<input type="hidden" name="name" value="<?=$q_h_name?>">
-<?=_("No, I don't want to think of a password right now.") ?>
- <input type="submit" name="NoPassword" value="<?=_('Click here to continue') ?>">
-<br><small><?=_('(you can set a password another time)') ?></small>
-</form><p></p></li>
-
-<li><form action="/login" name="loginSetPassword" class="login" method="POST" accept-charset="utf-8">
-<input type="hidden" name="stash" value="<?=$q_h_stash?>">
-<input type="hidden" name="email" value="<?=$q_h_email?>">
-<input type="hidden" name="name" value="<?=$q_h_name?>">
-<input type="hidden" name="SetPassword" value="1">
-
-<?=_("Yes, I'd like to set a password, so I don't have to keep going back to my email.") ?>
-<br>
-    <strong><?=_('Password:') ?></strong> <input type="password" name="pw1" id="pw1" size="15">
-    <strong><?=_('Password (again):') ?></strong> <input type="password" name="pw2" size="15">
-    <input type="submit" name="SetPassword" value="<?=_('Set password') ?>">
-</form>
-</li>
-
-</ul>
-
-</div>
-<?
-    page_footer(array('nonav' => 1));
-    exit();
-}
-
 
 ?>

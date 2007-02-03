@@ -1,11 +1,11 @@
 <?
-// all.php:
-// List all pledges.
+// your.php:
+// List all your pledges, and offer account options.
 //
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.24 2007-01-31 15:48:14 francis Exp $
+// $Id: your.php,v 1.25 2007-02-03 02:41:50 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';

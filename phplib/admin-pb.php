@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.146 2007-01-03 15:49:06 matthew Exp $
+ * $Id: admin-pb.php,v 1.147 2007-02-05 23:06:20 matthew Exp $
  * 
  */
 
@@ -72,7 +72,7 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function list_all_pledges() {
-        global $open, $pb_today;
+        global $found, $pb_today;
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^ratdecspuolgz]/', $sort)) $sort = 'c';
         $order = '';
@@ -162,13 +162,13 @@ class ADMIN_PAGE_PB_MAIN {
         }
         if ($sort=='o') {
             function sort_by_percent($a, $b) {
-                global $open;
-                preg_match('#<td>([\d\.,]+)%</td>#', $open[$a], $m); $aa = str_replace(',','',$m[1]);
-                preg_match('#<td>([\d\.,]+)%</td>#', $open[$b], $m); $bb = str_replace(',','',$m[1]);
+                global $found;
+                preg_match('#<td>([\d\.,]+)%</td>#', $found[$a], $m); $aa = str_replace(',','',$m[1]);
+                preg_match('#<td>([\d\.,]+)%</td>#', $found[$b], $m); $bb = str_replace(',','',$m[1]);
                 if ($aa==$bb) return 0;
                 return ($aa<$bb) ? 1 : -1;
             }
-            uksort($open, 'sort_by_percent');
+            uksort($found, 'sort_by_percent');
         }
 
         print "<p>";

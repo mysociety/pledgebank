@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.49 2007-01-03 20:13:01 matthew Exp $
+// $Id: faq.php,v 1.50 2007-02-06 16:25:29 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -384,7 +384,29 @@ function livesimply_faq() {
 
 <dt>Who is behind <em>live</em>simply:promise?</dt>
 
-<dd>The <em>live</em>simply:promise is managed by a group of Catholic agencies and organisations in England and Wales who together form the <a href="http://www.progressio.org.uk/livesimply/AssociatesInternal/92992/members/"><em>live</em>simply network</a>.  This site was built by <a href="http://www.mysociety.org">mySociety</a>. mySociety is a charitable organisation which has grown out of this community of volunteers. mySociety's primary mission is to build Internet projects which give people simple, tangible benefits in the civic and community aspects of their lives. </dd>
+<dd><p>The <em>live</em>simply:promise is managed by a group of
+Catholic agencies and organisations in England and Wales who
+together form the <a href="http://www.progressio.org.uk/livesimply/AssociatesInternal/92992/members/"><em>live</em>simply network</a>.
+This site was built by <a href="http://www.mysociety.org">mySociety</a>.
+mySociety is a charitable organisation which has grown out of this
+community of volunteers. mySociety's primary mission is to build
+Internet projects which give people simple, tangible benefits in
+the civic and community aspects of their lives.</p>
+
+<p><em>live</em>simply network is managing this website as a
+space for people to take action in response to the <em>live</em>simply
+challenge. The network is not responsible for the content of the
+promises themselves.</p>
+
+<p>If you feel that a promise breaks the <a href="/terms">Terms and Conditions</a> of
+the website you can report the comment to the network by clicking on
+"Anything wrong with this promise? Tell us!?" link underneath each
+promise.</p>
+
+<p>The network reserves the right to decide if a promise violates Terms and
+Conditions of the website and if it needs to be removed.</p>
+
+</dd>
 
 </dl><h2>Promise Creators' Questions  </h2><dl>
 

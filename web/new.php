@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.173 2007-02-02 09:14:07 matthew Exp $
+// $Id: new.php,v 1.174 2007-02-07 09:13:49 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -979,7 +979,9 @@ function display_categories($data) { ?>
                     (is_null($parent_id) ? '' : '&nbsp;-&nbsp;'),
                     htmlspecialchars(_($name)));
     }
-    uksort($out, 'strcoll');
+    global $microsite; # XXX
+    if ($microsite != 'o2')
+        uksort($out, 'strcoll');
     foreach ($out as $n => $s) {
         print $s;
     } ?>

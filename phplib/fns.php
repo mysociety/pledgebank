@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.156 2007-02-01 16:29:06 matthew Exp $
+// $Id: fns.php,v 1.157 2007-02-07 09:13:48 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -211,7 +211,10 @@ function view_friends_form($p, $errors = array(), $track=null) {
         print '<input type="hidden" name="track" value="' . htmlentities($track) . '">';
     if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
 print h2(_('Email this pledge'));
-print p(_('Please enter these details so that we can send your message to your contacts.
+if (microsites_intranet_site())
+    print p('Please enter these details so that we can send your message to your contacts.');
+else
+    print p(_('Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.')); ?>
 <p><strong><?=_('Other people\'s email addresses:') ?></strong></p>
 <div class="formrow"><input <? if (array_key_exists('email1', $errors)) print ' class="error"' ?> type="text" name="email1" value="<? if (get_http_var('email1')) print htmlentities(get_http_var('email1'));?>" size="40"></div>

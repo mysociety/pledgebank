@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.96 2007-02-01 18:39:59 matthew Exp $
+ * $Id: microsites.php,v 1.97 2007-02-07 09:13:48 matthew Exp $
  * 
  */
 
@@ -389,12 +389,26 @@ function microsites_frontpage_intro() {
     } elseif ($microsite == 'o2') { ?>
 <h2>Welcome to O2&#8217;s Promise Bank!</h2>
 
-<p>The Promise Bank is where we can all make our commitment to making
-O2 a better place. Using Promise Bank you can make your People Promise
-and contribute to making O2 the kind of place we want it to be.</p>
+<p>Welcome to the Promise Bank! It&#8217;s your chance to make a promise
+(or several!) to support one or more elements of the People Promise.</p>
 
-<p>After hundreds of conversations about O2 at its best, we&#8217;ve
-captured all the ideas and come up with the People Promise:</p>
+<p>Over a thousand conversations between O2 people took place last year
+asking what would make O2 the best place to work.  Now we&#8217;ve
+captured everyone&#8217;s ideas &mdash; in their own words &mdash; as
+our People Promise.  It describes the O2 we want to be.</p>
+
+<p>While we don&#8217;t live up to all of it yet, we&#8217;re clear about
+where we&#8217;re going.  So how do we start the journey?  Quite simply
+by living the People Promise.</p>
+
+<p>And that&#8217;s where Promise Bank comes in.  You&#8217;re in the
+right place to promise to do your bit &mdash; big or small &mdash; to
+bring the People Promise to life around you.  You&#8217;ll notice the
+difference and so will others.</p>
+
+<p>Just read the People Promise on Vital o2 (insert link) or in the
+latest strategy booklet and think about what you can do to support
+one of the elements:</p>
 
 <ul>
 <li>A warm welcome
@@ -406,15 +420,14 @@ captured all the ideas and come up with the People Promise:</p>
 <li>Thanks for a job well done
 </ul>
 
-<p>Use the Promise Bank and make your Promise. What are you going to
-do to make the People Promise come alive? </p>
+<p>Then, just use the Promise Bank to make your Promise. It&#8217;s easy!</p>
 
 <p>You can make a Promise for yourself or on behalf of your team. The
-most important thing is that you make a Promise and let us know what
-you are going to do. </p>
+most important thing is that you make a Promise and then keep it &mdash;
+if 11,000 people each promise to do something to bring the People Promise
+to life, you really will be part of something special.</p>
 
-<p>We&#8217;ll keep you updated about all your Promises and how we 
-are making O2 the best place to work anywhere.</p>
+It&#8217;s your chance to make a difference, and you really can!</p>
 
 <?
         $audio_intro = false;
@@ -1278,7 +1291,15 @@ function microsites_no_target() {
     return false;
 }
 
+# Return true if microsite has SMS at all
 function microsites_has_sms() {
+    global $microsite;
+    if ($microsite == 'o2') return false;
+    return true;
+}
+
+# Return true if microsite has flyers
+function microsites_has_flyers() {
     global $microsite;
     if ($microsite == 'o2') return false;
     return true;

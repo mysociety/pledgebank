@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.97 2007-02-07 09:13:48 matthew Exp $
+ * $Id: microsites.php,v 1.98 2007-02-08 18:51:47 matthew Exp $
  * 
  */
 
@@ -818,7 +818,7 @@ function microsites_categories_allowed() {
  * Returns whether categories are offered in the usual place in the new pledge dialog. */
 function microsites_categories_page3() {
     global $microsite;
-    if ($microsite == 'o2') return false;
+    if ($microsite == 'o2' || !microsites_categories_allowed()) return false;
     return true;
 }
 

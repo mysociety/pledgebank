@@ -7,15 +7,17 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbperson.php,v 1.3 2006-07-27 18:25:01 francis Exp $
+// $Id: pbperson.php,v 1.4 2007-02-12 12:17:57 matthew Exp $
 
 require_once 'microsites.php';
 
 require_once '../../phplib/person.php';
 
 // Special version of person_make_signon_url which uses fancy PledgeBank domain URLs
-function pb_person_make_signon_url($data, $email, $method, $url, $params) {
-     return person_make_signon_url($data, $email, $method, $url, $params, pb_domain_url(array('path'=>'/')));
+function pb_person_make_signon_url($data, $email, $method, $url, $params, $microsite = '') { # XXX Ugh
+     $url_params = array('path'=>'/');
+     if ($microsite) $url_params['microsite'] = $microsite;
+     return person_make_signon_url($data, $email, $method, $url, $params, pb_domain_url($url_params));
 }
 // Special version of person_if_signed_on for microsite remote authentication hooks
 function pb_person_if_signed_on($norenew = false) {

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.100 2007-02-02 14:18:01 matthew Exp $
+ * $Id: frequentupdate,v 1.101 2007-02-12 12:17:55 matthew Exp $
  *
  */
 
@@ -656,7 +656,7 @@ function send_pending_messages() {
                 $params['location'] = $msg['byarea_location_id'];
             }
             $data['url'] = pb_person_make_signon_url(null, $pledge->creator_email(), 
-                "GET", $pledge->url_announce(), $params);
+                "GET", $pledge->url_announce(), $params, $pledge->microsite());
             locale_pop();
         }
         // Number of signers reached at current probably rate
@@ -801,7 +801,7 @@ function send_pending_messages() {
             if ($r['emailtemplatename'] == 'succeeded-signer' ||
                 $r['emailtemplatename'] == 'succeeded-signer-byarea' ) {
                 $data['local_alert_url'] = pb_person_make_signon_url(null, $r['signer_email'], "GET", 
-                        pb_domain_url(array('path'=>"/alert")), array());
+                        pb_domain_url(array('path'=>"/alert")), array(), $pledge->microsite());
             }
             // Description of town that success is for
             if ($r['emailtemplatename'] == 'succeeded-signer-byarea' ||
@@ -846,7 +846,7 @@ function send_pending_messages() {
                     $h = sprintf(_('%d minutes ago'), intval($r['howlongago'] / 60));
                 else
                     $h = _('a minute ago');
-                $url = pb_person_make_signon_url(null, $r['signer_email'], "GET", $pledge->url_announce_archive(), array());
+                $url = pb_person_make_signon_url(null, $r['signer_email'], "GET", $pledge->url_announce_archive(), array(), $pledge->microsite());
                 # TRANS: The first %s is one of the time strings above.
                 $emailbody = sprintf(_("[ You signed this pledge after this message was sent to the other signers. They will have received copies of this message %s. You can read older messages from the pledge creator that you missed here: %s ]"), $h, $url)
                              . "\n\n" . $emailbody;

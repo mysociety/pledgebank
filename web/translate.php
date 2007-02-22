@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: translate.php,v 1.7 2006-08-02 17:11:23 matthew Exp $
+// $Id: translate.php,v 1.8 2007-02-22 23:16:40 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../../phplib/utility.php';
@@ -46,7 +46,7 @@ keeps track of untranslated strings and things like that.') ?></p>
 <ol>
 
 <li><?=_('<strong>Installing PoEdit:</strong>
-Download poEdit from <a href="http://www.poedit.org/">PoEdit</a>
+Download poEdit from <a href="http://www.poedit.net/">PoEdit</a>
 (if running Windows, just get the simple installer version)
 and install it.') ?>
 

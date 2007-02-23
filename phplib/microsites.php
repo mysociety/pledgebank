@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.98 2007-02-08 18:51:47 matthew Exp $
+ * $Id: microsites.php,v 1.99 2007-02-23 08:17:14 timsk Exp $
  * 
  */
 
@@ -1321,7 +1321,7 @@ function microsites_search_help() {
         if (!microsites_site_country() || microsites_site_country() == 'GB')
             print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
         print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
-        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
+        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publicly"));
         print "</ul>";
     }
 }

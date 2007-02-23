@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.61 2007-02-01 16:29:07 matthew Exp $
+// $Id: search.php,v 1.62 2007-02-23 08:17:14 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -288,7 +288,7 @@ function search($search) {
         print '</ul>';
     }
 
-    // Signers and creators (NOT person table, as we only search for publically visible names)
+    // Signers and creators (NOT person table, as we only search for publicly visible names)
     $people = array();
     global $microsite; # XXX
     if ($microsite == 'o2') {

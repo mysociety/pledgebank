@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.97 2007-02-07 09:13:49 matthew Exp $
+// $Id: ref-index.php,v 1.98 2007-02-27 11:31:34 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -100,9 +100,13 @@ function draw_spreadword($p) { ?>
     }
     print '<ul>';
     if (!$p->finished()) {
-        print '<li>' . print_link_with_pin($p->url_email(), "", _("Email pledge to your friends")) . '</li>';
+        print '<li>';
+        print_link_with_pin($p->url_email(), "", _("Email pledge to your friends"));
+        print '</li>';
         if (microsites_has_flyers())
-            print '<li>' . print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers")) . '</li>';
+            print '<li>';
+            print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers"));
+            print '</li>';
     } ?>
     <li><a href="/new/local/<?=$p->ref() ?>"><?=_('Create a local version of this pledge') ?></a></li>
     <li> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a> <?=_('(creator only)');

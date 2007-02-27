@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.98 2007-02-27 11:31:34 matthew Exp $
+# $Id: poster.cgi,v 1.99 2007-02-27 11:33:10 matthew Exp $
 #
 
 import sys
@@ -310,7 +310,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
     if pledge['identity']:
         identity = ', ' + pledge['identity']
     story = PyRTF.Section(paper=papersizesRTF[papersize])
-    story.Footer.append(PyRTF.Paragraph(ss.ParagraphStyles.footer, _("PledgeBank.com")))
+    story.Footer.append(PyRTF.Paragraph(ss.ParagraphStyles.footer, rtf_repr(_("PledgeBank.com"))))
     story.extend([
         PyRTF.Paragraph(
                 ss.ParagraphStyles.header, 

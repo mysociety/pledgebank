@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.100 2007-02-27 11:19:39 matthew Exp $
+ * $Id: microsites.php,v 1.101 2007-02-27 11:24:24 matthew Exp $
  * 
  */
 
@@ -679,13 +679,6 @@ function microsites_contact_intro() {
     global $microsite;
     if ($microsite == 'livesimply') { ?>
 <p>If you need help with your promise or you have other questions or comments use this form to contact us.</p>
-
-<p>If you would like to contact the Promise Creator, please use the 'comments' section on the promise.
-The form below is for messages to the <em>live</em>simply:promise team only, not the Promise Creator.</p>
-
-<p><a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.
-If that doesn't help either you can fill in the form below or get in touch with Mark Woods,
-<em>live</em>simply Project Co-ordinator on 01293 541334.</p>
 <?
     } else {
         print "<p>";

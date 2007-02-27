@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.54 2007-02-05 19:50:32 matthew Exp $
+// $Id: contact.php,v 1.55 2007-02-27 11:24:24 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -72,8 +72,14 @@ function contact_form($errors = array()) {
     }
 
     print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge. The form below is for messages to the PledgeBank Team only, <strong>not</strong> the Pledge Creator."));
-    if (!$comment_id) 
-        print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
+    if (!$comment_id) {
+        # XXX
+        $blurb = '';
+        global $microsite;
+        if ($microsite == 'livesimply')
+            $blurb = " If that doesn't help either you can fill in the form below or get in touch with Mark Woods, <em>live</em>simply Project Co-ordinator on 01293 541334.";
+        print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.' . $blurb));
+    }
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';

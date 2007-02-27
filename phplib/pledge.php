@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.217 2007-02-23 08:17:14 timsk Exp $
+ * $Id: pledge.php,v 1.218 2007-02-27 11:19:39 matthew Exp $
  * 
  */
 
@@ -649,7 +649,7 @@ class Pledge {
         } else {
             print '<p>
     <small>
-    <strong><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publicly on this pledge.') . '</strong>
+    <strong><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publically on this pledge.') . '</strong>
     '._('People searching for your name on the Internet will be able
     to find your signature, unless you uncheck this box.').'</small>
     </p>';

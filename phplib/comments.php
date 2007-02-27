@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.53 2007-02-23 08:17:14 timsk Exp $
+ * $Id: comments.php,v 1.54 2007-02-27 11:19:39 matthew Exp $
  * 
  */
 
@@ -336,7 +336,7 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
     print 'Your name will be shown publicly on this page
 with your comment. Your email address will not be shown.';
 } else { 
-    print _('Your name (and web site address if given) will be shown publicly on this page
+    print _('Your name (and web site address if given) will be shown publically on this page
 with your comment. Your email address will not be shown. People searching for your
 name on the Internet may find your comment.');
 } ?></small></p> <p><input

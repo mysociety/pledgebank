@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.99 2007-02-23 08:17:14 timsk Exp $
+ * $Id: microsites.php,v 1.100 2007-02-27 11:19:39 matthew Exp $
  * 
  */
 
@@ -677,18 +677,25 @@ EOF;
  */
 function microsites_contact_intro() {
     global $microsite;
-    print "<p>";
-    if ($microsite == 'livesimply') {
-        print "If you need help with your promise or you have other questions or comments use this form to contact us. ";
+    if ($microsite == 'livesimply') { ?>
+<p>If you need help with your promise or you have other questions or comments use this form to contact us.</p>
+
+<p>If you would like to contact the Promise Creator, please use the 'comments' section on the promise.
+The form below is for messages to the <em>live</em>simply:promise team only, not the Promise Creator.</p>
+
+<p><a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.
+If that doesn't help either you can fill in the form below or get in touch with Mark Woods,
+<em>live</em>simply Project Co-ordinator on 01293 541334.</p>
+<?
     } else {
+        print "<p>";
         print _('Was it useful?  How could it be better?
     We make PledgeBank and thrive off feedback, good and bad.
     Use this form to contact us.');
         $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
         printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
-  
+        print "</p>";
     }
-    print "</p>";
 }
 
 /* microsites_pledge_closed_text
@@ -1321,7 +1328,7 @@ function microsites_search_help() {
         if (!microsites_site_country() || microsites_site_country() == 'GB')
             print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
         print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
-        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publicly"));
+        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
         print "</ul>";
     }
 }

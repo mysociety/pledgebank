@@ -1,4 +1,4 @@
-Subject: Sorry, your promise failed - '<?=$values['title']?>' at livesimply
+Subject: Sorry, your deadline has passed - '<?=$values['title']?>' at livesimply
 
 The livesimply promise you created hasn't reached its target within the
 timeframe. It required <?=$values['target']?> <?=$values['type']?> to sign

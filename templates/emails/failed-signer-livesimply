@@ -1,4 +1,4 @@
-Subject: Promise deadline passed - '<?=$values['title']?>' at livesimply
+Subject: The deadline for your promise has passed - '<?=$values['title']?>' at livesimply
 
 The livesimply promise you signed up to hasn't reached its target within
 the timeframe. It required <?=$values['target']?>

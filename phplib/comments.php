@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.54 2007-02-27 11:19:39 matthew Exp $
+ * $Id: comments.php,v 1.55 2007-03-02 17:06:38 matthew Exp $
  * 
  */
 
@@ -146,7 +146,7 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
 function comments_summary($r) {
     $text = $r['text'];
     if (strlen($text) > 20) $text = trim_characters($text, 0, 30);
-    $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . $text . '</a>';
+    $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . htmlspecialchars($text) . '</a>';
     
     # TRANS: "<start of comment text...> by <name>, on <pledge reference link> at <time>" - these are the strings under Latest comments on the front page. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
     return sprintf(_('%s by %s, on %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
@@ -161,7 +161,7 @@ function comments_rss_entry($r) {
     return array(
           'title' => sprintf(_('Comment on %s pledge by %s'), $r['ref'], htmlspecialchars($r['name'])),
           'link' => pb_domain_url(array('explicit'=>true, 'path'=>"/". $r['ref'] . '#comment_' . $r['id'])),
-          'description' => $text,
+          'description' => htmlspecialchars($text),
           'whenposted' => $r['whenposted']
     );
 

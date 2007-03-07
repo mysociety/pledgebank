@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: pbcli.php,v 1.5 2006-10-15 23:45:22 francis Exp $
+ * $Id: pbcli.php,v 1.6 2007-03-07 13:48:55 matthew Exp $
  *
  */
 
@@ -27,5 +27,7 @@ locale_negotiate_language(OPTION_PB_LANGUAGES, 'en-gb');
 locale_change();
 locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
 
-
-
+$microsite = null;
+if (OPTION_WEB_HOST == 'promise') { # XXX: Can't use microsites() as not running "on" a site
+    $microsite = 'livesimply';
+}

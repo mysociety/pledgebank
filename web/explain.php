@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: explain.php,v 1.12 2006-12-11 17:54:55 francis Exp $
+// $Id: explain.php,v 1.13 2007-03-07 13:48:55 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -73,7 +73,7 @@ function default_explanation() {
 }
 
 function livesimply_explanation() {
-    page_header(_("How does Live Simply Promise work?"));
+    page_header("How does Live Simply Promise work?");
 
     print h2("How does Live Simply Promise work?");
 

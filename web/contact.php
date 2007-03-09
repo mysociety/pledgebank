@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.55 2007-02-27 11:24:24 matthew Exp $
+// $Id: contact.php,v 1.56 2007-03-09 23:11:37 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -153,6 +153,7 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
         .($comment_id ? ('#comment_' . $comment_id) : '')
         ) : '') . 
     ($comment_id ? ("\n  Comment author: " . db_getOne('select name from comment where id = ?', $comment_id)
+                . "\n  Comment website: " . db_getOne('select website from comment where id = ?', $comment_id)
                 . "\n  Comment text: " . db_getOne('select text from comment where id = ?', $comment_id)) : '') . 
     ' ]';
     $headers = array();

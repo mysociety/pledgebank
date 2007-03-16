@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.218 2007-02-27 11:19:39 matthew Exp $
+ * $Id: pledge.php,v 1.219 2007-03-16 15:08:45 matthew Exp $
  * 
  */
 
@@ -506,7 +506,7 @@ class Pledge {
 
         if (array_key_exists('showdetails', $params) && $params['showdetails'] && isset($this->data['detail']) && $this->data['detail']) {
             $det = htmlspecialchars($this->data['detail']);
-            $det = ms_make_clickable($det, array('contract'=>true));
+            $det = ms_make_clickable($det, array('contract'=>true, 'nofollow'=>true));
             $det = nl2br($det);
             print '<p id="moredetails"><strong>' . _('More details') . '</strong><br>' . $det . '</p>';
         }
@@ -563,7 +563,7 @@ class Pledge {
 
         $signup = trim($r['signup']);
         if ($html)
-            $signup = ms_make_clickable($signup);
+            $signup = ms_make_clickable($signup, array('nofollow'=>true));
         if (microsites_no_target()) {
             if ($firstperson === "includename") {
                 $s = sprintf(_("I, %s, will %s."), $r['name'], $title);

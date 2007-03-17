@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.56 2007-03-16 15:08:44 matthew Exp $
+ * $Id: comments.php,v 1.57 2007-03-17 10:18:23 matthew Exp $
  * 
  */
 
@@ -43,7 +43,7 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
 
     $name = htmlspecialchars($comment['name']);
     if (isset($comment['website']))
-        $name = '<a href="' . htmlspecialchars($comment['website']) . '">' . $name . '</a>';
+        $name = '<a rel="nofollow" href="' . htmlspecialchars($comment['website']) . '">' . $name . '</a>';
     if ($admin)
         $name .= " (<a href=\"mailto:" . $comment['email'] . "\">" . $comment['email'] . "</a>)";
 

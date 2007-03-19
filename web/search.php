@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.63 2007-02-27 11:19:39 matthew Exp $
+// $Id: search.php,v 1.64 2007-03-19 09:07:39 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -272,6 +272,7 @@ function search($search) {
                           text,comment.name,website,ref 
                    FROM comment,pledges 
                    WHERE pin IS NULL
+                    '.$backpage_clause.'
                         AND comment.pledge_id = pledges.id 
                         AND NOT ishidden 
                         AND text ILIKE \'%\' || ? || \'%\'

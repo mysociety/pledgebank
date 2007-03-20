@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: translate.php,v 1.8 2007-02-22 23:16:40 timsk Exp $
+// $Id: translate.php,v 1.9 2007-03-20 01:00:58 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../../phplib/utility.php';
@@ -86,7 +86,7 @@ placeholder goes where. Here\'s an example, but ask if this comes up
 in your translation (hopefully it won\'t :) ) :') ?>
 
 <pre>"I have %s the %s."                (I have <em style="color: #ff0000">read</em> the <em style="color: #00ff00">book</em>.)
-"Ich habe das %2\$s %1\$s."        (Ich habe das <em style="color: #00ff00">Buch</em> <em style="color: #ff0000">gelesen</em>.)
+"Ich habe das %2$s %1$s."        (Ich habe das <em style="color: #00ff00">Buch</em> <em style="color: #ff0000">gelesen</em>.)
 </pre>
 
 <li><?=_('Email me with as much or as little as you have done, and I will get it up and running as soon as possible. :-)') ?>
@@ -165,7 +165,7 @@ placeholder goes where. Here\'s an example, but ask if this comes up
 in your translation (hopefully it won\'t :) ) :') ?>
 
 <pre>msgid "I have %s the %s."                 (I have <em style="color: #ff0000">read</em> the <em style="color: #00ff00">book</em>.)
-msgstr "Ich habe das %2\$s %1\$s."        (Ich habe das <em style="color: #00ff00">Buch</em> <em style="color: #ff0000">gelesen</em>.)
+msgstr "Ich habe das %2$s %1$s."        (Ich habe das <em style="color: #00ff00">Buch</em> <em style="color: #ff0000">gelesen</em>.)
 </pre>
 
 <li><p><?=_('<strong>Plurals:</strong> These are the other more complicated thing.

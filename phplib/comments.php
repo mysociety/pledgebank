@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.57 2007-03-17 10:18:23 matthew Exp $
+ * $Id: comments.php,v 1.58 2007-03-22 20:49:16 matthew Exp $
  * 
  */
 
@@ -258,18 +258,15 @@ function comments_show_admin($pledge, $limit = 0) {
                     where comment.pledge_id = ?
                     order by whenposted desc';
         if ($limit) {
-            $query .= " LIMIT " . $limit . " OFFSET " . ($count - $limit);
+            $query .= " LIMIT " . $limit;
         }
         $q = db_query($query , $id);
 
         while ($r = db_fetch_array($q)) {
             print '<li class="comment" id="comment_' . $r['id'] . '">';
-
             comments_show_one($r, true, true);
-
             print '</li>';
         }
-
         print "</ul>";
     }
     print "</div>";

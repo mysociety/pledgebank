@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.101 2007-02-27 11:24:24 matthew Exp $
+ * $Id: microsites.php,v 1.102 2007-03-26 11:58:03 matthew Exp $
  * 
  */
 
@@ -148,7 +148,7 @@ function microsites_site_country() {
 /* microsites_logo
  * Returns HTML to use for logo of microsite, or country. */
 function microsites_logo() {
-    global $microsite;
+    global $microsite, $lang;
     if ($microsite && $microsite == 'interface') {
         return '
 <h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
@@ -203,11 +203,18 @@ function microsites_logo() {
         return '
 <h1><a href="/"><img src="/microsites/o2-logo.jpg" alt="O2 Promise Bank" border="0" width="386" height="66"></a></h1>
 ';
+    } elseif ($lang == 'zh') {
+        $country_name = pb_site_country_name();
+        return '
+<h1><a href="/"><span id="logo_zh">' . _('Pledge') . _('Bank') . '</span>
+<small><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></small></a>
+<span id="countrytitle">' . $country_name . '
+<a href="/where">' . _('(change)') . '</a></span></h1>';
     } else {
         $country_name = pb_site_country_name();
         return '
 <h1><a href="/"><span id="logo_pledge">' . _('Pledge') . '</span><span id="logo_bank">' . _('Bank') . '</span></a>
-<span id="countrytitle">'.$country_name.'
+<span id="countrytitle">' . $country_name . '
 <a href="/where">' . _('(change)') . '</a></span></h1>';
     }
 }

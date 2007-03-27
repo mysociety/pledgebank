@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.44 2007-02-01 16:29:07 matthew Exp $
+// $Id: list.php,v 1.45 2007-03-27 17:21:20 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -110,9 +110,9 @@ if ($q_sort == 'creationtime' || $q_sort == 'whensucceeded' || $q_sort == 'signe
             pledge_category.category_id = category.id AND parent_category_id IS NULL AND 
             pledge_category.pledge_id = pledges.id LIMIT 1), '"._("Miscellaneous")."')";
 } elseif ($q_sort == 'site') {
-    $sort_phrase = 'address_1';
-} elseif ($q_sort == 'directorate') {
     $sort_phrase = 'address_postcode';
+} elseif ($q_sort == 'directorate') {
+    $sort_phrase = 'address_1';
 } else {
     $sort_phrase = $q_sort;
 }

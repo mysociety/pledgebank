@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.53 2007-02-01 18:39:59 matthew Exp $
+ * $Id: ref-announce.php,v 1.54 2007-03-28 11:09:40 matthew Exp $
  * 
  */
 
@@ -317,7 +317,7 @@ ways.')); ?>
 
 <p><label for="message_subject"><?=_('Subject') ?>:</label> <input name="message_subject" id="message_subject" size="40" value="<?=$q_h_message_subject?>"></p>
 
-<p><textarea
+<p><textarea style="max-width: 100%"
     name="message_body"
     id="message_body"
     cols="72"
@@ -331,7 +331,7 @@ ways.')); ?>
     <strong>Include contact details, such as your phone number or email address.</strong>
     Otherwise people who signed up by text won\'t be able to contact you again.'));
     ?>
-<p><textarea
+<p><textarea style="max-width: 100%"
     name="message_sms"
     id="message_sms"
     cols="72"

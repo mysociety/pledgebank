@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.214 2007-02-01 16:29:06 matthew Exp $
+-- $Id: schema.sql,v 1.215 2007-03-28 11:09:40 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1125,6 +1125,8 @@ create function pb_delete_comment(integer)
     end
 ' language 'plpgsql';
 
+
+-- XXX: This is broken for cascading pledges, as success only changes byarea_location table
 
 -- pledge_last_change_time PLEDGE
 -- Return the time of the last change to PLEDGE.

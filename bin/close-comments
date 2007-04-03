@@ -1,0 +1,22 @@
+#!/usr/bin/php -q
+<?php
+/* 
+ * close-comments:
+ * Closes comments on old pledges
+ *
+ * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: close-comments,v 1.1 2007-04-03 07:13:53 francis Exp $
+ *
+ */
+
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once '../../phplib/db.php';
+
+db_connect();
+db_query("update pledges set closed_for_comments = 't' where now() - date > '1 year'::interval");
+db_commit();
+
+

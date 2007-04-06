@@ -1,0 +1,159 @@
+#!/usr/bin/perl -w
+#
+# anmollipi-to-unicode-po:
+# Given a .po file created using the Anmol Lipi Punjabi font, convert
+# to a UTF-8 Unicode .po file, using Unicodify from 
+#   http://www.lancs.ac.uk/staff/hardiea/unicodify.htm
+# This is a Windows program, though I do have the source if we have
+# time in future. But this works. :-)
+# 
+# Run with input .po file as argument; outputs to stdout.
+#
+# Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+# Email: matthew@mysociety.org; WWW: http://www.mysociety.org
+
+use strict;
+use HTML::Entities;
+
+die "Only argument is input .po file in Anmol Lipi" unless @ARGV==1;
+
+# Create fake MSWord file to send to Unicodify
+my $file = join('', <>);
+$file = msword_create($file);
+
+open(FP, '>UnicodifyInput') or die $!;
+print FP $file;
+close(FP);
+
+unlink('UnicodifyOutput'); # unicodify refuses to run if the output file exists
+`unicodify.exe AnmolLipi UnicodifyInput UnicodifyOutput`;
+$file = `iconv -f utf-16 -t utf-8 UnicodifyOutput`;
+unlink('UnicodifyInput');
+unlink('UnicodifyOutput');
+
+$file =~ s/^.*?#/#/s;
+$file =~ s/\s+<\/p>.*$/\n/s;
+$file = decode_entities($file);
+print $file;
+
+sub msword_create {
+    my $str = shift;
+
+    # Unicodify oddly removes some < and >, so double encode...
+    $str = encode_entities(encode_entities($str));
+
+    $str =~ s/\n/<br>\n/g;
+
+    # XXX: Doesn't cope with multi-line msgstr yet
+    $str =~ s/msgstr &amp;quot;(.+?)&amp;quot;/msgstr &amp;quot;<span style='font-family:AnmolLipi'>$1<\/span>&amp;quot;/g;
+
+    return <<EOF;
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns:st1="urn:schemas-microsoft-com:office:smarttags"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 10">
+<meta name=Originator content="Microsoft Word 10">
+<title>TITLE</title>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PlaceType"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PlaceName"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="country-region"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="place"/>
+<!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:GrammarState>Clean</w:GrammarState>
+  <w:Compatibility>
+   <w:BreakWrappedTables/>
+   <w:SnapToGridInCell/>
+   <w:WrapTextWithPunct/>
+   <w:UseAsianBreakRules/>
+  </w:Compatibility>
+  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
+ </w:WordDocument>
+</xml><![endif]--><!--[if !mso]><object
+ classid="clsid:38481807-CA0E-42D2-BF39-B33AF135CC4D" id=ieooui></object>
+<style>
+st1\\:*{behavior:url(#ieooui) }
+</style>
+<![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+ \@font-face
+	{font-family:AnmolLipi;
+	panose-1:0 0 4 0 0 0 0 0 0 0;
+	mso-font-charset:0;
+	mso-generic-font-family:auto;
+	mso-font-pitch:variable;
+	mso-font-signature:3 0 0 0 1 0;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.MsoPlainText, li.MsoPlainText, div.MsoPlainText
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Courier New";
+	mso-fareast-font-family:"Times New Roman";}
+\@page Section1
+	{size:595.3pt 841.9pt;
+	margin:72.0pt 57.6pt 72.0pt 57.6pt;
+	mso-header-margin:35.4pt;
+	mso-footer-margin:35.4pt;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+<!--[if gte mso 10]>
+<style>
+ /* Style Definitions */
+ table.MsoNormalTable
+	{mso-style-name:"Table Normal";
+	mso-tstyle-rowband-size:0;
+	mso-tstyle-colband-size:0;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-padding-alt:0cm 5.4pt 0cm 5.4pt;
+	mso-para-margin:0cm;
+	mso-para-margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";}
+</style>
+<![endif]-->
+</head>
+
+<body lang=EN-GB style='tab-interval:36.0pt'>
+
+<div class=Section1>
+
+<p class=MsoPlainText>
+
+$str
+
+</p>
+
+</div>
+
+</body>
+
+</html>
+EOF
+}
+

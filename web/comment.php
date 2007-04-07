@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.41 2006-12-22 21:13:57 matthew Exp $
+ * $Id: comment.php,v 1.42 2007-04-07 09:03:01 matthew Exp $
  * 
  */
 
@@ -117,16 +117,21 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     /* Actually post the comment. Guard against double-insertion. */
     $id = db_getOne('select id from comment where id = ? for update', $comment_id);
     if (is_null($id)) {
+        $hidden = false;
+        $text_click = ms_make_clickable($q_text);
+        $text_no_links = preg_replace('#<a.*?</a>#s', '', $text_click);
+        if (substr_count($text_click, '<a') > 4 && strlen($text_no_links) / strlen($q_text) <= 0.5)
+            $hidden = true;
         db_query('
-                insert into comment (id, pledge_id, person_id, name, website, text)
+                insert into comment (id, pledge_id, person_id, name, website, text, ishidden)
                 values (
                     ?, ?,
                     ?, ?, ?,
-                    ?)',
+                    ?, ?)',
                 array(
                     $comment_id, $pledge_id,
                     $P->id(), $q_author_name, $q_author_website,
-                    $q_text
+                    $q_text, $hidden
                 ));
         if ($q_comment_alert_signup) {
             alert_signup($P->id(), "comments/ref", array('pledge_id' => $pledge->id()));

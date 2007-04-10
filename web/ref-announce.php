@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.54 2007-03-28 11:09:40 matthew Exp $
+ * $Id: ref-announce.php,v 1.55 2007-04-10 15:31:01 matthew Exp $
  * 
  */
 
@@ -131,7 +131,7 @@ else if (!is_null(db_getOne('select id from message where id = ?', $q_message_id
 /* Figure out which circumstance we should do a message for, and hence the
  * subject of the email. */
 if ($failed) {
-    $n = db_getOne("select id from message where PLEDGe_id = ? and circumstance = 'failure-announce' and $byarea_location_test", $p->id());
+    $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'failure-announce' and $byarea_location_test", $p->id());
     if (!is_null($n))
         /* Only get to send one announcement on failure. */
         refuse_announce($p, 'failure-announce');

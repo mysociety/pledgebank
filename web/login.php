@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.79 2007-02-03 03:24:33 francis Exp $
+ * $Id: login.php,v 1.80 2007-04-10 15:31:01 matthew Exp $
  * 
  */
 
@@ -312,7 +312,7 @@ function login_form($errors = array()) {
 <br>
 </p>
 
-<p><input type="submit" name="loginsubmit" value="Continue">
+<p><input type="submit" name="loginsubmit" value="<?=_('Continue')?>">
 </p>
 
 </div>

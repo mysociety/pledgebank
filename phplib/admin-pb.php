@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.147 2007-02-05 23:06:20 matthew Exp $
+ * $Id: admin-pb.php,v 1.148 2007-04-11 15:54:20 matthew Exp $
  * 
  */
 
@@ -508,7 +508,7 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         db_query('UPDATE signers set showname = ? where id = ?', 
             array(get_http_var('showname') ? true : false, $id));
         db_commit();
-	# TRANS: http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000078.html
+        # TRANS: http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000078.html
         print p(_('<em>Show name for signer updated</em>'));
     }
 
@@ -641,7 +641,7 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
             $pledge_id = get_http_var('send_announce_token_pledge_id');
             if (ctype_digit($pledge_id)) {
                 send_announce_token($pledge_id);
-		# TRANS: This is an admin message, printed when someone has pressed the button to send an email to a pledge creator letting them send an announcement message. (Matthew Somerville,  http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
+                # TRANS: This is an admin message, printed when someone has pressed the button to send an email to a pledge creator letting them send an announcement message. (Matthew Somerville,  http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
                 print p(_('<em>Announcement permission mail sent</em>'));
             }
         }
@@ -974,7 +974,7 @@ class ADMIN_PAGE_PB_STATS {
         print '</table>';
 
         print h2(_("Local alerts by country"));
-        $q = db_query('select country, 
+        $q = db_query('select country, state
             count(case when whendisabled is null then 1 else null end) as active, 
             count(whendisabled) as disabled, 
             date(min(whensubscribed)) as t1, date(max(whensubscribed)) as t2,
@@ -982,24 +982,42 @@ class ADMIN_PAGE_PB_STATS {
             from alert 
                 left join location on location.id = alert.location_id 
             where event_code = \'pledges/local\' 
-            group by country
-            order by country
+            group by country, state
+            order by country, state
             ');
 
         print '<table border="1" cellpadding="3" cellspacing="0">';
-        print '<tr><th>Country</th>
+        print '<tr><th>Country</th> <th>State</th>
             <th>Signups<br>(still active)</th>
             <th>Signups<br>(now unsubscribed)</th>
             <th>Signup date range</th>
             <th>Unsubscribe date range</th>
             </tr>';
         $n = 0;
+        $us_active = 0; $us_disabled = 0; $us_started = false;
         while ($r = db_fetch_array($q)) {
+            if ($r['country'] == 'US') {
+                $us_active += $r['active'];
+                $us_disabled += $r['disabled'];
+                $us_started = true;
+            }
+            if ($r['country'] != 'US' && $us_started) {
+                if ($n++%2)
+                    print '<tr>';
+                else 
+                    print '<tr class="v">';
+                print '<td>US</td>';
+                print '<td>Total</td>';
+                print "<td>$us_active</td> <td>$us_disabled</td>";
+                print "</tr>\n";
+                $us_started = false;
+            }
             if ($n++%2)
                 print '<tr>';
             else 
                 print '<tr class="v">';
             print '<td>'.htmlspecialchars($r['country']) . '</td>';
+            print '<td>'.htmlspecialchars($r['state']) . '</td>';
             print '<td>'.htmlspecialchars($r['active']) . '</td>';
             print '<td>'.htmlspecialchars($r['disabled']) . '</td>';
             print '<td>'.htmlspecialchars($r['t1']) . ' to '. htmlspecialchars($r['t2']) . '</td>';

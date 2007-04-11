@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.148 2007-04-11 15:54:20 matthew Exp $
+ * $Id: admin-pb.php,v 1.149 2007-04-11 15:55:59 matthew Exp $
  * 
  */
 
@@ -974,7 +974,7 @@ class ADMIN_PAGE_PB_STATS {
         print '</table>';
 
         print h2(_("Local alerts by country"));
-        $q = db_query('select country, state
+        $q = db_query('select country, state,
             count(case when whendisabled is null then 1 else null end) as active, 
             count(whendisabled) as disabled, 
             date(min(whensubscribed)) as t1, date(max(whensubscribed)) as t2,

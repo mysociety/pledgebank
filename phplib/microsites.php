@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.102 2007-03-26 11:58:03 matthew Exp $
+ * $Id: microsites.php,v 1.103 2007-04-11 19:36:01 matthew Exp $
  * 
  */
 
@@ -1278,6 +1278,8 @@ function microsites_example_date() {
             print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
         elseif ($lang=='de')
             print strftime('%e. %B %Y', $pb_time+60*60*24*28);
+        elseif ($lang=='zh')
+            print strftime('%Y&#24180;%m&#26376;%d&#26085;', $pb_time+60*60*24*28);
         else
             print strftime('%e %B %Y', $pb_time+60*60*24*28);
         print '"';

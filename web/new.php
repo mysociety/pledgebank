@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.175 2007-02-08 12:44:13 matthew Exp $
+// $Id: new.php,v 1.176 2007-04-23 13:50:53 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -95,19 +95,19 @@ function pledge_form_one($data = array(), $errors = array()) {
 
     if (get_http_var('streetparty')) {
         # Remember to change the error handling code down below if you change <MY STREET>
-        $data['title'] = _("organise a street party for <MY STREET>");
+        $data['title'] = "organise a street party for <MY STREET>";
         $data['target'] = 3;
-        $data['type'] = _('other people on <MY STREET>');
-        $data['signup'] = _('help organise it');
-        $data['identity'] = _('resident of <MY STREET>');
+        $data['type'] = 'other people on <MY STREET>';
+        $data['signup'] = 'help organise it';
+        $data['identity'] = 'resident of <MY STREET>';
     }
 
     if (get_http_var('picnic')) {
-        $data['title'] = _("organise a picnic this summer");
+        $data['title'] = "organise a picnic this summer";
         $data['target'] = 5;
-        $data['type'] = _('friends');
-        $data['signup'] = _('pledge to come along and bring food or drink');
-        $data['identity'] = _('picnic lover');
+        $data['type'] = 'friends';
+        $data['signup'] = 'pledge to come along and bring food or drink';
+        $data['identity'] = 'picnic lover';
     }
 
     global $pb_time;
@@ -614,7 +614,8 @@ function step1_error_check($data) {
     if (!$data['email']) $errors['email'] = _('Please enter your email address');
     if (!validate_email($data['email'])) $errors['email'] = _('Please enter a valid email address');
 
-    $mystreetmessage = htmlspecialchars(_('Please change <MY STREET> to the name of your street'));
+    # These strings deliberately not localised
+    $mystreetmessage = htmlspecialchars('Please change <MY STREET> to the name of your street');
     if (stristr($data['title'], "<MY STREET>")) $errors['title'] = $mystreetmessage;
     if (stristr($data['type'], "<MY STREET>")) $errors['type'] = $mystreetmessage;
     if (stristr($data['identity'], "<MY STREET>")) $errors['identity'] = $mystreetmessage;

@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.80 2007-04-10 15:31:01 matthew Exp $
+ * $Id: login.php,v 1.81 2007-04-23 10:37:16 francis Exp $
  * 
  */
 
@@ -302,7 +302,7 @@ function login_form($errors = array()) {
 <label for="rememberme"><?=_('Remember me') ?></label>
 <input type="checkbox" name="rememberme" id="rememberme" <?=$q_rememberme ? "checked" : ""?> onchange="check_login_password_radio()"><strong>
 </strong>
-<small><?=_("don't use this on a public or shared computer") ?></small>
+<small>(<?=_("don't use this on a public or shared computer") ?>)</small>
 </p>
 
 <p>

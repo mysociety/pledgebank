@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.22 2006-06-19 17:47:03 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.23 2007-05-01 10:10:46 francis Exp $';
 
 use strict;
 
@@ -35,9 +35,20 @@ use File::stat;
 use POSIX;
 use Time::HiRes qw(sleep);
 use utf8;
+use Locale::gettext;
+use POSIX qw(locale_h);
 
 use mySociety::DBHandle qw(dbh);
 use PB;
+
+# settup gettext
+my $domain = mySociety::Config::get('PB_GETTEXT_DOMAIN');
+my $gettext = Locale::gettext->domain_raw($domain) or die "failed to bind to gettext domain $domain";
+$gettext->dir("../../locale") or die "failed to change to locale directory";
+sub _ {
+    my ($s) = @_;
+    return $gettext->get($s);
+}
 
 # Where we stuff the graphs output.
 my $dir_hash_levels = 2;
@@ -155,6 +166,19 @@ while (my $q = new CGI::Fast()) {
             $start_date = sprintf('%04d-%02d-%02d', Add_Delta_YM(split(/-/, $end_date), -1, 0));
         }
 
+        # Set language to that of the pledge
+        my $iso_lang = 'en_GB';
+        my @available_langs = split(/\|/, mySociety::Config::get('PB_LANGUAGES'));
+        foreach my $available_lang (@available_langs) {
+            my ($loop_pb_code, $loop_name, $loop_iso) = split(/,/, $available_lang);
+            if ($P->{lang} eq $loop_pb_code) {
+                $iso_lang = $loop_iso;
+            }
+        }
+        $ENV{LANG} = $iso_lang . '.UTF-8';
+        $ENV{LANGUAGE} = $iso_lang . '.UTF-8';
+        setlocale(LC_ALL, $iso_lang . '.UTF-8') or die "failed to setlocale to $iso_lang.UTF-8"; # XXX not tested
+
         # Make sure the graph shows at least a few days.
         if (Delta_Days(split(/-/, $start_date), split(/-/, $end_date)) < 7) {
             $start_date = sprintf('%04d-%02d-%02d', Add_Delta_Days(split(/-/, $end_date), -7));
@@ -194,10 +218,13 @@ while (my $q = new CGI::Fast()) {
             # number of bars, but not too many or too few.
             my $length = Delta_Days(split(/-/, $start_date), split(/-/, $end_date));
             my $bucket = 'day';
+            my $bucket_label = _('signups per day');
             if ($length > 70) {
                 $bucket = 'week';
+                $bucket_label = _('signups per week');
             } elsif ($length > 500) {
                 $bucket = 'month';
+                $bucket_label = _('signups per month');
             }
 
             my ($h, $signers_file) = mySociety::Util::named_tempfile();
@@ -259,6 +286,8 @@ while (my $q = new CGI::Fast()) {
                 $datefmt = "%b '%y";
             }
 
+            my $total_label = _("total number of signers");
+
             # XXX problems: fractional tic intervals; sometimes x tics are too
             # close together; look of graph when there are very few signups.
             g(<<EOF
@@ -279,10 +308,10 @@ set nokey
 set xtics nomirror
 set ytics nomirror tc lt 2
 set y2tics
-set y2label "total number of signers"
+set y2label $total_label
 set tics out
 set format x '$datefmt'
-set ylabel 'signups per $bucket' tc lt 1
+set ylabel $bucket_label tc lt 1
 plot "$signuprate_file" using 1:2 with impulses lt 1 lw 15, "$signers_file" using 1:2 axes x1y2 with steps lt -1 lw 1
 show output
 system "mv $graphfile.new $graphfile"

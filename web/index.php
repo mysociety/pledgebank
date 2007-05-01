@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.251 2007-02-01 16:29:07 matthew Exp $
+// $Id: index.php,v 1.252 2007-05-01 21:14:01 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -199,14 +199,14 @@ function list_frontpage_pledges() {
     }
 
     if (count($pledges) < 4) {
-        $foriegn_more = 4 - count($pledges);
+        $foreign_more = 4 - count($pledges);
         $pledges = get_pledges_list("
                     cached_prominence = 'frontpage' AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
-                    LIMIT $foriegn_more", array('global'=>false,'main'=>false,'foreign'=>true,'showcountry'=>true));
+                    LIMIT $foreign_more", array('global'=>false,'main'=>false,'foreign'=>true,'showcountry'=>true));
         if ($pledges) {
             print p(_("Interesting pledges from other countries"));
             print '<ol>' . join("",$pledges) . '</ol>';
@@ -222,12 +222,23 @@ function list_successful_pledges() {
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list/succeeded"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of successful pledges') ?>"></a><?
     print h2(_('Recent successful pledges'));
 
+    // Try to avoid global pledges
     $pledges = get_pledges_list("
                 (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
                 pin IS NULL AND 
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC
-                LIMIT 11", array('global'=>true, 'main'=>true,'foreign'=>false,'showcountry'=>false));
+                LIMIT 11", array('global'=>false, 'main'=>true,'foreign'=>false,'showcountry'=>false));
+    // Include global pledges if we need them
+    if (count($pledges) < 11) {
+        $pledges = get_pledges_list("
+            (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
+            pin IS NULL AND 
+            whensucceeded IS NOT NULL
+            ORDER BY whensucceeded DESC
+            LIMIT 11", array('global'=>true, 'main'=>true,'foreign'=>false,'showcountry'=>false));
+   }
+
     $more = false;
     if (!$pledges) {
         pb_print_no_featured_link();

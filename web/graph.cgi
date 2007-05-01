@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.24 2007-05-01 15:02:52 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.25 2007-05-01 15:32:55 matthew Exp $';
 
 use strict;
 
@@ -167,6 +167,7 @@ while (my $q = new CGI::Fast()) {
 
         # Set language to that of the pledge
         mySociety::Locale::change($P->{lang});
+        my $locale = $mySociety::Locale::langmap{$P->{lang}}.'.UTF-8';
 
         # Make sure the graph shows at least a few days.
         if (Delta_Days(split(/-/, $start_date), split(/-/, $end_date)) < 7) {
@@ -281,6 +282,7 @@ while (my $q = new CGI::Fast()) {
             # close together; look of graph when there are very few signups.
             g(<<EOF
 reset
+set locale '$locale'
 set term png enhanced size 500,300 xffffff x000000 xaaaaaa x9c7bbd x522994 x21004a font $gnuplot_font_face 9
 set output '$graphfile.new'
 set timefmt '%Y-%m-%d'

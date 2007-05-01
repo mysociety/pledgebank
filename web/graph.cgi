@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.23 2007-05-01 10:10:46 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.24 2007-05-01 15:02:52 matthew Exp $';
 
 use strict;
 
@@ -35,20 +35,17 @@ use File::stat;
 use POSIX;
 use Time::HiRes qw(sleep);
 use utf8;
-use Locale::gettext;
 use POSIX qw(locale_h);
 
 use mySociety::DBHandle qw(dbh);
+use mySociety::Locale;
+use mySociety::WatchUpdate;
 use PB;
 
-# settup gettext
+# Language setup
+my $languages = mySociety::Config::get('PB_LANGUAGES');
 my $domain = mySociety::Config::get('PB_GETTEXT_DOMAIN');
-my $gettext = Locale::gettext->domain_raw($domain) or die "failed to bind to gettext domain $domain";
-$gettext->dir("../../locale") or die "failed to change to locale directory";
-sub _ {
-    my ($s) = @_;
-    return $gettext->get($s);
-}
+mySociety::Locale::gettext_domain($domain);
 
 # Where we stuff the graphs output.
 my $dir_hash_levels = 2;
@@ -118,10 +115,12 @@ sub g ($) {
         or die "write to gnuplot: $!";
 }
 
+my $W = new mySociety::WatchUpdate();
 while (my $q = new CGI::Fast()) {
     try {
-        my $pledge_id = $q->param('pledge_id');
+        mySociety::Locale::negotiate_language($languages);
 
+        my $pledge_id = $q->param('pledge_id');
         throw PB::Error("No pledge_id specified")
             if (!defined($pledge_id));
         throw PB::Error("Invalid pledge_id '$pledge_id'")
@@ -167,17 +166,7 @@ while (my $q = new CGI::Fast()) {
         }
 
         # Set language to that of the pledge
-        my $iso_lang = 'en_GB';
-        my @available_langs = split(/\|/, mySociety::Config::get('PB_LANGUAGES'));
-        foreach my $available_lang (@available_langs) {
-            my ($loop_pb_code, $loop_name, $loop_iso) = split(/,/, $available_lang);
-            if ($P->{lang} eq $loop_pb_code) {
-                $iso_lang = $loop_iso;
-            }
-        }
-        $ENV{LANG} = $iso_lang . '.UTF-8';
-        $ENV{LANGUAGE} = $iso_lang . '.UTF-8';
-        setlocale(LC_ALL, $iso_lang . '.UTF-8') or die "failed to setlocale to $iso_lang.UTF-8"; # XXX not tested
+        mySociety::Locale::change($P->{lang});
 
         # Make sure the graph shows at least a few days.
         if (Delta_Days(split(/-/, $start_date), split(/-/, $end_date)) < 7) {
@@ -308,10 +297,10 @@ set nokey
 set xtics nomirror
 set ytics nomirror tc lt 2
 set y2tics
-set y2label $total_label
+set y2label "$total_label"
 set tics out
 set format x '$datefmt'
-set ylabel $bucket_label tc lt 1
+set ylabel '$bucket_label' tc lt 1
 plot "$signuprate_file" using 1:2 with impulses lt 1 lw 15, "$signers_file" using 1:2 axes x1y2 with steps lt -1 lw 1
 show output
 system "mv $graphfile.new $graphfile"
@@ -397,4 +386,5 @@ EOF
         }
         $E->throw();
     };
+    $W->exit_if_changed();
 }

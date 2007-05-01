@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: PB.pm,v 1.9 2006-06-19 17:47:02 francis Exp $
+# $Id: PB.pm,v 1.10 2007-05-01 15:02:52 matthew Exp $
 #
 
 package PB::Error;
@@ -71,4 +71,20 @@ sub Time () {
     return time() + int($time_offset);
 }
 
+# Extract language from URL.
+# OPTION_WEB_HOST . OPTION_WEB_DOMAIN - default
+# xx . OPTION_WEB_DOMAIN - xx is an ISO 639-1 country code
+# xx . yy . OPTION_WEB_DOMAIN - xx is a country code, yy a language code (either aa or aa-bb)
+sub extract_domain_lang {
+    my $domain_lang;
+    my $host = lc $ENV{HTTP_HOST};
+    my $web = mySociety::Config::get('WEB_HOST');
+    my $re_lang = '(..(?:-..)?)';
+    if ($web eq 'www') {
+        $domain_lang = $1 if $host =~ /^(?:[^.]+|www)\.$re_lang\./;
+    } else {
+        $domain_lang = $1 if $host =~ /^(?:[^.]+)\.$re_lang\.$web\./;
+    }
+    return $domain_lang;
+}
 1;

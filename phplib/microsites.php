@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.103 2007-04-11 19:36:01 matthew Exp $
+ * $Id: microsites.php,v 1.104 2007-05-01 17:22:00 matthew Exp $
  * 
  */
 
@@ -674,6 +674,7 @@ limit to the number of Promises you make</li>
 </ol>
 </div>
 EOF;
+
     } else {
         print _("Did you read the tips at the top of the page? They'll help you make a successful pledge.");
     }

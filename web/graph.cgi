@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.25 2007-05-01 15:32:55 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.26 2007-05-01 16:24:40 matthew Exp $';
 
 use strict;
 
@@ -96,6 +96,9 @@ sub spawn_gnuplot_if_necessary () {
             # NB this means that we won't see any error output
             # from gnuplot, but the alternative is to accept
             # screeds of irrelevant crap from it.
+	    # 
+	    # XXX: The above isn't working, gnuplot's STDERR is
+	    # still being written to /var/log/apache/error.log
         }
         { exec($gnuplot_bin); }
         exit(1);

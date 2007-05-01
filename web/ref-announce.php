@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.55 2007-04-10 15:31:01 matthew Exp $
+ * $Id: ref-announce.php,v 1.56 2007-05-01 14:37:42 matthew Exp $
  * 
  */
 
@@ -142,7 +142,7 @@ if ($failed) {
         else 
             $email_subject = sprintf(_("Sorry - pledge failed - '%s'"), $p->title() );
     }
-} else if ($succeeded) {
+} elseif ($succeeded) {
     $n = db_getOne("select id from message where pledge_id = ? and circumstance = 'success-announce' and $byarea_location_test", $p->id());
     if (is_null($n))
         $circumstance = 'success-announce'; /* also send SMS */
@@ -299,6 +299,9 @@ if (!sizeof($errors) && $q_submit) {
             printf(_('Write a message to the %d %s who have signed your pledge in %s.'), $howmany, htmlspecialchars($p->type()), $byarea_location_description);
         else
             printf(_('Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
+    }
+    if ($failed) {
+        print p(strong(_('Please note you can only send one failure announcement message to your signers.')));
     }
     if ($p->open()) {
         if ($byarea_location_id) 

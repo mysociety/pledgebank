@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.56 2007-05-01 14:37:42 matthew Exp $
+ * $Id: ref-announce.php,v 1.57 2007-05-01 21:39:43 francis Exp $
  * 
  */
 
@@ -301,7 +301,7 @@ if (!sizeof($errors) && $q_submit) {
             printf(_('Write a message to the %d %s who have signed your pledge.'), $howmany, htmlspecialchars($p->type()));
     }
     if ($failed) {
-        print p(strong(_('Please note you can only send one failure announcement message to your signers.')));
+        print "</p><p>" . strong(_('Please note you can only send one failure announcement message to your signers.'));
     }
     if ($p->open()) {
         if ($byarea_location_id) 

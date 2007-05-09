@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.104 2007-05-01 17:22:00 matthew Exp $
+ * $Id: microsites.php,v 1.105 2007-05-09 09:37:15 francis Exp $
  * 
  */
 
@@ -52,7 +52,7 @@ $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 /* These are listed on /where */
 $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countries in all languages'),
                                 'london' => _('London (United Kingdom)'),
-                                'global-cool' => _('Global Cool (One by One, Ton by Ton)'),
+                                /* 'global-cool' => _('Global Cool (One by One, Ton by Ton)'), */
                                 'catcomm' => _('Catalytic Communities')
                                 );
 

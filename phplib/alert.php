@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.34 2007-02-01 16:29:06 matthew Exp $
+// $Id: alert.php,v 1.35 2007-05-10 15:52:10 timsk Exp $
 
 require_once '../phplib/pbperson.php';
 require_once '../../phplib/mapit.php';
@@ -207,7 +207,8 @@ function alert_list_comments($person_id) {
             and whendisabled is null', $person_id);
     if (0 != db_num_rows($s)) {
         print h2(_("Comment alerts"));
-        print _("You will get email when there are:<ul>");
+        print p(_("You will get email when there are:"));
+	print '<ul>';
         while ($row = db_fetch_array($s)) {
             $description = ucfirst(alert_h_description($row['id']));
     ?>
@@ -221,7 +222,6 @@ function alert_list_comments($person_id) {
     <?
         }
         print "</ul>";
-        print '<p>';
     }
 }
 

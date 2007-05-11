@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.58 2007-03-22 20:49:16 matthew Exp $
+ * $Id: comments.php,v 1.59 2007-05-11 11:45:49 matthew Exp $
  * 
  */
 
@@ -31,7 +31,7 @@ function comments_format_timestamp($time) {
 /* comments_show_one COMMENT [NOABUSE] [ADMIN]
  * Given COMMENT, an associative array containing fields 'text', 'name' and
  * 'website' (and optional fields 'id', the comment ID, and 'whenposted', the
- * posting time in seconds since the epoch), print HTML for the comment
+ * posting time in seconds before now), print HTML for the comment
  * described. If NOABUSE is true, don't show the link for reporting an abusive
  * comment. If ADMIN is true display email address and form for changing hidden
  * status.
@@ -59,14 +59,14 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
         $r = '<a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a>';
         if (isset($comment['whenposted'])) {
 	    # TRANS: "blah, blah, this is a comment. - To pledge artnotads by Matthew at 08:00 today." (Matthew Somerville in http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000099.html)
-            printf(_('To pledge %s by %s at %s.'), $r, $name, prettify($comment['whenposted']));
+            printf(_('To pledge %s by %s, %s.'), $r, $name, prettify_duration($comment['whenposted']));
         } else {
             printf(_('To pledge %s by %s.'), $r, $name);
         }
     } else {
         /* Format the time sanely. */
         if (isset($comment['whenposted'])) {
-            printf(_('%s at %s.'), $name, prettify($comment['whenposted']));
+            printf(_('%s, %s.'), $name, prettify_duration($comment['whenposted']));
         } else {
             print $name;
         }
@@ -117,12 +117,12 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
         print '<ul class="commentslist">';
 
         $query = '
-                    select id, extract(epoch from whenposted) as whenposted,
+                    select id, extract(epoch from ms_current_timestamp()-whenposted) as whenposted,
                         text, name, website, pledge_id
                     from comment
                     where comment.pledge_id = ?
                         and not ishidden
-                    order by whenposted';
+                    order by whenposted desc';
         if ($limit) {
             $query .= " LIMIT " . $limit . " OFFSET " . ($count - $limit);
         }
@@ -149,7 +149,7 @@ function comments_summary($r) {
     $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . htmlspecialchars($text) . '</a>';
     
     # TRANS: "<start of comment text...> by <name>, on <pledge reference link> at <time>" - these are the strings under Latest comments on the front page. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
-    return sprintf(_('%s by %s, on %s at %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify($r['whenposted']));
+    return sprintf(_('%s by %s, on %s, %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify_duration($r['whenposted']));
 }
 
 /* comments_rss_entry COMMENT 
@@ -199,7 +199,7 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
     $sql_params[] = $comments_to_show;
     $q = db_query("
                 SELECT comment.id,
-                    extract(epoch from whenposted) as whenposted, text,
+                    extract(epoch from ms_current_timestamp()-whenposted) as whenposted, text,
                     comment.name, website, ref
                 FROM comment, pledges, location
                 WHERE comment.pledge_id = pledges.id
@@ -208,7 +208,7 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
                     AND pin IS NULL
                     AND pledges.cached_prominence <> 'backpage'
                     AND ($site_limit)
-                ORDER BY whenposted DESC
+                ORDER BY whenposted
                 LIMIT ?", $sql_params);
     $num = db_num_rows($q);
     if ($num > 0) {
@@ -250,13 +250,13 @@ function comments_show_admin($pledge, $limit = 0) {
     else {
         print '<ul class="commentslist">';
 
-        $query = ' select comment.id, extract(epoch from whenposted) as whenposted,
+        $query = ' select comment.id, extract(epoch from ms_current_timestamp()-whenposted) as whenposted,
                         text, comment.name, comment.website, ishidden, pledge_id,
                         person.email as email
                     from comment
                     left join person on comment.person_id = person.id
                     where comment.pledge_id = ?
-                    order by whenposted desc';
+                    order by whenposted';
         if ($limit) {
             $query .= " LIMIT " . $limit;
         }
@@ -351,6 +351,25 @@ type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ?
 <? } ?>
 </form>
 <?
+}
+
+function prettify_duration($s) {
+    $s = floor(($s+30)/60); # Nearest minute
+    $weeks = floor($s / (60*24*7));
+    $days = floor($s / (60*24));
+    $hours = floor($s / (60));
+    $minutes = floor($s);
+    # XXX: years?
+    if ($s >= 60*24*7*2)
+        return sprintf(ngettext('%d week ago', '%d weeks ago', $weeks), $weeks);
+    elseif ($s >= 60*24)
+        return sprintf(ngettext('%d day ago', '%d days ago', $days), $days);
+    elseif ($s >= 60)
+        return sprintf(ngettext('%d hour ago', '%d hours ago', $hours), $hours);
+    elseif ($s >= 1)
+        return sprintf(ngettext('%d minute ago', '%d minutes ago', $minutes), $minutes);
+    else
+        return _('less than a minute ago');
 }
 
 ?>

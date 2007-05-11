@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.64 2007-03-19 09:07:39 matthew Exp $
+// $Id: search.php,v 1.65 2007-05-11 11:45:49 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -268,7 +268,7 @@ function search($search) {
     // Comments
     $comments_to_show = 10;
     $q = db_query('SELECT comment.id,
-                          extract(epoch from whenposted) as whenposted,
+                          extract(epoch from ms_current_timestamp()-whenposted) as whenposted,
                           text,comment.name,website,ref 
                    FROM comment,pledges 
                    WHERE pin IS NULL
@@ -276,7 +276,7 @@ function search($search) {
                         AND comment.pledge_id = pledges.id 
                         AND NOT ishidden 
                         AND text ILIKE \'%\' || ? || \'%\'
-                   ORDER BY whenposted DESC', array($search));
+                   ORDER BY whenposted', array($search));
     if (db_num_rows($q)) {
         $success = 1;
         print sprintf(p(_("Results for <strong>comments</strong> matching <strong>%s</strong>:")), htmlspecialchars($search) );

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.57 2007-03-17 17:10:58 matthew Exp $
+// $Id: contact.php,v 1.58 2007-05-11 11:45:49 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -61,7 +61,7 @@ function contact_form($errors = array()) {
     if ($comment_id) {
         print p(_('You are reporting the following comment:'));
         print '<blockquote>';
-        $row = db_getRow('select *,extract(epoch from whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
+        $row = db_getRow('select *,extract(epoch from ms_current_timestamp()-whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
         if ($row)
             print comments_show_one($row, true);
         else

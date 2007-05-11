@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.42 2007-04-07 09:03:01 matthew Exp $
+ * $Id: comment.php,v 1.43 2007-05-11 11:45:49 matthew Exp $
  * 
  */
 
@@ -165,7 +165,7 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
         print '<ul class="commentslist"><li class="comment">';
         comments_show_one(array('name' => $q_author_name, 'email' => $q_author_email, 
                 'website' => $q_author_website, 'text' => $q_text, 
-                'whenposted' => strval($pb_time), 'pledge_id' => $pledge->id()));
+                'whenposted' => 0, 'pledge_id' => $pledge->id()));
         print '</li></ul></div></div>';
     }
 

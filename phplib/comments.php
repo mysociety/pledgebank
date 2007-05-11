@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.59 2007-05-11 11:45:49 matthew Exp $
+ * $Id: comments.php,v 1.60 2007-05-11 15:31:25 francis Exp $
  * 
  */
 
@@ -355,12 +355,17 @@ type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ?
 
 function prettify_duration($s) {
     $s = floor(($s+30)/60); # Nearest minute
+    $years = floor($s / (60*24*365));
+    $months = floor($s / (60*24*(365/12.0)));
     $weeks = floor($s / (60*24*7));
     $days = floor($s / (60*24));
     $hours = floor($s / (60));
     $minutes = floor($s);
-    # XXX: years?
-    if ($s >= 60*24*7*2)
+    if ($s >= 60*24*365*2)
+        return sprintf(ngettext('%d year ago', '%d years ago', $years), $years);
+    elseif ($s >= 60*24*(365/12)*2)
+        return sprintf(ngettext('%d month ago', '%d months ago', $months), $months);
+    elseif ($s >= 60*24*7*2)
         return sprintf(ngettext('%d week ago', '%d weeks ago', $weeks), $weeks);
     elseif ($s >= 60*24)
         return sprintf(ngettext('%d day ago', '%d days ago', $days), $days);

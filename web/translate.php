@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: translate.php,v 1.9 2007-03-20 01:00:58 timsk Exp $
+// $Id: translate.php,v 1.10 2007-05-13 17:36:59 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../../phplib/utility.php';
@@ -104,7 +104,7 @@ Save the following link to somewhere on your computer
 <a href="https://secure.mysociety.org/cvstrac/getfile/mysociety/locale/PledgeBank.po">Translation file</a>.
 (If you left click on the link, you can File-&gt;Save As... and then click Back to get back here.)') ?>
 
-<li><?=('<strong>Opening the file:</strong>
+<li><?=_('<strong>Opening the file:</strong>
 Open Notepad (Start-&gt;Programs-&gt;Accessories-&gt;Notepad), go to File-&gt;Open and open up the file you have just downloaded.
 <em>Don\'t be worried by the size of this file!</em>
 You do not have to translate every line before sending

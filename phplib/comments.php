@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.60 2007-05-11 15:31:25 francis Exp $
+ * $Id: comments.php,v 1.61 2007-05-13 18:06:27 timsk Exp $
  * 
  */
 
@@ -58,14 +58,18 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
     if (isset($comment['ref'])) {
         $r = '<a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a>';
         if (isset($comment['whenposted'])) {
-	    # TRANS: "blah, blah, this is a comment. - To pledge artnotads by Matthew at 08:00 today." (Matthew Somerville in http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000099.html)
+	    # TRANS: This appears immediately after a comment, to show who wrote it when, as: "To pledge <pledge reference> by <person's name>, <how long ago>."
+	    # TRANS: e.g. "blah, blah, this is a comment. - To pledge artnotads by Matthew, 3 hours ago."
             printf(_('To pledge %s by %s, %s.'), $r, $name, prettify_duration($comment['whenposted']));
         } else {
+	    # TRANS: This is a shortened version of the above string: "To pledge <pledge reference> by <person's name>."
             printf(_('To pledge %s by %s.'), $r, $name);
         }
     } else {
         /* Format the time sanely. */
         if (isset($comment['whenposted'])) {
+	    # TRANS: This appears immediately after a comment, to show who wrote it when, as: "<person's name>, <how long ago>."
+	    # TRANS: e.g. "Matthew, 4 minutes ago."
             printf(_('%s, %s.'), $name, prettify_duration($comment['whenposted']));
         } else {
             print $name;
@@ -106,6 +110,7 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
         $id = db_getOne('select id from pledges where ref = ?', $pledge);
 
     if (is_null($id))
+	# TRANS: this is an error message meaning, "The pledge called '%s' doesn't exist.
         err(sprintf(_("No pledge '%s'"), $pledge));
 
     print '<div class="commentsbox">';
@@ -148,7 +153,8 @@ function comments_summary($r) {
     if (strlen($text) > 20) $text = trim_characters($text, 0, 30);
     $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . htmlspecialchars($text) . '</a>';
     
-    # TRANS: "<start of comment text...> by <name>, on <pledge reference link> at <time>" - these are the strings under Latest comments on the front page. (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
+    # TRANS: This appears under "Latest comments" on the front page as: "<start of comment text...> by <name>, on <pledge reference link>, <how long ago>"
+    # TRANS: e.g. "Most of my veg are British..." by Esther, on ukfood, 3 hours ago"
     return sprintf(_('%s by %s, on %s, %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify_duration($r['whenposted']));
 }
 
@@ -159,6 +165,8 @@ function comments_rss_entry($r) {
     if (strlen($text) > 250) $text = trim_characters($text, 0, 250);
     
     return array(
+	  # TRANS: this appears in an RSS feed as: "Comment on <pledge reference> pledge by <person's name>"
+	  # TRANS: e.g. "Comment on Electric pledge by Owen Blacker"
           'title' => sprintf(_('Comment on %s pledge by %s'), $r['ref'], htmlspecialchars($r['name'])),
           'link' => pb_domain_url(array('explicit'=>true, 'path'=>"/". $r['ref'] . '#comment_' . $r['id'])),
           'description' => htmlspecialchars($text),

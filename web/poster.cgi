@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.102 2007-02-27 11:58:40 matthew Exp $
+# $Id: poster.cgi,v 1.103 2007-05-14 12:38:12 timsk Exp $
 #
 
 import sys
@@ -112,7 +112,7 @@ def microsites_poster_logo(c, x1, y1, w, h_purple, p_footer):
     else:
         # Logo for main PledgeBank
         story = [
-            Paragraph(_('<font color="#ffffff">Pledge</font>Bank.com'), p_footer)
+            Paragraph(_('<font color="#ffffff">Pledge</font>Bank.com').encode('utf-8'), p_footer)
         ]
         f = Frame(x1, y1+0.1*h_purple, w, h_purple, showBoundary = 0, id='Footer',
                 topPadding = 0, bottomPadding = 0)
@@ -182,6 +182,7 @@ font_dir = mysociety.config.get('PB_FONTS')
 myRegisterFont(ttfonts.TTFont('Rockwell', font_dir + '/rock.ttf'))
 myRegisterFont(ttfonts.TTFont('Rockwell-Bold', font_dir + '/rockb.ttf'))
 pdfmetrics.registerFont(ttfonts.TTFont('Transport', font_dir + '/transport.ttf'))
+pdfmetrics.registerFont(ttfonts.TTFont('SimHei', font_dir + '/simhei.ttf'))
 addMapping('rockwell', 0, 0, 'Rockwell')
 addMapping('rockwell', 1, 0, 'Rockwell-Bold')
 addMapping('rockwell', 0, 1, 'Rockwell')
@@ -399,6 +400,9 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
         heading_font = 'Trebuchet MS'
         main_font = 'Georgia'
+    elif iso_lang == 'zh_CN':
+        heading_font = 'SimHei'
+        main_font = 'SimHei'
     else:
         heading_font = 'Transport'
         main_font = 'Rockwell'
@@ -698,6 +702,8 @@ while fcgi.isFCGI():
             pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         elif iso_lang == 'eo_XX':
             pledge['date'] = date.strftime("la %e-a de %B %Y")
+	elif iso_lang == 'zh_CN':
+	    pledge['date'] = date.strftime("%Y\xe5\xb9\xb4%m\xe6\x9c\x88%d\xe6\x97\xa5")
         else:
             pledge['date'] = date.strftime("%e %B %Y")
         if pledge['signup'].decode('utf-8') == u"do the same":

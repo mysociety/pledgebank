@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.50 2007-02-06 16:25:29 matthew Exp $
+// $Id: faq.php,v 1.51 2007-05-15 00:37:42 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -141,8 +141,9 @@ function default_faq() {
     Richard Pope,
     Matthew Somerville,
     Tom Steinberg.
+    '));
 
-    <strong>Translations by</strong>
+    print dd(_('<strong>Translations by</strong>
     Nic Dafis (Welsh),
     Hugo Caballero Figueroa (Spanish),
     Tim Morley (Esperanto),
@@ -150,9 +151,12 @@ function default_faq() {
     LaPingvino and Leo De Cooman (Dutch),
     Creso Moraes (Brazilian Portuguese),
     Alexander Markushin (Russian),
-    maidan.org.ua team (Ukrainian).
+    maidan.org.ua team (Ukrainian),
+    Oliver Ding, Isaac Mao, Danny Yu, Nan Yang, Jacky Peng (Chinese),
+    Aliaksej Lavońčyk (Belarusian).
+    '));
 
-    <strong>Thanks also to</strong>
+    print dd(_('<strong>Thanks also to</strong>
     <a href="http://www.c360uk.com/">c360</a> (for SMS in the UK), 
     the <a href="http://earth-info.nga.mil/gns/html/">US military</a> (for the world gazetteer),
     <a href="http://sedac.ciesin.columbia.edu/gpw/">CIESIN</a> (for population density data),

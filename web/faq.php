@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.51 2007-05-15 00:37:42 timsk Exp $
+// $Id: faq.php,v 1.52 2007-05-16 11:27:08 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -82,8 +82,11 @@ function default_faq() {
 
     print dd(sprintf(_("The site is free to use, no matter how big a pledge you create. PledgeBank
     is run by a charitable organisation, though, so if you want to run an
-    especially big pledge, and feel like making a contribution, please contact us.
-    SMS messages to PledgeBank (available in %s only) cost your normal text fee."), sms_countries_description()));
+    especially big pledge, and feel like making a contribution, please <a
+    <a href=\"/contact\">contact us</a> or
+    <a href=\"https://secure.mysociety.org/donate/\">make a donation directly</a>.
+    SMS messages to PledgeBank (available in %s only) cost your normal text fee."),
+    sms_countries_description()));
 
     print "</dl>\n";
 

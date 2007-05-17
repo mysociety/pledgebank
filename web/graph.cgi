@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.27 2007-05-17 12:46:43 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.28 2007-05-17 13:12:55 matthew Exp $';
 
 use strict;
 
@@ -281,10 +281,12 @@ while (my $q = new CGI::Fast()) {
             my $graphfile = "$graph_dir/$filename";
 
             my $datefmt = '%d %b';
-                # XXX really we should do something more sensible, like
-                # labelling the month only when it changes.
-            if ($bucket eq 'month') {
-                $datefmt = "%b '%y";
+            # XXX really we should do something more sensible, like
+            # labelling the month only when it changes.
+            $datefmt = "%b '%y" if $bucket eq 'month';
+            if ($locale eq 'zh_CN.UTF-8') {
+                $datefmt = "%b%d\xe6\x97\xa5"; # XXX Must be somewhere in locale with this?
+                $datefmt = "%b '%y" if $bucket eq 'month';
             }
 
             my $total_label = _("total number of signers");

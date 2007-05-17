@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.46 2006-11-03 20:59:05 francis Exp $
+ * $Id: general-example,v 1.47 2007-05-17 12:48:25 matthew Exp $
  * 
  */
 
@@ -74,6 +74,7 @@ define('OPTION_PB_FONTS', "/home/francis/devel/mysociety/pb/fonts");
 define('OPTION_GNUPLOT_PATH', '/software/bin/gnuplot');
 // The TrueType font used to write axis labels in gnuplot
 define('OPTION_GNUPLOT_FONT', '/usr/X11R6/lib/X11/fonts/TTF/arial.ttf');
+define('OPTION_GNUPLOT_FONT_ZH', '/path/to/chinese/font');
 // Where cache of rendered graphs should go, and where it appears on the
 // web. No trailing '/', in either case.
 define('OPTION_PB_GRAPH_DIR', "/path/to/somehere/graphs");

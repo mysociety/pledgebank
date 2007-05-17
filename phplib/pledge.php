@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.219 2007-03-16 15:08:45 matthew Exp $
+ * $Id: pledge.php,v 1.220 2007-05-17 13:30:39 matthew Exp $
  * 
  */
 
@@ -445,9 +445,9 @@ class Pledge {
 <?      if ($this->signers() >= 0) {
             print '<i>';
             if ($this->finished())
-                printf(ngettext('%s person signed up', '%s people signed up', $this->signers()), prettify($this->signers()));
+                printf(ngettext('%s person signed up', '%s people signed up', $this->signers()), prettify_num($this->signers()));
             else
-                printf(ngettext('%s person has signed up', '%s people have signed up', $this->signers()), prettify($this->signers()));
+                printf(ngettext('%s person has signed up', '%s people have signed up', $this->signers()), prettify_num($this->signers()));
             if ($this->byarea()) {
                 print ', ';
                 print sprintf(
@@ -571,9 +571,9 @@ class Pledge {
                 $s = sprintf(_("I will %s."), $title);
             }
         } elseif ($firstperson === "includename") {
-            $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify($r['target']), $r['type'], $signup);
+            $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify_num($r['target']), $r['type'], $signup);
         } else {
-            $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify($r['target']), $r['type'], $signup);
+            $s = sprintf(_("I will %s but only if <strong>%s</strong> %s will %s."), $title, prettify_num($r['target']), $r['type'], $signup);
         }
 
         if (!$html or array_key_exists('href', $params))
@@ -725,7 +725,7 @@ class Pledge {
                         $this->byarea_successes()), $this->byarea_successes());
             $text .= ', ';
             if ($this->daysleft() == 0)
-                $text .= 'pledge open until midnight tonight, London time.';
+                $text .= 'pledge open until midnight tonight, London time.'; # XXX Should be N hours left
             elseif ($this->daysleft() < 0) {
                 $text .= 'pledge closed.';
             } else {

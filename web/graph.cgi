@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.26 2007-05-01 16:24:40 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.27 2007-05-17 12:46:43 matthew Exp $';
 
 use strict;
 
@@ -57,11 +57,17 @@ die "graph output directory '$graph_dir' does not exist and cannot be created"
 my ($gnuplot_pid, $gnuplot_pipe, $gnuplot_uses);
 
 my $gnuplot_font = mySociety::Config::get('GNUPLOT_FONT');
+my $gnuplot_font_zh = mySociety::Config::get('GNUPLOT_FONT_ZH');
 die "font for axis labels in gnuplot should be an absolute pathname ending '.ttf', not '$gnuplot_font'"
     unless ($gnuplot_font =~ m#^/.+/[^/]+\.ttf$#);
 die "font file '$gnuplot_font' does not exist"
     unless (-e $gnuplot_font);
+die "font file '$gnuplot_font_zh' does not exist"
+    unless (-e $gnuplot_font_zh);
 my ($gnuplot_font_dir, $gnuplot_font_face) = ($gnuplot_font =~ m#^(/.+)/([^/]+)\.ttf$#);
+my ($gnuplot_font_dir_zh, $gnuplot_font_face_zh) = ($gnuplot_font_zh =~ m#^(/.+)/([^/]+)\.ttf$#);
+die 'Fonts must be in same directory'
+    unless $gnuplot_font_dir eq $gnuplot_font_dir_zh;
 
 # spawn_gnuplot_if_necessary
 # Ensure that we have a pipe to gnuplot.
@@ -96,9 +102,9 @@ sub spawn_gnuplot_if_necessary () {
             # NB this means that we won't see any error output
             # from gnuplot, but the alternative is to accept
             # screeds of irrelevant crap from it.
-	    # 
-	    # XXX: The above isn't working, gnuplot's STDERR is
-	    # still being written to /var/log/apache/error.log
+            # 
+            # XXX: The above isn't working, gnuplot's STDERR is
+            # still being written to /var/log/apache/error.log
         }
         { exec($gnuplot_bin); }
         exit(1);
@@ -171,6 +177,8 @@ while (my $q = new CGI::Fast()) {
         # Set language to that of the pledge
         mySociety::Locale::change($P->{lang});
         my $locale = $mySociety::Locale::langmap{$P->{lang}}.'.UTF-8';
+        my $locale_font_face = $locale eq 'zh_CN.UTF-8'
+            ? $gnuplot_font_face_zh : $gnuplot_font_face;
 
         # Make sure the graph shows at least a few days.
         if (Delta_Days(split(/-/, $start_date), split(/-/, $end_date)) < 7) {
@@ -286,7 +294,7 @@ while (my $q = new CGI::Fast()) {
             g(<<EOF
 reset
 set locale '$locale'
-set term png enhanced size 500,300 xffffff x000000 xaaaaaa x9c7bbd x522994 x21004a font $gnuplot_font_face 9
+set term png enhanced size 500,300 xffffff x000000 xaaaaaa x9c7bbd x522994 x21004a font $locale_font_face 9
 set output '$graphfile.new'
 set timefmt '%Y-%m-%d'
 set xdata time

@@ -1,15 +1,16 @@
-Subject: Reminder - Please send a message to your pledge signers - '<?=$values['title']?>'
+Subject: Reminder - Please write to your pledge signers - '<?=$values['title']?>'
 
 Congratulations!
 
 Your pledge reached its target three days ago.
 
-However, you haven't sent a message yet to all your signers to
-tell them what to do. Hit the link below to talk to them.
+We suggest that you write to the signers of your pledge to suggest some
+next steps. Click on the link below to talk to them.
 
 <?=$values['url']?>
 
-Why not ask your signers to take some photos of themselves fulfilling their
-pledge - we love to see PledgeBank in action.
+While you're at it, why not ask your signers to take some photos of themselves
+fulfilling their pledge - we love to see PledgeBank in action! Send any
+pictures to team@pledgebank.com
 
 <?=$values['signature']?>

@@ -6,9 +6,9 @@ We are pleased to tell you that your pledge reached its target for people in
 <?=$values['location_description']?> in the required time.  Your pledge reads:
 '<?=$values['sentence_first']?>'
 
-Next, please click on the link below and write a message to tell everyone who
-signed the pledge in <?=$values['location_description']?> what you want them to
-do next.
+Next, please click on the link below and write a message to suggest some next
+steps to everyone who signed the pledge in <?=$values['location_description']?>
+what you want them to do next.
 
 <?=$values['url']?>
 
@@ -16,6 +16,6 @@ There are now <?=$values['byarea_success_count']?> places where your pledge has
 been successful.
 
 We love getting photos of people fulfilling their pledges, so why not
-ask them to take some pics?
+ask them to take some pics? Send any pictures to team@pledgebank.com
 
 <?=$values['signature']?>

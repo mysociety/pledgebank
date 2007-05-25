@@ -6,11 +6,20 @@ We are pleased to tell you that your pledge <?=$values['exceeded_or_met']?> its
 target in the required time.  Your pledge reads: '<?=$values['sentence_first']?>'
 
 Next, please click on the link below and write a message to tell everyone who
-signed the pledge what you want them to do next.
+signed the pledge what next steps you have in mind.
 
 <?=$values['url']?>
 
-We love getting photos of people fulfilling their pledges, so why not
-ask them to take some pics?
+You may also want to consider, if it makes sense for your pledge and pledge
+signers, creating a Google group or Yahoo group to keep in touch after the
+action has been completed.  You can find instructions for creating a Google
+group at http://groups.google.com/ and for creating a Yahoo group at
+http://groups.yahoo.com/
+
+We love getting photos of people fulfilling their pledges, so why not ask them
+to take some pics? Send any pictures to team@pledgebank.com
+
+Thanks for using PledgeBank, and please continue creating and signing
+pledges!
 
 <?=$values['signature']?>

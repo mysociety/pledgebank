@@ -3,11 +3,11 @@ Subject: <?=$values['from_name']?> saw this pledge and thought of you
 <?=$values['from_name']?> <<?=$values['from_email']?>> thought you would
 be interested in a pledge by <?=$values['creator_name']?> to '<?=$values['title']?>'.
 Simply by clicking <?=$values['pledge_url']?> you can show the world that
-you're ready to start making a difference, alongside other like-minded people.
+you're ready to start making a difference, along with other like-minded people.
 
 <?=$values['creator_name']?>'s pledge will close on <?=$values['pretty_date']?>
 and it only needs the support of <?=$values['target']?> people before it
-goes into action.
+succeeds and goes into action.
 
 <?=$values['from_message']?><?=$values['pledgebank_url']?> is a site set up
 to give power to YOU, by allowing you to ensure that others will support

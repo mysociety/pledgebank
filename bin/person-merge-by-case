@@ -3,11 +3,11 @@
 # person-merge-by-case:
 # Fix up people so no two have the same email differing only by case.
 #
-# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
-# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+# Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+# Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: person-merge-by-case,v 1.1 2007-05-28 13:37:48 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: person-merge-by-case,v 1.2 2007-05-28 20:45:15 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -25,21 +25,52 @@ use mySociety::DBHandle qw(dbh);
 
 use PB;
 
-my $st = dbh()->prepare('select p1.email, p1.id, p2.email, p2.id from person as p1, person as p2 where p1.email = lower(p2.email) and p1.email > p2.email');
+# Find all pairs of people whose email addresses differ only by upper/lower case.
+my $st = dbh()->prepare('select p1.email, p1.id, p2.email, p2.id from person as p1, person as p2 where lower(p1.email) = lower(p2.email) and p1.email > p2.email');
 $st->execute();
-while (my ($p1_email, $p1, $p2email, $p2) = $st->fetchrow_array()) {
+while (my ($p1_email, $p1, $p2_email, $p2) = $st->fetchrow_array()) {
     my $signers1 = dbh()->selectrow_array('select count(*) from signers where person_id = ?', {}, $p1);
-    my $signers2 = dbh()->selectrow_array('select count(*) from signers where person_id = ?', {}, $p1);
+    my $signers2 = dbh()->selectrow_array('select count(*) from signers where person_id = ?', {}, $p2);
+    my $pledges1 = dbh()->selectrow_array('select count(*) from pledges where person_id = ?', {}, $p1);
+    my $pledges2 = dbh()->selectrow_array('select count(*) from pledges where person_id = ?', {}, $p2);
+    my $alert1 = dbh()->selectrow_array('select count(*) from alert where person_id = ?', {}, $p1);
+    my $alert2 = dbh()->selectrow_array('select count(*) from alert where person_id = ?', {}, $p2);
+    my $comments1 = dbh()->selectrow_array('select count(*) from comment where person_id = ?', {}, $p1);
+    my $comments2 = dbh()->selectrow_array('select count(*) from comment where person_id = ?', {}, $p2);
 
-    print "$p1_email $p2_email\n";
-    print "\tSigners: $signers1/$signers\n";
-#    my $person_id = dbh()->selectrow_array('select id from person where email = ?', {}, $email);
-#    if (!defined($person_id)) {
-#        $person_id = dbh()->selectrow_array("select nextval('person_id_seq')");
-#        dbh()->do('insert into person (id, email, name) values (?, ?, ?)', {}, $person_id, $email, $name);
-#        print "create user ($person_id, $email, $name)\n";
-#    }
-#    dbh()->do('update signers set person_id = ? where id = ?', {}, $person_id, $signer_id);
+    if ($signers1 == 0 && $pledges1 == 0 && $alert1 == 0 && $comments1 == 0) {
+        # Just delete people we don't reference anywhere else (deliberately
+        # don't use pb_delete_person to ensure we don't reference them)
+	    dbh()->do('delete from person where id = ?', {}, $p1);
+    } elsif ($signers2 == 0 && $pledges2 == 0 && $alert2 == 0 && $comments2 == 0) {
+        # Just delete people we don't reference anywhere else (deliberately
+        # don't use pb_delete_person to ensure we don't reference them)
+	    dbh()->do('delete from person where id = ?', {}, $p2);
+    } else {
+	    print "$p1, $p2 $p1_email $p2_email\n";
+	    print "\tSigners: $signers1/$signers2\n";
+	    print "\tPledges: $pledges1/$pledges2\n";
+	    print "\tComments: $comments1/$comments2\n";
+
+	    # If case insensitively they signed a pledge twice, remove one signature
+	    my $st2 = dbh()->prepare('select a.id, a.name, b.id, b.name from signers as a, signers as b where 
+	    		a.pledge_id = b.pledge_id and a.person_id = ? and b.person_id = ?');
+            $st2->execute($p1, $p2);
+	    if ($st2->rows > 5) {
+	    	die "rows greater than 5";
+	    }
+	    while (my ($s1, $s1name, $s2, $s2name) = $st2->fetchrow_array()) {
+		print "\tTwicesign: $s1 $s1name $s2 $s2name\n";
+		dbh()->do('select pb_delete_signer(?)', {}, $s2);
+	    }
+
+       # Merge the two people together
+	   dbh()->do('update signers set person_id = ? where person_id = ?', {}, $p1, $p2); 
+	   dbh()->do('update pledges set person_id = ? where person_id = ?', {}, $p1, $p2); 
+	   dbh()->do('update alert set person_id = ? where person_id = ?', {}, $p1, $p2); 
+	   dbh()->do('update comment set person_id = ? where person_id = ?', {}, $p1, $p2); 
+    }
 }
 
-#dbh()->commit();
+dbh()->commit();
+

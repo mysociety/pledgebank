@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+#
+# person-merge-by-case:
+# Fix up people so no two have the same email differing only by case.
+#
+# Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+# Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: person-merge-by-case,v 1.1 2007-05-28 13:37:48 francis Exp $';
+
+use strict;
+require 5.8.0;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+
+use PB;
+
+my $st = dbh()->prepare('select p1.email, p1.id, p2.email, p2.id from person as p1, person as p2 where p1.email = lower(p2.email) and p1.email > p2.email');
+$st->execute();
+while (my ($p1_email, $p1, $p2email, $p2) = $st->fetchrow_array()) {
+    my $signers1 = dbh()->selectrow_array('select count(*) from signers where person_id = ?', {}, $p1);
+    my $signers2 = dbh()->selectrow_array('select count(*) from signers where person_id = ?', {}, $p1);
+
+    print "$p1_email $p2_email\n";
+    print "\tSigners: $signers1/$signers\n";
+#    my $person_id = dbh()->selectrow_array('select id from person where email = ?', {}, $email);
+#    if (!defined($person_id)) {
+#        $person_id = dbh()->selectrow_array("select nextval('person_id_seq')");
+#        dbh()->do('insert into person (id, email, name) values (?, ?, ?)', {}, $person_id, $email, $name);
+#        print "create user ($person_id, $email, $name)\n";
+#    }
+#    dbh()->do('update signers set person_id = ? where id = ?', {}, $person_id, $signer_id);
+}
+
+#dbh()->commit();

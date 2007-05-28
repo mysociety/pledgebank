@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.215 2007-03-28 11:09:40 matthew Exp $
+-- $Id: schema.sql,v 1.216 2007-05-28 10:49:19 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1028,7 +1028,9 @@ create table requeststash (
             (post_data is null and method = 'GET') or
             (post_data is not null and method = 'POST')
         ),
-    extra text
+    extra text,
+    -- email address of user in the stash data
+    email text
 );
 
 -- make expiring old requests quite quick

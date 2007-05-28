@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.81 2007-04-23 10:37:16 francis Exp $
+ * $Id: login.php,v 1.82 2007-05-28 10:49:19 francis Exp $
  * 
  */
 
@@ -130,7 +130,7 @@ if (!is_null($q_t)) {
     if ($q_name && !$P->matches_name($q_name))
         $P->name($q_name);
 
-    stash_redirect($q_stash);
+    stash_redirect($q_stash, $q_email, "pb_stash_email_replacer");
     /* NOTREACHED */
 }
 
@@ -141,19 +141,45 @@ if (!is_null($P)) {
         /* ... but they have specified a name which differs from their recorded
          * name. Change it. */
         $P->name($q_name);
-    if (!is_null($q_stash))
+    if (!is_null($q_stash)) {
         /* No name change, just pass them through to the page they actually
          * wanted. */
-        stash_redirect($q_stash);
-    else
+        stash_redirect($q_stash, $q_email, "pb_stash_email_replacer");
+    } else {
         /* This happens if you are logged in and type (or go in browser history)
          * to /login. May as well redirect to login as a new person. */
         header("Location: /login?now=1");
+    }
 } elseif (is_null($q_stash)) {
     header("Location: /login?now=1");
 } else {
     /* Main login page. */
     login_page();
+}
+
+/* Used if email address is changed on login screen to update POST stash. 
+   It finds where the email is in the POST, and replaces it with the new email.
+   Called from person.php via passed in function pointer */
+function pb_stash_email_replacer($params, $old_email, $new_email) {
+    // This for most stuff
+    if (array_key_exists('email', $params) && $params['email'] == $old_email) {
+        $params['email'] = $new_email;
+    }
+    // This for comments
+    if (array_key_exists('author_email', $params) && $params['author_email'] == $old_email) {
+        $params['author_email'] = $new_email;
+    }
+    // This for new pledges
+    if (array_key_exists('data', $params)) {
+        $inner_data = unserialize(base64_decode($params['data']));
+        if (array_key_exists('email', $inner_data) && $inner_data['email'] == $old_email) {
+            $inner_data['email'] = $new_email;
+        }
+        $inner_data = base64_encode(serialize($inner_data));
+        $params['data'] = $inner_data;
+    }
+
+    return $params;
 }
 
 /* login_page
@@ -188,7 +214,7 @@ function login_page() {
                 $P->name($q_name);
             $P->inc_numlogins();
             db_commit();
-            stash_redirect($q_stash);
+            stash_redirect($q_stash, $q_email, "pb_stash_email_replacer");
             /* NOTREACHED */
         }
     } else if (get_http_var("loginradio") == 'SendEmail' ||

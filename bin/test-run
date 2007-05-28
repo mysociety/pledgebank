@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.218 2007-05-28 11:39:00 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.219 2007-05-28 12:41:45 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -1638,7 +1638,7 @@ sub do_byarea_tests {
     comment("Success reminder messages");
     set_pb_date('1984-09-10');
     call_frequentupdate();
-    $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%However, you haven\'t sent a message yet%Birkenhead%');
+    $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%Your pledge reached its target in Birkenhead three days ago%');
     die "Success reminder email link not found\n" if ($success_email_1 !~ m#^\s*(http://.*$)#m);
     my $announce_link_2 = $1;
 

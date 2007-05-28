@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.158 2007-02-07 09:23:12 matthew Exp $
+// $Id: fns.php,v 1.159 2007-05-28 22:38:03 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -577,6 +577,8 @@ function change_personal_details($yourpage = false) {
     <br><?=_('New password, again:') ?> <input type="password" name="pw2" id="pw2" size="10">
     <input name="submit" type="submit" value="<?=_('Submit') ?>"></p>
     </form>
+    <p>Your email: <?=htmlspecialchars($P->email())?> (<a href="/contact">contact us</a> to change this)
+    </p>
     </div>
 
     <?

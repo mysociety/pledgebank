@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.216 2007-05-28 10:49:19 francis Exp $
+-- $Id: schema.sql,v 1.217 2007-05-28 22:38:03 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -133,6 +133,7 @@ create table person (
 );
 
 create unique index person_email_idx on person(email);
+create unique index person_email_lower_idx on person(lower(email));
 
 -- information about each pledge
 create table pledges (
@@ -388,13 +389,13 @@ create function pledge_is_valid_to_sign(integer, text, text)
         -- check for signed by email (before finished, so repeat sign-ups
         -- by same person give the best message)
         if $2 is not null then
-            if $2 = creator_email then
+            if lower($2) = lower(creator_email) then
                 return ''signed'';
             end if;
             perform signers.id from signers, person
                 where pledge_id = $1
                     and signers.person_id = person.id
-                    and person.email = $2 for update;
+                    and lower(person.email) = lower($2) for update;
             if found then
                 return ''signed'';
             end if;

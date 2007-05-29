@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.61 2007-05-13 18:06:27 timsk Exp $
+ * $Id: comments.php,v 1.62 2007-05-29 17:55:46 francis Exp $
  * 
  */
 
@@ -208,7 +208,8 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
     $q = db_query("
                 SELECT comment.id,
                     extract(epoch from ms_current_timestamp()-whenposted) as whenposted, text,
-                    comment.name, website, ref
+                    comment.name, website, ref,
+                    comment.person_id
                 FROM comment, pledges, location
                 WHERE comment.pledge_id = pledges.id
                     AND location.id = pledges.location_id
@@ -219,6 +220,7 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
                 ORDER BY whenposted
                 LIMIT ?", $sql_params);
     $num = db_num_rows($q);
+    $done = array();
     if ($num > 0) {
         if ($rss) {
             while($r = db_fetch_array($q)) {
@@ -230,6 +232,10 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
             <?=_('<h2>Latest comments</h2>') ?> <?  
             print '<ul>';
             while($r = db_fetch_array($q)) {
+                // Only show one comment from each person
+                if (array_key_exists($r['person_id'], $done))
+                    continue;
+                $done[$r['person_id']] = 1;
                 print '<li>';
                 print comments_summary($r);
                 print '</li>';

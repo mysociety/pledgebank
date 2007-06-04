@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 
-my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.6 2007-06-04 12:43:29 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.7 2007-06-04 12:51:01 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -76,7 +76,7 @@ sub run {
         $rss->add_item(
             title => ent("Comment by $row->{name}"),
             link => "$CONF{base_url}$ref#comment_$row->{id}",
-            description=> ent($row->{text})
+            description=> ent(ent($row->{text})) # Yes, double-encode
          );
     }
 

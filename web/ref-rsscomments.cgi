@@ -6,10 +6,9 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 
-my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.5 2006-12-19 22:58:44 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.6 2007-06-04 12:43:29 matthew Exp $';
 
 use strict;
-use utf8;
 require 5.8.0;
 
 # Horrible boilerplate to set up appropriate library paths.
@@ -23,6 +22,7 @@ BEGIN {
 }
 use mySociety::DBHandle qw(dbh);
 use mySociety::WatchUpdate;
+use mySociety::Web qw(ent);
 use PB;
 use XML::RSS;
 use CGI::Carp;
@@ -42,22 +42,19 @@ while ($request = new CGI::Fast()) {
 
 sub run {
     my $ref = $request->param('ref') || '';
-    my $rss = new XML::RSS (version => '1', encoding => 'UTF-8');
+    # Do our own encoding
+    my $rss = new XML::RSS (version => '1', encoding => 'UTF-8', encode_output => undef );
 
-    my $query= dbh()->prepare("select id,title,detail from pledges where ref=? and pin is null");
+    my $query= dbh()->prepare("select id,title from pledges where ref=? and pin is null");
     $query->execute($ref);
-    my ($pledge_id, $title, $detail) = $query->fetchrow_array;
+    my ($pledge_id, $title) = $query->fetchrow_array;
     $title ||= '';
-    $detail ||= '';
-    # XXX needs sorting for i18n 
     # Probably just migrate to PHP really, the functions are more set up for it.
     # e.g. Would naturally get the base URL with full lang/country as needed in RSS feeds.
-    utf8::encode($title);
-    utf8::encode($detail);
     $rss->channel(
         title        => "Comments on $ref pledge",
         link         => $CONF{base_url} . $ref,
-        description  => "Comments on '$title'",
+        description  => ent("Comments on '$title'"),
         dc => {
             creator    => $CONF{contact_email},
             language   => 'en-gb',
@@ -76,12 +73,10 @@ sub run {
     $query->execute($pledge_id);
 
     while (my $row = $query->fetchrow_hashref) {
-        utf8::encode($row->{text});
-        utf8::encode($row->{name});
         $rss->add_item(
-            title => "Comment by $row->{name}",
+            title => ent("Comment by $row->{name}"),
             link => "$CONF{base_url}$ref#comment_$row->{id}",
-            description=> $row->{text}
+            description=> ent($row->{text})
          );
     }
 

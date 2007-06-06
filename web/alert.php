@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.62 2007-01-24 17:24:16 francis Exp $
+// $Id: alert.php,v 1.63 2007-06-06 16:54:58 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -104,6 +104,8 @@ function local_alert_subscribe_box($location, $errors = array()) {
     $disambiguate_form = false;
     if ($errors == array('gaze_place' => 'NOTICE')) {
         $disambiguate_form = true;
+        unset($errors['gaze_place']); # remove NOTICE
+    } elseif (isset($errors['gaze_place']) && $errors['gaze_place'] == 'NOTICE') {
         unset($errors['gaze_place']); # remove NOTICE
     }
 

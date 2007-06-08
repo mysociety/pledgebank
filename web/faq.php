@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.52 2007-05-16 11:27:08 francis Exp $
+// $Id: faq.php,v 1.53 2007-06-08 12:17:25 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -160,7 +160,7 @@ function default_faq() {
     '));
 
     print dd(_('<strong>Thanks also to</strong>
-    <a href="http://www.c360uk.com/">c360</a> (for SMS in the UK), 
+    <a href="http://www.tangentlabs.co.uk/">Tangent Labs</a> (for SMS in the UK), 
     the <a href="http://earth-info.nga.mil/gns/html/">US military</a> (for the world gazetteer),
     <a href="http://sedac.ciesin.columbia.edu/gpw/">CIESIN</a> (for population density data),
     <a href="http://www.ordnancesurvey.co.uk">Ordnance Survey</a> (for UK postcodes),

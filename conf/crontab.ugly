@@ -4,7 +4,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.16 2007-06-11 15:21:18 matthew Exp $
+# $Id: crontab.ugly,v 1.17 2007-06-11 15:23:47 matthew Exp $
 
 PATH=/usr/local/bin:/usr/bin:/bin
 !!(* if ($vhost eq "matthew.pledgebank.com") { *)!!
@@ -17,7 +17,7 @@ MAILTO=team@pledgebank.com
 ## These scripts are pretty well concurrent, but we get occasional deadlocks when they
 ## are run on multiple machines, and in the end I gave up. So they are only run on one
 ## machine now.
-!!(* if (($hostname eq "bitter" && !$staging) || ($staging && $vhost eq 'matthew.pledgebank.com)) { *)!!
+!!(* if (($hostname eq "bitter" && !$staging) || ($staging && $vhost eq 'matthew.pledgebank.com')) { *)!!
 # Frequently
 0-59/20 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate || echo "stalled?"
 
@@ -27,7 +27,7 @@ MAILTO=team@pledgebank.com
 
 
 ## These scripts definitely aren't concurrent, and should only be run on one machine
-!!(* if (($hostname eq "bitter" && !$staging) || ($staging && $vhost eq 'matthew.pledgebank.com)) { *)!!
+!!(* if (($hostname eq "bitter" && !$staging) || ($staging && $vhost eq 'matthew.pledgebank.com')) { *)!!
 # Once an hour
 33 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "stalled?" )
 # Once a day, early morning

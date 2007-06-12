@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: person.csv.php,v 1.5 2007-01-03 19:13:19 matthew Exp $
+ * $Id: person.csv.php,v 1.6 2007-06-12 20:17:16 matthew Exp $
  * 
  */
 
@@ -21,12 +21,24 @@ function escape_csv($v) {
 
 header("Content-Type: application/csv; charset=utf-8");
 
-// XXX pledge creators only for now
-$q = db_query("SELECT person.name, person.email, address_1, address_2, address_3,
+print "Creators\n\n";
+
+$q = db_query("SELECT pledges.name, person.email, address_1, address_2, address_3,
     address_town, address_county, address_postcode, address_country, ref, title
     FROM person, pledges 
-    WHERE pledges.person_id = person.id ORDER BY person.id");
+    WHERE pledges.person_id = person.id ORDER BY creationtime");
 print "name,email,address_1,address_2,address_3,town,county,postcode,country,ref,title\n";
+while ($r = db_fetch_row($q)) {
+    print join(',', array_map('escape_csv', $r)) . "\n";
+}
+
+print "\n\nSigners\n\n";
+
+$q = db_query("SELECT signers.name, person.email, address_1, address_2, address_3,
+    address_town, address_county, address_postcode, address_country, ref
+    FROM person, signers, pledges
+    WHERE person_id = person.id AND pledge_id = pledges.id ORDER BY creationtime, signtime");
+print "name,email,address_1,address_2,address_3,town,county,postcode,country,ref\n";
 while ($r = db_fetch_row($q)) {
     print join(',', array_map('escape_csv', $r)) . "\n";
 }

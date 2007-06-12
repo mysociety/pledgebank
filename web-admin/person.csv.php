@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: person.csv.php,v 1.8 2007-06-12 20:42:28 matthew Exp $
+ * $Id: person.csv.php,v 1.9 2007-06-12 20:49:16 matthew Exp $
  * 
  */
 
@@ -34,7 +34,7 @@ while ($r = db_fetch_row($q)) {
 
 print "\n\nSigners\n\n";
 
-$q = db_query("SELECT ref, signers.name, person.email,
+$q = db_query("SELECT ref, signers.name, person.email
     FROM person, signers, pledges
     WHERE signers.person_id = person.id AND pledge_id = pledges.id ORDER BY creationtime, signtime");
 print "ref,name,email\n";

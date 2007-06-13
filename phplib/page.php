@@ -5,13 +5,13 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.157 2007-02-01 16:29:06 matthew Exp $
+// $Id: page.php,v 1.158 2007-06-13 16:35:22 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/tracking.php';
 require_once 'pbperson.php';
-require_once 'pledge.php';
+require_once 'pledge.php'; # XXX: I don't think this is needed?
 
 // Do NOT include microsites.php here, or it won't get translated.
 // This may cause funny errors, but you'll just have to deal with it :)

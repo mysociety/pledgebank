@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-related.js.php,v 1.1 2007-06-13 16:40:44 matthew Exp $
+ * $Id: ref-related.js.php,v 1.2 2007-06-13 16:53:21 matthew Exp $
  * 
  */
 
@@ -24,15 +24,14 @@ $ref = $p->ref();
 $url = $p->url_typein();
 
 $html = <<<EOF
-<div class="pledgebank_pledgebox" style="float:left;border:solid 1px #522994;font-family:'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Arial,sans-serif;width:17em;font-size:83%;margin-bottom:1em">
+<div class="pledgebank_pledgebox" style="border:solid 1px #522994;font-family:'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Arial,sans-serif;width:17em;font-size:83%;margin-bottom:1em">
 <div style="background-color:#9c7bbd;color:#ffffff;border-bottom:solid 1px #522994;padding:2px">
 <a href="http://www.pledgebank.com/" style="font-weight:bold;text-decoration:none">
 <span style="color:#ffffff;background-color:#9c7bbd;">Pledge</span><span
  style="color:#21004a;background-color:#9c7bbd;">Bank</span></a> related pledges
 </div>
-<div style="padding:2px">
-<p style="margin:0">
-Pledges also signed by people who signed
+<div class="pledgebank_blurb" style="padding:2px">
+<p style="margin:0">Pledges also signed by people who signed
 <a style="color:#522994;" href="$url">$ref</a>:</p>
 <ul style="margin:0;padding: 2px 2px 2px 1.5em;">
 EOF;

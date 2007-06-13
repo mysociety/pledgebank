@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-progress.js.php,v 1.6 2007-06-13 16:35:23 matthew Exp $
+ * $Id: ref-progress.js.php,v 1.7 2007-06-13 16:53:21 matthew Exp $
  * 
  */
 
@@ -27,14 +27,14 @@ $target = prettify($p->target());
 $url = $p->url_typein();
 
 $html = <<<EOF
-<div class="pledgebank_pledgebox" style="float:left;border:solid 1px #522994;font-family:'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Arial,sans-serif;width:17em;font-size:83%;margin-bottom:1em">
+<div class="pledgebank_pledgebox" style="border:solid 1px #522994;font-family:'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Arial,sans-serif;width:17em;font-size:83%;margin-bottom:1em">
 <div style="font-weight:bold;background-color:#9c7bbd;color:#ffffff;border-bottom:solid 1px #522994;padding:2px">
 <a href="http://www.pledgebank.com/" style="text-decoration:none">
 <span style="color:#ffffff;background-color:#9c7bbd;">Pledge</span><span
  style="color:#21004a;background-color:#9c7bbd;">Bank</span></a>
 </div>
 <ul class="pledgebank_blurb" style="margin:0;padding:2px 2px 2px 1.5em">
-<li class="pledgebank_pledgetext" style=""><p style="margin:0"><a style="color:#522994;"
+<li class="pledgebank_pledgetext"><p style="margin:0"><a style="color:#522994;"
  href="$url">$sentence</a></p>
  <p style="margin:0" align="right">&mdash; $name</p></li>
 <li class="pledgebank_progress">

@@ -6,13 +6,13 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: js.php,v 1.1 2007-06-13 20:50:05 matthew Exp $
+ * $Id: js.php,v 1.2 2007-06-13 20:53:11 matthew Exp $
  * 
  */
 
 function js_header($title = '') {
-    if ($titlel)
-        $title = " - $title"
+    if ($title)
+        $title = " - $title";
     return <<<EOF
 <style type="text/css">
 .pb_pledgebox { border: solid 1px #522994; font-family: 'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Arial,sans-serif; margin-bottom: 1em; }

@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: js.php,v 1.2 2007-06-13 20:53:11 matthew Exp $
+ * $Id: js.php,v 1.3 2007-06-13 21:03:50 matthew Exp $
  * 
  */
 
@@ -20,8 +20,8 @@ function js_header($title = '') {
 .pb_pledgebox p.pb_gap { margin: 0 0 0.5em; }
 .pb_pledgebox a { color: #522994; font-weight: normal; text-decoration: underline; }
 .pb_header { background-color: #9c7bbd; color: #ffffff; border-bottom: solid 1px #522994; padding: 2px; }
-.pb_header a { text-decoration: none; font-weight: bold; }
-.pb_header span { color: #21004a; background-color: #9c7bbd; }
+.pb_header a { text-decoration: none; font-weight: bold; color: #ffffff; }
+.pb_header a span { color: #21004a; background-color: #9c7bbd; }
 .pb_body { padding: 2px; }
 </style>
 <div class="pb_pledgebox">

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-progress.js.php,v 1.7 2007-06-13 16:53:21 matthew Exp $
+ * $Id: ref-progress.js.php,v 1.8 2007-06-13 20:38:47 matthew Exp $
  * 
  */
 
@@ -27,17 +27,22 @@ $target = prettify($p->target());
 $url = $p->url_typein();
 
 $html = <<<EOF
-<div class="pledgebank_pledgebox" style="border:solid 1px #522994;font-family:'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Arial,sans-serif;width:17em;font-size:83%;margin-bottom:1em">
-<div style="font-weight:bold;background-color:#9c7bbd;color:#ffffff;border-bottom:solid 1px #522994;padding:2px">
-<a href="http://www.pledgebank.com/" style="text-decoration:none">
-<span style="color:#ffffff;background-color:#9c7bbd;">Pledge</span><span
- style="color:#21004a;background-color:#9c7bbd;">Bank</span></a>
+<style type="text/css">
+.pb_pledgebox { border: solid 1px #522994; font-family: 'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Arial,sans-serif; font-size: 83%; margin-bottom: 1em; }
+.pb_pledgebox p { margin: 0; }
+.pb_pledgebox p.pb_gap { margin: 0 0 0.5em; }
+.pb_pledgebox a { color: #522994; font-weight: normal; text-decoration: underline; }
+.pb_header { font-weight: bold; background-color: #9c7bbd; color: #ffffff; border-bottom: solid 1px #522994; padding: 2px; }
+.pb_header a { text-decoration: none; }
+.pb_header span { background-color: #9c7bbd; }
+</style>
+<div class="pb_pledgebox">
+<div class="pb_header">
+<a href="http://www.pledgebank.com/"><span style="color:#ffffff;">Pledge</span><span style="color:#21004a;">Bank</span></a>
 </div>
-<ul class="pledgebank_blurb" style="margin:0;padding:2px 2px 2px 1.5em">
-<li class="pledgebank_pledgetext"><p style="margin:0"><a style="color:#522994;"
- href="$url">$sentence</a></p>
- <p style="margin:0" align="right">&mdash; $name</p></li>
-<li class="pledgebank_progress">
+<p class="pb_pledgetext"><a href="$url">$sentence</a></p>
+<p class="pb_gap" align="right">&mdash; $name</p>
+<p class="pb_progress pb_gap">
 EOF;
 if ($p->finished())
     $html .= sprintf(ngettext('%s person signed up', '%s people signed up', $p->signers()), prettify_num($p->signers()));
@@ -54,15 +59,14 @@ if ($p->left() <= 0) {
         $html .= sprintf(ngettext('%d more needed', '%d more needed', $p->left()), $p->left());
 }
 
-$html .= "</li>";
+$html .= "</p>";
 
 if ($p->open()) {
-    $html .= '<li class="pledgebank_open">Open until ' . $p->h_pretty_date();
-    $html .= ' &mdash; <a style="color:#522994;" href="' . $url . '">Sign this pledge &raquo;</a></li>';
+    $html .= '<p class="pb_open">Open until ' . $p->h_pretty_date();
+    $html .= ' &mdash; <a href="' . $url . '">Sign this pledge &raquo;</a></p>';
 } else {
-    $html .= '<li class="pledgebank_closed">Closed on ' . $p->h_pretty_date() . '</li>';
+    $html .= '<p class="pb_closed">Closed on ' . $p->h_pretty_date() . '</p>';
 }
-$html .= '</ul>';
 $html .= '</div>';
 
 header('Content-Type: text/javascript; charset=utf-8');

@@ -6,13 +6,14 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-progress.js.php,v 1.8 2007-06-13 20:38:47 matthew Exp $
+ * $Id: ref-progress.js.php,v 1.9 2007-06-13 20:50:05 matthew Exp $
  * 
  */
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
 require_once '../../phplib/utility.php';
+require_once '../phplib/js.php';
 
 page_check_ref(get_http_var('ref'));
 $p  = new Pledge(get_http_var('ref'));
@@ -26,20 +27,8 @@ $signers = prettify($p->signers());
 $target = prettify($p->target());
 $url = $p->url_typein();
 
-$html = <<<EOF
-<style type="text/css">
-.pb_pledgebox { border: solid 1px #522994; font-family: 'Lucida Grande','Lucida Sans Unicode','Lucida Sans',Arial,sans-serif; font-size: 83%; margin-bottom: 1em; }
-.pb_pledgebox p { margin: 0; }
-.pb_pledgebox p.pb_gap { margin: 0 0 0.5em; }
-.pb_pledgebox a { color: #522994; font-weight: normal; text-decoration: underline; }
-.pb_header { font-weight: bold; background-color: #9c7bbd; color: #ffffff; border-bottom: solid 1px #522994; padding: 2px; }
-.pb_header a { text-decoration: none; }
-.pb_header span { background-color: #9c7bbd; }
-</style>
-<div class="pb_pledgebox">
-<div class="pb_header">
-<a href="http://www.pledgebank.com/"><span style="color:#ffffff;">Pledge</span><span style="color:#21004a;">Bank</span></a>
-</div>
+$html = js_header();
+$html .= <<<EOF
 <p class="pb_pledgetext"><a href="$url">$sentence</a></p>
 <p class="pb_gap" align="right">&mdash; $name</p>
 <p class="pb_progress pb_gap">
@@ -58,7 +47,6 @@ if ($p->left() <= 0) {
     else
         $html .= sprintf(ngettext('%d more needed', '%d more needed', $p->left()), $p->left());
 }
-
 $html .= "</p>";
 
 if ($p->open()) {
@@ -67,12 +55,9 @@ if ($p->open()) {
 } else {
     $html .= '<p class="pb_closed">Closed on ' . $p->h_pretty_date() . '</p>';
 }
-$html .= '</div>';
 
-header('Content-Type: text/javascript; charset=utf-8');
-$html = addslashes($html);  /* XXX check this works with UTF-8 and is correct
-                             * for JS. */
-$html = preg_replace("/\n/s", '\\n', $html);
-print "<!--\ndocument.write(\"$html\");\n//-->\n";
+$html .= js_footer();
+
+js_output($html);
 
 ?>

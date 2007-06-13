@@ -1,12 +1,12 @@
 <?php
 /*
- * ref-progress.js.php:
- * Produce includable Javascript for showing pledge status on another web page.
+ * ref-similar.js.php:
+ * Produce includable Javascript for showing similar pledges on another web page.
  * 
- * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
- * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
+ * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+ * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-similar.js.php,v 1.1 2007-06-13 16:35:23 matthew Exp $
+ * $Id: ref-related.js.php,v 1.1 2007-06-13 16:40:44 matthew Exp $
  * 
  */
 
@@ -20,10 +20,7 @@ microsites_redirect($p);
 if (defined($p->pin()) && $p->pin() != '')
     err("Permission denied");
 
-$sentence = $p->h_sentence(array('firstperson'=>true));
-$name = $p->h_name_and_identity();
-$signers = prettify($p->signers());
-$target = prettify($p->target());
+$ref = $p->ref();
 $url = $p->url_typein();
 
 $html = <<<EOF
@@ -31,12 +28,12 @@ $html = <<<EOF
 <div style="background-color:#9c7bbd;color:#ffffff;border-bottom:solid 1px #522994;padding:2px">
 <a href="http://www.pledgebank.com/" style="font-weight:bold;text-decoration:none">
 <span style="color:#ffffff;background-color:#9c7bbd;">Pledge</span><span
- style="color:#21004a;background-color:#9c7bbd;">Bank</span></a> similar pledges
+ style="color:#21004a;background-color:#9c7bbd;">Bank</span></a> related pledges
 </div>
 <div style="padding:2px">
 <p style="margin:0">
-Pledges similar to <a style="color:#522994;"
- href="$url">$sentence</a> :</p>
+Pledges also signed by people who signed
+<a style="color:#522994;" href="$url">$ref</a>:</p>
 <ul style="margin:0;padding: 2px 2px 2px 1.5em;">
 EOF;
 $html .= draw_connections($p);
@@ -67,12 +64,14 @@ function draw_connections($p) {
     while (list($a, $b, $strength) = db_fetch_row($s)) {
         $id = $a == $p->id() ? $b : $a;
         $p2 = new Pledge(intval($id));
-        $out .= '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
+        $out .= '<li><a style="color:#522994;" href="' . $p2->url_typein() . '">' . $p2->h_title() . '</a>';
         $out .= ' (';
         $out .= sprintf(ngettext('%s person', '%s people', $strength), $strength);
         $out .= ')';
         $out .= '</li>';
     }
+    if (!$out)
+        $out = "<li>None, I'm afraid</li>";
     return $out;
 }
 

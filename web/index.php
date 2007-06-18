@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.252 2007-05-01 21:14:01 francis Exp $
+// $Id: index.php,v 1.253 2007-06-18 23:56:41 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -91,42 +91,6 @@ can make your pledge succeed &raquo;') ?>"></a></div>
     microsites_frontpage_credit_footer();
 }
 
-# params must have:
-# 'global' - true or false, whether global pledges to be included
-# 'main' - true or false, whether site country pledges to be included
-# 'foreign' - true or false, whether pledges from other countries (or all countries if no site country) to be included
-# 'showcountry' - whether to display country name in summary
-function get_pledges_list($where, $params) {
-    $query = "SELECT pledges.*, pledges.ref, country
-            FROM pledges LEFT JOIN location ON location.id = pledges.location_id
-            WHERE ";
-    $sql_params = array();
-    
-    $queries = array();
-    if ($params['main'])
-        $queries[] = pb_site_pledge_filter_main($sql_params);
-    if ($params['foreign'])
-        $queries[] = pb_site_pledge_filter_foreign($sql_params);
-    if ($params['global'])
-        $queries[] = pb_site_pledge_filter_general($sql_params);
-    $query .= '(' . join(" OR ", $queries) . ')';
-
-    $query .= " AND " . $where;
-#print "<p>query: $query</p>"; print_r($sql_params);
-    $q = db_query($query, $sql_params);
-    $pledges = array();
-    while ($r = db_fetch_array($q)) {
-        $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
-        $pledge = new Pledge($r);
-        $pstring = '<li>';
-        $pstring .= $pledge->summary(array('html'=>true, 'href'=>$r['ref'], 'showcountry'=>$params['showcountry']));
-        
-        $pstring .= '</li>';
-        $pledges[] = $pstring;
-    }
-    return $pledges;
-}
-
 function list_frontpage_pledges() {
     global $pb_today;
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of new pledges') ?>"></a>
@@ -134,7 +98,7 @@ function list_frontpage_pledges() {
     $pledges_required_fp = 8 + 1; // number of pledges to show on main part of front page if frontpaged
     $pledges_required_n = 6 + 1; // number of pledges below which we show normal pledges, rather than just frontpaged ones
     $more_threshold = $pledges_required_fp;
-    $pledges = get_pledges_list("
+    $pledges = pledge_get_list("
                 cached_prominence = 'frontpage' AND
                 date >= '$pb_today' AND 
                 pin is NULL AND 
@@ -145,7 +109,7 @@ function list_frontpage_pledges() {
     if (count($pledges) < $pledges_required_fp) {
         // If too few, show some global frontpage pledges
         $more =$pledges_required_fp - count($pledges);
-        $global_pledges = get_pledges_list("
+        $global_pledges = pledge_get_list("
                     cached_prominence = 'frontpage' AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
@@ -161,7 +125,7 @@ function list_frontpage_pledges() {
     if (count($pledges) < $pledges_required_n) {
         // If too few, show a few of the normal pledges for the country
         $more = $pledges_required_n - count($pledges);
-        $normal_pledges = get_pledges_list("
+        $normal_pledges = pledge_get_list("
                     ".microsites_normal_prominences()." AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
@@ -174,7 +138,7 @@ function list_frontpage_pledges() {
     if (count($pledges) < $pledges_required_n) {
         // If too few, show some global normal pledges
         $more =$pledges_required_n - count($pledges);
-        $global_normal_pledges = get_pledges_list("
+        $global_normal_pledges = pledge_get_list("
                     ".microsites_normal_prominences()." AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
@@ -200,7 +164,7 @@ function list_frontpage_pledges() {
 
     if (count($pledges) < 4) {
         $foreign_more = 4 - count($pledges);
-        $pledges = get_pledges_list("
+        $pledges = pledge_get_list("
                     cached_prominence = 'frontpage' AND
                     date >= '$pb_today' AND 
                     pin is NULL AND 
@@ -223,7 +187,7 @@ function list_successful_pledges() {
     print h2(_('Recent successful pledges'));
 
     // Try to avoid global pledges
-    $pledges = get_pledges_list("
+    $pledges = pledge_get_list("
                 (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
                 pin IS NULL AND 
                 whensucceeded IS NOT NULL
@@ -231,13 +195,13 @@ function list_successful_pledges() {
                 LIMIT 11", array('global'=>false, 'main'=>true,'foreign'=>false,'showcountry'=>false));
     // Include global pledges if we need them
     if (count($pledges) < 11) {
-        $pledges = get_pledges_list("
+        $pledges = pledge_get_list("
             (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
             pin IS NULL AND 
             whensucceeded IS NOT NULL
             ORDER BY whensucceeded DESC
             LIMIT 11", array('global'=>true, 'main'=>true,'foreign'=>false,'showcountry'=>false));
-   }
+    }
 
     $more = false;
     if (!$pledges) {

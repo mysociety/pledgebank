@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.220 2007-05-17 13:30:39 matthew Exp $
+ * $Id: pledge.php,v 1.221 2007-06-18 23:56:40 francis Exp $
  * 
  */
 
@@ -1002,6 +1002,42 @@ function percent_success_above($threshold) {
     else
         $percent_successful_above = 100.0 * $successful_pledges_above / $total_pledges_above;
     return $percent_successful_above;
+}
+
+# params must have:
+# 'global' - true or false, whether global pledges to be included
+# 'main' - true or false, whether site country pledges to be included
+# 'foreign' - true or false, whether pledges from other countries (or all countries if no site country) to be included
+# 'showcountry' - whether to display country name in summary
+function pledge_get_list($where, $params) {
+    $query = "SELECT pledges.*, pledges.ref, country
+            FROM pledges LEFT JOIN location ON location.id = pledges.location_id
+            WHERE ";
+    $sql_params = array();
+    
+    $queries = array();
+    if ($params['main'])
+        $queries[] = pb_site_pledge_filter_main($sql_params);
+    if ($params['foreign'])
+        $queries[] = pb_site_pledge_filter_foreign($sql_params);
+    if ($params['global'])
+        $queries[] = pb_site_pledge_filter_general($sql_params);
+    $query .= '(' . join(" OR ", $queries) . ')';
+
+    $query .= " AND " . $where;
+#print "<p>query: $query</p>"; print_r($sql_params);
+    $q = db_query($query, $sql_params);
+    $pledges = array();
+    while ($r = db_fetch_array($q)) {
+        $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
+        $pledge = new Pledge($r);
+        $pstring = '<li>';
+        $pstring .= $pledge->summary(array('html'=>true, 'href'=>$r['ref'], 'showcountry'=>$params['showcountry']));
+        
+        $pstring .= '</li>';
+        $pledges[] = $pstring;
+    }
+    return $pledges;
 }
 
 

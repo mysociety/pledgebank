@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.47 2007-05-17 12:48:25 matthew Exp $
+ * $Id: general-example,v 1.48 2007-06-19 12:39:40 francis Exp $
  * 
  */
 
@@ -108,5 +108,10 @@ define('OPTION_TRACKING_SECRET', 'really-secret-value');
 
 // Microsites
 define('OPTION_GLOBALCOOL_SECRET', 'really-secret-value');
+
+// Facebook get these from http://developers.facebook.com
+define('OPTION_FACEBOOK_API_KEY', 'XXX');
+define('OPTION_FACEBOOK_SECRET', 'YYY');
+define('OPTION_FACEBOOK_CANVAS', 'http://apps.facebook.com/pledgebank/');
 
 ?>

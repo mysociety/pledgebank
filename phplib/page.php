@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.159 2007-06-14 23:37:54 francis Exp $
+// $Id: page.php,v 1.160 2007-06-19 12:39:40 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -18,6 +18,7 @@ require_once 'pledge.php'; # XXX: I don't think this is needed?
 //require_once 'microsites.php';
 
 $page_vary_header_sent = false;
+$page_plain_headers = false;
 
 /* page_send_vary_header
  * Emit an appropriate Vary: header for PledgeBank. */
@@ -75,7 +76,13 @@ function strip_title($title) {
  *      been output.
  */
 function page_header($title, $params = array()) {
-    global $lang, $microsite;
+    global $lang, $microsite, $page_plain_headers;
+
+    if ($page_plain_headers) {
+        print "Title: $title\n\n";
+        print "Body: ";
+        return;
+    }
 
     if (!is_array($params))
         err("PARAMS must be an array in page_header");
@@ -256,7 +263,11 @@ function page_header($title, $params = array()) {
  *      to pass to track_event.
  */
 function page_footer($params = array()) {
-    global $contact_ref, $microsite;
+    global $contact_ref, $microsite, $page_plain_headers;
+
+    if ($page_plain_headers) {
+        return;
+    }
 
     // Just logged in, so show password set box if they don't have one
     global $P;

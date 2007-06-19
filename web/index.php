@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.253 2007-06-18 23:56:41 francis Exp $
+// $Id: index.php,v 1.254 2007-06-19 12:39:41 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -91,6 +91,18 @@ can make your pledge succeed &raquo;') ?>"></a></div>
     microsites_frontpage_credit_footer();
 }
 
+function format_pledge_list($pledges, $params) {
+    $out = '<ol>';
+    foreach ($pledges as $pledge)  {
+        $out .= '<li>';
+        $out .= $pledge->summary(array('html'=>true, 'href'=>$pledge->ref(), 'showcountry'=>$params['showcountry']));
+        
+        $out .= '</li>';
+    }
+    $out .= '</ol>';
+    return $out;
+}
+
 function list_frontpage_pledges() {
     global $pb_today;
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of new pledges') ?>"></a>
@@ -104,7 +116,7 @@ function list_frontpage_pledges() {
                 pin is NULL AND 
                 whensucceeded IS NULL
                 ORDER BY RANDOM()
-                LIMIT $pledges_required_fp", array('global'=>false,'main'=>true,'foreign'=>false,'showcountry'=>false));
+                LIMIT $pledges_required_fp", array('global'=>false,'main'=>true,'foreign'=>false));
     //print "<p>main frontpage: ".count($pledges);
     if (count($pledges) < $pledges_required_fp) {
         // If too few, show some global frontpage pledges
@@ -115,7 +127,7 @@ function list_frontpage_pledges() {
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
-                    LIMIT '$more'", array('global'=>true,'main'=>false,'foreign'=>false,'showcountry'=>false));
+                    LIMIT '$more'", array('global'=>true,'main'=>false,'foreign'=>false));
         $pledges = array_merge($pledges, $global_pledges);
         //print "<p>global frontpage: ".count($global_pledges);
     }
@@ -131,7 +143,7 @@ function list_frontpage_pledges() {
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
-                    LIMIT $more", array('global'=>false,'main'=>true,'foreign'=>false,'showcountry'=>false));
+                    LIMIT $more", array('global'=>false,'main'=>true,'foreign'=>false));
         $pledges = array_merge($pledges, $normal_pledges);
         //print "<p>main normal: ".count($normal_pledges);
     }
@@ -144,7 +156,7 @@ function list_frontpage_pledges() {
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
-                    LIMIT '$more'", array('global'=>true,'main'=>false,'foreign'=>false,'showcountry'=>false));
+                    LIMIT '$more'", array('global'=>true,'main'=>false,'foreign'=>false));
         $pledges = array_merge($pledges, $global_normal_pledges);
         //print "<p>global normal: ".count($global_normal_pledges);
     }
@@ -159,7 +171,7 @@ function list_frontpage_pledges() {
         pb_print_no_featured_link();
     } else {
         pb_print_filter_link_main_general();
-        print '<ol>' . join("",$pledges) . '</ol>';
+        print format_pledge_list($pledges, array('showcountry'=>false));
     }
 
     if (count($pledges) < 4) {
@@ -170,10 +182,10 @@ function list_frontpage_pledges() {
                     pin is NULL AND 
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
-                    LIMIT $foreign_more", array('global'=>false,'main'=>false,'foreign'=>true,'showcountry'=>true));
+                    LIMIT $foreign_more", array('global'=>false,'main'=>false,'foreign'=>true));
         if ($pledges) {
             print p(_("Interesting pledges from other countries"));
-            print '<ol>' . join("",$pledges) . '</ol>';
+            print format_pledge_list($pledges, array('showcountry'=>true));
         }
     } 
     if ($more) {
@@ -192,7 +204,7 @@ function list_successful_pledges() {
                 pin IS NULL AND 
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC
-                LIMIT 11", array('global'=>false, 'main'=>true,'foreign'=>false,'showcountry'=>false));
+                LIMIT 11", array('global'=>false, 'main'=>true,'foreign'=>false));
     // Include global pledges if we need them
     if (count($pledges) < 11) {
         $pledges = pledge_get_list("
@@ -200,7 +212,7 @@ function list_successful_pledges() {
             pin IS NULL AND 
             whensucceeded IS NOT NULL
             ORDER BY whensucceeded DESC
-            LIMIT 11", array('global'=>true, 'main'=>true,'foreign'=>false,'showcountry'=>false));
+            LIMIT 11", array('global'=>true, 'main'=>true,'foreign'=>false));
     }
 
     $more = false;
@@ -212,7 +224,7 @@ function list_successful_pledges() {
             array_pop($pledges);
         }
         pb_print_filter_link_main_general();
-        print '<ol>'.join("",$pledges).'</ol>';
+        print format_pledge_list($pledges, array('showcountry'=>false));
     }
 
     if ($more) {

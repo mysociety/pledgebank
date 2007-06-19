@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.221 2007-06-18 23:56:40 francis Exp $
+ * $Id: pledge.php,v 1.222 2007-06-19 12:39:40 francis Exp $
  * 
  */
 
@@ -468,6 +468,7 @@ class Pledge {
             }
             print '</i>';
         }
+        print "</p>";
 
         $place_lines = array();
         // Microsite
@@ -520,8 +521,6 @@ class Pledge {
     global $contact_ref; ?>
 <div id="reportpledge"><a href="/contact<?=$contact_ref?>"><?=_('Anything wrong with this pledge?  Tell us!') ?></a></div>
 <? } ?>
-
-</div>
 <?
     }
 
@@ -1010,7 +1009,8 @@ function percent_success_above($threshold) {
 # 'foreign' - true or false, whether pledges from other countries (or all countries if no site country) to be included
 # 'showcountry' - whether to display country name in summary
 function pledge_get_list($where, $params) {
-    $query = "SELECT pledges.*, pledges.ref, country
+    $query = "SELECT pledges.*, pledges.ref, country,
+                    (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
             FROM pledges LEFT JOIN location ON location.id = pledges.location_id
             WHERE ";
     $sql_params = array();
@@ -1025,17 +1025,12 @@ function pledge_get_list($where, $params) {
     $query .= '(' . join(" OR ", $queries) . ')';
 
     $query .= " AND " . $where;
-#print "<p>query: $query</p>"; print_r($sql_params);
+    #print "<p>query: $query</p>"; print_r($sql_params);
     $q = db_query($query, $sql_params);
     $pledges = array();
     while ($r = db_fetch_array($q)) {
-        $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
         $pledge = new Pledge($r);
-        $pstring = '<li>';
-        $pstring .= $pledge->summary(array('html'=>true, 'href'=>$r['ref'], 'showcountry'=>$params['showcountry']));
-        
-        $pstring .= '</li>';
-        $pledges[] = $pstring;
+        $pledges[] = $pledge;
     }
     return $pledges;
 }

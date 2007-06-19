@@ -7,7 +7,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.1 2007-06-19 21:59:42 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.2 2007-06-19 22:02:21 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -32,8 +32,9 @@ while (my ($signer) = $st->fetchrow_hashref()) {
     print "Signer: " . $signer->{id} . "\n";
     # See whether this person has converted already
     if ($signer->{person_id}) {
-        my $person = dbh()->selectrow_array('select * from person where person_id = ?', {}, $signer->{person_id}});
-        print Dumper($person)
+    	print "Signer has a person_id\n";
+        my $person = dbh()->selectrow_array('select * from person where person_id = ?', {}, $signer->{person_id});
+        print Dumper($person);
         # If there is a mobile field already, check it has same value
         if ($person->{mobile}) {
             die "signer/mobile mismatch" if $person->{mobile} ne $signer->{mobile};
@@ -42,8 +43,9 @@ while (my ($signer) = $st->fetchrow_hashref()) {
             dbh()->do('update person set mobile = ? where person_id = ?', {}, $signer->{mobile}, $person->{id}); 
         }
     } else {
+    	print "Signer has no person_id\n";
         # See if that mobile already has a person record
-        my $person = dbh()->selectrow_array('select * from person where mobile = ?', {}, $signer->{mobile}});
+        my $person = dbh()->selectrow_array('select * from person where mobile = ?', {}, $signer->{mobile});
         # If there is, check the email is also the same
         if ($person) {
             die "email/mobile mismatch" if $person->{email} ne $signer->{email};
@@ -54,10 +56,6 @@ while (my ($signer) = $st->fetchrow_hashref()) {
             dbh()->do('insert into person (id, mobile) values (?, ?)', $next_person_id, $signer->{mobile});
             dbh()->do('update signers set person_id = ? where signer_id = ?', {}, $next_person_id, $signer->{id}); 
         }
-    }
-
-       # Merge the two people together
-	#dbh()->do('update signers set person_id = ? where person_id = ?', {}, $p1, $p2); 
     }
 }
 

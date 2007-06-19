@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.99 2007-06-04 12:24:55 matthew Exp $
+// $Id: ref-index.php,v 1.100 2007-06-19 23:54:18 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -128,18 +128,18 @@ function draw_spreadword($p) { ?>
 define('MAX_PAGE_SIGNERS', '500');
 
 // Internal
-function display_anonymous_signers(&$anon, &$unknownname, &$in_ul) {
-    if ($anon || $unknownname) {
+function display_anonymous_signers(&$anon, &$mobilesigners, &$in_ul) {
+    if ($anon || $mobilesigners) {
         $extra = '';
         if ($anon)
             $extra .= sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon);
-        if ($unknownname) {
+        if ($mobilesigners) {
             if ($anon) {
                 /* XXX shouldn't assume we can split sentences like this --
                  * make it two bullet points? */
-                $extra .= sprintf(ngettext(', and %d who signed up via mobile', ', and %d who signed up via mobile', $unknownname), $unknownname);
+                $extra .= sprintf(ngettext(', and %d who signed up via mobile', ', and %d who signed up via mobile', $mobilesigners), $mobilesigners);
             } else {
-                $extra .= sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $unknownname), $unknownname);
+                $extra .= sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $mobilesigners), $mobilesigners);
             }
         }
         if (!$in_ul) {
@@ -148,7 +148,7 @@ function display_anonymous_signers(&$anon, &$unknownname, &$in_ul) {
         }
         print "<li>$extra</li>";
         $anon = 0;
-        $unknownname = 0;
+        $mobilesigners = 0;
     }
 }
 
@@ -201,7 +201,7 @@ function draw_signatories($p) {
     }
 
     $anon = 0;
-    $unknownname = 0;
+    $mobilesigners = 0;
     
     $order_by = "ORDER BY id";
     $extra_select = "";
@@ -211,11 +211,12 @@ function draw_signatories($p) {
         $extra_select = ", byarea_location.whensucceeded";
         $extra_join = "LEFT JOIN byarea_location ON byarea_location.byarea_location_id = signers.byarea_location_id AND byarea_location.pledge_id = signers.pledge_id";
     }
-    $query = "SELECT signers.*, 
+    $query = "SELECT signers.*, person.mobile as mobile,
             location.description as location_description, location.country as location_country
             $extra_select
         from signers 
         LEFT JOIN location on location.id = signers.byarea_location_id 
+        LEFT JOIN person on person.id = signers.person_id 
         $extra_join
         WHERE signers.pledge_id = ? $order_by";
     if ($limit) {
@@ -232,7 +233,7 @@ function draw_signatories($p) {
             $loc_desc_with_country .= ", ". $countries_code_to_name[$r['location_country']];
         }
         if ($p->byarea() && $last_location_description != $loc_desc_with_country) {
-            display_anonymous_signers($anon, $unknownname, $in_ul);
+            display_anonymous_signers($anon, $mobilesigners, $in_ul);
             if ($in_ul)  {
                 print "</ul></div>";
                 $in_ul = false;
@@ -258,13 +259,15 @@ function draw_signatories($p) {
                         . htmlspecialchars($r['name'])
                         . '</li>';
             } else {
-                ++$unknownname;
+                err('showname set but no name');
             }
+        } elseif (isset($r['mobile'])) {
+            $mobilesigners++;
         } else {
             $anon++;
         }
     }
-    display_anonymous_signers($anon, $unknownname, $in_ul);
+    display_anonymous_signers($anon, $mobilesigners, $in_ul);
     if ($in_ul) {
         print "</ul>";
         if ($p->byarea())

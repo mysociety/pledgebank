@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.9 2006-10-17 10:08:53 francis Exp $
+ * $Id: ref-plain.php,v 1.10 2007-06-19 23:54:18 francis Exp $
  * 
  */
 
@@ -137,7 +137,7 @@ function add_signatories($p) {
     }
     $signers = array();
     $anon = 0;
-    $unknownname = 0;
+    $mobilesigners = 0;
 
     $order_by = "ORDER BY id";
     $extra_select = "";
@@ -147,11 +147,12 @@ function add_signatories($p) {
         $extra_select = ", byarea_location.whensucceeded";
         $extra_join = "LEFT JOIN byarea_location ON byarea_location.byarea_location_id = signers.byarea_location_id AND byarea_location.pledge_id = signers.pledge_id";
     }
-    $query = "SELECT signers.*, 
+    $query = "SELECT signers.*, person.mobile as mobile,
             location.description as location_description, location.country as location_country
             $extra_select
         from signers 
         LEFT JOIN location on location.id = signers.byarea_location_id 
+        LEFT JOIN person on person.id = signers.person_id 
         $extra_join
         WHERE signers.pledge_id = ? $order_by";
 
@@ -167,8 +168,10 @@ function add_signatories($p) {
                 }
                 $signers[] = $signer;
             } else {
-                ++$unknownname;
+                err('showname set but no name');
             }
+        } elseif (isset($r['mobile'])) {
+                $mobilesigners++;
         } else {
             $anon++;
         }
@@ -184,12 +187,12 @@ function add_signatories($p) {
         }
         print "</signerslist>\n";
         print "<anonymous_signers>$anon</anonymous_signers>\n";
-        print "<mobile_signers>$unknownname</mobile_signers>\n";
+        print "<mobile_signers>$mobilesigners</mobile_signers>\n";
     } elseif ($q_output == 'rabx') {
         global $out;
         $out['signers']['list'] = $signers;
         $out['data']['anonymous_signers'] = $anon;
-        $out['data']['mobile_signers'] = $unknownname;
+        $out['data']['mobile_signers'] = $mobilesigners;
     }
 }
 

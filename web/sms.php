@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.42 2007-06-19 23:15:21 francis Exp $
+ * $Id: sms.php,v 1.43 2007-06-19 23:54:18 francis Exp $
  * 
  */
 
@@ -117,11 +117,12 @@ if (!pledge_is_error($r)) {
      * record now uses. */
     $old_person_id = db_getOne('select person.id from signers left join person on person.id = signers.person_id where signers.id = ?', $signer_id);
     if (!$old_person_id) err('Expected old_person_id');
-    db_query('update signers set person_id = ?, name = ? where id = ?', array($P->id(), $P->name(), $signer_id));
+    db_query('update signers set person_id = ?, name = ?, showname = ? where id = ?', array($P->id(), $P->name(), $q_showname ? 't' : 'f', $signer_id));
     if ($old_person_id != $P->id()) {
         db_query('update signers set person_id = ? where person_id = ?', array($P->id(), $old_person_id));
         db_query('delete from person where id = ?', array($old_person_id));
     }
+    /* This will only keep their most recent mobile, so what. */
     db_query('update person set mobile = ? where id = ?', array($phone, $P->id()));
 } else if ($r == PLEDGE_SIGNED) {
     /* Either the pledge creator or somebody who's already signed up. */

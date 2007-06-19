@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+#
+# mobile-merge-person
+# Database migration script. Move the mobile field from the signers table into the person table.
+#
+# Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+# Email: francis@mysociety.org; WWW: http://www.mysociety.org/
+#
+
+my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.1 2007-06-19 21:59:42 francis Exp $';
+
+use strict;
+require 5.8.0;
+
+# Horrible boilerplate to set up appropriate library paths.
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+use lib "$FindBin::Bin/../../perllib";
+
+use mySociety::Config;
+BEGIN {
+    mySociety::Config::set_file("$FindBin::Bin/../conf/general");
+}
+use mySociety::DBHandle qw(dbh);
+
+use PB;
+
+# Find all pairs of people whose email addresses differ only by upper/lower case.
+my $st = dbh()->prepare('select * from signers where mobile is not null');
+$st->execute();
+while (my ($signer) = $st->fetchrow_hashref()) {
+    print "Signer: " . $signer->{id} . "\n";
+    # See whether this person has converted already
+    if ($signer->{person_id}) {
+        my $person = dbh()->selectrow_array('select * from person where person_id = ?', {}, $signer->{person_id}});
+        print Dumper($person)
+        # If there is a mobile field already, check it has same value
+        if ($person->{mobile}) {
+            die "signer/mobile mismatch" if $person->{mobile} ne $signer->{mobile};
+        } else {
+            # Otherwise copy mobile from signer to person table
+            dbh()->do('update person set mobile = ? where person_id = ?', {}, $signer->{mobile}, $person->{id}); 
+        }
+    } else {
+        # See if that mobile already has a person record
+        my $person = dbh()->selectrow_array('select * from person where mobile = ?', {}, $signer->{mobile}});
+        # If there is, check the email is also the same
+        if ($person) {
+            die "email/mobile mismatch" if $person->{email} ne $signer->{email};
+            dbh()->do('update signers set person_id = ? where signer_id = ?', {}, $person->{id}, $signer->{id}); 
+        } else {
+            # Otherwise, make a brand new shiny person record
+            my $next_person_id =  dbh()->selectrow_array("select nextval('person_id_seq')");
+            dbh()->do('insert into person (id, mobile) values (?, ?)', $next_person_id, $signer->{mobile});
+            dbh()->do('update signers set person_id = ? where signer_id = ?', {}, $next_person_id, $signer->{id}); 
+        }
+    }
+
+       # Merge the two people together
+	#dbh()->do('update signers set person_id = ? where person_id = ?', {}, $p1, $p2); 
+    }
+}
+
+#dbh()->commit();
+dbh()->rollback();
+
+

@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.1 2007-06-19 12:39:41 francis Exp $
+// $Id: facebook.php,v 1.2 2007-06-19 13:56:20 francis Exp $
 
 /*
 
@@ -114,8 +114,6 @@ img.creatorpicture {
 
 </style>
 <? $p->render_box(array('class'=>'')) ?>
-
-</div>
 
 <? /*<fb:share-button href="http://www.pledgebank.com/helo" class="url" /> */ ?>
 

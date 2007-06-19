@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.30 2006-09-19 14:27:24 chris Exp $
+# $Id: SMS.pm,v 1.31 2007-06-19 23:15:21 francis Exp $
 #
 
 package PB::SMS;
@@ -272,7 +272,7 @@ sub receive_sms ($$$$$$) {
                 # remains.
                 my ($signer_id) = dbh()->selectrow_array('
                                     select signers.id from signers
-                                    where pledge_id = ? and mobile = ?
+                                    where pledge_id = ? and (select mobile from person where person.id = signers.person_id) = ?
                                     for update', {}, $pledge_id, $sender);
                 my ($email) = dbh()->selectrow_array('
                                     select person.email from person
@@ -332,7 +332,7 @@ sub receive_sms ($$$$$$) {
                             from smssubscription, signers
                             where smssubscription.signer_id = signers.id
                                 and signers.pledge_id = ?
-                                and mobile = ?', {}, $pledge_id, $sender);
+                                and (select mobile from person where person.id = signers.person_id) = ?', {}, $pledge_id, $sender);
 
                 # 3. No previous token; generate a new one.
                 $token ||= unpack('h*', mySociety::Util::random_bytes(2))

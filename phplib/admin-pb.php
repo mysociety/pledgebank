@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.149 2007-04-11 15:55:59 matthew Exp $
+ * $Id: admin-pb.php,v 1.150 2007-06-19 23:15:21 francis Exp $
  * 
  */
 
@@ -325,7 +325,7 @@ class ADMIN_PAGE_PB_MAIN {
         // Signers
         print "<h2>Signers (".$pdata['signers']."/".$pdata['target'].")</h2>";
         $query = 'SELECT signers.name as signname,person.email as signemail,
-                         signers.mobile as signmobile,
+                         person.mobile as signmobile,
                          date_trunc(\'second\',signtime) AS signtime,
                          showname, signers.id AS signid,
                          location.description AS location_description
@@ -698,7 +698,7 @@ class ADMIN_PAGE_PB_LATEST {
         }
  
         $q = db_query("SELECT signers.name, signer_person.email,
-                              signers.mobile, signtime, showname, pledges.title,
+                              signer_person.mobile as mobile, signtime, showname, pledges.title,
                               pledges.ref, pledges.id,
                               extract(epoch from signtime) as epoch
                          FROM pledges, signers

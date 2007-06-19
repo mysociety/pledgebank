@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.41 2007-01-16 13:12:38 matthew Exp $
+ * $Id: sms.php,v 1.42 2007-06-19 23:15:21 francis Exp $
  * 
  */
 
@@ -54,10 +54,7 @@ elseif (!isset($r['signer_id'])) {
 
 /* We have signed up. Obtain pledge ID. */
 $signer_id = $r['signer_id'];
-$pledge_id = db_getOne('
-                    select pledge_id from signers where id = ?',
-                    $signer_id
-                );
+$pledge_id = db_getOne('select pledge_id from signers where id = ?', $signer_id);
 $pledge = new Pledge(intval($pledge_id));
 
 /* Don't allow conversion on private pledges. */
@@ -65,7 +62,7 @@ if (!is_null(db_getOne('select pin from pledges where id = ?', $pledge_id)))
     err(_('Permission denied'));
 
 /* Have we already converted? If so just show the usual "thank you" page. */
-if (db_getOne('select person_id from signers where id = ?', $signer_id)) {
+if (db_getOne('select email from signers left join person on person.id = signers.person_id where signers.id = ?', $signer_id)) {
     page_header(_('SMS'));
     print p(strong(_('Thanks for signing up to this pledge!')));
     post_confirm_advertise();
@@ -87,7 +84,7 @@ if (!$errs)
 $showform = true;
 
 $p = preg_replace("/[^\d]/", '', $q_phone);
-$phone = db_getOne('select mobile from signers where id = ?', $signer_id);
+$phone = db_getOne('select mobile from signers left join person on person.id = signers.person_id where signers.id = ?', $signer_id);
 if (!$phone)
     err(sprintf(_('No mobile number recorded for SMS signer %d'), $signer_id));
 else if (substr($p, -6) != substr($phone, -6)) {
@@ -116,27 +113,21 @@ $P = pb_person_signon($data, $q_email, $q_name);
 $r = pledge_is_valid_to_sign($pledge_id, $P->email());
 
 if (!pledge_is_error($r)) {
-    /* No existing signer, so just stick this person in
-     * to the SMS-signed record. */
+    /* No existing signer, so make this person the one the SMS-signer 
+     * record now uses. */
+    $old_person_id = db_getOne('select person.id from signers left join person on person.id = signers.person_id where signers.id = ?', $signer_id);
+    if (!$old_person_id) err('Expected old_person_id');
     db_query('update signers set person_id = ?, name = ? where id = ?', array($P->id(), $P->name(), $signer_id));
-} else if ($r == PLEDGE_SIGNED) {
-    /* Either the pledge creator or somebody who's already
-     * signed up. */
-    db_query('lock table signers in share mode');
-    $signer_id2 = db_getOne('select id from signers where person_id = ?', $P->id());
-    if (!is_null($signer_id2))
-        /* Somebody else has already signed under this
-         * email address, so combine the two
-         * subscriptions. */
-        db_query('select signers_combine_2(?, ?)', array($signer_id, $signer_id2));
-            /* fall through so they just see the "thanks for signing" message */
-    else {
-        /* Creator trying to sign their own pledge. Need to remove the old
-         * signer record. */
-        print p(strong(_('You cannot sign your own pledge!')));
-        page_footer();
-        exit();
+    if ($old_person_id != $P->id()) {
+        db_query('update signers set person_id = ? where person_id = ?', array($P->id(), $old_person_id));
+        db_query('delete from person where id = ?', array($old_person_id));
     }
+    db_query('update person set mobile = ? where id = ?', array($phone, $P->id()));
+} else if ($r == PLEDGE_SIGNED) {
+    /* Either the pledge creator or somebody who's already signed up. */
+    print p(strong(_('You either made or already signed this pledge!')));
+    page_footer();
+    exit();
 } else
     oops($r);
 
@@ -205,9 +196,9 @@ function oops($r, $what = null) {
 function conversion_form($errs, $pledge_id) {
     global $q_h_token, $q_unchecked_h_phone, $q_unchecked_h_email, $q_unchecked_h_name;
     print _('<h2>Thanks for signing up!</h2>');
-    print p(_('On this page you can let us have your name and email address so that you can
-get email from the pledge creator.  We will also email you when the pledge
-succeeds, rather than sending an SMS.'));
+    print p(_('On this page you can <strong>let us have your name and email address</strong> so that you can
+get email from the pledge creator.  We will then <strong>email you when the pledge succeeds</strong>,
+rather than sending an SMS.'));
     if ($errs) {
         print '<div id="errors"><ul>';
         if (array_key_exists('phone', $errs))
@@ -225,7 +216,7 @@ succeeds, rather than sending an SMS.'));
 
     print '<form accept-charset="utf-8" id="pledgeaction" class="pledge" method="post" action="/sms" name="pledge">';
     # TRANS: Heading of a form to get details to sign up
-    print _('<h2>Get updates by email</h2>');
+    print _('<h2>Get updates by email instead of SMS</h2>');
 ?>
 <input type="hidden" name="f" value="1">
 <input type="hidden" name="token" value="<?=$q_h_token ?>">

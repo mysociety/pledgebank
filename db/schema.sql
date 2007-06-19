@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.217 2007-05-28 22:38:03 francis Exp $
+-- $Id: schema.sql,v 1.218 2007-06-19 23:15:20 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -117,10 +117,13 @@ create index location_country_idx on location(country);
 create table person (
     id serial not null primary key,
     name text,
-    email text not null,
+    email text,
     password text,
     website text,
     numlogins integer not null default 0,
+    mobile text,
+
+    check ( email is not null or mobile is not null ),
 
     -- extra data, added originally for Live Simply Promise
     address_1 text,
@@ -134,6 +137,7 @@ create table person (
 
 create unique index person_email_idx on person(email);
 create unique index person_email_lower_idx on person(lower(email));
+create unique index person_mobile_idx on person(mobile);
 
 -- information about each pledge
 create table pledges (
@@ -406,7 +410,7 @@ create function pledge_is_valid_to_sign(integer, text, text)
             if p.target_type = ''byarea'' then
                 return ''byarea'';
             end if;
-            perform id from signers where pledge_id = $1 and mobile = $3 for update;
+            perform signers.id from signers left join person on person.id = signers.person_id where pledge_id = $1 and person.mobile = $3 for update;
             if found then
                 return ''signed'';
             end if;
@@ -568,7 +572,6 @@ create table signers (
     -- without giving their name.
     name text,
     person_id integer references person(id),
-    mobile text,
 
     -- whether they want their name public
     showname boolean not null default false,
@@ -583,19 +586,13 @@ create table signers (
     -- IP address of browser at time of signing
     ipaddr varchar(15),     -- nullable since added late
   
-    check (
-        (showname and name is not null and person_id is not null)
-        or (not showname and person_id is not null)
-        or (name is null and person_id is null and mobile is not null)
-    )
+    check ( person_id is not null),
+    check ( (showname and name is not null) or (not showname))
 );
 
 create index signers_pledge_id_idx on signers(pledge_id);
 
--- There may be only one signature on any given pledge from any given mobile
--- phone number.
-create unique index signers_pledge_id_mobile_idx on signers(pledge_id, mobile);
--- Ditto emails.
+-- Check each person only signs each pledge once
 create unique index signers_pledge_id_person_id_idx on signers(pledge_id, person_id);
 
 -- Used to make connection-finding faster.
@@ -603,71 +600,6 @@ create index signers_person_id_idx on signers(person_id);
 
 -- Used to make pledge change time calculation faster.
 create index signers_signtime_idx on signers(signtime);
-
--- signers_combine_2 ID1 ID2
--- Given the IDs ID1 and ID2 of two signers of a pledge, coalesce them into one
--- signer combining the two. One signer should have a name and person ID, and
--- the other a mobile phone number only. The ID of the remaining signer is the
--- ID of the signer with the email address. If the pledge was successful before
--- this combination took place, set the removedsigneraftersuccessflag to record
--- this fact. This function has no return value, and raises an exception if any
--- of its preconditions are not met.
-create function signers_combine_2(integer, integer)
-    returns void as '
-    declare
-        id1 integer;
-        id2 integer;
-        t_pledge_id integer;
-        t_mobile text;
-        p record;
-    begin
-        -- Lock the signers table.
-        lock table signers in share mode;
-
-        if (select pledge_id from signers where id = $1)
-            <> (select pledge_id from signers where id = $2) then
-            raise exception ''ID1 and ID2 must be signers to the same pledge'';
-        end if;
-        
-        t_pledge_id := (select pledge_id from signers where id = $1);
-
-        -- lock pledges table in case we need to update it later
-        select into p whensucceeded
-            from pledges
-            where id = t_pledge_id
-            for update;
-
-        if (select person_id from signers where id = $1) is not null
-            and (select person_id from signers where id = $2) is null then
-            id1 := $1;
-            id2 := $2;
-        elsif (select person_id from signers where id = $1) is null
-            and (select person_id from signers where id = $2) is not null then
-            id1 := $2;
-            id2 := $1;
-        else
-            raise exception ''exactly one of ID1, ID2 must be a logged-in person'';
-        end if;
-
-        t_mobile = (select mobile from signers where id = id2);
-        
-        delete from smssubscription where signer_id = id2;
-        delete from signers where id = id2;
-
-        update signers
-            set mobile = t_mobile
-            where id = id1;
-
-        if p.whensucceeded is not null then
-            -- pledge was successful and now we''re removing a signer, so record
-            -- this fact
-            update pledges set removedsigneraftersuccess = true
-                where id = t_pledge_id;
-        end if;
-
-        return;
-    end;
-' language 'plpgsql';
 
 -- Subscription by SMS. The punter sends us a message, and we reply with a
 -- reverse-billed one, recording the mapping from pledge to outgoing SMS in
@@ -713,6 +645,7 @@ create function smssubscription_sign(integer, text)
         t_token text;
         status text;
         t_mobile text;
+        t_person_id integer;
     begin
         t_outgoingsms_id := $1;
         t_token := $2;
@@ -779,8 +712,8 @@ create function smssubscription_sign(integer, text)
             -- If we have already signed this, then we should update this
             -- subscription record to point at the existing subscription.
             if status = ''signed'' then
-                select into p id
-                    from signers
+                select into p signers.id
+                    from signers left join person on person.id = signers.person_id
                     where mobile = t_mobile
                     for update;
                 -- XXX repeated code
@@ -791,15 +724,21 @@ create function smssubscription_sign(integer, text)
             end if;
             return status;
         end if;
+
+        -- See if we already have a person record for this mobile
+        t_person_id :=  ( select id from person where mobile = t_mobile );
+        if t_person_id is null then
+            -- If not, then make one
+            t_person_id := ( select nextval(''person_id_seq''));
+            insert into person (id, mobile) values (t_person_id, t_mobile);
+        end if;
         
+        -- Add the new signature to the signers table
         t_signer_id := (
             select nextval(''signers_id_seq'')
         );
-
-        -- showname = true here so that they will appear as a "person whose
-        -- name we do not know" rather than an anonymous person
-        insert into signers (id, pledge_id, mobile, showname, signtime)
-            values (t_signer_id, t_pledge_id, t_mobile, true, ms_current_timestamp());
+        insert into signers (id, pledge_id, person_id, showname, signtime)
+            values (t_signer_id, t_pledge_id, t_person_id, false, ms_current_timestamp());
 
        
         update smssubscription

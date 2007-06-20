@@ -5,18 +5,25 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.6 2007-06-20 18:21:08 francis Exp $
+// $Id: facebook.php,v 1.7 2007-06-20 21:41:44 francis Exp $
 
 /*
 
 TODO:
-- Sort out when we require an add
+- Sort out when we require the application to be added
+- Infinite loop after sending request
+- More details / pledge success failure / link to pledgebank.com for flyers/comments
+- sign_in_facebook shouldn't get stuck in the URL
 
-- Detect language that Facebook is using, and tell PledgeBank pages to use that.
-- Lower case and fuzzy matching of pledge refs
+- Don't use mySociety logo for notification icon
 - Make sure can't do redirect in another site's iframe to sign pledge without permission 
 - Test PIN protected pledges are safe
 - Fix sorting of pledges in profile box
+- Fix $invite_intro stuff that isn't used
+
+Not so important
+- Lower case and fuzzy matching of pledge refs
+- Detect language that Facebook is using, and tell PledgeBank pages to use that.
 
 */
 
@@ -26,7 +33,7 @@ require_once '../phplib/pledge.php';
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
-#$GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
+$GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
 $page_plain_headers = true;
 
 // the facebook client library
@@ -92,10 +99,12 @@ function update_profile_box($uid) {
 
 function do_test() {
     global $facebook;
-    $user = $facebook->require_login();
-
-    update_profile_box($user);
+#    $facebook->require_login();
+#    update_profile_box($facebook->get_loggedin_user());
     print "Doing test";
+
+    $notifications = $facebook->api_client->notifications_get();
+    print_r($notifications);
     exit;
 }
 
@@ -198,8 +207,9 @@ function render_frontpage() {
     return;
 }
 
-function sign_pledge_in_facebook($pledge, $user) {
+function sign_pledge_in_facebook($pledge) {
     global $facebook;
+    $user = $facebook->get_loggedin_user();
 
     $R = pledge_is_valid_to_sign($pledge->id(), null, null, $user);
     $f1 = $pledge->succeeded(true);
@@ -214,32 +224,41 @@ function sign_pledge_in_facebook($pledge, $user) {
         # Add them as a signer
         db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge->id(), null, $person_id, 'f', $_SERVER['REMOTE_ADDR'], null));
         db_commit();
-        print '<p>'. _("Thanks for signing up to this pledge!") . '</p>';
+        print "<p class=\"notification\">"._("Thanks for signing up to this pledge!")."</p>";
+#        print '<h1 style=\"text-align: center\">'. . '</h1>';
 
         # See if they tipped the balance
         $pledge = new Pledge($pledge->ref());
         if (!$f1 && $pledge->succeeded()) {
-            print '<p><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
+            print '<p class=\"notification\"><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
         }
 
         # Show on their profile that they have signed it
         update_profile_box($user);
 
         # Publish feed story
-        $feed_title = '<fb:userlink uid="'.$user.'" shownetwork="false"/> has signed a pledge.';
+        $feed_title = '<fb:userlink uid="'.$user.'" shownetwork="false"/> has signed '; 
+        if (OPTION_PB_STAGING) 
+            $feed_title .= 'a test pledge.';
+        else
+            $feed_title .= 'a pledge.';
         $feed_body = $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>false));
         $ret = $facebook->api_client->feed_publishActionOfUser($feed_title, $feed_body);
-        if ($ret[0] != 1) err("Error calling feed_publishActionOfUser: " . print_r($ret, TRUE));
+        if (!$ret) {
+            print '<p class="notification">'._('For some reason, could not add that you signed this pledge to your feed.').'</p>';
+        } else {
+            if ($ret[0] != 1) err("Error calling feed_publishActionOfUser: " . print_r($ret, TRUE));
+        }
         #$ret = $facebook->api_client->feed_publishStoryToUser($feed_title, $feed_body);
         #if ($ret[0] != 1) err("Error calling feed_publishStoryToUser: " . print_r($ret, TRUE));
 
     } else if ($R == PLEDGE_SIGNED) {
-        print '<p>'._('You\'ve already signed this pledge!').'</p>';
+        print '<p class="notification">'._('You\'ve already signed this pledge!').'</p>';
     } else {
         /* Something else has gone wrong. */
-        print '<p><strong>' . _("Sorry &mdash; it wasn't possible to sign that pledge.") . ' '
+        print '<p class="notification">' . _("Sorry &mdash; it wasn't possible to sign that pledge.") . ' '
                 . htmlspecialchars(pledge_strerror($R))
-                . ".</strong></p>";
+                . ".</p>";
     }
 
 }
@@ -249,25 +268,42 @@ function send_pledge_to_friends($pledge, $friends) {
     global $facebook;
 
     #$invite_intro = "Invite more friends to sign this pledge.";
-    $content = "<p>I've signed this pledge, and thought you might like to sign it as well.</p>";
-    $content .= "<p>'".$pledge->h_sentence(array('firstperson'=>'includename')) ."'</p>";
+
+/*    if (OPTION_PB_STAGING) 
+        $content = "I've signed this test pledge, and thought you might like to sign it as well. ";
+    else
+        $content = "I've signed this pledge, and thought you might like to sign it as well. ";
+    $content .= " '".$pledge->sentence(array('firstperson'=>'includename')) ."' ";
     $content .= "
-<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."\" label=\"Sign the pledge!\" />
+<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."?sign_in_facebook=1\" label=\"Sign the pledge!\" />
 ";
     $ret = $facebook->api_client->notifications_sendRequest(join(",", $friends), "pledge", $content, "http://www.mysociety.org/mysociety_sm.gif", "invitation");
-    if (is_int($ret)) err("Error calling notifications_sendRequest: " . print_r($ret, TRUE));
-    if (!$ret) err("Couldn't send the pledge to your friends, probably because too many messages in too short a time.");
-    $facebook->redirect($ret);
-    exit;
+    if (is_int($ret)) err("Error calling notifications_sendRequest: " . print_r($ret, TRUE)); */
+
+    $user = $facebook->get_loggedin_user();
+
+    $content = '<fb:notif-subject><fb:name uid="' . $user . '" firstnameonly="false" capitalize="true"/> pledged to do something...</fb:notif-subject> 
+        <fb:name uid="' . $user . '" firstnameonly="true" capitalize="true"/> signed this pledge:
+        \''.$pledge->sentence(array('firstperson'=>'includename')) .'\'
+        <a href="'.OPTION_FACEBOOK_CANVAS.$pledge->ref().'">Sign the pledge yourself</a>.';
+    $ret = $facebook->api_client->notifications_send(join(",", $friends), $content, FALSE);
+    if (is_int($ret)) err("Error calling notifications_send: " . print_r($ret, TRUE));
+    if (!$ret)
+        return false;
+    else {
+        $facebook->redirect($ret);
+        exit;
+    }
 }
 
 function render_header() {
 ?> <div style="padding: 10px;">  <?
 if (OPTION_PB_STAGING) {
 ?>
-<p><i>This is a development version of PledgeBank in Facebook. It doesn't work yet, but it
-will soon. Any pledges are test ones in a test database, not real ones from 
-<a href="http://www.pledgebank.com">PledgeBank.com</a>.</i></p>
+<p><i>This is a development version of PledgeBank in Facebook.  Any pledges are
+test ones in a test database. For real ones try the <a href="http://apps.facebook.com/pledgebank">live
+PledgeBank</a> application.</i>
+</p>
 <?
 }
 
@@ -296,7 +332,10 @@ img.creatorpicture {
     display: inline;
     margin-right: 10px;
 }
-
+.notification {
+    font-style: italic;
+    text-align: center;
+}
 </style>
 <? 
 }
@@ -314,7 +353,7 @@ $facebook = new Facebook(OPTION_FACEBOOK_API_KEY, OPTION_FACEBOOK_SECRET);
 
 $facebook->require_frame();
 #$facebook->require_add();
-#$user = $facebook->require_login();
+#$facebook->require_login();
 #print $facebook->get_add_url() ; 
 
 if (get_http_var("test")) {
@@ -329,22 +368,31 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     render_frontpage();
     render_footer();
 } else {
+    $facebook->require_add();
+
     $pledge = new Pledge($ref);
     if ($pledge->pin()) {
         err("PIN protected pledges can't be accessed from Facebook");
     }
     if (get_http_var("sign_in_facebook")) {
-        $user = $facebook->require_login();
+        $facebook->require_login();
     }
+    $no_send_error = false;
     if (get_http_var("invite_friends")) {
-        $user = $facebook->require_login();
-        send_pledge_to_friends($pledge, $_POST['ids']);
+        $facebook->require_login();
+        if (array_key_exists('ids', $_POST)) {
+            if (!send_pledge_to_friends($pledge,$_POST['ids'])) {
+                $no_send_error = true;
+            }
+        }
     }
 
     render_header();
     render_dashboard();
+    if ($no_send_error)
+        print '<p class="notification">'."Sorry, PledgeBank couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
     if (get_http_var("sign_in_facebook")) {
-        sign_pledge_in_facebook($pledge, $user);
+        sign_pledge_in_facebook($pledge);
     }
     render_pledge($pledge);
     render_footer();

@@ -7,7 +7,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.2 2007-06-19 22:02:21 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.3 2007-06-20 02:36:39 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -16,6 +16,7 @@ require 5.8.0;
 use FindBin;
 use lib "$FindBin::Bin/../perllib";
 use lib "$FindBin::Bin/../../perllib";
+use Data::Dumper;
 
 use mySociety::Config;
 BEGIN {
@@ -25,41 +26,68 @@ use mySociety::DBHandle qw(dbh);
 
 use PB;
 
+# Do schema upgrades
+dbh()->do('alter table person add mobile text');
+dbh()->do('alter table person alter email drop not null');
+dbh()->do('update signers set showname = \'f\' where mobile is not null and showname and name is null');
+#dbh()->do('alter table signers drop constrant "$1"');
 # Find all pairs of people whose email addresses differ only by upper/lower case.
+my @signers;
 my $st = dbh()->prepare('select * from signers where mobile is not null');
 $st->execute();
-while (my ($signer) = $st->fetchrow_hashref()) {
+my $c=0;
+while (my $signer = $st->fetchrow_hashref()) {
+    push @signers, $signer;
+}
+foreach my $signer (@signers) {
+    print $c++ . "\n";
     print "Signer: " . $signer->{id} . "\n";
+    print Dumper($signer);
     # See whether this person has converted already
     if ($signer->{person_id}) {
-    	print "Signer has a person_id\n";
-        my $person = dbh()->selectrow_array('select * from person where person_id = ?', {}, $signer->{person_id});
-        print Dumper($person);
+    	#print "Signer has a person_id\n";
+        my $person = dbh()->selectrow_hashref('select * from person where id = ?', {}, $signer->{person_id});
+        #print Dumper($person);
         # If there is a mobile field already, check it has same value
         if ($person->{mobile}) {
             die "signer/mobile mismatch" if $person->{mobile} ne $signer->{mobile};
         } else {
             # Otherwise copy mobile from signer to person table
-            dbh()->do('update person set mobile = ? where person_id = ?', {}, $signer->{mobile}, $person->{id}); 
+            dbh()->do('update person set mobile = ? where id = ?', {}, $signer->{mobile}, $person->{id}); 
         }
     } else {
-    	print "Signer has no person_id\n";
+    	#print "Signer has no person_id\n";
         # See if that mobile already has a person record
-        my $person = dbh()->selectrow_array('select * from person where mobile = ?', {}, $signer->{mobile});
+        my $person = dbh()->selectrow_hashref('select * from person where mobile = ?', {}, $signer->{mobile});
         # If there is, check the email is also the same
         if ($person) {
-            die "email/mobile mismatch" if $person->{email} ne $signer->{email};
-            dbh()->do('update signers set person_id = ? where signer_id = ?', {}, $person->{id}, $signer->{id}); 
+            #print Dumper($person);
+            if (defined($person->{email}) && defined($signer->{email})) {
+                die "email/mobile mismatch" if $person->{email} ne $signer->{email};
+            }
+            dbh()->do('update signers set person_id = ? where signers.id = ?', {}, $person->{id}, $signer->{id}); 
         } else {
             # Otherwise, make a brand new shiny person record
             my $next_person_id =  dbh()->selectrow_array("select nextval('person_id_seq')");
-            dbh()->do('insert into person (id, mobile) values (?, ?)', $next_person_id, $signer->{mobile});
-            dbh()->do('update signers set person_id = ? where signer_id = ?', {}, $next_person_id, $signer->{id}); 
+            dbh()->do('insert into person (id, mobile) values (?, ?)', {}, $next_person_id, $signer->{mobile});
+            dbh()->do('update signers set person_id = ? where signers.id = ?', {}, $next_person_id, $signer->{id}); 
         }
     }
 }
 
 #dbh()->commit();
-dbh()->rollback();
+print "adding\n";
+dbh()->do('alter table person add check ( email is not null or mobile is not null )');
+print "adding 1\n";
+dbh()->do('alter table signers drop mobile');
+print "adding 2\n";
+dbh()->do('alter table signers add check ( person_id is not null)');
+print "adding 3\n";
+dbh()->do('alter table signers add check ( (showname and name is not null) or (not showname))');
+dbh()->commit();
+
+# create or replace function pledge_is_valid_to_sign(integer, text, text);
+# drop function signers_combine_2(integer, integer);
+# create or replace function smssubscription_sign(integer, text)
 
 

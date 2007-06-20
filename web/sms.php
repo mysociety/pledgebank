@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.43 2007-06-19 23:54:18 francis Exp $
+ * $Id: sms.php,v 1.44 2007-06-20 03:34:09 francis Exp $
  * 
  */
 
@@ -195,7 +195,7 @@ function oops($r, $what = null) {
  * Display the form for a user to convert their SMS subscription to email.
  * ERRORS is an array of errors to display for each field. */
 function conversion_form($errs, $pledge_id) {
-    global $q_h_token, $q_unchecked_h_phone, $q_unchecked_h_email, $q_unchecked_h_name;
+    global $q_h_token, $q_unchecked_h_phone, $q_unchecked_h_email, $q_unchecked_h_name, $q_showname;
     print _('<h2>Thanks for signing up!</h2>');
     print p(_('On this page you can <strong>let us have your name and email address</strong> so that you can
 get email from the pledge creator.  We will then <strong>email you when the pledge succeeds</strong>,
@@ -215,6 +215,8 @@ rather than sending an SMS.'));
         $p->render_box(array('showdetails' => false));
     }
 
+    $showname = $q_showname ? ' checked' : '';
+
     print '<form accept-charset="utf-8" id="pledgeaction" class="pledge" method="post" action="/sms" name="pledge">';
     # TRANS: Heading of a form to get details to sign up
     print _('<h2>Get updates by email instead of SMS</h2>');
@@ -225,7 +227,7 @@ rather than sending an SMS.'));
 <?=_('Phone number:') ?> <input type="text" name="phone" value="<?=$q_unchecked_h_phone ?>"><br>
 <?=_('Name:') ?> <input type="text" name="name" value="<?=$q_unchecked_h_name ?>"><br>
 <?=_('Email:') ?> <input type="text" name="email" size="30" value="<?=$q_unchecked_h_email ?>"><br>
-<?=_('Show my name on this pledge') ?>: <input name="showname" value="1" checked="checked" type="checkbox"><br>
+<?=_('Show my name on this pledge') ?>: <input name="showname" value="1" <?=$showname?> type="checkbox"><br>
 <input type="submit" name="submit" value="<?=_('Submit') ?>">
 </form>
 <?

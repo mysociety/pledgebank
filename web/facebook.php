@@ -5,17 +5,16 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.8 2007-06-20 23:18:42 francis Exp $
+// $Id: facebook.php,v 1.9 2007-06-20 23:50:36 francis Exp $
 
 /*
 
 TODO:
 - Success / failures / announce messages
-- Sort out when we require the application to be added
+
 - Infinite loop after sending request
-- After Helen clicked link in email and added herself it took her to the wrong page
+- After you add yourself for signing, should actually do the signature
 - Sign the pledge link in Email should actually sign it, or say something else, grrr
-- Pledge success failure messages on pledge page
 - sign_in_facebook shouldn't get stuck in the URL
 
 - Don't use mySociety logo for notification icon
@@ -142,7 +141,7 @@ function render_pledge($pledge) {
     print '<a href="'.$pledge->url_typein().'">';
     print '<strong>'. str_replace('http://', '', $pledge->url_typein()) . '</strong>';
     print '</a>';
-    print " for comments, flyers, SMS and more.";
+    print " for comments, flyers, SMS signup and more.";
     print '</p>';
 }
 
@@ -184,12 +183,25 @@ function render_dashboard() {
 
 function render_frontpage() {
     global $facebook, $pb_today;
-/*<p><a href="<?= $facebook->get_add_url() ?>">Put PledgeBank in your profile</a>, if you haven't already!</p>*/
 /*<fb:tabs>
 <fb:tab-item title="Friends pledges" selected="true" href="http://apps.facebook.com/pledgebank/list/friends" />
 <fb:tab-item title="Recent pledges" href="http://apps.facebook.com/pledgebank/list/recent" />
 <fb:tab-item title="Successful pledges" href="http://apps.facebook.com/pledgebank/list/success" />
 </fb:tabs>*/
+
+//    $friends = $facebook->api_client->friends_get();
+/*    $friends_joined = join(",", $friends);
+    print_r($friends);
+    $q = db_query("SELECT pledges.*, country, 
+            (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
+            FROM pledges 
+            LEFT JOIN location ON location.id = pledges.location_id
+            LEFT JOIN person ON person.id = pledges.person_id
+            WHERE pin IS NULL AND 
+            (person.facebook_id in ($friends_joined)
+            OR pledges.id IN (SELECT pledge_id FROM signers LEFT JOIN person on person.id = signers.person_id
+                    WHERE facebook_id in ($friends_joined)))");
+*/
     if (OPTION_PB_STAGING) {
 ?> <p>Here are some pledges from the test database:</p> <?
     } else {
@@ -258,7 +270,7 @@ function sign_pledge_in_facebook($pledge) {
         $feed_body = $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>false));
         $ret = $facebook->api_client->feed_publishActionOfUser($feed_title, $feed_body);
         if (!$ret) {
-            print '<p class="errors">'._('For some reason, could not add the news that you\'ve signed to your feed.').'</p>';
+            print '<p class="errors">'._('The news that you\'ve signed could not be added to your feed.').'</p>';
         } else {
             if ($ret[0] != 1) err("Error calling feed_publishActionOfUser: " . print_r($ret, TRUE));
         }
@@ -273,7 +285,7 @@ function sign_pledge_in_facebook($pledge) {
                 . htmlspecialchars(pledge_strerror($R))
                 . ".</p>";
     }
-
+    return $pledge;
 }
 
 // Send notification email
@@ -344,11 +356,24 @@ PledgeBank</a> application.</i>
     background-color: #ffcccc;
     border: solid 2px #990000;
     padding: 3px;
+    text-align: center;
 }
 .errors {
     margin: 0 auto 1em;
 }
 .errors ul {
+    padding: 0;
+    margin: 0 0 0 1.5em;
+}
+/* formnote is for non-negative notes at top of page about form filling in */
+.formnote {
+    margin: 0 auto 1em;
+    background-color: #ccffcc;
+    border: solid 2px #009900;
+    padding: 3px;
+    text-align: center;
+}
+.formnote ul {
     padding: 0;
     margin: 0 0 0 1.5em;
 }
@@ -385,18 +410,17 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     render_frontpage();
     render_footer();
 } else {
-    $facebook->require_add();
 
     $pledge = new Pledge($ref);
     if ($pledge->pin()) {
         err("PIN protected pledges can't be accessed from Facebook");
     }
     if (get_http_var("sign_in_facebook")) {
-        $facebook->require_login();
+        $facebook->require_add('/'.$pledge->ref());
     }
     $no_send_error = false;
     if (get_http_var("invite_friends")) {
-        $facebook->require_login();
+        $facebook->require_add('/'.$pledge->ref());
         if (array_key_exists('ids', $_POST)) {
             if (!send_pledge_to_friends($pledge,$_POST['ids'])) {
                 $no_send_error = true;
@@ -409,7 +433,7 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     if ($no_send_error)
         print '<p class="errors">'."Sorry, PledgeBank couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
     if (get_http_var("sign_in_facebook")) {
-        sign_pledge_in_facebook($pledge);
+        $pledge = sign_pledge_in_facebook($pledge);
     }
     render_pledge($pledge);
     render_footer();

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.224 2007-06-20 10:23:00 francis Exp $
+ * $Id: pledge.php,v 1.225 2007-06-20 15:12:52 francis Exp $
  * 
  */
 
@@ -402,6 +402,7 @@ class Pledge {
     //            the pledge sentence
     //     reportlink - if present and true, show "report this pledge" link
     //     class - adds the given classes (space separated) to the division
+    //     facebook - add facebook specific buttons
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
         if (array_key_exists('href', $params)) {
@@ -424,7 +425,7 @@ class Pledge {
 <?      } ?>
 </p>
 <?      if (!$this->byarea()) { ?>
-<p align="right">&mdash; <?=$this->h_name_and_identity() ?></p>
+<p style="text-align: right">&mdash; <?=$this->h_name_and_identity() ?></p>
 <?      }
 
         global $microsite; # XXX
@@ -521,8 +522,18 @@ class Pledge {
     global $contact_ref; ?>
 <div id="reportpledge"><a href="/contact<?=$contact_ref?>"><?=_('Anything wrong with this pledge?  Tell us!') ?></a></div>
 <? } ?>
-    </div>
 <?
+        if (array_key_exists('facebook', $params) && $params['facebook']) {
+?>
+<fb:editor action="" labelwidth="200">
+  <fb:editor-buttonset>
+    <fb:editor-button value="Sign Pledge"/>
+  </fb:editor-buttonset>
+   <input type="hidden" name="sign_in_facebook" value="1">
+</fb:editor>
+<?
+        }
+?>   </div> <?
     }
 
     /* sentence PLEDGE PARAMS

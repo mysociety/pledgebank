@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.221 2007-06-19 17:43:18 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.222 2007-06-20 02:46:40 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -635,7 +635,6 @@ sub do_public_succeeding_pledge {
     my $reno_field = '39.52972|-119.81278|Reno, Washoe County, NV';
     my $sparks_field = '39.535|-119.75167|Sparks, Washoe County, NV';
     my $content = $wth->browser_content();
-    print $content;
     if ($content !~ m/\Q$reno_field/) {
         $reno_field = '39.5296329|-119.8138027|Reno, Washoe County, NV';
         $sparks_field = '39.5349112|-119.7526886|Sparks, Washoe County, NV';

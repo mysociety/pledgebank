@@ -7,7 +7,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.5 2007-06-20 03:23:33 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.6 2007-06-20 03:24:23 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -92,6 +92,7 @@ dbh()->commit();
 
 # create or replace function pledge_is_valid_to_sign(integer, text, text);
 # drop function signers_combine_2(integer, integer);
-# create or replace function smssubscription_sign(integer, text)
+# create function smssubscription_sign(integer, text)
+
 
 

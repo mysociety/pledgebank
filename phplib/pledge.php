@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.225 2007-06-20 15:12:52 francis Exp $
+ * $Id: pledge.php,v 1.226 2007-06-20 15:25:03 francis Exp $
  * 
  */
 
@@ -1029,6 +1029,7 @@ function pledge_get_list($where, $params) {
     $query = "SELECT pledges.*, pledges.ref, country,
                     (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
             FROM pledges LEFT JOIN location ON location.id = pledges.location_id
+                         LEFT JOIN person ON person.id = pledges.person_id
             WHERE ";
     $sql_params = array();
     

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.223 2007-06-19 13:56:20 francis Exp $
+ * $Id: pledge.php,v 1.224 2007-06-20 10:23:00 francis Exp $
  * 
  */
 
@@ -772,6 +772,7 @@ define('PLEDGE_FINISHED',   -2);    /* Pledge has expired */
 define('PLEDGE_FULL',       -3);    /* All places taken */
 define('PLEDGE_SIGNED',     -4);    /* Email address is already on pledge */
 define('PLEDGE_DENIED',     -5);    /* Permission denied */
+define('PLEDGE_BYAREA',     -6);    /* Not supported for byarea pledges */
 
     /* codes <= -100 represent temporary errors */
 define('PLEDGE_ERROR',    -100);    /* Some sort of nonspecific error. */
@@ -794,6 +795,9 @@ function pledge_strerror($e) {
 
     case PLEDGE_FULL:
         return _("That pledge is already full");
+
+    case PLEDGE_BYAREA:
+        return _("Signing up with a place name is supported only by email (not mobile phones or Facebook)");
 
     case PLEDGE_SIGNED:
         return _("You've already signed that pledge");
@@ -824,6 +828,7 @@ function pledge_dbresult_to_code($r) {
             'finished' => PLEDGE_FINISHED,
             'signed' => PLEDGE_SIGNED,
             'full' => PLEDGE_FULL,
+            'byarea' => PLEDGE_BYAREA
         );
     if (array_key_exists($r, $resmap))
         return $resmap[$r];
@@ -831,14 +836,14 @@ function pledge_dbresult_to_code($r) {
         err("Bad result $r in pledge_dbresult_to_code");
 }
 
-/* pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
- * Return a PLEDGE_... code describing whether EMAIL/MOBILE may validly sign
- * PLEDGE. This function locks rows in pledges and signers with select ... for
- * update / lock tables. */
-function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null) {
+/* pledge_is_valid_to_sign PLEDGE EMAIL MOBILE FACEBOOK_ID
+ * Return a PLEDGE_... code describing whether EMAIL/MOBILE/FACEBOOK_ID may
+ * validly sign PLEDGE. This function locks rows in pledges and signers with
+ * select ... for update / lock tables. */
+function pledge_is_valid_to_sign($pledge_id, $email, $mobile = null, $facebook_id = null) {
     return pledge_dbresult_to_code(
-                db_getOne('select pledge_is_valid_to_sign(?, ?, ?)',
-                    array($pledge_id, $email, $mobile))
+                db_getOne('select pledge_is_valid_to_sign(?, ?, ?, ?)',
+                    array($pledge_id, $email, $mobile, $facebook_id))
             );
 }
 

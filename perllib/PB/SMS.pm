@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.31 2007-06-19 23:15:21 francis Exp $
+# $Id: SMS.pm,v 1.32 2007-06-20 10:23:00 francis Exp $
 #
 
 package PB::SMS;
@@ -293,7 +293,7 @@ sub receive_sms ($$$$$$) {
                 } else {
                     # Case 1. But we should only send the token in the case
                     # where the pledge is still signable.
-                    my $r = PB::pledge_is_valid_to_sign($pledge_id, undef, $sender);
+                    my $r = PB::pledge_is_valid_to_sign($pledge_id, undef, $sender, undef);
                     my %errormsg = (
                             finished => "Sorry, it's too late to sign up to the '$ref' pledge",
                             full => "Sorry, the '$ref' pledge is now full"

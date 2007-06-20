@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.218 2007-06-19 23:15:20 francis Exp $
+-- $Id: schema.sql,v 1.219 2007-06-20 10:22:59 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -122,8 +122,9 @@ create table person (
     website text,
     numlogins integer not null default 0,
     mobile text,
+    facebook_id integer,
 
-    check ( email is not null or mobile is not null ),
+    check ( email is not null or mobile is not null or facebook_id is not null),
 
     -- extra data, added originally for Live Simply Promise
     address_1 text,
@@ -138,6 +139,7 @@ create table person (
 create unique index person_email_idx on person(email);
 create unique index person_email_lower_idx on person(lower(email));
 create unique index person_mobile_idx on person(mobile);
+create unique index person_facebook_id_idx on person(facebook_id);
 
 -- information about each pledge
 create table pledges (
@@ -362,17 +364,17 @@ create table pledge_category (
 );
 create index pledge_category_pledge_id_idx on pledge_category(pledge_id);
 
--- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE
+-- pledge_is_valid_to_sign PLEDGE EMAIL MOBILE FACEBOOK_ID
 -- Whether the given PLEDGE is valid for EMAIL or MOBILE to sign. One of EMAIL
--- or MOBILE may be null. Returns one of:
+-- or MOBILE or FACEBOOK_ID must be not null. Returns one of:
 --      ok          pledge is OK to sign
 --      none        no such pledge exists
 --      finished    pledge has expired
 --      full        pledge is full
 --      signed      signer has already signed this pledge
 --      byarea      pledge requires selection of a place during signing, 
---                  not supported yet for mobile signing
-create function pledge_is_valid_to_sign(integer, text, text)
+--                  not supported yet for mobile signing / facebook signing
+create function pledge_is_valid_to_sign(integer, text, text, integer)
     returns text as '
     declare
         p record;
@@ -390,8 +392,8 @@ create function pledge_is_valid_to_sign(integer, text, text)
             return ''none'';
         end if;
 
-        -- check for signed by email (before finished, so repeat sign-ups
-        -- by same person give the best message)
+        -- check for signed already by email (before finished, so repeat
+        -- sign-ups by same person give the best message)
         if $2 is not null then
             if lower($2) = lower(creator_email) then
                 return ''signed'';
@@ -405,7 +407,7 @@ create function pledge_is_valid_to_sign(integer, text, text)
             end if;
         end if;
 
-        -- check for signed by mobile
+        -- check for signed already by mobile
         if $3 is not null then
             if p.target_type = ''byarea'' then
                 return ''byarea'';
@@ -416,6 +418,18 @@ create function pledge_is_valid_to_sign(integer, text, text)
             end if;
         end if;
 
+        -- check for signed already via facebook
+        if $4 is not null then
+            if p.target_type = ''byarea'' then
+                return ''byarea'';
+            end if;
+            perform signers.id from signers left join person on person.id = signers.person_id where pledge_id = $1 and person.facebook_id = $4 for update;
+            if found then
+                return ''signed'';
+            end if;
+        end if;
+
+        -- check pledge open
         if p.date < ms_current_date() or p.cancelled is not null then
             return ''finished'';
         end if;
@@ -706,7 +720,7 @@ create function smssubscription_sign(integer, text)
         end if;
 
         -- Check whether we can sign up under this number
-        status = pledge_is_valid_to_sign(t_pledge_id, null, t_mobile);
+        status = pledge_is_valid_to_sign(t_pledge_id, null, t_mobile, null);
 
         if status <> ''ok'' then
             -- If we have already signed this, then we should update this

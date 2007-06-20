@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.5 2007-06-20 17:13:51 francis Exp $
+// $Id: facebook.php,v 1.6 2007-06-20 18:21:08 francis Exp $
 
 /*
 
@@ -26,7 +26,7 @@ require_once '../phplib/pledge.php';
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
-$GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
+#$GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
 $page_plain_headers = true;
 
 // the facebook client library
@@ -97,28 +97,30 @@ function do_test() {
     update_profile_box($user);
     print "Doing test";
     exit;
-
-    // Send notification email
-/*    $send_email_url =
-      $facebook->api_client->notifications_send($to, '<fb:notif-subject>You have been stepped on...</fb:notif-subject>' .
-        '<a href="http://apps.facebook.com/footprints/">Check out your Footprints!</a>', false);*/
-
-#    $content = "Pledge to clean the local park, but only if 10 other people do too. 7 people have pledge so far, the deadline is the 20th July. 
-#<fb:req-choice url=\"http://apps.facebook.com/pledgebank/cleanpark/sign\" label=\"Make the pledge!\" />
-#";
-#    $ret = $facebook->api_client->notifications_sendRequest($from/*"582616613"*/, "pledge", $content, "http://www.mysociety.org/mysociety_sm.gif", "invitation");
-#    print "notifications_sendRequest ret:";
-#    print_r($ret);
-
-/*  if (isset($send_email_url) && $send_email_url) {
-    $facebook->redirect($send_email_url . '&next=' . urlencode('?to=' . $to) . '&canvas');
-  }*/
-  #return $prints;
 }
 
 function render_pledge($pledge) {
     global $facebook;
-    $pledge->render_box(array('class'=>'', 'facebook'=>true));
+
+    $invite_intro = "Invite your friends to also sign this pledge.";
+    $signer_id = db_getOne("select signers.id from signers left join person on person.id = signers.person_id
+            where facebook_id = ?", array($facebook->get_loggedin_user()));
+    if ($signer_id) {
+        print "<h2 style=\"text-align: center\">$invite_intro</h2>";
+        print '
+<fb:editor action="" labelwidth="200">
+    <fb:editor-custom label="Friends">
+        <fb:multi-friend-input/>
+    </fb:editor-custom>
+    <fb:editor-buttonset>
+        <fb:editor-button value="Send Pledge"/>
+    </fb:editor-buttonset>
+    <input type="hidden" name="invite_friends" value="1">
+</fb:editor>
+';
+    }
+
+    $pledge->render_box(array('class'=>'', 'facebook-sign'=>$signer_id ? false: true));
     print render_share_pledge($pledge);
 }
 
@@ -242,6 +244,23 @@ function sign_pledge_in_facebook($pledge, $user) {
 
 }
 
+// Send notification email
+function send_pledge_to_friends($pledge, $friends) {
+    global $facebook;
+
+    #$invite_intro = "Invite more friends to sign this pledge.";
+    $content = "<p>I've signed this pledge, and thought you might like to sign it as well.</p>";
+    $content .= "<p>'".$pledge->h_sentence(array('firstperson'=>'includename')) ."'</p>";
+    $content .= "
+<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."\" label=\"Sign the pledge!\" />
+";
+    $ret = $facebook->api_client->notifications_sendRequest(join(",", $friends), "pledge", $content, "http://www.mysociety.org/mysociety_sm.gif", "invitation");
+    if (is_int($ret)) err("Error calling notifications_sendRequest: " . print_r($ret, TRUE));
+    if (!$ret) err("Couldn't send the pledge to your friends, probably because too many messages in too short a time.");
+    $facebook->redirect($ret);
+    exit;
+}
+
 function render_header() {
 ?> <div style="padding: 10px;">  <?
 if (OPTION_PB_STAGING) {
@@ -317,6 +336,11 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     if (get_http_var("sign_in_facebook")) {
         $user = $facebook->require_login();
     }
+    if (get_http_var("invite_friends")) {
+        $user = $facebook->require_login();
+        send_pledge_to_friends($pledge, $_POST['ids']);
+    }
+
     render_header();
     render_dashboard();
     if (get_http_var("sign_in_facebook")) {

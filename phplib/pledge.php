@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.226 2007-06-20 15:25:03 francis Exp $
+ * $Id: pledge.php,v 1.227 2007-06-20 18:21:08 francis Exp $
  * 
  */
 
@@ -402,7 +402,8 @@ class Pledge {
     //            the pledge sentence
     //     reportlink - if present and true, show "report this pledge" link
     //     class - adds the given classes (space separated) to the division
-    //     facebook - add facebook specific buttons
+    //     facebook-sign - add facebook sign button
+
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
         if (array_key_exists('href', $params)) {
@@ -523,7 +524,7 @@ class Pledge {
 <div id="reportpledge"><a href="/contact<?=$contact_ref?>"><?=_('Anything wrong with this pledge?  Tell us!') ?></a></div>
 <? } ?>
 <?
-        if (array_key_exists('facebook', $params) && $params['facebook']) {
+        if (array_key_exists('facebook-sign', $params) && $params['facebook-sign']) {
 ?>
 <fb:editor action="" labelwidth="200">
   <fb:editor-buttonset>

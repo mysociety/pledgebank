@@ -7,7 +7,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.4 2007-06-20 02:54:17 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: mobile-merge-person,v 1.5 2007-06-20 03:23:33 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -33,7 +33,7 @@ dbh()->do('update signers set showname = \'f\' where mobile is not null and show
 #dbh()->do('alter table signers drop constrant "$1"');
 # Find all pairs of people whose email addresses differ only by upper/lower case.
 my @signers;
-my $st = dbh()->prepare('select * from signers where mobile is not null');
+my $st = dbh()->prepare('select signers.*, person.email from signers left join person on person.id = signers.person_id where signers.mobile is not null');
 $st->execute();
 my $c=0;
 while (my $signer = $st->fetchrow_hashref()) {
@@ -61,9 +61,9 @@ foreach my $signer (@signers) {
         my $person = dbh()->selectrow_hashref('select * from person where mobile = ?', {}, $signer->{mobile});
         # If there is, check the email is also the same
         if ($person) {
-            #print Dumper($person);
-            die if (defined($person->{email}) && !defined($signer->{email}));
-            die if (!defined($person->{email}) && defined($signer->{email}));
+            print Dumper($person);
+            #die if (defined($person->{email}) && !defined($signer->{email})); # this happens when one converted SMS is merged with another non-converted SMS
+            die if (!defined($person->{email}) && defined($signer->{email})); # XXX todo this case
             if (defined($person->{email}) && defined($signer->{email})) {
                 die "email/mobile mismatch" if $person->{email} ne $signer->{email};
             }
@@ -86,6 +86,8 @@ print "adding 2\n";
 dbh()->do('alter table signers add check ( person_id is not null)');
 print "adding 3\n";
 dbh()->do('alter table signers add check ( (showname and name is not null) or (not showname))');
+
+#dbh()->rollback();
 dbh()->commit();
 
 # create or replace function pledge_is_valid_to_sign(integer, text, text);

@@ -5,14 +5,17 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.7 2007-06-20 21:41:44 francis Exp $
+// $Id: facebook.php,v 1.8 2007-06-20 23:18:42 francis Exp $
 
 /*
 
 TODO:
+- Success / failures / announce messages
 - Sort out when we require the application to be added
 - Infinite loop after sending request
-- More details / pledge success failure / link to pledgebank.com for flyers/comments
+- After Helen clicked link in email and added herself it took her to the wrong page
+- Sign the pledge link in Email should actually sign it, or say something else, grrr
+- Pledge success failure messages on pledge page
 - sign_in_facebook shouldn't get stuck in the URL
 
 - Don't use mySociety logo for notification icon
@@ -113,7 +116,7 @@ function render_pledge($pledge) {
 
     $invite_intro = "Invite your friends to also sign this pledge.";
     $signer_id = db_getOne("select signers.id from signers left join person on person.id = signers.person_id
-            where facebook_id = ?", array($facebook->get_loggedin_user()));
+            where facebook_id = ? and signers.pledge_id = ?", array($facebook->get_loggedin_user(), $pledge->id()));
     if ($signer_id) {
         print "<h2 style=\"text-align: center\">$invite_intro</h2>";
         print '
@@ -129,8 +132,18 @@ function render_pledge($pledge) {
 ';
     }
 
-    $pledge->render_box(array('class'=>'', 'facebook-sign'=>$signer_id ? false: true));
-    print render_share_pledge($pledge);
+    pledge_draw_status_plaque($pledge);
+    $pledge->render_box(array('class'=>'', 'facebook-sign'=>!$pledge->finished(), 'showdetails' => true));
+
+    if (!$signer_id)
+        print render_share_pledge($pledge);
+
+    print '<p style="text-align:center">Visit this pledge at ';
+    print '<a href="'.$pledge->url_typein().'">';
+    print '<strong>'. str_replace('http://', '', $pledge->url_typein()) . '</strong>';
+    print '</a>';
+    print " for comments, flyers, SMS and more.";
+    print '</p>';
 }
 
 function render_comments() {
@@ -224,13 +237,13 @@ function sign_pledge_in_facebook($pledge) {
         # Add them as a signer
         db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge->id(), null, $person_id, 'f', $_SERVER['REMOTE_ADDR'], null));
         db_commit();
-        print "<p class=\"notification\">"._("Thanks for signing up to this pledge!")."</p>";
+        print "<p class=\"formnote\">"._("Thanks for signing up to this pledge!")."</p>";
 #        print '<h1 style=\"text-align: center\">'. . '</h1>';
 
         # See if they tipped the balance
         $pledge = new Pledge($pledge->ref());
         if (!$f1 && $pledge->succeeded()) {
-            print '<p class=\"notification\"><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
+            print '<p class=\"formnote\"><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
         }
 
         # Show on their profile that they have signed it
@@ -245,7 +258,7 @@ function sign_pledge_in_facebook($pledge) {
         $feed_body = $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>false));
         $ret = $facebook->api_client->feed_publishActionOfUser($feed_title, $feed_body);
         if (!$ret) {
-            print '<p class="notification">'._('For some reason, could not add that you signed this pledge to your feed.').'</p>';
+            print '<p class="errors">'._('For some reason, could not add the news that you\'ve signed to your feed.').'</p>';
         } else {
             if ($ret[0] != 1) err("Error calling feed_publishActionOfUser: " . print_r($ret, TRUE));
         }
@@ -253,10 +266,10 @@ function sign_pledge_in_facebook($pledge) {
         #if ($ret[0] != 1) err("Error calling feed_publishStoryToUser: " . print_r($ret, TRUE));
 
     } else if ($R == PLEDGE_SIGNED) {
-        print '<p class="notification">'._('You\'ve already signed this pledge!').'</p>';
+        print '<p class="formnote">'._('You\'ve already signed this pledge!').'</p>';
     } else {
         /* Something else has gone wrong. */
-        print '<p class="notification">' . _("Sorry &mdash; it wasn't possible to sign that pledge.") . ' '
+        print '<p class="errors">' . _("Sorry &mdash; it wasn't possible to sign that pledge.") . ' '
                 . htmlspecialchars(pledge_strerror($R))
                 . ".</p>";
     }
@@ -306,36 +319,40 @@ PledgeBank</a> application.</i>
 </p>
 <?
 }
-
 ?>
 <style>
-.pledge, #pledgeaction {
+<? readfile("pb.css"); ?>
+.pledge {
     border: solid 2px #522994;
-    margin: 0 50px 50px 50px;
+    margin: 20px 50px 50px 50px;
     padding: 10px;
     background-color: #c6b5de;
 }
-.pledge p, #pledgeaction p {
+.pledge p {
     margin-bottom: 0;
     text-align: center;
 }
 
-.pledge, #tips, #pledge, #all .pledge, #yourpledges .pledge {
+.pledge {
     border: solid 2px #522994;
     background-color: #f6e5ff;
     margin-bottom: 1em;
     padding: 10px;
 }
+.errors {
+    color: #ff0000;
+    background-color: #ffcccc;
+    border: solid 2px #990000;
+    padding: 3px;
+}
+.errors {
+    margin: 0 auto 1em;
+}
+.errors ul {
+    padding: 0;
+    margin: 0 0 0 1.5em;
+}
 
-img.creatorpicture {
-    float: left;
-    display: inline;
-    margin-right: 10px;
-}
-.notification {
-    font-style: italic;
-    text-align: center;
-}
 </style>
 <? 
 }
@@ -390,12 +407,11 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     render_header();
     render_dashboard();
     if ($no_send_error)
-        print '<p class="notification">'."Sorry, PledgeBank couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
+        print '<p class="errors">'."Sorry, PledgeBank couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
     if (get_http_var("sign_in_facebook")) {
         sign_pledge_in_facebook($pledge);
     }
     render_pledge($pledge);
     render_footer();
 }
-
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.227 2007-06-20 18:21:08 francis Exp $
+ * $Id: pledge.php,v 1.228 2007-06-20 23:18:42 francis Exp $
  * 
  */
 
@@ -507,6 +507,18 @@ class Pledge {
             print '</p>';
         }
 
+        if (array_key_exists('facebook-sign', $params) && $params['facebook-sign']) {
+?>
+<fb:editor action="" labelwidth="170">
+  <fb:editor-buttonset>
+    <fb:editor-button value="Sign Pledge"/>
+  </fb:editor-buttonset>
+   <input type="hidden" name="sign_in_facebook" value="1">
+</fb:editor>
+<?
+        }
+
+
         if (array_key_exists('showdetails', $params) && $params['showdetails'] && isset($this->data['detail']) && $this->data['detail']) {
             $det = htmlspecialchars($this->data['detail']);
             $det = ms_make_clickable($det, array('contract'=>true, 'nofollow'=>true));
@@ -519,21 +531,13 @@ class Pledge {
 <p class="byareamadeby"><?=sprintf(_("Pledge originally made by %s"), $this->h_name_and_identity()) ?></p>
 <? } ?>
 
-<? if (array_key_exists('reportlink', $params) && $params['reportlink']) { 
+<? 
+    if (array_key_exists('reportlink', $params) && $params['reportlink']) { 
     global $contact_ref; ?>
 <div id="reportpledge"><a href="/contact<?=$contact_ref?>"><?=_('Anything wrong with this pledge?  Tell us!') ?></a></div>
 <? } ?>
 <?
-        if (array_key_exists('facebook-sign', $params) && $params['facebook-sign']) {
-?>
-<fb:editor action="" labelwidth="200">
-  <fb:editor-buttonset>
-    <fb:editor-button value="Sign Pledge"/>
-  </fb:editor-buttonset>
-   <input type="hidden" name="sign_in_facebook" value="1">
-</fb:editor>
-<?
-        }
+
 ?>   </div> <?
     }
 
@@ -1052,6 +1056,40 @@ function pledge_get_list($where, $params) {
         $pledges[] = $pledge;
     }
     return $pledges;
+}
+
+# Draw part at top of pledge page which says pledge has succeeded/failed etc.
+function pledge_draw_status_plaque($p) {
+    if ($p->is_cancelled()) {
+        print '<p class="cancelled">' . comments_text_to_html($p->data['cancelled']) . '</p>';
+        return;
+    }
+    if ($p->data['notice']) {
+        print '<p class="notice">' . comments_text_to_html($p->data['notice']) . '</p>';
+    }
+    if (!$p->open()) {
+        print '<p class="finished">' . microsites_pledge_closed_text() . '</p>';
+    }
+    if ($p->byarea()) {
+        if ($p->byarea_successes() > 0) {
+            print '<p class="success">';
+            print sprintf(
+                ngettext('This pledge has been successful in <strong>%d place</strong>!',
+                        'This pledge has been successful in <strong>%d places</strong>!',
+                        $p->byarea_successes()), 
+                $p->byarea_successes());
+            if (!$p->finished()) {
+                print '<br>' . _('<strong>You can still sign up</strong>, to help make it successful where you live.');
+            }
+            print '</p>';
+        }
+    } elseif ($p->left() <= 0 && !microsites_no_target()) {
+        print '<p class="success">' . _('This pledge has been successful!');
+        if (!$p->finished()) {
+            print '<br>' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');
+        }
+        print '</p>';
+    }
 }
 
 

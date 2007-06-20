@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.102 2007-06-20 21:58:00 francis Exp $
+// $Id: ref-index.php,v 1.103 2007-06-20 23:18:42 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -56,39 +56,6 @@ if ($pin_box) {
     print $pin_box;
     page_footer();
     exit;
-}
-
-function draw_status_plaque($p) {
-    if ($p->is_cancelled()) {
-        print '<p class="cancelled">' . comments_text_to_html($p->data['cancelled']) . '</p>';
-        return;
-    }
-    if ($p->data['notice']) {
-        print '<p class="notice">' . comments_text_to_html($p->data['notice']) . '</p>';
-    }
-    if (!$p->open()) {
-        print '<p id="finished">' . microsites_pledge_closed_text() . '</p>';
-    }
-    if ($p->byarea()) {
-        if ($p->byarea_successes() > 0) {
-            print '<p class="success">';
-            print sprintf(
-                ngettext('This pledge has been successful in <strong>%d place</strong>!',
-                        'This pledge has been successful in <strong>%d places</strong>!',
-                        $p->byarea_successes()), 
-                $p->byarea_successes());
-            if (!$p->finished()) {
-                print '<br>' . _('<strong>You can still sign up</strong>, to help make it successful where you live.');
-            }
-            print '</p>';
-        }
-    } elseif ($p->left() <= 0 && !microsites_no_target()) {
-        print '<p class="success">' . _('This pledge has been successful!');
-        if (!$p->finished()) {
-            print '<br>' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');
-        }
-        print '</p>';
-    }
 }
 
 function draw_spreadword($p) { ?>
@@ -366,7 +333,7 @@ if (microsites_comments_allowed() && !$p->pin())
     
 page_header($title, $params);
 debug_comment_timestamp("after page_header()");
-draw_status_plaque($p);
+pledge_draw_status_plaque($p);
 debug_comment_timestamp("after draw_status_plaque()");
 $p->render_box(array('showdetails' => true, 'reportlink' => true));
 debug_comment_timestamp("after \$p->render_box()");

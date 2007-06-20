@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.3 2007-06-20 15:12:53 francis Exp $
+// $Id: facebook.php,v 1.4 2007-06-20 16:40:49 francis Exp $
 
 /*
 
@@ -14,6 +14,7 @@ TODO:
 - Lower case and fuzzy matching of pledge refs
 - Make sure can't do redirect in another site's iframe to sign pledge without permission 
 - Test PIN protected pledges are safe
+- Fix sorting of pledges in profile box
 
 */
 
@@ -21,7 +22,8 @@ require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 
-$GLOBALS['facebook_config']['debug'] = true;
+if (OPTION_PB_STAGING) 
+    $GLOBALS['facebook_config']['debug'] = true;
 $page_plain_headers = true;
 
 // the facebook client library
@@ -35,22 +37,62 @@ require_once '../../phplib/facebookphp4/facebook.php';
 }*/
 
 function update_profile_box($uid) {
-    $fbml = "
+    global $facebook;
+
+    $out = "";
+    $q = db_query("SELECT pledges.*, country, 
+            (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
+            FROM pledges 
+            LEFT JOIN location ON location.id = pledges.location_id
+            LEFT JOIN person ON person.id = pledges.person_id
+            WHERE pin IS NULL AND 
+            (person.facebook_id = ?
+            OR pledges.id IN (SELECT pledge_id FROM signers LEFT JOIN person on person.id = signers.person_id
+                    WHERE facebook_id = ?))",
+            array($uid, $uid));
+    if (db_num_rows($q) > 0) {
+        $out .= "
+<fb:if-is-own-profile>
+    You have signed these Pledges.
+<fb:else>
+    <fb:name uid=\"$uid\"/> has signed these Pledges.
+</fb:else>
+</fb:if-is-own-profile>
+";
+        $out .= '<ol>';
+        while ($r = db_fetch_array($q)) {
+            $pledge = new Pledge($r);
+            $out .= '<li>';
+            $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
+            #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
+            $out .= '</li>';
+        }
+        $out .= '</ol>';
+        $out .= "<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find more pledges to sign</a>.</p>";
+    } else {
+    $out = "
 <fb:if-is-own-profile>
     You haven't signed any pledges in Facebook yet.
 <fb:else>
     <fb:name uid=\"$uid\"/> has not signed any pledges in Facebook.
 </fb:else>
 </fb:if-is-own-profile>
-<a href=\"".OPTION_FACEBOOK_CANVAS."\">Find a pledge to sign</a>.
+<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find a pledge to sign</a>.</p>
 ";
-    $ret = $facebook->api_client->profile_setFBML($fbml, $uid);
+
+    }
+
+    $ret = $facebook->api_client->profile_setFBML($out, $uid);
     if ($ret != 1) err("Error calling profile_setFBML");
 }
 
 function do_test() {
     global $facebook;
+    $user = $facebook->require_login();
+
+    update_profile_box($user);
     print "Doing test";
+    exit;
 
     // Send notification email
 /*    $send_email_url =
@@ -72,34 +114,7 @@ function do_test() {
 
 function render_pledge($p) {
     global $facebook;
-?>
-<style>
-.pledge, #pledgeaction {
-    border: solid 2px #522994;
-    margin: 0 50px 50px 50px;
-    padding: 10px;
-    background-color: #c6b5de;
-}
-.pledge p, #pledgeaction p {
-    margin-bottom: 0;
-    text-align: center;
-}
-
-.pledge, #tips, #pledge, #all .pledge, #yourpledges .pledge {
-    border: solid 2px #522994;
-    background-color: #f6e5ff;
-    margin-bottom: 1em;
-    padding: 10px;
-}
-
-img.creatorpicture {
-    float: left;
-    display: inline;
-    margin-right: 10px;
-}
-
-</style>
-<? $p->render_box(array('class'=>'', 'facebook'=>true)) ?>
+    $p->render_box(array('class'=>'', 'facebook'=>true)) ?>
 
 <? /*<fb:share-button href="http://www.pledgebank.com/helo" class="url" /> */ ?>
 
@@ -153,7 +168,8 @@ function render_frontpage() {
     $out = '<ol>';
     foreach ($pledges as $pledge)  {
         $out .= '<li>';
-        $out .= $pledge->summary(array('html'=>true, 'href'=>$pledge->ref(), 'showcountry'=>true));
+        $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
+        #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
 
         $out .= '</li>';
     }
@@ -164,15 +180,17 @@ function render_frontpage() {
 }
 
 function sign_pledge_in_facebook($p, $user) {
+    global $facebook;
+
     print "Trying to sign... ";
     $R = pledge_is_valid_to_sign($p->id(), null, null, $user);
     $f1 = $p->succeeded(true);
 
     if (!pledge_is_error($R)) {
         # See if there is already a Facebook person with this id XXX factor this out into a function
-        $person_id = db_getOne("select id from person where facebook = ?", array($user));
+        $person_id = db_getOne("select id from person where facebook_id = ?", array($user));
         if (!$person_id) {
-            $person_id = db_getOne("select nextval(''person_id_seq'')");
+            $person_id = db_getOne("select nextval('person_id_seq')");
             db_query("insert into person (id, facebook_id) values (?, ?)", array($person_id, $user));
         }
         # Add them as a signer
@@ -191,14 +209,14 @@ function sign_pledge_in_facebook($p, $user) {
 
         # Publish feed story
         $feed_title = '<fb:userlink uid="'.$user.'" shownetwork="false"/> has signed a pledge.';
-        $feed_body = 'Check out <a href="http://apps.facebook.com/pledgebank/'.$p->ref().'">' .
-                     '<fb:name uid="'.$to.'" firstnameonly="true" possessive="true"/> PledgeBank</a>.';
-        $feed_body = null;
+        $feed_body = $p->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$p->ref(), 'showcountry'=>false));
         $ret = $facebook->api_client->feed_publishActionOfUser($feed_title, $feed_body);
-        if ($ret != 1) err("Error calling feed_publishActionOfUser");
+        if ($ret[0] != 1) err("Error calling feed_publishActionOfUser: " . print_r($ret, TRUE));
+        #$ret = $facebook->api_client->feed_publishStoryToUser($feed_title, $feed_body);
+        #if ($ret[0] != 1) err("Error calling feed_publishStoryToUser: " . print_r($ret, TRUE));
 
     } else if ($R == PLEDGE_SIGNED) {
-        print _('You\'ve already signed this pledge!');
+        print '<p>'._('You\'ve already signed this pledge!').'</p>';
     } else {
         /* Something else has gone wrong. */
         print '<p><strong>' . _("Sorry &mdash; it wasn't possible to sign that pledge.") . ' '
@@ -217,6 +235,35 @@ will soon. Any pledges are test ones in a test database, not real ones from
 <a href="http://www.pledgebank.com">PledgeBank.com</a>.</i></p>
 <?
 }
+
+?>
+<style>
+.pledge, #pledgeaction {
+    border: solid 2px #522994;
+    margin: 0 50px 50px 50px;
+    padding: 10px;
+    background-color: #c6b5de;
+}
+.pledge p, #pledgeaction p {
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.pledge, #tips, #pledge, #all .pledge, #yourpledges .pledge {
+    border: solid 2px #522994;
+    background-color: #f6e5ff;
+    margin-bottom: 1em;
+    padding: 10px;
+}
+
+img.creatorpicture {
+    float: left;
+    display: inline;
+    margin-right: 10px;
+}
+
+</style>
+<? 
 }
 
 function render_footer() {

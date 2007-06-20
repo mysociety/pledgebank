@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.11 2007-06-20 21:48:53 francis Exp $
+ * $Id: ref-plain.php,v 1.12 2007-06-20 21:58:00 francis Exp $
  * 
  */
 
@@ -148,7 +148,7 @@ function add_signatories($p) {
         $extra_select = ", byarea_location.whensucceeded";
         $extra_join = "LEFT JOIN byarea_location ON byarea_location.byarea_location_id = signers.byarea_location_id AND byarea_location.pledge_id = signers.pledge_id";
     }
-    $query = "SELECT signers.*, person.mobile as mobile,
+    $query = "SELECT signers.*, person.mobile as mobile, person.facebook_id as facebook_id,
             location.description as location_description, location.country as location_country
             $extra_select
         from signers 

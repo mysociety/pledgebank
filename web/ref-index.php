@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.101 2007-06-20 21:48:53 francis Exp $
+// $Id: ref-index.php,v 1.102 2007-06-20 21:58:00 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -128,7 +128,7 @@ function draw_spreadword($p) { ?>
 define('MAX_PAGE_SIGNERS', '500');
 
 // Internal
-function display_anonymous_signers(&$anon, &$mobilesigners, &$facebooksigners, &$in_ul) {
+function display_anonymous_signers($p, &$anon, &$mobilesigners, &$facebooksigners, &$in_ul) {
     if ($anon || $mobilesigners || $facebooksigners) {
         if (!$in_ul) {
             print "<ul>";
@@ -139,7 +139,7 @@ function display_anonymous_signers(&$anon, &$mobilesigners, &$facebooksigners, &
         if ($mobilesigners)
             print "<li>". sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $mobilesigners), $mobilesigners) . "</li>";
         if ($facebooksigners)
-            print "<li>". sprintf(ngettext('%d person who signed up in Facebook', '%d people who signed up in Facebook', $facebooksigners), $facebooksigners) . "</li>";
+            print "<li>". sprintf(ngettext('%d person who signed up <a href="%s">in Facebook</a>', '%d people who signed up <a href="%s">in Facebook</a>', $facebooksigners), $facebooksigners, OPTION_FACEBOOK_CANVAS . $p->ref()) . "</li>";
 
         $anon = 0;
         $mobilesigners = 0;
@@ -207,7 +207,7 @@ function draw_signatories($p) {
         $extra_select = ", byarea_location.whensucceeded";
         $extra_join = "LEFT JOIN byarea_location ON byarea_location.byarea_location_id = signers.byarea_location_id AND byarea_location.pledge_id = signers.pledge_id";
     }
-    $query = "SELECT signers.*, person.mobile as mobile,
+    $query = "SELECT signers.*, person.mobile as mobile, person.facebook_id as facebook_id,
             location.description as location_description, location.country as location_country
             $extra_select
         from signers 
@@ -229,7 +229,7 @@ function draw_signatories($p) {
             $loc_desc_with_country .= ", ". $countries_code_to_name[$r['location_country']];
         }
         if ($p->byarea() && $last_location_description != $loc_desc_with_country) {
-            display_anonymous_signers($anon, $mobilesigners, $facebooksigners, $in_ul);
+            display_anonymous_signers($p, $anon, $mobilesigners, $facebooksigners, $in_ul);
             if ($in_ul)  {
                 print "</ul></div>";
                 $in_ul = false;
@@ -265,7 +265,7 @@ function draw_signatories($p) {
             $anon++;
         }
     }
-    display_anonymous_signers($anon, $mobilesigners, $facebooksigners, $in_ul);
+    display_anonymous_signers($p, $anon, $mobilesigners, $facebooksigners, $in_ul);
     if ($in_ul) {
         print "</ul>";
         if ($p->byarea())

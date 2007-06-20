@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.100 2007-06-19 23:54:18 francis Exp $
+// $Id: ref-index.php,v 1.101 2007-06-20 21:48:53 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -128,27 +128,22 @@ function draw_spreadword($p) { ?>
 define('MAX_PAGE_SIGNERS', '500');
 
 // Internal
-function display_anonymous_signers(&$anon, &$mobilesigners, &$in_ul) {
-    if ($anon || $mobilesigners) {
-        $extra = '';
-        if ($anon)
-            $extra .= sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon);
-        if ($mobilesigners) {
-            if ($anon) {
-                /* XXX shouldn't assume we can split sentences like this --
-                 * make it two bullet points? */
-                $extra .= sprintf(ngettext(', and %d who signed up via mobile', ', and %d who signed up via mobile', $mobilesigners), $mobilesigners);
-            } else {
-                $extra .= sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $mobilesigners), $mobilesigners);
-            }
-        }
+function display_anonymous_signers(&$anon, &$mobilesigners, &$facebooksigners, &$in_ul) {
+    if ($anon || $mobilesigners || $facebooksigners) {
         if (!$in_ul) {
             print "<ul>";
             $in_ul = true;
         }
-        print "<li>$extra</li>";
+        if ($anon)
+            print "<li>". sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon) . "</li>";
+        if ($mobilesigners)
+            print "<li>". sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $mobilesigners), $mobilesigners) . "</li>";
+        if ($facebooksigners)
+            print "<li>". sprintf(ngettext('%d person who signed up in Facebook', '%d people who signed up in Facebook', $facebooksigners), $facebooksigners) . "</li>";
+
         $anon = 0;
         $mobilesigners = 0;
+        $facebooksigners = 0;
     }
 }
 
@@ -202,6 +197,7 @@ function draw_signatories($p) {
 
     $anon = 0;
     $mobilesigners = 0;
+    $facebooksigners = 0;
     
     $order_by = "ORDER BY id";
     $extra_select = "";
@@ -233,7 +229,7 @@ function draw_signatories($p) {
             $loc_desc_with_country .= ", ". $countries_code_to_name[$r['location_country']];
         }
         if ($p->byarea() && $last_location_description != $loc_desc_with_country) {
-            display_anonymous_signers($anon, $mobilesigners, $in_ul);
+            display_anonymous_signers($anon, $mobilesigners, $facebooksigners, $in_ul);
             if ($in_ul)  {
                 print "</ul></div>";
                 $in_ul = false;
@@ -263,11 +259,13 @@ function draw_signatories($p) {
             }
         } elseif (isset($r['mobile'])) {
             $mobilesigners++;
+        } elseif (isset($r['facebook_id'])) {
+            $facebooksigners++;
         } else {
             $anon++;
         }
     }
-    display_anonymous_signers($anon, $mobilesigners, $in_ul);
+    display_anonymous_signers($anon, $mobilesigners, $facebooksigners, $in_ul);
     if ($in_ul) {
         print "</ul>";
         if ($p->byarea())

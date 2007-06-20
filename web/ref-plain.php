@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.10 2007-06-19 23:54:18 francis Exp $
+ * $Id: ref-plain.php,v 1.11 2007-06-20 21:48:53 francis Exp $
  * 
  */
 
@@ -138,6 +138,7 @@ function add_signatories($p) {
     $signers = array();
     $anon = 0;
     $mobilesigners = 0;
+    $facebooksigners = 0;
 
     $order_by = "ORDER BY id";
     $extra_select = "";
@@ -172,6 +173,8 @@ function add_signatories($p) {
             }
         } elseif (isset($r['mobile'])) {
                 $mobilesigners++;
+        } elseif (isset($r['facebook_id'])) {
+                $facebooksigners++;
         } else {
             $anon++;
         }
@@ -188,11 +191,13 @@ function add_signatories($p) {
         print "</signerslist>\n";
         print "<anonymous_signers>$anon</anonymous_signers>\n";
         print "<mobile_signers>$mobilesigners</mobile_signers>\n";
+        print "<facebook_signers>$facebooksigners</facebook_signers>\n";
     } elseif ($q_output == 'rabx') {
         global $out;
         $out['signers']['list'] = $signers;
         $out['data']['anonymous_signers'] = $anon;
         $out['data']['mobile_signers'] = $mobilesigners;
+        $out['data']['facebook_signers'] = $facebooksigners;
     }
 }
 

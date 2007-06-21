@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.54 2007-06-11 18:20:23 francis Exp $
+// $Id: faq.php,v 1.55 2007-06-21 22:20:20 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -155,6 +155,7 @@ function default_faq() {
     Creso Moraes (Brazilian Portuguese),
     Alexander Markushin (Russian),
     maidan.org.ua team (Ukrainian),
+    Hugo Lamoureux (French),
     Oliver Ding, Isaac Mao, Danny Yu, Nan Yang, Jacky Peng (Chinese),
     Aliaksej Lavońčyk (Belarusian).
     '));

@@ -5,23 +5,26 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.9 2007-06-20 23:50:36 francis Exp $
+// $Id: facebook.php,v 1.10 2007-06-21 19:40:21 francis Exp $
 
 /*
 
 TODO:
+
 - Success / failures / announce messages
+- Store infinite session key or keys for Pledge success cron job.
+  http://wiki.developers.facebook.com/index.php/Infinite_session_keys
 
 - Infinite loop after sending request
-- After you add yourself for signing, should actually do the signature
-- Sign the pledge link in Email should actually sign it, or say something else, grrr
-- sign_in_facebook shouldn't get stuck in the URL
+- After you add yourself for signing, should actually do the signature (STILL BROKEN)
 
 - Don't use mySociety logo for notification icon
-- Make sure can't do redirect in another site's iframe to sign pledge without permission 
 - Test PIN protected pledges are safe
 - Fix sorting of pledges in profile box
 - Fix $invite_intro stuff that isn't used
+
+- Update the pledges on everyone's profile with new numbers of signers
+    http://dev.formd.net/facebook/lastfmCharts/tutorial.html
 
 Not so important
 - Lower case and fuzzy matching of pledge refs
@@ -38,17 +41,22 @@ if (OPTION_PB_STAGING)
 $GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
 $page_plain_headers = true;
 
-// the facebook client library
 require_once '../../phplib/facebookphp4/facebook.php';
 
-/*function render_profile_action($id, $num) {
-  return '<fb:profile-action url="http://apps.facebook.com/footprints/?to=' . $id . '">'
-       .   '<fb:name uid="' . $id . '" firstnameonly="true" capitalize="true"/> '
-       .   'has been stepped on ' . $num . ' times.'
-       . '</fb:profile-action>';
-}*/
+function do_test() {
+    global $facebook;
+#    $facebook->require_login();
+#    pbfacebook_update_profile_box($facebook->get_loggedin_user());
+    print "Doing test";
 
-function update_profile_box($uid) {
+    $notifications = $facebook->api_client->friends_get();
+    #$notifications = $facebook->api_client->notifications_get();
+    print_r($notifications);
+    exit;
+}
+
+// Write the static FBML to the given user's profile box
+function pbfacebook_update_profile_box($uid) {
     global $facebook;
 
     $out = "";
@@ -75,7 +83,7 @@ function update_profile_box($uid) {
         while ($r = db_fetch_array($q)) {
             $pledge = new Pledge($r);
             $out .= '<li>';
-            $out .= render_share_pledge($pledge);
+            $out .= pbfacebook_render_share_pledge($pledge);
             $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
             #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
             $out .= '</li>';
@@ -99,18 +107,8 @@ function update_profile_box($uid) {
     if ($ret != 1) err("Error calling profile_setFBML");
 }
 
-function do_test() {
-    global $facebook;
-#    $facebook->require_login();
-#    update_profile_box($facebook->get_loggedin_user());
-    print "Doing test";
-
-    $notifications = $facebook->api_client->notifications_get();
-    print_r($notifications);
-    exit;
-}
-
-function render_pledge($pledge) {
+// Draw pledge index page within Facebook
+function pbfacebook_render_pledge($pledge) {
     global $facebook;
 
     $invite_intro = "Invite your friends to also sign this pledge.";
@@ -132,10 +130,15 @@ function render_pledge($pledge) {
     }
 
     pledge_draw_status_plaque($pledge);
-    $pledge->render_box(array('class'=>'', 'facebook-sign'=>!$pledge->finished(), 'showdetails' => true));
+
+#function auth_verify_with_shared_secret($item, $secret, $signature) {
+    $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
+    $pledge->render_box(array('class'=>'', 
+            'facebook-sign'=>!$pledge->finished(), 'facebook-sign-csrf'=>$csrf_sig,
+            'showdetails' => true));
 
     if (!$signer_id)
-        print render_share_pledge($pledge);
+        print pbfacebook_render_share_pledge($pledge);
 
     print '<p style="text-align:center">Visit this pledge at ';
     print '<a href="'.$pledge->url_typein().'">';
@@ -145,7 +148,9 @@ function render_pledge($pledge) {
     print '</p>';
 }
 
-function render_comments() {
+// Draw comments on pledges onto Facebook
+// XXX Not finished/used
+function pbfacebook_render_comments() {
 ?>
 <fb:wall>
   <fb:wallpost uid="1000550" t="1180070566">
@@ -158,7 +163,8 @@ function render_comments() {
 <?
 }
 
-function render_share_pledge($pledge) {
+// Draw "share" button for a pledge on Facebook
+function pbfacebook_render_share_pledge($pledge) {
     $out = "<div style=\"float: right\">";
     $out .='
       <fb:share-button class="meta">
@@ -170,7 +176,8 @@ function render_share_pledge($pledge) {
     return $out;
 }
 
-function render_dashboard() {
+// Render common top of PledgeBank pages on Facebook
+function pbfacebook_render_dashboard() {
 ?>
 <fb:dashboard>
   <fb:action href="<?=OPTION_FACEBOOK_CANVAS?>">All Pledges</fb:action>
@@ -181,7 +188,8 @@ function render_dashboard() {
   /*<fb:create-button href="<?=pb_domain_url(array('path'=>'/new'))?>">Create a New Pledge</fb:create-button> */
 }
 
-function render_frontpage() {
+// Render frontpage of PledgeBank on Facebook
+function pbfacebook_render_frontpage() {
     global $facebook, $pb_today;
 /*<fb:tabs>
 <fb:tab-item title="Friends pledges" selected="true" href="http://apps.facebook.com/pledgebank/list/friends" />
@@ -189,50 +197,75 @@ function render_frontpage() {
 <fb:tab-item title="Successful pledges" href="http://apps.facebook.com/pledgebank/list/success" />
 </fb:tabs>*/
 
-//    $friends = $facebook->api_client->friends_get();
-/*    $friends_joined = join(",", $friends);
-    print_r($friends);
-    $q = db_query("SELECT pledges.*, country, 
-            (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
-            FROM pledges 
-            LEFT JOIN location ON location.id = pledges.location_id
-            LEFT JOIN person ON person.id = pledges.person_id
-            WHERE pin IS NULL AND 
-            (person.facebook_id in ($friends_joined)
-            OR pledges.id IN (SELECT pledge_id FROM signers LEFT JOIN person on person.id = signers.person_id
-                    WHERE facebook_id in ($friends_joined)))");
-*/
-    if (OPTION_PB_STAGING) {
-?> <p>Here are some pledges from the test database:</p> <?
-    } else {
-?> <p>Here are some pledges:</p> <?
+    $friends_signed_joined = "";
+    if ($facebook->get_loggedin_user()) {
+        $friends = $facebook->api_client->friends_get();
+        $friends_joined = join(",", $friends);
+        $query = "SELECT pledges.*, country, 
+                (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
+                FROM pledges 
+                LEFT JOIN location ON location.id = pledges.location_id
+                LEFT JOIN person ON person.id = pledges.person_id
+                WHERE pin IS NULL AND 
+                (person.facebook_id in ($friends_joined)
+                OR pledges.id IN (SELECT pledge_id FROM signers LEFT JOIN person on person.id = signers.person_id
+                        WHERE facebook_id in ($friends_joined)))";
+        $friends_signed = array();
+        $q = db_query($query);
+        if (db_num_rows($q) > 0) {
+            if (OPTION_PB_STAGING) {
+        ?> <p>Some test pledges that your friends have signed:</p> <?
+            } else {
+        ?> <p>Some pledges your friends have signed:</p> <?
+            }
+
+            $out = '<ol>';
+            while ($r = db_fetch_array($q)) {
+                $pledge = new Pledge($r);
+                $out .= '<li>';
+                $out .= pbfacebook_render_share_pledge($pledge);
+                $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
+                #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
+                $out .= '</li>';
+                $friends_signed[] = $pledge->id();
+            }
+            $out .= '</ol>';
+            print $out;
+        }
+        $friends_signed_joined = " AND pledges.id NOT IN (".join(",", $friends_signed).")";
     }
+
     $pledges = pledge_get_list("
                 cached_prominence = 'frontpage' AND
                 date >= '$pb_today' AND 
                 pin is NULL AND 
-                whensucceeded IS NULL
+                whensucceeded IS NULL 
+                $friends_signed_joined
                 ORDER BY RANDOM()
                 LIMIT 10", array('global'=>true,'main'=>true,'foreign'=>true));
-
-
-    $out = '<ol>';
-    foreach ($pledges as $pledge)  {
-        $out .= '<li>';
-        $out .= render_share_pledge($pledge);
-        $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
-        
-        #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
-
-        $out .= '</li>';
+    if ($pledges) {
+        if (OPTION_PB_STAGING) {
+    ?> <p>Here are some pledges from the test database:</p> <?
+        } else {
+    ?> <p>Here are some pledges:</p> <?
+        }
+        $out = '<ol>';
+        foreach ($pledges as $pledge)  {
+            $out .= '<li>';
+            $out .= pbfacebook_render_share_pledge($pledge);
+            $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
+            #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
+            $out .= '</li>';
+        }
+        $out .= '</ol>';
+        print $out;
     }
-    $out .= '</ol>';
-    print $out;
 
     return;
 }
 
-function sign_pledge_in_facebook($pledge) {
+// Sign a pledge, update profile, add to feeds, on Facebook
+function pbfacebook_sign_pledge($pledge) {
     global $facebook;
     $user = $facebook->get_loggedin_user();
 
@@ -259,7 +292,7 @@ function sign_pledge_in_facebook($pledge) {
         }
 
         # Show on their profile that they have signed it
-        update_profile_box($user);
+        pbfacebook_update_profile_box($user);
 
         # Publish feed story
         $feed_title = '<fb:userlink uid="'.$user.'" shownetwork="false"/> has signed '; 
@@ -288,8 +321,8 @@ function sign_pledge_in_facebook($pledge) {
     return $pledge;
 }
 
-// Send notification email
-function send_pledge_to_friends($pledge, $friends) {
+// Send notification email to friends on Facebook
+function pbfacebook_send_to_friends($pledge, $friends) {
     global $facebook;
 
     #$invite_intro = "Invite more friends to sign this pledge.";
@@ -300,17 +333,19 @@ function send_pledge_to_friends($pledge, $friends) {
         $content = "I've signed this pledge, and thought you might like to sign it as well. ";
     $content .= " '".$pledge->sentence(array('firstperson'=>'includename')) ."' ";
     $content .= "
-<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."?sign_in_facebook=1\" label=\"Sign the pledge!\" />
+<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."\" label=\"Sign the pledge!\" />
 ";
     $ret = $facebook->api_client->notifications_sendRequest(join(",", $friends), "pledge", $content, "http://www.mysociety.org/mysociety_sm.gif", "invitation");
     if (is_int($ret)) err("Error calling notifications_sendRequest: " . print_r($ret, TRUE)); */
 
     $user = $facebook->get_loggedin_user();
 
-    $content = '<fb:notif-subject><fb:name uid="' . $user . '" firstnameonly="false" capitalize="true"/> pledged to do something...</fb:notif-subject> 
-        <fb:name uid="' . $user . '" firstnameonly="true" capitalize="true"/> signed this pledge:
-        \''.$pledge->sentence(array('firstperson'=>'includename')) .'\'
-        <a href="'.OPTION_FACEBOOK_CANVAS.$pledge->ref().'">Sign the pledge yourself</a>.';
+    $content = '
+        <fb:notif-subject><fb:name uid="'.$user.'" firstnameonly="true" capitalize="true"/> pledged to do something...</fb:notif-subject> 
+        <fb:name uid="' . $user . '" firstnameonly="true" capitalize="true"/>
+        just signed a pledge on Facebook and thought you might be interested. 
+        <a href="'.OPTION_FACEBOOK_CANVAS.$pledge->ref().'">Click here</a>
+        to see the pledge.';
     $ret = $facebook->api_client->notifications_send(join(",", $friends), $content, FALSE);
     if (is_int($ret)) err("Error calling notifications_send: " . print_r($ret, TRUE));
     if (!$ret)
@@ -321,7 +356,8 @@ function send_pledge_to_friends($pledge, $friends) {
     }
 }
 
-function render_header() {
+// FBML header for all PledgeBank Facebook pages
+function pbfacebook_render_header() {
 ?> <div style="padding: 10px;">  <?
 if (OPTION_PB_STAGING) {
 ?>
@@ -333,7 +369,9 @@ PledgeBank</a> application.</i>
 }
 ?>
 <style>
-<? readfile("pb.css"); ?>
+<? 
+    readfile("pb.css"); 
+?>
 .pledge {
     border: solid 2px #522994;
     margin: 20px 50px 50px 50px;
@@ -382,7 +420,8 @@ PledgeBank</a> application.</i>
 <? 
 }
 
-function render_footer() {
+// FBML footer for all PledgeBank Facebook pages
+function pbfacebook_render_footer() {
 ?> 
 <div style="clear: both;"/>
 </div> <?
@@ -405,10 +444,10 @@ $ref = get_http_var("ref");
 if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     $ref = null;
     $pledge = null;
-    render_header();
-    render_dashboard();
-    render_frontpage();
-    render_footer();
+    pbfacebook_render_header();
+    pbfacebook_render_dashboard();
+    pbfacebook_render_frontpage();
+    pbfacebook_render_footer();
 } else {
 
     $pledge = new Pledge($ref);
@@ -417,25 +456,28 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     }
     if (get_http_var("sign_in_facebook")) {
         $facebook->require_add('/'.$pledge->ref());
+        $verified = auth_verify_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET, get_http_var("csrf"));
     }
     $no_send_error = false;
     if (get_http_var("invite_friends")) {
         $facebook->require_add('/'.$pledge->ref());
         if (array_key_exists('ids', $_POST)) {
-            if (!send_pledge_to_friends($pledge,$_POST['ids'])) {
+            if (!pbfacebook_send_to_friends($pledge,$_POST['ids'])) {
                 $no_send_error = true;
             }
         }
     }
+#    print_r($_POST);
+#    print_r($_GET);
 
-    render_header();
-    render_dashboard();
+    pbfacebook_render_header();
+    pbfacebook_render_dashboard();
     if ($no_send_error)
         print '<p class="errors">'."Sorry, PledgeBank couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
-    if (get_http_var("sign_in_facebook")) {
-        $pledge = sign_pledge_in_facebook($pledge);
+    if (get_http_var("sign_in_facebook") && $verified) {
+        $pledge = pbfacebook_sign_pledge($pledge);
     }
-    render_pledge($pledge);
-    render_footer();
+    pbfacebook_render_pledge($pledge);
+    pbfacebook_render_footer();
 }
 

@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.48 2007-06-19 12:39:40 francis Exp $
+ * $Id: general-example,v 1.49 2007-06-21 19:40:20 francis Exp $
  * 
  */
 
@@ -113,5 +113,6 @@ define('OPTION_GLOBALCOOL_SECRET', 'really-secret-value');
 define('OPTION_FACEBOOK_API_KEY', 'XXX');
 define('OPTION_FACEBOOK_SECRET', 'YYY');
 define('OPTION_FACEBOOK_CANVAS', 'http://apps.facebook.com/pledgebank/');
+define('OPTION_CSRF_SECRET', 'ZZZ');
 
 ?>

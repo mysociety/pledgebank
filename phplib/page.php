@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.160 2007-06-19 12:39:40 francis Exp $
+// $Id: page.php,v 1.161 2007-06-22 00:18:33 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -79,8 +79,9 @@ function page_header($title, $params = array()) {
     global $lang, $microsite, $page_plain_headers;
 
     if ($page_plain_headers) {
-        print "Title: $title\n\n";
-        print "Body: ";
+        # No need to print anything, body is enough.
+        #print "Title: $title\n\n";
+        #print "Body: ";
         return;
     }
 

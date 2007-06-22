@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.10 2007-06-21 19:40:21 francis Exp $
+// $Id: facebook.php,v 1.11 2007-06-22 00:18:34 francis Exp $
 
 /*
 
@@ -16,15 +16,16 @@ TODO:
   http://wiki.developers.facebook.com/index.php/Infinite_session_keys
 
 - Infinite loop after sending request
-- After you add yourself for signing, should actually do the signature (STILL BROKEN)
+- Adding app while 'inviting friends', check works OK
 
 - Don't use mySociety logo for notification icon
-- Test PIN protected pledges are safe
 - Fix sorting of pledges in profile box
 - Fix $invite_intro stuff that isn't used
 
 - Update the pledges on everyone's profile with new numbers of signers
     http://dev.formd.net/facebook/lastfmCharts/tutorial.html
+
+- Test what happens if you add app, but refuse each of the major permissions
 
 Not so important
 - Lower case and fuzzy matching of pledge refs
@@ -449,13 +450,12 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     pbfacebook_render_frontpage();
     pbfacebook_render_footer();
 } else {
-
     $pledge = new Pledge($ref);
     if ($pledge->pin()) {
         err("PIN protected pledges can't be accessed from Facebook");
     }
     if (get_http_var("sign_in_facebook")) {
-        $facebook->require_add('/'.$pledge->ref());
+        $facebook->require_add('/'.$pledge->ref()."/?sign_in_facebook=1&csrf=".get_http_var('csrf'));
         $verified = auth_verify_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET, get_http_var("csrf"));
     }
     $no_send_error = false;

@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.11 2007-06-22 00:18:34 francis Exp $
+// $Id: facebook.php,v 1.12 2007-06-24 02:42:35 francis Exp $
 
 /*
 
@@ -15,12 +15,13 @@ TODO:
 - Store infinite session key or keys for Pledge success cron job.
   http://wiki.developers.facebook.com/index.php/Infinite_session_keys
 
-- Infinite loop after sending request
 - Adding app while 'inviting friends', check works OK
 
 - Don't use mySociety logo for notification icon
 - Fix sorting of pledges in profile box
 - Fix $invite_intro stuff that isn't used
+
+- Posting sending message sucks.
 
 - Update the pledges on everyone's profile with new numbers of signers
     http://dev.formd.net/facebook/lastfmCharts/tutorial.html
@@ -36,6 +37,18 @@ Not so important
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
+
+function pbfacebook_after_sent() {
+    header('Location: '.OPTION_FACEBOOK_CANVAS);
+    exit;
+}
+if (get_http_var('sent')) {
+    # XXX I don't understand why we get sent back here after doing a
+    # notifications_send. If you try to instantiate the Facebook $facebook
+    # object you get redirected more confusingly in some sort of infinite loop.
+    # This is the best I could do to regain control after the callback URL.
+    pbfacebook_after_sent();
+}
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -115,7 +128,7 @@ function pbfacebook_render_pledge($pledge) {
     $invite_intro = "Invite your friends to also sign this pledge.";
     $signer_id = db_getOne("select signers.id from signers left join person on person.id = signers.person_id
             where facebook_id = ? and signers.pledge_id = ?", array($facebook->get_loggedin_user(), $pledge->id()));
-    if ($signer_id) {
+    if ($signer_id && !$pledge->finished()) {
         print "<h2 style=\"text-align: center\">$invite_intro</h2>";
         print '
 <fb:editor action="" labelwidth="200">
@@ -135,7 +148,7 @@ function pbfacebook_render_pledge($pledge) {
 #function auth_verify_with_shared_secret($item, $secret, $signature) {
     $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
     $pledge->render_box(array('class'=>'', 
-            'facebook-sign'=>!$pledge->finished(), 'facebook-sign-csrf'=>$csrf_sig,
+            'facebook-sign'=>!$pledge->finished() && !$signer_id, 'facebook-sign-csrf'=>$csrf_sig,
             'showdetails' => true));
 
     if (!$signer_id)
@@ -233,7 +246,8 @@ function pbfacebook_render_frontpage() {
             $out .= '</ol>';
             print $out;
         }
-        $friends_signed_joined = " AND pledges.id NOT IN (".join(",", $friends_signed).")";
+        if ($friends_signed) 
+            $friends_signed_joined = " AND pledges.id NOT IN (".join(",", $friends_signed).")";
     }
 
     $pledges = pledge_get_list("
@@ -289,7 +303,7 @@ function pbfacebook_sign_pledge($pledge) {
         # See if they tipped the balance
         $pledge = new Pledge($pledge->ref());
         if (!$f1 && $pledge->succeeded()) {
-            print '<p class=\"formnote\"><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
+            print '<p class="formnote"><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
         }
 
         # Show on their profile that they have signed it
@@ -347,14 +361,21 @@ function pbfacebook_send_to_friends($pledge, $friends) {
         just signed a pledge on Facebook and thought you might be interested. 
         <a href="'.OPTION_FACEBOOK_CANVAS.$pledge->ref().'">Click here</a>
         to see the pledge.';
+#    print "Friend inviting not ready yet"; exit; 
     $ret = $facebook->api_client->notifications_send(join(",", $friends), $content, FALSE);
+    if ($ret == 4) return false; // Special "sent too many" error
     if (is_int($ret)) err("Error calling notifications_send: " . print_r($ret, TRUE));
-    if (!$ret)
-        return false;
-    else {
-        $facebook->redirect($ret);
+    if (!$ret) { 
+        // Empty URL can, according to docs mean EITHER an error, OR that
+        // sending could happen without user confirmation. We just
+        // assume the latter for now.
+//        pbfacebook_after_sent();
+        print "Message probably sent, thank you!";
         exit;
+        return true; 
     }
+    $facebook->redirect($ret."&canvas=1");
+    return true;
 }
 
 // FBML header for all PledgeBank Facebook pages
@@ -473,7 +494,7 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     pbfacebook_render_header();
     pbfacebook_render_dashboard();
     if ($no_send_error)
-        print '<p class="errors">'."Sorry, PledgeBank couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
+        print '<p class="errors">'."Sorry, couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
     if (get_http_var("sign_in_facebook") && $verified) {
         $pledge = pbfacebook_sign_pledge($pledge);
     }

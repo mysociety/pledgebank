@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.12 2007-06-24 02:42:35 francis Exp $
+// $Id: facebook.php,v 1.13 2007-06-24 12:36:56 francis Exp $
 
 /*
 
@@ -294,6 +294,11 @@ function pbfacebook_sign_pledge($pledge) {
             $person_id = db_getOne("select nextval('person_id_seq')");
             db_query("insert into person (id, facebook_id) values (?, ?)", array($person_id, $user));
         }
+        # Update our record session key, if it is infinite
+        if ($facebook->fb_params['expires'] == 0) {
+            db_query("delete from facebook where facebook_id = ?", array($user));
+            db_query("insert into facebook (facebook_id, session_key) values (?, ?)", array($user, $facebook->fb_params['session_key']));
+        }
         # Add them as a signer
         db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge->id(), null, $person_id, 'f', $_SERVER['REMOTE_ADDR'], null));
         db_commit();
@@ -450,14 +455,26 @@ function pbfacebook_render_footer() {
 
 }
 
-// Beginning of main code
-$facebook = new Facebook(OPTION_FACEBOOK_API_KEY, OPTION_FACEBOOK_SECRET);
-#print_r($facebook->fb_params); exit;
+// Call from Facebook callbook hook pages
+function pbfacebook_init_webpage() {
+    global $facebook;
 
-$facebook->require_frame();
-#$facebook->require_add();
-#$facebook->require_login();
-#print $facebook->get_add_url() ; 
+    $facebook = new Facebook(OPTION_FACEBOOK_API_KEY, OPTION_FACEBOOK_SECRET);
+    #print_r($facebook->fb_params); exit;
+
+    $facebook->require_frame();
+}
+
+// Call from other scripts like cron jobs
+function pbfacebook_init_cron() {
+    global $facebook;
+
+    $facebook = new Facebook(OPTION_FACEBOOK_API_KEY, OPTION_FACEBOOK_SECRET);
+}
+
+
+// Beginning of main code
+pbfacebook_init_webpage();
 
 if (get_http_var("test")) {
     do_test();

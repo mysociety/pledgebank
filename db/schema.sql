@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.219 2007-06-20 10:22:59 francis Exp $
+-- $Id: schema.sql,v 1.220 2007-06-24 12:36:55 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -140,6 +140,14 @@ create unique index person_email_idx on person(email);
 create unique index person_email_lower_idx on person(lower(email));
 create unique index person_mobile_idx on person(mobile);
 create unique index person_facebook_id_idx on person(facebook_id);
+
+-- extra information about Facebook users
+create table facebook (
+    -- only store info for user accounts which still exist
+    facebook_id integer not null primary key references person(facebook_id),
+    -- unexpiring session ids
+    session_key text
+);
 
 -- information about each pledge
 create table pledges (

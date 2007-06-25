@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.103 2007-06-20 23:18:42 francis Exp $
+// $Id: ref-index.php,v 1.104 2007-06-25 22:16:14 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -68,26 +68,22 @@ function draw_spreadword($p) { ?>
     print '<ul>';
     if (!$p->finished()) {
         print '<li>';
-        print_link_with_pin($p->url_email(), "", _("Email pledge to your friends"));
+        print_link_with_pin($p->url_email(), "", _("Email your friends"));
         print '</li>';
         if (microsites_has_flyers())
             print '<li>';
             print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers"));
             print '</li>';
     } ?>
+    <li><a href="/<?=$p->ref() ?>/promote"><?=_('Promote on your site or blog') ?></a></li>
     <li><a href="/new/local/<?=$p->ref() ?>"><?=_('Create a local version of this pledge') ?></a></li>
-    <li> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a> <?=_('(creator only)');
-    if (!$p->finished()) { ?>
-    <li> <?
-        print '<a href="' . $p->url_picture() . '" title="' . _('Only if you made this pledge') . '">';
-        if ($p->has_picture()) {
-            print _('Change the pledge picture');
-        } else {
-            print _('Add a picture to your pledge');
-        }
-        print '</a> ' . _('(creator only)'); ?>
-    </li>
-<?  }
+    <li><small><?=_('Creator only:') ?> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a>
+<?  if (!$p->finished()) {
+        print ' | <a href="' . $p->url_picture() . '" title="' . _('Only if you made this pledge') . '">';
+        print $p->has_picture() ? _('Change picture') : _('Add a picture');
+        print '</a>';
+    }
+    print '</small></li>';
     print '</ul>';
     print '</div>';
 }

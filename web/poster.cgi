@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.103 2007-05-14 12:38:12 timsk Exp $
+# $Id: poster.cgi,v 1.104 2007-06-25 22:16:14 matthew Exp $
 #
 
 import sys
@@ -264,7 +264,7 @@ def rtf_repr(s):
         s = re.sub('\\\u%s' % i, '\u%s?' % dec, s) # I don't quite understand why so many slashes, but it works
     for i in re.findall(r'\\x([0-9a-f]{2})', s):
         dec = int(i, 16)
-	s = re.sub(r'\\x%s' % i, '\u%s?' % dec, s)
+        s = re.sub(r'\\x%s' % i, '\u%s?' % dec, s)
     return s
 
 def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
@@ -289,18 +289,23 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
     text_style = PyRTF.TextStyle( PyRTF.TextPS(font=heading_font, size=int(small_writing) ) )
     p_head = PyRTF.ParagraphStyle('header', text_style.Copy(), PyRTF.ParagraphPS(alignment=1, space_before = 0, space_after = 0) )
     ss.ParagraphStyles.append(p_head)
+
     text_style.TextPropertySet.SetSize(int(h_purple*4/5))
     p_footer = PyRTF.ParagraphStyle('footer', text_style.Copy(), PyRTF.ParagraphPS(alignment=PyRTF.ParagraphPS.RIGHT, space_before = 0, space_after = 0) )
     ss.ParagraphStyles.append(p_footer)
+
     text_style.TextPropertySet.SetFont(main_font)
     text_style.TextPropertySet.SetSize(int(small_writing))
     p_normal = PyRTF.ParagraphStyle('normal', text_style.Copy(), PyRTF.ParagraphPS(alignment = 1, space_before = 0, space_after = int(size*200)) )
     ss.ParagraphStyles.append(p_normal)
+
     p_nospaceafter = PyRTF.ParagraphStyle('nospaceafter', text_style.Copy(), PyRTF.ParagraphPS(alignment = 1, space_before = 0, space_after = 10) )
     ss.ParagraphStyles.append(p_nospaceafter)
+
     text_style.TextPropertySet.SetSize(int(small_writing*0.75))
     p_detail = PyRTF.ParagraphStyle('detail', text_style.Copy(), PyRTF.ParagraphPS(alignment = 1, space_before=0, space_after=int(size*100)) )
     ss.ParagraphStyles.append(p_detail)
+
     p_smallprint = PyRTF.ParagraphStyle('smallprint', text_style.Copy(), PyRTF.ParagraphPS(alignment=1, space_before=10, space_after=0) )
     ss.ParagraphStyles.append(p_smallprint)
 
@@ -389,12 +394,9 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 #        c.line(x1,y1+i,x2,y1+i)
 
     # Scale font sizes - with minimum for extreme cases
-    large_writing = size * 20
     small_writing = size * 12
     if small_writing < 4:
         small_writing = 4
-    if large_writing < 4:
-        large_writing = 4
 
     # Set up styles
     if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
@@ -409,14 +411,19 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
     p_head = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 0, 
         fontSize = small_writing, leading = small_writing*1.2, fontName = heading_font)
+
     p_normal = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*20, 
         fontSize = small_writing, leading = small_writing*1.2, fontName = main_font)
+
     p_detail = ParagraphStyle('detail', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*10, 
         fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font)
+
     p_nospaceafter = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 1, 
         fontSize = small_writing, leading = small_writing*1.2, fontName = main_font)
+
     p_footer = ParagraphStyle('normal', alignment = TA_RIGHT, spaceBefore = 0, spaceAfter = 0,
         fontSize = h_purple*4/5, leading = 0, fontName = heading_font)
+
     p_smallprint = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 1, spaceAfter = 0,
         fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font)
 
@@ -429,14 +436,15 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     # Main body text
     dots_body_gap = w/30
 
-    # Check web domain fits, as that is long word that doesn't fit on
-    # (and platypus/reportlab doesn't raise an error in that case)
-    webdomain_text = '''<font size="+3" color="%s"><b>%s/%s</b></font>''' % (html_colour, pb_domain_url(), ref)
-    webdomain_para = Paragraph(webdomain_text, p_normal)
-    webdomain_allowed_width = w - dots_body_gap * 2
-    webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]
-    if webdomain_width > webdomain_allowed_width:
-        return False
+    if not live:
+        # Check web domain fits, as that is long word that doesn't fit on
+        # (and platypus/reportlab doesn't raise an error in that case)
+        webdomain_text = '''<font size="+3" color="%s"><b>%s/%s</b></font>''' % (html_colour, pb_domain_url(), ref)
+        webdomain_para = Paragraph(webdomain_text, p_normal)
+        webdomain_allowed_width = w - dots_body_gap * 2
+        webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]
+        if webdomain_width > webdomain_allowed_width:
+            return False
     # print >>sys.stderr, "webdomain_width ", webdomain_width, w
 
     # Draw text
@@ -472,29 +480,63 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 re.split("\r?\n\r?\n", _('<b>More details:</b> %s').encode('utf-8') % pledge['detail']))
             )
 
-    if not has_sms(pledge):
-        pledge_at_text = _("Pledge at ").encode('utf-8')
-        if pledge['pin']:
-            pin_text = _(' pin ').encode('utf-8') + '''<font color="%s" size="+2">%s</font>''' % (html_colour, userpin)
+    if not live:
+        if not has_sms(pledge):
+            pledge_at_text = _("Pledge at ").encode('utf-8')
+            if pledge['pin']:
+                pin_text = _(' pin ').encode('utf-8') + '''<font color="%s" size="+2">%s</font>''' % (html_colour, userpin)
+            else:
+                pin_text = ''
+            sms_to_text = ""
+            sms_smallprint = ""
         else:
-            pin_text = ''
-        sms_to_text = ""
-        sms_smallprint = ""
-    else:
-        pledge_at_text = _("pledge at ").encode('utf-8')
-        pin_text = ""
-        sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="%s">
+            pledge_at_text = _("pledge at ").encode('utf-8')
+            pin_text = ""
+            sms_to_text = _("""<font size="+2">Text</font> <font size="+8" color="%s">
             <b>%s %s</b></font> to <font color="%s"><b>%s</b></font> 
             (%s only) or """).encode('utf-8') % (html_colour, mysociety.config.get('PB_SMS_PREFIX'), ref, html_colour, sms_number, sms_countries_description.encode('utf-8'))
-        sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
+            sms_smallprint = _(boilerplate_sms_smallprint) # translate now lang set
 
-    story.extend([
-        Paragraph('''%s%s%s%s''' % 
-            (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal),
-        Paragraph(_('''
+        story.append(
+            Paragraph('''%s%s%s%s''' % 
+                (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal)
+        )
+
+        story.append(
+            Paragraph(_('''
             This pledge closes on <font color="%s">%s</font>. Thanks!
             ''').encode('utf-8') % (html_colour, pledge['date']), p_normal)
-    ])
+        )
+
+    else:
+
+        left = pledge['target'] - pledge['signers']
+        if not pledge['open']:
+            status = gettext.ngettext('<font color="%s">%s</font> person signed up', '<font color="%s">%s</font> people signed up', pledge['signers']) % (html_colour, pledge['signers'])
+        else:
+            status = gettext.ngettext('<font color="%s">%s</font> person has signed up', '<font color="%s">%s</font> people have signed up', pledge['signers']) % (html_colour, pledge['signers'])
+        if left <= 0:
+            status += u' (%d over target) \u2014 success!'.encode('utf-8') % -left
+        else:
+            status += ', '
+            if not pledge['open']:
+                status += gettext.ngettext('<font color="%s">%d</font> more was needed', '<font color="%s">%d</font> more were needed', left) % (html_colour, left)
+            else:
+                status += gettext.ngettext('<font color="%s">%d</font> more needed', '<font color="%s">%d</font> more needed', left) % (html_colour, left)
+        story.append(
+            Paragraph('<font size="+3">%s</font>' % status, p_normal)
+        )
+        if pledge['open']:
+            if has_sms(pledge):
+                sms_text = _(""" Or you can text <font color="%s">%s %s</font> to <font color="%s">%s</font> <font size="-1">(%s only)</font>.""").encode('utf-8') % (html_colour, mysociety.config.get('PB_SMS_PREFIX'), ref, html_colour, sms_number, sms_countries_description.encode('utf-8'))
+            else:
+                sms_text = ''
+            story.append(
+                Paragraph(u'Open until %s \u2014 <font color="%s">Sign this pledge</font>!%s'.encode('utf-8') % (pledge['date'], html_colour, sms_text), p_normal)
+            )
+        else:
+            story.append(Paragraph('Closed on <font color="%s">%s</font>' % (html_colour, pledge['date']), p_normal))
+
     remember = microsites_poster_remember_text(pledge)
     if remember:
         story.extend([
@@ -584,22 +626,13 @@ while fcgi.isFCGI():
     try:
         if req.env.get('PATH_INFO'):
             incgi = True
-
-            path_info = req.env.get('PATH_INFO').split('_')
-            if len(path_info)>0:
-                ref = path_info[0][1:]
-
-            if len(path_info)>1 and path_info[1]:
-                size = path_info[1]
-            else:
-                size = 'A4'
-                
-            if len(path_info)>2 and path_info[2]:
-                type = path_info[2]
-                (type, format) = type.split('.')
-            else:
-                type = 'flyers4'
-                format = 'pdf'
+            path_info = req.env.get('PATH_INFO').split('.')
+            format = (len(path_info)>1 and path_info[1]) and path_info[1] or 'png'
+            path_info = path_info[0][1:].split('_')
+            ref = path_info[0]
+            size = (len(path_info)>1 and path_info[1]) and path_info[1] or 'A4'
+            type = (len(path_info)>2 and path_info[2]) and path_info[2] or 'flyers8'
+            live = (len(path_info)>3 and path_info[3]) and '_%s' % path_info[3] or ''
         else:
             incgi = False
 
@@ -620,6 +653,8 @@ while fcgi.isFCGI():
                 help=", ".join(types));
             parser.add_option("--format", dest="format", default="pdf",
                 help=", ".join(formats));
+            parser.add_option("--live", dest="live", default="",
+                help="for live details in the output");
             (options, args) = parser.parse_args()
             if len(args) <> 1:
                 parser.print_help()
@@ -629,6 +664,7 @@ while fcgi.isFCGI():
             size = options.size
             type = options.type 
             format = options.format
+            live = options.live
 
         if not size in sizes:
             raise Exception, "Unknown size '%s'" % size
@@ -640,11 +676,17 @@ while fcgi.isFCGI():
         # Get information from database
         q = db.cursor()
         pledge = {}
-        q.execute('SELECT title, date, name, type, target, target_type, signup, pin, identity, detail, country, lang, microsite FROM pledges LEFT JOIN location ON location.id = pledges.location_id WHERE lower(ref) = %s', ref.lower())
+        q.execute('''SELECT title, date, name, type, target, target_type, signup,
+            pin, identity, detail, country, lang, microsite,
+            (select count(*) from signers where pledges.id=pledge_id) as signers,
+            ms_current_date() <= pledges.date AS open
+            FROM pledges
+            LEFT JOIN location ON location.id = pledges.location_id
+            WHERE lower(ref) = %s''', ref.lower())
         row = q.fetchone()
         if not row:
             raise Exception, "Unknown ref '%s'" % ref
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['target_type'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang'], pledge['microsite']) = row
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['target_type'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang'], pledge['microsite'], pledge['signers'], pledge['open']) = row
         q.close()
 
         # Work out if we're on a microsite
@@ -702,8 +744,8 @@ while fcgi.isFCGI():
             pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         elif iso_lang == 'eo_XX':
             pledge['date'] = date.strftime("la %e-a de %B %Y")
-	elif iso_lang == 'zh_CN':
-	    pledge['date'] = date.strftime("%Y\xe5\xb9\xb4%m\xe6\x9c\x88%d\xe6\x97\xa5")
+        elif iso_lang == 'zh_CN':
+            pledge['date'] = date.strftime("%Y\xe5\xb9\xb4%m\xe6\x9c\x88%d\xe6\x97\xa5")
         else:
             pledge['date'] = date.strftime("%e %B %Y")
         if pledge['signup'].decode('utf-8') == u"do the same":
@@ -744,16 +786,18 @@ while fcgi.isFCGI():
 
         outdir = mysociety.config.get("PB_PDF_CACHE")
         if microsite:
-            outpdf = "%s_%s_%s_%s.pdf" % (microsite, ref, size, type)
+            outpdf = "%s_%s_%s_%s%s.pdf" % (microsite, ref, size, type, live)
         else:
-            outpdf = "%s_%s_%s.pdf" % (ref, size, type)
+            outpdf = "%s_%s_%s%s.pdf" % (ref, size, type, live)
         if microsite:
-            outfile = "%s_%s_%s_%s.%s" % (microsite, ref, size, type, format)
+            outfile = "%s_%s_%s_%s%s.%s" % (microsite, ref, size, type, live, format)
         else:
-            outfile = "%s_%s_%s.%s" % (ref, size, type, format)
+            outfile = "%s_%s_%s%s.%s" % (ref, size, type, live, format)
 
         # Cache file checking
         # XXX TODO - sanity check size and date, or we risk caching a failure here!
+        # XXX THe live ones are cached for ever too, need to remove upon every
+        # signer
         if os.path.exists(outdir + '/' + outfile) and incgi:
             # Use cache file
             file_to_stdout(outdir + '/' + outfile)
@@ -785,6 +829,11 @@ while fcgi.isFCGI():
                 margin_left = 1 * cm
                 margin_bottom = 1 * cm
                 margin_right = 1 * cm
+            elif size == 'A7':
+                margin_top = 0
+                margin_left = 0
+                margin_bottom = 0
+                margin_right = 0
 
             flyer_width = (page_width - margin_left - margin_right)
             flyer_height = (page_height - margin_top - margin_bottom)

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.105 2007-06-27 16:24:27 matthew Exp $
+# $Id: poster.cgi,v 1.106 2007-06-27 17:14:58 matthew Exp $
 #
 
 import sys
@@ -680,7 +680,7 @@ while fcgi.isFCGI():
             pin, identity, detail, country, lang, microsite,
             (select count(*) from signers where pledges.id=pledge_id) as signers,
             ms_current_date() <= pledges.date AS open,
-            extract(epoch from pledge_last_change_time(id))
+            extract(epoch from pledge_last_change_time(pledges.id))
             FROM pledges
             LEFT JOIN location ON location.id = pledges.location_id
             WHERE lower(ref) = %s''', ref.lower())

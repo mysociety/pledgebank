@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: ref-promote.php,v 1.1 2007-06-25 22:16:14 matthew Exp $
+ * $Id: ref-promote.php,v 1.2 2007-06-27 17:14:58 matthew Exp $
  */
 
 include_once '../phplib/pb.php';
@@ -32,7 +32,6 @@ page_header('Promoting your pledge', $params);
 ?>
 <h2>Promoting your pledge</h2>
 
-<p>There are many ways you can promote your pledge, both on- and off-line.</p>
 <style type="text/css">
 li {
     margin: 1em 0;
@@ -47,7 +46,8 @@ li {
 -->
 
 <li>
-<p><strong>MySpace, LiveJournal:</strong>
+<p><strong>MySpace, LiveJournal</strong>
+<small>(and other sites that don't allow JavaScript)</small>:
 Copy the text from the box below to have this
 automatically updating image:</p>
 <a style="float:right" href="<?=$p->url_typein()?>"><img border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="Sign my pledge at PledgeBank"></a>
@@ -57,7 +57,9 @@ automatically updating image:</p>
 
 <li style="clear:both; padding-top:1em">
 
-<p><strong>Other blog sites:</strong> Embed the status of your pledge in your blog sidebar by copying the text from the box below:</p>
+<p><strong>Other blog sites</strong>
+<small>(that allow JavaScript)</small>:
+Embed the status of your pledge in your blog sidebar by copying the text from the box below:</p>
 
 <div style="width:300px;float:right" id="progress">
 <script type="text/javascript" src="<?=$p->url_typein()?>/progress.js"></script>

@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.104 2007-06-25 22:16:14 matthew Exp $
+# $Id: poster.cgi,v 1.105 2007-06-27 16:24:27 matthew Exp $
 #
 
 import sys
@@ -679,14 +679,15 @@ while fcgi.isFCGI():
         q.execute('''SELECT title, date, name, type, target, target_type, signup,
             pin, identity, detail, country, lang, microsite,
             (select count(*) from signers where pledges.id=pledge_id) as signers,
-            ms_current_date() <= pledges.date AS open
+            ms_current_date() <= pledges.date AS open,
+            extract(epoch from pledge_last_change_time(id))
             FROM pledges
             LEFT JOIN location ON location.id = pledges.location_id
             WHERE lower(ref) = %s''', ref.lower())
         row = q.fetchone()
         if not row:
             raise Exception, "Unknown ref '%s'" % ref
-        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['target_type'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang'], pledge['microsite'], pledge['signers'], pledge['open']) = row
+        (pledge['title'],date,pledge['name'],pledge['type'],pledge['target'],pledge['target_type'],pledge['signup'],pledge['pin'], pledge['identity'], pledge['detail'], pledge['country'], pledge['lang'], pledge['microsite'], pledge['signers'], pledge['open'], pledge['last_change']) = row
         q.close()
 
         # Work out if we're on a microsite
@@ -798,7 +799,7 @@ while fcgi.isFCGI():
         # XXX TODO - sanity check size and date, or we risk caching a failure here!
         # XXX THe live ones are cached for ever too, need to remove upon every
         # signer
-        if os.path.exists(outdir + '/' + outfile) and incgi:
+        if os.path.exists(outdir + '/' + outfile) and incgi and (not live or pledge['last_change'] < os.path.getmtime(outdir + '/' + outfile)):
             # Use cache file
             file_to_stdout(outdir + '/' + outfile)
         elif format == 'rtf':

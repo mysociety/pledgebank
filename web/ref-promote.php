@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: ref-promote.php,v 1.2 2007-06-27 17:14:58 matthew Exp $
+ * $Id: ref-promote.php,v 1.3 2007-06-27 17:21:58 matthew Exp $
  */
 
 include_once '../phplib/pb.php';
@@ -72,7 +72,7 @@ Embed the status of your pledge in your blog sidebar by copying the text from th
 <input type="hidden" name="widget.content" value="&lt;script type='text/javascript' src='<?=$p->url_typein()?>/progress.js'&gt;&lt;/script&gt;">
 <input type="hidden" name="widget.template" value="&lt;data:content/&gt;">
 <input type="hidden" name="infoUrl" value="<?=$p->url_typein()?>">
-<input type="image" src="/add2blogger_lg.gif" align="middle">
+<input type="image" src="/add2blogger_lg.gif" align="middle" alt="Install widget on Blogger">
 </form>
 
 <form action="https://www.typepad.com/t/app/weblog/design/widgets" method="post">
@@ -83,7 +83,7 @@ Embed the status of your pledge in your blog sidebar by copying the text from th
 <input type="hidden" name="short_name" value="<?=$p->ref()?>">
 <input type="hidden" name="content" value="&lt;script type='text/javascript' src='<?=$p->url_typein()?>/progress.js'&gt;&lt;/script&gt;">
 <input type="hidden" name="return_url" value="<?=$p->url_typein()?>">
-<input type="submit" name="submit" value="Install Widget on TypePad">
+<input type="image" src="/typepad.gif" align="middle" alt="Install widget on TypePad">
 </form>
 
 <li><strong>Wordpress</strong>:

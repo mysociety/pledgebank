@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.106 2007-06-27 17:14:58 matthew Exp $
+# $Id: poster.cgi,v 1.107 2007-06-27 19:01:46 matthew Exp $
 #
 
 import sys
@@ -516,7 +516,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         else:
             status = gettext.ngettext('<font color="%s">%s</font> person has signed up', '<font color="%s">%s</font> people have signed up', pledge['signers']) % (html_colour, pledge['signers'])
         if left <= 0:
-            status += u' (%d over target) \u2014 success!'.encode('utf-8') % -left
+            status += _(u' (%d over target) \u2014 success!').encode('utf-8') % -left
         else:
             status += ', '
             if not pledge['open']:
@@ -532,10 +532,10 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
             else:
                 sms_text = ''
             story.append(
-                Paragraph(u'Open until %s \u2014 <font color="%s">Sign this pledge</font>!%s'.encode('utf-8') % (pledge['date'], html_colour, sms_text), p_normal)
+                Paragraph(_(u'Open until %s \u2014 <font color="%s">Sign this pledge</font>!%s').encode('utf-8') % (pledge['date'], html_colour, sms_text), p_normal)
             )
         else:
-            story.append(Paragraph('Closed on <font color="%s">%s</font>' % (html_colour, pledge['date']), p_normal))
+            story.append(Paragraph(_('Closed on <font color="%s">%s</font>') % (html_colour, pledge['date']), p_normal))
 
     remember = microsites_poster_remember_text(pledge)
     if remember:

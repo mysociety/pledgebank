@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: ref-promote.php,v 1.3 2007-06-27 17:21:58 matthew Exp $
+ * $Id: ref-promote.php,v 1.4 2007-06-27 19:01:46 matthew Exp $
  */
 
 include_once '../phplib/pb.php';
@@ -27,11 +27,11 @@ $params = array(
     'ref' => $p->ref(),
     'pref' => $p->url_typein()
 );
-page_header('Promoting your pledge', $params);
+page_header(_('Promoting your pledge'), $params);
+
+print h2(_('Promoting your pledge'));
 
 ?>
-<h2>Promoting your pledge</h2>
-
 <style type="text/css">
 li {
     margin: 1em 0;
@@ -46,20 +46,19 @@ li {
 -->
 
 <li>
-<p><strong>MySpace, LiveJournal</strong>
-<small>(and other sites that don't allow JavaScript)</small>:
-Copy the text from the box below to have this
-automatically updating image:</p>
-<a style="float:right" href="<?=$p->url_typein()?>"><img border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="Sign my pledge at PledgeBank"></a>
+<p><strong><?=_('MySpace, LiveJournal') ?></strong>
+<small><?=_("(and other sites that don't allow JavaScript)") ?></small>:
+<?=_('Copy the text from the box below to have this automatically updating image:') ?></p>
+<a style="float:right" href="<?=$p->url_typein()?>"><img border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="<?=_('Sign my pledge at PledgeBank') ?>"></a>
 <textarea rows="8" cols="45" onclick="this.select()">
-<a href="<?=$p->url_typein()?>"><img border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="Sign my pledge at PledgeBank"></a>
+<a href="<?=$p->url_typein()?>"><img border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="<?=_('Sign my pledge at PledgeBank') ?>"></a>
 </textarea>
 
 <li style="clear:both; padding-top:1em">
 
-<p><strong>Other blog sites</strong>
-<small>(that allow JavaScript)</small>:
-Embed the status of your pledge in your blog sidebar by copying the text from the box below:</p>
+<p><strong><?=_('Other blog sites') ?></strong>
+<small><?=_('(that allow JavaScript)') ?></small>:
+<?=_('Embed the status of your pledge in your blog sidebar by copying the text from the box below:') ?></p>
 
 <div style="width:300px;float:right" id="progress">
 <script type="text/javascript" src="<?=$p->url_typein()?>/progress.js"></script>
@@ -72,7 +71,7 @@ Embed the status of your pledge in your blog sidebar by copying the text from th
 <input type="hidden" name="widget.content" value="&lt;script type='text/javascript' src='<?=$p->url_typein()?>/progress.js'&gt;&lt;/script&gt;">
 <input type="hidden" name="widget.template" value="&lt;data:content/&gt;">
 <input type="hidden" name="infoUrl" value="<?=$p->url_typein()?>">
-<input type="image" src="/add2blogger_lg.gif" align="middle" alt="Install widget on Blogger">
+<input type="image" src="/add2blogger_lg.gif" align="middle" alt="<?=_('Install widget on Blogger') ?>">
 </form>
 
 <form action="https://www.typepad.com/t/app/weblog/design/widgets" method="post">
@@ -83,11 +82,12 @@ Embed the status of your pledge in your blog sidebar by copying the text from th
 <input type="hidden" name="short_name" value="<?=$p->ref()?>">
 <input type="hidden" name="content" value="&lt;script type='text/javascript' src='<?=$p->url_typein()?>/progress.js'&gt;&lt;/script&gt;">
 <input type="hidden" name="return_url" value="<?=$p->url_typein()?>">
-<input type="image" src="/typepad.gif" align="middle" alt="Install widget on TypePad">
+<input type="image" src="/typepad.gif" align="middle" alt="<?=_('Install widget on TypePad') ?>">
 </form>
 
 <li><strong>Wordpress</strong>:
-you can install <a href="/WPwidget.zip">this WordPress widget</a> in the widget folder, and have a configuration page to enable you to pick which pledge you want to follow. (Users of Wordpress before version 2.2. will need to <a href="http://automattic.com/code/widgets/">install the widget plugin</a>.)
+<? print _('you can install <a href="/WPwidget.zip">this WordPress widget</a> in the widget folder, and have a configuration page to enable you to pick which pledge you want to follow.');
+print _('(Users of Wordpress before version 2.2. will need to <a href="http://automattic.com/code/widgets/">install the widget plugin</a>.)'); ?>
 
 <!--
 

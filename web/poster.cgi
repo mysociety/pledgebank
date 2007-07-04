@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.107 2007-06-27 19:01:46 matthew Exp $
+# $Id: poster.cgi,v 1.108 2007-07-04 14:49:03 matthew Exp $
 #
 
 import sys
@@ -787,21 +787,18 @@ while fcgi.isFCGI():
 
         outdir = mysociety.config.get("PB_PDF_CACHE")
         if microsite:
-            outpdf = "%s_%s_%s_%s%s.pdf" % (microsite, ref, size, type, live)
+            outpdf = "%s/%s_%s_%s_%s%s.pdf" % (outdir, microsite, ref, size, type, live)
         else:
-            outpdf = "%s_%s_%s%s.pdf" % (ref, size, type, live)
+            outpdf = "%s/%s_%s_%s%s.pdf" % (outdir, ref, size, type, live)
         if microsite:
-            outfile = "%s_%s_%s_%s%s.%s" % (microsite, ref, size, type, live, format)
+            outfile = "%s/%s_%s_%s_%s%s.%s" % (outdir, microsite, ref, size, type, live, format)
         else:
-            outfile = "%s_%s_%s%s.%s" % (ref, size, type, live, format)
+            outfile = "%s/%s_%s_%s%s.%s" % (outdir, ref, size, type, live, format)
 
         # Cache file checking
-        # XXX TODO - sanity check size and date, or we risk caching a failure here!
-        # XXX THe live ones are cached for ever too, need to remove upon every
-        # signer
-        if os.path.exists(outdir + '/' + outfile) and incgi and (not live or pledge['last_change'] < os.path.getmtime(outdir + '/' + outfile)):
+        if os.path.exists(outfile) and os.path.getsize(outfile)>0 and incgi and pledge['last_change'] < os.path.getmtime(outfile):
             # Use cache file
-            file_to_stdout(outdir + '/' + outfile)
+            file_to_stdout(outfile)
         elif format == 'rtf':
             # Generate PDF file to get correct font size
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
@@ -845,10 +842,10 @@ while fcgi.isFCGI():
 
             DR = PyRTF.Renderer()
             DR.Write(doc, file(canvasfilename, 'w'))
-            os.rename(canvasfilename, outdir + '/' + outfile)
-            os.chmod(outdir + '/' + outfile, 0644)
+            os.rename(canvasfilename, outfile)
+            os.chmod(outfile, 0644)
             if (incgi):
-                file_to_stdout(outdir + '/' + outfile)
+                file_to_stdout(outfile)
         else:
             # Generate PDF file
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
@@ -872,13 +869,13 @@ while fcgi.isFCGI():
                 c.setFont("Helvetica", 15)
                 c.drawCentredString(10.5*cm, 25*cm, str(e))
             c.save()
-            os.rename(canvasfilename, outdir + '/' + outpdf)
-            os.chmod(outdir + '/' + outpdf, 0644)
+            os.rename(canvasfilename, outpdf)
+            os.chmod(outpdf, 0644)
                 
             # Generate any other file type
             if format != 'pdf':
                 # Call out to "convert" from ImageMagick
-                cmd = "gs-afpl -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outdir + '/' + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outdir + '/' + outfile
+                cmd = "gs-afpl -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outfile
                 child = popen2.Popen3(cmd, True) # capture stderr
                 child.tochild.close()
                 # no need for stdout in log file, so ignore this
@@ -897,7 +894,7 @@ while fcgi.isFCGI():
                 elif os.WEXITSTATUS(status) != 0:
                     raise Exception, "%s: exited with failure status %d" % (cmd, os.WEXITSTATUS(status))
             if (incgi):
-                file_to_stdout(outdir + '/' + outfile)
+                file_to_stdout(outfile)
 
 
     except Exception, e:

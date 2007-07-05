@@ -1,0 +1,60 @@
+#!/usr/bin/php -q
+<?php
+/* 
+ * update-facebook-stuff:
+ * Update all the static FBML on everyone's profiles, to reflect new signatures
+ * on pledges and whether they are successful or not.
+ *
+ * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: update-facebook-stuff,v 1.1 2007-07-05 14:43:26 francis Exp $
+ *
+ */
+
+$short_opts = '';
+$long_opts = array('verbose','help');
+
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once '../phplib/pledge.php';
+require_once '../phplib/pbfacebook.php';
+
+function verbose($str) {
+    global $verbose;
+    if ($verbose) 
+        fwrite(STDERR, "update-facebook-stuff ".posix_getpid().": $str\n");
+}
+function error($str) {
+    fwrite(STDERR, "update-facebook-stuff: ERROR: $str\n");
+}
+
+$switches = $options[0];
+$args = $options[1];
+$verbose = 0; 
+foreach ($switches as $switch) {
+    if ($switch[0]=='--verbose') $verbose = 1;
+    if ($switch[0]=='--help') {
+?>
+
+PledgeBank Facebook update script.
+
+Usage: update-facebook-stuff [--verbose]
+
+--help      Display this help message
+--verbose   Display more information
+
+<?
+        exit;
+    }
+}
+
+$q = db_query("select * from person where facebook_id is not null");
+while ($person = db_fetch_array($q)) {
+    verbose("updating profile of Facebook person " . $person['facebook_id']);
+    pbfacebook_init_cron($person['facebook_id']); 
+    pbfacebook_update_profile_box($person['facebook_id']);
+}
+ 
+
+

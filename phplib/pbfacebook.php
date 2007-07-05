@@ -5,7 +5,13 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.1 2007-06-24 12:41:30 francis Exp $
+// $Id: pbfacebook.php,v 1.2 2007-07-05 14:43:27 francis Exp $
+
+if (OPTION_PB_STAGING) 
+    $GLOBALS['facebook_config']['debug'] = true;
+$GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
+
+require_once '../../phplib/facebookphp4/facebook.php';
 
 // Write the static FBML to the given user's profile box
 function pbfacebook_update_profile_box($uid) {
@@ -56,7 +62,7 @@ function pbfacebook_update_profile_box($uid) {
     }
 
     $ret = $facebook->api_client->profile_setFBML($out, $uid);
-    if ($ret != 1) err("Error calling profile_setFBML");
+    if ($ret != 1) err("Error calling profile_setFBML: ". print_r($ret, TRUE));
 }
 
 // Draw pledge index page within Facebook
@@ -404,11 +410,78 @@ function pbfacebook_init_webpage() {
 }
 
 // Call from other scripts like cron jobs
-function pbfacebook_init_cron() {
+function pbfacebook_init_cron($user) {
     global $facebook;
 
     $facebook = new Facebook(OPTION_FACEBOOK_API_KEY, OPTION_FACEBOOK_SECRET);
+
+    $session_key = db_getOne("select session_key from facebook where facebook_id = ?", $user);
+    if (!$session_key) 
+        err("No session key for Facebook user $user");
+
+    #print "session key: $session_key";
+
+    # XXX their ought be a (working!) function in the Facebook PHP class to do this
+    #$facebook->set_user($user, $session_key);
+    $facebook->user = $user;
+    $facebook->api_client->session_key = $session_key;
 }
 
+// Like pb_send_email in pb/phplib/fns.php
+function pbfacebook_send($to, $subject, $message, $headers = array()) {
+    $message .= "
+<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS."\" label=\"Sign the pledge!\" />
+";
+    return pbfacebook_send_internal($to, $subject . $message); # XXXX include subject properly
+}
+
+// Like pb_send_email_template in pb/phplib/fns.php
+function pbfacebook_send_template($to, $template_name, $values, $headers = array()) {
+    global $pbfacebook_values;
+    $pbfacebook_values = pb_message_add_template_values($values);
+
+    $template = file_get_contents("../templates/facebook/$template_name");
+    $template = _($template);
+    $template = preg_replace_callback("|<\?\=\\\$values\['([^']+)'\]\?>|", create_function('$a',
+            ' global $pbfacebook_values; return $pbfacebook_values[$a[1]]; '
+        ), $template);
+
+    return pbfacebook_send_internal($to, $template);
+}
+
+// XXX this calls pbfacebook_init_cron so perhaps should be in frequentupdate
+function pbfacebook_send_internal($to, $message) {
+    global $facebook;
+
+    // 703090157 = Francis Irving
+    // 582616613 = Opera Tuck
+
+    pbfacebook_init_cron($to); 
+    $to_info = $facebook->api_client->users_getInfo($to, array("name"));
+    print "pbfacebook_send_internal: ". $message. "\nTo:". $to_info[0]['name'];
+
+    # Publish feed story
+    $lines = split("\n", $message);
+    $feed_title = array_shift($lines);
+    $feed_body = join("\n", $lines);
+    $ret = $facebook->api_client->feed_publishStoryToUser($feed_title, $feed_body);
+    if (!$ret) {
+        err("Calling feed_publishStoryToUser failed mysteriously in pbfacebook_send_internal");
+    } else {
+        if ($ret[0] != 1) err("Error calling feed_publishStoryToUser in pbfacebook_send_internal: " . print_r($ret, TRUE));
+    }
+
+    # Frustratingly, this always requires URL confirmation, even when the users have added the application,
+    # so we can't use it from a cron job.
+    /*
+    $ret = $facebook->api_client->notifications_sendRequest($to, "pledge", $message, "http://www.mysociety.org/mysociety_sm.gif", "invitation");
+    #$ret = $facebook->api_client->notifications_send($to, $message, FALSE);
+    if (is_int($ret)) err("Error calling notifications_sendRequest in pb_send_facebook: " . print_r($ret, TRUE)); 
+    if ($ret) err("Need URL confirmation calling notifications_sendRequest in pb_send_facebook: " . print_r($ret, TRUE));
+    print "Success\n";
+    */
+
+    return true;
+}
 
 

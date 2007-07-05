@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.159 2007-05-28 22:38:03 francis Exp $
+// $Id: fns.php,v 1.160 2007-07-05 14:43:27 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -94,8 +94,8 @@ function pb_domain_url($params = array('path'=>'/')) {
     return $url;
 }
 
-// $to can be one recipient address in a string, or an array of addresses
-function pb_send_email_template($to, $template_name, $values, $headers = array()) {
+// Used by email and Facebook sending
+function pb_message_add_template_values($values) {
     // TODO: perhaps these days, this pb_send_email_template should take a pledge
     // object as a parameter, and the $values should only be extra values
     $p = null;
@@ -118,6 +118,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         $values['pledge_url'] = pb_domain_url(array('path'=> "/" . $values['ref']));
         $values['pledge_url_email'] = pb_domain_url(array('path'=> "/" . $values['ref'] . "/email"));
         $values['pledge_url_flyers'] = pb_domain_url(array('path'=> "/" . $values['ref'] . "/flyers"));
+        $values['pledge_facebook_url'] = OPTION_FACEBOOK_CANVAS . $values['ref'];
     }
     if (array_key_exists('date', $values))
         $values['pretty_date'] = prettify($values['date'], false);
@@ -136,6 +137,12 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
         
     $values['signature'] = _("-- the PledgeBank.com team");
 
+    return $values;
+}
+
+// $to can be one recipient address in a string, or an array of addresses
+function pb_send_email_template($to, $template_name, $values, $headers = array()) {
+    $values = pb_message_add_template_values($values);
     $template = file_get_contents("../templates/emails/$template_name");
     $template = _($template);
 

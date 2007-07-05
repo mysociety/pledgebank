@@ -4,7 +4,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.17 2007-06-11 15:23:47 matthew Exp $
+# $Id: crontab.ugly,v 1.18 2007-07-05 14:43:27 francis Exp $
 
 PATH=/usr/local/bin:/usr/bin:/bin
 !!(* if ($vhost eq "matthew.pledgebank.com") { *)!!
@@ -30,6 +30,7 @@ MAILTO=team@pledgebank.com
 !!(* if (($hostname eq "bitter" && !$staging) || ($staging && $vhost eq 'matthew.pledgebank.com')) { *)!!
 # Once an hour
 33 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "stalled?" )
+03 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/update-facebook-stuff.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/update-facebook-stuff || echo "stalled?" )
 # Once a day, early morning
 0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts
 0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/close-comments

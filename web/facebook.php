@@ -5,30 +5,36 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.14 2007-06-24 12:41:30 francis Exp $
+// $Id: facebook.php,v 1.15 2007-07-05 14:43:28 francis Exp $
 
 /*
 
 TODO:
 
-- Success / failures / announce messages
-- Store infinite session key or keys for Pledge success cron job.
-  http://wiki.developers.facebook.com/index.php/Infinite_session_keys
+- Success / failures
+- Announce messages
 
 - Adding app while 'inviting friends', check works OK
 
-- Don't use mySociety logo for notification icon
 - Fix sorting of pledges in profile box
 - Fix $invite_intro stuff that isn't used
-
-- Posting sending message sucks.
 
 - Update the pledges on everyone's profile with new numbers of signers
     http://dev.formd.net/facebook/lastfmCharts/tutorial.html
 
 - Test what happens if you add app, but refuse each of the major permissions
 
-Not so important
+- Display list of Facebook signers on Facebook pledge
+
+Improvements:
+- Post in friend's news feed when a pledge is successful (but only once if multiple!)
+- Somehow actually send notifications for success
+- Let people say "I've done it!" on the pledges on their profile.
+- Show comments (wall!) on Facebook pledges
+- Let people add comments to Facebook pledges
+
+Not so important:
+- Multiple success announce messages should all be sent to Facebook users
 - Lower case and fuzzy matching of pledge refs
 - Detect language that Facebook is using, and tell PledgeBank pages to use that.
 
@@ -37,8 +43,8 @@ Not so important
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
-require_once '../phplib/pbfacebook.php';
 
+# XXX clean up this mess
 function pbfacebook_after_sent() {
     header('Location: '.OPTION_FACEBOOK_CANVAS);
     exit;
@@ -51,12 +57,9 @@ if (get_http_var('sent')) {
     pbfacebook_after_sent();
 }
 
-if (OPTION_PB_STAGING) 
-    $GLOBALS['facebook_config']['debug'] = true;
-$GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
-$page_plain_headers = true;
+require_once '../phplib/pbfacebook.php';
 
-require_once '../../phplib/facebookphp4/facebook.php';
+$page_plain_headers = true;
 
 function do_test() {
     global $facebook;
@@ -64,9 +67,12 @@ function do_test() {
 #    pbfacebook_update_profile_box($facebook->get_loggedin_user());
     print "Doing test";
 
-    $notifications = $facebook->api_client->friends_get();
+#    $ret = pbfacebook_send_internal(582616613, "Hello you");
+#    print_r($ret);
+
+#    $notifications = $facebook->api_client->friends_get();
     #$notifications = $facebook->api_client->notifications_get();
-    print_r($notifications);
+#    print_r($notifications);
     exit;
 }
 

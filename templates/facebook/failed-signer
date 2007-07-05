@@ -1,16 +1,6 @@
-Subject: Your pledge - '<?=$values['title']?>' at PledgeBank.com
+Pledge unsuccessful!
 
-Unfotunately, the pledge to which you signed up did not meet its target in the
-required time.  It required <?=$values['target']?> <?=$values['type']?>, but
-achieved only <?=$values['actual']?>.
+Unfortunately, the pledge you signed required <?=$values['target']?>
+<?=$values['type']?>, but achieved only <?=$values['actual']?>.
 
-The pledge, created by <?=$values['creator_name']?>, read:
-'<?=$values['sentence_first']?>'
-
-Depending on the pledge, you can feel free to either move forward with your
-part of the pledge or withdraw your pledge. As a next step, feel free to
-sign up to local alerts at <?=$values['pledgebank_url']?>alert to find out
-when someone creates a new pledge near you, browse the pledges at
-<?=$values['pledgebank_url']?>list or perhaps make your own pledge!
-
-<?=$values['signature']?>
+The pledge was: '<a href="<?=$values['pledge_facebook_url']?>"><?=$values['title']?></a>'.

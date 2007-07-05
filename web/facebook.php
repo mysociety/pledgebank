@@ -5,26 +5,23 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.16 2007-07-05 15:17:22 francis Exp $
+// $Id: facebook.php,v 1.17 2007-07-05 20:37:08 francis Exp $
 
 /*
 
 TODO:
 
-- Success messages don't go out due to SMS check thing I think
-- Announce messages
-
+- Adding app while signing requires two clicks :(
 - Adding app while 'inviting friends', check works OK
+- After sending invitation text and URL is a bit rubbish
 
 - Fix sorting of pledges in profile box
 - Fix $invite_intro stuff that isn't used
 
-- Update the pledges on everyone's profile with new numbers of signers
-    http://dev.formd.net/facebook/lastfmCharts/tutorial.html
-
-- Test what happens if you add app, but refuse each of the major permissions
-
 - Display list of Facebook signers on Facebook pledge
+
+- Link to creator
+- Link to rest of site
 
 Improvements:
 - Post in friend's news feed when a pledge is successful (but only once if multiple!)
@@ -32,9 +29,12 @@ Improvements:
 - Let people say "I've done it!" on the pledges on their profile.
 - Show comments (wall!) on Facebook pledges
 - Let people add comments to Facebook pledges
+- Aggregate multiple announce messages more intelligently - if user posts two messages
+  within 12 hours, then only post once on news feed. Or link to specific messages from
+  news feed, rather than to general pledge.
 
 Not so important:
-- Multiple success announce messages should all be sent to Facebook users
+- Test what happens if you add app, but refuse each of the major permissions
 - Lower case and fuzzy matching of pledge refs
 - Detect language that Facebook is using, and tell PledgeBank pages to use that.
 
@@ -43,6 +43,7 @@ Not so important:
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
+require_once '../phplib/comments.php';
 
 # XXX clean up this mess
 function pbfacebook_after_sent() {

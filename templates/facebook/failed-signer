@@ -1,4 +1,4 @@
-Pledge unsuccessful!
+Pledge unsuccessful.
 
 Unfortunately, the pledge you signed required <?=$values['target']?>
 <?=$values['type']?>, but achieved only <?=$values['actual']?>.

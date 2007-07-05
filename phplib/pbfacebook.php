@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.3 2007-07-05 15:17:22 francis Exp $
+// $Id: pbfacebook.php,v 1.4 2007-07-05 20:37:07 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -77,32 +77,64 @@ function pbfacebook_update_fbmlref_profilepledge($pledge) {
 function pbfacebook_render_pledge($pledge) {
     global $facebook;
 
-    $invite_intro = "Invite your friends to also sign this pledge.";
     $signer_id = db_getOne("select signers.id from signers left join person on person.id = signers.person_id
-            where facebook_id = ? and signers.pledge_id = ?", array($facebook->get_loggedin_user(), $pledge->id()));
-    if ($signer_id && !$pledge->finished()) {
-        print "<h2 style=\"text-align: center\">$invite_intro</h2>";
-        print '
-<fb:editor action="" labelwidth="200">
-    <fb:editor-custom label="Friends">
-        <fb:multi-friend-input/>
-    </fb:editor-custom>
-    <fb:editor-buttonset>
-        <fb:editor-button value="Send Pledge"/>
-    </fb:editor-buttonset>
-    <input type="hidden" name="invite_friends" value="1">
-</fb:editor>
-';
+            where facebook_id = ? and signers.pledge_id = ?", array($facebook->get_loggedin_user(), $pledge->id())); 
+    $announce_messages = db_getOne("select count(*) from message where pledge_id = ? and sendtosigners and emailbody is not null", array($pledge->id())); 
+
+    // Fancy invitation section
+    if (!$announce_messages) {
+        $invite_intro = "Invite your friends to also sign this pledge.";
+        if ($signer_id && !$pledge->finished()) {
+            print "<h2 style=\"text-align: center\">$invite_intro</h2>";
+            print '
+    <fb:editor action="" labelwidth="200">
+        <fb:editor-custom label="Friends">
+            <fb:multi-friend-input/>
+        </fb:editor-custom>
+        <fb:editor-buttonset>
+            <fb:editor-button value="Send Pledge"/>
+        </fb:editor-buttonset>
+        <input type="hidden" name="invite_friends" value="1">
+    </fb:editor>
+    ';
+        }
     }
 
-    pledge_draw_status_plaque($pledge);
 
-#function auth_verify_with_shared_secret($item, $secret, $signature) {
+    // Announcement messages
+    if ($announce_messages && $signer_id) {
+        $q = db_query('select id, whencreated, fromaddress, emailsubject, emailbody from message where pledge_id = ? and sendtosigners and emailbody is not null order by id desc', $pledge->id());
+        if (db_num_rows($q) > 0) {
+            while (list($id, $when, $from, $subject, $body) = db_fetch_row($q)) {
+                print '<hr>';
+                ?>
+                <p><strong><?=_("Message from pledge creator") ?></strong>
+                <?= $pledge->h_name() ?> &lt;<?= htmlspecialchars($pledge->creator_email()) ?>&gt;
+                <strong><?=_('on') ?></strong>
+                <?= prettify(substr($when, 0, 10)) ?>
+                <br><strong><?=_('Subject') ?></strong>:
+                <?= htmlspecialchars($subject) ?>
+                </p>
+                <div class="message" id="message_<?=$id?>" ><?= comments_text_to_html($body) ?></div>
+        <?
+                /*
+style="display: none"
+<a href="#" clicktoshow="message_<?=$id?>">Show text of message from creator</a>
+                / <a href="#" clicktohide="message_<?=$id?>">Hide text</a> */
+
+            }
+            print "<hr>";
+        }
+    }
+
+    // Pledge itself
+    pledge_draw_status_plaque($pledge);
     $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
     $pledge->render_box(array('class'=>'', 
             'facebook-sign'=>!$pledge->finished() && !$signer_id, 'facebook-sign-csrf'=>$csrf_sig,
             'showdetails' => true));
 
+     // Bog standard Facebook share button (probably put in better place)
     if (!$signer_id)
         print pbfacebook_render_share_pledge($pledge);
 
@@ -436,11 +468,8 @@ function pbfacebook_init_cron($user) {
 }
 
 // Like pb_send_email in pb/phplib/fns.php
-function pbfacebook_send($to, $subject, $message, $headers = array()) {
-    $message .= "
-<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS."\" label=\"Sign the pledge!\" />
-";
-    return pbfacebook_send_internal($to, $subject . $message); # XXXX include subject properly
+function pbfacebook_send($to, $message) {
+    return pbfacebook_send_internal($to, $message);
 }
 
 // Like pb_send_email_template in pb/phplib/fns.php
@@ -466,7 +495,7 @@ function pbfacebook_send_internal($to, $message) {
 
     pbfacebook_init_cron($to); 
     $to_info = $facebook->api_client->users_getInfo($to, array("name"));
-    print "pbfacebook_send_internal: ". $message. "\nTo:". $to_info[0]['name'];
+    #print "pbfacebook_send_internal: ". $message. "\nTo:". $to_info[0]['name'];
 
     # Publish feed story
     $lines = split("\n", $message);
@@ -474,7 +503,8 @@ function pbfacebook_send_internal($to, $message) {
     $feed_body = join("\n", $lines);
     $ret = $facebook->api_client->feed_publishStoryToUser($feed_title, $feed_body);
     if (!$ret) {
-        err("Calling feed_publishStoryToUser failed mysteriously in pbfacebook_send_internal");
+        print("Calling feed_publishStoryToUser failed probably due to 1 msg / 12 hour limit: " . print_r($ret, TRUE)) . "\n";
+        return false;
     } else {
         if ($ret[0] != 1) err("Error calling feed_publishStoryToUser in pbfacebook_send_internal: " . print_r($ret, TRUE));
     }

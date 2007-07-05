@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.4 2007-07-05 20:37:07 francis Exp $
+// $Id: pbfacebook.php,v 1.5 2007-07-05 22:57:56 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -329,21 +329,18 @@ function pbfacebook_sign_pledge($pledge) {
 function pbfacebook_send_to_friends($pledge, $friends) {
     global $facebook;
 
-    #$invite_intro = "Invite more friends to sign this pledge.";
-
-/*    if (OPTION_PB_STAGING) 
-        $content = "I've signed this test pledge, and thought you might like to sign it as well. ";
-    else
-        $content = "I've signed this pledge, and thought you might like to sign it as well. ";
-    $content .= " '".$pledge->sentence(array('firstperson'=>'includename')) ."' ";
-    $content .= "
-<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."\" label=\"Sign the pledge!\" />
-";
-    $ret = $facebook->api_client->notifications_sendRequest(join(",", $friends), "pledge", $content, "http://www.mysociety.org/mysociety_sm.gif", "invitation");
-    if (is_int($ret)) err("Error calling notifications_sendRequest: " . print_r($ret, TRUE)); */
-
     $user = $facebook->get_loggedin_user();
 
+    $content = '<fb:name uid="'.$user.'" firstnameonly="true" capitalize="true"/> just signed this pledge, and would like you to take a look. ';
+    $content .= "
+<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."\" label=\"Go to the pledge!\" />
+";
+    $ret = $facebook->api_client->notifications_sendRequest(join(",", $friends), "pledge", $content, 
+            $pledge->has_picture() ? $pledge->picture_url() : (OPTION_BASE_URL . "/pyramid.gif"), 
+            "invitation");
+    if (is_int($ret)) err("Error calling notifications_sendRequest: " . print_r($ret, TRUE));
+
+/*
     $content = '
         <fb:notif-subject><fb:name uid="'.$user.'" firstnameonly="true" capitalize="true"/> pledged to do something...</fb:notif-subject> 
         <fb:name uid="' . $user . '" firstnameonly="true" capitalize="true"/>
@@ -354,15 +351,14 @@ function pbfacebook_send_to_friends($pledge, $friends) {
     $ret = $facebook->api_client->notifications_send(join(",", $friends), $content, FALSE);
     if ($ret == 4) return false; // Special "sent too many" error
     if (is_int($ret)) err("Error calling notifications_send: " . print_r($ret, TRUE));
+*/
+
     if (!$ret) { 
-        // Empty URL can, according to docs mean EITHER an error, OR that
-        // sending could happen without user confirmation. We just
-        // assume the latter for now.
-//        pbfacebook_after_sent();
-        print "Message probably sent, thank you!";
-        exit;
-        return true; 
-    }
+        # XXX maybe this happens when sending was successful, but Facebook 
+        # error reporting sucks in this regard so who knows.
+        err("Probably failed to send request to your friend.");
+   } 
+
     $facebook->redirect($ret."&canvas=1");
     return true;
 }

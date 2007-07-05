@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.17 2007-07-05 20:37:08 francis Exp $
+// $Id: facebook.php,v 1.18 2007-07-05 22:57:56 francis Exp $
 
 /*
 
@@ -13,18 +13,17 @@ TODO:
 
 - Adding app while signing requires two clicks :(
 - Adding app while 'inviting friends', check works OK
-- After sending invitation text and URL is a bit rubbish
 
 - Fix sorting of pledges in profile box
 - Fix $invite_intro stuff that isn't used
 
 - Display list of Facebook signers on Facebook pledge
 
-- Link to creator
-- Link to rest of site
+- Link id to creator
+- Links from rest of PledgeBank site
 
 Improvements:
-- Post in friend's news feed when a pledge is successful (but only once if multiple!)
+- Show on http://apps.facebook.com/pledgebank ones you've already signed clearer
 - Somehow actually send notifications for success
 - Let people say "I've done it!" on the pledges on their profile.
 - Show comments (wall!) on Facebook pledges
@@ -37,6 +36,7 @@ Not so important:
 - Test what happens if you add app, but refuse each of the major permissions
 - Lower case and fuzzy matching of pledge refs
 - Detect language that Facebook is using, and tell PledgeBank pages to use that.
+- Post in friend's news feed when a pledge is successful (but only once if multiple!)
 
 */
 
@@ -44,19 +44,6 @@ require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
-
-# XXX clean up this mess
-function pbfacebook_after_sent() {
-    header('Location: '.OPTION_FACEBOOK_CANVAS);
-    exit;
-}
-if (get_http_var('sent')) {
-    # XXX I don't understand why we get sent back here after doing a
-    # notifications_send. If you try to instantiate the Facebook $facebook
-    # object you get redirected more confusingly in some sort of infinite loop.
-    # This is the best I could do to regain control after the callback URL.
-    pbfacebook_after_sent();
-}
 
 require_once '../phplib/pbfacebook.php';
 
@@ -89,6 +76,10 @@ if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     $pledge = null;
     pbfacebook_render_header();
     pbfacebook_render_dashboard();
+    if (get_http_var('sent')) {
+        print "<p class=\"formnote\">"._("Thanks for sending the pledge to your friends!").
+            "<br/>"._("Here are some more pledges you might like.")."</p>";
+    }
     pbfacebook_render_frontpage();
     pbfacebook_render_footer();
 } else {

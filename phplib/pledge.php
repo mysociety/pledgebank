@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.229 2007-06-21 19:40:20 francis Exp $
+ * $Id: pledge.php,v 1.230 2007-07-05 22:57:56 francis Exp $
  * 
  */
 
@@ -245,7 +245,8 @@ class Pledge {
     function lang() { return $this->data['lang']; }
 
     function has_picture() { return array_key_exists('picture', $this->data) && $this->data['picture']; }
-    
+    function picture_url() { return $this->data['picture']; }
+
     function categories() {
         $c = array();
         $q = db_query('select category_id, category.name from pledge_category, category where pledge_id = ? and category_id = category.id', $this->id());
@@ -415,7 +416,7 @@ class Pledge {
             print '<div id="pledge">';
 ?>
 <p style="margin-top: 0">
-<?      if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->data['picture']."\" alt=\"\">"; } ?>
+<?      if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->picture_url()."\" alt=\"\">"; } ?>
 &quot;<?=$this->sentence($sentence_params) ?>&quot;
 <?      if ($this->url_translate_pledge()) { ?>
     (<a title="<?=_("Roughly translate the pledge into your language (using Altavista's Babel Fish machine translator)")?>" href="<?=htmlspecialchars($this->url_translate_pledge())?>"><?=_("translate")?></a>)

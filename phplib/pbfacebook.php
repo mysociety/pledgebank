@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.5 2007-07-05 22:57:56 francis Exp $
+// $Id: pbfacebook.php,v 1.6 2007-07-05 23:07:03 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -331,15 +331,17 @@ function pbfacebook_send_to_friends($pledge, $friends) {
 
     $user = $facebook->get_loggedin_user();
 
+    // Requests version
     $content = '<fb:name uid="'.$user.'" firstnameonly="true" capitalize="true"/> just signed this pledge, and would like you to take a look. ';
     $content .= "
-<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."\" label=\"Go to the pledge!\" />
+<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."\" label=\"Go to the pledge\" />
 ";
     $ret = $facebook->api_client->notifications_sendRequest(join(",", $friends), "pledge", $content, 
             $pledge->has_picture() ? $pledge->picture_url() : (OPTION_BASE_URL . "/pyramid.gif"), 
             "invitation");
     if (is_int($ret)) err("Error calling notifications_sendRequest: " . print_r($ret, TRUE));
 
+    // Email version
 /*
     $content = '
         <fb:notif-subject><fb:name uid="'.$user.'" firstnameonly="true" capitalize="true"/> pledged to do something...</fb:notif-subject> 

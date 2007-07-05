@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.2 2007-07-05 14:43:27 francis Exp $
+// $Id: pbfacebook.php,v 1.3 2007-07-05 15:17:22 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -40,10 +40,9 @@ function pbfacebook_update_profile_box($uid) {
         $out .= '<ol>';
         while ($r = db_fetch_array($q)) {
             $pledge = new Pledge($r);
+            pbfacebook_update_fbmlref_profilepledge($pledge);
             $out .= '<li>';
-            $out .= pbfacebook_render_share_pledge($pledge);
-            $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
-            #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
+            $out .= '<fb:ref handle="profilepledge-'.$pledge->ref().'" />';
             $out .= '</li>';
         }
         $out .= '</ol>';
@@ -62,7 +61,16 @@ function pbfacebook_update_profile_box($uid) {
     }
 
     $ret = $facebook->api_client->profile_setFBML($out, $uid);
-    if ($ret != 1) err("Error calling profile_setFBML: ". print_r($ret, TRUE));
+    if ($ret != 1) err("Error calling profile_setFBML for $uid: ". print_r($ret, TRUE) . "\n");
+}
+
+// Draw pledge index page within Facebook
+function pbfacebook_update_fbmlref_profilepledge($pledge) {
+    global $facebook;
+    
+    $content = pbfacebook_render_share_pledge($pledge);
+    $content .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
+    $facebook->api_client->fbml_setRefHandle("profilepledge-".$pledge->ref(), $content);
 }
 
 // Draw pledge index page within Facebook

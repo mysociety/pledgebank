@@ -8,7 +8,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: update-facebook-stuff,v 1.1 2007-07-05 14:43:26 francis Exp $
+ * $Id: update-facebook-stuff,v 1.2 2007-07-05 15:17:22 francis Exp $
  *
  */
 
@@ -49,12 +49,27 @@ Usage: update-facebook-stuff [--verbose]
     }
 }
 
-$q = db_query("select * from person where facebook_id is not null");
+# Update profile page FBML for each pledge
+$q = db_query("select distinct(pledges.id) from pledges where id in 
+            (select signers.pledge_id from person left join signers on
+            signers.person_id = person.id where facebook_id is not null)"); 
+while ($pdata = db_fetch_array($q)) {
+    $pledge = new Pledge(intval($pdata['id']));
+    verbose("updating profile FBML of pledge " . $pledge->ref());
+    pbfacebook_init_cron(582616613);  # XXX - that's Opera Tuck (Francis's test
+                                      # account), should have a mySociety bot or something
+    pbfacebook_update_fbmlref_profilepledge($pledge);
+}
+ 
+/*
+# We use FBML ref stuff now, so don't need to update each user's profile
+
+$q = db_query("select * from person where facebook_id is not null order by random()");
 while ($person = db_fetch_array($q)) {
     verbose("updating profile of Facebook person " . $person['facebook_id']);
     pbfacebook_init_cron($person['facebook_id']); 
     pbfacebook_update_profile_box($person['facebook_id']);
 }
- 
+*/ 
 
 

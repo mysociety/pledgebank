@@ -5,13 +5,13 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.15 2007-07-05 14:43:28 francis Exp $
+// $Id: facebook.php,v 1.16 2007-07-05 15:17:22 francis Exp $
 
 /*
 
 TODO:
 
-- Success / failures
+- Success messages don't go out due to SMS check thing I think
 - Announce messages
 
 - Adding app while 'inviting friends', check works OK

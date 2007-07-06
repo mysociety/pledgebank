@@ -6,18 +6,15 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.19 2007-07-05 23:07:04 francis Exp $
+// $Id: facebook.php,v 1.20 2007-07-06 00:28:16 francis Exp $
 
 /*
 
 TODO:
 
-- Fix sorting of pledges in profile box
-- Fix $invite_intro stuff that isn't used
-
 - Display list of Facebook signers on Facebook pledge
-
 - Link id to creator
+
 - Links from rest of PledgeBank site
 
 Improvements:
@@ -69,16 +66,18 @@ if (get_http_var("test")) {
     do_test();
 }
 $ref = get_http_var("ref");
-if (is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
-    $ref = null;
-    $pledge = null;
+if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     pbfacebook_render_header();
     pbfacebook_render_dashboard();
-    if (get_http_var('sent')) {
-        print "<p class=\"formnote\">"._("Thanks for sending the pledge to your friends!").
-            "<br/>"._("Here are some more pledges you might like.")."</p>";
+    if ($ref == 'new') {
+        pbfacebook_render_new();
+    } else {
+        if (get_http_var('sent')) {
+            print "<p class=\"formnote\">"._("Thanks for sending the pledge to your friends!").
+                "<br/>"._("Here are some more pledges you might like.")."</p>";
+        }
+        pbfacebook_render_frontpage();
     }
-    pbfacebook_render_frontpage();
     pbfacebook_render_footer();
 } else {
     $pledge = new Pledge($ref);

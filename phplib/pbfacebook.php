@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.6 2007-07-05 23:07:03 francis Exp $
+// $Id: pbfacebook.php,v 1.7 2007-07-06 00:28:16 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -18,16 +18,16 @@ function pbfacebook_update_profile_box($uid) {
     global $facebook;
 
     $out = "";
-    $q = db_query("SELECT pledges.*, country, 
+    $q = db_query("SELECT pledges.*, country,
             (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
-            FROM pledges 
+            FROM pledges
             LEFT JOIN location ON location.id = pledges.location_id
-            LEFT JOIN person ON person.id = pledges.person_id
-            WHERE pin IS NULL AND 
-            (person.facebook_id = ?
-            OR pledges.id IN (SELECT pledge_id FROM signers LEFT JOIN person on person.id = signers.person_id
-                    WHERE facebook_id = ?))",
-            array($uid, $uid));
+            LEFT JOIN signers on signers.pledge_id = pledges.id
+            LEFT JOIN person ON person.id = signers.person_id
+            WHERE pin IS NULL AND
+                  person.facebook_id = ?
+            ORDER BY signtime DESC",
+            array($uid));
     if (db_num_rows($q) > 0) {
         $out .= "
 <fb:if-is-own-profile>
@@ -261,6 +261,11 @@ function pbfacebook_render_frontpage() {
     }
 
     return;
+}
+
+// New pledge
+function pbfacebook_render_new() {
+    print '<fb:iframe src="'.pb_domain_url().'/new" smartsize="1"/>';
 }
 
 // Sign a pledge, update profile, add to feeds, on Facebook

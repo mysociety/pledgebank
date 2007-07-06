@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.220 2007-06-24 12:36:55 francis Exp $
+-- $Id: schema.sql,v 1.221 2007-07-06 21:50:19 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -181,6 +181,7 @@ create table pledges (
     person_id integer not null references person(id),
     name text not null,
     identity text not null default '', -- LLL
+    via_facebook boolean not null default false,
     -- metadata
     creationtime timestamp not null,
     -- changes which are not caught by signtime, comment whenposted etc.
@@ -597,6 +598,9 @@ create table signers (
 
     -- whether they want their name public
     showname boolean not null default false,
+
+    -- if they signed this via Facebook
+    via_facebook boolean not null default false,
 
     -- if target_type for the pledge is 'byarea' then this is the id
     -- of the location which the signature is for

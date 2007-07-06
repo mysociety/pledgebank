@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.13 2007-07-06 21:30:05 francis Exp $
+// $Id: pbfacebook.php,v 1.14 2007-07-06 21:50:20 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -27,7 +27,8 @@ function pbfacebook_update_profile_box($uid) {
             LEFT JOIN location ON location.id = pledges.location_id
             LEFT JOIN person ON person.id = pledges.person_id
             WHERE pin IS NULL AND
-                  person.facebook_id = ?
+                  person.facebook_id = ? AND
+                  pledges.via_facebook
             ORDER BY creationtime DESC",
             array($uid));
     if (db_num_rows($q) > 0) {
@@ -59,7 +60,8 @@ function pbfacebook_update_profile_box($uid) {
             LEFT JOIN signers on signers.pledge_id = pledges.id
             LEFT JOIN person ON person.id = signers.person_id
             WHERE pin IS NULL AND
-                  person.facebook_id = ?
+                  person.facebook_id = ? AND
+                  signers.via_facebook
             ORDER BY signtime DESC",
             array($uid));
     if (db_num_rows($q) > 0) {
@@ -269,7 +271,8 @@ function pbfacebook_render_frontpage($page = "") {
                 LEFT JOIN signers on signers.pledge_id = pledges.id
                 LEFT JOIN person ON person.id = signers.person_id
                 WHERE pin IS NULL AND 
-                person.facebook_id in ($friends_joined)
+                    person.facebook_id in ($friends_joined) AND
+                    signers.via_facebook
                 ORDER BY pledges.id DESC
                 LIMIT 20
                 ";
@@ -330,7 +333,8 @@ function pbfacebook_render_frontpage($page = "") {
                 LEFT JOIN location ON location.id = pledges.location_id
                 LEFT JOIN person ON person.id = pledges.person_id
                 WHERE pin IS NULL AND 
-                person.facebook_id = ?
+                    person.facebook_id = ? AND
+                    pledges.via_facebook
                 ORDER BY creationtime DESC
                 ";
         $q = db_query($query, $you_id);
@@ -352,7 +356,8 @@ function pbfacebook_render_frontpage($page = "") {
                 LEFT JOIN signers on signers.pledge_id = pledges.id
                 LEFT JOIN person ON person.id = signers.person_id
                 WHERE pin IS NULL AND 
-                person.facebook_id = ?
+                    person.facebook_id = ? AND
+                    signers.via_facebook
                 ORDER BY signtime DESC
                 LIMIT 40
                 ";
@@ -418,7 +423,7 @@ function pbfacebook_sign_pledge($pledge) {
             db_query("insert into facebook (facebook_id, session_key) values (?, ?)", array($user, $facebook->fb_params['session_key']));
         }
         # Add them as a signer
-        db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge->id(), null, $person_id, 'f', $_SERVER['REMOTE_ADDR'], null));
+        db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id, via_facebook) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?, ?)', array($pledge->id(), null, $person_id, 'f', $_SERVER['REMOTE_ADDR'], null, 't'));
         db_commit();
         print "<p class=\"formnote\">"._("Thanks for signing up to this pledge!")."</p>";
 #        print '<h1 style=\"text-align: center\">'. . '</h1>';

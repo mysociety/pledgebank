@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.181 2007-07-06 21:11:03 francis Exp $
+// $Id: new.php,v 1.182 2007-07-06 21:50:20 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -970,7 +970,8 @@ function create_new_pledge($P, $data) {
                     detail,
                     lang, location_id, microsite,
                     pin, identity, 
-                    prominence, cached_prominence
+                    prominence, cached_prominence,
+                    via_facebook
                 ) values (
                     ?, ?, ?,
                     ?, ?, ?, ?,
@@ -979,7 +980,8 @@ function create_new_pledge($P, $data) {
                     ?,
                     ?, ?, ?,
                     ?, ?,
-                    ?, ?
+                    ?, ?,
+                    ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
                     $data['type'], $data['signup'], $isodate, $data['date'],
@@ -987,7 +989,8 @@ function create_new_pledge($P, $data) {
                     $data['detail'],
                     $data['lang'], $location_id, $data['microsite'],
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity'],
-                    $prominence, $cached_prominence
+                    $prominence, $cached_prominence,
+                    $data['facebook_id'] ? 't' : 'f'
                 ));
 
         if ($data['category'] != -1)

@@ -6,13 +6,12 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.24 2007-07-06 21:00:27 francis Exp $
+// $Id: facebook.php,v 1.25 2007-07-06 21:50:20 francis Exp $
 
 /*
 
 TODO:
 
-- Privacy issue when merging facebook accounts with normal
 - Finish links from rest of PledgeBank site
 
 Improvements:

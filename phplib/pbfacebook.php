@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.7 2007-07-06 00:28:16 francis Exp $
+// $Id: pbfacebook.php,v 1.8 2007-07-06 01:57:47 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -178,7 +178,7 @@ function pbfacebook_render_share_pledge($pledge) {
 function pbfacebook_render_dashboard() {
 ?>
 <fb:dashboard>
-  <fb:action href="<?=OPTION_FACEBOOK_CANVAS?>">All Pledges</fb:action>
+  <fb:action href="<?=OPTION_FACEBOOK_CANVAS?>">Browse Pledges</fb:action>
   <fb:action href="<?=pb_domain_url(array('path'=>'/new'))?>">Create a New Pledge</fb:action>
   <fb:help href="<?=pb_domain_url(array('path'=>'/faq'))?>" title="Need help">Help</fb:help>
 </fb:dashboard>
@@ -187,77 +187,104 @@ function pbfacebook_render_dashboard() {
 }
 
 // Render frontpage of PledgeBank on Facebook
-function pbfacebook_render_frontpage() {
+function pbfacebook_render_frontpage($page = "") {
     global $facebook, $pb_today;
-/*<fb:tabs>
-<fb:tab-item title="Friends pledges" selected="true" href="http://apps.facebook.com/pledgebank/list/friends" />
-<fb:tab-item title="Recent pledges" href="http://apps.facebook.com/pledgebank/list/recent" />
-<fb:tab-item title="Successful pledges" href="http://apps.facebook.com/pledgebank/list/success" />
-</fb:tabs>*/
+
+    if ($page == "" && !$facebook->get_loggedin_user()) {
+        $page = "feature";
+    }
+    if ($page == "" && $facebook->get_loggedin_user()) {
+        $page = "friends";
+    }
+
+
+?>    <fb:tabs>
+    <fb:tab-item title="Friends pledges" <?=($page=="friends")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/friends" />
+    <fb:tab-item title="Featured pledges" <?=($page=="feature")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/feature" />
+<!--    <fb:tab-item title="Successful pledges" <?=($page=="success")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/success" /> -->
+    </fb:tabs> <?
 
     $friends_signed_joined = "";
-    if ($facebook->get_loggedin_user()) {
+    if ($page == "friends" ) {
+        $facebook->require_login('/list/friends');
         $friends = $facebook->api_client->friends_get();
         $friends_joined = join(",", $friends);
         $query = "SELECT pledges.*, country, 
-                (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
+                (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
+                person.facebook_id as facebook_id
                 FROM pledges 
                 LEFT JOIN location ON location.id = pledges.location_id
-                LEFT JOIN person ON person.id = pledges.person_id
+                LEFT JOIN signers on signers.pledge_id = pledges.id
+                LEFT JOIN person ON person.id = signers.person_id
                 WHERE pin IS NULL AND 
-                (person.facebook_id in ($friends_joined)
-                OR pledges.id IN (SELECT pledge_id FROM signers LEFT JOIN person on person.id = signers.person_id
-                        WHERE facebook_id in ($friends_joined)))";
+                person.facebook_id in ($friends_joined)
+                ";
         $friends_signed = array();
         $q = db_query($query);
         if (db_num_rows($q) > 0) {
-            if (OPTION_PB_STAGING) {
-        ?> <p>Some test pledges that your friends have signed:</p> <?
-            } else {
-        ?> <p>Some pledges your friends have signed:</p> <?
-            }
-
-            $out = '<ol>';
-            while ($r = db_fetch_array($q)) {
+            print '<ul>';
+            $prev = "";
+            $r = db_fetch_array($q);
+            while ($r) {
                 $pledge = new Pledge($r);
-                $out .= '<li>';
-                $out .= pbfacebook_render_share_pledge($pledge);
-                $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
-                #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
-                $out .= '</li>';
+                $signer_id = db_getOne("select signers.id from signers left join person on person.id = signers.person_id
+                    where facebook_id = ? and signers.pledge_id = ?", array($facebook->get_loggedin_user(), $pledge->id())); 
+
+                $friends_sig = array();
+                $friends_sig[] = $r['facebook_id'];
+                while ($r = db_fetch_array($q)) {
+                    if ($r['ref'] == $pledge->ref())
+                        $friends_sig[] = $r['facebook_id'];
+                    else
+                        break;
+                }
+
+                $friends_text = array();
+                foreach ($friends_sig as $friend) {
+                    $friends_text[] = '<fb:userlink shownetwork="0" uid="'.$friend.'" />';
+                    #$friends_pics[] ='<fb:profile-pic style="vertical-align: middle" uid="'.$friend.'"/> ';
+                }
+
+                print '<li>';
+                print join(", ", $friends_text) . " ";
+                print make_plural(count($friends_sig), "has pledged:", "have pledged:") . " ";
+                $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
+                $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                        'facebook-sign'=>!$pledge->finished() && !$signer_id, 'facebook-sign-csrf'=>$csrf_sig,
+                        'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref()));
                 $friends_signed[] = $pledge->id();
+                print '</li>';
+/*                $out .= "<table><tr><td>";
+                $out .= "</td></tr><tr><td>";
+                $out .= '<fb:profile-pic style="vertical-align: middle" uid="'.$r['facebook_id'].'"/> ';
+                $out .= "</td></tr></table>";*/
             }
-            $out .= '</ol>';
-            print $out;
+            print '</ul>';
         }
         if ($friends_signed) 
             $friends_signed_joined = " AND pledges.id NOT IN (".join(",", $friends_signed).")";
     }
 
-    $pledges = pledge_get_list("
-                cached_prominence = 'frontpage' AND
-                date >= '$pb_today' AND 
-                pin is NULL AND 
-                whensucceeded IS NULL 
-                $friends_signed_joined
-                ORDER BY RANDOM()
-                LIMIT 10", array('global'=>true,'main'=>true,'foreign'=>true));
-    if ($pledges) {
-        if (OPTION_PB_STAGING) {
-    ?> <p>Here are some pledges from the test database:</p> <?
-        } else {
-    ?> <p>Here are some pledges:</p> <?
+    if ($page == "feature") {
+        $pledges = pledge_get_list("
+                    cached_prominence = 'frontpage' AND
+                    date >= '$pb_today' AND 
+                    pin is NULL AND 
+                    whensucceeded IS NULL 
+                    $friends_signed_joined
+                    ORDER BY RANDOM()
+                    LIMIT 10", array('global'=>true,'main'=>true,'foreign'=>true));
+        if ($pledges) {
+            $out = '<ol>';
+            foreach ($pledges as $pledge)  {
+                $out .= '<li>';
+                $out .= pbfacebook_render_share_pledge($pledge);
+                $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
+                $out .= '</li>';
+            }
+            $out .= '</ol>';
+            print $out;
         }
-        $out = '<ol>';
-        foreach ($pledges as $pledge)  {
-            $out .= '<li>';
-            $out .= pbfacebook_render_share_pledge($pledge);
-            $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
-            #$out .= $pledge->render_box(array('class'=>'', 'facebook'=>true));
-            $out .= '</li>';
-        }
-        $out .= '</ol>';
-        print $out;
     }
 
     return;
@@ -384,7 +411,7 @@ PledgeBank</a> application.</i>
 ?>
 <style>
 <? 
-    readfile("pb.css"); 
+#    print file_get_contents("pb.css"); 
 ?>
 .pledge {
     border: solid 2px #522994;

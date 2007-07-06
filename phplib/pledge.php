@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.230 2007-07-05 22:57:56 francis Exp $
+ * $Id: pledge.php,v 1.231 2007-07-06 01:57:47 francis Exp $
  * 
  */
 
@@ -404,6 +404,7 @@ class Pledge {
     //     reportlink - if present and true, show "report this pledge" link
     //     class - adds the given classes (space separated) to the division
     //     facebook-sign - add facebook sign button
+    //     facebook-share - add facebook share button
 
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
@@ -414,6 +415,10 @@ class Pledge {
             print '<div class="pledge ' . $params['class'] . '">';
         else
             print '<div id="pledge">';
+
+        if (array_key_exists('facebook-share', $params) && $params['facebook-share']) {
+            print $params['facebook-share'];
+        }
 ?>
 <p style="margin-top: 0">
 <?      if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->picture_url()."\" alt=\"\">"; } ?>
@@ -511,7 +516,7 @@ class Pledge {
         if (array_key_exists('facebook-sign', $params) && $params['facebook-sign']) {
             // We use GET, as adding the application loses POST parameters
 ?>
-<fb:editor action="?sign_in_facebook=1&amp;csrf=<?=$params['facebook-sign-csrf']?>" labelwidth="170">
+<fb:editor action="<?=OPTION_FACEBOOK_CANVAS?><?=$this->ref()?>?sign_in_facebook=1&amp;csrf=<?=$params['facebook-sign-csrf']?>" labelwidth="170">
   <fb:editor-buttonset>
     <fb:editor-button value="Sign Pledge"/>
   </fb:editor-buttonset>

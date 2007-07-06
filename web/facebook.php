@@ -6,15 +6,13 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.21 2007-07-06 01:57:47 francis Exp $
+// $Id: facebook.php,v 1.22 2007-07-06 11:33:54 francis Exp $
 
 /*
 
 TODO:
 
-- Display list of Facebook signers on Facebook pledge
 - Link id to creator (then put in profile, and put in pledges friends made lists)
-
 - Links from rest of PledgeBank site
 
 Improvements:

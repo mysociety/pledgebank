@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.231 2007-07-06 01:57:47 francis Exp $
+ * $Id: pledge.php,v 1.232 2007-07-06 11:33:53 francis Exp $
  * 
  */
 
@@ -361,6 +361,7 @@ class Pledge {
     function url_announce() { return pb_domain_url() . $this->h_ref . "/announce"; }
     function url_info() { return pb_domain_url() . $this->h_ref . "/info"; }
     function url_announce_archive() { return pb_domain_url() . $this->h_ref . "/announcearchive"; }
+    function url_facebook() { return OPTION_FACEBOOK_CANVAS . $this->h_ref; }
 
     // This one needs encoding for use HTML, to escape the &
     function url_place_map() {
@@ -698,16 +699,18 @@ class Pledge {
     _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>';
         microsites_signup_extra_fields($errors);
         print '<p><input type="submit" name="submit" value="' . ($this->byarea() ? _('Sign Pledge') : _('Sign Pledge')) . '"></p>';
+        print '<p>';
         // Display SMS if we are sure it makes sense - i.e. we support SMS for
         // the pledge country (or it is global) and we support SMS for the site
         // country.
         if ($this->has_sms() && sms_site_country() && microsites_has_sms()) {
-            print '<p>';
             printf(_("Or, text '<strong>%s %s</strong>' to <strong>%s</strong>"), OPTION_PB_SMS_PREFIX, $this->ref(), OPTION_PB_SMS_DISPLAY_NUMBER);
             print " ";
             printf(_("(in %s only)"), sms_countries_description());
-            print '</p>';
+            print "<br>";
         }
+        printf(_('Or, share and sign this pledge <strong><a href="%s">in Facebook</a></strong>'), $this->url_facebook());
+        print '</p>';
         print '</form>';
     }
 

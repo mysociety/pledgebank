@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.8 2007-07-06 01:57:47 francis Exp $
+// $Id: pbfacebook.php,v 1.9 2007-07-06 11:33:53 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -69,7 +69,7 @@ function pbfacebook_update_fbmlref_profilepledge($pledge) {
     global $facebook;
     
     $content = pbfacebook_render_share_pledge($pledge);
-    $content .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
+    $content .= $pledge->summary(array('html'=>true, 'href'=>$pledge->url_facebook(), 'showcountry'=>true));
     $facebook->api_client->fbml_setRefHandle("profilepledge-".$pledge->ref(), $content);
 }
 
@@ -168,7 +168,7 @@ function pbfacebook_render_share_pledge($pledge) {
       <fb:share-button class="meta">
           <meta name="title" content="Sign this pledge"/>
           <meta name="description" content="'.$pledge->h_sentence(array('firstperson'=>'includename')).'"/>
-          <link rel="target_url" href="'.OPTION_FACEBOOK_CANVAS.$pledge->ref().'"/>
+          <link rel="target_url" href="'.$pledge->url_facebook().'"/>
       </fb:share-button>';
     $out .= "</div>";
     return $out;
@@ -251,7 +251,7 @@ function pbfacebook_render_frontpage($page = "") {
                 $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
                 $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
                         'facebook-sign'=>!$pledge->finished() && !$signer_id, 'facebook-sign-csrf'=>$csrf_sig,
-                        'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref()));
+                        'href'=>$pledge->url_facebook()));
                 $friends_signed[] = $pledge->id();
                 print '</li>';
 /*                $out .= "<table><tr><td>";
@@ -279,7 +279,7 @@ function pbfacebook_render_frontpage($page = "") {
             foreach ($pledges as $pledge)  {
                 $out .= '<li>';
                 $out .= pbfacebook_render_share_pledge($pledge);
-                $out .= $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>true));
+                $out .= $pledge->summary(array('html'=>true, 'href'=>$pledge->url_facebook(), 'showcountry'=>true));
                 $out .= '</li>';
             }
             $out .= '</ol>';
@@ -336,7 +336,7 @@ function pbfacebook_sign_pledge($pledge) {
             $feed_title .= 'a test pledge.';
         else
             $feed_title .= 'a pledge.';
-        $feed_body = $pledge->summary(array('html'=>true, 'href'=>OPTION_FACEBOOK_CANVAS.$pledge->ref(), 'showcountry'=>false));
+        $feed_body = $pledge->summary(array('html'=>true, 'href'=>$pledge->url_facebook(), 'showcountry'=>false));
         $ret = $facebook->api_client->feed_publishActionOfUser($feed_title, $feed_body);
         if (!$ret) {
             print '<p class="errors">'._('The news that you\'ve signed could not be added to your feed.').'</p>';
@@ -366,7 +366,7 @@ function pbfacebook_send_to_friends($pledge, $friends) {
     // Requests version
     $content = '<fb:name uid="'.$user.'" firstnameonly="true" capitalize="true"/> just signed this pledge, and would like you to take a look. ';
     $content .= "
-<fb:req-choice url=\"".OPTION_FACEBOOK_CANVAS.$pledge->ref()."\" label=\"Go to the pledge\" />
+<fb:req-choice url=\"".$pledge->url_facebook()."\" label=\"Go to the pledge\" />
 ";
     $ret = $facebook->api_client->notifications_sendRequest(join(",", $friends), "pledge", $content, 
             $pledge->has_picture() ? $pledge->picture_url() : (OPTION_BASE_URL . "/pyramid.gif"), 

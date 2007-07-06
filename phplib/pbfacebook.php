@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.12 2007-07-06 21:08:16 francis Exp $
+// $Id: pbfacebook.php,v 1.13 2007-07-06 21:30:05 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -92,9 +92,9 @@ function pbfacebook_update_profile_box($uid) {
     </fb:else>
     </fb:if-is-own-profile>
     ";
-        $out .= "<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find more pledges to sign</a>.</p>";
-    } else {
         $out .= "<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find a pledge to sign</a>.</p>";
+    } else {
+        $out .= "<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find more pledges to sign</a>.</p>";
     }
 
     $ret = $facebook->api_client->profile_setFBML($out, $uid);

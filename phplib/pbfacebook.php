@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.9 2007-07-06 11:33:53 francis Exp $
+// $Id: pbfacebook.php,v 1.10 2007-07-06 19:32:13 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -132,11 +132,9 @@ style="display: none"
     $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
     $pledge->render_box(array('class'=>'', 
             'facebook-sign'=>!$pledge->finished() && !$signer_id, 'facebook-sign-csrf'=>$csrf_sig,
-            'showdetails' => true));
-
-     // Bog standard Facebook share button (probably put in better place)
-    if (!$signer_id)
-        print pbfacebook_render_share_pledge($pledge);
+            'showdetails' => true,
+            'facebook-share' => pbfacebook_render_share_pledge($pledge) 
+            ));
 
     print '<p style="text-align:center">Visit this pledge at ';
     print '<a href="'.$pledge->url_typein().'">';
@@ -176,14 +174,19 @@ function pbfacebook_render_share_pledge($pledge) {
 
 // Render common top of PledgeBank pages on Facebook
 function pbfacebook_render_dashboard() {
+    global $facebook;
+    $urlpart = "";
+    if ($facebook->get_loggedin_user()) {
+        $sig = auth_sign_with_shared_secret($facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
+        $urlpart = "?facebook_id=" . $facebook->get_loggedin_user() . "&facebook_id_sig=" . $sig;
+    }
 ?>
 <fb:dashboard>
   <fb:action href="<?=OPTION_FACEBOOK_CANVAS?>">Browse Pledges</fb:action>
-  <fb:action href="<?=pb_domain_url(array('path'=>'/new'))?>">Create a New Pledge</fb:action>
+  <fb:action href="<?=pb_domain_url(array('path'=>'/new'.$urlpart))?>">Create a New Pledge</fb:action>
   <fb:help href="<?=pb_domain_url(array('path'=>'/faq'))?>" title="Need help">Help</fb:help>
 </fb:dashboard>
 <?
-  /*<fb:create-button href="<?=pb_domain_url(array('path'=>'/new'))?>">Create a New Pledge</fb:create-button> */
 }
 
 // Render frontpage of PledgeBank on Facebook
@@ -288,11 +291,6 @@ function pbfacebook_render_frontpage($page = "") {
     }
 
     return;
-}
-
-// New pledge
-function pbfacebook_render_new() {
-    print '<fb:iframe src="'.pb_domain_url().'/new" smartsize="1"/>';
 }
 
 // Sign a pledge, update profile, add to feeds, on Facebook
@@ -455,6 +453,25 @@ PledgeBank</a> application.</i>
 .formnote ul {
     padding: 0;
     margin: 0 0 0 1.5em;
+}
+.finished {
+    color: #ff0000;
+    background-color: #ffcccc;
+    border: solid 2px #990000;
+    padding: 3px;
+}
+.success, .finished {
+    margin: 1em auto 0;
+    width: 80%;
+    padding: 10px;
+    text-align: center;
+}
+.success {
+    background-color: #ccffcc;
+    border: solid 2px #009900;
+}
+.finished {
+    color: #000000;
 }
 
 </style>

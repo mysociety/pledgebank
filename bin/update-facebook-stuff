@@ -8,7 +8,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: update-facebook-stuff,v 1.3 2007-07-06 00:28:16 francis Exp $
+ * $Id: update-facebook-stuff,v 1.4 2007-07-06 19:32:12 francis Exp $
  *
  */
 
@@ -56,8 +56,7 @@ $q = db_query("select distinct(pledges.id) from pledges where id in
 while ($pdata = db_fetch_array($q)) {
     $pledge = new Pledge(intval($pdata['id']));
     verbose("updating profile FBML of pledge " . $pledge->ref());
-    pbfacebook_init_cron(582616613);  # XXX - that's Opera Tuck (Francis's test
-                                      # account), should have a mySociety bot or something
+    pbfacebook_init_cron(OPTION_FACEBOOK_ROBOT_ID);
     pbfacebook_update_fbmlref_profilepledge($pledge);
 }
  

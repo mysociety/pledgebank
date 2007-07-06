@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.22 2007-07-06 11:33:54 francis Exp $
+// $Id: facebook.php,v 1.23 2007-07-06 19:32:13 francis Exp $
 
 /*
 
@@ -67,15 +67,11 @@ $ref = get_http_var("ref");
 if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     pbfacebook_render_header();
     pbfacebook_render_dashboard();
-    if ($ref == 'new') {
-        pbfacebook_render_new();
-    } else {
-        if (get_http_var('sent')) {
-            print "<p class=\"formnote\">"._("Thanks for sending the pledge to your friends!").
-                "<br/>"._("Here are some more pledges you might like.")."</p>";
-        }
-        pbfacebook_render_frontpage(get_http_var("list"));
+    if (get_http_var('sent')) {
+        print "<p class=\"formnote\">"._("Thanks for sending the pledge to your friends!").
+            "<br/>"._("Here are some more pledges you might like.")."</p>";
     }
+    pbfacebook_render_frontpage(get_http_var("list"));
     pbfacebook_render_footer();
 } else {
     $pledge = new Pledge($ref);

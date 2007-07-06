@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.177 2007-06-14 23:12:58 francis Exp $
+// $Id: new.php,v 1.178 2007-07-06 19:32:13 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -14,6 +14,7 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
+require_once '../phplib/pbfacebook.php';
 require_once '../../phplib/utility.php';
 require_once '../../phplib/mapit.php';      # To test validity of postcodes
 require_once "../../phplib/votingarea.php";
@@ -57,6 +58,27 @@ ob_end_clean();
 page_header($page_title, $page_params);
 print $contents;
 page_footer(array('nolocalsignup'=>true));
+
+function check_facebook_params($data) {
+    if ($data && array_key_exists('facebook_id', $data)) {
+        $facebook_id = $data['facebook_id'];
+        $facebook_id_sig = $data['facebook_id_sig'];
+    } else {
+        $facebook_id = intval(get_http_var('facebook_id'));
+        $facebook_id_sig = get_http_var("facebook_id_sig");
+    }
+    if ($facebook_id) { 
+        $verified = auth_verify_with_shared_secret($facebook_id, OPTION_CSRF_SECRET, $facebook_id_sig);
+        if ($verified) {
+            pbfacebook_init_cron(OPTION_FACEBOOK_ROBOT_ID);
+            global $facebook;
+            $facebook_info = $facebook->api_client->users_getInfo($facebook_id, array('name'));
+            $facebook_name = $facebook_info[0]['name'];
+            return array($facebook_id, $facebook_id_sig, $facebook_name);
+        }
+    }
+    return null;
+}
 
 function pledge_form_one($data = array(), $errors = array()) {
     global $lang, $langs;
@@ -179,7 +201,18 @@ onfocus="fadein(this)" onblur="fadeout(this)" value="<?
 
 <? if ($microsite != 'o2') { ?>
 <h3><?=_('About You') ?></h3>
-<p style="margin-bottom: 1em;"><strong><?=_('Your name:') ?></strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+<p style="margin-bottom: 1em;">
+<? 
+    list ($facebook_id, $facebook_id_sig, $facebook_name) = check_facebook_params($data);
+    if ($facebook_id) { 
+?>
+<strong><?=_('Your Facebook account:')?></strong> <a href="http://www.facebook.com/profile.php?id=<?=$facebook_id?>"><?=htmlspecialchars($facebook_name)?></a> 
+<input type="hidden" name="facebook_id" value="<?=htmlspecialchars($facebook_id)?>">
+<input type="hidden" name="facebook_id_sig" value="<?=htmlspecialchars($facebook_id_sig)?>">
+<input type="hidden" name="name" value="<?=htmlspecialchars($facebook_name)?>">
+<?   } else { ?>
+<strong><?=_('Your name:') ?></strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+<?   } ?>
 <strong><?=_('Email:') ?></strong> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
 <? } ?>
@@ -454,6 +487,11 @@ function pledge_form_submitted() {
     $data['title'] = preg_replace('#^' . _('I will') . ' #i', '', $data['title']);
     $data['title'] = preg_replace('#^' . _('will') . ' #i', '', $data['title']);
     if (microsites_no_target()) { $data['target'] = 0; }
+    list ($facebook_id, $facebook_id_sig, $facebook_name) = check_facebook_params($data);
+    if (!$facebook_id) {
+        $data['facebook_id'] = null;
+        $data['facebook_id_sig'] = null;
+    }
 
     # Step 2 fixes
     if (array_key_exists('local', $data) && !$data['local']) { 
@@ -557,6 +595,19 @@ function pledge_form_submitted() {
     $data['reason_web'] = _('Before creating your new pledge, we need to check that your email is working.');
     $data['template'] = 'pledge-confirm';
     $P = pb_person_signon($data, $data['email'], $data['name']);
+    if ($data['facebook_id']) {
+        $existing_facebook_person = db_getOne("select id from person where facebook_id = ?", $data['facebook_id']);
+        if ($existing_facebook_person && $existing_facebook_person != $P->id()) {
+            /* Merge the user accounts, if say they already signed a pledge from in Facebook */
+            $session_key = db_getOne("select session_key from facebook where facebook_id = ?", $existing_facebook_person);
+            db_query("delete from facebook where facebook_id = ?", $data['facebook_id']);
+            db_query("update signers set person_id = ? where person_id = ?", $P->id, $existing_facebook_person);
+            db_query("delete from person where id = ?", $existing_facebook_person);
+            if ($session_key)
+                db_query("insert into facebook (facebook_id, session_key) values (?, ?)", $data['facebook_id'], $session_key);
+        }
+        db_query('update person set facebook_id = ? where id = ?', array($data['facebook_id'], $P->id()));
+    }
 
     stepaddr_fillin_address($P, $data);
     create_new_pledge($P, $data);
@@ -623,6 +674,13 @@ function step1_error_check($data) {
     global $langs;
     if (!array_key_exists($data['lang'], $langs)) {
         $errors['lang'] = _('Unknown language code:') . ' ' . htmlspecialchars($data['lang']);
+    }
+
+    if ($data['facebook_id']) {
+        $facebook_email = db_getOne("select email from person where facebook_id = ?", $data['facebook_id']);
+        if ($facebook_email && $facebook_email != $data['email']) {
+            $errors['email'] = _('You already have Facebook set up on PledgeBank with a different email address. Please use that address, it is ') . htmlspecialchars($facebook_email);
+        }
     }
 
     $errors = array_merge($errors, microsites_step1_error_check($data));
@@ -953,9 +1011,15 @@ function create_new_pledge($P, $data) {
     $page_params['noprint'] = true;
 
     $url = htmlspecialchars(pb_domain_url() . urlencode($p->data['ref']));
+    $facebook_url = htmlspecialchars($p->url_facebook());
 ?>
     <p class="noprint loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
+<? if ($data['facebook_id']) { ?>
+    <p class="noprint loudmessage" align="center"><? printf(_('It is now live on Facebook at %s<br>and your friends can sign up to it there.'), '<a href="'.$facebook_url.'">'.$facebook_url.'</a>') ?></p>
+    <p class="noprint loudmessage" align="center"><? printf(_('Or sign up by email at %s'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
+<? } else { ?>
     <p class="noprint loudmessage" align="center"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
+<? } ?>
 <?  if (microsites_new_pledges_prominence() != 'backpage') { ?>
     <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge &mdash; for ways to do this check out the "Spread the Word" section of your pledge webpage.') ?></p>
 <?  } else { ?>

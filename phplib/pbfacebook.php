@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.15 2007-07-06 22:12:00 francis Exp $
+// $Id: pbfacebook.php,v 1.16 2007-07-06 22:19:04 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -316,6 +316,10 @@ function pbfacebook_render_frontpage($page = "") {
                 $out .= "</td></tr></table>";*/
             }
             print '</ul>';
+        } else {
+            print "<p>"._("None of your friends have made or signed any pledges.").
+                    " <a href=\"/list/feature\">"._("See some featured pledges.")."</a>".
+                    "</p>";
         }
         if ($friends_signed) 
             $friends_signed_joined = " AND pledges.id NOT IN (".join(",", $friends_signed).")";

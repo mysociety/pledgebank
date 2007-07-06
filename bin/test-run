@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.222 2007-06-20 02:46:40 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.223 2007-07-06 00:30:40 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -729,7 +729,7 @@ sub do_public_succeeding_pledge {
 
     comment("Mail pledge to friends");
     $wth->browser_get($locale_url . "/$pledge_ref");
-    $wth->browser_follow_link(text_regex => qr/Email pledge/);
+    $wth->browser_follow_link(text_regex => qr/Email your friends/);
     $wth->browser_check_contents("Email this pledge");
     my $friend_message = "Hello you!";
     $wth->browser_submit_form(form_name => 'pledge',

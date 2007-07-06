@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.10 2007-07-06 19:32:13 francis Exp $
+// $Id: pbfacebook.php,v 1.11 2007-07-06 21:00:27 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -76,15 +76,14 @@ function pbfacebook_update_fbmlref_profilepledge($pledge) {
 // Draw pledge index page within Facebook
 function pbfacebook_render_pledge($pledge) {
     global $facebook;
-
-    $signer_id = db_getOne("select signers.id from signers left join person on person.id = signers.person_id
-            where facebook_id = ? and signers.pledge_id = ?", array($facebook->get_loggedin_user(), $pledge->id())); 
+    $already_signed = pbfacebook_already_signed($pledge);
+    
     $announce_messages = db_getOne("select count(*) from message where pledge_id = ? and sendtosigners and emailbody is not null", array($pledge->id())); 
 
     // Fancy invitation section
     if (!$announce_messages) {
         $invite_intro = "Invite your friends to also sign this pledge.";
-        if ($signer_id && !$pledge->finished()) {
+        if ($already_signed && !$pledge->finished()) {
             print "<h2 style=\"text-align: center\">$invite_intro</h2>";
             print '
     <fb:editor action="" labelwidth="200">
@@ -102,7 +101,7 @@ function pbfacebook_render_pledge($pledge) {
 
 
     // Announcement messages
-    if ($announce_messages && $signer_id) {
+    if ($announce_messages && $already_signed) {
         $q = db_query('select id, whencreated, fromaddress, emailsubject, emailbody from message where pledge_id = ? and sendtosigners and emailbody is not null order by id desc', $pledge->id());
         if (db_num_rows($q) > 0) {
             while (list($id, $when, $from, $subject, $body) = db_fetch_row($q)) {
@@ -131,7 +130,7 @@ style="display: none"
     pledge_draw_status_plaque($pledge);
     $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
     $pledge->render_box(array('class'=>'', 
-            'facebook-sign'=>!$pledge->finished() && !$signer_id, 'facebook-sign-csrf'=>$csrf_sig,
+            'facebook-sign'=>!$pledge->finished() && !$already_signed, 'facebook-sign-csrf'=>$csrf_sig,
             'showdetails' => true,
             'facebook-share' => pbfacebook_render_share_pledge($pledge) 
             ));
@@ -189,6 +188,18 @@ function pbfacebook_render_dashboard() {
 <?
 }
 
+// See if pledge has already been signed, or was created by, the user
+function pbfacebook_already_signed($pledge) {
+    global $facebook;
+    $signer_id = db_getOne("select signers.id from signers left join person on person.id = signers.person_id
+            where facebook_id = ? and signers.pledge_id = ?", array($facebook->get_loggedin_user(), $pledge->id())); 
+    if (!$signer_id) {
+        $owner_id = db_getOne("select person_id from pledges left join person on person.id = pledges.person_id
+                where facebook_id = ? and pledges.id = ?", array($facebook->get_loggedin_user(), $pledge->id())); 
+    }
+    return ($signer_id || $owner_id);
+}
+
 // Render frontpage of PledgeBank on Facebook
 function pbfacebook_render_frontpage($page = "") {
     global $facebook, $pb_today;
@@ -203,6 +214,7 @@ function pbfacebook_render_frontpage($page = "") {
 
 ?>    <fb:tabs>
     <fb:tab-item title="Friends pledges" <?=($page=="friends")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/friends" />
+    <fb:tab-item title="Your pledges" <?=($page=="your")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/your" />
     <fb:tab-item title="Featured pledges" <?=($page=="feature")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/feature" />
 <!--    <fb:tab-item title="Successful pledges" <?=($page=="success")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/success" /> -->
     </fb:tabs> <?
@@ -221,6 +233,8 @@ function pbfacebook_render_frontpage($page = "") {
                 LEFT JOIN person ON person.id = signers.person_id
                 WHERE pin IS NULL AND 
                 person.facebook_id in ($friends_joined)
+                ORDER BY pledges.id DESC
+                LIMIT 20
                 ";
         $friends_signed = array();
         $q = db_query($query);
@@ -230,8 +244,7 @@ function pbfacebook_render_frontpage($page = "") {
             $r = db_fetch_array($q);
             while ($r) {
                 $pledge = new Pledge($r);
-                $signer_id = db_getOne("select signers.id from signers left join person on person.id = signers.person_id
-                    where facebook_id = ? and signers.pledge_id = ?", array($facebook->get_loggedin_user(), $pledge->id())); 
+                $already_signed = pbfacebook_already_signed($pledge);
 
                 $friends_sig = array();
                 $friends_sig[] = $r['facebook_id'];
@@ -253,7 +266,7 @@ function pbfacebook_render_frontpage($page = "") {
                 print make_plural(count($friends_sig), "has pledged:", "have pledged:") . " ";
                 $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
                 $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
-                        'facebook-sign'=>!$pledge->finished() && !$signer_id, 'facebook-sign-csrf'=>$csrf_sig,
+                        'facebook-sign'=>!$pledge->finished() && !$already_signed, 'facebook-sign-csrf'=>$csrf_sig,
                         'href'=>$pledge->url_facebook()));
                 $friends_signed[] = $pledge->id();
                 print '</li>';
@@ -266,6 +279,60 @@ function pbfacebook_render_frontpage($page = "") {
         }
         if ($friends_signed) 
             $friends_signed_joined = " AND pledges.id NOT IN (".join(",", $friends_signed).")";
+    }
+
+    if ($page == "your" ) {
+        $facebook->require_login('/list/your');
+        $you_id = $facebook->get_loggedin_user();
+        $got = 0;
+
+        $query = "SELECT pledges.*, country, 
+                (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
+                person.facebook_id as facebook_id
+                FROM pledges 
+                LEFT JOIN location ON location.id = pledges.location_id
+                LEFT JOIN person ON person.id = pledges.person_id
+                WHERE pin IS NULL AND 
+                person.facebook_id = ?
+                ORDER BY creationtime DESC
+                ";
+        $q = db_query($query, $you_id);
+        if (db_num_rows($q) > 0) {
+            $got = 1;
+            print "<p>"._("Pledge you've created:")."</p>";
+            while ($r = db_fetch_array($q)) {
+                $pledge = new Pledge($r);
+                $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                        'href'=>$pledge->url_facebook()));
+            }
+        }
+
+        $query = "SELECT pledges.*, country, 
+                (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
+                person.facebook_id as facebook_id
+                FROM pledges 
+                LEFT JOIN location ON location.id = pledges.location_id
+                LEFT JOIN signers on signers.pledge_id = pledges.id
+                LEFT JOIN person ON person.id = signers.person_id
+                WHERE pin IS NULL AND 
+                person.facebook_id = ?
+                ORDER BY signtime DESC
+                LIMIT 40
+                ";
+        $q = db_query($query, $you_id);
+        if (db_num_rows($q) > 0) {
+            $got = 1;
+            print "<p>"._("Pledge you've signed:")."</p>";
+            while ($r = db_fetch_array($q)) {
+                $pledge = new Pledge($r);
+                $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                        'href'=>$pledge->url_facebook()));
+            }
+        }
+
+        if (!$got) {
+            print "<p>"._("You've neither made nor signed any pledges.")."</p>";
+        }
     }
 
     if ($page == "feature") {

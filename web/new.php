@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.178 2007-07-06 19:32:13 francis Exp $
+// $Id: new.php,v 1.179 2007-07-06 21:00:27 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -679,7 +679,7 @@ function step1_error_check($data) {
     if ($data['facebook_id']) {
         $facebook_email = db_getOne("select email from person where facebook_id = ?", $data['facebook_id']);
         if ($facebook_email && $facebook_email != $data['email']) {
-            $errors['email'] = _('You already have Facebook set up on PledgeBank with a different email address. Please use that address, it is ') . htmlspecialchars($facebook_email);
+            $errors['email'] = _('You already have Facebook set up on PledgeBank with a different email address. Please use that address, it is ') . htmlspecialchars($facebook_email) . ".";
         }
     }
 

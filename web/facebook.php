@@ -6,14 +6,14 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.23 2007-07-06 19:32:13 francis Exp $
+// $Id: facebook.php,v 1.24 2007-07-06 21:00:27 francis Exp $
 
 /*
 
 TODO:
 
-- Link id to creator (then put in profile, and put in pledges friends made lists)
-- Links from rest of PledgeBank site
+- Privacy issue when merging facebook accounts with normal
+- Finish links from rest of PledgeBank site
 
 Improvements:
 - Show on http://apps.facebook.com/pledgebank ones you've already signed clearer

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.105 2007-07-05 20:37:07 francis Exp $
+ * $Id: frequentupdate,v 1.106 2007-07-06 11:24:01 francis Exp $
  *
  */
 
@@ -857,7 +857,7 @@ function send_pending_messages() {
                     $send_it = false;
                 }
 
-                if (!is_null($r['signer_facebook_id'])) {
+                if (is_null($r['signer_facebook_id'])) {
                     /* Add special header */
                     locale_push($pledge->lang());
                     if ($r['howlongago'] > 2 * 86400)

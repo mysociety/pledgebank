@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.180 2007-07-06 21:08:16 francis Exp $
+// $Id: new.php,v 1.181 2007-07-06 21:11:03 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -1009,6 +1009,11 @@ function create_new_pledge($P, $data) {
     global $page_title, $page_params;
     $page_title = _('Pledge Created');
     $page_params['noprint'] = true;
+
+    if ($data['facebook_id']) {
+        pbfacebook_init_cron(OPTION_FACEBOOK_ROBOT_ID);
+        pbfacebook_update_profile_box($data['facebook_id']);
+    }
 
     $url = htmlspecialchars(pb_domain_url() . urlencode($p->data['ref']));
     $facebook_url = htmlspecialchars($p->url_facebook());

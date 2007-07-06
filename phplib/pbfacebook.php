@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.16 2007-07-06 22:19:04 francis Exp $
+// $Id: pbfacebook.php,v 1.17 2007-07-06 22:31:56 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -274,7 +274,7 @@ function pbfacebook_render_frontpage($page = "") {
                     person.facebook_id in ($friends_joined) AND
                     signers.via_facebook
                 ORDER BY pledges.id DESC
-                LIMIT 20
+                LIMIT 30
                 ";
         $friends_signed = array();
         $q = db_query($query);
@@ -363,7 +363,6 @@ function pbfacebook_render_frontpage($page = "") {
                     person.facebook_id = ? AND
                     signers.via_facebook
                 ORDER BY signtime DESC
-                LIMIT 40
                 ";
         $q = db_query($query, $you_id);
         if (db_num_rows($q) > 0) {
@@ -389,17 +388,15 @@ function pbfacebook_render_frontpage($page = "") {
                     whensucceeded IS NULL 
                     $friends_signed_joined
                     ORDER BY RANDOM()
-                    LIMIT 10", array('global'=>true,'main'=>true,'foreign'=>true));
+                    LIMIT 30", array('global'=>true,'main'=>true,'foreign'=>true));
         if ($pledges) {
-            $out = '<ol>';
             foreach ($pledges as $pledge)  {
-                $out .= '<li>';
-                $out .= pbfacebook_render_share_pledge($pledge);
-                $out .= $pledge->summary(array('html'=>true, 'href'=>$pledge->url_facebook(), 'showcountry'=>true));
-                $out .= '</li>';
+                $already_signed = pbfacebook_already_signed($pledge);
+                $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
+                $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                        'facebook-sign'=>!$pledge->finished() && !$already_signed, 'facebook-sign-csrf'=>$csrf_sig,
+                        'href'=>$pledge->url_facebook()));
             }
-            $out .= '</ol>';
-            print $out;
         }
     }
 

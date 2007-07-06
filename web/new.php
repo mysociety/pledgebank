@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.179 2007-07-06 21:00:27 francis Exp $
+// $Id: new.php,v 1.180 2007-07-06 21:08:16 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -599,7 +599,7 @@ function pledge_form_submitted() {
         $existing_facebook_person = db_getOne("select id from person where facebook_id = ?", $data['facebook_id']);
         if ($existing_facebook_person && $existing_facebook_person != $P->id()) {
             /* Merge the user accounts, if say they already signed a pledge from in Facebook */
-            $session_key = db_getOne("select session_key from facebook where facebook_id = ?", $existing_facebook_person);
+            $session_key = db_getOne("select session_key from facebook where facebook_id = ?", $data['facebook_id']);
             db_query("delete from facebook where facebook_id = ?", $data['facebook_id']);
             db_query("update signers set person_id = ? where person_id = ?", $P->id, $existing_facebook_person);
             db_query("delete from person where id = ?", $existing_facebook_person);

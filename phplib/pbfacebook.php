@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.11 2007-07-06 21:00:27 francis Exp $
+// $Id: pbfacebook.php,v 1.12 2007-07-06 21:08:16 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -18,6 +18,40 @@ function pbfacebook_update_profile_box($uid) {
     global $facebook;
 
     $out = "";
+    $got = 0;
+
+    // Created
+    $q = db_query("SELECT pledges.*, country,
+            (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
+            FROM pledges
+            LEFT JOIN location ON location.id = pledges.location_id
+            LEFT JOIN person ON person.id = pledges.person_id
+            WHERE pin IS NULL AND
+                  person.facebook_id = ?
+            ORDER BY creationtime DESC",
+            array($uid));
+    if (db_num_rows($q) > 0) {
+        $got = 1;
+        $out .= "
+<fb:if-is-own-profile>
+    You have created these Pledges.
+<fb:else>
+    <fb:name uid=\"$uid\"/> has created these Pledges.
+</fb:else>
+</fb:if-is-own-profile>
+";
+        $out .= '<ol>';
+        while ($r = db_fetch_array($q)) {
+            $pledge = new Pledge($r);
+            pbfacebook_update_fbmlref_profilepledge($pledge);
+            $out .= '<li>';
+            $out .= '<fb:ref handle="profilepledge-'.$pledge->ref().'" />';
+            $out .= '</li>';
+        }
+        $out .= '</ol>';
+    }     
+
+    // Signed
     $q = db_query("SELECT pledges.*, country,
             (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers
             FROM pledges
@@ -29,6 +63,7 @@ function pbfacebook_update_profile_box($uid) {
             ORDER BY signtime DESC",
             array($uid));
     if (db_num_rows($q) > 0) {
+        $got = 1;
         $out .= "
 <fb:if-is-own-profile>
     You have signed these Pledges.
@@ -46,18 +81,20 @@ function pbfacebook_update_profile_box($uid) {
             $out .= '</li>';
         }
         $out .= '</ol>';
+    }
+
+    if (!$got) {
+        $out = "
+    <fb:if-is-own-profile>
+        You haven't signed or created any pledges in Facebook yet.
+    <fb:else>
+        <fb:name uid=\"$uid\"/> has not signed or created any pledges in Facebook.
+    </fb:else>
+    </fb:if-is-own-profile>
+    ";
         $out .= "<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find more pledges to sign</a>.</p>";
     } else {
-    $out = "
-<fb:if-is-own-profile>
-    You haven't signed any pledges in Facebook yet.
-<fb:else>
-    <fb:name uid=\"$uid\"/> has not signed any pledges in Facebook.
-</fb:else>
-</fb:if-is-own-profile>
-<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find a pledge to sign</a>.</p>
-";
-
+        $out .= "<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find a pledge to sign</a>.</p>";
     }
 
     $ret = $facebook->api_client->profile_setFBML($out, $uid);

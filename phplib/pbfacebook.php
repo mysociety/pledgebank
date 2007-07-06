@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.17 2007-07-06 22:31:56 francis Exp $
+// $Id: pbfacebook.php,v 1.18 2007-07-06 22:36:22 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -381,6 +381,7 @@ function pbfacebook_render_frontpage($page = "") {
     }
 
     if ($page == "feature") {
+        print '<p style="text-align:center"><a href="http://www.pledgebank.com">Find more pledges</a> to sign over on <a href="http://www.pledgebank.com">www.pledgebank.com</a></p>';
         $pledges = pledge_get_list("
                     cached_prominence = 'frontpage' AND
                     date >= '$pb_today' AND 

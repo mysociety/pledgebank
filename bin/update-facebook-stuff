@@ -8,7 +8,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: update-facebook-stuff,v 1.5 2007-07-06 21:11:02 francis Exp $
+ * $Id: update-facebook-stuff,v 1.6 2007-07-07 01:48:07 francis Exp $
  *
  */
 
@@ -52,7 +52,8 @@ Usage: update-facebook-stuff [--verbose]
 # Update profile page FBML for each pledge
 $q = db_query("select distinct(pledges.id) from pledges where id in 
             (select signers.pledge_id from person left join signers on
-            signers.person_id = person.id where facebook_id is not null)"); 
+            signers.person_id = person.id where facebook_id is not null)
+            or pledges.via_facebook"); 
 while ($pdata = db_fetch_array($q)) {
     $pledge = new Pledge(intval($pdata['id']));
     verbose("updating profile FBML of pledge " . $pledge->ref());

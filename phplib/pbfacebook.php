@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.20 2007-07-06 23:14:34 francis Exp $
+// $Id: pbfacebook.php,v 1.21 2007-07-07 01:31:11 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -250,7 +250,6 @@ function pbfacebook_render_frontpage($page = "") {
         $page = "friends";
     }
 
-
 ?>    <fb:tabs>
     <fb:tab-item title="Friends' pledges" <?=($page=="friends")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/friends" />
     <fb:tab-item title="Your pledges" <?=($page=="your")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/your" />
@@ -263,6 +262,8 @@ function pbfacebook_render_frontpage($page = "") {
         $facebook->require_login('/list/friends');
         $friends = $facebook->api_client->friends_get();
         $friends_joined = join(",", $friends);
+        if (!$friends_joined) # no friends case
+            $friends_joined = -1; 
         $query = "SELECT pledges.*, country, 
                 (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
                 person.facebook_id as facebook_id

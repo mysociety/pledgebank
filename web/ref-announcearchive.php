@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announcearchive.php,v 1.7 2006-10-17 10:08:53 francis Exp $
+ * $Id: ref-announcearchive.php,v 1.8 2007-07-07 01:47:56 francis Exp $
  * 
  */
 
@@ -64,7 +64,7 @@ print "<div class=\"oldannounce\">";
 print h2(_('Messages sent by creator to signers'));
 
 if ($priv & PRIV_SIGNER) {
-    $q = db_query('select id, whencreated, fromaddress, emailsubject, emailbody from message where pledge_id = ? and sendtosigners and emailbody is not null', $p->id());
+    $q = db_query('select id, whencreated, fromaddress, emailsubject, emailbody from message where pledge_id = ? and sendtosigners and emailbody is not null order by id desc', $p->id());
     if (db_num_rows($q) > 0) {
         while (list($id, $when, $from, $subject, $body) = db_fetch_row($q)) {
             print '<hr>';

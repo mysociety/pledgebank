@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.185 2007-07-09 16:32:10 francis Exp $
+// $Id: new.php,v 1.186 2007-07-09 16:34:15 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -60,7 +60,7 @@ print $contents;
 page_footer(array('nolocalsignup'=>true));
 
 function check_facebook_params($data) {
-    if ($data && array_key_exists('facebook_id', $data) && array_key_exists('facebook_name', $data) && array_key_exists('facebook_+id_sig', $data)) {
+    if ($data && array_key_exists('facebook_id', $data) && array_key_exists('facebook_name', $data) && array_key_exists('facebook_id_sig', $data)) {
         $facebook_id = $data['facebook_id'];
         $facebook_name = $data['facebook_name'];
         $facebook_id_sig = $data['facebook_id_sig'];

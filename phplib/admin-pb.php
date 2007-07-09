@@ -6,17 +6,26 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.150 2007-06-19 23:15:21 francis Exp $
+ * $Id: admin-pb.php,v 1.151 2007-07-09 12:58:33 francis Exp $
  * 
  */
 
 require_once "../phplib/pb.php";
 require_once "../phplib/pledge.php";
 require_once "../phplib/comments.php";
+require_once '../phplib/pbfacebook.php';
 require_once "../../phplib/db.php";
 require_once "../../phplib/utility.php";
 require_once "../../phplib/importparams.php";
 require_once "../../phplib/gaze.php";
+
+function facebook_display_name($facebook_id) {
+    global $facebook;
+    if (!$facebook)
+        pbfacebook_init_cron(OPTION_FACEBOOK_ROBOT_ID);
+    $facebook_name = pbfacebook_get_user_name($facebook_id);
+    return '<a href="http://www.facebook.com/profile.php?id='.$facebook_id.'">'.htmlspecialchars($facebook_name).'</a> (Facebook)';
+}
 
 class ADMIN_PAGE_PB_SUMMARY {
     function ADMIN_PAGE_PB_SUMMARY() {
@@ -325,7 +334,7 @@ class ADMIN_PAGE_PB_MAIN {
         // Signers
         print "<h2>Signers (".$pdata['signers']."/".$pdata['target'].")</h2>";
         $query = 'SELECT signers.name as signname,person.email as signemail,
-                         person.mobile as signmobile,
+                         person.mobile as signmobile, person.facebook_id as signfacebook_id,
                          date_trunc(\'second\',signtime) AS signtime,
                          showname, signers.id AS signid,
                          location.description AS location_description
@@ -351,6 +360,9 @@ class ADMIN_PAGE_PB_MAIN {
                 array_push($e, $r['signemail']);
             if ($r['signmobile'])
                 array_push($e, $r['signmobile']);
+            if ($r['signfacebook_id']) {
+                array_push($e, facebook_display_name($r['signfacebook_id']));
+            }
             if ($r['location_description'])
                 array_push($e, $r['location_description']);
             $e = join("<br>", $e);
@@ -698,7 +710,9 @@ class ADMIN_PAGE_PB_LATEST {
         }
  
         $q = db_query("SELECT signers.name, signer_person.email,
-                              signer_person.mobile as mobile, signtime, showname, pledges.title,
+                              signer_person.mobile as mobile, 
+                              signer_person.facebook_id as facebook_id, 
+                              signtime, showname, pledges.title,
                               pledges.ref, pledges.id,
                               extract(epoch from signtime) as epoch
                          FROM pledges, signers
@@ -835,6 +849,7 @@ class ADMIN_PAGE_PB_LATEST {
                 print $data['name'];
                 if ($data['email']) print ' &lt;'.htmlspecialchars($data['email']).'&gt;';
                 if ($data['mobile']) print ' (' . htmlspecialchars($data['mobile']) . ')';
+                if ($data['facebook_id']) print ' ' . facebook_display_name($data['facebook_id']);
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, ";
                 print $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (confirmed)';

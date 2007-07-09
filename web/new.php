@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.182 2007-07-06 21:50:20 francis Exp $
+// $Id: new.php,v 1.183 2007-07-09 12:58:34 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -71,9 +71,7 @@ function check_facebook_params($data) {
         $verified = auth_verify_with_shared_secret($facebook_id, OPTION_CSRF_SECRET, $facebook_id_sig);
         if ($verified) {
             pbfacebook_init_cron(OPTION_FACEBOOK_ROBOT_ID);
-            global $facebook;
-            $facebook_info = $facebook->api_client->users_getInfo($facebook_id, array('name'));
-            $facebook_name = $facebook_info[0]['name'];
+            $facebook_name = pbfacebook_get_user_name($facebook_id);
             return array($facebook_id, $facebook_id_sig, $facebook_name);
         }
     }

@@ -5,13 +5,20 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.21 2007-07-07 01:31:11 francis Exp $
+// $Id: pbfacebook.php,v 1.22 2007-07-09 12:58:34 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
 $GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
 
 require_once '../../phplib/facebookphp4/facebook.php';
+
+// Find anyone's name
+function pbfacebook_get_user_name($facebook_id) {
+    global $facebook;
+    $facebook_info = $facebook->api_client->users_getInfo($facebook_id, array('name'));
+    return $facebook_info[0]['name'];
+}
 
 // Write the static FBML to the given user's profile box
 function pbfacebook_update_profile_box($uid) {

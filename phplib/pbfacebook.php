@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.24 2007-07-09 16:22:29 francis Exp $
+// $Id: pbfacebook.php,v 1.25 2007-07-09 17:20:18 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -257,7 +257,8 @@ function pbfacebook_render_frontpage($page = "") {
         $page = "feature";
     }
     if ($page == "" && $facebook->get_loggedin_user()) {
-        $page = "friends";
+        $page = "feature";
+        #$page = "friends";
     }
 
 ?>    <fb:tabs>

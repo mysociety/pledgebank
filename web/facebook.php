@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.29 2007-07-09 15:10:30 francis Exp $
+// $Id: facebook.php,v 1.30 2007-07-09 16:08:24 francis Exp $
 
 /*
 
@@ -22,6 +22,8 @@ TODO:
 - Text on message for "share" links is not perfect.
 - Finish links from rest of PledgeBank site.
 - Post in news when new pledge created - doesn't seem to work?
+
+- Just show English pledges on featured pledges page
 
 Improvements:
 - Show signers on pledge pages (only show ones that are via facebook of course)

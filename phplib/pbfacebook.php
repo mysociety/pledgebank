@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.22 2007-07-09 12:58:34 francis Exp $
+// $Id: pbfacebook.php,v 1.23 2007-07-09 15:10:30 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -13,7 +13,9 @@ $GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB call
 
 require_once '../../phplib/facebookphp4/facebook.php';
 
-// Find anyone's name
+// Find anyone's name. Well, anyone who hasn't turned off their visibility
+// from Facebook search results by people who aren't their friends - returns
+// untrue value for those.
 function pbfacebook_get_user_name($facebook_id) {
     global $facebook;
     $facebook_info = $facebook->api_client->users_getInfo($facebook_id, array('name'));

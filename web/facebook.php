@@ -6,11 +6,18 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.28 2007-07-07 01:50:39 francis Exp $
+// $Id: facebook.php,v 1.29 2007-07-09 15:10:30 francis Exp $
 
 /*
 
 TODO:
+
+- Text that is show by Facebook when you add application. (Heather to write)
+
+- Still taking two clicks to sign a pledge when you add the app.
+- "The news that you've signed could not be added to your feed." when Tom signed pledge
+
+- If you have "only friends" set for search, then robots can't work out your name e.g. on new pledge page
 
 - Text on message for "share" links is not perfect.
 - Finish links from rest of PledgeBank site.

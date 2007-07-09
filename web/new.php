@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.183 2007-07-09 12:58:34 francis Exp $
+// $Id: new.php,v 1.184 2007-07-09 16:22:29 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -62,16 +62,16 @@ page_footer(array('nolocalsignup'=>true));
 function check_facebook_params($data) {
     if ($data && array_key_exists('facebook_id', $data)) {
         $facebook_id = $data['facebook_id'];
+        $facebook_name = $data['facebook_name'];
         $facebook_id_sig = $data['facebook_id_sig'];
     } else {
         $facebook_id = intval(get_http_var('facebook_id'));
+        $facebook_name = get_http_var('facebook_name');
         $facebook_id_sig = get_http_var("facebook_id_sig");
     }
     if ($facebook_id) { 
-        $verified = auth_verify_with_shared_secret($facebook_id, OPTION_CSRF_SECRET, $facebook_id_sig);
+        $verified = auth_verify_with_shared_secret($facebook_id.":".$facebook_name, OPTION_CSRF_SECRET, $facebook_id_sig);
         if ($verified) {
-            pbfacebook_init_cron(OPTION_FACEBOOK_ROBOT_ID);
-            $facebook_name = pbfacebook_get_user_name($facebook_id);
             return array($facebook_id, $facebook_id_sig, $facebook_name);
         }
     }
@@ -207,6 +207,7 @@ onfocus="fadein(this)" onblur="fadeout(this)" value="<?
 <strong><?=_('Your Facebook account:')?></strong> <a href="http://www.facebook.com/profile.php?id=<?=$facebook_id?>"><?=htmlspecialchars($facebook_name)?></a> 
 <input type="hidden" name="facebook_id" value="<?=htmlspecialchars($facebook_id)?>">
 <input type="hidden" name="facebook_id_sig" value="<?=htmlspecialchars($facebook_id_sig)?>">
+<input type="hidden" name="facebook_name" value="<?=htmlspecialchars($facebook_name)?>">
 <input type="hidden" name="name" value="<?=htmlspecialchars($facebook_name)?>">
 <?   } else { ?>
 <strong><?=_('Your name:') ?></strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">

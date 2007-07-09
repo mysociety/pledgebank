@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.23 2007-07-09 15:10:30 francis Exp $
+// $Id: pbfacebook.php,v 1.24 2007-07-09 16:22:29 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -224,8 +224,9 @@ function pbfacebook_render_dashboard() {
     global $facebook;
     $urlpart = "";
     if ($facebook->get_loggedin_user()) {
-        $sig = auth_sign_with_shared_secret($facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
-        $urlpart = "?facebook_id=" . $facebook->get_loggedin_user() . "&facebook_id_sig=" . $sig;
+        $facebook_name = pbfacebook_get_user_name($facebook->get_loggedin_user());
+        $sig = auth_sign_with_shared_secret($facebook->get_loggedin_user().":".$facebook_name, OPTION_CSRF_SECRET);
+        $urlpart = "?facebook_id=" . $facebook->get_loggedin_user() . "&facebook_name=".urlencode($facebook_name)."&facebook_id_sig=" . $sig;
     }
 ?>
 <fb:dashboard>

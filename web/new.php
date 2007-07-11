@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.187 2007-07-11 12:18:01 francis Exp $
+// $Id: new.php,v 1.188 2007-07-11 12:30:18 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -910,6 +910,8 @@ function stepaddr_fillin_address($P, $data) {
 
 # Someone has submitted a new pledge
 function create_new_pledge($P, $data) {
+    global $site_country;
+
     $isodate = $data['parseddate']['iso'];
     if ($data['visibility'] == 'all')
         $data['pin'] = null;
@@ -1021,19 +1023,29 @@ function create_new_pledge($P, $data) {
     $url = htmlspecialchars(pb_domain_url() . urlencode($p->data['ref']));
     $facebook_url = htmlspecialchars($p->url_facebook());
 ?>
-    <p class="noprint loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
+    <p class="loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
 <? if ($data['facebook_id']) { ?>
-    <p class="noprint loudmessage" align="center"><? printf(_('It is now live on Facebook at %s<br>and your friends can sign up to it there.'), '<a href="'.$facebook_url.'">'.$facebook_url.'</a>') ?></p>
-    <p class="noprint loudmessage" align="center"><? printf(_('Or sign up by email at %s'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
+    <p class="loudmessage"><? printf(_('It is now live on Facebook at %s<br>and your friends can sign up to it there.'), '<a href="'.$facebook_url.'">'.$facebook_url.'</a>') ?></p>
+    <p class="loudmessage"><? printf(_('Or sign up by email at %s'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
 <? } else { ?>
-    <p class="noprint loudmessage" align="center"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
+    <p class="loudmessage"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
 <? } ?>
 <?  if (microsites_new_pledges_prominence() != 'backpage') { ?>
-    <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge &mdash; for ways to do this check out the "Spread the Word" section of your pledge webpage.') ?></p>
+    <p class="loudmessage"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge &mdash; for ways to do this check out the "Spread the Word" section of your pledge webpage.') ?></p>
 <?  } else { ?>
-    <p class="noprint loudmessage" align="center"><?=_('Your pledge will <strong>not be publicised</strong> elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
-<?   } ?>
-<?  post_confirm_advertise();
+    <p class="loudmessage"><?=_('Your pledge will <strong>not be publicised</strong> elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
+<?  }
+
+    if ($site_country == 'US') {
+?><p class="loudmessage" style="margin-bottom:0">
+If your pledge is about raising money and you want people to be able to donate straight away, why not use
+<a href="http://www.changingthepresent.org/">ChangingThePresent</a> if you're giving to a registered non-profit
+or <a href="http://www.chipin.com/">ChipIn</a> if you're raising money for something else?</p>
+<p align="center">(If you do that, <a href="/contact">email us</a> and we'll add a link to your pledge)</p>
+<?
+    } else {
+        post_confirm_advertise();
+    }
 }
 
 function display_categories($data) { ?>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.234 2007-07-11 21:51:09 matthew Exp $
+ * $Id: pledge.php,v 1.235 2007-07-11 21:51:42 matthew Exp $
  * 
  */
 
@@ -754,7 +754,7 @@ class Pledge {
             if ($this->daysleft() == 0) {
                 $hours = 24 - date('G');
                 $text .= sprintf(ngettext('pledge open for %d hour.', 'pledge open for %d hours.', $hours), $hours);
-            elseif ($this->daysleft() < 0) {
+            } elseif ($this->daysleft() < 0) {
                 $text .= 'pledge closed.';
             } else {
                 if ($this->daysleft() <= 3) {

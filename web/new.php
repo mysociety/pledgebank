@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.188 2007-07-11 12:30:18 matthew Exp $
+// $Id: new.php,v 1.189 2007-07-11 12:53:09 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -1031,13 +1031,13 @@ function create_new_pledge($P, $data) {
     <p class="loudmessage"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
 <? } ?>
 <?  if (microsites_new_pledges_prominence() != 'backpage') { ?>
-    <p class="loudmessage"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge &mdash; for ways to do this check out the "Spread the Word" section of your pledge webpage.') ?></p>
+    <p class="noisymessage"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge &mdash; for ways to do this check out the "Spread the Word" section of your pledge webpage.') ?></p>
 <?  } else { ?>
-    <p class="loudmessage"><?=_('Your pledge will <strong>not be publicised</strong> elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
+    <p class="noisymessage"><?=_('Your pledge will <strong>not be publicised</strong> elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
 <?  }
 
     if ($site_country == 'US') {
-?><p class="loudmessage" style="margin-bottom:0">
+?><p class="noisymessage" style="margin-bottom:0">
 If your pledge is about raising money and you want people to be able to donate straight away, why not use
 <a href="http://www.changingthepresent.org/">ChangingThePresent</a> if you're giving to a registered non-profit
 or <a href="http://www.chipin.com/">ChipIn</a> if you're raising money for something else?</p>

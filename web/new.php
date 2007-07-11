@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.186 2007-07-09 16:34:15 francis Exp $
+// $Id: new.php,v 1.187 2007-07-11 12:18:01 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -596,16 +596,17 @@ function pledge_form_submitted() {
     $P = pb_person_signon($data, $data['email'], $data['name']);
     if ($data['facebook_id']) {
         $existing_facebook_person = db_getOne("select id from person where facebook_id = ?", $data['facebook_id']);
+        $session_key = null;
         if ($existing_facebook_person && $existing_facebook_person != $P->id()) {
             /* Merge the user accounts, if say they already signed a pledge from in Facebook */
             $session_key = db_getOne("select session_key from facebook where facebook_id = ?", $data['facebook_id']);
             db_query("delete from facebook where facebook_id = ?", $data['facebook_id']);
             db_query("update signers set person_id = ? where person_id = ?", $P->id, $existing_facebook_person);
             db_query("delete from person where id = ?", $existing_facebook_person);
-            if ($session_key)
-                db_query("insert into facebook (facebook_id, session_key) values (?, ?)", $data['facebook_id'], $session_key);
         }
         db_query('update person set facebook_id = ? where id = ?', array($data['facebook_id'], $P->id()));
+        if ($session_key)
+            db_query("insert into facebook (facebook_id, session_key) values (?, ?)", $data['facebook_id'], $session_key);
     }
 
     stepaddr_fillin_address($P, $data);

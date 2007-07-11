@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.233 2007-07-11 11:11:36 francis Exp $
+ * $Id: pledge.php,v 1.234 2007-07-11 21:51:09 matthew Exp $
  * 
  */
 
@@ -32,6 +32,7 @@ class Pledge {
         global $pb_today;
         $main_query_part = "SELECT pledges.*, 
                                '$pb_today' <= pledges.date AS open,
+                               pledges.date - '$pb_today' AS daysleft,
                                (SELECT count(*) FROM signers WHERE 
                                     signers.pledge_id = pledges.id) AS signers,
                                 person.email AS email,
@@ -113,7 +114,8 @@ class Pledge {
         $this->data['open'] = ($this->data['open'] == 't');
         $this->h_ref = htmlspecialchars($this->data['ref']);
         global $pb_today;
-        $this->data['daysleft'] = (strtotime($this->data['date']) - strtotime($pb_today)) / (60*60*24);
+        if (!array_key_exists('daysleft', $this->data))
+            $this->data['daysleft'] = (strtotime($this->data['date']) - strtotime($pb_today)) / (60*60*24);
 
         // "Finished" means closed to new signers
         $finished = false;
@@ -438,12 +440,12 @@ class Pledge {
 
         global $microsite; # XXX
         if ($microsite == 'o2') {
-	    $cat_name = '';
+            $cat_name = '';
             if (isset($this->data['category']))
                 $cat_name = db_getOne('select name from category where id=?', $this->data['category']);
-	    else
-	        $cat_name = join('', $this->categories());
-	    if ($cat_name)
+            else
+                $cat_name = join('', $this->categories());
+            if ($cat_name)
                 print '<p>My Promise is about <strong>' . $cat_name . '</strong></p>';
         }
 ?>
@@ -728,7 +730,7 @@ class Pledge {
         }
         $params['firstperson'] = 'includename';
         $text .= $this->sentence($params) . ' ';
-        if (microsites_no_target()) {
+        if (microsites_no_target()) { # XXX O2
             if ($this->daysleft() == 0)
                 $text .= 'Promise open until midnight tonight, London time.';
             elseif ($this->daysleft() < 0)
@@ -749,8 +751,9 @@ class Pledge {
                 $text .= sprintf(ngettext('Target met in %d place', 'Target met in %d places',
                         $this->byarea_successes()), $this->byarea_successes());
             $text .= ', ';
-            if ($this->daysleft() == 0)
-                $text .= 'pledge open until midnight tonight, London time.'; # XXX Should be N hours left
+            if ($this->daysleft() == 0) {
+                $hours = 24 - date('G');
+                $text .= sprintf(ngettext('pledge open for %d hour.', 'pledge open for %d hours.', $hours), $hours);
             elseif ($this->daysleft() < 0) {
                 $text .= 'pledge closed.';
             } else {
@@ -762,25 +765,31 @@ class Pledge {
             }
             if ($this->daysleft() > 0) $text .= ')';
         } elseif ($this->left() <= 0) {
-            if ($this->daysleft() == 0)
-                $text .= _('Target met, pledge open until midnight tonight, London time.');
-            elseif ($this->daysleft() < 0)
+            if ($this->daysleft() == 0) {
+                $hours = 24 - date('G');
+                $text .= sprintf(ngettext('Target met, pledge still open for %d hour.', 'Target met, pledge still open for %d hours.', $hours), $hours);
+            } elseif ($this->daysleft() < 0)
                 $text .= _('Target met, pledge closed.');
             else
                 $text .= sprintf(ngettext('Target met, pledge still open for %d day.', 'Target met, pledge still open for %d days.', $this->daysleft()), $this->daysleft());
         } else {
-            if ($this->daysleft() == 0)
-                $text .= sprintf(_("(needs %d more by midnight tonight, London time)"), $this->left());
-            elseif ($this->daysleft() < 0)
+            if ($this->daysleft() == 0) {
+                $hours = 24 - date('G');
+                $text .= '(';
+                $text .= sprintf(ngettext('Just %d hour left', 'Just %d hours left', $hours), $hours);
+                $text .= sprintf(ngettext(', %d more signature needed', ', %d more signatures needed', $this->left()), $this->left());
+                $text .= ')';
+            } elseif ($this->daysleft() < 0)
                 $text .= _('Deadline expired, pledge failed.');
             else {
                 $text .= "(";
                 if ($this->daysleft() <= 3) {
-                    $text .= sprintf(ngettext('just %d day left', 'just %d days left', $this->daysleft()), $this->daysleft());
+                    $text .= sprintf(ngettext('Just %d day left', 'Just %d days left', $this->daysleft()), $this->daysleft());
                 } else {
                     $text .= sprintf(ngettext('%d day left', '%d days left', $this->daysleft()), $this->daysleft());
                 }
-                $text .= sprintf(ngettext(', %d more signature needed)', ', %d more signatures needed)', $this->left()), $this->left());
+                $text .= sprintf(ngettext(', %d more signature needed', ', %d more signatures needed', $this->left()), $this->left());
+                $text .= ')';
             }
         }
         return $text;

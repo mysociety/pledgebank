@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.189 2007-07-11 12:53:09 matthew Exp $
+// $Id: new.php,v 1.190 2007-07-11 21:51:10 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -1039,7 +1039,7 @@ function create_new_pledge($P, $data) {
     if ($site_country == 'US') {
 ?><p class="noisymessage" style="margin-bottom:0">
 If your pledge is about raising money and you want people to be able to donate straight away, why not use
-<a href="http://www.changingthepresent.org/">ChangingThePresent</a> if you're giving to a registered non-profit
+<a href="http://www.changingthepresent.org/drives/drive_splash">ChangingThePresent</a> if you're giving to a registered non-profit
 or <a href="http://www.chipin.com/">ChipIn</a> if you're raising money for something else?</p>
 <p align="center">(If you do that, <a href="/contact">email us</a> and we'll add a link to your pledge)</p>
 <?

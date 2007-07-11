@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.27 2007-07-10 02:21:40 francis Exp $
+// $Id: pbfacebook.php,v 1.28 2007-07-11 11:11:36 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -393,14 +393,7 @@ function pbfacebook_render_frontpage($page = "") {
 
     if ($page == "feature") {
         print '<p style="text-align:center"><a href="http://www.pledgebank.com">Find more pledges</a> to sign over on <a href="http://www.pledgebank.com">www.pledgebank.com</a></p>';
-        $pledges = pledge_get_list("
-                    cached_prominence = 'frontpage' AND
-                    date >= '$pb_today' AND 
-                    pin is NULL AND 
-                    whensucceeded IS NULL 
-                    $friends_signed_joined
-                    ORDER BY RANDOM()
-                    LIMIT 30", array('global'=>true,'main'=>true,'foreign'=>true));
+        list($pledges, $more) = pledge_get_frontpage_list(8, 6);
         if ($pledges) {
             foreach ($pledges as $pledge)  {
                 $already_signed = pbfacebook_already_signed($pledge);

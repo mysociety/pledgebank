@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.254 2007-06-19 12:39:41 francis Exp $
+// $Id: index.php,v 1.255 2007-07-11 11:11:37 francis Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -107,65 +107,8 @@ function list_frontpage_pledges() {
     global $pb_today;
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of new pledges') ?>"></a>
 <?=microsites_frontpage_sign_invitation_text()?><?
-    $pledges_required_fp = 8 + 1; // number of pledges to show on main part of front page if frontpaged
-    $pledges_required_n = 6 + 1; // number of pledges below which we show normal pledges, rather than just frontpaged ones
-    $more_threshold = $pledges_required_fp;
-    $pledges = pledge_get_list("
-                cached_prominence = 'frontpage' AND
-                date >= '$pb_today' AND 
-                pin is NULL AND 
-                whensucceeded IS NULL
-                ORDER BY RANDOM()
-                LIMIT $pledges_required_fp", array('global'=>false,'main'=>true,'foreign'=>false));
-    //print "<p>main frontpage: ".count($pledges);
-    if (count($pledges) < $pledges_required_fp) {
-        // If too few, show some global frontpage pledges
-        $more =$pledges_required_fp - count($pledges);
-        $global_pledges = pledge_get_list("
-                    cached_prominence = 'frontpage' AND
-                    date >= '$pb_today' AND 
-                    pin is NULL AND 
-                    whensucceeded IS NULL
-                    ORDER BY RANDOM()
-                    LIMIT '$more'", array('global'=>true,'main'=>false,'foreign'=>false));
-        $pledges = array_merge($pledges, $global_pledges);
-        //print "<p>global frontpage: ".count($global_pledges);
-    }
-    if (count($pledges) <= $pledges_required_n) 
-        $more_threshold = $pledges_required_n;
-    
-    if (count($pledges) < $pledges_required_n) {
-        // If too few, show a few of the normal pledges for the country
-        $more = $pledges_required_n - count($pledges);
-        $normal_pledges = pledge_get_list("
-                    ".microsites_normal_prominences()." AND
-                    date >= '$pb_today' AND 
-                    pin is NULL AND 
-                    whensucceeded IS NULL
-                    ORDER BY RANDOM()
-                    LIMIT $more", array('global'=>false,'main'=>true,'foreign'=>false));
-        $pledges = array_merge($pledges, $normal_pledges);
-        //print "<p>main normal: ".count($normal_pledges);
-    }
-    if (count($pledges) < $pledges_required_n) {
-        // If too few, show some global normal pledges
-        $more =$pledges_required_n - count($pledges);
-        $global_normal_pledges = pledge_get_list("
-                    ".microsites_normal_prominences()." AND
-                    date >= '$pb_today' AND 
-                    pin is NULL AND 
-                    whensucceeded IS NULL
-                    ORDER BY RANDOM()
-                    LIMIT '$more'", array('global'=>true,'main'=>false,'foreign'=>false));
-        $pledges = array_merge($pledges, $global_normal_pledges);
-        //print "<p>global normal: ".count($global_normal_pledges);
-    }
 
-    $more = false;
-    if (count($pledges) == $more_threshold) {
-        $more = true;
-        array_pop($pledges);
-    }
+    list($pledges, $more) = pledge_get_frontpage_list(8, 6);
 
     if (!$pledges) {
         pb_print_no_featured_link();

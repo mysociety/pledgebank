@@ -1,11 +1,11 @@
 <?
-// ref-alert.php:
-// Signing up for alerts.
+// lang.php:
+// Showing choice of languages.
 //
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: lang.php,v 1.1 2005-10-10 12:30:18 francis Exp $
+// $Id: lang.php,v 1.2 2007-07-16 08:09:19 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';

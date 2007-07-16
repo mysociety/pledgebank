@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.223 2007-07-06 00:30:40 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.224 2007-07-16 16:50:04 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -311,7 +311,7 @@ sub perform_login_action {
 
         # Request confirmation email (unless we are resuming request)
         if ($login_action ne "resume") {
-            $wth->browser_check_contents(qr/(I've never used PledgeBank before|Nunca usei o PledgeBank antes)/);
+            $wth->browser_check_contents(qr/(I've never used PledgeBank before|Nunca usei o EuPrometo antes)/);
             $login_fields->{'loginradio'} = 'SendEmail';
             $wth->browser_submit_form(form_name => 'login',
                 fields => $login_fields,

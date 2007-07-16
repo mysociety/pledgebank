@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.152 2007-07-09 15:10:30 francis Exp $
+ * $Id: admin-pb.php,v 1.153 2007-07-16 11:15:29 francis Exp $
  * 
  */
 
@@ -334,6 +334,26 @@ class ADMIN_PAGE_PB_MAIN {
 
         print 'Comments: <strong>' . $pdata['comments']. '</strong>';
 
+        if (get_http_var("edit")) {
+            print '<h2>Edit pledge text</h2>';
+            print '<form name="editform" method="post" action="'.$this->self_link.'">';
+            print 'I will <input type="text" name="title" value="'.htmlspecialchars($pdata['title']).'" size="60">';
+            print '<br>but only if ' . $pdata['target']. ' <input type="text" name="type" value="'.htmlspecialchars($pdata['type']).'" size="40">';
+            print '<br>will <input type="text" name="signup" value="'.htmlspecialchars($pdata['signup']).'" size="60">';
+            print '<br>&mdash;<input type="text" name="name" value="'.htmlspecialchars($pdata['name']).'" size="20">, ';
+            print '<input type="text" name="identity" value="'.htmlspecialchars($pdata['identity']).'" size="30">';
+            print '<br>More details: <textarea type="text" name="detail" cols="70" rows="7">'.htmlspecialchars($pdata['detail']).'</textarea>';
+            #cancelled
+            #notice
+            print '<input type="hidden" name="edit_pledge_text_id" value="' . $pdata['id'] . '">';
+            print '<input type="hidden" name="edit_pledge_text" value="1">';
+            print '<input type="hidden" name="edit" value="1">';
+            print '<br><input type="submit" name="edit_pledge" value="Save updates">';
+            print "</form>";
+        } else {
+            print '<p><a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit=1">Edit pledge text</a></p>';
+        }
+
         // Signers
         print "<h2>Signers (".$pdata['signers']."/".$pdata['target'].")</h2>";
         $query = 'SELECT signers.name as signname,person.email as signemail,
@@ -608,6 +628,18 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         print p(_('<em>Categories updated.</em>'));
     }
 
+    function edit_pledge_text($pledge_id) {
+        $title = get_http_var('title');
+        $type = get_http_var('type');
+        $signup = get_http_var('signup');
+        $name = get_http_var('name');
+        $identity = get_http_var('identity');
+        $detail = get_http_var('detail');
+        db_query('update pledges set title = ?, type = ?, signup = ?, name = ?, identity = ?, detail = ? where id = ?', $title, $type, $signup, $name, $identity, $detail, $pledge_id);
+        db_commit();
+        print p(_('<em>Pledge text updated. Check it in the pledge box preview on the right.</em>'));
+    }
+
     function display($self_link) {
         db_connect();
 
@@ -651,13 +683,20 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
             }
         } elseif (get_http_var('update_cats')) {
             $pledge_id = get_http_var('pledge_id');
-            $this->update_categories($pledge_id);
+            if (ctype_digit($pledge_id)) {
+                $this->update_categories($pledge_id);
+            }
         } elseif (get_http_var('send_announce_token')) {
             $pledge_id = get_http_var('send_announce_token_pledge_id');
             if (ctype_digit($pledge_id)) {
                 send_announce_token($pledge_id);
                 # TRANS: This is an admin message, printed when someone has pressed the button to send an email to a pledge creator letting them send an announcement message. (Matthew Somerville,  http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000092.html)
                 print p(_('<em>Announcement permission mail sent</em>'));
+            }
+        } elseif (get_http_var('edit_pledge_text')) {
+            $pledge_id = get_http_var('edit_pledge_text_id');
+            if (ctype_digit($pledge_id)) {
+                $this->edit_pledge_text($pledge_id);
             }
         }
 

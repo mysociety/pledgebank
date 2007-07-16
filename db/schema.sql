@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.221 2007-07-06 21:50:19 francis Exp $
+-- $Id: schema.sql,v 1.222 2007-07-16 11:15:29 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -210,7 +210,7 @@ create table pledges (
     -- Cancelled by creator, takes no more signers.  Text (in same format as a 
     -- comment) is displayed at the top of the pledge page, and the pledge 
     -- counts as "finished".
-    cancelled text,
+    cancelled text, -- LLL
     -- Notice puts an extra text banner at the top of the pledge (like cancelled
     -- but without stopping signups)
     notice text, -- LLL

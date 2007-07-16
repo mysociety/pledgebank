@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.31 2007-07-10 02:21:41 francis Exp $
+// $Id: facebook.php,v 1.32 2007-07-16 11:15:29 francis Exp $
 
 /*
 
@@ -23,7 +23,7 @@ TODO:
 - Finish links from rest of PledgeBank site.
 - Post in news when new pledge created - doesn't seem to work?
 
-- Just show English pledges on featured pledges page
+- Add chivvy email about Facebook
 
 Improvements:
 - Show signers on pledge pages (only show ones that are via facebook of course)
@@ -37,6 +37,7 @@ Improvements:
 - Aggregate multiple announce messages more intelligently - if user posts two messages
   within 12 hours, then only post once on news feed. Or link to specific messages from
   news feed, rather than to general pledge.
+- Show fastest growing pledges
 
 Not so important:
 - Test what happens if you add app, but refuse each of the major permissions

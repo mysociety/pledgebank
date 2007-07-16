@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.153 2007-07-16 11:15:29 francis Exp $
+ * $Id: admin-pb.php,v 1.154 2007-07-16 11:25:12 francis Exp $
  * 
  */
 
@@ -348,7 +348,8 @@ class ADMIN_PAGE_PB_MAIN {
             print '<input type="hidden" name="edit_pledge_text_id" value="' . $pdata['id'] . '">';
             print '<input type="hidden" name="edit_pledge_text" value="1">';
             print '<input type="hidden" name="edit" value="1">';
-            print '<br><input type="submit" name="edit_pledge" value="Save updates">';
+            print '<br><input type="submit" name="edit_pledge" value="Save updates"> ';
+            print ' <a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp">Cancel edit</a>';
             print "</form>";
         } else {
             print '<p><a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit=1">Edit pledge text</a></p>';

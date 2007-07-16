@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.32 2007-07-16 11:15:29 francis Exp $
+// $Id: facebook.php,v 1.33 2007-07-16 15:05:33 francis Exp $
 
 /*
 
@@ -24,6 +24,8 @@ TODO:
 - Post in news when new pledge created - doesn't seem to work?
 
 - Add chivvy email about Facebook
+
+- Fix sign button so it is properly centred
 
 Improvements:
 - Show signers on pledge pages (only show ones that are via facebook of course)

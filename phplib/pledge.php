@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.237 2007-07-16 15:02:28 francis Exp $
+ * $Id: pledge.php,v 1.238 2007-07-17 07:45:32 francis Exp $
  * 
  */
 
@@ -383,18 +383,34 @@ class Pledge {
         global $locale_current;
         $explicit_url = pb_domain_url(array('lang'=>$this->lang(), 'path'=>"/".$this->ref()));
         $from_lang =  $this->lang(); 
-        $split_locale_current = split("-", $locale_current);
+        $split_locale_current = split("-", $locale_current); # note that subcodes Google Translate offers won't work as we ditch them here
         $to_lang = $split_locale_current[0];
+
+        /*
+        # For testing
+        $explicit_url = "http://www.pledgebank.com";
+        $from_lang = "en";
+        $to_lang = "ar"; 
+        */
 
         if ($from_lang == $to_lang)
             return false;
 
-        $translate_type = $from_lang."_".$to_lang;
-        $babelfish_languages = array("zh_en" => 1, "zt_en" => 1, "en_zh" => 1, "en_zt" => 1, "en_nl" => 1, "en_fr" => 1, "en_de" => 1, "en_el" => 1, "en_it" => 1, "en_ja" => 1, "en_ko" => 1, "en_pt" => 1, "en_ru" => 1, "en_es" => 1, "nl_en" => 1, "nl_fr" => 1, "fr_en" => 1, "fr_de" => 1, "fr_el" => 1, "fr_it" => 1, "fr_pt" => 1, "fr_nl" => 1, "fr_es" => 1, "de_en" => 1, "de_fr" => 1, "el_en" => 1, "el_fr" => 1, "it_en" => 1, "it_fr" => 1, "ja_en" => 1, "ko_en" => 1, "pt_en" => 1, "pt_fr" => 1, "ru_en" => 1, "es_en" => 1, "es_fr");
-        if (!array_key_exists($translate_type, $babelfish_languages))
-            return false;
+        // Babelfish
+        $babelfish_translate_type = $from_lang."_".$to_lang;
+        $babelfish_languages = array("zh_en"=>1, "zt_en"=>1, "en_zh"=>1, "en_zt"=>1, "en_nl"=>1, "en_fr"=>1, "en_de"=>1, "en_el"=>1, "en_it"=>1, "en_ja"=>1, "en_ko"=>1, "en_pt"=>1, "en_ru"=>1, "en_es"=>1, "nl_en"=>1, "nl_fr"=>1, "fr_en"=>1, "fr_de"=>1, "fr_el"=>1, "fr_it"=>1, "fr_pt"=>1, "fr_nl"=>1, "fr_es"=>1, "de_en"=>1, "de_fr"=>1, "el_en"=>1, "el_fr"=>1, "it_en"=>1, "it_fr"=>1, "ja_en"=>1, "ko_en"=>1, "pt_en"=>1, "pt_fr"=>1, "ru_en"=>1, "es_en"=>1, "es_fr");
+        if (array_key_exists($babelfish_translate_type, $babelfish_languages)) {
+            return "http://babelfish.altavista.com/babelfish/tr?doit=done&tt=url&intl=1&trurl=".$explicit_url."&lp=".$babelfish_translate_type;
+        }
 
-        return "http://babelfish.altavista.com/babelfish/tr?doit=done&tt=url&intl=1&trurl=".$explicit_url."&lp=".$translate_type;
+        // Google Translate
+        $google_translate_type = $from_lang."|".$to_lang;
+        $google_languages = array("ar|en"=>1, "zh|en"=>1, "zh-CN|zh-TW"=>1, "zh-TW|zh-CN"=>1, "en|ar"=>1, "en|zh-CN"=>1, "en|zh-TW"=>1, "en|fr"=>1, "en|de"=>1, "en|it"=>1, "en|ja"=>1, "en|ko"=>1, "en|pt"=>1, "en|ru"=>1, "en|es"=>1, "fr|en"=>1, "fr|de"=>1, "de|en"=>1, "de|fr"=>1, "it|en"=>1, "ja|en"=>1, "ko|en"=>1, "pt|en"=>1, "ru|en"=>1, "es|en"=>1);
+        if (array_key_exists($google_translate_type, $google_languages)) {
+            return "http://translate.google.com/translate?u=".$explicit_url."&langpair=".$google_translate_type."&ie=UTF";
+        }
+
+        return false;
     }
 
     // Rendering the pledge in various ways

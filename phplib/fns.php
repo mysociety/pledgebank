@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.161 2007-07-18 10:38:36 francis Exp $
+// $Id: fns.php,v 1.162 2007-07-18 10:41:42 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -27,19 +27,21 @@ function dt($s) { print "<dt>$s</dt>\n"; }
 function dd($s) { print "<dd>$s</dd>\n"; }
 function li($s) { return "<li>$s</li>\n"; }
 
-// Language domains, such as promessotheque.com. Indexed by OPTION_WEB_DOMAIN.
-$language_domains = array(
-    // Main site
-    'pledgebank.com' => array(
+// Language domains, such as promessotheque.com. 
+if (OPTION_WEB_DOMAIN == 'pledgebank.com') {
+    $language_domains = array(
         'eo' => 'promesobanko.com',
         'fr' => 'promessotheque.com',
-    ),
+    );
+} elseif (OPTION_WEB_DOMAIN == 'pledgebank.cat') {
     // Francis's test ones
-    'pledgebank.cat' => array(
+    $language_domains = array(
         'eo' => 'promesobanko.cat',
         'fr' => 'promessotheque.cat',
-    )
-);
+    );
+} else {
+    $language_domains = array();
+}
 
 # pb_domain_url returns current URL with country and language in it.
 # Defaults to keeping country country or language, unless param contains:
@@ -92,8 +94,8 @@ function pb_domain_url($params = array('path'=>'/')) {
             $url .= strtolower("$c.");
         else
             $url .= 'www.';
-        if  (array_key_exists($l, $language_domains[OPTION_WEB_DOMAIN])) {
-            $url .= $language_domains[OPTION_WEB_DOMAIN][$l];
+        if  (array_key_exists($l, $language_domains)) {
+            $url .= $language_domains[$l];
         } else { 
             if ($l)
                 $url .= "$l.";

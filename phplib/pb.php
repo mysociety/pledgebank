@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.78 2007-07-18 10:38:36 francis Exp $
+ * $Id: pb.php,v 1.79 2007-07-18 10:41:42 francis Exp $
  * 
  */
 
@@ -95,7 +95,7 @@ if (OPTION_WEB_HOST == 'www') {
 # Check for promesobanko.com etc.
 $top_domain_lang = null;
 $top_domain_domain = null;
-foreach ($language_domains[OPTION_WEB_DOMAIN] as $k => $v) {
+foreach ($language_domains as $k => $v) {
     if (preg_match('#\.'.$v.'$#', $_SERVER['HTTP_HOST'])) {
         $top_domain_lang = $k;
         $top_domain_domain = $v;
@@ -104,7 +104,7 @@ foreach ($language_domains[OPTION_WEB_DOMAIN] as $k => $v) {
 }
 if (!$domain_lang) {
     $domain_lang = $top_domain_lang;
-} elseif (array_key_exists($domain_lang, $language_domains[OPTION_WEB_DOMAIN])
+} elseif (array_key_exists($domain_lang, $language_domains)
         && $domain_lang != $top_domain_lang) {
     $url = pb_domain_url(array('country' => $domain_country));
     #print $url;exit;

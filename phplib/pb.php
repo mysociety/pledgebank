@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.79 2007-07-18 10:41:42 francis Exp $
+ * $Id: pb.php,v 1.80 2007-07-18 11:37:33 francis Exp $
  * 
  */
 
@@ -104,18 +104,21 @@ foreach ($language_domains as $k => $v) {
 }
 if (!$domain_lang) {
     $domain_lang = $top_domain_lang;
-} elseif (array_key_exists($domain_lang, $language_domains)
-        && $domain_lang != $top_domain_lang) {
-    $url = pb_domain_url(array('country' => $domain_country));
-    #print $url;exit;
-    header('Location: ' . $url);
-    exit;
 }
 
 # Language negotiation
 locale_negotiate_language(OPTION_PB_LANGUAGES, $domain_lang);
 locale_change();
 locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
+
+# Redirect to promesobanko.com etc. if appropriate
+if ($lang && array_key_exists($lang, $language_domains)
+        && $lang != $top_domain_lang) {
+    $url = pb_domain_url(array('country' => $domain_country, 'lang' => $lang));
+    #print $url;exit;
+    header('Location: ' . $url);
+    exit;
+}
 
 # Do includes after language negotiation, so translated globals
 # are translated in them

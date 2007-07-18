@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.160 2007-07-05 14:43:27 francis Exp $
+// $Id: fns.php,v 1.161 2007-07-18 10:38:36 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -27,6 +27,20 @@ function dt($s) { print "<dt>$s</dt>\n"; }
 function dd($s) { print "<dd>$s</dd>\n"; }
 function li($s) { return "<li>$s</li>\n"; }
 
+// Language domains, such as promessotheque.com. Indexed by OPTION_WEB_DOMAIN.
+$language_domains = array(
+    // Main site
+    'pledgebank.com' => array(
+        'eo' => 'promesobanko.com',
+        'fr' => 'promessotheque.com',
+    ),
+    // Francis's test ones
+    'pledgebank.cat' => array(
+        'eo' => 'promesobanko.cat',
+        'fr' => 'promessotheque.cat',
+    )
+);
+
 # pb_domain_url returns current URL with country and language in it.
 # Defaults to keeping country country or language, unless param contains:
 #   'lang' - language to change to, or "explicit" to explicitly include current language in URL
@@ -36,7 +50,7 @@ function li($s) { return "<li>$s</li>\n"; }
 # Parameters are:
 #   'path' - path component, if not present uses request URI
 function pb_domain_url($params = array('path'=>'/')) {
-    global $domain_lang, $microsite, $lang, $site_country, $locale_current, $locale_stack;
+    global $domain_lang, $microsite, $lang, $site_country, $locale_current, $locale_stack, $language_domains;
 
     if (array_key_exists('explicit', $params) && $params['explicit']) {
         $params['lang'] = 'explicit';
@@ -78,13 +92,17 @@ function pb_domain_url($params = array('path'=>'/')) {
             $url .= strtolower("$c.");
         else
             $url .= 'www.';
-        if ($l)
-            $url .= "$l.";
-        # XXX: Not sure this is accurate
-        if (OPTION_WEB_HOST != 'www' && OPTION_WEB_HOST != $c) {
-            $url .= OPTION_WEB_HOST.'.';
+        if  (array_key_exists($l, $language_domains[OPTION_WEB_DOMAIN])) {
+            $url .= $language_domains[OPTION_WEB_DOMAIN][$l];
+        } else { 
+            if ($l)
+                $url .= "$l.";
+            # XXX: Not sure this is accurate
+            if (OPTION_WEB_HOST != 'www' && OPTION_WEB_HOST != $c) {
+                $url .= OPTION_WEB_HOST.'.';
+            }
+            $url .= OPTION_WEB_DOMAIN;
         }
-        $url .= OPTION_WEB_DOMAIN;
     }
 
     if (array_key_exists('path', $params) && $params['path'])
@@ -290,11 +308,11 @@ function pb_get_change_language_link() {
 }
 
 function pb_print_change_language_links($path = null) {
-    global $lang, $langs;
+    global $lang, $langs, $site_country;
     print _('Available in');
     $out = array();
     foreach ($langs as $l => $pretty) {
-        $params = array('lang'=>$l);
+        $params = array('lang'=>$l, 'country'=>$site_country);
         if ($path)
             $params['path'] = $path;
         $url = pb_domain_url($params);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.59 2007-06-02 16:25:06 matthew Exp $
+// $Id: contact.php,v 1.60 2007-07-18 10:38:36 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -158,7 +158,7 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
     ' ]';
     $headers = array();
     $headers['From'] = array($email, $name);
-#print "<pre>";    print_r($message . "\n\n" . $postfix);exit;
+#print "$to<pre>";    print_r($message . "\n\n" . $postfix);exit;
     if ($subject == $name || $subject == '...' || $subject == 'Unknown' || $subject == 'hello' || $_SERVER['REMOTE_ADDR'] == '81.177.14.19')
         $success = true;
     else

@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.106 2007-06-28 08:43:24 matthew Exp $
+ * $Id: microsites.php,v 1.107 2007-07-18 10:38:36 francis Exp $
  * 
  */
 
@@ -56,8 +56,7 @@ $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countr
                                 'catcomm' => _('Catalytic Communities')
                                 );
 
-/* As sometimes microsites.php is included before the locale is set... 
- */
+/* As sometimes microsites.php is included before the locale is set... */
 function microsites_for_locale() {
     global $microsites_list, $microsites_public_list;
     $microsites_list['everywhere'] = _('Everywhere');

@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.77 2007-02-01 16:29:06 matthew Exp $
+ * $Id: pb.php,v 1.78 2007-07-18 10:38:36 francis Exp $
  * 
  */
 
@@ -92,6 +92,26 @@ if (OPTION_WEB_HOST == 'www') {
         $domain_country = OPTION_WEB_HOST; # e.g. for interface.pledgebank.com
 }
 
+# Check for promesobanko.com etc.
+$top_domain_lang = null;
+$top_domain_domain = null;
+foreach ($language_domains[OPTION_WEB_DOMAIN] as $k => $v) {
+    if (preg_match('#\.'.$v.'$#', $_SERVER['HTTP_HOST'])) {
+        $top_domain_lang = $k;
+        $top_domain_domain = $v;
+        break;
+    }
+}
+if (!$domain_lang) {
+    $domain_lang = $top_domain_lang;
+} elseif (array_key_exists($domain_lang, $language_domains[OPTION_WEB_DOMAIN])
+        && $domain_lang != $top_domain_lang) {
+    $url = pb_domain_url(array('country' => $domain_country));
+    #print $url;exit;
+    header('Location: ' . $url);
+    exit;
+}
+
 # Language negotiation
 locale_negotiate_language(OPTION_PB_LANGUAGES, $domain_lang);
 locale_change();
@@ -114,9 +134,10 @@ if ($domain_country) {
     if ($domain_country == 'UK')
         $domain_country = 'GB';
     if (array_key_exists($domain_country, $countries_code_to_name)) {
-            if (!get_http_var('rss')) {
+        if (!get_http_var('rss')) {
             $url = pb_domain_url(array());
-            setcookie('country', $domain_country, 0, '/', '.' . OPTION_WEB_DOMAIN);
+            setcookie('country', $domain_country, 0, '/', 
+                $top_domain_lang ? '.'.$top_domain_domain : '.'.OPTION_WEB_DOMAIN);
             header('Location: ' . $url);
             exit;
         }

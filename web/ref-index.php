@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.106 2007-07-18 17:05:03 francis Exp $
+// $Id: ref-index.php,v 1.107 2007-07-18 17:54:31 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -332,8 +332,8 @@ function draw_connections_for_finished($p) {
         ORDER BY STRENGTH DESC 
         LIMIT $try_pledges_required", array($p->id(), $p->id()));
 
-    print "\n\n" . '<div id="pledgeaction"><h2><a name="connections">' . 
-        _('Pledge closed, try these instead') . ' </a></h2>';
+    print "\n\n" . '<div id="pledgeaction">' . 
+        _('You might be interested in these other pledges.');
 
     $pledges = array();
     if (0 != db_num_rows($s)) {
@@ -356,7 +356,7 @@ function draw_connections_for_finished($p) {
     print "\n\n";
     print '</ul>';
 
-    print p(_('<a href="/">More pledges</a>, and more about how PledgeBank works'));
+    print p(_('See <a href="/">more other pledges</a>, and all about how PledgeBank works.'));
 
     print '</div>';
 }

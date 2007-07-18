@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.104 2007-06-25 22:16:14 matthew Exp $
+// $Id: ref-index.php,v 1.105 2007-07-18 17:02:45 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -315,6 +315,51 @@ function draw_connections($p) {
     print '</ul></div>';
 }
 
+// When a pledge has closed, we advertise other pledges (ones signed by same
+// people, or else featured ones)
+function draw_connections_for_finished($p) {
+    $try_pledges_required = 4;
+
+    global $pb_today;
+    $s = db_query("SELECT a_pledge_id, b_pledge_id, strength 
+        FROM pledge_connection 
+            LEFT JOIN pledges AS a_pledges ON a_pledge_id = a_pledges.id
+            LEFT JOIN pledges AS b_pledges ON b_pledge_id = b_pledges.id
+        WHERE
+            (a_pledge_id = ? AND b_pledges.date >= '$pb_today' AND b_pledges.whensucceeded is null) or
+            (b_pledge_id = ? AND a_pledges.date >= '$pb_today' AND a_pledges.whensucceeded is null)
+        ORDER BY STRENGTH DESC 
+        LIMIT $try_pledges_required", array($p->id(), $p->id()));
+
+    print "\n\n" . '<div id="pledgeaction"><h2><a name="connections">' . 
+        _('Try these pledges instead') . ' </a></h2>';
+
+    $pledges = array();
+    if (0 != db_num_rows($s)) {
+        while (list($a, $b, $strength) = db_fetch_row($s)) {
+            $id = $a == $p->id() ? $b : $a;
+            $p2 = new Pledge(intval($id));
+            $pledges[] = $p2;
+        }
+    } 
+    if (count($pledges) < $try_pledges_required) {
+        list($extra_pledges, $more) = pledge_get_frontpage_list($try_pledges_required - count($pledges), $try_pledges_required - count($pledges));
+        $pledges = array_merge($pledges, $extra_pledges);
+    }
+
+    print '<ul>' . "\n\n";
+    foreach ($pledges as $p2) {
+        print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
+        print '</li>';
+    }
+    print "\n\n";
+    print '</ul>';
+
+    print p(_('<a href="/">More pledges</a>, and more about how PledgeBank works'));
+
+    print '</div>';
+}
+
 locale_push($p->lang());
 $title = "'" . _('I will') . ' ' . $p->h_title() . "'";
 locale_pop();
@@ -334,7 +379,10 @@ debug_comment_timestamp("after draw_status_plaque()");
 $p->render_box(array('showdetails' => true, 'reportlink' => true));
 debug_comment_timestamp("after \$p->render_box()");
 print '<div id="col2">';
-if (!$p->finished()) { $p->sign_box(); } 
+if (!$p->finished())
+    $p->sign_box();
+else
+    draw_connections_for_finished($p);
 draw_spreadword($p);
 debug_comment_timestamp("after draw_spreadword()");
 if (microsites_comments_allowed())

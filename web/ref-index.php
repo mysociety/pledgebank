@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.105 2007-07-18 17:02:45 francis Exp $
+// $Id: ref-index.php,v 1.106 2007-07-18 17:05:03 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -74,8 +74,9 @@ function draw_spreadword($p) { ?>
             print '<li>';
             print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers"));
             print '</li>';
-    } ?>
-    <li><a href="/<?=$p->ref() ?>/promote"><?=_('Promote on your site or blog') ?></a></li>
+        ?> <li><a href="/<?=$p->ref() ?>/promote"><?=_('Promote on your site or blog') ?></a></li> <?
+    } 
+    ?>
     <li><a href="/new/local/<?=$p->ref() ?>"><?=_('Create a local version of this pledge') ?></a></li>
     <li><small><?=_('Creator only:') ?> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a>
 <?  if (!$p->finished()) {
@@ -332,7 +333,7 @@ function draw_connections_for_finished($p) {
         LIMIT $try_pledges_required", array($p->id(), $p->id()));
 
     print "\n\n" . '<div id="pledgeaction"><h2><a name="connections">' . 
-        _('Try these pledges instead') . ' </a></h2>';
+        _('Pledge closed, try these instead') . ' </a></h2>';
 
     $pledges = array();
     if (0 != db_num_rows($s)) {

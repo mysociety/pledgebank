@@ -6,13 +6,13 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.33 2007-07-16 15:05:33 francis Exp $
+// $Id: facebook.php,v 1.34 2007-07-18 14:42:41 francis Exp $
 
 /*
 
 TODO:
 
-- Text that is show by Facebook when you add application. (Heather to write)
+- Show signers on pledge pages (only show ones that are via facebook of course)
 
 - Still taking two clicks to sign a pledge when you add the app.
 - "The news that you've signed could not be added to your feed." when Tom signed pledge
@@ -27,15 +27,15 @@ TODO:
 
 - Fix sign button so it is properly centred
 
+- Text that is show by Facebook when you add application. (Heather to write)
+
 Improvements:
-- Show signers on pledge pages (only show ones that are via facebook of course)
 - Link to creators of via facebook pledges
 - Show in "friends pledges" section ones created by friends
 - Show on http://apps.facebook.com/pledgebank ones you've already signed clearer
 - Somehow actually send notifications for success
 - Let people say "I've done it!" on the pledges on their profile.
-- Show comments (wall!) on Facebook pledges
-- Let people add comments to Facebook pledges
+- Show comments (wall!) on Facebook pledges -- use fb:comments?
 - Aggregate multiple announce messages more intelligently - if user posts two messages
   within 12 hours, then only post once on news feed. Or link to specific messages from
   news feed, rather than to general pledge.
@@ -62,7 +62,7 @@ function do_test() {
     global $facebook;
 #    $facebook->require_login();
 #    pbfacebook_update_profile_box($facebook->get_loggedin_user());
-    print "Doing test";
+    print "Doing test...";
 
 #    $ret = pbfacebook_send_internal(582616613, "Hello you");
 #    print_r($ret);
@@ -70,6 +70,11 @@ function do_test() {
 #    $notifications = $facebook->api_client->friends_get();
     #$notifications = $facebook->api_client->notifications_get();
 #    print_r($notifications);
+
+#    $ret = $facebook->api_client->notifications_send(703090157 /*582616613*/, "Notification from Opera!", "Wouldn't it ROCK if you could click here and sign up to the awesomest pledge.");
+#    print_r($ret);
+#    print "<p>Done";
+
     exit;
 }
 

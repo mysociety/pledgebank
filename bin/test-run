@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.225 2007-07-19 15:48:05 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.226 2007-07-19 15:48:26 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -273,7 +273,7 @@ sub comment {
 }
 sub verbose {
     my $comment = shift;
-    date_print("  $comment") if $verbose > 1;
+    date_print("    $comment") if $verbose > 1;
 }
 
 # display_url URL

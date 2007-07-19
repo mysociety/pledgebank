@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.29 2007-07-16 14:54:06 francis Exp $
+// $Id: pbfacebook.php,v 1.30 2007-07-19 12:31:01 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -670,9 +670,10 @@ function pbfacebook_send_internal($to, $message) {
     $lines = split("\n", $message);
     $feed_title = array_shift($lines);
     $feed_body = join("\n", $lines);
+
     $ret = $facebook->api_client->feed_publishStoryToUser($feed_title, $feed_body);
     if (!$ret) {
-        print("Calling feed_publishStoryToUser failed probably due to 1 msg / 12 hour limit: " . print_r($ret, TRUE)) . "\n";
+        print("Calling feed_publishStoryToUser failed; maybe due to 1 msg / 12 hour limit, or length limit: " . print_r($ret, TRUE)) . "\n";
         return false;
     } else {
         if ($ret[0] != 1) err("Error calling feed_publishStoryToUser in pbfacebook_send_internal: " . print_r($ret, TRUE));
@@ -687,7 +688,6 @@ function pbfacebook_send_internal($to, $message) {
     if ($ret) err("Need URL confirmation calling notifications_sendRequest in pb_send_facebook: " . print_r($ret, TRUE));
     print "Success\n";
     */
-
     return true;
 }
 

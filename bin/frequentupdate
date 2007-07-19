@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.108 2007-07-19 11:37:52 francis Exp $
+ * $Id: frequentupdate,v 1.109 2007-07-19 12:31:01 francis Exp $
  *
  */
 
@@ -856,7 +856,7 @@ function send_pending_messages() {
                  * as you can't fit the full message in the news feed! */
                 locale_push($pledge->lang());
                 $emailbody = "Message from pledge creator!
-<a href=\"".$pledge->url_facebook()."\">Read the message</a> for instructions about the pledge that you signed. The pledge is: '<a href=\"".$pledge->url_facebook()."\">".$pledge->h_title()."</a>'.";
+<a href=\"".$pledge->url_facebook()."\">Read the message</a> for instructions about the pledge that you signed. The pledge is: '<a href=\"".$pledge->url_facebook()."\">".htmlspecialchars(trim_characters($pledge->title(), 0, 50))."</a>'.";
                 locale_pop();
             } 
             if ($r['islatesigner'] == 't') {

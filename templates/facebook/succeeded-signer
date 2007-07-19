@@ -1,6 +1,6 @@
 Pledge successful! Now do your part.
 
-The <?=$values['signers_ordinal']?> person has signed the pledge, just moments
-ago! Now it's your turn to do what you pledged. 
+The <?=$values['signers_ordinal']?> person has signed the pledge! Now it's your
+turn to do what you pledged. 
 
-The pledge is: '<a href="<?=$values['pledge_facebook_url']?>"><?=$values['title']?></a>'.
+The pledge is: '<a href="<?=$values['pledge_facebook_url']?>"><?=$values['facebook_short_title']?></a>'.

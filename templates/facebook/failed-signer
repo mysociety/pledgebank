@@ -1,6 +1,6 @@
 Pledge unsuccessful.
 
-Unfortunately, the pledge you signed required <?=$values['target']?>
-<?=$values['type']?>, but achieved only <?=$values['actual']?>.
+Unfortunately, the pledge you signed needed <?=$values['target']?>
+<?=$values['type']?>, but got only <?=$values['actual']?>.
 
-The pledge was: '<a href="<?=$values['pledge_facebook_url']?>"><?=$values['title']?></a>'.
+The pledge is: '<a href="<?=$values['pledge_facebook_url']?>"><?=$values['facebook_short_title']?></a>'.

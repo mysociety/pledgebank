@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.224 2007-07-16 16:50:04 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.225 2007-07-19 15:48:05 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -159,12 +159,11 @@ sub location_n { my $n = shift;
 our $login_count; # reference to hash of person number => how many times they've logged in
 our $name_admin = "\"PledgeBank.com\"";
 
-
 #############################################################################
 # Main code
 
 # Configure test harness class
-print "Set up web test harness...\n" if $verbose > 0;
+date_print("Set up web test harness...");
 our $wth = new mySociety::WebTestHarness();
 $base_url =~ m#^http://(.+)/?$#;
 $wth->browser_credentials("$1:80", "$stub_url admin pages", $admin_auth_user, $admin_auth_password);
@@ -182,7 +181,7 @@ sub lock_locale_url {
     $locale_url = $1;
     $wth->browser_base() =~ m#^(http://[^/]+)/?#; 
     $locale_url_redirected = $1;
-    print "lock_locale_url browser URL is $locale_url, redirected $locale_url_redirected\n" if $verbose > 1;
+    verbose("lock_locale_url browser URL is $locale_url, redirected $locale_url_redirected");
 }
 
 $wth->database_connect('PB_');
@@ -198,7 +197,7 @@ $wth->browser_set_validator("/usr/bin/validate");
 sms_setup();
 
 # Syntax check all .php files
-print "Syntax check all PHP files...\n" if $verbose > 0;
+date_print("Syntax check all PHP files...");
 $wth->php_check_syntax("../../pb/");
 $wth->php_check_syntax("../../pb/templates/emails/", qr//);
 
@@ -208,41 +207,41 @@ $wth->log_watcher_self_test($base_url . "/test.php?error=1", "deliberate_error_t
 
 # Run some pledges through life cycle
 if ($action{'all'}) {
-    print "Making unconfirmed pledge...\n" if $verbose > 0;
+    date_print("Making unconfirmed pledge...");
     do_unconfirmed_pledge();
 }
 if ($action{'public'}) {
-    print "Making public pledge and making it succeed...\n" if $verbose > 0;
+    date_print("Making public pledge and making it succeed...");
     do_public_succeeding_pledge();
 } 
 if ($action{'private'}) {
-    print "Making private pledge and letting it expire...\n" if $verbose > 0;
+    date_print("Making private pledge and letting it expire...");
     do_private_failing_pledge();
 }
 if ($action{'chivvy'}) {
-    print "Making pledge and getting lots of chivvies...\n" if $verbose > 0;
+    date_print("Making pledge and getting lots of chivvies...");
     do_chivvy_testing();
 }
 if ($action{'sms'}) {
-    print "Testing SMS with pledge...\n" if $verbose > 0;
+    date_print("Testing SMS with pledge...");
     do_sms_pledge();
 }
 if ($action{'login'}) {
-    print "Testing user login...\n" if $verbose > 0;
+    date_print("Testing user login...");
     do_login_tests();
 }
 if ($action{'category'}) {
-    print "Testing display of pledges of different types...\n" if $verbose > 0;
+    date_print("Testing display of pledges of different types...");
     do_category_tests();
 }
 if ($action{'byarea'}) {
-    print "Testing pledges with targets by area...\n" if $verbose > 0;
+    date_print("Testing pledges with targets by area...");
     do_byarea_tests();
 }
 if ($action{'all'}) {
-    print "Checking administration functions...\n" if $verbose > 0;
+    date_print("Checking administration functions...");
     do_admin_tests();
-    print "Final checks (RSS etc.)...\n" if $verbose > 0;
+    date_print("Final checks (RSS etc.)...");
     do_final_checks();
 }
 
@@ -261,10 +260,20 @@ if ($action{'all'})  {
 #############################################################################
 # Functions to make and sign pledges, and so on
 
+# Print log line with date
+sub date_print {
+    $_ = shift;
+    print scalar localtime() . " $_\n";
+}
+
 # Print what we're doing
 sub comment {
     my $comment = shift;
-    print "\t$comment\n" if $verbose > 0;
+    date_print("  $comment") if $verbose > 0;
+}
+sub verbose {
+    my $comment = shift;
+    date_print("  $comment") if $verbose > 1;
 }
 
 # display_url URL
@@ -273,7 +282,7 @@ sub comment {
 sub display_url {
     my ($circumstance, $url) = @_;
     $wth->email_check_url($url);
-    print "$circumstance: " . $url . "\n" if $verbose > 1 || $pause;
+    date_print("$circumstance: " . $url . "\n") if $verbose > 1 || $pause;
     if ($pause) {
         print "Press RETURN to continue";
         readline(*STDIN);
@@ -304,7 +313,7 @@ sub perform_login_action {
     my $login_action = $login_options->{'action'};
     my $login_fields = $login_options->{'giveemail'} ? { email => email_n($who) } : {};
 
-    print "login by ".name_n($who)." action '$login_action' for " . $wth->browser_uri() . "\n" if $verbose > 1;
+    verbose("login by ".name_n($who)." action '$login_action' for " . $wth->browser_uri());
 
     if ($login_action eq "viaemail" || $login_action eq "abandon" || 
         $login_action eq "suspend" || $login_action eq "resume") {
@@ -385,7 +394,7 @@ sub create_pledge {
     my ($who, $page1, $page2, $page3, $login_options) = @_;
     my $login_action = $login_options->{'action'};
 
-    print "Creating pledge ". $page1->{'ref'} . "\n" if $verbose > 1;
+    verbose("Creating pledge ". $page1->{'ref'});
     $page1->{name} = name_n($who); 
     $page1->{email} = email_n($who);
     die "'resume' not supported for pledges yet" if ($login_action eq "resume");
@@ -435,11 +444,11 @@ sub create_pledge {
     # Requires authentication
     perform_login_action($who, $login_options, ["to confirm that you", "para confirmar que deseja"]);
     if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword") {
-        print "Done creating pledge ". $page1->{'ref'} . " ($login_action)\n" if $verbose > 1;
+        verbose("Done creating pledge ". $page1->{'ref'} . " ($login_action)");
         return;
     }
     $wth->browser_check_contents(qr/(Thank you for creating your pledge|Obrigado por criar sua promessa)/);
-    print "Done creating pledge ". $page1->{'ref'} . " ($login_action)\n" if $verbose > 1;
+    verbose("Done creating pledge ". $page1->{'ref'} . " ($login_action)");
     return;
 }
 
@@ -752,7 +761,6 @@ sub do_public_succeeding_pledge {
     }
 
     comment("Sign it twice");
-    print "Signing the pledge twice...\n" if $verbose > 1;
     find_and_sign_pledge("ref", $pledge_ref, 1, 1, {action=>"viaemail"}, "signed");
     call_frequentupdate(); # update prominence cache
     find_and_sign_pledge("list_open", $pledge_action_completion, 2, undef, {action=>"viaemail"}, "signed");
@@ -791,7 +799,6 @@ sub do_public_succeeding_pledge {
     find_and_sign_pledge("list_open", $pledge_action_completion, 0, 1, {action=>"viaemail"}, "ownpledge");
 
     comment("Sign it once more, this tipping balance");
-    print "Signing the pledge once more...\n" if $verbose > 1;
     find_and_sign_pledge("list_open", $pledge_action_completion, 3, 1, {action=>"viaemail"}, "reached");
 
     comment("Partially sign pledge before completion state change...");
@@ -938,13 +945,13 @@ sub do_private_failing_pledge {
     die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
     call_smsd();
     my $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
-    print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
+    verbose("Private sign attempt SMS text: $sms_text");
     comment("Try to sign up by SMS, with partial pledge identifier");
     sms_fake_to_pledgebank(10, "pledge rivatepl");
     die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
     call_smsd();
     $sms_text = sms_get_containing(mobile_n(10), "%We can't find the pledge%", 0);
-    print "Private sign attempt SMS text: $sms_text\n" if $verbose > 1;
+    verbose("Private sign attempt SMS text: $sms_text");
     comment("Wait for delivery notification, which would confirm signature");
     comment("(want to test that nothing happens, as nothing was signed)");
     set_pb_date('1980-12-02');
@@ -957,7 +964,7 @@ sub do_private_failing_pledge {
     $wth->browser_check_contents("<i>1 person has signed up");
     $wth->browser_check_no_contents("This pledge is now closed");
  
-    print "Checking no leaks of private pledge..." if $verbose > 1;
+    verbose("Checking no leaks of private pledge...");
 
     comment("Check pledge really is private on lists of pledges");
     comment("... index page, all pledges");
@@ -1305,7 +1312,7 @@ sub do_sms_pledge {
         call_smsd();
         # All first person, as sign up simultaneously
         my $conversion_sms = sms_get_containing(mobile_n($who), "%You are the 1st person to pledge%", 0);
-        print "SMS text: $conversion_sms\n" if $verbose > 1;
+        verbose("SMS text: $conversion_sms");
     }
     comment("Check not got signup yet");
     $wth->browser_get($locale_url . "/$pledge_ref");
@@ -1323,11 +1330,11 @@ sub do_sms_pledge {
     die "Didn't get OK for incoming SMS" if $wth->browser_content() ne "OK";
     call_smsd();
     my $conversion_sms = sms_get_containing(mobile_n(105), "%You are the 4th person to pledge%", 0);
-    print "SMS text: $conversion_sms\n" if $verbose > 1;
+    verbose("SMS text: $conversion_sms");
     my $base_url_without_http = $base_url; $base_url_without_http =~ s#http://##;
     die "Conversion link not found in SMS '$conversion_sms'\n" if ($conversion_sms !~ m#\b($base_url_without_http[^\s]*)\b#m);
     my $conversion_url = "http://".$1;
-    print "SMS conversion URL $conversion_url\n" if $verbose > 1;
+    verbose("SMS conversion URL $conversion_url");
     comment("Go to conversion link and fill in conversion form");
     $wth->browser_get($conversion_url);
     $wth->browser_check_contents("rather than sending an SMS");
@@ -1373,7 +1380,7 @@ sub do_sms_pledge {
     comment("... the input unicode pound sign should come out as HTML entity");
     for (my $who = 101; $who <= 103; ++$who) {
         my $sms_text = sms_get_containing(mobile_n($who), '%Yippee! All the &#x00a3; are yours!%', 0);
-        print "SMS text: $sms_text\n" if $verbose > 1;
+        verbose("SMS text: $sms_text");
     }
 
     comment("Check nothing left");

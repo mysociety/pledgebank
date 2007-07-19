@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.110 2007-07-19 17:23:52 francis Exp $
+ * $Id: frequentupdate,v 1.111 2007-07-19 17:51:32 francis Exp $
  *
  */
 
@@ -802,7 +802,7 @@ function send_pending_messages() {
         }
 
         // Send it
-        if ($send_by == 'sms') {
+        if ($send_by == 'mobile') {
             /* Send by SMS. */
             verbose("delivering message #${r['id']} by SMS to signer #${r['signer_id']} on ${r['signer_mobile']}");
             db_query('

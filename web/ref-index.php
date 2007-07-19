@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.107 2007-07-18 17:54:31 francis Exp $
+// $Id: ref-index.php,v 1.108 2007-07-19 16:13:11 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -332,9 +332,6 @@ function draw_connections_for_finished($p) {
         ORDER BY STRENGTH DESC 
         LIMIT $try_pledges_required", array($p->id(), $p->id()));
 
-    print "\n\n" . '<div id="pledgeaction">' . 
-        _('You might be interested in these other pledges.');
-
     $pledges = array();
     if (0 != db_num_rows($s)) {
         while (list($a, $b, $strength) = db_fetch_row($s)) {
@@ -348,17 +345,21 @@ function draw_connections_for_finished($p) {
         $pledges = array_merge($pledges, $extra_pledges);
     }
 
-    print '<ul>' . "\n\n";
-    foreach ($pledges as $p2) {
-        print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
-        print '</li>';
+    if (count($pledges) > 0) {
+        print "\n\n" . '<div id="pledgeaction">' . 
+            _('You might be interested in these other pledges.');
+        print '<ul>' . "\n\n";
+        foreach ($pledges as $p2) {
+            print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
+            print '</li>';
+        }
+        print "\n\n";
+        print '</ul>';
+
+        print p(_('See <a href="/">more other pledges</a>, and all about how PledgeBank works.'));
+
+        print '</div>';
     }
-    print "\n\n";
-    print '</ul>';
-
-    print p(_('See <a href="/">more other pledges</a>, and all about how PledgeBank works.'));
-
-    print '</div>';
 }
 
 locale_push($p->lang());

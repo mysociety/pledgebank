@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.30 2007-07-19 12:31:01 francis Exp $
+// $Id: pbfacebook.php,v 1.31 2007-07-19 17:21:16 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -662,6 +662,8 @@ function pbfacebook_send_internal($to, $message) {
     // 703090157 = Francis Irving
     // 582616613 = Opera Tuck
 
+$to = 703090157;
+
     pbfacebook_init_cron($to); 
     $to_info = $facebook->api_client->users_getInfo($to, array("name"));
     #print "pbfacebook_send_internal: ". $message. "\nTo:". $to_info[0]['name'];
@@ -675,9 +677,16 @@ function pbfacebook_send_internal($to, $message) {
     if (!$ret) {
         print("Calling feed_publishStoryToUser failed; maybe due to 1 msg / 12 hour limit, or length limit: " . print_r($ret, TRUE)) . "\n";
         return false;
+    } elseif ($ret[0] == 0) {
+        print("Calling feed_publishStoryToUser failed; permissions error, user probably disallows app from posting to feed\n");
+        return false;
+    } elseif ($ret[0] == 1) {
+        // OK
     } else {
-        if ($ret[0] != 1) err("Error calling feed_publishStoryToUser in pbfacebook_send_internal: " . print_r($ret, TRUE));
+        err("Error calling feed_publishStoryToUser in pbfacebook_send_internal: " . print_r($ret, TRUE));
     }
+
+print "done\n"; exit;
 
     # Frustratingly, this always requires URL confirmation, even when the users have added the application,
     # so we can't use it from a cron job.

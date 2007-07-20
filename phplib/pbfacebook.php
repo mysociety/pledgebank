@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.33 2007-07-20 10:37:26 francis Exp $
+// $Id: pbfacebook.php,v 1.34 2007-07-20 12:11:49 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -38,6 +38,9 @@ function pbfacebook_update_profile_box($uid) {
 
     $out = "";
     $got = 0;
+
+    // XXX If we have too many here to show, should use fb:subtitle to say
+    // "Displaying n of m wall posts. See all.", as with the Wall.
 
     // Created
     $q = db_query("SELECT pledges.*, country,
@@ -653,6 +656,7 @@ img.creatorpicture {
     margin-right: 10px;
 }
 </style>
+
 <? 
 }
 

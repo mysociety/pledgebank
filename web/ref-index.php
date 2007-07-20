@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.108 2007-07-19 16:13:11 francis Exp $
+// $Id: ref-index.php,v 1.109 2007-07-20 12:36:31 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -223,7 +223,7 @@ function draw_signatories($p) {
             }
         } elseif (isset($r['mobile'])) {
             $mobilesigners++;
-        } elseif (isset($r['facebook_id'])) {
+        } elseif (isset($r['facebook_id']) && $r['via_facebook'] == 't') {
             $facebooksigners++;
         } else {
             $anon++;

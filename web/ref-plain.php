@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.12 2007-06-20 21:58:00 francis Exp $
+ * $Id: ref-plain.php,v 1.13 2007-07-20 12:36:31 francis Exp $
  * 
  */
 
@@ -173,7 +173,7 @@ function add_signatories($p) {
             }
         } elseif (isset($r['mobile'])) {
                 $mobilesigners++;
-        } elseif (isset($r['facebook_id'])) {
+        } elseif (isset($r['facebook_id']) && $r['via_facebook'] == 't') {
                 $facebooksigners++;
         } else {
             $anon++;

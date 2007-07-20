@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.32 2007-07-19 17:21:59 francis Exp $
+// $Id: pbfacebook.php,v 1.33 2007-07-20 10:37:26 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -20,6 +20,16 @@ function pbfacebook_get_user_name($facebook_id) {
     global $facebook;
     $facebook_info = $facebook->api_client->users_getInfo(array($facebook_id), array('name'));
     return $facebook_info[0]['name'];
+}
+
+// Returns comma separated lists of logged in user's friends
+function pbfacebook_friends_list() {
+    global $facebook;
+    $friends = $facebook->api_client->friends_get();
+    $friends_joined = join(",", $friends);
+    if (!$friends_joined) # no friends case
+        $friends_joined = -1; 
+    return $friends_joined;
 }
 
 // Write the static FBML to the given user's profile box
@@ -124,6 +134,10 @@ function pbfacebook_update_fbmlref_profilepledge($pledge) {
 // Draw pledge index page within Facebook
 function pbfacebook_render_pledge($pledge) {
     global $facebook;
+
+    $title = "'" . _('I will') . ' ' . $pledge->h_title() . "'";
+    print "<fb:title>".$title."</fb:title>";
+
     $already_signed = pbfacebook_already_signed($pledge);
     
     $announce_messages = db_getOne("select count(*) from message where pledge_id = ? and sendtosigners and emailbody is not null", array($pledge->id())); 
@@ -183,6 +197,46 @@ style="display: none"
             'facebook-share' => pbfacebook_render_share_pledge($pledge) 
             ));
 
+    // Show signers
+    $friends_joined = pbfacebook_friends_list();
+    $q = db_query("SELECT facebook_id FROM signers LEFT JOIN person ON person.id = signers.person_id
+                WHERE signers.via_facebook AND person.facebook_id is not null
+                      AND signers.pledge_id = ?
+                ORDER BY (person.facebook_id in ($friends_joined)) DESC, signtime DESC", array($pledge->id()));
+    if (db_num_rows($q) > 0) {
+    print '<fb:subtitle seeallurl="http://apps.facebook.com/wall/allposts.php">
+      <fb:action href="http://apps.facebook.com/wall/walltowall.php">Wall-to-wall</fb:action>
+      Displaying 10 wall posts 
+       </fb:subtitle>';
+        print "<h1 style=\"text-align: center\">Current signatories</h1>";
+        // Grrr - annoyingly, fb:user-table only works in a profile.
+        $c = 0;
+        $signers_rows = 8;
+        print '<table border="0"><tr>';
+        while ($r = db_fetch_array($q)) {
+            print "<td>";
+            print '<table border="0"><tr><td style="text-align: center">';
+            print '<fb:profile-pic uid="'.$r['facebook_id'].'" size="thumb" /> ';
+            print '</td></tr><tr><td style="text-align: center">';
+            print '<fb:userlink shownetwork="0" uid="'.$r['facebook_id'].'"/> ';
+            print "</td></tr></table>";
+            print "</td>";
+            $c++;
+            if ($c % $signers_rows == 0) {
+                print "</tr><tr>";
+            }
+        }
+        print "</tr></table>";
+
+        $off_facebook_signers = $pledge->signers() - $c;
+        if ($off_facebook_signers > 0) {
+            print "<p>";
+            print "Plus $off_facebook_signers " . make_plural($off_facebook_signers, "other") . ", from <a href=\"".$pledge->url_typein()."\">outside Facebook</a>.";
+            print "</p>";
+        }
+    }
+
+    // Link to pledgebank.com
     print '<p style="text-align:center">Visit this pledge at ';
     print '<a href="'.$pledge->url_typein().'">';
     print '<strong>'. str_replace('http://', '', $pledge->url_typein()) . '</strong>';
@@ -269,11 +323,10 @@ function pbfacebook_render_frontpage($page = "") {
 
     $friends_signed_joined = "";
     if ($page == "friends" ) {
+        print "<fb:title>"."Friends' pledges"."</fb:title>";
+
         $facebook->require_login('/list/friends');
-        $friends = $facebook->api_client->friends_get();
-        $friends_joined = join(",", $friends);
-        if (!$friends_joined) # no friends case
-            $friends_joined = -1; 
+        $friends_joined = pbfacebook_friends_list();
         $query = "SELECT pledges.*, country, 
                 (SELECT COUNT(*) FROM signers WHERE signers.pledge_id = pledges.id) AS signers,
                 person.facebook_id as facebook_id
@@ -337,6 +390,8 @@ function pbfacebook_render_frontpage($page = "") {
     }
 
     if ($page == "your" ) {
+        print "<fb:title>"."Your pledges"."</fb:title>";
+
         $facebook->require_login('/list/your');
         $you_id = $facebook->get_loggedin_user();
         $got = 0;
@@ -392,6 +447,7 @@ function pbfacebook_render_frontpage($page = "") {
     }
 
     if ($page == "feature") {
+        print "<fb:title>"."Featured pledges"."</fb:title>";
 #$facebook_info = $facebook->api_client->users_getInfo(array($facebook->get_loggedin_user()), array('hometown_location'));
 #print_r($facebook_info);exit;
 

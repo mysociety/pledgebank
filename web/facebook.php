@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.34 2007-07-18 14:42:41 francis Exp $
+// $Id: facebook.php,v 1.35 2007-07-20 10:37:27 francis Exp $
 
 /*
 
@@ -16,8 +16,6 @@ TODO:
 
 - Still taking two clicks to sign a pledge when you add the app.
 - "The news that you've signed could not be added to your feed." when Tom signed pledge
-
-- If you have "only friends" set for search, then robots can't work out your name e.g. on new pledge page
 
 - Text on message for "share" links is not perfect.
 - Finish links from rest of PledgeBank site.
@@ -30,16 +28,20 @@ TODO:
 - Text that is show by Facebook when you add application. (Heather to write)
 
 Improvements:
-- Link to creators of via facebook pledges
-- Show in "friends pledges" section ones created by friends
+- Link to creators of via facebook pledges, and show their photo
+- Show in "friends pledges" section ones created by friends separately
 - Show on http://apps.facebook.com/pledgebank ones you've already signed clearer
-- Somehow actually send notifications for success
+- Somehow actually send notifications for success, rather than news post
+- On profile page, highlight more successful pledges, and that you must do them.
 - Let people say "I've done it!" on the pledges on their profile.
 - Show comments (wall!) on Facebook pledges -- use fb:comments?
 - Aggregate multiple announce messages more intelligently - if user posts two messages
   within 12 hours, then only post once on news feed. Or link to specific messages from
   news feed, rather than to general pledge.
 - Show fastest growing pledges
+- Let people remove pledges from their profile page
+- Show featured pledges in facebook via mutual signer connections
+  (first need to fix connections to use Facebook ids as well as emails?)
 
 Not so important:
 - Test what happens if you add app, but refuse each of the major permissions

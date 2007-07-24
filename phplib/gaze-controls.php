@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.14 2007-01-10 17:24:22 matthew Exp $
+// $Id: gaze-controls.php,v 1.15 2007-07-24 10:41:29 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -279,9 +279,13 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
     if ($location['postcode']) {
         if (!validate_partial_postcode($location['postcode']) && !validate_postcode($location['postcode']))
             $errors['postcode'] = _('Please enter a postcode, or just its first part; for example, OX1 3DR or WC1.');
-        else if (mapit_get_error(mapit_get_location($location['postcode'], 1)))
-            $errors['postcode'] = sprintf(_("We couldn't recognise the postcode '%s'; please re-check it"), htmlspecialchars($location['postcode']));
-        else
+        elseif (mapit_get_error(mapit_get_location($location['postcode'], 1))) {
+            if (preg_match('#^(IM|JE|GY)#i', $location['postcode'])) {
+                $errors['postcode'] = _("I'm afraid we don't know about Isle of Man or Channel Island postcodes. Please try entering a local town instead.");
+            } else {
+                $errors['postcode'] = sprintf(_("We couldn't recognise the postcode '%s'; please re-check it"), htmlspecialchars($location['postcode']));
+            }
+        } else
             $location['postcode'] = canonicalise_partial_postcode($location['postcode']);
     } elseif ($location['place']) {
         if (!$location['gaze_place']) {

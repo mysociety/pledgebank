@@ -14,7 +14,7 @@
  * Copyright (c) 2004 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: general-example,v 1.51 2007-07-16 11:15:28 francis Exp $
+ * $Id: general-example,v 1.52 2007-07-26 12:28:47 francis Exp $
  * 
  */
 
@@ -110,10 +110,10 @@ define('OPTION_TRACKING_SECRET', 'really-secret-value');
 define('OPTION_GLOBALCOOL_SECRET', 'really-secret-value');
 
 // Facebook get these from http://developers.facebook.com
-define('OPTION_FACEBOOK_API_KEY', 'XXX');
-define('OPTION_FACEBOOK_SECRET', 'YYY');
-define('OPTION_FACEBOOK_CANVAS', 'http://apps.facebook.com/pledgebank/');
-define('OPTION_CSRF_SECRET', 'ZZZ');
+define('OPTION_FACEBOOK_API_KEY', ''); // leave empty if not using Facebook
+define('OPTION_FACEBOOK_SECRET', '');
+define('OPTION_FACEBOOK_CANVAS', 'http://apps.facebook.com/blahblahblah/');
+define('OPTION_CSRF_SECRET', ''); // arbitary long string of random data
 // A Facebook user account for doing general stuff as
 define('OPTION_FACEBOOK_ROBOT_ID', -1);
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.238 2007-07-17 07:45:32 francis Exp $
+ * $Id: pledge.php,v 1.239 2007-07-26 12:28:48 francis Exp $
  * 
  */
 
@@ -720,18 +720,28 @@ class Pledge {
     _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>';
         microsites_signup_extra_fields($errors);
         print '<p><input type="submit" name="submit" value="' . ($this->byarea() ? _('Sign Pledge') : _('Sign Pledge')) . '"></p>';
-        print '<p>';
+
+        $extras = array();
         // Display SMS if we are sure it makes sense - i.e. we support SMS for
         // the pledge country (or it is global) and we support SMS for the site
         // country.
         if ($this->has_sms() && sms_site_country() && microsites_has_sms()) {
-            printf(_("Or, text '<strong>%s %s</strong>' to <strong>%s</strong>"), OPTION_PB_SMS_PREFIX, $this->ref(), OPTION_PB_SMS_DISPLAY_NUMBER);
-            print " ";
-            printf(_("(in %s only)"), sms_countries_description());
-            print "<br>";
+            $out = sprintf(_("Or, text '<strong>%s %s</strong>' to <strong>%s</strong>"), OPTION_PB_SMS_PREFIX, $this->ref(), OPTION_PB_SMS_DISPLAY_NUMBER);
+            $out .= " ";
+            $out .= sprintf(_("(in %s only)"), sms_countries_description());
+            $extras[] = $out;
         }
-        printf(_('Or, share and sign this pledge <strong><a href="%s">in Facebook</a></strong>'), $this->url_facebook());
-        print '</p>';
+        // Display Facebook link if that is available
+        if (OPTION_FACEBOOK_API_KEY) {
+            $out = sprintf(_('Or, share and sign this pledge <strong><a href="%s">in Facebook</a></strong>'), $this->url_facebook());
+            $extras[] = $out;
+        }
+        if ($extras) {
+            print '<p>';
+            print join("\n<br>\n",$extras);
+            print '</p>';
+        }
+
         print '</form>';
     }
 

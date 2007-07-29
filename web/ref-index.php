@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.109 2007-07-20 12:36:31 francis Exp $
+// $Id: ref-index.php,v 1.110 2007-07-29 22:25:44 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -92,37 +92,47 @@ function draw_spreadword($p) { ?>
 define('MAX_PAGE_SIGNERS', '500');
 
 // Internal
-function display_anonymous_signers($p, &$anon, &$mobilesigners, &$facebooksigners, &$in_ul) {
+function display_anonymous_signers($p, &$anon, &$anon_done, &$mobilesigners, &$facebooksigners, &$in_ul) {
     if ($anon || $mobilesigners || $facebooksigners) {
         if (!$in_ul) {
             print "<ul>";
             $in_ul = true;
         }
-        if ($anon)
-            print "<li>". sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon) . "</li>";
+        if ($anon) {
+            print "<li>" . sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon);
+            if ($anon_done == $anon)
+                print _(', all of whom have done the pledge');
+            elseif ($anon_done)
+                printf(ngettext(', %d of whom has done the pledge', ', %d of whom have done the pledge', $anon_done), $anon_done);
+            print "</li>";
+        }
         if ($mobilesigners)
             print "<li>". sprintf(ngettext('%d person who signed up via mobile', '%d people who signed up via mobile', $mobilesigners), $mobilesigners) . "</li>";
         if ($facebooksigners)
             print "<li>". sprintf(ngettext('%d person who signed up <a href="%s">in Facebook</a>', '%d people who signed up <a href="%s">in Facebook</a>', $facebooksigners), $facebooksigners, OPTION_FACEBOOK_CANVAS . $p->ref()) . "</li>";
 
         $anon = 0;
+        $anon_done = 0;
         $mobilesigners = 0;
         $facebooksigners = 0;
     }
 }
 
 function draw_signatories($p) {
+    $P = pb_person_if_signed_on();
+
     $nsigners = db_getOne('select count(id) from signers where pledge_id = ?', $p->id());
-    ?>
-    <div id="signatories">
+?>
+<div id="signatories">
 <?
-    print '<h2><a name="signers">' . _('Current signatories') . '</a></h2>';
+    $title = '<a name="signers">' . _('Current signatories') . '</a>';
+    $title .= ' <span style="font-size:50%; font-weight:normal">(<span style="color:#006600"><img alt="Green text " src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png">= they\'ve done it</span>)</span>';
+    print h2($title);
 
     if ($nsigners == 0) {
-
-        print '<p>'
-                . sprintf(_('So far, only %s, the Pledge Creator, has signed this pledge.'), htmlspecialchars($p->creator_name()))
-                . '</p></div>';
+        print p(sprintf(_('So far, only %s, the Pledge Creator, has signed this pledge.'),
+            htmlspecialchars($p->creator_name())))
+            . '</div>';
         return;
     }
 
@@ -160,6 +170,7 @@ function draw_signatories($p) {
     }
 
     $anon = 0;
+    $anon_done = 0;
     $mobilesigners = 0;
     $facebooksigners = 0;
     
@@ -193,7 +204,7 @@ function draw_signatories($p) {
             $loc_desc_with_country .= ", ". $countries_code_to_name[$r['location_country']];
         }
         if ($p->byarea() && $last_location_description != $loc_desc_with_country) {
-            display_anonymous_signers($p, $anon, $mobilesigners, $facebooksigners, $in_ul);
+            display_anonymous_signers($p, $anon, $anon_done, $mobilesigners, $facebooksigners, $in_ul);
             if ($in_ul)  {
                 print "</ul></div>";
                 $in_ul = false;
@@ -215,9 +226,15 @@ function draw_signatories($p) {
         }
         if ($showname) {
             if (isset($r['name'])) {
-                print '<li>'
-                        . htmlspecialchars($r['name'])
-                        . '</li>';
+                print '<li id="signer' . $r['id'] . '"';
+                if ($r['done']=='t') print ' class="done"';
+                print '>';
+		if (!is_null($P) && $r['person_id'] == $P->id())
+		    print '<form method="post" action="' . $p->url_survey() . '"><input type="hidden" name="r" value="pledge">';
+                print htmlspecialchars($r['name']);
+		if ($r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id())
+		    print ' &ndash; <input type="submit" value="I have done this pledge"></form>';
+                print '</li>';
             } else {
                 err('showname set but no name');
             }
@@ -227,9 +244,10 @@ function draw_signatories($p) {
             $facebooksigners++;
         } else {
             $anon++;
+            if ($r['done']=='t') $anon_done++;
         }
     }
-    display_anonymous_signers($p, $anon, $mobilesigners, $facebooksigners, $in_ul);
+    display_anonymous_signers($p, $anon, $anon_done, $mobilesigners, $facebooksigners, $in_ul);
     if ($in_ul) {
         print "</ul>";
         if ($p->byarea())

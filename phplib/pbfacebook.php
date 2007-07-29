@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.35 2007-07-20 12:55:05 francis Exp $
+// $Id: pbfacebook.php,v 1.36 2007-07-29 22:25:43 matthew Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -651,10 +651,9 @@ PledgeBank</a> application.</i>
     margin: 0 0 0 1.5em;
 }
 .finished {
-    color: #ff0000;
+    color: #000000;
     background-color: #ffcccc;
     border: solid 2px #990000;
-    padding: 3px;
 }
 .success, .finished {
     margin: 1em auto 0;
@@ -665,9 +664,6 @@ PledgeBank</a> application.</i>
 .success {
     background-color: #ccffcc;
     border: solid 2px #009900;
-}
-.finished {
-    color: #000000;
 }
 img.creatorpicture {
     float: left; 

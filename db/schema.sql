@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.222 2007-07-16 11:15:29 francis Exp $
+-- $Id: schema.sql,v 1.223 2007-07-29 22:25:43 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -602,16 +602,19 @@ create table signers (
     -- if they signed this via Facebook
     via_facebook boolean not null default false,
 
+    -- whether they've done their pledge or not
+    done boolean not null default false,
+
     -- if target_type for the pledge is 'byarea' then this is the id
     -- of the location which the signature is for
     byarea_location_id integer references location(id),
     foreign key (pledge_id, byarea_location_id) references byarea_location (pledge_id, byarea_location_id), 
+
     -- when they signed
     signtime timestamp not null,
-
     -- IP address of browser at time of signing
     ipaddr varchar(15),     -- nullable since added late
-  
+
     check ( person_id is not null),
     check ( (showname and name is not null) or (not showname))
 );

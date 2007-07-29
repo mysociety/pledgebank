@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.128 2007-07-27 15:53:17 matthew Exp $
+ * $Id: pb.css,v 1.129 2007-07-29 22:25:44 matthew Exp $
  * 
  */
 
@@ -237,18 +237,24 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #loginradio {
     margin-left: 1em;
 }
-#localsignupfrontpage {
-    text-align: center;
-    margin-bottom: 1em;
+
+/* Local alert signup boxes */
+#localsignupfrontpage p, #localsignupeverypage p,
+#localsignupyourpage p, #localsignupsearchpage p {
+    margin: 0;
+}
+#localsignupfrontpage select, #localsignupeverypage select,
+#localsignupyourpage select, #localsignupsearchpage select {
+    width: 12em;
+}
+#localsignupyourpage, #localsignupsearchpage, #localsignupfrontpage {
     border: solid 2px #522994;
     background-color: #f6e5ff;
     padding: 10px;
 }
-#localsignupfrontpage p {
-    margin: 0;
-}
-#localsignupfrontpage select {
-    width: 12em;
+#localsignupfrontpage {
+    text-align: center;
+    margin-bottom: 1em;
 }
 #localsignupeverypage {
     text-align: center;
@@ -259,64 +265,23 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     width: 90%;
     border-top: solid 1px #c6b5d3;
 }
-#localsignupeverypage p {
-    margin: 0;
-}
-#localsignupeverypage select {
-    width: 12em;
-}
-#localsignupyourpage {
-    text-align: left;
-    width: 60%;
-    border: solid 2px #522994;
-    background-color: #f6e5ff;
-    padding: 10px;
-}
-#localsignupyourpage p {
-    margin: 0;
-}
-#localsignupyourpage select {
-    width: 12em;
-}
-#localsignupsearchpage {
-    text-align: left;
-    width: 100%;
-    border: solid 2px #522994;
-    background-color: #f6e5ff;
-    padding: 10px;
-}
-#localsignupsearchpage p {
-    margin: 0;
-}
-#localsignupsearchpage select {
-    width: 12em;
-}
-#localsignupsearch {
-    margin-bottom: 1em;
-}
-#localsignupsearch p {
-    margin: 0;
-}
+
 #currentpledges {
     clear: left;
     margin-top: 1em;
 }
-#successfulpledges {
-    clear: left;
-}
-#currentpledges, #successfulpledges, #yoursignedpledges {
+#currentpledges, #yoursignaturesandpledges {
     width: 59%;
     float: left;
 }
-#currentpledges li, #successfulpledges li, #yoursignedpledges li, #yourconnections li {
+#currentpledges li, #yoursignedpledges li, #yourconnections li {
     padding-bottom: 0.5em;
     border-bottom: dotted 1px #999999;
     margin-bottom: 0.5em;
 }
-.pledge-yourcreated {
-    float: left;
-    clear: left;
-    width: 60%;
+#yoursignedpledges p {
+    text-align: right;
+    margin: 0.5em 0 0;
 }
 
 #photo {
@@ -487,15 +452,6 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     clear: left;
 }
 
-.comments {
-    float: right;
-    clear: right;
-    width: 45%;
-}
-#preview .comments {
-    float: left;
-    clear: left;
-}
 #yourpledges h2 {
     clear: left;
 }
@@ -505,6 +461,23 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     float: right;
     width: 32%;
 }
+
+.done {
+    background-color: #ffffff;
+    color: #006600;
+    list-style-image: url('http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png');
+}
+
+.comments {
+    float: right;
+    clear: right;
+    width: 45%;
+}
+#preview .comments {
+    float: left;
+    clear: left;
+}
+
 .comments ul {
     padding: 0;
     margin: 0;
@@ -533,7 +506,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     margin-bottom: 2px;
 }
 
-.cancelled {
+#cancelled {
     margin: 1em auto 0;
     width: 80%;
     padding: 10px;
@@ -542,7 +515,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     border: solid 2px #990000;
 }
 
-.notice {
+#notice {
     margin: 1em auto 0;
     width: 80%;
     padding: 10px;
@@ -562,7 +535,7 @@ img.creatorpicture {
     text-align: left;
 }
 
-.oldannounce {
+#oldannounce {
     float: right;
     width: 45%;
 }
@@ -638,16 +611,14 @@ input.greyed, textarea.greyed {
 
 /* Offline page */
 
-.offline {
+#offline div {
     clear: both;
 }
-.offline img.l {
+#offline img.l {
     float: left;
 }
-.offline img.r {
+#offline img.r {
     float: right;
-}
-.offline h2, .offline p {
 }
 
 #modifyfaq {
@@ -659,11 +630,11 @@ input.greyed, textarea.greyed {
 
 /* For /where */
 
-.wherecolumn {
+#wherecolumns div {
     float: left; 
     width: 33%; 
 }
-.wherespecial, .wheremakepledge {
+#wherespecial, #wheremakepledge {
     clear: both;
 }
 

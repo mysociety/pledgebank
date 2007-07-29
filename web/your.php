@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.26 2007-05-10 15:52:10 timsk Exp $
+// $Id: your.php,v 1.27 2007-07-29 22:25:44 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -74,69 +74,69 @@ function pledges_you_might_like() {
     }
 }
 
-// Open pledges you made
-function show_your_open_pledges() {
+# Pledges you have created
+function show_your_pledges($type) {
     global $pb_today, $P;
+    $qdate = ($type == 'open') ? '<=' : '>';
     $qrows = db_query("
-                    SELECT pledges.*
+                    SELECT pledges.*,
+                        (select count(*) from signers where pledge_id = pledges.id) as signers
                     FROM pledges
                     WHERE pledges.person_id = ?
-                    AND '$pb_today' <= pledges.date
+                    AND '$pb_today' $qdate pledges.date
                     ORDER BY creationtime DESC
                 ", $P->id());
-    print _("<h2>Open pledges you created</h2>");
+    if ($type == 'open')
+        print h2(_('Open pledges you created'));
     if (db_num_rows($qrows) > 0) {
+        if ($type == 'closed')
+            print h2(_('Closed pledges you created'));
         while ($r = db_fetch_array($qrows)) {
-            $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
             $pledge = new Pledge($r);
-            $pledge->render_box(array('class' => 'pledge-yourcreated', 'href'=>$pledge->url_main()));
+            $pledge->render_box(array('class' => '', 'href'=>$pledge->url_main()));
         }
-    } else {
+    } elseif ($type == 'open') {
         print p(_('You have no open pledges. <a href="/new">Start a new pledge</a>.'));
     }
-}
-
-// Closed pledges you made
-function show_your_closed_pledges() {
-    global $pb_today, $P;
-    $qrows = db_query("
-                    SELECT pledges.*
-                    FROM pledges
-                    WHERE pledges.person_id = ?
-                    AND '$pb_today' > pledges.date
-                    ORDER BY creationtime DESC
-                ", $P->id());
-    if (db_num_rows($qrows) > 0) {
-        print _("<h2>Closed pledges you created</h2>");
-        while ($r = db_fetch_array($qrows)) {
-            $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
-            $pledge = new Pledge($r);
-            $pledge->render_box(array('class' => 'pledge-yourcreated', 'href'=>$pledge->url_main()));
-        }
-    } 
 }
 
 // Pledges you have signed
 function show_your_signed_pledges() {
     global $P;
     $qrows = db_query("
-                    SELECT pledges.*
+                    SELECT pledges.*, signers.done,
+                        (select count(*) from signers where pledge_id = pledges.id) as signers
                     FROM pledges, signers
                     WHERE pledges.id = signers.pledge_id
                     AND signers.person_id = ?
                     ORDER BY signtime DESC
                 ", $P->id());
-    print '<div id="yoursignedpledges">';
     print _("<h2>Pledges you signed</h2>");
     $successful_ever = 0;
     if (db_num_rows($qrows) > 0) {
-        print '<ol>';
+        print '<ol id="yoursignedpledges">';
+	$done = get_http_var('done');
         while ($r = db_fetch_array($qrows)) {
-            $pledge = new Pledge($r['ref']);
-            $r['signers'] = db_getOne('SELECT COUNT(*) FROM signers WHERE pledge_id = ?', array($r['id']));
-            print '<li>';
+            $pledge = new Pledge($r);
+	    print '<li id="signed' . $pledge->id() . '"';
+	    if ($r['done']=='t')
+	        print ' class="done">';
+	    else
+	        print '><form method="post" action="' . $pledge->url_survey() . '">';
             print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
-            
+	    if ($r['done']=='f') {
+	        print p(_('Have you done this pledge?')
+		    . ' <input type="submit" value="' . _('Yes') . '">');
+		print '<input type="hidden" name="r" value="your"></form>';
+	    }
+	    if ($done == $pledge->ref()) {
+	        print p('<em>' . _("That's great!") . '</em>');
+		?>
+<script type="text/javascript">
+    highlight_fade('signed<?=$pledge->id()?>');
+</script>
+<?
+	    }
             print '</li>';
             if ($r['whensucceeded']) 
                 $successful_ever = 1;
@@ -147,7 +147,6 @@ function show_your_signed_pledges() {
     }
     if ($successful_ever)
         print p(sprintf(_("Why not <a href=\"mailto:%s\">send us photos</a> of yourself carrying out successful pledges?"), str_replace("@", "&#64;", OPTION_CONTACT_EMAIL)));
-    print '</div>';
 }
 
 // Display everything
@@ -157,13 +156,15 @@ pledges_you_might_like();
 alert_list_comments($P->id());
 print '</div>';
 
-show_your_open_pledges();
+print '<div id="yoursignaturesandpledges">';
+show_your_pledges('open');
 # XXX: microsites.php!
 global $microsite;
 if ($microsite != 'o2')
     alert_list_pledges_local($P->id());
-show_your_closed_pledges();
+show_your_pledges('closed');
 show_your_signed_pledges();
+print '</div>';
 
 page_footer();
 

@@ -1,0 +1,16 @@
+Subject: Pledge survey - '<?=$values['title']?>' at PledgeBank.com
+
+Four weeks ago, a pledge you signed succeeded, which is great!
+This is just a quick automatic email to ask if you've done your
+pledge yet. Obviously, some pledges might be more long term, and
+so you might not yet have been able to - if so, keep this email
+safe until you do.
+
+If you've done your pledge, follow the link below:
+
+    <?=$values['survey_url']?>
+
+Just to remind you, the pledge, created by <?=$values['creator_name']?>, reads:
+'<?=$values['sentence_first']?>'
+
+<?=$values['signature']?>

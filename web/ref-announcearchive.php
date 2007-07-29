@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announcearchive.php,v 1.8 2007-07-07 01:47:56 francis Exp $
+ * $Id: ref-announcearchive.php,v 1.9 2007-07-29 22:25:44 matthew Exp $
  * 
  */
 
@@ -59,7 +59,7 @@ page_header(_("Messages sent by creator to signers: ") . $p->h_title(), array('r
 
 $p->render_box();
 
-print "<div class=\"oldannounce\">";
+print '<div id="oldannounce">';
 
 print h2(_('Messages sent by creator to signers'));
 

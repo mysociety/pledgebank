@@ -5,15 +5,15 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: offline.php,v 1.15 2006-02-24 19:21:55 matthew Exp $
+// $Id: offline.php,v 1.16 2007-07-29 22:25:44 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 
-page_header(_("You never bump into your neighbours online"));
+page_header(_("You never bump into your neighbours online"), array('id'=>"offline"));
 
 ?>
-<div class="offline">
+<div>
 <img src="monitor-neighbours-250px.jpg" class="l" style="margin-right: 20px;" title="<?=_('You never bump into your neighbours online') ?>" width="245" height="250" alt="">
 <h2><?=_('You never bump into your neighbours online') ?></h2>
 <?
@@ -26,7 +26,7 @@ involved even if they never use the internet."));
 ?>
 </div>
 
-<div class="offline">
+<div>
 <img src="flyer-example.png" class="r" style="margin-left: 20px;" title="<?=_('Example PledgeBank flyer') ?>" width="298" height="211" alt="">
 <h2><?=_('Flyers') ?></h2>
 <?
@@ -42,7 +42,7 @@ simple two word text message.'));
 ?>
 </div>
 
-<div class="offline">
+<div>
 <img src="phone-200px.jpg" class="l" style="margin-right: 20px;" width="168" height="200" alt="">
 <h2><?=_('Mobile Phones') ?></h2>
 <?

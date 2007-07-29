@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.111 2007-07-19 17:51:32 francis Exp $
+ * $Id: frequentupdate,v 1.112 2007-07-29 22:25:43 matthew Exp $
  *
  */
 
@@ -601,6 +601,49 @@ function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_
     }
 }
 
+/* send_surveys
+ * Sends survey emails a few weeks after a successful pledge has closed
+ */
+function send_surveys() {
+    global $pb_timestamp;
+
+    verbose("finding pledges that need survey emails");
+    if (!db_getOne("
+                select id from pledges
+                where whensucceeded is not null
+                    and '$pb_timestamp'::timestamp > whensucceeded + '4 week'::interval
+                    and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
+                    and (select id from message where pledge_id = pledges.id
+                        and circumstance = 'survey') is null")) {
+        verbose("... no such pledges found");
+        return;
+    }
+
+    db_query("lock table message in exclusive mode");
+    $q = db_query("
+                select * from pledges
+                where whensucceeded is not null
+                    and '$pb_timestamp'::timestamp > whensucceeded + '4 week'::interval
+                    and prominence <> 'backpage' ". /* deliberately NOT pb_pledge_prominence */ "
+                    and (select id from message where pledge_id = pledges.id
+                        and circumstance = 'survey') is null
+                for update");
+    while ($pledge = db_fetch_array($q)) {
+        verbose("pledge #${pledge['id']} (${pledge['ref']}) signers being sent survey email");
+        db_query("
+                insert into message (
+                    pledge_id, circumstance,
+                    sendtocreator, sendtosigners, sendtolatesigners,
+                    emailtemplatename
+                ) values (
+                    ?, 'survey', false, true, false, 'survey'
+                )", $pledge['id']);
+    }
+    
+    db_commit();
+    verbose("finished finding pledges for sending survey emails");
+}
+
 /* send_pending_messages
  * Dispatch messages to pledge signers and creators which have not yet been
  * sent. */
@@ -814,11 +857,15 @@ function send_pending_messages() {
             locale_push($pledge->lang());
             /* Local alert signup link */
             $data = $pledge->data;
-            if ($r['emailtemplatename'] == 'succeeded-signer' ||
-                $r['emailtemplatename'] == 'succeeded-signer-byarea' ) {
-                if ($send_by == 'email') {
+            if ($send_by == 'email') {
+                if ($r['emailtemplatename'] == 'succeeded-signer' ||
+                    $r['emailtemplatename'] == 'succeeded-signer-byarea' ) {
                     $data['local_alert_url'] = pb_person_make_signon_url(null, $r['signer_email'], "GET", 
                             pb_domain_url(array('path'=>"/alert")), array(), $pledge->microsite());
+                }
+                if ($r['circumstance'] == 'survey') {
+                    $data['survey_url'] = pb_person_make_signon_url(null, $r['signer_email'],
+		        "POST", $pledge->url_survey(), array('r'=>'your'), $pledge->microsite());
                 }
             }
             // Description of town that success is for
@@ -837,9 +884,13 @@ function send_pending_messages() {
             if ($send_by == 'email') {
                 verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
                 $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $data, $headers);
-            } elseif ($send_by == 'facebook') {
+            } elseif ($send_by == 'facebook' && $r['circumstance'] != 'survey') {
                 verbose("sending message #${r['id']} by Facebook id ${r['signer_facebook_id']} template '${r['emailtemplatename']}'");
                 $f = pbfacebook_send_template($r['signer_facebook_id'], $r['emailtemplatename'], $data, $headers);
+            } elseif ($send_by == 'facebook' && $r['circumstance'] == 'survey') {
+	        # XXX: Obviously, the survey message should be sent to FaceBook signers too somehow.
+		# But I can't work out how to do it, given this section currently uses publishStoryToUser
+	        $f = true;
             } else {
                 err("Unknown send_by $send_by");
             }
@@ -956,10 +1007,7 @@ if (OPTION_WEB_HOST != 'o2') { # XXX: Can't use microsites() as not running "on"
     chivvy_creators_lowrate_new();
     send_pledge_success_reminder();
     send_byarea_pledge_success_reminder();
+    send_surveys();
 }
 send_pending_messages();
-
-
-
-
 

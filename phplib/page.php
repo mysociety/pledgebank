@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.162 2007-06-28 08:43:24 matthew Exp $
+// $Id: page.php,v 1.163 2007-07-29 22:25:43 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -168,15 +168,16 @@ function page_header($title, $params = array()) {
 <? } ?>
 <script type="text/javascript" src="/pb.js"></script>
 <script type="text/javascript" src="/jslib/utils.js"></script>
+<script type="text/javascript" src="/jquery.js"></script>
 <?  //this was conditional, but now we need it nearly always for bottom of page local alert signups
     //if (array_key_exists('gazejs', $params)) { ?>
 <script type="text/javascript" src="/gaze.js"></script>
 <? //}
     microsites_display_favicon();
     if (!$microsite || $microsite != 'global-cool') { ?>
-        </head>
-        <body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
-        <?
+</head>
+<body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
+<?
         // On the "print flyers from in-page image" page, these top parts are hidden from printing
         if (array_key_exists('noprint', $params) and $params['noprint'])
             print '<div class="noprint">';

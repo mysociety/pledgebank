@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.14 2006-08-04 15:45:28 francis Exp $
+// $Id: where.php,v 1.15 2007-07-29 22:25:44 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -24,12 +24,12 @@ print h2(_('Choose your country ...'));
 
 // Link to all pledges in all countries near the top (for search engines to
 // find easily, and for the curious)
-print "<div class=\"wherespecial\">";
+print "<p>";
 $code = 'everywhere';
 $name = $microsites_public_list[$code];
 $url = pb_domain_url(array('microsite'=>$code, 'path'=>$r));
 print "<a href=\"".$url."\">".$name."</a>";
-print "</div>";
+print "</p>";
 
 // Count how many pledges there are for each country
 $query = "SELECT count(*) as c, location.country as country
@@ -44,13 +44,13 @@ while ($row = db_fetch_array($q)) {
 
 // Display countries which have at least one pledge
 $lastchar = "*";
-print "<p>";
 uksort($countries_name_to_code, 'strcoll');
 $column = 0;
 $total_countries = count($country_count);
 $n = 0;
 $last_col_n = 0;
-print "<div class=\"wherecolumn\"><p>\n";
+print '<div id="wherecolumns">';
+print "<div><p>\n";
 foreach ($countries_name_to_code as $name => $code) {
     if (!array_key_exists($code, $country_count))
         continue;
@@ -64,7 +64,7 @@ foreach ($countries_name_to_code as $name => $code) {
         if (($n > $total_countries / 3 && $column == 0) ||
            ($n > 2 * $total_countries / 3 && $column == 1)) {
            $column++;
-           print "</div><div class=\"wherecolumn\">";
+           print "</div><div>";
            $last_col_n = $n;
         }
         print "<h3>$firstchar</h3><p>\n";
@@ -76,14 +76,14 @@ foreach ($countries_name_to_code as $name => $code) {
     $n++;
     $lastchar = $firstchar;
 }
-print "\n</p></div>";
+print "\n</p></div></div>";
 
-print "<div class=\"wheremakepledge\">";
-print p(_('Your country isn\'t there? <a href="/new">Make a pledge</a> specific to your country, and get people to sign up to it.'));
-print "</div>";
+print '<p id="wheremakepledge">';
+print _('Your country isn\'t there? <a href="/new">Make a pledge</a> specific to your country, and get people to sign up to it.');
+print "</p>";
 
 // Show special sites
-print "<div class=\"wherespecial\">";
+print '<div id="wherespecial">';
 print h2(_('... or choose a special site'));
 foreach ($microsites_public_list as $code => $name) {
     if ($code == 'everywhere') // this shown at top

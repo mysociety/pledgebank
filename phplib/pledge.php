@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.239 2007-07-26 12:28:48 francis Exp $
+ * $Id: pledge.php,v 1.240 2007-07-29 22:25:43 matthew Exp $
  * 
  */
 
@@ -364,6 +364,7 @@ class Pledge {
     function url_info() { return pb_domain_url() . $this->h_ref . "/info"; }
     function url_announce_archive() { return pb_domain_url() . $this->h_ref . "/announcearchive"; }
     function url_facebook() { return OPTION_FACEBOOK_CANVAS . $this->h_ref; }
+    function url_survey() { return pb_domain_url() . $this->h_ref . '/survey'; }
 
     // This one needs encoding for use HTML, to escape the &
     function url_place_map() {
@@ -430,9 +431,11 @@ class Pledge {
         if (array_key_exists('href', $params)) {
             $sentence_params['href'] = $params['href'];
         }
-        if (array_key_exists('class', $params))
-            print '<div class="pledge ' . $params['class'] . '">';
-        else
+        if (array_key_exists('class', $params)) {
+            print '<div class="pledge';
+            if ($params['class']) print ' ' . $params['class'];
+            print '">';
+        } else
             print '<div id="pledge">';
 
         if (array_key_exists('facebook-share', $params) && $params['facebook-share']) {
@@ -1181,11 +1184,11 @@ function pledge_get_frontpage_list($pledges_required_fp, $pledges_required_n) {
 # Draw part at top of pledge page which says pledge has succeeded/failed etc.
 function pledge_draw_status_plaque($p) {
     if ($p->is_cancelled()) {
-        print '<p class="cancelled">' . comments_text_to_html($p->data['cancelled']) . '</p>';
+        print '<p id="cancelled">' . comments_text_to_html($p->data['cancelled']) . '</p>';
         return;
     }
     if ($p->data['notice']) {
-        print '<p class="notice">' . comments_text_to_html($p->data['notice']) . '</p>';
+        print '<p id="notice">' . comments_text_to_html($p->data['notice']) . '</p>';
     }
     if (!$p->open()) {
         print '<p class="finished">' . microsites_pledge_closed_text() . '</p>';

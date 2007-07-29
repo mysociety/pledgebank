@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.227 2007-07-29 22:25:43 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.228 2007-07-29 23:55:46 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -898,14 +898,18 @@ sub do_public_succeeding_pledge {
     comment("And now the survey emails...");
     set_pb_date('1982-03-01');
     call_frequentupdate();
-    for (my $i = 1; $i <= 3; ++$i) {
+    for (my $i = 1; $i <= 4; ++$i) {
         my $survey_email = $wth->email_get_containing( 
-            '%To: '.email_n($i).  '%From: '.name_n(0). '%Pledge survey%');
-        die $survey_email . "\n\nUnsubscribe link not found" if ($survey_email !~ m#\b(http://.*/L/.*)\b#m);
-        my $survey_url = $1;
+            '%To: '.email_n($i).  '%From: ' . $name_admin . '%If you\'ve done your pledge%');
+        if ($i == 3) {
+            die $survey_email . "\n\nSurvey link not found" if ($survey_email !~ m#\b(http://.*/L/.*)\b#m);
+            my $survey_url = $1;
+            $wth->browser_get($survey_url);
+        }
     }
-    # Follow link in an email!
-    # Check pledge page is different
+    $wth->browser_get($locale_url . "/$pledge_ref");
+    $wth->browser_check_contents('class="done">' . name_n(3));
+    $wth->email_check_none_left();
 
     comment("Change back to global URL");
     lock_locale_url($base_url);

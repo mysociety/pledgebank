@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.112 2007-07-29 22:25:43 matthew Exp $
+ * $Id: frequentupdate,v 1.113 2007-07-29 23:55:46 matthew Exp $
  *
  */
 
@@ -788,7 +788,7 @@ function send_pending_messages() {
                     and message.pledge_id = pledges.id
                     and (message.sms is not null or signer_person.email is not null or signer_person.facebook_id is not null)
                     and (pledges.whensucceeded is null or sendtolatesigners
-                            or signers.signtime < pledges.whensucceeded)
+                            or signers.signtime < message.whencreated)
                     and (select signer_id
                         from message_signer_recipient
                         where message_id = message.id
@@ -865,7 +865,7 @@ function send_pending_messages() {
                 }
                 if ($r['circumstance'] == 'survey') {
                     $data['survey_url'] = pb_person_make_signon_url(null, $r['signer_email'],
-		        "POST", $pledge->url_survey(), array('r'=>'your'), $pledge->microsite());
+                        "POST", $pledge->url_survey(), array('r'=>'your'), $pledge->microsite());
                 }
             }
             // Description of town that success is for
@@ -888,9 +888,9 @@ function send_pending_messages() {
                 verbose("sending message #${r['id']} by Facebook id ${r['signer_facebook_id']} template '${r['emailtemplatename']}'");
                 $f = pbfacebook_send_template($r['signer_facebook_id'], $r['emailtemplatename'], $data, $headers);
             } elseif ($send_by == 'facebook' && $r['circumstance'] == 'survey') {
-	        # XXX: Obviously, the survey message should be sent to FaceBook signers too somehow.
-		# But I can't work out how to do it, given this section currently uses publishStoryToUser
-	        $f = true;
+                # XXX: Obviously, the survey message should be sent to FaceBook signers too somehow.
+                # But I can't work out how to do it, given this section currently uses publishStoryToUser
+                $f = true;
             } else {
                 err("Unknown send_by $send_by");
             }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.27 2007-07-29 22:25:44 matthew Exp $
+// $Id: your.php,v 1.28 2007-07-29 23:55:46 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -115,28 +115,28 @@ function show_your_signed_pledges() {
     $successful_ever = 0;
     if (db_num_rows($qrows) > 0) {
         print '<ol id="yoursignedpledges">';
-	$done = get_http_var('done');
+        $done = get_http_var('done');
         while ($r = db_fetch_array($qrows)) {
             $pledge = new Pledge($r);
-	    print '<li id="signed' . $pledge->id() . '"';
-	    if ($r['done']=='t')
-	        print ' class="done">';
-	    else
-	        print '><form method="post" action="' . $pledge->url_survey() . '">';
+            print '<li id="signed' . $pledge->id() . '"';
+            if ($r['done']=='t')
+                print ' class="done">';
+            else
+                print '><form method="post" action="' . $pledge->url_survey() . '">';
             print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
-	    if ($r['done']=='f') {
-	        print p(_('Have you done this pledge?')
-		    . ' <input type="submit" value="' . _('Yes') . '">');
-		print '<input type="hidden" name="r" value="your"></form>';
-	    }
-	    if ($done == $pledge->ref()) {
-	        print p('<em>' . _("That's great!") . '</em>');
-		?>
+            if ($r['done']=='f') {
+                print p(_('Have you done this pledge?')
+                    . ' <input type="submit" value="' . _('Yes') . '">');
+                print '<input type="hidden" name="r" value="your"></form>';
+            }
+            if ($done == $pledge->ref()) {
+                print p('<em>' . _("That's great!") . '</em>');
+                ?>
 <script type="text/javascript">
     highlight_fade('signed<?=$pledge->id()?>');
 </script>
 <?
-	    }
+            }
             print '</li>';
             if ($r['whensucceeded']) 
                 $successful_ever = 1;

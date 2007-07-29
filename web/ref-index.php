@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.110 2007-07-29 22:25:44 matthew Exp $
+// $Id: ref-index.php,v 1.111 2007-07-29 23:55:46 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -229,11 +229,11 @@ function draw_signatories($p) {
                 print '<li id="signer' . $r['id'] . '"';
                 if ($r['done']=='t') print ' class="done"';
                 print '>';
-		if (!is_null($P) && $r['person_id'] == $P->id())
-		    print '<form method="post" action="' . $p->url_survey() . '"><input type="hidden" name="r" value="pledge">';
+                if ($r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id())
+                    print '<form method="post" action="' . $p->url_survey() . '"><input type="hidden" name="r" value="pledge">';
                 print htmlspecialchars($r['name']);
-		if ($r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id())
-		    print ' &ndash; <input type="submit" value="I have done this pledge"></form>';
+                if ($r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id())
+                    print ' &ndash; <input type="submit" value="I have done this pledge"></form>';
                 print '</li>';
             } else {
                 err('showname set but no name');

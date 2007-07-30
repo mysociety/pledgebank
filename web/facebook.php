@@ -6,13 +6,11 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.35 2007-07-20 10:37:27 francis Exp $
+// $Id: facebook.php,v 1.36 2007-07-30 11:30:51 francis Exp $
 
 /*
 
 TODO:
-
-- Show signers on pledge pages (only show ones that are via facebook of course)
 
 - Still taking two clicks to sign a pledge when you add the app.
 - "The news that you've signed could not be added to your feed." when Tom signed pledge

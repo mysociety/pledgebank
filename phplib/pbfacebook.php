@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.36 2007-07-29 22:25:43 matthew Exp $
+// $Id: pbfacebook.php,v 1.37 2007-07-30 11:30:41 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -26,7 +26,9 @@ function pbfacebook_get_user_name($facebook_id) {
 function pbfacebook_friends_list() {
     global $facebook;
     $friends = $facebook->api_client->friends_get();
-    $friends_joined = join(",", $friends);
+    $friends_joined = null;
+    if ($friends)
+        $friends_joined = join(",", $friends);
     if (!$friends_joined) # no friends case
         $friends_joined = -1; 
     return $friends_joined;

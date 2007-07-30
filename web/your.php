@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.29 2007-07-30 11:32:49 francis Exp $
+// $Id: your.php,v 1.30 2007-07-30 11:57:30 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -126,8 +126,13 @@ function show_your_signed_pledges() {
                 print '><form method="post" action="' . $pledge->url_survey() . '">';
             print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
             if ($r['done']=='f') {
-                print p(_('Have you done this pledge?')
-                    . ' <input type="submit" value="' . _('Yes') . '">');
+                print '<p>';
+                if ($pledge->failed()) {
+                    print _('Have you done this pledge anyway?');
+                } else {
+                    print _('Have you done this pledge?');
+                }
+                print ' <input type="submit" value="' . _('Yes') . '"></p>';
                 print '<input type="hidden" name="r" value="your"></form>';
             }
             if ($done == $pledge->ref()) {

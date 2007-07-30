@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.163 2007-07-29 22:25:43 matthew Exp $
+// $Id: page.php,v 1.164 2007-07-30 14:50:23 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -290,11 +290,28 @@ function page_footer($params = array()) {
             debug_timestamp(true, "begin footer");
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
+<div id="navforms">
+<?
+    if (microsites_show_translate_blurb()) {
+        global $lang, $langs, $site_country;
+        print '<form action="/lang" method="get">
+<label for="language">' . _('Language:') . '</label> <select name="lang" id="language">';
+        foreach ($langs as $l => $pretty) {
+            $o = '<option value="' . $l . '"';
+            if ($l == $lang) $o .= ' selected';
+            $o .= ">$pretty</option>";
+            print $o;
+        }
+        print '<option value="translate">'._('Translate into your language...').'</option>
+        </select> <input type="submit" value="' . _('Change') . '"></form>';
+    }
+?>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
-<p><label for="q"><?=_('Search') ?>:</label>
-<input type="text" id="q" name="q" size="25" value="" onblur="fadeout(this)" onfocus="fadein(this)"> <input type="submit" value="<?=_('Go') ?>"></p>
+<label for="q"><?=_('Search') ?>:</label>
+<input type="text" id="q" name="q" size="25" value="" onblur="fadeout(this)" onfocus="fadein(this)"> <input type="submit" value="<?=_('Go') ?>">
 </form>
 <?
+    print '</div>'; # navforms
     $menu = microsites_navigation_menu($contact_ref);
     # remove all extraneous whitespace to avoid IE bug
     print '<ul id="nav">';
@@ -313,12 +330,9 @@ function page_footer($params = array()) {
         debug_timestamp(true, "local alert quick timestamp");
         ?>
 <hr class="v">
-<div id="pbfooter"><?
-    if (microsites_show_translate_blurb()) {
-        pb_print_change_language_links();
-        print '<br>';
-    }?>
-<a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.
+<div id="pbfooter">
+<a href="/translate/"><?=_('Translate PledgeBank into your language') ?></a>.
+<br><a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.
 <a href="http://www.easynet.net/publicsector/"><?=_('Powered by Easynet')?></a>.</div>
 </div>
 <?

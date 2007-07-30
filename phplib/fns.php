@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.164 2007-07-19 17:12:35 francis Exp $
+// $Id: fns.php,v 1.165 2007-07-30 14:50:23 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -310,31 +310,6 @@ function pb_get_change_language_link() {
     $change .= _("change language");
     $change .= '</a>';
     return $change;
-}
-
-function pb_print_change_language_links($path = null) {
-    global $lang, $langs, $site_country;
-    print _('Available in');
-    $out = array();
-    foreach ($langs as $l => $pretty) {
-        $params = array('lang'=>$l, 'country'=>$site_country);
-        if ($path)
-            $params['path'] = $path;
-        $url = pb_domain_url($params);
-        if ($l == $lang) $o = '<strong>';
-        else $o = '<a href="'.$url.'" lang="' . $l . '" hreflang="' . $l . '">';
-        $o .= $pretty;
-        if ($l == $lang) $o .= '</strong>';
-        else $o .= '</a>';
-        $out[] = $o;
-    }
-    $first = array_splice($out, 0, -2);
-    if (count($first)) print ' ' . join(', ', $first) . ',';
-    if (count($out) >= 2)
-        print ' ' . $out[count($out)-2] . ' ' . _('and') . ' ' . $out[count($out)-1];
-    elseif (count($out) == 1)
-        print ' ' . $out[0];
-    print '. <br><a href="/translate/">'._('Translate PledgeBank into your language').'</a>.';
 }
 
 /* pb_site_pledge_filter_main SQL_PARAMS

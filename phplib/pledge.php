@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.240 2007-07-29 22:25:43 matthew Exp $
+ * $Id: pledge.php,v 1.241 2007-07-30 12:08:23 matthew Exp $
  * 
  */
 
@@ -84,9 +84,11 @@ class Pledge {
 
     // Internal function to calculate some values from data
     function _calc() {
+        global $pb_today;
         // Fill in partial pledges (ones being made still)
         if (!array_key_exists('signers', $this->data)) $this->data['signers'] = -1;
-        if (!array_key_exists('open', $this->data)) $this->data['open'] = 't';
+        if (!array_key_exists('open', $this->data))
+            $this->data['open'] = ($pb_today <= $this->data['date']) ? 't' : 'f';
         if (!array_key_exists('cancelled', $this->data)) $this->data['cancelled'] = null;
         if (!array_key_exists('notice', $this->data)) $this->data['notice'] = null;
         if (array_key_exists('country', $this->data)) {

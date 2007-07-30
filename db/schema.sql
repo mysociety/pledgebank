@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.224 2007-07-30 12:18:21 matthew Exp $
+-- $Id: schema.sql,v 1.225 2007-07-30 12:26:32 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -630,7 +630,7 @@ create index signers_person_id_idx on signers(person_id);
 
 -- Used to make pledge change time calculation faster.
 create index signers_signtime_idx on signers(signtime);
-create index signers_donetime_idx on signers(donetime);
+create index signers_donetime_idx on signers(donetime) where donetime is not null;
 
 -- Subscription by SMS. The punter sends us a message, and we reply with a
 -- reverse-billed one, recording the mapping from pledge to outgoing SMS in
@@ -1118,7 +1118,7 @@ create function pledge_last_change_time(integer)
         if t2 > t then
             t = t2;
         end if;
-        t2 := (select donetime from signers where pledge_id = $1 order by donetime desc limit 1);
+        t2 := (select donetime from signers where pledge_id = $1 and donetime is not null order by donetime desc limit 1);
         if t2 > t then
             t = t2;
         end if;

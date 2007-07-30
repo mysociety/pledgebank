@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.28 2007-07-29 23:55:46 matthew Exp $
+// $Id: your.php,v 1.29 2007-07-30 11:32:49 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -60,8 +60,9 @@ function pledges_you_might_like() {
                   $P->id(), $P->id(), 
                   $P->id(), $P->id()));
     if (0 != db_num_rows($s)) {
-        print "\n\n" . '<h2><a name="connections">' . _('Suggested pledges') . '</a></h2><ol>' . "\n\n";
+        print "\n\n" . '<h2><a name="connections">' . _('Suggested pledges') . '</a></h2>' . "\n\n";
         print p(_("People who signed the pledges you created or signed also signed these..."));
+        print '<ol>';
         while (list($id, $strength) = db_fetch_row($s)) {
             $p2 = new Pledge(intval($id));
             print '<li>';

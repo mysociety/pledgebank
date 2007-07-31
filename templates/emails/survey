@@ -5,7 +5,7 @@ Four weeks ago, a pledge you signed succeeded, which is great!
 This is just a quick automatic email to ask: have you carried out
 your pledge yet?
 
-If you HAVE done your pledge, follow the link below:
+If you HAVE done your pledge, please click the link below:
 
     <?=$values['survey_url']?>
 

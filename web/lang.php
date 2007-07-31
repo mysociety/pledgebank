@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: lang.php,v 1.3 2007-07-30 14:50:23 matthew Exp $
+// $Id: lang.php,v 1.4 2007-07-31 18:27:58 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -27,7 +27,7 @@ if ($l) {
 
 page_header(_('Choose your language'));
 print h2(_('Choose your language'));
-print '<p>';
+print '<ul>';
 $out = array();
 foreach ($langs as $l => $pretty) {
     $params = array('lang'=>$l, 'country'=>$site_country);
@@ -39,14 +39,9 @@ foreach ($langs as $l => $pretty) {
     $o .= $pretty;
     if ($l == $lang) $o .= '</strong>';
     else $o .= '</a>';
-    $out[] = $o;
+    print "<li>$o</li>";
 }
-$first = array_splice($out, 0, -2);
-if (count($first)) print ' ' . join(', ', $first) . ',';
-if (count($out) >= 2)
-    print ' ' . $out[count($out)-2] . ' ' . _('and') . ' ' . $out[count($out)-1];
-elseif (count($out) == 1)
-    print ' ' . $out[0];
-print '.</p> <p><a href="/translate/">'._('Translate PledgeBank into your language').'</a>.</p>';
+print '</ul>
+<p><a href="/translate/">'._('Translate PledgeBank into your language').'</a>.</p>';
 
 page_footer();

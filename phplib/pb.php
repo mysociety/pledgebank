@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.80 2007-07-18 11:37:33 francis Exp $
+ * $Id: pb.php,v 1.81 2007-07-31 18:27:50 matthew Exp $
  * 
  */
 
@@ -200,7 +200,7 @@ $pb_time = strtotime($pb_timestamp);
 function pb_show_error($message) {
     header('HTTP/1.0 500 Internal Server Error');
     page_header(_("Sorry! Something's gone wrong."), array('override'=>true));
-    print _('<h2>Sorry!  Something\'s gone wrong.</h2>') .
+    print h2(_('Sorry! Something\'s gone wrong.')) .
         "\n<p>" . $message . '</p>';
     page_footer(array('nolocalsignup'=>true));
 }

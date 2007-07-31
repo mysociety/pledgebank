@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.192 2007-07-31 16:36:56 matthew Exp $
+// $Id: new.php,v 1.193 2007-07-31 18:27:58 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -191,7 +191,7 @@ onfocus="fadein(this)" onblur="fadeout(this)" value="<?
 <small>(<?=sprintf(_('This gives your pledge an easy web address. e.g. %s/tidyupthepark'), OPTION_WEB_HOST.".".OPTION_WEB_DOMAIN) ?>)</small>
 </p>
 
-<p id="moreinfo"><?=_('More details about your pledge: <small>(optional)</small>') ?>
+<p id="moreinfo"><?=_('More details about your pledge:') . ' <small>' . _('(optional)') . '</small>' ?>
 <br><?=microsites_new_pledges_detail_textarea($data) ?>
 <br><small><?=_('(links and email addresses will be automatically made clickable, no "markup" needed)') ?></small>
 
@@ -214,7 +214,7 @@ onfocus="fadein(this)" onblur="fadeout(this)" value="<?
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
 <? } ?>
 
-<p><?=_('On flyers and elsewhere, after your name, how would you like to be described? <small>(optional)</small>') ?>
+<p><?=_('On flyers and elsewhere, after your name, how would you like to be described?') . ' <small>' . _('(optional)') . '</small>' ?>
 <input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40">
 <br><small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
 </p>

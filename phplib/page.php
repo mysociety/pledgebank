@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.164 2007-07-30 14:50:23 matthew Exp $
+// $Id: page.php,v 1.165 2007-07-31 18:25:59 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -141,13 +141,6 @@ function page_header($title, $params = array()) {
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <?
 
-    $category = '';
-    if (array_key_exists('ref', $params)) {
-        $category = db_getOne('SELECT name FROM category,pledge_category WHERE category_id=id AND pledge_id=(SELECT id FROM pledges WHERE ref=?)', substr($params['ref'],1) );
-        if ($category && is_file('../web/css/' . strtolower($category) . '.css'))
-            print '<style type="text/css" media="all">@import url(\'/css/' . rawurlencode(strtolower($category)) . '.css\');</style>' . "\n";
-    }
-
     if (array_key_exists('rss', $params)) {
         foreach ($params['rss'] as $rss_title => $rss_url) {
             print '<link rel="alternate" type="application/rss+xml" title="' . $rss_title . '" href="'.$rss_url.'">' . "\n";
@@ -209,9 +202,6 @@ function page_header($title, $params = array()) {
         print '<strong>'. str_replace('http://', '', $url) . '</strong>';
         if (!array_key_exists('noreflink', $params))
             print '</a>';
-/*            if ($category) {
-            print '<br>This pledge is in the <strong>' . _($category) . '</strong> category';
-        } */
         print '</p>';
     }
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.255 2007-07-11 11:11:37 francis Exp $
+// $Id: index.php,v 1.256 2007-07-31 16:36:56 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -71,22 +71,21 @@ only if 5 other people will do the same".') ?>
 ?>
 </div>
 
-<? global $lang;
-   if (microsites_frontpage_has_offline_secrets()) {
-       if ($lang == 'en-gb') { ?>
+<?  global $lang;
+    if (microsites_frontpage_has_offline_secrets()) {
+        if ($lang == 'en-gb') { ?>
 <div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-text-275px.jpg" alt="<?=_('How scissors, a phone and some printouts
 can make your pledge succeed &raquo;') ?>"></a></div>
-    <? } else { ?>
+    <?  } else { ?>
 <div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-275px.jpg" alt="<?=_('Scissors, a phone and some printouts &mdash; ') ?>"></a></div>
 <div id="photocaption"><a href="/offline"><?=_("Find out why these things are the secret of a successful pledge")?> &raquo;</a></div>
-    <? }?>
-<?  }
+    <?  }
+    }
 
     if (microsites_comments_allowed()) {
         comments_show_latest();
         debug_comment_timestamp("after comments_show_latest()");
     }
-
 
     microsites_frontpage_credit_footer();
 }

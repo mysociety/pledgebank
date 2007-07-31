@@ -5,13 +5,12 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.191 2007-07-12 13:29:33 matthew Exp $
+// $Id: new.php,v 1.192 2007-07-31 16:36:56 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pbperson.php';
 require_once '../phplib/pledge.php';
-require_once '../phplib/comments.php';
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
 require_once '../phplib/pbfacebook.php';
@@ -84,9 +83,8 @@ function pledge_form_one($data = array(), $errors = array()) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
-    } else {
-        microsites_new_pledges_toptips();
     }
+    microsites_new_pledges_toptips();
 
     if (get_http_var('local') && $ref = get_http_var('ref')) {
         $p = new Pledge($ref);
@@ -142,14 +140,13 @@ function pledge_form_one($data = array(), $errors = array()) {
     global $number_of_steps;
 ?>
 
-<form accept-charset="utf-8" class="pledge" name="pledge" method="post" action="/new">
+<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
 <h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), 1, $number_of_steps)?></h2>
-<div class="c">
 
 <h3><?=_('Your Pledge')?></h3>
 <?  if (microsites_show_translate_blurb() && !count($_POST)) { ?>
-<p><small><?=sprintf(_('(if you\'d like your pledge in a language other than %s, <a href="%s">click here</a>)'), $langs[$lang],
-    "/lang?r=/new")?></small></p>
+<p><small><?=sprintf(_('(<a href="%s">Want your pledge in a language other than %s?</a>)'),
+    "/lang?r=/new", $langs[$lang]) ?></small></p>
 <? } ?>
 
 <?
@@ -166,17 +163,17 @@ my email address is <input<? if (array_key_exists('email', $errors)) print ' cla
 <p>as part of the <? display_categories($data); ?> part of the People Promise,</p>
 
 <?  } else { ?>
-<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
+<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="50"></p>
 
-<p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="5" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
-<input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="50" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
+<p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="3" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
+<input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="32" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
 
 <p><? if ($lang=='de') { ?>
 <input type="text" id="signup" name="signup"
-size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>"> <strong><?=_('will') ?></strong>.
+size="51" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>"> <strong><?=_('will') ?></strong>.
 <? } else { ?>
 <strong><?=_('will') ?></strong> <input type="text" id="signup" name="signup"
-size="74" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
+size="51" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
 <? }
 ?></p>
 
@@ -191,11 +188,12 @@ onfocus="fadein(this)" onblur="fadeout(this)" value="<?
 
 <p><?=_('Choose a short name for your pledge (6 to 16 letters):') ?>
 <input<? if (array_key_exists('ref', $errors) || array_key_exists('ref2', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
-<br><small><?=sprintf(_('This gives your pledge an easy web address. e.g. %s/tidyupthepark'), OPTION_WEB_HOST.".".OPTION_WEB_DOMAIN) ?></small>
+<small>(<?=sprintf(_('This gives your pledge an easy web address. e.g. %s/tidyupthepark'), OPTION_WEB_HOST.".".OPTION_WEB_DOMAIN) ?>)</small>
 </p>
 
-<p id="moreinfo"><?=_('More details about your pledge: (optional)') ?><br> <small><?=_('(links and email addresses will be automatically made clickable, no "markup" needed)') ?></small>
+<p id="moreinfo"><?=_('More details about your pledge: <small>(optional)</small>') ?>
 <br><?=microsites_new_pledges_detail_textarea($data) ?>
+<br><small><?=_('(links and email addresses will be automatically made clickable, no "markup" needed)') ?></small>
 
 <? if ($microsite != 'o2') { ?>
 <h3><?=_('About You') ?></h3>
@@ -210,33 +208,30 @@ onfocus="fadein(this)" onblur="fadeout(this)" value="<?
 <input type="hidden" name="facebook_name" value="<?=htmlspecialchars($facebook_name)?>">
 <input type="hidden" name="name" value="<?=htmlspecialchars($facebook_name)?>">
 <?   } else { ?>
-<strong><?=_('Your name:') ?></strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+<?=_('Your name:') ?> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 <?   } ?>
-<strong><?=_('Email:') ?></strong> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
+<br><?=_('Email:') ?> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
 <? } ?>
 
-<p><?=_('On flyers and elsewhere, after your name, how would you like to be described? (optional)') ?>
+<p><?=_('On flyers and elsewhere, after your name, how would you like to be described? <small>(optional)</small>') ?>
+<input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40">
 <br><small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
-<input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40"></p>
+</p>
 
-</div>
-<? if (sizeof($data)) {
-    print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
-}
-
-?>
-<p style="text-align: center"><?
-$tips = microsites_new_pledges_toptips_bottom();
+<?  if (sizeof($data)) {
+        print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
+    }
+    print '<p>';
+    print _("Did you read the tips on the left of the page? They'll help you make a successful pledge.");
 ?> <input type="submit" name="<?
-if (has_step_2()) print 'tostep2';
-elseif (has_step_3()) print 'tostep3';
-elseif (has_step_addr()) print 'tostepaddr';
-else print 'topreview';
+    if (has_step_2()) print 'tostep2';
+    elseif (has_step_3()) print 'tostep3';
+    elseif (has_step_addr()) print 'tostepaddr';
+    else print 'topreview';
 ?>" value="<?=_('Next step') ?>"></p>
 </form>
 <? 
-if ($tips) print $tips;
 }
 
 function pledge_form_target_warning($data, $errors) {

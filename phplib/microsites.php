@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.107 2007-07-18 10:38:36 francis Exp $
+ * $Id: microsites.php,v 1.108 2007-07-31 16:36:55 matthew Exp $
  * 
  */
 
@@ -610,9 +610,8 @@ function microsites_allpage_credit_footer() {
  */
 function microsites_new_pledges_toptips() {
     global $microsite;
-    if ($microsite == 'livesimply') {
-        ?>
-        <div id="tips">
+    print '<div id="tips">';
+    if ($microsite == 'livesimply') { ?>
         <h2>Top Tips for Successful Promises</h2>
         <ol>
 
@@ -633,19 +632,30 @@ function microsites_new_pledges_toptips() {
         talking about. If they don't, you need to rewrite it. </li>
 
         </ol>
-        </div>
         <?
-    } elseif ($microsite == 'o2') {
-        /* No top tips at the top */
+    } elseif ($microsite == 'o2') { ?>
+<h2>Top Promise Tips</h2>
+<ol>
+<li><strong>Really think about what you can do to make your People Promise
+come alive</strong> &mdash; this is your commitment, promise to do
+something that you think will make O2 a better place to work</li>
+<li><strong>You're not on your own!</strong> Your Promise can be
+individual or you can share it with others. You might agree as a team to
+do something together. It's up to you!</li>
+<li><strong>You can promise more than once</strong> &mdash; there's no
+limit to the number of Promises you make</li>
+</ol>
+<?
     } else {
         print microsites_toptips_normal();
     }
+    print '</div>';
 }
 
 function microsites_toptips_normal() {
+    global $site_country;
     $percent_successful_above_100 = percent_success_above(100);
-    $out = '<div id="tips">';
-    $out .= '<h2>' . _('Top Tips for Successful Pledges') . '</h2>';
+    $out = '<h2>' . _('Top Tips for Successful Pledges') . '</h2>';
     $out .= '<ol>';
     $out .= '<li>' . sprintf(_('<strong>Keep your ambitions modest</strong> &mdash; why ask for 50 people
         to do something when 5 would be enough? Every extra person makes your pledge
@@ -659,32 +669,21 @@ function microsites_toptips_normal() {
         someone who picks up a flyer from their doormat? Read your pledge to the person
         next to you, or to your mother, and see if they understand what you're talking
         about. If they don't, you need to rewrite it.") . '</li>';
-    $out .= '</ol></div>';
+    /* $out .= '<li>' . _("<strong>Search first</strong>. Enter a keyword or two related to your pledge
+in the search box in the top righthand corner. If there's already a pledge related to yours, consider
+joining in on that pledge.") . '</li>'; */
+    $out .= '<li>' . _("<strong>A picture &ndash; or audio clip, or video &ndash; is worth a thousand
+words</strong>. You can add a picture to your pledge once you've created it, or consider including a
+link in your pledge to a picture, audio, or video if you have one.") . '</li>';
+    /* if ($site_country == 'US') {
+        $out .= '<li>' . "If your pledge is about raising money and you want people to be able to
+donate straight away, think about using <a href=\"http://www.changingthepresent.org/PledgeBank\">Changing
+the Present</a> if you're giving to a registered non-profit or <a href=\"http://www.chipin.com/\">ChipIn</a>
+if you're raising money for something else. Pledges are more successful when signers can process a donation
+online, rather than sending a check." . '</li>';
+    } */
+    $out .= '</ol>';
     return $out;
-}
-
-function microsites_new_pledges_toptips_bottom() {
-    global $microsite;
-    if ($microsite == 'o2') {
-        return <<<EOF
-<div id="tips">
-<h2>Top Promise Tips</h2>
-<ol>
-<li><strong>Really think about what you can do to make your People Promise
-come alive</strong> &mdash; this is your commitment, promise to do
-something that you think will make O2 a better place to work</li>
-<li><strong>You're not on your own!</strong> Your Promise can be
-individual or you can share it with others. You might agree as a team to
-do something together. It's up to you!</li>
-<li><strong>You can promise more than once</strong> &mdash; there's no
-limit to the number of Promises you make</li>
-</ol>
-</div>
-EOF;
-
-    } else {
-        print _("Did you read the tips at the top of the page? They'll help you make a successful pledge.");
-    }
 }
 
 /* microsites_contact_intro
@@ -1177,7 +1176,7 @@ function microsites_new_pledges_detail_textarea($data) {
     if ($microsite == 'o2') {
         return '<input type="text" size="60" name="detail" value="' . $detail . '">';
     } else {
-        return '<textarea name="detail" rows="10" cols="60">' . $detail . '</textarea>';
+        return '<textarea name="detail" rows="10" cols="40">' . $detail . '</textarea>';
     }
 }
 

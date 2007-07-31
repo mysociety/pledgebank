@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.62 2007-05-29 17:55:46 francis Exp $
+ * $Id: comments.php,v 1.63 2007-07-31 16:36:55 matthew Exp $
  * 
  */
 
@@ -47,14 +47,12 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
     if ($admin)
         $name .= " (<a href=\"mailto:" . $comment['email'] . "\">" . $comment['email'] . "</a>)";
 
-    print '<div class="commentcontent">';
     if (array_key_exists('ishidden', $comment) && $comment['ishidden'] == 't')
         print "<strike>";
     print comments_text_to_html($comment['text']);
     if (array_key_exists('ishidden', $comment) && $comment['ishidden'] == 't')
         print "</strike>";
-    print '</div>';
-    print '<div class="commentheader"><small>';  /* XXX or h1 or something? */
+    print '<div><small>';  /* XXX or h1 or something? */
     if (isset($comment['ref'])) {
         $r = '<a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a>';
         if (isset($comment['whenposted'])) {
@@ -77,7 +75,7 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
     }
 
     if (isset($comment['id']) && !$noabuse)
-        print ' <a class="abusivecommentlink" href="/contact?pledge_id=' . $comment['pledge_id'] . '&amp;comment_id=' . $comment['id'] . '">' . _('Abusive? Report it!') . '</a>';
+        print ' <a href="/contact?pledge_id=' . $comment['pledge_id'] . '&amp;comment_id=' . $comment['id'] . '">' . _('Abusive? Report it!') . '</a>';
     if (isset($comment['id']) && $admin) {
         print '<select name="deletecomment_status">';
         print '<option value="0"' . ($comment['ishidden'] == 'f'?' selected':'') . '>Visible</option>';
@@ -113,13 +111,11 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
 	# TRANS: this is an error message meaning, "The pledge called '%s' doesn't exist.
         err(sprintf(_("No pledge '%s'"), $pledge));
 
-    print '<div class="commentsbox">';
-    
     $count = db_getOne('select count(id) from comment where pledge_id = ? and not ishidden', $id);
     if ($count == 0)
         print '<p><em>' . _('No comments yet! Why not add one?') . '</em></p>';
     else {
-        print '<ul class="commentslist">';
+        print '<ul id="comments">';
 
         $query = '
                     select id, extract(epoch from ms_current_timestamp()-whenposted) as whenposted,
@@ -134,7 +130,7 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
         $q = db_query($query , $id);
 
         while ($r = db_fetch_array($q)) {
-            print '<li class="comment" id="comment_' . $r['id'] . '">';
+            print '<li id="comment_' . $r['id'] . '">';
 
             comments_show_one($r, $noabuse);
 
@@ -143,7 +139,6 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
 
         print "</ul>";
     }
-    print "</div>";
 }
 
 /* comments_summary COMMENT 
@@ -227,7 +222,7 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
                 $rss_items[] = comments_rss_entry($r);
             }
         } else {
-            ?><div class="comments">
+            ?><div id="comments">
 <a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/comments"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of comments on all pledges') ?>"></a>
             <?=_('<h2>Latest comments</h2>') ?> <?  
             print '<ul>';
@@ -256,13 +251,11 @@ function comments_show_admin($pledge, $limit = 0) {
     if (is_null($id))
         err(sprintf(_("No pledge '%s'"), $pledge));
 
-    print '<div class="commentsbox">';
-    
     $count = db_getOne('select count(id) from comment where pledge_id = ?', $id);
     if ($count == 0)
         print '<p><em>' . _('No comments') . '</em></p>';
     else {
-        print '<ul class="commentslist">';
+        print '<ul>';
 
         $query = ' select comment.id, extract(epoch from ms_current_timestamp()-whenposted) as whenposted,
                         text, comment.name, comment.website, ishidden, pledge_id,
@@ -277,13 +270,12 @@ function comments_show_admin($pledge, $limit = 0) {
         $q = db_query($query , $id);
 
         while ($r = db_fetch_array($q)) {
-            print '<li class="comment" id="comment_' . $r['id'] . '">';
+            print '<li id="comment_' . $r['id'] . '">';
             comments_show_one($r, true, true);
             print '</li>';
         }
         print "</ul>";
     }
-    print "</div>";
 }
 
 

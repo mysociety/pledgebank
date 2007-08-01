@@ -5,34 +5,35 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: lang.php,v 1.4 2007-07-31 18:27:58 matthew Exp $
+// $Id: lang.php,v 1.5 2007-08-01 09:16:26 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 
 $r = get_http_var('r');
-if (!$r)
-    $r = "/";
-
 $l = get_http_var('lang');
+
 if ($l) {
-    $params = array('lang'=>$l, 'country'=>$site_country, 'path'=>$r);
-    if ($l == 'translate')
+    if ($l == 'translate') {
         $url = '/translate';
-    else
+    } else {
+        $params = array('lang' => $l, 'country' => $site_country);
+        if ($r)
+            $params['path'] = $r;
         $url = pb_domain_url($params);
+    }
     header("Location: $url");
     exit;
 }
 
+if (!$r)
+    $r = '/';
 page_header(_('Choose your language'));
 print h2(_('Choose your language'));
 print '<ul>';
 $out = array();
 foreach ($langs as $l => $pretty) {
-    $params = array('lang'=>$l, 'country'=>$site_country);
-    if ($r)
-        $params['path'] = $r;
+    $params = array('lang'=>$l, 'country'=>$site_country, 'path'=>$r);
     $url = pb_domain_url($params);
     if ($l == $lang) $o = '<strong>';
     else $o = '<a href="'.$url.'" lang="' . $l . '" hreflang="' . $l . '">';

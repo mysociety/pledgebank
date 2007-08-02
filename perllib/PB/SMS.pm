@@ -10,7 +10,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: SMS.pm,v 1.32 2007-06-20 10:23:00 francis Exp $
+# $Id: SMS.pm,v 1.33 2007-08-02 11:45:07 matthew Exp $
 #
 
 package PB::SMS;
@@ -18,7 +18,9 @@ package PB::SMS;
 use strict;
 
 use mySociety::DBHandle qw(dbh);
-use mySociety::Util qw(print_log ordinal);
+use mySociety::SystemMisc qw(print_log);
+use mySociety::Sundries qw(ordinal);
+use mySociety::Random;
 
 use PB;
 
@@ -335,9 +337,9 @@ sub receive_sms ($$$$$$) {
                                 and (select mobile from person where person.id = signers.person_id) = ?', {}, $pledge_id, $sender);
 
                 # 3. No previous token; generate a new one.
-                $token ||= unpack('h*', mySociety::Util::random_bytes(2))
+                $token ||= unpack('h*', mySociety::Random::random_bytes(2))
                                 . "-"
-                                . unpack('h*', mySociety::Util::random_bytes(2));
+                                . unpack('h*', mySociety::Random::random_bytes(2));
 
                 # Tell the user how many people have signed. This isn't
                 # reliable but is Good Enough for these purposes.

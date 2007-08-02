@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: PB.pm,v 1.11 2007-06-20 10:23:00 francis Exp $
+# $Id: PB.pm,v 1.12 2007-08-02 11:45:03 matthew Exp $
 #
 
 package PB::Error;
@@ -21,7 +21,6 @@ use strict;
 
 use mySociety::Config;
 use mySociety::DBHandle qw(dbh);
-use mySociety::Util;
 use DBI;
 
 BEGIN {

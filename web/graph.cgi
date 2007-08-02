@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.28 2007-05-17 13:12:55 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.29 2007-08-02 11:45:08 matthew Exp $';
 
 use strict;
 
@@ -39,6 +39,7 @@ use POSIX qw(locale_h);
 
 use mySociety::DBHandle qw(dbh);
 use mySociety::Locale;
+use mySociety::TempFiles;
 use mySociety::WatchUpdate;
 use PB;
 
@@ -228,7 +229,7 @@ while (my $q = new CGI::Fast()) {
                 $bucket_label = _('signups per month');
             }
 
-            my ($h, $signers_file) = mySociety::Util::named_tempfile();
+            my ($h, $signers_file) = mySociety::TempFiles::named_tempfile();
 
             my $n = dbh()->selectrow_array('
                         select count(id) from signers
@@ -271,7 +272,7 @@ while (my $q = new CGI::Fast()) {
             $h->printf("%s %d\n", $end_date, $n1);
             $h->close();
 
-            ($h, my $signuprate_file) = mySociety::Util::named_tempfile();
+            ($h, my $signuprate_file) = mySociety::TempFiles::named_tempfile();
             $h->print("2000-01-01 0\n");    # avoid "no data point found" error
             foreach (keys %ts) {
                 $h->printf("%s %d\n", $_, $ts{$_});

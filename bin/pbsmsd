@@ -16,7 +16,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.42 2006-10-15 10:29:02 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: pbsmsd,v 1.43 2007-08-02 11:45:03 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -44,7 +44,7 @@ BEGIN {
 }
 use mySociety::DBHandle qw(dbh);
 use mySociety::PIDFile;
-use mySociety::Util qw(print_log);
+use mySociety::SystemMisc qw(print_log);
 
 use PB;
 use PB::SMS;
@@ -637,7 +637,7 @@ if ($help) {
 
 if ($once) {
     if (!$debug) {
-        mySociety::Util::log_to_stderr(0);
+        mySociety::SystemMisc::log_to_stderr(0);
     }
     run_processing_process();
     run_gathering_process();
@@ -648,7 +648,7 @@ if ($once) {
 
 $numprocesses = 2 if ($numprocesses < 1 or $numprocesses > 100);
 
-mySociety::Util::daemon() unless ($debug);
+mySociety::SystemMisc::daemon() unless ($debug);
 
 my $pidfile;
 try {
@@ -665,7 +665,7 @@ print_log('info', "starting up; 1 processing process, 1 gathering process, $nump
 $SIG{TERM} = $SIG{INT} = sub { $foad = POSIX::SIGTERM }; # so children know to exit
     # catch SIGINT so that we can conveniently be run from the terminal with
     # --debug, and still shut down cleanly.
-my $termsig = mySociety::Util::manage_child_processes({
+my $termsig = mySociety::SystemMisc::manage_child_processes({
         processing =>   [1, \&run_processing_process],
         gathering =>    [1, \&run_gathering_process],
         sending =>      [$numprocesses, \&run_sending_process]
@@ -735,5 +735,5 @@ Copyright (c) 2005 UK Citizens Online Democracy
 
 =head1 VERSION
 
-$Id: pbsmsd,v 1.42 2006-10-15 10:29:02 francis Exp $
+$Id: pbsmsd,v 1.43 2007-08-02 11:45:03 matthew Exp $
 

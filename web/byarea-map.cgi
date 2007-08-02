@@ -15,7 +15,7 @@
 #       http://geometryalgorithms.com/Archive/algorithm_0205/
 # Cross reference country names to ISO codes http://ws.geonames.org/countryInfo?
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.10 2006-11-01 16:14:31 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.11 2007-08-02 11:45:08 matthew Exp $';
 
 my $bitmap_size = 300;
 my $margin_extra = 0.05;
@@ -26,7 +26,6 @@ BEGIN {
     use mySociety::Config;
     mySociety::Config::set_file('../conf/general');
 }
-use mySociety::Util;
 use mySociety::DBHandle qw(dbh);
 use PB;
 

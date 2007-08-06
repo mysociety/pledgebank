@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.28 2007-08-06 14:52:51 matthew Exp $
+// $Id: ref-email.php,v 1.29 2007-08-06 17:41:49 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -32,26 +32,26 @@ $track = get_http_var('track');
 # fromname, fromemail, frommessage
 # email as an array
 $fromname = get_http_var('fromname', true);
-$fromemail = trim(get_http_var('fromemail'));
+$fromemail = trim(get_http_var('fromat'));
 $frommessage = get_http_var('frommessage', true);
 $errors = array();
 $emails = array();
 
 if (get_http_var('submit')) {
     for ($i = 1; $i <= 5; $i++) {
-        if (get_http_var("email$i")) {
-            $email = trim(get_http_var("email$i"));
+        if (get_http_var("e$i")) {
+            $email = trim(get_http_var("e$i"));
             $emails[] = $email;
             if (!validate_email($email)) {
-                $errors['email'.$i] = _("Please correct the email address '".htmlspecialchars($email)."', which is not a valid address.");
+                $errors['e'.$i] = _("Please correct the email address '".htmlspecialchars($email)."', which is not a valid address.");
             }
         }
     }
     $emails = array_unique($emails);
-    if (count($emails) < 1) $errors['email1'] = _("Please enter the email addresses of the people you want to tell about the pledge");
+    if (count($emails) < 1) $errors['e1'] = _("Please enter the email addresses of the people you want to tell about the pledge");
     if (!$fromname) $errors['fromname'] = _("Please enter your name");
-    if (!$fromemail) $errors['fromemail'] = _("Please enter your email address");
-    if (!validate_email($fromemail)) $errors['fromemail'] = _("Please enter a valid address for your email");
+    if (!$fromemail) $errors['fromat'] = _("Please enter your email address");
+    if (!validate_email($fromemail)) $errors['fromat'] = _("Please enter a valid address for your email");
 
     if (!$errors) {
         if (sizeof($emails)>5)

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.165 2007-07-30 14:50:23 matthew Exp $
+// $Id: fns.php,v 1.166 2007-08-06 17:41:49 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -219,7 +219,7 @@ function parse_date($date) {
 
 function view_friends_form($p, $errors = array(), $track=null) {
     $name = get_http_var('fromname', true);
-    $email = get_http_var('fromemail');
+    $email = get_http_var('fromat');
     $P = pb_person_if_signed_on();
     if (!is_null($P)) {
         if (is_null($name) || !$name)
@@ -248,18 +248,18 @@ else
     print p(_('Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.')); ?>
 <p><strong><?=_('Other people\'s email addresses:') ?></strong></p>
-<div class="formrow"><input <? if (array_key_exists('email1', $errors)) print ' class="error"' ?> type="text" name="email1" value="<? if (get_http_var('email1')) print htmlentities(get_http_var('email1'));?>" size="40"></div>
-<div class="formrow"><input <? if (array_key_exists('email2', $errors)) print ' class="error"' ?> type="text" name="email2" value="<? if (get_http_var('email2')) print htmlentities(get_http_var('email2'));?>" size="40"></div>
-<div class="formrow"><input <? if (array_key_exists('email3', $errors)) print ' class="error"' ?> type="text" name="email3" value="<? if (get_http_var('email3')) print htmlentities(get_http_var('email3'));?>" size="40"></div>
-<div class="formrow"><input <? if (array_key_exists('email4', $errors)) print ' class="error"' ?> type="text" name="email4" value="<? if (get_http_var('email4')) print htmlentities(get_http_var('email4'));?>" size="40"></div>
-<div class="formrow"><input <? if (array_key_exists('email5', $errors)) print ' class="error"' ?> type="text" name="email5" value="<? if (get_http_var('email5')) print htmlentities(get_http_var('email5'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('e1', $errors)) print ' class="error"' ?> type="text" name="e1" value="<? if (get_http_var('e1')) print htmlentities(get_http_var('e1'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('e2', $errors)) print ' class="error"' ?> type="text" name="e2" value="<? if (get_http_var('e2')) print htmlentities(get_http_var('e2'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('e3', $errors)) print ' class="error"' ?> type="text" name="e3" value="<? if (get_http_var('e3')) print htmlentities(get_http_var('e3'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('e4', $errors)) print ' class="error"' ?> type="text" name="e4" value="<? if (get_http_var('e4')) print htmlentities(get_http_var('e4'));?>" size="40"></div>
+<div class="formrow"><input <? if (array_key_exists('e5', $errors)) print ' class="error"' ?> type="text" name="e5" value="<? if (get_http_var('e5')) print htmlentities(get_http_var('e5'));?>" size="40"></div>
 
 <p><strong><?=_('Add a message, if you want:') ?></strong></p>
 <div class="formrow"><textarea <? if (array_key_exists('frommessage', $errors)) print ' class="error"' ?> name="frommessage" rows="8" cols="40"></textarea></div>
 
 <p>
 <div class="formrow"><strong><?=_('Your name:') ?></strong> <input <? if (array_key_exists('fromname', $errors)) print ' class="error"' ?> type="text" name="fromname" value="<?=htmlspecialchars($name) ?>" size="20">
-<br><strong><?=_('Email:') ?></strong> <input <? if (array_key_exists('fromemail', $errors)) print ' class="error"' ?> type="text" name="fromemail" value="<?=htmlspecialchars($email) ?>" size="30"></div>
+<br><strong><?=_('Email:') ?></strong> <input <? if (array_key_exists('fromat', $errors)) print ' class="error"' ?> type="text" name="fromat" value="<?=htmlspecialchars($email) ?>" size="30"></div>
 
 <p><input name="submit" type="submit" value="<?=_('Send message') ?>"></p>
 

@@ -5,23 +5,13 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.1 2007-08-06 17:42:47 matthew Exp $
+// $Id: success.php,v 1.2 2007-08-06 17:48:02 matthew Exp $
 
 require_once "../phplib/pb.php";
-#require_once '../phplib/fns.php';
-#require_once '../phplib/pledge.php';
-#require_once '../phplib/comments.php';
-#require_once '../phplib/pbperson.php';
-#require_once '../../phplib/utility.php';
-
 page_header('Success Stories', array('id'=>'success'));
+
+# XXX i18n
 ?>
-<style type="text/css">
-#success #pbcontent div {
-    clear: both;
-    border-top: dotted 1px #522994;
-}
-</style>
 
 <h2>Success Stories</h2>
 

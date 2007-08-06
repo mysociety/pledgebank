@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.37 2007-07-30 11:30:41 francis Exp $
+// $Id: pbfacebook.php,v 1.38 2007-08-06 20:08:41 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -203,7 +203,8 @@ style="display: none"
             ));
 
     // Show signers
-    print "<h1 style=\"text-align: center\">Current signatories</h1>";
+    print '<div class="pb_signers">';
+    print '<h3 class="wallkit_title">Current Signatories</h3>';
 
     $friends_joined = pbfacebook_friends_list();
     $q = db_query("SELECT facebook_id FROM signers LEFT JOIN person ON person.id = signers.person_id
@@ -213,7 +214,7 @@ style="display: none"
     $c = 0;
     if (db_num_rows($q) > 0) {
         // Grrr - annoyingly, fb:user-table only works in a profile.
-        $signers_rows = 8;
+        $signers_per_rows = 4;
         print '<table border="0"><tr>';
         while ($r = db_fetch_array($q)) {
             print "<td>";
@@ -224,13 +225,12 @@ style="display: none"
             print "</td></tr></table>";
             print "</td>";
             $c++;
-            if ($c % $signers_rows == 0) {
+            if ($c % $signers_per_rows == 0) {
                 print "</tr><tr>";
             }
         }
         print "</tr></table>";
     }
-
     $remaining = $pledge->signers() - $c;
     if ($remaining > 0) {
         print "<p>";
@@ -259,29 +259,22 @@ style="display: none"
         print " from <a href=\"".$pledge->url_typein()."\">outside Facebook</a>.";
         print "</p>";
     }
+    print "</div>";
+
+    // Comments
+    print '<div class="pb_wall">';
+    print '<fb:comments xid="pledge_'.$pledge->ref().'_comments" canpost="true" candelete="false">';
+    print '<fb:title>The Wall</fb:title>';
+    print '</fb:comments>';
+    print '</div>';
 
     // Link to pledgebank.com
-    print '<p style="text-align:center">Visit this pledge at ';
+    print '<p class="pb_visit">Visit this pledge at ';
     print '<a href="'.$pledge->url_typein().'">';
     print '<strong>'. str_replace('http://', '', $pledge->url_typein()) . '</strong>';
     print '</a>';
     print " for comments, flyers, SMS signup and more.";
     print '</p>';
-}
-
-// Draw comments on pledges onto Facebook
-// XXX Not finished/used
-function pbfacebook_render_comments() {
-?>
-<fb:wall>
-  <fb:wallpost uid="1000550" t="1180070566">
-    Whoa, I wrote on a wall!
-      <fb:wallpost-action href="reply.php">
-        Reply
-      </fb:wallpost-action>
-  </fb:wallpost>
-</fb:wall>
-<?
 }
 
 // Draw "share" button for a pledge on Facebook
@@ -671,6 +664,18 @@ img.creatorpicture {
     float: left; 
     display: inline;
     margin-right: 10px;
+}
+.pb_signers {
+    width: 50%;
+    float: left;
+}
+.pb_wall {
+    width: 45%;
+    float: right;
+}
+.pb_visit {
+    clear: both;
+    text-align: center;
 }
 </style>
 

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.27 2006-12-12 15:28:09 francis Exp $
+// $Id: ref-email.php,v 1.28 2007-08-06 14:52:51 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -47,6 +47,7 @@ if (get_http_var('submit')) {
             }
         }
     }
+    $emails = array_unique($emails);
     if (count($emails) < 1) $errors['email1'] = _("Please enter the email addresses of the people you want to tell about the pledge");
     if (!$fromname) $errors['fromname'] = _("Please enter your name");
     if (!$fromemail) $errors['fromemail'] = _("Please enter your email address");
@@ -70,8 +71,8 @@ if (get_http_var('submit')) {
         }
         if ($success) {
             print p(_('Your message has been sent.  Thanks very much for spreading the word of this pledge.'));
-	    if ($track)
-	        $track .= '; sent=' . sizeof($emails);
+            if ($track)
+                $track .= '; sent=' . sizeof($emails);
         } else {
             $errors[] = _('Unfortunately, something went wrong when trying to send the emails. Please check that all the email addresses are correct.');
             view_friends_form($p, $errors, $track);

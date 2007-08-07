@@ -6,24 +6,21 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.37 2007-08-07 19:00:51 francis Exp $
+// $Id: facebook.php,v 1.38 2007-08-07 19:06:15 francis Exp $
 
 /*
 
 TODO:
 
-- Still taking two clicks to sign a pledge when you add the app.
 - "The news that you've signed could not be added to your feed." when Tom signed pledge
+- Post in news when new pledge created - doesn't seem to work?
 
 - Text on message for "share" links is not perfect.
 - Finish links from rest of PledgeBank site.
-- Post in news when new pledge created - doesn't seem to work?
 
 - Add chivvy email about Facebook
 
-- Fix sign button so it is properly centred
-
-- Text that is show by Facebook when you add application. (Heather to write)
+- Text that is shown by Facebook when you add application. (Heather to write)
 
 Improvements:
 - Link to creators of via facebook pledges, and show their photo

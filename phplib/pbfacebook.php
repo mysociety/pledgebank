@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.39 2007-08-07 19:00:51 francis Exp $
+// $Id: pbfacebook.php,v 1.40 2007-08-07 19:06:15 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -152,9 +152,9 @@ function pbfacebook_render_sign_confirm($pledge) {
 <td id="pop_content" class="pop_content">
 <h2> <span>Add your signature to pledge?</span> </h2>
 <div class="dialog_content">
-<div class="dialog_body">Do you want to join this pledge? "<?=$pledge->sentence(array('firstperson'=>'includename'))?>"</div>
+<div class="dialog_body">Do you want to join this pledge? <p>"<?=$pledge->sentence(array('firstperson'=>'includename'))?>"</p></div>
 <div id="dialog_buttons" class="dialog_buttons">
-<form style="display: inline" method="post" action="<?=$url?>" name="confirm_sign" id="confirm_sign"> <input type="submit" value="Join" class="inputsubmit"/> </form>
+<form style="display: inline" method="post" action="<?=$url?>" name="confirm_sign" id="confirm_sign"> <input type="submit" value="Sign Pledge" class="inputsubmit"/> </form>
 <form style="display: inline" method="post" action="<?=$cancel_url?>" name="cancel_sign" id="cancel_sign"> <input type="submit" value="Cancel" class="inputsubmit"/> </form>
 </div>
 </div>

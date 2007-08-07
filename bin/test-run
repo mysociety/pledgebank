@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.228 2007-07-29 23:55:46 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.229 2007-08-07 19:32:16 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -743,13 +743,13 @@ sub do_public_succeeding_pledge {
     my $friend_message = "Hello you!";
     $wth->browser_submit_form(form_name => 'pledge',
         fields => { 
-            fromname => name_n(0), fromemail => email_n(0), 
+            fromname => name_n(0), fromat => email_n(0), 
             frommessage => $friend_message,
-            email1 =>  email_n(10),
-            email2 =>  email_n(11),
-            email3 =>  email_n(12),
+            e1 =>  email_n(10),
+            e2 =>  email_n(11),
+            e3 =>  email_n(12),
             # deliberate gap
-            email5 =>  email_n(13),
+            e5 =>  email_n(13),
             },
         button => 'submit') or die "Failed to submit friend emailing form";
     $wth->browser_check_contents("Thanks very much for spreading the word");

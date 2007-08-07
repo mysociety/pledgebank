@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.38 2007-08-06 20:08:41 francis Exp $
+// $Id: pbfacebook.php,v 1.39 2007-08-07 19:00:51 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -136,6 +136,37 @@ function pbfacebook_update_fbmlref_profilepledge($pledge) {
     $facebook->api_client->fbml_setRefHandle("profilepledge-".$pledge->ref(), $content);
 }
 
+// Signature confirmation dialog
+function pbfacebook_render_sign_confirm($pledge) {
+    global $facebook;
+
+    $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
+    $url = $pledge->url_facebook() . "?really_sign_in_facebook=1&csrf_sig=" . $csrf_sig;
+    $cancel_url = $pledge->url_facebook();
+?>
+<p></p>
+<table class="pop_dialog_table"> <tbody>
+<tr><td class="pop_topleft"/><td class="pop_border"/> <td class="pop_topright"/> </tr>
+<tr>
+<td class="pop_border"/>
+<td id="pop_content" class="pop_content">
+<h2> <span>Add your signature to pledge?</span> </h2>
+<div class="dialog_content">
+<div class="dialog_body">Do you want to join this pledge? "<?=$pledge->sentence(array('firstperson'=>'includename'))?>"</div>
+<div id="dialog_buttons" class="dialog_buttons">
+<form style="display: inline" method="post" action="<?=$url?>" name="confirm_sign" id="confirm_sign"> <input type="submit" value="Join" class="inputsubmit"/> </form>
+<form style="display: inline" method="post" action="<?=$cancel_url?>" name="cancel_sign" id="cancel_sign"> <input type="submit" value="Cancel" class="inputsubmit"/> </form>
+</div>
+</div>
+</td>
+<td class="pop_border"/>
+</tr>
+<tr> <td class="pop_bottomleft"/> <td class="pop_border"/> <td class="pop_bottomright"/> </tr>
+</tbody></table>
+<p></p>
+<?
+}
+
 // Draw pledge index page within Facebook
 function pbfacebook_render_pledge($pledge) {
     global $facebook;
@@ -195,9 +226,8 @@ style="display: none"
 
     // Pledge itself
     pledge_draw_status_plaque($pledge);
-    $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
     $pledge->render_box(array('class'=>'', 
-            'facebook-sign'=>!$pledge->finished() && !$already_signed, 'facebook-sign-csrf'=>$csrf_sig,
+            'facebook-sign'=>!$pledge->finished() && !$already_signed,
             'showdetails' => true,
             'facebook-share' => pbfacebook_render_share_pledge($pledge) 
             ));
@@ -275,6 +305,7 @@ style="display: none"
     print '</a>';
     print " for comments, flyers, SMS signup and more.";
     print '</p>';
+
 }
 
 // Draw "share" button for a pledge on Facebook
@@ -385,9 +416,8 @@ function pbfacebook_render_frontpage($page = "") {
                 print '<li>';
                 print join(", ", $friends_text) . " ";
                 print make_plural(count($friends_sig), "has pledged:", "have pledged:") . " ";
-                $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
                 $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
-                        'facebook-sign'=>!$pledge->finished() && !$already_signed, 'facebook-sign-csrf'=>$csrf_sig,
+                        'facebook-sign'=>!$pledge->finished() && !$already_signed,
                         'href'=>$pledge->url_facebook()));
                 $friends_signed[] = $pledge->id();
                 print '</li>';
@@ -473,9 +503,8 @@ function pbfacebook_render_frontpage($page = "") {
         if ($pledges) {
             foreach ($pledges as $pledge)  {
                 $already_signed = pbfacebook_already_signed($pledge);
-                $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
                 $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
-                        'facebook-sign'=>!$pledge->finished() && !$already_signed, 'facebook-sign-csrf'=>$csrf_sig,
+                        'facebook-sign'=>!$pledge->finished() && !$already_signed,
                         'href'=>$pledge->url_facebook()));
             }
         }
@@ -484,7 +513,8 @@ function pbfacebook_render_frontpage($page = "") {
     return;
 }
 
-// Sign a pledge, update profile, add to feeds, on Facebook
+// Sign a pledge, update profile, add to feeds, on Facebook. Must be signing
+// the pledge for the logged in user, so can do feed publishing properly.
 function pbfacebook_sign_pledge($pledge) {
     global $facebook;
     $user = $facebook->get_loggedin_user();
@@ -588,7 +618,7 @@ function pbfacebook_send_to_friends($pledge, $friends) {
 
 // FBML header for all PledgeBank Facebook pages
 function pbfacebook_render_header() {
-?> <div style="padding: 10px;">  <?
+?> <div style="padding: 10px;" id="all_content">  <?
 if (OPTION_PB_STAGING) {
 ?>
 <p><i>This is a development version of PledgeBank in Facebook.  Any pledges are
@@ -778,4 +808,8 @@ function pbfacebook_send_internal($to, $message) {
     return true;
 }
 
+/*
+    $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
+    $verified = auth_verify_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET, get_http_var("csrf"));
+*/
 

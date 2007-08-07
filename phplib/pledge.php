@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.241 2007-07-30 12:08:23 matthew Exp $
+ * $Id: pledge.php,v 1.242 2007-08-07 19:00:51 francis Exp $
  * 
  */
 
@@ -541,7 +541,7 @@ class Pledge {
             // We use GET, as adding the application loses POST parameters
 ?>
 <div style="clear:both"></div>
-<fb:editor action="<?=OPTION_FACEBOOK_CANVAS?><?=$this->ref()?>?sign_in_facebook=1&amp;csrf=<?=$params['facebook-sign-csrf']?>" labelwidth="170">
+<fb:editor action="<?=OPTION_FACEBOOK_CANVAS?><?=$this->ref()?>?sign_in_facebook=1" labelwidth="170">
   <fb:editor-buttonset>
     <fb:editor-button value="Sign Pledge"/>
   </fb:editor-buttonset>

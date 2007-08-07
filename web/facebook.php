@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.36 2007-07-30 11:30:51 francis Exp $
+// $Id: facebook.php,v 1.37 2007-08-07 19:00:51 francis Exp $
 
 /*
 
@@ -58,6 +58,7 @@ require_once '../phplib/pbfacebook.php';
 
 $page_plain_headers = true;
 
+// Test function
 function do_test() {
     global $facebook;
 #    $facebook->require_login();
@@ -81,9 +82,6 @@ function do_test() {
 // Beginning of main code
 pbfacebook_init_webpage();
 
-#print_r($_POST);
-#print_r($_GET);
-
 if (get_http_var("test")) {
     do_test();
 }
@@ -103,8 +101,10 @@ if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) 
         err("PIN protected pledges can't be accessed from Facebook");
     }
     if (get_http_var("sign_in_facebook")) {
-        $facebook->require_add('/'.$pledge->ref()."/?sign_in_facebook=1&csrf=".get_http_var('csrf'));
-        $verified = auth_verify_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET, get_http_var("csrf"));
+        $facebook->require_add('/'.$pledge->ref()."/?sign_in_facebook=1");
+        pbfacebook_render_header();
+        pbfacebook_render_sign_confirm($pledge);
+        exit;
     }
     $no_send_error = false;
     if (get_http_var("invite_friends")) {
@@ -118,11 +118,14 @@ if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) 
 
     pbfacebook_render_header();
     pbfacebook_render_dashboard();
+    if (get_http_var("really_sign_in_facebook")) {
+        $verified = auth_verify_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET, get_http_var("csrf_sig"));
+        if ($verified) {
+            pbfacebook_sign_pledge($pledge);
+        }
+    }
     if ($no_send_error)
         print '<p class="errors">'."Sorry, couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
-    if (get_http_var("sign_in_facebook") && $verified) {
-        $pledge = pbfacebook_sign_pledge($pledge);
-    }
     pbfacebook_render_pledge($pledge);
     pbfacebook_render_footer();
 }

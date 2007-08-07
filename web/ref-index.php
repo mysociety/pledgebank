@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.112 2007-07-31 16:36:56 matthew Exp $
+// $Id: ref-index.php,v 1.113 2007-08-07 11:24:27 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -126,7 +126,9 @@ function draw_signatories($p) {
 <div id="signatories">
 <?
     $title = '<a name="signers">' . _('Current signatories') . '</a>';
-    $title .= ' <span style="font-size:50%; font-weight:normal">(<span style="color:#006600"><img alt="Green text " src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png">= they\'ve done it</span>)</span>';
+    if (microsites_has_survey()) {
+        $title .= ' <span style="font-size:50%; font-weight:normal">(<span style="color:#006600"><img alt="Green text " src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png">= they\'ve done it</span>)</span>';
+    }
     print h2($title);
 
     if ($nsigners == 0) {
@@ -229,10 +231,10 @@ function draw_signatories($p) {
                 print '<li id="signer' . $r['id'] . '"';
                 if ($r['done']=='t') print ' class="done"';
                 print '>';
-                if ($r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id())
+                if (microsites_has_survey() && $r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id())
                     print '<form method="post" action="' . $p->url_survey() . '"><input type="hidden" name="r" value="pledge">';
                 print htmlspecialchars($r['name']);
-                if ($r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id())
+                if (microsites_has_survey() && $r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id())
                     print ' &ndash; <input type="submit" value="I have done this pledge"></form>';
                 print '</li>';
             } else {

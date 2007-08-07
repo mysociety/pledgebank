@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.108 2007-07-31 16:36:55 matthew Exp $
+ * $Id: microsites.php,v 1.109 2007-08-07 11:24:27 matthew Exp $
  * 
  */
 
@@ -1340,6 +1340,13 @@ function microsites_search_help() {
         print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
         print "</ul>";
     }
+}
+
+function microsites_has_survey() {
+    global $microsite;
+    if ($microsite == 'o2' || $microsite == 'livesimply')
+        return false;
+    return true;
 }
 
 ?>

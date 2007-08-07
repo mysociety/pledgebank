@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.30 2007-07-30 11:57:30 matthew Exp $
+// $Id: your.php,v 1.31 2007-08-07 11:24:27 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -122,10 +122,10 @@ function show_your_signed_pledges() {
             print '<li id="signed' . $pledge->id() . '"';
             if ($r['done']=='t')
                 print ' class="done">';
-            else
+            elseif (microsites_has_survey())
                 print '><form method="post" action="' . $pledge->url_survey() . '">';
             print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
-            if ($r['done']=='f') {
+            if (microsites_has_survey() && $r['done']=='f') {
                 print '<p>';
                 if ($pledge->failed()) {
                     print _('Have you done this pledge anyway?');

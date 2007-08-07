@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.113 2007-07-29 23:55:46 matthew Exp $
+ * $Id: frequentupdate,v 1.114 2007-08-07 11:24:26 matthew Exp $
  *
  */
 
@@ -1007,7 +1007,9 @@ if (OPTION_WEB_HOST != 'o2') { # XXX: Can't use microsites() as not running "on"
     chivvy_creators_lowrate_new();
     send_pledge_success_reminder();
     send_byarea_pledge_success_reminder();
-    send_surveys();
+    if (OPTION_WEB_HOST != 'promise') { # either; XXX XXX
+        send_surveys();
+    }
 }
 send_pending_messages();
 

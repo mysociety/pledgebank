@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.194 2007-08-06 17:42:47 matthew Exp $
+// $Id: new.php,v 1.195 2007-08-07 11:14:47 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -751,7 +751,9 @@ function step3_error_check(&$data) {
 
 function stepaddr_error_check(&$data) {
     $errors = array();
-    if (array_key_exists('address_postcode', $data) && $data['address_postcode'] && !validate_postcode($data['address_postcode'])) {
+    if (array_key_exists('address_postcode', $data) && $data['address_postcode']
+        && array_key_exists('address_country', $data) && $data['address_country'] == 'GB'
+        && !validate_postcode($data['address_postcode'])) {
         $errors['address_postcode'] = _('Please enter a valid postcode');
     }
 

@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.229 2007-08-07 19:32:16 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.230 2007-08-07 19:48:12 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -900,7 +900,7 @@ sub do_public_succeeding_pledge {
     call_frequentupdate();
     for (my $i = 1; $i <= 4; ++$i) {
         my $survey_email = $wth->email_get_containing( 
-            '%To: '.email_n($i).  '%From: ' . $name_admin . '%If you\'ve done your pledge%');
+            '%To: '.email_n($i).  '%From: ' . $name_admin . '%If you HAVE done your pledge%');
         if ($i == 3) {
             die $survey_email . "\n\nSurvey link not found" if ($survey_email !~ m#\b(http://.*/L/.*)\b#m);
             my $survey_url = $1;

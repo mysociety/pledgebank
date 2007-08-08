@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.38 2007-08-07 19:06:15 francis Exp $
+// $Id: facebook.php,v 1.39 2007-08-08 14:23:59 francis Exp $
 
 /*
 
@@ -101,6 +101,7 @@ if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) 
         $facebook->require_add('/'.$pledge->ref()."/?sign_in_facebook=1");
         pbfacebook_render_header();
         pbfacebook_render_sign_confirm($pledge);
+        pbfacebook_render_footer();
         exit;
     }
     $no_send_error = false;

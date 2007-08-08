@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.41 2007-08-08 08:41:02 francis Exp $
+// $Id: pbfacebook.php,v 1.42 2007-08-08 08:48:25 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -201,12 +201,14 @@ function pbfacebook_render_pledge($pledge) {
     // Announcement messages
     if ($announce_messages && $already_signed) {
         $q = db_query('select id, whencreated, fromaddress, emailsubject, emailbody from message where pledge_id = ? and sendtosigners and emailbody is not null order by id desc', $pledge->id());
-        if (db_num_rows($q) > 0) {
+        $num = db_num_rows($q);
+        if ($num > 0) {
+            print '<h3 class="wallkit_title">Messages from Pledge Creator</h3>';
+            $c = 0;
             while (list($id, $when, $from, $subject, $body) = db_fetch_row($q)) {
-                print '<hr>';
                 ?>
-                <p><strong><?=_("Message from pledge creator") ?></strong>
-                <?= $pledge->h_name() ?> &lt;<?= htmlspecialchars($pledge->creator_email()) ?>&gt;
+                <p><strong><?=_("From:") ?></strong>
+                <?= $pledge->h_name() ?> &lt;<a href="mailto:<?=htmlspecialchars($pledge->creator_email())?>"><?= htmlspecialchars($pledge->creator_email()) ?></a>&gt;
                 <strong><?=_('on') ?></strong>
                 <?= prettify(substr($when, 0, 10)) ?>
                 <br><strong><?=_('Subject') ?></strong>:
@@ -214,13 +216,16 @@ function pbfacebook_render_pledge($pledge) {
                 </p>
                 <div class="message" id="message_<?=$id?>" ><?= comments_text_to_html($body) ?></div>
         <?
+                if (++$c != $num) {
+                    print '<hr>';
+                }
                 /*
 style="display: none"
 <a href="#" clicktoshow="message_<?=$id?>">Show text of message from creator</a>
                 / <a href="#" clicktohide="message_<?=$id?>">Hide text</a> */
 
             }
-            print "<hr>";
+            print "<p></p>";
         }
     }
 

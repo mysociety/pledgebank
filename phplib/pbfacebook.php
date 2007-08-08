@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.40 2007-08-07 19:06:15 francis Exp $
+// $Id: pbfacebook.php,v 1.41 2007-08-08 08:41:02 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -225,6 +225,7 @@ style="display: none"
     }
 
     // Pledge itself
+    print '<h3 class="wallkit_title">The Pledge</h3>';
     pledge_draw_status_plaque($pledge);
     $pledge->render_box(array('class'=>'', 
             'facebook-sign'=>!$pledge->finished() && !$already_signed,
@@ -303,7 +304,7 @@ style="display: none"
     print '<a href="'.$pledge->url_typein().'">';
     print '<strong>'. str_replace('http://', '', $pledge->url_typein()) . '</strong>';
     print '</a>';
-    print " for comments, flyers, SMS signup and more.";
+    print " for flyers, SMS signup and to share it with people not on Facebook.";
     print '</p>';
 
 }

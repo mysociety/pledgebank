@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.42 2007-08-08 08:48:25 francis Exp $
+// $Id: pbfacebook.php,v 1.43 2007-08-09 15:47:37 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -556,7 +556,7 @@ function pbfacebook_sign_pledge($pledge) {
         pbfacebook_update_profile_box($user);
 
         # Publish feed story
-        $feed_title = '<fb:userlink uid="'.$user.'" shownetwork="false"/> has signed '; 
+        $feed_title = '<fb:userlink uid="'.$user.'" shownetwork="false"/> signed '; 
         if (OPTION_PB_STAGING) 
             $feed_title .= 'a test pledge.';
         else

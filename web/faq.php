@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.56 2007-06-28 08:43:24 matthew Exp $
+// $Id: faq.php,v 1.57 2007-08-09 16:56:16 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -48,10 +48,10 @@ function default_faq() {
     people to sign up to them. A pledge is a statement of the form 'I will
     do something, if a certain number of people will help me do it'. The
     creator of the pledge then publicises their pledge and encourages
-    people to sign up. One of two possible outcomes is possible&mdash;either
-    the pledge fails to get enough subscribers before it expires. In that
-    case, we contact everyone and tell them 'better luck next time'. But
-    the better possibility is that a pledge attracts enough people that
+    people to sign up. Two outcomes are possible &ndash; either
+    the pledge fails to get enough subscribers before it expires (in which
+    case, we contact everyone and tell them 'better luck next time'), or,
+    the better possibility, the pledge attracts enough people that
     they are all sent a message saying 'Well done&mdash;now get going!'"));
 
     print dt(_('What can I ask people to pledge?'));
@@ -64,9 +64,9 @@ function default_faq() {
 
     print dd(_("We can't; PledgeBank is based on a psychological bet. We believe that
     if a person possesses a slight desire to do something, and then we help
-    connect them to a bunch of  people who also want to do the same thing
-    then that first person is much more likely to act.  Update: we have now
-    surveyed a load of money based pledges that have succeeded, and found that
+    connect them to a bunch of people who also want to do the same thing,
+    then that first person is much more likely to act. We have
+    surveyed many of the money-based pledges that have succeeded, and found that
     payment rates vary from 50% to well over 150%, with three-quarters of 
     people paying being typical."));
 
@@ -98,12 +98,12 @@ function default_faq() {
     print dt(_('Who built PledgeBank?'));
 
     print dd(_('This site was built by <a href="http://www.mysociety.org">mySociety</a>. 
-    mySociety is a charitable organisation which has grown out of this community of
+    mySociety is a charitable organisation in the United Kingdom, which has grown out of a community of
     volunteers who built sites like <a href="http://www.theyworkforyou.com">TheyWorkForYou.com</a>. 
     mySociety\'s primary
     mission is to build Internet projects which give people simple, tangible
     benefits in the civic and community aspects of their lives. Our first project
-    was <a href="http://www.writetothem.com">WriteToThem.com</a>, where you can write to any of your
+    was <a href="http://www.writetothem.com">WriteToThem.com</a>, where UK citizens can write to any of their
     elected representatives, for free.'));
 
     print dt(_('Who pays for it?'));
@@ -241,8 +241,8 @@ function default_faq() {
     print dt(_('Can I contact the people who have signed my pledge?'));
 
     print dd(_("At any time, you can send a message to your signers so far.  Go 
-    to your pledge's page, and follow the link under 'Spread the word'.  For cost
-    reasons, this will not go to SMS signers.  If your pledge succeeds you will be
+    to your pledge's page, and follow the link under 'Spread the word'.
+    If your pledge succeeds you will be
     given a link to send a message to all your signers, including those who
     signed up by text message.  You should give your contact details, and ask for
     theirs, so you can stay in touch as you carry out your pledge.  If anybody
@@ -252,7 +252,7 @@ function default_faq() {
     print dt(_('Can people sign up by SMS (text message), and if so how?'));
 
     print dd(sprintf(_("Yes, although only in %s. If you'd like to help us organise
-    SMS for other countries, please contact us. The flyers for your pledge
+    SMS for other countries, please <a href=\"/contact\">contact us</a>. The flyers for your pledge
     describe how to sign up by SMS. So the easiest way to remember is to print some
     out and carry them with you.  You can find the flyers from the 'Spread the
     word' section on your pledge's page.  Otherwise, for people in %s, it says what to text and
@@ -334,7 +334,7 @@ function default_faq() {
     creator of your pledge, unless we are obliged to by law. We do let the pledge
     creators send emails to pledge subscribers to explain what's going on, to
     motivate them etc. However, we don't show the pledge creator the addresses of
-    the subscribers getting his email. If you reply to an email from the pledge
+    the subscribers getting their email. If you reply to an email from the pledge
     creator yourself, you will give them your email address&mdash;please be
     aware!"));
 
@@ -342,7 +342,7 @@ function default_faq() {
 
     print dd(_("Nope. After you sign up to a pledge we will send you emails in
     relation to your pledge. These will be a mixture of status emails from
-    PledgeBank itself, and missives from the pledge creator, trying to chivvy you
+    PledgeBank itself, and missives from the pledge creator, trying to encourage you
     into greater support. We will never give or sell your email addresses to anyone
     else, unless we are obliged to by law."));
 

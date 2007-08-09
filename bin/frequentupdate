@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.114 2007-08-07 11:24:26 matthew Exp $
+ * $Id: frequentupdate,v 1.115 2007-08-09 16:56:15 matthew Exp $
  *
  */
 
@@ -745,11 +745,13 @@ function send_pending_messages() {
         if (isset($msg['emailtemplatename'])) {
             verbose("sending message #${msg['id']} using email template '${msg['emailtemplatename']}'");
             locale_push($pledge->lang());
-            $f = pb_send_email_template($pledge->creator_email(), $msg['emailtemplatename'], $data, $headers);
+            $f = pb_send_email_template(array($pledge->creator_email(), $pledge->creator_name()),
+                $msg['emailtemplatename'], $data, $headers);
             locale_pop();
         } else {
             verbose("sending message #${msg['id']} as raw email, subject '${msg['emailsubject']}'");
-            $f = pb_send_email($pledge->creator_email(), $msg['emailsubject'], $msg['emailbody'], $headers);
+            $f = pb_send_email(array($pledge->creator_email(), $pledge->creator_name()),
+                $msg['emailsubject'], $msg['emailbody'], $headers);
         }
 
         // Store success
@@ -827,7 +829,7 @@ function send_pending_messages() {
         if ($r['fromaddress'] == 'pledgebank') {
             // the default in pb_send_email_internal is from PledgeBank
         } elseif ($r['fromaddress'] == 'creator') {
-            $headers['From'] = $pledge->creator_name() . " <" . $pledge->creator_email() .">";
+            $headers['From'] = array($pledge->creator_email(), $pledge->creator_name());
         } else {
             error("Unknown 'from' in message " . $r['id'] . ": " . $msg['fromaddress']);
         }
@@ -883,7 +885,8 @@ function send_pending_messages() {
             /* Send message using template. */
             if ($send_by == 'email') {
                 verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
-                $f = pb_send_email_template($r['signer_email'], $r['emailtemplatename'], $data, $headers);
+                $f = pb_send_email_template(array($r['signer_email'], $r['signer_name']),
+                    $r['emailtemplatename'], $data, $headers);
             } elseif ($send_by == 'facebook' && $r['circumstance'] != 'survey') {
                 verbose("sending message #${r['id']} by Facebook id ${r['signer_facebook_id']} template '${r['emailtemplatename']}'");
                 $f = pbfacebook_send_template($r['signer_facebook_id'], $r['emailtemplatename'], $data, $headers);
@@ -946,7 +949,8 @@ function send_pending_messages() {
             if ($send_it) {
                 if ($send_by == 'email') {
                     verbose("sending message #${r['id']} as raw email, subject '${r['emailsubject']}'");
-                    $f = pb_send_email($r['signer_email'], $r['emailsubject'], $emailbody, $headers);
+                    $f = pb_send_email(array($r['signer_email'], $r['signer_name']),
+                        $r['emailsubject'], $emailbody, $headers);
                 } elseif ($send_by == 'facebook') {
                     verbose("sending message #${r['id']} by Facebook id ${r['signer_facebook_id']} subject '${r['emailsubject']}'");
                     $f = pbfacebook_send($r['signer_facebook_id'], $emailbody);

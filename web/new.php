@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.196 2007-08-09 16:54:33 francis Exp $
+// $Id: new.php,v 1.197 2007-08-09 16:56:16 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -153,17 +153,17 @@ function pledge_form_one($data = array(), $errors = array()) {
     # XXX: Put in microsites.php
     global $microsite;
     if ($microsite == 'o2') { ?>
-<p><strong>I am</strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">,
+<p><strong>I am</strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">,
 my email address is <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">.
 </p>
 
 <p><strong>I promise that I will</strong>
-<input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
+<input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
 
 <p>as part of the <? display_categories($data); ?> part of the People Promise,</p>
 
 <?  } else { ?>
-<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="50"></p>
+<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="50"></p>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="3" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
 <input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="32" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
@@ -181,8 +181,7 @@ size="51" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 
 <p><?=_('The other people must sign up before') ?> <input<?
     if (array_key_exists('date', $errors)) print ' class="error"';
-?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date"
-onfocus="fadein(this)" onblur="fadeout(this)" value="<?
+?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" value="<?
     if (isset($data['date'])) print htmlspecialchars($data['date']) ?>">
 <small>(<?=_('e.g.') ?> <? microsites_example_date(); ?>)</small></p>
 
@@ -208,7 +207,7 @@ onfocus="fadein(this)" onblur="fadeout(this)" value="<?
 <input type="hidden" name="facebook_name" value="<?=htmlspecialchars($facebook_name)?>">
 <input type="hidden" name="name" value="<?=htmlspecialchars($facebook_name)?>">
 <?   } else { ?>
-<?=_('Your name:') ?> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+<?=_('Your name:') ?> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 <?   } ?>
 <br><?=_('Email:') ?> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>

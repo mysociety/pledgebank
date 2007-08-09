@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.29 2007-08-06 17:41:49 matthew Exp $
+// $Id: ref-email.php,v 1.30 2007-08-09 16:56:16 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,14 +15,7 @@ require_once '../../phplib/utility.php';
 page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));
 microsites_redirect($p);
-
-$pin_box = deal_with_pin($p->url_email(), $p->ref(), $p->pin());
-if ($pin_box) {
-    page_header(_("Enter PIN")); 
-    print $pin_box;
-    page_footer();
-    exit;
-}
+deal_with_pin($p->url_email(), $p->ref(), $p->pin());
 
 $title = _("Emailing friends");
 page_header($title, array('ref'=>$p->ref(),'pref' => $p->url_typein() ));
@@ -51,7 +44,7 @@ if (get_http_var('submit')) {
     if (count($emails) < 1) $errors['e1'] = _("Please enter the email addresses of the people you want to tell about the pledge");
     if (!$fromname) $errors['fromname'] = _("Please enter your name");
     if (!$fromemail) $errors['fromat'] = _("Please enter your email address");
-    if (!validate_email($fromemail)) $errors['fromat'] = _("Please enter a valid address for your email");
+    elseif (!validate_email($fromemail)) $errors['fromat'] = _("Please enter a valid address for your email");
 
     if (!$errors) {
         if (sizeof($emails)>5)
@@ -63,10 +56,10 @@ if (get_http_var('submit')) {
             global $microsite;
             $success &= pb_send_email_template($email, ($microsite && $microsite == 'livesimply') ? 'email-friends-livesimply' : 'email-friends', # XXX put condition in microsites.php
                 array_merge($p->data, array(
-                    'from_name'=>$fromname, 
+                    'from_name' => $fromname, 
                     'from_email' => $fromemail, 
                     'from_message' => $frommessage ? sprintf(_('%s added this message:'), $fromname) . " \"$frommessage\"\n\n" : "",
-                )), array('From'=>array($fromemail, $fromname))
+                )), array('From' => array($fromemail, $fromname))
             );
         }
         if ($success) {

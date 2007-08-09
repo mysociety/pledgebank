@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.243 2007-08-07 19:06:15 francis Exp $
+ * $Id: pledge.php,v 1.244 2007-08-09 16:56:16 matthew Exp $
  * 
  */
 
@@ -367,6 +367,7 @@ class Pledge {
     function url_announce_archive() { return pb_domain_url() . $this->h_ref . "/announcearchive"; }
     function url_facebook() { return OPTION_FACEBOOK_CANVAS . $this->h_ref; }
     function url_survey() { return pb_domain_url() . $this->h_ref . '/survey'; }
+    function url_contact_creator() { return pb_domain_url() . $this->h_ref . '/contact'; }
 
     // This one needs encoding for use HTML, to escape the &
     function url_place_map() {
@@ -684,7 +685,7 @@ class Pledge {
     <input type="hidden" name="ref" value="<?=htmlspecialchars($this->ref()) ?>">
     <?  print h2($this->byarea() ? _('Sign up where you live') : _('Sign up now'));
         if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
-        $namebox = '<input onblur="fadeout(this)" onfocus="fadein(this)" size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
+        $namebox = '<input size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
         print '<p><strong>';
         printf(_('I, %s, sign up to the pledge.'), $namebox);
         print '</strong><br></p>';
@@ -717,7 +718,7 @@ class Pledge {
 ?> <div id="byarea_town_ajax"></div> <?
         }
         print '
-    <p><strong>' . _('Your email') . '</strong>: <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
+    <p><strong>' . _('Your email:') . '</strong> <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
     _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>';
         microsites_signup_extra_fields($errors);
         print '<p><input type="submit" name="submit" value="' . ($this->byarea() ? _('Sign Pledge') : _('Sign Pledge')) . '"></p>';
@@ -932,7 +933,7 @@ function check_pin($ref, $actual) {
 }
 
 /* deal_with_pin LINK REF ACTUAL_PIN
-   Calls check_pin and if necessary returns HTML form for asking for pin.
+   Calls check_pin and if necessary prints HTML form for asking for pin and exits.
    Otherwise returns false.
        LINK url for pin form to post back to
        REF pledge reference
@@ -951,7 +952,11 @@ function deal_with_pin($link, $ref, $actual) {
         h2(_('PIN Protected Pledge')) . '<p>' . _('This pledge is protected.  Please enter the PIN to proceed.') . '</p>';
     $html .= '<p><strong>PIN:</strong> <input type="password" name="pin" value=""><input type="submit" name="submitpin" value="' . _('Submit') . '"></p>';
     $html .= '</form>';
-    return $html;
+    page_header(_("Enter PIN")); 
+    print $html;
+    page_footer();
+    exit;
+    /* NOT REACHED */
 }
 
 /* print_link_with_pin
@@ -962,15 +967,16 @@ function deal_with_pin($link, $ref, $actual) {
    should be already escaped, or not need escaping, for display in URLs or
    HTML.*/
 function print_link_with_pin($link, $title, $text) {
+    if ($title) $title = ' title="' . $title . '"';;
     if (get_http_var('pin', true)) {
 ?> 
-    <form class="buttonform" name="buttonform" action="<?=$link?>" method="post" title="<?=$title?>">
+    <form class="buttonform" name="buttonform" action="<?=$link?>" method="post"<?=$title?>>
     <input type="hidden" name="pin" value="<?=htmlspecialchars(get_http_var('pin', true))?>">
     <input type="submit" name="submitbuttonform" value="<?=$text?>">
     </form>
 <?
     } else {
-?><a href="<?=$link?>" title="<?=$title?>"><?=$text?></a><?
+?><a href="<?=$link?>"<?=$title?>><?=$text?></a><?
     }
 }
 

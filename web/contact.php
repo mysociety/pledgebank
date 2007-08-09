@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.60 2007-07-18 10:38:36 francis Exp $
+// $Id: contact.php,v 1.61 2007-08-09 16:56:16 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -71,7 +71,7 @@ function contact_form($errors = array()) {
         microsites_contact_intro();
     }
 
-    print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge. The form below is for messages to the PledgeBank Team only, <strong>not</strong> the Pledge Creator."));
+    print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge, or the 'contact the pledge creator' feature. The form below is for messages to the PledgeBank Team only, <strong>not</strong> the Pledge Creator."));
     if (!$comment_id) {
         # XXX
         $blurb = '';
@@ -89,8 +89,8 @@ function contact_form($errors = array()) {
 <form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>"><input type="hidden" name="referrer" value="<?=htmlspecialchars($referrer)?>"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($pledge_id)?>"><input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
 <p><?=_('Message to')?>: <strong><?=_("PledgeBank Team")?></strong></p>
 
-<p><label for="name"><?=_('Your name') ?></label>: <input type="text" id="name" name="name" onblur="fadeout(this)" onfocus="fadein(this)" value="<?=htmlspecialchars($name) ?>" size="25">
-<br><label for="email"><?=_('Your email') ?></label>: <input type="text" id="email" name="email" value="<?=htmlspecialchars($email) ?>" size="30"></p>
+<p><label for="name"><?=_('Your name:') ?></label> <input type="text" id="name" name="name" value="<?=htmlspecialchars($name) ?>" size="25">
+<br><label for="email"><?=_('Your email:') ?></label> <input type="text" id="email" name="email" value="<?=htmlspecialchars($email) ?>" size="30"></p>
 
 <p><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlspecialchars(get_http_var('subject', true)) ?>" size="48"></p>
 

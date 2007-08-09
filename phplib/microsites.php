@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.110 2007-08-09 16:54:33 francis Exp $
+ * $Id: microsites.php,v 1.111 2007-08-09 16:56:16 matthew Exp $
  * 
  */
 
@@ -739,6 +739,7 @@ function microsites_contact_intro() {
     We make PledgeBank and thrive off feedback, good and bad.
     Use this form to contact us.');
         $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
+	print ' ';
         printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
         print "</p>";
     }
@@ -939,15 +940,15 @@ information you provide us will help us in evaluating the success of the
 <em>live</em>simply challenge.
 
 <p><strong><?=_('Your address:') ?></strong> 
-<br><input<? if (array_key_exists('address_1', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_1" id="address_1" value="<? if (isset($data['address_1'])) print htmlspecialchars($data['address_1']) ?>" size="30">
-<br><input<? if (array_key_exists('address_2', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_2" id="address_2" value="<? if (isset($data['address_2'])) print htmlspecialchars($data['address_2']) ?>" size="30">
-<br><input<? if (array_key_exists('address_3', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_3" id="address_3" value="<? if (isset($data['address_3'])) print htmlspecialchars($data['address_3']) ?>" size="30">
+<br><input<? if (array_key_exists('address_1', $errors)) print ' class="error"' ?> type="text" name="address_1" id="address_1" value="<? if (isset($data['address_1'])) print htmlspecialchars($data['address_1']) ?>" size="30">
+<br><input<? if (array_key_exists('address_2', $errors)) print ' class="error"' ?> type="text" name="address_2" id="address_2" value="<? if (isset($data['address_2'])) print htmlspecialchars($data['address_2']) ?>" size="30">
+<br><input<? if (array_key_exists('address_3', $errors)) print ' class="error"' ?> type="text" name="address_3" id="address_3" value="<? if (isset($data['address_3'])) print htmlspecialchars($data['address_3']) ?>" size="30">
 <br><strong><?=_('Town:') ?></strong> 
-<br><input<? if (array_key_exists('address_town', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_town" id="address_town" value="<? if (isset($data['address_town'])) print htmlspecialchars($data['address_town']) ?>" size="20">
+<br><input<? if (array_key_exists('address_town', $errors)) print ' class="error"' ?> type="text" name="address_town" id="address_town" value="<? if (isset($data['address_town'])) print htmlspecialchars($data['address_town']) ?>" size="20">
 <br><strong><?=_('County:') ?></strong> 
-<br><input<? if (array_key_exists('address_county', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_county" id="address_county" value="<? if (isset($data['address_county'])) print htmlspecialchars($data['address_county']) ?>" size="20">
+<br><input<? if (array_key_exists('address_county', $errors)) print ' class="error"' ?> type="text" name="address_county" id="address_county" value="<? if (isset($data['address_county'])) print htmlspecialchars($data['address_county']) ?>" size="20">
 <br><strong><?=_('Postcode:') ?></strong> 
-<br><input<? if (array_key_exists('address_postcode', $errors)) print ' class="error"' ?> onblur="fadeout(this)" onfocus="fadein(this)" type="text" name="address_postcode" id="address_postcode" value="<? if (isset($data['address_postcode'])) print htmlspecialchars($data['address_postcode']) ?>" size="20">
+<br><input<? if (array_key_exists('address_postcode', $errors)) print ' class="error"' ?> type="text" name="address_postcode" id="address_postcode" value="<? if (isset($data['address_postcode'])) print htmlspecialchars($data['address_postcode']) ?>" size="20">
 <br><strong><?=_('Country:') ?></strong> 
 <? 
     gaze_controls_print_country_choice(microsites_site_country(), null, $errors, array('noglobal'=>true, 'fieldname' => 'address_country')); ?>

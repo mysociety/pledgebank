@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.167 2007-08-07 19:22:43 francis Exp $
+// $Id: page.php,v 1.168 2007-08-09 16:56:16 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -299,7 +299,7 @@ function page_footer($params = array()) {
 ?>
 <form id="search" accept-charset="utf-8" action="/search" method="get">
 <label for="q"><?=_('Search') ?>:</label>
-<input type="text" id="q" name="q" size="25" value="" onblur="fadeout(this)" onfocus="fadein(this)"> <input type="submit" value="<?=_('Go') ?>">
+<input type="text" id="q" name="q" size="25" value=""> <input type="submit" value="<?=_('Go') ?>">
 </form>
 <?
     print '</div>'; # navforms

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.63 2007-07-31 16:36:55 matthew Exp $
+ * $Id: comments.php,v 1.64 2007-08-09 16:56:16 matthew Exp $
  * 
  */
 
@@ -310,23 +310,23 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 <input type="hidden" name="pledge_id" value="<?=$pledge_id ?>">
 <?=_('<h2>Add public comment</h2>') ?>
 <div class="form_row">
- <label for="author_name"><?=_('Your name') ?></label>
+ <label for="author_name"><?=_('Your name:') ?></label>
  <input type="text" id="author_name" name="author_name" value="<?=$q_h_author_name?>" size="30">
 </div>
 
 <div class="form_row">
-<label for="author_email"><?=_('Your email') ?></label>
+<label for="author_email"><?=_('Your email:') ?></label>
   <input type="text" id="author_email" name="author_email" value="<?=$q_h_author_email?>" size="30">
 </div>
 
 <? if (!microsites_intranet_site()) { ?>
 <div class="form_row">
-<label for="author_website"><?=_('Your web site address') ?></label> <small><i><?=_('(optional)') ?></i></small>
+<label for="author_website"><?=_('Your web site address') ?>:</label> <small><i><?=_('(optional)') ?></i></small>
   <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="40">
 </div>
 <? } ?>
 
-<p><strong><?=_('Your comment') ?></strong>
+<p><strong><?=_('Your comment') ?>:</strong>
 <br><textarea style="max-width: 100%" name="text" id="text" cols="40" rows="10"><?=$q_h_text?></textarea>
 </p>
 

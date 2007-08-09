@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.44 2007-07-31 16:36:56 matthew Exp $
+ * $Id: ref-info.php,v 1.45 2007-08-09 16:56:16 matthew Exp $
  * 
  */
 
@@ -45,13 +45,7 @@ microsites_redirect($p);
 if (cond_maybe_respond($p->last_change_time()))
     exit();
 
-$pin_box = deal_with_pin($p->url_info(), $p->ref(), $p->pin());
-if ($pin_box) {
-    page_header(_("Enter PIN"));
-    print $pin_box;
-    page_footer();
-    exit;
-}
+deal_with_pin($p->url_info(), $p->ref(), $p->pin());
 
 page_header(_("More information: ") . $p->h_title(), array(
             'ref'=>$p->ref(),

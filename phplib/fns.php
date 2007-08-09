@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.166 2007-08-06 17:41:49 matthew Exp $
+// $Id: fns.php,v 1.167 2007-08-09 16:56:16 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -163,7 +163,7 @@ function pb_message_add_template_values($values) {
     return $values;
 }
 
-// $to can be one recipient address in a string, or an array of addresses
+// $to can either be one address in a string, or array(address, name)
 function pb_send_email_template($to, $template_name, $values, $headers = array()) {
     $values = pb_message_add_template_values($values);
     $template = file_get_contents("../templates/emails/$template_name");
@@ -177,7 +177,7 @@ function pb_send_email_template($to, $template_name, $values, $headers = array()
     return pb_send_email_internal($to, $spec);
 }
 
-// $to can be one recipient address in a string, or an array of addresses
+// $to can be as above
 function pb_send_email($to, $subject, $message, $headers = array()) {
     $spec = array(
         '_unwrapped_body_' => $message,
@@ -188,21 +188,14 @@ function pb_send_email($to, $subject, $message, $headers = array()) {
 }
 
 function pb_send_email_internal($to, $spec) {
-    // Construct parameters
-
     // Add standard PledgeBank from header
     if (!array_key_exists("From", $spec)) {
         $spec['From'] = '"' . _('PledgeBank.com') . '" <' . OPTION_CONTACT_EMAIL . ">";
     }
 
-    // With one recipient, put in header.  Otherwise default to undisclosed recip.
-    if (!is_array($to)) {
-        $spec['To'] = $to;
-        $to = array($to);
-    }
-
-    // Send the message
-    $result = evel_send($spec, $to);
+    $spec['To'] = array($to);
+    $recip = is_array($to) ? $to[0] : $to;
+    $result = evel_send($spec, $recip);
     $error = evel_get_error($result);
     if ($error) 
         error_log("pb_send_email_internal: " . $error);
@@ -237,7 +230,7 @@ function view_friends_form($p, $errors = array(), $track=null) {
     }
     $p->render_box(array('showdetails'=>false));
 ?>
-<form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post"><input type="hidden" name="ref" value="<?=$p->url_main() ?>">
+<form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post">
 <?  if ($track)
         print '<input type="hidden" name="track" value="' . htmlentities($track) . '">';
     if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
@@ -582,11 +575,21 @@ function change_personal_details($yourpage = false) {
     <br><?=_('New password, again:') ?> <input type="password" name="pw2" id="pw2" size="10">
     <input name="submit" type="submit" value="<?=_('Submit') ?>"></p>
     </form>
-    <p>Your email: <?=htmlspecialchars($P->email())?> (<a href="/contact">contact us</a> to change this)
+    <p><?=_('Your email:')?> <?=htmlspecialchars($P->email())?> <?=_('(<a href="/contact">contact us</a> to change this)')?>
     </p>
     </div>
 
     <?
 }
 
+/* Adds version number of file to filename, if possible */
+function add_version($s) {
+    if (OPTION_PB_STAGING) {
+        $stat = stat(".$s");
+	$v = $stat['mtime'];
+    } else {
+        $v = $resource_versions[$s];
+    }
+    return str_replace('.css', ".v$v.css", $s);
+}
 

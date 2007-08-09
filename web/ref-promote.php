@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: ref-promote.php,v 1.4 2007-06-27 19:01:46 matthew Exp $
+ * $Id: ref-promote.php,v 1.5 2007-08-09 16:56:16 matthew Exp $
  */
 
 include_once '../phplib/pb.php';
@@ -14,14 +14,7 @@ include_once '../phplib/pb.php';
 page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));
 microsites_redirect($p);
-
-$pin_box = deal_with_pin($p->url_flyers(), $p->ref(), $p->pin());
-if ($pin_box) {
-    page_header(_("Enter PIN"));
-    print $pin_box;
-    page_footer();
-    exit;
-}
+deal_with_pin($p->url_flyers(), $p->ref(), $p->pin());
 
 $params = array(
     'ref' => $p->ref(),

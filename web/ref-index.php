@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.113 2007-08-07 11:24:27 matthew Exp $
+// $Id: ref-index.php,v 1.114 2007-08-09 16:56:16 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -50,13 +50,7 @@ microsites_redirect($p);
 if (cond_maybe_respond($p->last_change_time()))
     exit();
 
-$pin_box = deal_with_pin($p->url_main(), $p->ref(), $p->pin());
-if ($pin_box) {
-    page_header(_("Enter PIN"));
-    print $pin_box;
-    page_footer();
-    exit;
-}
+deal_with_pin($p->url_main(), $p->ref(), $p->pin());
 
 function draw_spreadword($p) { ?>
     <div id="spreadword">
@@ -70,12 +64,18 @@ function draw_spreadword($p) { ?>
         print '<li>';
         print_link_with_pin($p->url_email(), "", _("Email your friends"));
         print '</li>';
-        if (microsites_has_flyers())
+        if (microsites_has_flyers()) {
             print '<li>';
             print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers"));
             print '</li>';
-        ?> <li><a href="/<?=$p->ref() ?>/promote"><?=_('Promote on your site or blog') ?></a></li> <?
+	}
+	print '<li>';
+	print_link_with_pin('/' . $p->ref() . '/promote', '', _('Promote on your site or blog'));
+	print '</li>';
     } 
+    print '<li>';
+    print_link_with_pin($p->url_contact_creator(), '', _('Contact the pledge creator'));
+    print '</li>';
     ?>
     <li><a href="/new/local/<?=$p->ref() ?>"><?=_('Create a local version of this pledge') ?></a></li>
     <li><small><?=_('Creator only:') ?> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a>

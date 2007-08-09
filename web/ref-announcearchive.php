@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announcearchive.php,v 1.9 2007-07-29 22:25:44 matthew Exp $
+ * $Id: ref-announcearchive.php,v 1.10 2007-08-09 16:56:16 matthew Exp $
  * 
  */
 
@@ -28,14 +28,7 @@ if (!is_null($err))
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
 microsites_redirect($p);
-
-$pin_box = deal_with_pin($p->url_info(), $p->ref(), $p->pin());
-if ($pin_box) {
-    page_header(_("Enter PIN"));
-    print $pin_box;
-    page_footer();
-    exit;
-}
+deal_with_pin($p->url_info(), $p->ref(), $p->pin());
 
 $P = pb_person_signon(array(
                      'reason_web' => _('To view announcement messages for a pledge, we need to check you have signed it.'),

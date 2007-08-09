@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.109 2007-08-07 11:24:27 matthew Exp $
+ * $Id: microsites.php,v 1.110 2007-08-09 16:54:33 francis Exp $
  * 
  */
 
@@ -98,8 +98,47 @@ function microsites_user_tracking() {
 EOF;
     }
 
-/* Don't do any cross site tracking on other sites, to avoid breaking
- * any privacy policies of organisations using the microsites. */
+    /* Don't do any cross site tracking on other sites, to avoid breaking
+     * any privacy policies of organisations using the microsites. */
+    return false;
+}
+
+/* microsites_google_conversion_tracking LABEL
+ * Whether to use Google AdWords conversion tracking for signers/new pledges.
+ * Outputs Javascript code if yes.  Label is the code used by adverts, things
+ * like "signup", "default", "lead".
+ */
+function microsites_google_conversion_tracking($label) {
+    global $microsite;
+
+    // Only do it on the main site.
+    if (OPTION_BASE_URL != "http://www.pledgebank.com")
+        return false;
+
+    if (!$microsite || $microsite == 'everywhere' || $microsite == 'london') {
+?>
+<!-- Google Code for signup Conversion Page -->
+<script language="JavaScript" type="text/javascript">
+<!--
+var google_conversion_id = 1067468161;
+var google_conversion_language = "en_GB";
+var google_conversion_format = "1";
+var google_conversion_color = "666666";
+if (1) {
+  var google_conversion_value = 1;
+}
+var google_conversion_label = "<?=$label?>";
+//-->
+</script>
+<script language="JavaScript" src="http://www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<img height=1 width=1 border=0 src="http://www.googleadservices.com/pagead/conversion/1067468161/imp.gif?value=1&label=signup&script=0">
+</noscript>
+<?
+    return true;
+}
+
     return false;
 }
 

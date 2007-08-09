@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.58 2007-07-31 16:36:56 matthew Exp $
+// $Id: ref-sign.php,v 1.59 2007-08-09 16:54:33 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -241,6 +241,8 @@ function do_sign(&$location) {
             print '<p><strong>' . _("Your signature has made this pledge reach its target! Woohoo!") . '</strong></p>';
 
         post_confirm_advertise();
+        
+        microsites_google_conversion_tracking("signup");
     } else if ($R == PLEDGE_SIGNED) {
         /* Either has already signer, or is creator. */
         print '<p><strong>';

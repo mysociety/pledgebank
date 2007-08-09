@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.195 2007-08-07 11:14:47 matthew Exp $
+// $Id: new.php,v 1.196 2007-08-09 16:54:33 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -1043,6 +1043,8 @@ or <a href="http://www.chipin.com/">ChipIn</a> if you're raising money for somet
     } else {
         post_confirm_advertise();
     }
+
+    microsites_google_conversion_tracking("default");
 }
 
 function display_categories($data) { ?>

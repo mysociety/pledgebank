@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.231 2007-08-10 03:02:02 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.232 2007-08-10 17:17:06 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -249,7 +249,7 @@ if ($action{'all'}) {
 # Check for any unhandled mails or errors
 call_frequentupdate();
 call_send_alerts();
-$wth->email_check_none_left();
+$wth->email_check_none_left(1);
 sms_check_none_left();
 $wth->log_watcher_check();
 if ($action{'all'})  {
@@ -1727,7 +1727,7 @@ sub do_admin_tests {
     $wth->browser_submit_form(form_name => 'contact',
             fields => { 
                 name => name_n(1000), 
-                email => email_n(1000), 
+                e => email_n(1000), 
                 subject => "Lovely site", 
                 message => "Hey, your PledgeBank site rules!" },
             button => 'submit') or die "Failed to submit contact form";
@@ -1744,7 +1744,7 @@ sub do_admin_tests {
     $wth->browser_submit_form(form_name => 'contact',
             fields => { 
                 name => name_n(1000),
-                email => email_n(1000),
+                e => email_n(1000),
                 subject => "Sucky sucky comment",
                 message => "I hate this comment, it sucks",
                 },

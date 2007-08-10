@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.83 2007-08-09 16:56:16 matthew Exp $
+ * $Id: login.php,v 1.84 2007-08-10 03:02:03 matthew Exp $
  * 
  */
 
@@ -241,7 +241,7 @@ function login_page() {
         if (is_null($template_data['user_name']))
             $template_data['user_name'] = 'Pledge signer';
         $template_data['user_email'] = $q_email;
-        pb_send_email_template(array($q_email, $q_name),
+        pb_send_email_template($q_name ? array($q_email, $q_name) : $q_email,
             array_key_exists('template', $template_data) 
                 ?  $template_data['template'] : 'generic-confirm', 
             $template_data);

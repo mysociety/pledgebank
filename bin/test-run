@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.230 2007-08-07 19:48:12 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.231 2007-08-10 03:02:02 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -171,8 +171,8 @@ $wth->browser_credentials("$1:80", "$stub_url admin pages", $admin_auth_user, $a
 # Specify URL as first parameter, will browse to it and store it as the new
 # locale base URL to use. Otherwise specify no URL, and the current one
 # is used.
-our $locale_url = $base_url; # including country code
-our $locale_url_redirected = $base_url; # after country codes are redirected out into cookie
+our $locale_url = $base_url; # including country code, old language code
+our $locale_url_redirected = $base_url; # after country codes are redirected out into cookie, new language code
 sub lock_locale_url { 
     my $new_url = shift;
     $wth->browser_get($new_url) if $new_url;
@@ -181,15 +181,16 @@ sub lock_locale_url {
     $locale_url = $1;
     $wth->browser_base() =~ m#^(http://[^/]+)/?#; 
     $locale_url_redirected = $1;
-    verbose("lock_locale_url browser URL is $locale_url, redirected $locale_url_redirected");
+    verbose("lock_locale_url browser URL is $locale_url from $new_url, redirected $locale_url_redirected from " . $wth->browser_base());
 }
 
 $wth->database_connect('PB_');
 $wth->database_drop_reload('../db/schema.sql');
 $wth->database_load_schema('../db/ican-categories.sql');
 $wth->database_cycle_sequences(200);
-my $eveld_bin = "$FindBin::Bin/../../services/EvEl/bin/eveld";
-$eveld_bin = undef if ! -e $eveld_bin; # when running on servers rely on EvEl daemon, rather than calling EvEl binary directly XXX need more explicit way of distinguishing this case, than just checking evel isn't checked out in the same tree
+# XXX As services are deployed now for Ratty, comment this out
+my $eveld_bin = undef; # "$FindBin::Bin/../../services/EvEl/bin/eveld";
+# $eveld_bin = undef if ! -e $eveld_bin; # when running on servers rely on EvEl daemon, rather than calling EvEl binary directly XXX need more explicit way of distinguishing this case, than just checking evel isn't checked out in the same tree
 $wth->email_setup({ eveld_bin => $eveld_bin,
                     eveld_multispawn => $multispawn,
                     log_mailbox => "log_mailbox" });
@@ -331,7 +332,7 @@ sub perform_login_action {
         # Wait for it to arrive, and extract the link (unless we are suspending request)
         my $confirmation_url;
         if ($login_action ne "suspend") {
-            my @email_text_array = map { '%To: '.email_n($who).'%'.$_.'%' } @$email_text;
+            my @email_text_array = map { '%To:%'.email_n($who).'%'.$_.'%' } @$email_text;
             my $confirmation_email = $wth->email_get_containing(\@email_text_array);
             die "Pledge confirmation link not found\n" if ($confirmation_email !~ m#^\s*(http://.*$)#m);
             $confirmation_url = $1;
@@ -400,7 +401,7 @@ sub create_pledge {
     die "'resume' not supported for pledges yet" if ($login_action eq "resume");
 
     # Make new pledge, step 1
-    $wth->browser_get($locale_url);
+    $wth->browser_get($locale_url_redirected); # We need the language, and hopefully not the country!
     $wth->browser_follow_link(text_regex => qr/(Start your own pledge|Crie sua promessa)/);
     $wth->browser_check_contents(qr/(New Pledge|Nova promessa)/);
     $wth->browser_submit_form(form_name => 'pledge', fields => $page1,
@@ -691,7 +692,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("Do I have to be a computer to take part?");
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(0).  '%This is a great pledge%');
+    $wth->email_get_containing('%To: "'.name_n(0).'" <'.email_n(0). '>%This is a great pledge%');
     comment("Add another comment so its email goes");
     $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_submit_form(form_name => 'commentform',
@@ -709,9 +710,9 @@ sub do_public_succeeding_pledge {
     call_send_alerts();
     $wth->email_get_containing(
         '%Content-Type: text/plain; charset%iso-8859-1%' .
-        '%To: '.email_n(0).  
+        '%To: "'.name_n(0).'" <'.email_n(0).  
         encode("iso-8859-1", decode("UTF-8", '%It cost £0 to make and was%mainly done in a%café%')));
-    my $comment_alert_email = $wth->email_get_containing('%To: '.email_n(90).  
+    my $comment_alert_email = $wth->email_get_containing('%To: "'.name_n(90).'" <'.email_n(90).  
         encode("iso-8859-1", decode("UTF-8", '%It cost £0 to make and was%mainly done in a%café%')));
     $wth->email_check_none_left();
     die $comment_alert_email . "\n\nUnsubscribe link not found" if ($comment_alert_email !~ m#\b(http://.*/L/.*)\b#m);
@@ -733,7 +734,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_follow_link(text_regex => qr/to the pledge comments/);
     $wth->browser_check_contents("This is a third comment");
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(0).  '%This is a third comment%');
+    $wth->email_get_containing('%To: "' . name_n(0) . '" <' . email_n(0) . '>%This is a third comment%');
     $wth->email_check_none_left();
 
     comment("Mail pledge to friends");
@@ -767,7 +768,7 @@ sub do_public_succeeding_pledge {
 
     comment("Now we have a signer, will get local alert");
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(11).  '%new pledge%'.$pledge_action_completion.'%');
+    $wth->email_get_containing('%To: ' . email_n(11) . '%new pledge%'.$pledge_action_completion.'%');
 
     comment("Check can't get to announce page as a mere signer");
     $wth->browser_get($locale_url . "/$pledge_ref");
@@ -787,9 +788,9 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
     call_frequentupdate();
     comment("Check all announcements arrived");
-    $wth->email_get_containing( '%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%Love and kisses%');
-    $wth->email_get_containing( '%To: '.email_n(1).  '%From: '.name_n(0).  '%Love and kisses%');
-    $wth->email_get_containing( '%To: '.email_n(2).  '%From: '.name_n(0).  '%Love and kisses%');
+    $wth->email_get_containing( '%To: "' . name_n(0) . '" <' . email_n(0) . '>%From: '.$name_admin.  '%[ This is a copy of the message%Love and kisses%');
+    $wth->email_get_containing( '%To: "' . name_n(1) . '" <' . email_n(1) . '>%From: "' . name_n(0) . '"%Love and kisses%');
+    $wth->email_get_containing( '%To: "' . name_n(2) . '" <' . email_n(2) . '>%From: "' . name_n(0) . '"%Love and kisses%');
     call_frequentupdate();
     $wth->email_check_none_left();
 
@@ -814,7 +815,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("This pledge has been successful!");
     $wth->browser_check_contents("1 person who did not want to give their name");
     comment("Check for late mid-pledge announce message");
-    $wth->email_get_containing( '%To: '.email_n(3).  '%From: '.name_n(0).  '%You signed this pledge after this message%Love and kisses%');
+    $wth->email_get_containing( '%To: "' . name_n(3) . '" <' . email_n(3) . '>%From: "' . name_n(0) . '"%You signed this pledge after this message%Love and kisses%');
     comment("Check success email there");
     my $announce_link = undef;
     for (my $i = 0; $i <= 3; ++$i) {
@@ -824,13 +825,13 @@ sub do_public_succeeding_pledge {
             $wth->browser_check_contents(name_n($i));
         }
         # Check got success emails
-        my $success_email = $wth->email_get_containing( '%To: '.email_n($i).'%We are pleased to tell you%');
+        my $success_email = $wth->email_get_containing('%To: "' . name_n($i) . '" <' . email_n($i) . '>%We are pleased to tell you%');
     }
 
     comment("Wait for reminder message");
     set_pb_date('1982-02-04');
     call_frequentupdate();
-    my $success_email = $wth->email_get_containing( '%To: '.email_n(0).'%Your pledge reached its target three days ago%');
+    my $success_email = $wth->email_get_containing('%To: "' . name_n(0) . '" <' . email_n(0) . '>%Your pledge reached its target three days ago%');
     die "Success email link not found\n" if ($success_email !~ m#^\s*(http://.*$)#m);
     $announce_link = $1;
 
@@ -849,10 +850,10 @@ sub do_public_succeeding_pledge {
     comment("Check all success messages arrived");
     for (my $i = 1; $i <= 3; ++$i) {
         my $success_email = $wth->email_get_containing( 
-            '%To: '.email_n($i).  '%From: '.name_n(0). '%By merely partaking%');
+            '%To: "' . name_n($i) . '" <' . email_n($i) . '>%From: "' . name_n(0) . '"%By merely partaking%');
     }
     $success_email = $wth->email_get_containing( 
-        '%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%By merely partaking%');
+        '%To: "' . name_n(0) . '" <' . email_n(0) . '>%From: ' . $name_admin . '%[ This is a copy of the message%By merely partaking%');
     comment("Make sure no extra emails - in particular that late partial-signer hasn't got message");
     call_frequentupdate();
     # TODO: Make this next line check that we only have the (unconfirmed) signup
@@ -865,7 +866,7 @@ sub do_public_succeeding_pledge {
     comment("Check the late signer (number 4) also recieves the success announcement message.");
     comment("They won't get the earlier success announcement message, instead a URL...");
     call_frequentupdate();
-    my $late_success_announce_email = $wth->email_get_containing( '%To: '.email_n(4).'%You signed this pledge after this message was%By merely partaking%');
+    my $late_success_announce_email = $wth->email_get_containing( '%To: "' . name_n(4) . '" <' . email_n(4) . '>%You signed this pledge after this message was%By merely partaking%');
     die $late_success_announce_email . "\n\nUnsubscribe link not found" if ($late_success_announce_email !~ m#\b(http://.*/L/.*)\b#m);
     my $announce_archive_link = $1;
     comment("... follow it to get other messages");
@@ -900,7 +901,7 @@ sub do_public_succeeding_pledge {
     call_frequentupdate();
     for (my $i = 1; $i <= 4; ++$i) {
         my $survey_email = $wth->email_get_containing( 
-            '%To: '.email_n($i).  '%From: ' . $name_admin . '%If you HAVE done your pledge%');
+            '%To: "' . name_n($i) . '" <' . email_n($i) . '>%From: ' . $name_admin . '%If you HAVE done your pledge%');
         if ($i == 3) {
             die $survey_email . "\n\nSurvey link not found" if ($survey_email !~ m#\b(http://.*/L/.*)\b#m);
             my $survey_url = $1;
@@ -1017,13 +1018,13 @@ sub do_private_failing_pledge {
     #comment("Provoke chivvy too few signers email");
     #set_pb_date('1980-12-07');
     #call_frequentupdate();
-    #$wth->email_get_containing('%Subject: You MUST publicise%To: '.email_n(0).  '%');
+    #$wth->email_get_containing('%Subject: You MUST publicise%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     #$wth->email_check_none_left();
     #comment("Provoke chivvy rate too low mail (we get it even though low signers count");
     #comment("as we are 'frontpage')");
     #set_pb_date('1980-12-10');
     #call_frequentupdate();
-    #$wth->email_get_containing('%To: '.email_n(0).  '%rate of growth you\'ve had over the last week%');
+    #$wth->email_get_containing('%To: "' . name_n(0) . '" <' . email_n(0) . '>%rate of growth you\'ve had over the last week%');
     #$wth->email_check_none_left();
 
     comment("Test what happens upon expiry");
@@ -1036,10 +1037,10 @@ sub do_private_failing_pledge {
     sign_pledge(2, 1, {action=>"resume"}, "finished");
     comment("Check failure emails");
     call_frequentupdate();
-    my $failure_email = $wth->email_get_containing('%Subject: Your pledge%To: '.email_n(0).  '%'); # failed
+    my $failure_email = $wth->email_get_containing('%Subject: Your pledge%To: "' . name_n(0) . '" <' . email_n(0) . '>%'); # failed
     die "Failure email link not found\n" if ($failure_email !~ m#^\s*(http://.*$)#m);
     my $announce_link = $1;
-    $wth->email_get_containing('%Subject: Your pledge%To: '.email_n(1).  '%'); # failed
+    $wth->email_get_containing('%Subject: Your pledge%To: "' . name_n(1) . '" <' . email_n(1) . '>%'); # failed
 
     comment("Make sure pledge says it is expired, and has no sign up box");
     &$goto_private_pledge_page();
@@ -1057,8 +1058,8 @@ sub do_private_failing_pledge {
         button => 'submit') or die "Failed to submit email failure form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
     call_frequentupdate();
-    my $success_email = $wth->email_get_containing('%To: '.email_n(0).  '%From: '.$name_admin.  '%[ This is a copy of the message%What a hassle%');
-    $success_email = $wth->email_get_containing('%To: '.email_n(1).  '%From: '.name_n(0).  '%What a hassle%');
+    my $success_email = $wth->email_get_containing('%To: "' . name_n(0) . '" <' . email_n(0) . '>%From: ' . $name_admin . '%[ This is a copy of the message%What a hassle%');
+    $success_email = $wth->email_get_containing('%To: "' . name_n(1) . '" <' . email_n(1) . '>%From: "' . name_n(0) . '"%What a hassle%');
     $wth->email_check_none_left();
     comment("Try to send second failure, which is not allowed");
     $wth->browser_get($locale_url . "/$pledge_ref/announce");
@@ -1095,42 +1096,42 @@ sub do_chivvy_testing {
     set_pb_date('1985-12-07'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-08'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-10'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-11'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-13'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-14'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-15'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-17'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-19'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-20'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-22'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-23'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your local politicians can help your pledge to grow%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Your local politicians can help your pledge to grow%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-24'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-26'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Bribe your friends to help spread your pledge%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Bribe your friends to help spread your pledge%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-29'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1986-01-01'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge%To: '.email_n(0).  '%'); # failed
+    $wth->email_get_containing('%Subject: Your pledge%To: "' . name_n(0) . '" <' . email_n(0) . '>%'); # failed
     $wth->email_check_none_left();
 
     comment("Now check no more than one a day, even if frequentupdate bombs and isn't run for two weeks");
@@ -1147,32 +1148,32 @@ sub do_chivvy_testing {
     );
     set_pledge_prominence($pledge_ref, 'frontpage');
     set_pb_date('1985-12-15'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-17'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-18'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-19'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-21'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-23'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-24'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-26'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-27'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-29'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1986-01-01'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge%To: '.email_n(0).  '%'); # failed
+    $wth->email_get_containing('%Subject: Your pledge%To: "' . name_n(0) . '" <' . email_n(0) . '>%'); # failed
     $wth->email_check_none_left();
 
     comment("Now check nothing sent if there has been some signups!");
@@ -1198,17 +1199,17 @@ sub do_chivvy_testing {
     set_pb_date('1985-12-10'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-12'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Helping to make your pledge succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-13'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-15'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Your pledge isn\'t growing fast enough%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-17'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-18'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: A suggestion to help your pledge succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-20'); call_frequentupdate();
     $wth->email_check_none_left();
@@ -1220,21 +1221,21 @@ sub do_chivvy_testing {
     set_pb_date('1985-12-23'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-24'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Your pledge needs to grow faster to succeed%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-26'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-27'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: '.email_n(0).  '%');
+    $wth->email_get_containing('%Subject: Need some help to get your pledge to grow faster%To: "' . name_n(0) . '" <' . email_n(0) . '>%');
     $wth->email_check_none_left();
     set_pb_date('1985-12-28'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1985-12-31'); call_frequentupdate();
     $wth->email_check_none_left();
     set_pb_date('1986-01-01'); call_frequentupdate();
-    $wth->email_get_containing('%Subject: Your pledge%To: '.email_n(0).  '%'); # failed
+    $wth->email_get_containing('%Subject: Your pledge%To: "' . name_n(0) . '" <' . email_n(0) . '>%'); # failed
     for (my $i=101; $i<=106; $i++) {
-        $wth->email_get_containing('%Subject: Your pledge%To: '.email_n($i).  '%'); # failed
+        $wth->email_get_containing('%Subject: Your pledge%To: "' . name_n($i) . '" <' . email_n($i) . '>%'); # failed
     }
     $wth->email_check_none_left();
 }
@@ -1375,11 +1376,11 @@ sub do_sms_pledge {
     comment("Let pledge succeed");
     set_pb_date('1982-03-09');
     call_frequentupdate();
-    my $success_email = $wth->email_get_containing( '%To: '.email_n(100).'%We are pleased to tell you%');
+    my $success_email = $wth->email_get_containing( '%To: "' . name_n(100) . '" <' . email_n(100) . '>%We are pleased to tell you%');
     die "Announce link not found\n" if ($success_email !~ m#^\s*(http://.*$)#m);
     my $announce_link = $1;
     display_url("Announce URL", $announce_link);
-    $wth->email_get_containing( '%To: '.email_n(105).'%We are pleased to tell you%');
+    $wth->email_get_containing( '%To: "' . name_n(105) . '" <' . email_n(105) . '>%We are pleased to tell you%');
     comment("Send announce message");
     $wth->browser_get($announce_link);
     $wth->browser_check_contents("Send announcement");
@@ -1391,18 +1392,25 @@ sub do_sms_pledge {
     call_frequentupdate();
     call_smsd();
     comment("Check all the success texts arrived");
-    $wth->email_get_containing( '%To: '.email_n(100).'%[ This is a copy of the message%hurrah!%');
-    $wth->email_get_containing( '%To: '.email_n(105).'%hurrah!%');
+    $wth->email_get_containing( '%To: "' . name_n(100) . '" <' . email_n(100) . '>%[ This is a copy of the message%hurrah!%');
+    $wth->email_get_containing( '%To: "' . name_n(105) . '" <' . email_n(105) . '>%hurrah!%');
     comment("... the input unicode pound sign should come out as HTML entity");
     for (my $who = 101; $who <= 103; ++$who) {
         my $sms_text = sms_get_containing(mobile_n($who), '%Yippee! All the &#x00a3; are yours!%', 0);
         verbose("SMS text: $sms_text");
     }
 
-    comment("Check nothing left");
     set_pb_date('1982-03-10');
     call_smsd();  # delivery notification
     call_smsd();  # cull done with message
+
+    comment("Provoke survey email");
+    set_pb_date('1982-05-01');
+    call_frequentupdate();
+    my $survey_email = $wth->email_get_containing( 
+        '%To: "' . name_n(105) . '" <' . email_n(105) . '>%From: ' . $name_admin . '%If you HAVE done your pledge%');
+
+    comment("Check nothing left");
     sms_check_none_left();
     $wth->email_check_none_left();
 }
@@ -1529,7 +1537,7 @@ sub do_login_tests {
     comment("Check local alert for two pledges at once works");
     call_frequentupdate(); # update prominence cache
     call_send_alerts();
-    $wth->email_get_containing('%To: '.email_n(250).  '%2 new pledge%login1%login2%');
+    $wth->email_get_containing('%To: ' . email_n(250) . '%2 new pledge%login1%login2%');
     $wth->email_check_none_left();
 
 }
@@ -1542,8 +1550,10 @@ sub do_category_tests {
     comment("Make Portuguese language pledge");
     my $pledge_action_portuguese = 'learn to speak Portuguese';
     my $pledge_ref_portugese = "portuguese";
-    $wth->browser_get($locale_url);
-    $wth->browser_follow_link(text_regex => qr/Portugu/);
+    # XXX: If we had WWW::Mechanize 1.19 or later, then these things would be much easier to write:
+    # $wth->browser_submit_form(with_fields => { lang => 'pt-br' })
+    $wth->browser_submit_form(form_name => 'language',
+        fields => { lang => 'pt-br' }) or die "Failed to change language";
     lock_locale_url();
     create_pledge(300, 
         { title => $pledge_action_portuguese, 
@@ -1553,8 +1563,9 @@ sub do_category_tests {
         { },
         { action => "viaemail", setpassword => 0 }
     );
-    $wth->browser_get($locale_url);
-    $wth->browser_follow_link(text => "English");
+    $wth->browser_get($locale_url_redirected);
+    $wth->browser_submit_form(form_name => 'language',
+        fields => { lang => 'en-gb' }) or die "Failed to change language";
     lock_locale_url();
 
     comment("Make English language pledge");
@@ -1574,14 +1585,14 @@ sub do_category_tests {
     set_pledge_prominence($pledge_ref_portugese, 'frontpage');
     call_frequentupdate(); # update prominence cache
 
-    comment("Change to Portugese pages");
-    $wth->browser_get($locale_url);
+    comment("Change to Portugal pages");
+    $wth->browser_get($locale_url_redirected);
     $wth->browser_follow_link(text => "(change)");
     $wth->browser_follow_link(text => "Portugal");
     lock_locale_url();
 
     comment("Check pledges appear correctly");
-    $wth->browser_get($locale_url);
+    $wth->browser_get($locale_url_redirected);
     $wth->browser_check_contents("desde que 3 other monoglots");
     $wth->browser_check_contents("but only if 3 other polyglots");
 
@@ -1629,12 +1640,12 @@ sub do_byarea_tests {
     find_and_sign_pledge("ref", $pledge_ref_boo, 604, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", {byarea=>1, byarea_near=>'default'});
     call_frequentupdate();
-    my $success_email = $wth->email_get_containing( '%To: '.email_n(600).'%We are pleased to tell you that your pledge%Liverpool%');
+    my $success_email = $wth->email_get_containing( '%To: "' . name_n(600) . '" <' . email_n(600) . '>%We are pleased to tell you that your pledge%Liverpool%');
     die "Success email link not found\n" if ($success_email !~ m#^\s*(http://.*$)#m);
     my $announce_link = $1;
     display_url("Announce Liverpool URL", $announce_link);
-    $wth->email_get_containing( '%To: '.email_n(601).'%We are pleased to tell you that the pledge%Liverpool%');
-    $wth->email_get_containing( '%To: '.email_n(604).'%We are pleased to tell you that the pledge%Liverpool%');
+    $wth->email_get_containing( '%To: "' . name_n(601) . '" <' . email_n(601) . '>%We are pleased to tell you that the pledge%Liverpool%');
+    $wth->email_get_containing( '%To: "' . name_n(604) . '" <' . email_n(604) . '>%We are pleased to tell you that the pledge%Liverpool%');
     $wth->email_check_none_left();
     
     comment("Send success announce to Liverpool");
@@ -1645,20 +1656,20 @@ sub do_byarea_tests {
         button => 'submit') or die "Failed to submit Liverpool email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Liverpool");
     call_frequentupdate();
-    $wth->email_get_containing( '%To: '.email_n(601).  '%From: '.name_n(600). '%It all works in Liverpool%');
-    $wth->email_get_containing( '%To: '.email_n(604).  '%From: '.name_n(600). '%It all works in Liverpool%');
-    $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all works in Liverpool%');
+    $wth->email_get_containing( '%To: "' . name_n(601) . '" <' . email_n(601) . '>%From: "' . name_n(600) . '"%It all works in Liverpool%');
+    $wth->email_get_containing( '%To: "' . name_n(604) . '" <' . email_n(604) . '>%From: "' . name_n(600) . '"%It all works in Liverpool%');
+    $wth->email_get_containing( '%To: "' . name_n(600) . '" <' . email_n(600) . '>%From: '.$name_admin.  '%[ This is a copy of the message%It all works in Liverpool%');
 
     comment("This will provoke success in Birkenhead");
     find_and_sign_pledge("ref", $pledge_ref_boo, 605, 1, 
         {action=>"viaemail",setpassword=>1}, "signed", {byarea=>1, byarea_near=>'default'});
     call_frequentupdate();
-    my $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%We are pleased to tell you that your pledge%Birkenhead%');
+    my $success_email_1 = $wth->email_get_containing( '%To: "' . name_n(600) . '" <' . email_n(600) . '>%We are pleased to tell you that your pledge%Birkenhead%');
     die "Success email link not found\n" if ($success_email_1 !~ m#^\s*(http://.*$)#m);
     my $announce_link_1 = $1;
     display_url("Announce Birkenhead URL", $announce_link_1);
-    $wth->email_get_containing( '%To: '.email_n(602).'%We are pleased to tell you that the pledge%Birkenhead%');
-    $wth->email_get_containing( '%To: '.email_n(605).'%We are pleased to tell you that the pledge%Birkenhead%');
+    $wth->email_get_containing( '%To: "' . name_n(602) . '" <' . email_n(602) . '>%We are pleased to tell you that the pledge%Birkenhead%');
+    $wth->email_get_containing( '%To: "' . name_n(605) . '" <' . email_n(605) . '>%We are pleased to tell you that the pledge%Birkenhead%');
     $wth->email_check_none_left();
 
     comment("Check display on pledge page");
@@ -1668,7 +1679,7 @@ sub do_byarea_tests {
     comment("Success reminder messages");
     set_pb_date('1984-09-10');
     call_frequentupdate();
-    $success_email_1 = $wth->email_get_containing( '%To: '.email_n(600).'%Your pledge reached its target in Birkenhead three days ago%');
+    $success_email_1 = $wth->email_get_containing( '%To: "' . name_n(600) . '" <' . email_n(600) . '>%Your pledge reached its target in Birkenhead three days ago%');
     die "Success reminder email link not found\n" if ($success_email_1 !~ m#^\s*(http://.*$)#m);
     my $announce_link_2 = $1;
 
@@ -1680,18 +1691,18 @@ sub do_byarea_tests {
         button => 'submit') or die "Failed to submit Birkenhead email success form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Birkenhead");
     call_frequentupdate();
-    $wth->email_get_containing( '%To: '.email_n(602).  '%From: '.name_n(600). '%It all rocks in Birkenhead%');
-    $wth->email_get_containing( '%To: '.email_n(605).  '%From: '.name_n(600). '%It all rocks in Birkenhead%');
-    $wth->email_get_containing( '%To: '.email_n(600).  '%From: '.$name_admin.  '%[ This is a copy of the message%It all rocks in Birkenhead%');
+    $wth->email_get_containing( '%To: "' . name_n(602) . '" <' . email_n(602) . '>%From: "' . name_n(600) . '"%It all rocks in Birkenhead%');
+    $wth->email_get_containing( '%To: "' . name_n(605) . '" <' . email_n(605) . '>%From: "' . name_n(600) . '"%It all rocks in Birkenhead%');
+    $wth->email_get_containing( '%To: "' . name_n(600) . '" <' . email_n(600) . '>%From: '.$name_admin.  '%[ This is a copy of the message%It all rocks in Birkenhead%');
 
     comment("Cause failure of pledge for other towns");
     set_pb_date('1984-10-10');
     call_frequentupdate();
-    my $failure_email = $wth->email_get_containing('%Subject: Your pledge%unsuccessful in Hexham%To: '.email_n(600).  '%');
+    my $failure_email = $wth->email_get_containing('%Subject: Your pledge%unsuccessful in Hexham%To: "' . name_n(600) . '" <' . email_n(600) . '>%');
     die "Failure email link not found\n" if ($failure_email !~ m#^\s*(http://.*$)#m);
     my $announce_link_failure = $1;
     display_url("Announce failure URL", $announce_link_failure);
-    $wth->email_get_containing('%Subject: Your pledge%To: '.email_n(603).  '%'); # failed
+    $wth->email_get_containing('%Subject: Your pledge%To: "' . name_n(603) . '" <' . email_n(603) . '>%'); # failed
 
     comment("Send failure announce to Hexham places");
     $wth->browser_get($announce_link_failure);
@@ -1701,8 +1712,8 @@ sub do_byarea_tests {
         button => 'submit') or die "Failed to submit Hexham email failure form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge in Hexham");
     call_frequentupdate();
-    $wth->email_get_containing( '%To: '.email_n(603).'%From: '.name_n(600).'%It went badly in Hexham%');
-    $wth->email_get_containing( '%To: '.email_n(600).'%From: '.$name_admin.'%[ This is a copy of the message%It went badly in Hexham%');
+    $wth->email_get_containing( '%To: "' . name_n(603) . '" <' . email_n(603) . '>%From: "' . name_n(600) . '"%It went badly in Hexham%');
+    $wth->email_get_containing( '%To: "' . name_n(600) . '" <' . email_n(600) . '>%From: '.$name_admin.'%[ This is a copy of the message%It went badly in Hexham%');
 
     $wth->email_check_none_left();
 }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.168 2007-08-09 16:56:16 matthew Exp $
+// $Id: page.php,v 1.169 2007-08-10 03:02:02 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -284,7 +284,7 @@ function page_footer($params = array()) {
 <?
     if (microsites_show_translate_blurb()) {
         global $lang, $langs, $site_country;
-        print '<form action="/lang" method="get">
+        print '<form action="/lang" method="get" name="language">
 <input type="hidden" name="r" value="' . htmlspecialchars($_SERVER['REQUEST_URI']) . '">
 <label for="language">' . _('Language:') . '</label> <select name="lang" id="language">';
         foreach ($langs as $l => $pretty) {

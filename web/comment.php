@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.44 2007-07-31 16:36:56 matthew Exp $
+ * $Id: comment.php,v 1.45 2007-08-10 16:32:42 matthew Exp $
  * 
  */
 
@@ -17,6 +17,7 @@ require_once('../phplib/pbperson.php');
 require_once('../phplib/pledge.php');
 require_once('../phplib/comments.php');
 require_once('../phplib/alert.php');
+require_once('../phplib/abuse.php');
 
 $err = importparams(
             array('pledge_id',          '/^[1-9][0-9]*$/',  _("Missing pledge id")),
@@ -118,10 +119,14 @@ if (sizeof($err) == 0 && isset($_POST['submit'])) {
     $id = db_getOne('select id from comment where id = ? for update', $comment_id);
     if (is_null($id)) {
         $hidden = false;
-        $text_click = ms_make_clickable($q_text);
-        $text_no_links = preg_replace('#<a.*?</a>#s', '', $text_click);
-        if (substr_count($text_click, '<a') > 4 && strlen($text_no_links) / strlen($q_text) <= 0.5)
-            $hidden = true;
+        $vars = array(
+            'name' => array($q_author_name, "User's name"),
+            'email' => array($q_author_email, "User's email"),
+            'ref' => array($ref, 'Pledge reference'),
+            'message' => array($q_text, 'Message entered'),
+        );
+        $result = abuse_test($vars);
+        if ($result) $hidden = true;
         db_query('
                 insert into comment (id, pledge_id, person_id, name, website, text, ishidden)
                 values (

@@ -5,13 +5,14 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.61 2007-08-09 16:56:16 matthew Exp $
+// $Id: contact.php,v 1.62 2007-08-10 16:32:42 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../phplib/pbperson.php';
+require_once '../phplib/abuse.php';
 require_once '../../phplib/utility.php';
 
 $params = array();
@@ -38,7 +39,7 @@ page_footer();
 
 function contact_form($errors = array()) {
     $name = get_http_var('name', true);
-    $email = get_http_var('email');
+    $email = get_http_var('e');
     $ref = get_http_var('ref');
     $pledge_id = get_http_var('pledge_id');
     $comment_id = get_http_var('comment_id');
@@ -90,7 +91,7 @@ function contact_form($errors = array()) {
 <p><?=_('Message to')?>: <strong><?=_("PledgeBank Team")?></strong></p>
 
 <p><label for="name"><?=_('Your name:') ?></label> <input type="text" id="name" name="name" value="<?=htmlspecialchars($name) ?>" size="25">
-<br><label for="email"><?=_('Your email:') ?></label> <input type="text" id="email" name="email" value="<?=htmlspecialchars($email) ?>" size="30"></p>
+<br><label for="e"><?=_('Your email:') ?></label> <input type="text" id="e" name="e" value="<?=htmlspecialchars($email) ?>" size="30"></p>
 
 <p><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlspecialchars(get_http_var('subject', true)) ?>" size="48"></p>
 
@@ -105,7 +106,7 @@ function contact_form($errors = array()) {
 function contact_form_submitted() {
     $name = get_http_var('name', true);
     if ($name == _('<Enter your name>')) $name = '';
-    $email = get_http_var('email');
+    $email = get_http_var('e');
     $subject = get_http_var('subject', true);
     $message = get_http_var('message', true);
     $ref = get_http_var('ref');
@@ -114,16 +115,28 @@ function contact_form_submitted() {
     $referrer = get_http_var('referrer');
     $comment_id = get_http_var('comment_id');
     $errors = array();
-        if (!$name) $errors[] = _('Please enter your name');
-        if (!$email) $errors[] = _('Please enter your email address');
-        if (!validate_email($email)) $errors[] = _('Please enter a valid email address');
-        if (!$subject) $errors[] = _('Please enter a subject');
-        if (!$message) $errors[] = _('Please enter your message');
-        if (sizeof($errors)) {
-                contact_form($errors);
-        } else {
-                send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id);
-        }
+    if (!$name) $errors[] = _('Please enter your name');
+    if (!$email) $errors[] = _('Please enter your email address');
+    elseif (!validate_email($email)) $errors[] = _('Please enter a valid email address');
+    if (!$subject) $errors[] = _('Please enter a subject');
+    if (!$message) $errors[] = _('Please enter your message');
+    if (!sizeof($errors)) {
+        $vars = array(
+            'name' => array($name, "User's name"),
+            'email' => array($email, "User's email address"),
+            'subject' => array($subject, 'Subject entered'),
+            'message' => array($message, 'Message entered'),
+            'ref' => array($ref, 'Pledge reference'),
+        );
+        $result = abuse_test($vars);
+        if ($result)
+            $errors[] = _("I'm afraid that we rate limit the usage of the contact form to prevent abuse.");
+    }
+    if (sizeof($errors)) {
+        contact_form($errors);
+    } else {
+        send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id);
+    }
 }
 
 function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id) {
@@ -137,11 +150,6 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
     /* User mail must be submitted with \n line endings. */
     $message = str_replace("\r\n", "\n", $message);
 
-    if ($_SERVER['REMOTE_ADDR'] == '202.71.106.121') {
-        # TODO: Use a database instead, but this'll do for now
-        print _('Please stop sending us spam. Thank you.');
-        return;
-    }
     $postfix = '[ ';
     $postfix .= 'Sent by ';
     $postfix .= 'contact.php ' . ($ref ? ('for pledge ' . $ref . ' ') : '')  .  
@@ -158,8 +166,7 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
     ' ]';
     $headers = array();
     $headers['From'] = array($email, $name);
-#print "$to<pre>";    print_r($message . "\n\n" . $postfix);exit;
-    if ($subject == $name || $subject == '...' || $subject == 'Unknown' || $subject == 'hello' || $_SERVER['REMOTE_ADDR'] == '81.177.14.19')
+    if ($subject == $name)
         $success = true;
     else
         $success = pb_send_email($to, $subject, $message . "\n\n-- \n" . $postfix, $headers);

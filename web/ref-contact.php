@@ -5,13 +5,13 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-contact.php,v 1.1 2007-08-09 16:56:16 matthew Exp $
+// $Id: ref-contact.php,v 1.2 2007-08-10 16:32:42 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
+require_once '../phplib/abuse.php';
 require_once '../../phplib/utility.php';
-require_once '../../phplib/ratty.php';
 
 page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));
@@ -36,19 +36,17 @@ if (get_http_var('submit')) {
     if (!$data['email']) $errors['e'] = _("Please enter your email address");
     elseif (!validate_email($data['email'])) $errors['e'] = _("Please enter a valid address for your email");
     if (!$data['message']) $errors['message'] = _('Please enter your message');
-    if (strstr($data['message'], '[url')) $errors['message'] = _("Please don't use this form for spam");
 
     if (!count($errors)) {
         $vars = array(
+            'name' => array($data['name'], "User's name"),
             'email' => array($data['email'], 'Email address'),
-	    'ref' => array($p->ref(), 'Pledge reference'),
-            'IPADDR' => array($_SERVER['REMOTE_ADDR'], "IP address"),
-            'SERVER' => array($_SERVER['SERVER_NAME'], "Web server"),
-            'PAGE' => array($_SERVER['SCRIPT_NAME'], "Web page"),
+            'ref' => array($p->ref(), 'Pledge reference'),
+            'message' => array($data['message'], 'Message entered'),
         );
-        $result = ratty_test('pb-abuse', $vars);
+        $result = abuse_test($vars);
         if ($result) {
-	    $errors[] = _("I'm afraid that to prevent abuse we rate limit the usage of the
+            $errors[] = _("I'm afraid that to prevent abuse we rate limit the usage of the
 Contact the pledge creator feature. Please try again tomorrow.");
         } else {
             $success = pb_send_email_template(array($p->creator_email(), $p->creator_name()),

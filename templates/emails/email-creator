@@ -9,8 +9,9 @@ will then go directly to the person who wrote the message.
 
 <?=$values['signature']?>
 
+------------------------------------------------------------
+
 Their message was as follows:
 
 <?=$values['message']?>
-
 

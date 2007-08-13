@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.232 2007-08-10 17:17:06 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.233 2007-08-13 15:39:58 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -173,6 +173,7 @@ $wth->browser_credentials("$1:80", "$stub_url admin pages", $admin_auth_user, $a
 # is used.
 our $locale_url = $base_url; # including country code, old language code
 our $locale_url_redirected = $base_url; # after country codes are redirected out into cookie, new language code
+# Note that WWW::Mechanize 1.19+ changes its behaviour, and will return the *redirected* URL in browser_uri()
 sub lock_locale_url { 
     my $new_url = shift;
     $wth->browser_get($new_url) if $new_url;

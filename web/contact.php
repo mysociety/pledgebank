@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.62 2007-08-10 16:32:42 matthew Exp $
+// $Id: contact.php,v 1.63 2007-08-14 16:30:08 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -72,7 +72,14 @@ function contact_form($errors = array()) {
         microsites_contact_intro();
     }
 
-    print p(_("If you would like to contact the Pledge Creator, please use the 'comments' section on the pledge, or the 'contact the pledge creator' feature. The form below is for messages to the PledgeBank Team only, <strong>not</strong> the Pledge Creator."));
+    if ($ref) {
+        $h_ref = htmlspecialchars($ref);
+        print sprintf(p(_('If you would like to contact the creator of the %s pledge, please either use the <a href="%s">comments section</a> on the pledge, or the <a href="%s">contact the pledge creator</a> feature. The form below is for messages to the PledgeBank team only, <strong>not</strong> the pledge creator.')),
+            $h_ref, "/$h_ref#comments", "/$h_ref/contact");
+    } else {
+        print p(_("If you would like to contact a pledge creator, please use the 'comments' section on the pledge, or the 'contact the pledge creator' feature. The form below is for messages to the PledgeBank team only, <strong>not</strong> a pledge creator."));
+    }
+
     if (!$comment_id) {
         # XXX
         $blurb = '';

@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-contact.php,v 1.2 2007-08-10 16:32:42 matthew Exp $
+// $Id: ref-contact.php,v 1.3 2007-08-14 16:30:08 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -96,7 +96,7 @@ function contact_creator_form($p, $errors, $data) {
     print h2($title);
     print p(sprintf(_('Please fill in the form below to send a message to the pledge creator.
 Your email address will be given to the pledge creator so that they can reply.
-If you do not want to do that, please <a href="%s">leave a comment</a> on the pledge instead.'), $p->url_comments()));
+If you do not want to do that, please <a href="%s">leave a comment</a> on the pledge instead.'), $p->url_main() . '#commentform'));
 
 ?>
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.245 2007-08-15 10:52:55 francis Exp $
+ * $Id: pledge.php,v 1.246 2007-08-15 13:34:44 matthew Exp $
  * 
  */
 
@@ -49,7 +49,7 @@ class Pledge {
         } elseif (gettype($ref) == "string") {
             $q = db_query("$main_query_part WHERE lower(ref) = ?", array(strtolower($ref)));
             if (!db_num_rows($q)) {
-                err(_('We couldn\'t find that pledge.  Please check the URL again carefully.  Alternatively, try the search at the top right.'));
+                err(_('We couldn\'t find that pledge.  Please check the URL again carefully.  Alternatively, try the search at the top right.'), E_USER_NOTICE);
             }
             $this->data = db_fetch_array($q);
         } elseif (gettype($ref) == "array") {

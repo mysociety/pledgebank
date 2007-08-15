@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.114 2007-08-09 16:56:16 matthew Exp $
+// $Id: ref-index.php,v 1.115 2007-08-15 10:52:55 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -396,7 +396,7 @@ page_header($title, $params);
 debug_comment_timestamp("after page_header()");
 pledge_draw_status_plaque($p);
 debug_comment_timestamp("after draw_status_plaque()");
-$p->render_box(array('showdetails' => true, 'reportlink' => true));
+$p->render_box(array('showdetails' => true, 'reportlink' => true, 'showcontact' => true));
 debug_comment_timestamp("after \$p->render_box()");
 print '<div id="col2">';
 if (!$p->finished())

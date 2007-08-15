@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.244 2007-08-09 16:56:16 matthew Exp $
+ * $Id: pledge.php,v 1.245 2007-08-15 10:52:55 francis Exp $
  * 
  */
 
@@ -422,6 +422,7 @@ class Pledge {
     // Draws a plaque containing the pledge.  $params is an array, which
     // can contain the following:
     //     showdetails - if present and true, show "details" field
+    //     showcontact - if present and true, show "contact pledge creator" link
     //     href - if present must contain a URL, which is used as a link for
     //            the pledge sentence
     //     reportlink - if present and true, show "report this pledge" link
@@ -457,7 +458,12 @@ class Pledge {
 <?      } ?>
 </p>
 <?      if (!$this->byarea()) { ?>
-<p style="text-align: right">&mdash; <?=$this->h_name_and_identity() ?></p>
+<p style="text-align: right">&mdash; <?=$this->h_name_and_identity() ?> 
+
+<?          if (array_key_exists('showcontact', $params) && $params['showcontact']) { ?>
+(<a href="<?=$this->url_contact_creator()?>"><?=_("contact")?></a>)
+<?          }       ?>
+</p>
 <?      }
 
         global $microsite; # XXX

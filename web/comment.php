@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comment.php,v 1.45 2007-08-10 16:32:42 matthew Exp $
+ * $Id: comment.php,v 1.46 2007-08-15 12:51:00 matthew Exp $
  * 
  */
 
@@ -45,11 +45,11 @@ $comment_id = $q_comment_id;
 $pledge = new Pledge(intval($pledge_id));
 $ref = $pledge->ref();
 if ($pledge->closed_for_comments()) {
-    err(_("Sorry, this pledge is now closed for new comments."));
+    err(_("Sorry, this pledge is now closed for new comments."), E_USER_NOTICE);
 }
 
 if (!check_pin($ref, $pledge->pin()))
-    err(_("Permission denied"));
+    err(_("Permission denied"), E_USER_NOTICE);
 
 // TODO: test for commenting on expired pledges etc.
 

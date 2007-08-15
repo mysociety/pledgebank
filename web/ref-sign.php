@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.59 2007-08-09 16:54:33 francis Exp $
+// $Id: ref-sign.php,v 1.60 2007-08-15 12:51:00 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -81,7 +81,7 @@ function do_sign(&$location) {
 
     $pledge = new Pledge($q_ref);
     if (!check_pin($q_ref, $pledge->pin()))
-        err(_("Permission denied"));
+        err(_("Permission denied"), E_USER_NOTICE);
 
     if ($pledge->byarea()) {
         gaze_controls_validate_location($location, $errors, array('townonly'=>true));

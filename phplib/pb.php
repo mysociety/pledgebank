@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.82 2007-08-10 03:02:02 matthew Exp $
+ * $Id: pb.php,v 1.83 2007-08-15 12:51:00 matthew Exp $
  * 
  */
 
@@ -53,9 +53,13 @@ function pb_handle_error($num, $message, $file, $line, $context) {
         while (ob_get_level()) {
             ob_end_clean();
         }
-        /* Message will be in log file, don't display it for cleanliness */
-        $err = p(_('Please try again later, or <a href="mailto:team&#64;pledgebank.com">email us</a> for help resolving the problem.'));
-        if ($num & E_USER_ERROR) {
+        if ($num & E_USER_NOTICE)
+            # Assume we've said everything we need to
+            $err = "<p><em>$message</em></p>";
+        else
+            # Message will be in log file, don't display it for cleanliness
+            $err = p(_('Please try again later, or <a href="mailto:team&#64;pledgebank.com">email us</a> for help resolving the problem.'));
+        if ($num & (E_USER_ERROR | E_USER_WARNING)) {
             $err = "<p><em>$message</em></p> $err";
         }
         ob_start(); // since page header writes content length, must be in ob_

@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-related.js.php,v 1.3 2007-06-13 20:50:05 matthew Exp $
+ * $Id: ref-related.js.php,v 1.4 2007-08-15 12:51:00 matthew Exp $
  * 
  */
 
@@ -19,7 +19,7 @@ page_check_ref(get_http_var('ref'));
 $p  = new Pledge(get_http_var('ref'));
 microsites_redirect($p);
 if (defined($p->pin()) && $p->pin() != '')
-    err("Permission denied");
+    err("Permission denied", E_USER_NOTICE);
 
 $ref = $p->ref();
 $url = $p->url_typein();

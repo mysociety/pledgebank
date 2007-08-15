@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.44 2007-06-20 03:34:09 francis Exp $
+ * $Id: sms.php,v 1.45 2007-08-15 12:51:00 matthew Exp $
  * 
  */
 
@@ -59,7 +59,7 @@ $pledge = new Pledge(intval($pledge_id));
 
 /* Don't allow conversion on private pledges. */
 if (!is_null(db_getOne('select pin from pledges where id = ?', $pledge_id)))
-    err(_('Permission denied'));
+    err(_('Permission denied'), E_USER_NOTICE);
 
 /* Have we already converted? If so just show the usual "thank you" page. */
 if (db_getOne('select email from signers left join person on person.id = signers.person_id where signers.id = ?', $signer_id)) {

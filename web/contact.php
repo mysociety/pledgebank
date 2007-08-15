@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.63 2007-08-14 16:30:08 matthew Exp $
+// $Id: contact.php,v 1.64 2007-08-15 11:19:04 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -53,6 +53,8 @@ function contact_form($errors = array()) {
         if (is_null($email) || !$email)
             $email = $P->email();
     }
+
+    print '<div id="tips">';
  
     if ($comment_id) {
         print h2(_('Report abusive, suspicious or wrong comment'));
@@ -60,24 +62,9 @@ function contact_form($errors = array()) {
         print h2(_('Contact Us'));
     }
     if ($comment_id) {
-        print p(_('You are reporting the following comment:'));
-        print '<blockquote>';
-        $row = db_getRow('select *,extract(epoch from ms_current_timestamp()-whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
-        if ($row)
-            print comments_show_one($row, true);
-        else
-            print 'Comment no longer exists';
-        print '</blockquote>';
+        print p(_('Thank you for taking the time to report a comment, please fill in the form on the right.'));
     } else {
         microsites_contact_intro();
-    }
-
-    if ($ref) {
-        $h_ref = htmlspecialchars($ref);
-        print sprintf(p(_('If you would like to contact the creator of the %s pledge, please either use the <a href="%s">comments section</a> on the pledge, or the <a href="%s">contact the pledge creator</a> feature. The form below is for messages to the PledgeBank team only, <strong>not</strong> the pledge creator.')),
-            $h_ref, "/$h_ref#comments", "/$h_ref/contact");
-    } else {
-        print p(_("If you would like to contact a pledge creator, please use the 'comments' section on the pledge, or the 'contact the pledge creator' feature. The form below is for messages to the PledgeBank team only, <strong>not</strong> a pledge creator."));
     }
 
     if (!$comment_id) {
@@ -89,24 +76,49 @@ function contact_form($errors = array()) {
         print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.' . $blurb));
     }
 
+    print "</div>";
+
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
     } ?>
-<form class="pledge" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>"><input type="hidden" name="referrer" value="<?=htmlspecialchars($referrer)?>"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($pledge_id)?>"><input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
-<p><?=_('Message to')?>: <strong><?=_("PledgeBank Team")?></strong></p>
+<form id="pledgeaction" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>"><input type="hidden" name="referrer" value="<?=htmlspecialchars($referrer)?>"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($pledge_id)?>"><input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
+<? if ($comment_id) { ?>
+<h2><?=_("Report comment to PledgeBank")?></h2>
+<?
+        print p(_('You are reporting the following comment to the PledgeBank team:'));
+        print '<blockquote>';
+        $row = db_getRow('select *,extract(epoch from ms_current_timestamp()-whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
+        if ($row)
+            print comments_show_one($row, true);
+        else
+            print 'Comment no longer exists';
+        print '</blockquote>';
+        print p("Please let us know exactly what is wrong with the comment, and why you think it should be removed.");
+?>
+<? } else { ?>
+<h2><?=_("Contact the PledgeBank team")?></h2>
+<?  if ($ref) {
+        $h_ref = htmlspecialchars($ref);
+        print sprintf(p(_('To contact the creator of the <strong>%s</strong> pledge <a href="%s">leave a comment</a> on the pledge, or <a href="%s">contact the pledge creator</a>. The form below is for messages to the PledgeBank team only, <strong>not</strong> the pledge creator.')),
+            $h_ref, "/$h_ref#comments", "/$h_ref/contact");
+    } else { 
+        print p(_("To contact a pledge creator, please use the 'comments' section on the pledge, or the 'contact the pledge creator' feature. The form below is for messages to the PledgeBank team only, <strong>not</strong> a pledge creator."));
+    }
+?>
+<? } ?>
 
 <p><label for="name"><?=_('Your name:') ?></label> <input type="text" id="name" name="name" value="<?=htmlspecialchars($name) ?>" size="25">
 <br><label for="e"><?=_('Your email:') ?></label> <input type="text" id="e" name="e" value="<?=htmlspecialchars($email) ?>" size="30"></p>
 
 <p><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlspecialchars(get_http_var('subject', true)) ?>" size="48"></p>
 
-<p><label for="message"><?=_('Write your message') ?></label>
+<p><label for="message"><?=_('Your message:') ?></label>
 <br><textarea rows="7" cols="60" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
 
 <?  print '<p>' . _('Did you <a href="/faq">read the FAQ</a> first?') . '
---&gt; <input type="submit" name="submit" value="' . _('Send') . '"></p>';
+--&gt; <input type="submit" name="submit" value="' . _('Send to PledgeBank team') . '"></p>';
     print '</form>';
 }
 

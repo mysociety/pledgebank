@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.64 2007-08-09 16:56:16 matthew Exp $
+ * $Id: comments.php,v 1.65 2007-08-15 10:32:34 francis Exp $
  * 
  */
 
@@ -315,13 +315,13 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 </div>
 
 <div class="form_row">
-<label for="author_email"><?=_('Your email:') ?></label>
+<label for="author_email"><?=_('Your email:') ?></label> 
   <input type="text" id="author_email" name="author_email" value="<?=$q_h_author_email?>" size="30">
 </div>
 
 <? if (!microsites_intranet_site()) { ?>
 <div class="form_row">
-<label for="author_website"><?=_('Your web site address') ?>:</label> <small><i><?=_('(optional)') ?></i></small>
+<label for="author_website"><?=_('Your web site address') ?>:</label> <small><i><?=_('(optional, will be shown publically)') ?></i></small>
   <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="40">
 </div>
 <? } ?>
@@ -336,8 +336,7 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 <input type="hidden" name="n" value="<?=$nextn?>">
 <p><small><strong><?=_('Privacy note:')?></strong>
 <? if (microsites_intranet_site()) {
-    print 'Your name will be shown publicly on this page
-with your comment. Your email address will not be shown.';
+    print 'Your name will be shown publically on this page with your comment. Your email address will not be shown.';
 } else { 
     print _('Your name (and web site address if given) will be shown publically on this page
 with your comment. Your email address will not be shown. People searching for your

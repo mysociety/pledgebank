@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.29 2007-08-02 11:45:08 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.30 2007-08-16 15:17:25 matthew Exp $';
 
 use strict;
 
@@ -385,7 +385,6 @@ EOF
     } catch PB::Error with {
         my $E = shift;
         my $t = $E->text();
-        print STDERR "$t\n";
         print $q->header(
                     -status => "500 Internal Error: $t",
                     -type => 'text/plain; charset=utf-8',

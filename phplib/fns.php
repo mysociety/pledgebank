@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.167 2007-08-09 16:56:16 matthew Exp $
+// $Id: fns.php,v 1.168 2007-08-16 18:07:54 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -190,7 +190,7 @@ function pb_send_email($to, $subject, $message, $headers = array()) {
 function pb_send_email_internal($to, $spec) {
     // Add standard PledgeBank from header
     if (!array_key_exists("From", $spec)) {
-        $spec['From'] = '"' . _('PledgeBank.com') . '" <' . OPTION_CONTACT_EMAIL . ">";
+        $spec['From'] = array(OPTION_CONTACT_EMAIL, _('PledgeBank.com'));
     }
 
     $spec['To'] = array($to);

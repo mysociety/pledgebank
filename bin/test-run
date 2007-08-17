@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.233 2007-08-13 15:39:58 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.234 2007-08-17 09:31:23 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -1012,7 +1012,7 @@ sub do_private_failing_pledge {
     $wth->browser_check_contents("Correct PIN needed");
 
     comment("... sign page");
-    $wth->log_watcher_self_test("$locale_url/$pledge_ref/sign", "Permission denied");
+    $wth->browser_get("$locale_url/$pledge_ref/sign");
     $wth->browser_check_contents("Permission denied");
     $wth->browser_check_no_contents($pledge_action_private);
 

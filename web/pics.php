@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pics.php,v 1.8 2006-10-10 14:26:36 matthew Exp $
+ * $Id: pics.php,v 1.9 2007-08-18 09:58:01 matthew Exp $
  * 
  */
 
@@ -27,13 +27,13 @@ if (!is_null($time)) cond_maybe_respond($time);
 # Get from database
 $data = db_getOne('select data from picture where filename = ?', $file);
 if (!$data)
-    err("Picture file doesn't exist");
+    err("Picture file doesn't exist", E_USER_NOTICE);
 $data = pg_unescape_bytea($data);
-if (preg_match('/.jpe?g$/i', $file))
+if (preg_match('/\.jpe?g$/i', $file))
     header("Content-type: image/jpeg");
-elseif (preg_match('/.gif/i', $file))
+elseif (preg_match('/\.gif/i', $file))
     header("Content-type: image/gif");
-elseif (preg_match('/.png/i', $file))
+elseif (preg_match('/\.png/i', $file))
     header("Content-type: image/png");
 else
     err('Unknown image type');

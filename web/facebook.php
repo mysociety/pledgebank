@@ -6,11 +6,13 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.39 2007-08-08 14:23:59 francis Exp $
+// $Id: facebook.php,v 1.40 2007-08-20 05:14:55 francis Exp $
 
 /*
 
 TODO:
+
+- Remove if-is-own-profile stuff by 25 August, see if there is a way of doing has/have
 
 - "The news that you've signed could not be added to your feed." when Tom signed pledge
 - Post in news when new pledge created - doesn't seem to work?
@@ -37,6 +39,7 @@ Improvements:
 - Let people remove pledges from their profile page
 - Show featured pledges in facebook via mutual signer connections
   (first need to fix connections to use Facebook ids as well as emails?)
+- Show pledges made by / signed by people in same network as you
 
 Not so important:
 - Test what happens if you add app, but refuse each of the major permissions

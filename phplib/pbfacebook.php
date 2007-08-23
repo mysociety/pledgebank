@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.43 2007-08-09 15:47:37 francis Exp $
+// $Id: pbfacebook.php,v 1.44 2007-08-23 09:30:29 matthew Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -639,63 +639,48 @@ PledgeBank</a> application.</i>
 #    print file_get_contents("pb.css"); 
 ?>
 .pledge {
+    margin: 2em 10%;
     border: solid 2px #522994;
-    margin: 20px 50px 50px 50px;
+    background-color: #f6e5ff;
     padding: 10px;
-    background-color: #c6b5de;
 }
 .pledge p {
     margin-bottom: 0;
     text-align: center;
 }
-
-.pledge {
-    border: solid 2px #522994;
-    background-color: #f6e5ff;
-    margin-bottom: 1em;
-    padding: 10px;
+.pledge p#moredetails {
+    text-align: left;
 }
+
 .errors {
     color: #ff0000;
-    background-color: #ffcccc;
-    border: solid 2px #990000;
-    padding: 3px;
-    text-align: center;
-}
-.errors {
-    margin: 0 auto 1em;
-}
-.errors ul {
-    padding: 0;
-    margin: 0 0 0 1.5em;
 }
 /* formnote is for non-negative notes at top of page about form filling in */
-.formnote {
-    margin: 0 auto 1em;
+.formnote, .success {
     background-color: #ccffcc;
     border: solid 2px #009900;
-    padding: 3px;
-    text-align: center;
 }
-.formnote ul {
-    padding: 0;
-    margin: 0 0 0 1.5em;
-}
-.finished {
-    color: #000000;
+.finished, .errors {
     background-color: #ffcccc;
     border: solid 2px #990000;
 }
+.errors, .formnote {
+    margin: 0 auto 1em;
+    padding: 3px;
+    text-align: center;
+}
+.errors ul, .formnote ul {
+    padding: 0;
+    margin: 0 0 0 1.5em;
+}
 .success, .finished {
+    color: #000000;
     margin: 1em auto 0;
     width: 80%;
     padding: 10px;
     text-align: center;
 }
-.success {
-    background-color: #ccffcc;
-    border: solid 2px #009900;
-}
+
 img.creatorpicture {
     float: left; 
     display: inline;

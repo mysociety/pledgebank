@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.116 2007-08-14 17:13:37 matthew Exp $
+ * $Id: frequentupdate,v 1.117 2007-08-30 17:34:49 matthew Exp $
  *
  */
 
@@ -361,7 +361,9 @@ function send_automatic_failure_messages_overall() {
     
     db_query("lock table message in exclusive mode");
     $q = db_query("
-                select * from pledges
+                select *, (select count(*) from signers where 
+                    signers.pledge_id = pledges.id) as signers
+                from pledges
                 where whensucceeded is null
                     and '$pb_today' > date
                     and (select id
@@ -374,7 +376,9 @@ function send_automatic_failure_messages_overall() {
     while ($pledge = db_fetch_array($q)) {
         verbose("pledge #${pledge['id']} (${pledge['ref']}) has failed");
 
-        $email_template = ($pledge['microsite'] && $pledge['microsite'] == 'livesimply') ? 'failed-creator-livesimply' : 'failed-creator';
+        $ls = ($pledge['microsite'] && $pledge['microsite'] == 'livesimply');
+        $zero = $pledge['signers']==0 ? '-zero' : '';
+        $email_template = $ls ? "failed-creator-livesimply$zero" : "failed-creator$zero";
         db_query("
                 insert into message (
                     pledge_id, circumstance,

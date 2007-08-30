@@ -1,0 +1,17 @@
+Subject: The deadline for your promise has passed - '<?=$values['title']?>' at livesimply
+
+The livesimply promise you created hasn't reached its target within the
+timeframe. It required <?=$values['target']?> <?=$values['type']?> to sign
+up, but didn't get any signatures.
+
+The promise read: '<?=$values['sentence_first']?>'
+
+<?=$values['pledge_url']?>
+
+You have two options now. You can start the promise with a new timeframe
+by starting a new promise: <?=$values['pledgebank_url']?>new
+
+Or you can sign up to a similar promise - check out the list of all
+promises: <?=$values['pledgebank_url']?>list
+
+<?=$values['signature']?>

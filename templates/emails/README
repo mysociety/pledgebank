@@ -61,6 +61,9 @@ are not logged in, and we need to confirm their email address.
 Sent to creator when a pledge fails.
   - actual, number of people who signed up.
 
+* failed-creator-zero
+If they have no signatures, use different text.
+
 * failed-creator-byarea
 Sent to creator when a pledge with a target by area fails in one area.
 Parameters as for failed-creator, with additionally:

@@ -1,0 +1,12 @@
+Subject: Your pledge - '<?=$values['title']?>' at PledgeBank.com.
+
+Unfortunately, your pledge did not meet its target in the required time. You
+required <?=$values['target']?> <?=$values['type']?>, but didn't get any
+signatures.
+
+The pledge read: '<?=$values['sentence_first']?>'
+
+Sorry about that. Why not try creating a new pledge, with a lower target
+to have more chance of success, and ask your friends or colleagues to sign?
+
+<?=$values['signature']?>

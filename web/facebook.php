@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.40 2007-08-20 05:14:55 francis Exp $
+// $Id: facebook.php,v 1.41 2007-08-31 17:56:02 francis Exp $
 
 /*
 
@@ -25,6 +25,8 @@ TODO:
 - Text that is shown by Facebook when you add application. (Heather to write)
 
 Improvements:
+- Find pledges by people with similar interests, or who've signed similar pledges etc.
+- Include featured pledges on EVERYONE's profile
 - Link to creators of via facebook pledges, and show their photo
 - Show in "friends pledges" section ones created by friends separately
 - Show on http://apps.facebook.com/pledgebank ones you've already signed clearer

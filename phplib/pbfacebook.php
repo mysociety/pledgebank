@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.44 2007-08-23 09:30:29 matthew Exp $
+// $Id: pbfacebook.php,v 1.45 2007-09-10 10:54:19 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -57,14 +57,7 @@ function pbfacebook_update_profile_box($uid) {
             array($uid));
     if (db_num_rows($q) > 0) {
         $got = 1;
-        $out .= "
-<fb:if-is-own-profile>
-    You have created these Pledges.
-<fb:else>
-    <fb:name uid=\"$uid\"/> has created these Pledges.
-</fb:else>
-</fb:if-is-own-profile>
-";
+        $out .= "<fb:name uid=\"$uid\"/> has created these Pledges.";
         $out .= '<ol>';
         while ($r = db_fetch_array($q)) {
             $pledge = new Pledge($r);
@@ -90,14 +83,7 @@ function pbfacebook_update_profile_box($uid) {
             array($uid));
     if (db_num_rows($q) > 0) {
         $got = 1;
-        $out .= "
-<fb:if-is-own-profile>
-    You have signed these Pledges.
-<fb:else>
-    <fb:name uid=\"$uid\"/> has signed these Pledges.
-</fb:else>
-</fb:if-is-own-profile>
-";
+        $out .= "<fb:name uid=\"$uid\"/> has signed these Pledges.";
         $out .= '<ol>';
         while ($r = db_fetch_array($q)) {
             $pledge = new Pledge($r);
@@ -110,14 +96,7 @@ function pbfacebook_update_profile_box($uid) {
     }
 
     if (!$got) {
-        $out = "
-    <fb:if-is-own-profile>
-        You haven't signed or created any pledges in Facebook yet.
-    <fb:else>
-        <fb:name uid=\"$uid\"/> has not signed or created any pledges in Facebook.
-    </fb:else>
-    </fb:if-is-own-profile>
-    ";
+        $out = "<fb:name uid=\"$uid\"/> has not signed or created any pledges in Facebook.";
         $out .= "<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find a pledge to sign</a>.</p>";
     } else {
         $out .= "<p><a href=\"".OPTION_FACEBOOK_CANVAS."\">Find more pledges to sign</a>.</p>";

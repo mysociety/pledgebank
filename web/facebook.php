@@ -6,13 +6,11 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.41 2007-08-31 17:56:02 francis Exp $
+// $Id: facebook.php,v 1.42 2007-09-10 10:54:19 francis Exp $
 
 /*
 
 TODO:
-
-- Remove if-is-own-profile stuff by 25 August, see if there is a way of doing has/have
 
 - "The news that you've signed could not be added to your feed." when Tom signed pledge
 - Post in news when new pledge created - doesn't seem to work?

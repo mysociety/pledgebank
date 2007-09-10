@@ -6,11 +6,15 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.42 2007-09-10 10:54:19 francis Exp $
+// $Id: facebook.php,v 1.43 2007-09-10 11:13:39 francis Exp $
 
 /*
 
 TODO:
+
+- Use the new <fb:request-form> for sending pledge invites
+- Experiment with notifications.send WITHOUT sending email - looks like that
+  will be the only option left from the notifications API.
 
 - "The news that you've signed could not be added to your feed." when Tom signed pledge
 - Post in news when new pledge created - doesn't seem to work?

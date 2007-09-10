@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.43 2007-09-10 11:13:39 francis Exp $
+// $Id: facebook.php,v 1.44 2007-09-10 11:29:05 francis Exp $
 
 /*
 
@@ -25,6 +25,8 @@ TODO:
 - Add chivvy email about Facebook
 
 - Text that is shown by Facebook when you add application. (Heather to write)
+
+- Add link to source code
 
 Improvements:
 - Find pledges by people with similar interests, or who've signed similar pledges etc.

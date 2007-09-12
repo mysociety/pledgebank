@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.108 2007-07-04 14:49:03 matthew Exp $
+# $Id: poster.cgi,v 1.109 2007-09-12 14:11:41 matthew Exp $
 #
 
 import sys
@@ -659,6 +659,7 @@ while fcgi.isFCGI():
             if len(args) <> 1:
                 parser.print_help()
                 req.err.write("specify PledgeBank ref\n")
+                req.Finish()
                 continue
             ref = args[0] 
             size = options.size
@@ -778,6 +779,10 @@ while fcgi.isFCGI():
                 req.out.write("Content-Type: text/rtf\r\n\r\n")
             else:
                 req.out.write("Content-Type: text/plain\r\n\r\n")
+
+        if req.env.get('REQUEST_METHOD') == 'HEAD':
+            req.Finish()
+            continue
 
         def file_to_stdout(filename):
             f = file(filename, 'rb')

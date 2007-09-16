@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.19 2007-09-16 15:29:05 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.20 2007-09-16 15:32:28 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -76,7 +76,7 @@ while (my ($pledge_id, $person_id, $name) = $s->fetchrow_array()) {
     push(@{$name_pledges{$person_id}{$name}}, $pledge_id);
 }
 
-foreach my $name_pledge (values %$name_pledges) {
+foreach my $name_pledge (values %name_pledges) {
     do_connections($name_pledge);
 }
 

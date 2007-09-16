@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.18 2006-03-21 17:15:31 chris Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.19 2007-09-16 15:29:05 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -45,6 +45,7 @@ sub do_connections ($) {
 }
 
 dbh()->do('delete from pledge_connection');
+my %name_pledges;
 
 my $s = dbh()->prepare("
                 select pledge_id, signers.person_id, signers.name
@@ -56,21 +57,11 @@ my $s = dbh()->prepare("
                     and pledges.cached_prominence <> 'backpage'
                 order by signers.person_id");
 $s->execute();
-
-my $last_person_id;
-my %name_pledge;
 while (my ($pledge_id, $person_id, $name) = $s->fetchrow_array()) {
-    if (defined($last_person_id) && $person_id != $last_person_id) {
-        do_connections(\%name_pledge);
-        %name_pledge = ( );
-    }
-    $last_person_id = $person_id;
     $name = lc($name);
     $name =~ s/[^a-z-]//g;
-    push(@{$name_pledge{$name}}, $pledge_id);
+    push(@{$name_pledges{$person_id}{$name}}, $pledge_id);
 }
-
-do_connections(\%name_pledge);
 
 $s = dbh()->prepare("
                 select id, person_id, name
@@ -79,19 +70,14 @@ $s = dbh()->prepare("
                     and cached_prominence <> 'backpage'
                 order by person_id");
 $s->execute();
-$last_person_id = undef;
-%name_pledge = ( );
 while (my ($pledge_id, $person_id, $name) = $s->fetchrow_array()) {
-    if (defined($last_person_id) && $person_id != $last_person_id) {
-        do_connections(\%name_pledge);
-        %name_pledge = ( );
-    }
-    $last_person_id = $person_id;
     $name = lc($name);
     $name =~ s/[^a-z-]//g;
-    push(@{$name_pledge{$name}}, $pledge_id);
+    push(@{$name_pledges{$person_id}{$name}}, $pledge_id);
 }
 
-do_connections(\%name_pledge);
+foreach my $name_pledge (values %$name_pledges) {
+    do_connections($name_pledge);
+}
 
 dbh()->commit();

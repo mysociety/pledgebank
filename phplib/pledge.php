@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.247 2007-08-24 11:23:21 matthew Exp $
+ * $Id: pledge.php,v 1.248 2007-09-16 10:54:25 francis Exp $
  * 
  */
 
@@ -1217,7 +1217,12 @@ function pledge_draw_status_plaque($p) {
             print '</p>';
         }
     } elseif ($p->left() <= 0 && !microsites_no_target()) {
-        print '<p class="success">' . _('This pledge has been successful!');
+        print '<p class="success">';
+        # TRANS: "This pledge was successful!" is used when the pledge succeeded recently, "This pledge has been successful!" is used when it succeeded more than 30 days ago.
+        if ($p->daysleft() > -30)
+            print _('This pledge has been successful!');
+        else
+            print _('This pledge was successful!');
         if (!$p->finished()) {
             print '<br>' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');
         }

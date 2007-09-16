@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+/* 
+ * makepin:
+ * Generates the encrypted code of a PIN for use in adding/editing
+ * private pledge PINs directly in the database.
+ *
+ * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: makepin,v 1.1 2007-09-16 11:33:32 francis Exp $
+ *
+ */
+
+
+if (!$argv[1]) {
+    die("Please specify PIN as first parameter\n");
+}
+
+print(sha1($argv[1]));
+print "\n";
+
+

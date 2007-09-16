@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.115 2007-08-15 10:52:55 francis Exp $
+// $Id: ref-index.php,v 1.116 2007-09-16 15:40:07 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -68,10 +68,10 @@ function draw_spreadword($p) { ?>
             print '<li>';
             print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers"));
             print '</li>';
-	}
-	print '<li>';
-	print_link_with_pin('/' . $p->ref() . '/promote', '', _('Promote on your site or blog'));
-	print '</li>';
+        }
+        print '<li>';
+        print_link_with_pin('/' . $p->ref() . '/promote', '', _('Promote on your site or blog'));
+        print '</li>';
     } 
     print '<li>';
     print_link_with_pin($p->url_contact_creator(), '', _('Contact the pledge creator'));
@@ -312,7 +312,7 @@ function draw_connections($p) {
         WHERE
             (a_pledge_id = ? AND b_pledges.date >= '$pb_today' AND b_pledges.whensucceeded is null) or
             (b_pledge_id = ? AND a_pledges.date >= '$pb_today' AND a_pledges.whensucceeded is null)
-        ORDER BY STRENGTH DESC 
+        ORDER BY strength DESC,RANDOM() 
         LIMIT 8", array($p->id(), $p->id()));
     if (0 == db_num_rows($s))
         return;

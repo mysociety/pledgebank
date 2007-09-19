@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.45 2007-08-09 16:56:16 matthew Exp $
+ * $Id: ref-info.php,v 1.46 2007-09-19 17:32:42 matthew Exp $
  * 
  */
 
@@ -17,11 +17,13 @@ require_once '../../phplib/db.php';
 
 /* Short-circuit the conditional GET as soon as possible -- parsing the rest of
  * the includes is costly. */
-page_send_vary_header();
+$etag = page_send_vary_header();
 if (array_key_exists('ref', $_GET)
-    && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))
-    && cond_maybe_respond(intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id))))
-    exit();
+    && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))) {
+        $t = intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id));
+        if (cond_maybe_respond($t, sha1($etag . $t)))
+            exit;
+}
 
 require_once '../phplib/pb.php';
 
@@ -42,7 +44,8 @@ microsites_redirect($p);
 
 /* Do this again because it's possible we'll reach here with a non-canonical
  * ref (e.g. different case from that entered by the creator). */
-if (cond_maybe_respond($p->last_change_time()))
+$etag = sha1($etag . $p->last_change_time());
+if (cond_maybe_respond($p->last_change_time(), $etag))
     exit();
 
 deal_with_pin($p->url_info(), $p->ref(), $p->pin());
@@ -50,7 +53,8 @@ deal_with_pin($p->url_info(), $p->ref(), $p->pin());
 page_header(_("More information: ") . $p->h_title(), array(
             'ref'=>$p->ref(),
             'pref' => $p->url_typein(),
-            'last-modified' => $p->last_change_time()
+            'last-modified' => $p->last_change_time(),
+            'etag' => $etag,
         ));
 
 debug_timestamp(true, "retrieved pledge");
@@ -85,7 +89,7 @@ debug_timestamp(true, "pledge info box");
             $p->byarea_successes());
     } elseif ($p->open())
         print _('open for signers; ')
-	        # TRANS: "successful" is only ever used in singular context
+                # TRANS: "successful" is only ever used in singular context
                 . ($p->succeeded() ? _('successful') : _('not yet successful'));
     else
         print _('closed; ')

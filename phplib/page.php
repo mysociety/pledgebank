@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.169 2007-08-10 03:02:02 matthew Exp $
+// $Id: page.php,v 1.170 2007-09-19 17:32:42 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -30,7 +30,13 @@ function page_send_vary_header() {
      * This list is conservative (it may contain headers which don't affect a
      * particular page), and we may wish to optimise this later. */
     header('Vary: Cookie, Accept-Encoding, Accept-Language, X-GeoIP-Country');
+    $etag = '';
+    foreach (array('COOKIE', 'ACCEPT_ENCODING', 'ACCEPT_LANGUAGE', 'X_GEOIP_COUNTRY') as $h) {
+        if (isset($_SERVER['HTTP_'.$h])) $etag .= $_SERVER['HTTP_'.$h];
+        $etag .= '|';
+    }
     $page_vary_header_sent = true;
+    return $etag;
 }
 
 // Internal
@@ -436,8 +442,11 @@ function page_cache_headers($params) {
             $lm = $params['last-modified'];
         if (array_key_exists('etag', $params))
             $etag = $params['etag'];
-        if (isset($lm) || isset($etag))
+        if (isset($lm) || isset($etag)) {
+            locale_push('en-gb');
             cond_headers($lm, $etag);
+            locale_pop();
+        }
 
         /* Ditto a max-age if specified. */
         if (array_key_exists('cache-max-age', $params))

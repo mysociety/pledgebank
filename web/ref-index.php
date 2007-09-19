@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.116 2007-09-16 15:40:07 matthew Exp $
+// $Id: ref-index.php,v 1.117 2007-09-19 17:32:42 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -14,11 +14,13 @@ require_once '../../phplib/db.php';
 
 /* Short-circuit the conditional GET as soon as possible -- parsing the rest of
  * the includes is costly. */
-page_send_vary_header();
+$etag = page_send_vary_header();
 if (array_key_exists('ref', $_GET)
-    && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))
-    && cond_maybe_respond(intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id))))
-    exit();
+    && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))) {
+        $t = intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id));
+        if (cond_maybe_respond($t, sha1($etag . $t)))
+            exit;
+}
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -47,7 +49,8 @@ microsites_redirect($p);
 
 /* Do this again because it's possible we'll reach here with a non-canonical
  * ref (e.g. different case from that entered by the creator). */
-if (cond_maybe_respond($p->last_change_time()))
+$etag = sha1($etag . $p->last_change_time());
+if (cond_maybe_respond($p->last_change_time(), $etag))
     exit();
 
 deal_with_pin($p->url_main(), $p->ref(), $p->pin());
@@ -387,7 +390,8 @@ $params = array(
             'ref'=>$p->ref(),
             'pref' => $p->url_typein(),
             'noreflink' => 1,
-            'last-modified' => $p->last_change_time()
+            'last-modified' => $p->last_change_time(),
+            'etag' => $etag,
         );
 if (microsites_comments_allowed() && !$p->pin())
     $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());

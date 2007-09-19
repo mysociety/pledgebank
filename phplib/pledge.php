@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.248 2007-09-16 10:54:25 francis Exp $
+ * $Id: pledge.php,v 1.249 2007-09-19 17:32:42 matthew Exp $
  * 
  */
 
@@ -660,7 +660,9 @@ class Pledge {
     /* last_change_time
      * Return the time that the pledge was last changed in any way. */
     function last_change_time() {
-        return intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $this->data['id']));
+        if (!isset($this->last_change_time))
+            $this->last_change_time = intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $this->data['id']));
+        return $this->last_change_time;
     }
 
     /* Display form for pledge signing. */

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-plain.php,v 1.14 2007-08-09 16:56:16 matthew Exp $
+ * $Id: ref-plain.php,v 1.15 2007-09-19 17:32:42 matthew Exp $
  * 
  */
 
@@ -15,13 +15,8 @@ require_once '../phplib/page.php';
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
 
-/* Short-circuit the conditional GET as soon as possible -- parsing the rest of
- * the includes is costly. */
-page_send_vary_header();
-if (array_key_exists('ref', $_GET)
-    && ($id = db_getOne('select id from pledges where ref = ?', $_GET['ref']))
-    && cond_maybe_respond(intval(db_getOne('select extract(epoch from pledge_last_change_time(?))', $id))))
-    exit();
+# XXX Do conditional get here, I guess - not used currently.
+# Never happy with Chris' opinion we had to do this
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -38,11 +33,6 @@ if (!is_null($err))
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
 microsites_redirect($p);
-
-/* Do this again because it's possible we'll reach here with a non-canonical
- * ref (e.g. different case from that entered by the creator). */
-if (cond_maybe_respond($p->last_change_time()))
-    exit();
 
 deal_with_pin($p->url_info(), $p->ref(), $p->pin());
 

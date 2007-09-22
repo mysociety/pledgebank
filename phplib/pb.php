@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.83 2007-08-15 12:51:00 matthew Exp $
+ * $Id: pb.php,v 1.84 2007-09-22 11:18:03 francis Exp $
  * 
  */
 
@@ -116,8 +116,9 @@ locale_change();
 locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
 
 # Redirect to promesobanko.com etc. if appropriate
+global $no_language_redirects;
 if ($lang && array_key_exists($lang, $language_domains)
-        && $lang != $top_domain_lang) {
+        && $lang != $top_domain_lang && !$no_language_redirects) {
     $url = pb_domain_url(array('country' => $domain_country, 'lang' => $lang));
     #print $url;exit;
     header('Location: ' . $url);
@@ -134,6 +135,8 @@ require_once '../../phplib/stash.php';
 require_once "../../phplib/utility.php";
 require_once "../../phplib/gaze.php";
 
+# Redirect to domain without country code in it, and set country in the cookie
+# (we keep language in the URL)
 $site_country = null;
 if ($domain_country) {
     if (array_key_exists('UK', $countries_code_to_name)) 
@@ -153,8 +156,9 @@ if ($domain_country) {
 } 
 
 /* Find country for this IP address. If we're being called through the
- * accelerator it will have made up an X-GeoIP-Country: header which will
- * contain this information; otherwise, we must call out to Gaze. */
+ * accelerator (a custom Squid with a patch to add this header) it will have
+ * made up an X-GeoIP-Country: header which will contain this information;
+ * otherwise, we must call out to Gaze. */
 $ip_country = null;
 if (array_key_exists('HTTP_X_GEOIP_COUNTRY', $_SERVER)) {
     $ip_country = $_SERVER['HTTP_X_GEOIP_COUNTRY'];

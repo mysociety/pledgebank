@@ -6,9 +6,13 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: index.php,v 1.17 2007-08-09 16:56:17 matthew Exp $
+ * $Id: index.php,v 1.18 2007-09-22 11:18:03 francis Exp $
  * 
  */
+
+# Don't redirect to promesobanko.com etc. See pb.php.
+global $no_language_redirects;
+$no_language_redirects = true;
 
 require_once "../conf/general";
 require_once "../phplib/admin-pb.php";

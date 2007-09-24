@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.46 2007-03-27 17:25:22 matthew Exp $
+// $Id: list.php,v 1.47 2007-09-24 16:11:24 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -77,6 +77,13 @@ $byarea_clause = ($open_byarea ? " date $open_byarea '$pb_today' AND " : "")
 $page_clause = "AND ( (pledges.target_type = 'overall' $signers_range_clause $date_range_clause)
                 OR (pledges.target_type = 'byarea' AND $byarea_clause) )";
 
+$limit_to_category = intval(get_http_var('category'));
+if ($limit_to_category) {
+    $category_clause = ' AND (SELECT count(*) from pledge_category where pledge_category.pledge_id = pledges.id and pledge_category.category_id = '.$limit_to_category.') > 0 ';
+} else {
+    $category_clause = '';
+}
+
 $sql_params = array();
 $locale_clause = "(".
     pb_site_pledge_filter_main($sql_params) . 
@@ -87,6 +94,7 @@ $query = "
                 FROM pledges LEFT JOIN location ON location.id = pledges.location_id
                 WHERE $locale_clause AND pin IS NULL 
                 $page_clause
+                $category_clause
                 AND (".microsites_normal_prominences()." OR cached_prominence = 'frontpage')";
 $ntotal = db_getOne($query, $sql_params);
 
@@ -129,6 +137,7 @@ $qrows = db_query("
             WHERE $locale_clause
             AND pin IS NULL
             $page_clause
+            $category_clause
             AND (".microsites_normal_prominences()." OR cached_prominence = 'frontpage')
             ORDER BY $sort_phrase,pledges.id LIMIT ? OFFSET $q_offset", $sql_params);
 /* PG bug: mustn't quote parameter of offset */
@@ -161,6 +170,10 @@ else {
                     ),
             'cache-max-age' => 60,
     ));
+}
+
+if ($limit_to_category) {
+    $heading .= " " . _("(one category only)");
 }
 
 if (!$rss) {
@@ -219,12 +232,14 @@ if ($ntotal > 0) {
         $pledge = new Pledge($row);
         if ($q_sort == "category") {
             $categories = $pledge->categories();
-            $thiscategory = array_pop($categories);
+            foreach ($categories as $thiscategory_no => $thiscategory) {
+                # just let variables fill in with last one
+            }
             if ($thiscategory == null) 
                 $thiscategory = _("Miscellaneous");
             if ($lastdivision <> $thiscategory) {
                 if (!$rss)
-                    print "<h2 style=\"clear:both\">"._($thiscategory)."</h2>";
+                    print "<h2 style=\"clear:both\">"._($thiscategory)."</h2> <!-- " . $thiscategory_no. "-->";
                 $c = 0;
                 $lastdivision = $thiscategory;
             }

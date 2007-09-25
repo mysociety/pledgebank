@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.60 2007-08-15 12:51:00 matthew Exp $
+// $Id: ref-sign.php,v 1.61 2007-09-25 16:26:20 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -200,7 +200,7 @@ function do_sign(&$location) {
             if ($byarea_location_id) {
                 // check byarea_location is valid if already set from form choice
                 $pledge->byarea_validate_location($byarea_location_id);
-            } else if ($already_id) {
+            } elseif ($already_id) {
                 $byarea_location_id = $already_id;
             } else {
                 $byarea_location_id = db_getOne("select nextval('location_id_seq')");
@@ -243,7 +243,7 @@ function do_sign(&$location) {
         post_confirm_advertise();
         
         microsites_google_conversion_tracking("signup");
-    } else if ($R == PLEDGE_SIGNED) {
+    } elseif ($R == PLEDGE_SIGNED) {
         /* Either has already signer, or is creator. */
         print '<p><strong>';
         if ($P->id() == $pledge->creator_id()) {

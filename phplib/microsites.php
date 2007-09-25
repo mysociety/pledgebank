@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.111 2007-08-09 16:56:16 matthew Exp $
+ * $Id: microsites.php,v 1.112 2007-09-25 16:26:19 matthew Exp $
  * 
  */
 
@@ -486,42 +486,42 @@ It&#8217;s your chance to make a difference, and you really can!</p>
         $audio_intro = false;
     } else {
         # Main site
-        $tom = _('"We all know what it is like to feel powerless, that our own
+        $tom = _('&ldquo;We all know what it is like to feel powerless, that our own
         actions can\'t really change the things that we want to change.
-        PledgeBank is about beating that feeling..."');
+        PledgeBank is about beating that feeling&hellip;&rdquo;');
     }
     
     # Quote from Tom, and his photo
     if ($tom) {
-?><h2><?=_('Tell the world &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;') ?></h2>
-<blockquote class="noindent"><a href="<?
+        echo h2(_('&#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;'));
+        echo '<blockquote class="noindent">';
+        echo '<a href="';
 
         if ($lang=='en-gb') print 'tom-on-pledgebank-vbr.mp3';
         else print '/explain';
 
-?>"><img src="tomsteinberg_small.jpg"
-alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;
-"></a>
-<?=$tom?>
-</blockquote>
-<?  
+        echo '">';
+        echo '<img src="tomsteinberg_small.jpg"
+alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;"></a> ';
+        echo $tom, '</blockquote>';
     }
 
     # Give how it works explanation
     if ($audio_intro) {
-        if ($lang == 'en-gb') { ?>
-    <p><a href="tom-on-pledgebank-vbr.mp3"><?=_('Listen to how PledgeBank
-    works</a>, as explained by mySociety\'s director Tom Steinberg.
-    Or <a href="/explain">read a full transcript') ?></a>.</p>
-    <? } else { ?>
-    <p><?=_('<a href="/explain">Find out how PledgeBank
-    works</a>, as explained by mySociety\'s director Tom Steinberg.')?></p>
-    <? }  
+        if ($lang == 'en-gb') {
+            echo p('<a href="tom-on-pledgebank-vbr.mp3">Listen to how PledgeBank
+    works</a>, as explained by mySociety&rsquo;s director Tom Steinberg,
+    <a href="/explain">read a transcript</a>, or 
+    <a href="/success">read some success stories</a>.');
+        } else {
+            echo p(_('<a href="/explain">Find out how PledgeBank
+    works</a>'));
+        }  
     }
     
     # Extra end text
     if ($microsite == 'catcomm') {
-?> For technical help, contact us at <a href="mailto:techhelp@catcomm.org">techhelp@catcomm.org</a>.<?
+        echo ' For technical help, contact us at <a href="mailto:techhelp@catcomm.org">techhelp@catcomm.org</a>.';
     }
 
 }
@@ -739,7 +739,7 @@ function microsites_contact_intro() {
     We make PledgeBank and thrive off feedback, good and bad.
     Use this form to contact us.');
         $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
-	print ' ';
+        print ' ';
         printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
         print "</p>";
     }

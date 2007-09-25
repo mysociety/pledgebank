@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.256 2007-07-31 16:36:56 matthew Exp $
+// $Id: index.php,v 1.257 2007-09-25 16:26:20 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -30,6 +30,8 @@ debug_comment_timestamp("after front_page()");
 page_footer(array('nolocalsignup'=>true));
 
 function front_page() {
+    global $lang;
+
     debug_comment_timestamp("in front_page()");
     if (microsites_frontpage_has_local_emails()) {
         pb_view_local_alert_quick_signup("localsignupfrontpage");
@@ -37,49 +39,42 @@ function front_page() {
     debug_comment_timestamp("after pb_view_local_alert_quick_signup()");
 
     if (microsites_frontpage_has_intro()) {
-?>
-<div id="tellworld">
-<?
-    microsites_frontpage_intro();
-?>
-</div>
-<?  }
+        echo '<div id="tellworld">';
+        microsites_frontpage_intro();
+	echo '</div>';
+    }
     debug_comment_timestamp("after microsites_frontpage_intro()");
 
     if (microsites_frontpage_has_start_your_own()) {
-?>
-<div id="startblurb">
-<h2><?=_('Start your own pledge') ?></h2>
-<p><?=_('PledgeBank is free and easy to use. Once you\'ve thought of something you\'d like
+        echo '<div id="startblurb">
+<h2>', _('Start your own pledge'), '</h2>
+<p>', _('PledgeBank is free and easy to use. Once you\'ve thought of something you\'d like
 to do, just <a href="/new">create a pledge</a> which says "I\'ll do this, but
-only if 5 other people will do the same".') ?>
-<p id="start"><a href="./new"><?=_('Start your own pledge') ?>&nbsp;&raquo;</a></p>
-</div>
-<?
+only if 5 other people will do the same".'),
+            '<p id="start"><a href="./new">', _('Start your own pledge'), '&nbsp;&raquo;</a></p>
+</div>';
     }
 
     microsites_frontpage_extra_blurb();
 
-?>
-<div id="currentpledges">
-<?
+    echo '<div id="currentpledges">';
     list_frontpage_pledges();
     debug_comment_timestamp("after list_frontpage_pledges()");
     if (!microsites_no_target())
         list_successful_pledges();
     debug_comment_timestamp("after list_successful_pledges()");
-?>
-</div>
+    echo '</div>';
 
-<?  global $lang;
     if (microsites_frontpage_has_offline_secrets()) {
-        if ($lang == 'en-gb') { ?>
-<div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-text-275px.jpg" alt="<?=_('How scissors, a phone and some printouts
-can make your pledge succeed &raquo;') ?>"></a></div>
-    <?  } else { ?>
-<div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-275px.jpg" alt="<?=_('Scissors, a phone and some printouts &mdash; ') ?>"></a></div>
-<div id="photocaption"><a href="/offline"><?=_("Find out why these things are the secret of a successful pledge")?> &raquo;</a></div>
-    <?  }
+        if ($lang == 'en-gb') {
+	    echo '<div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-text-275px.jpg" alt="',
+	        _('How scissors, a phone and some printouts can make your pledge succeed &raquo;'),
+		'"></a></div>';
+        } else {
+	    echo '<div id="photo"><a href="/offline"><img src="leaflet-phone-scissors-275px.jpg" alt="',
+	        _('Scissors, a phone and some printouts &mdash; '), '"></a></div>
+<div id="photocaption"><a href="/offline">', _("Find out why these things are the secret of a successful pledge"), ' &raquo;</a></div>';
+        }
     }
 
     if (microsites_comments_allowed()) {
@@ -104,8 +99,9 @@ function format_pledge_list($pledges, $params) {
 
 function list_frontpage_pledges() {
     global $pb_today;
-?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of new pledges') ?>"></a>
-<?=microsites_frontpage_sign_invitation_text()?><?
+    echo '<a href="', pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list")),
+        '"><img align="right" border="0" src="rss.gif" alt="', _('RSS feed of new pledges'), '"></a>';
+    echo microsites_frontpage_sign_invitation_text();
 
     list($pledges, $more) = pledge_get_frontpage_list(8, 6);
 
@@ -137,7 +133,8 @@ function list_frontpage_pledges() {
 }
 
 function list_successful_pledges() {
-?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list/succeeded"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of successful pledges') ?>"></a><?
+    echo '<a href="', pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list/succeeded")),
+        '"><img align="right" border="0" src="rss.gif" alt="', _('RSS feed of successful pledges'), '"></a>';
     print h2(_('Recent successful pledges'));
 
     // Try to avoid global pledges
@@ -175,4 +172,3 @@ function list_successful_pledges() {
     }
 }
 
-?>

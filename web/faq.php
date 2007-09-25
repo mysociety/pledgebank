@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.57 2007-08-09 16:56:16 matthew Exp $
+// $Id: faq.php,v 1.58 2007-09-25 16:26:20 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -65,7 +65,9 @@ function default_faq() {
     print dd(_("We can't; PledgeBank is based on a psychological bet. We believe that
     if a person possesses a slight desire to do something, and then we help
     connect them to a bunch of people who also want to do the same thing,
-    then that first person is much more likely to act. We have
+    then that first person is much more likely to act. We have some
+    <a href='/success'>success stories</a> for a variety of pledges from the site,
+    and we have also
     surveyed many of the money-based pledges that have succeeded, and found that
     payment rates vary from 50% to well over 150%, with three-quarters of 
     people paying being typical."));

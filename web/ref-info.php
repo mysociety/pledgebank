@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.46 2007-09-19 17:32:42 matthew Exp $
+ * $Id: ref-info.php,v 1.47 2007-09-25 13:30:21 matthew Exp $
  * 
  */
 
@@ -100,7 +100,7 @@ debug_timestamp(true, "pledge info box");
 <tr>
     <th><?=_('Number of signers') ?></th>
     <td><?= $p->signers() ?> 
-        <? if (!$p->byarea()) { ?>
+        <? if (!$p->byarea() && !microsites_no_target()) { ?>
         / <?= $p->target() ?>
         <?= sprintf(_('(%.1f%% of target)'), 100. * $p->signers() / $p->target()) ?>
         <? } ?>
@@ -110,7 +110,7 @@ debug_timestamp(true, "pledge info box");
 <tr>
     <th><?=_('Estimated signers by deadline') ?></th>
     <td><?= $p->probable_will_reach() ?> 
-        <? if (!$p->byarea()) { ?>
+        <? if (!$p->byarea() && !microsites_no_target()) { ?>
         <?= sprintf(_('(%.1f%% of target)<br><small>if signup rate continues as in last week</small>'), 100. * $p->probable_will_reach() / $p->target()) ?>
         <? } ?>
     </td>

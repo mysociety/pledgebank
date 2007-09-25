@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.3 2007-09-25 16:26:20 matthew Exp $
+// $Id: success.php,v 1.4 2007-09-25 16:39:32 matthew Exp $
 
 require_once "../phplib/pb.php";
 page_header('Success Stories', array('id'=>'success'));
@@ -41,7 +41,7 @@ BAKUL PICTURE
 
 <div>
 <p><img align="right" src="/i/airfarespledge.tn.jpeg" style="margin: 0 0 0.5em 0.5em; border: solid 1px #666666;" title="My best friend in Biloxi MS" alt="The creator of the pledge with a friendly dog, tagged 595">
-<h3><a href="/success/airfarespledge">airfarespledge</a></h3>
+<h3><a href="/success/airfarespledge">Organise aid trip to New Orleans &ndash; airfarespledge</a></h3>
 <p>&ldquo;After seeing the news about Hurricane Katrina, which had some pretty graphic
 pictures showing the damage, I thought of how I could help....Being a fan
 of Jazz music and knowing a lot about New Orleans, Harry Connick Jr was the
@@ -58,7 +58,7 @@ organisation CERMT (Emergency Relief Massage Therapy).</p>
 <div>
 <p><img align="left" style="margin:0 0.5em 0.5em 0" alt="Election observer Becky, outside a polling station"
 src="http://www.openrightsgroup.org/wp-content/uploads/observers.jpg" width="195" height="200"></p>
-<h3><a href="/electionwatch07">electionwatch07</a></h3>
+<h3><a href="/electionwatch07">Gather people to monitor elections &ndash; electionwatch07</a></h3>
 <p>&ldquo;Basically,
 without PledgeBank I doubt we would have had nearly as many election observers
 volunteer. The public nature of PledgeBank also seemed to encourage the very
@@ -73,7 +73,7 @@ launched with significant press coverage.&rdquo;
 <div>
 <p><img align="right" style="margin: 0 0 0.5em 0.5em" alt="First1000 logo"
 src="http://www.pledgebank.com/pics/First1000.gif" width="100" height="90"></p>
-<h3><a href="/First1000">First1000</a></h3>
+<h3><a href="/First1000">Get 1000 people to move house &ndash; First1000</a></h3>
 <p>&ldquo;The membership of the
 Free State Project was very active in recruiting signers, and as a result of
 the pledge, 1000 people will be moving to New Hampshire by the end of 2008 in
@@ -81,7 +81,7 @@ order to become activists for liberty!&rdquo;
 </div>
 
 <div>
-<h3><a href="http://promise.livesimply.org.uk/">LiveSimply</a></h3>
+<h3><a href="http://promise.livesimply.org.uk/">Changing lifestyles &ndash; LiveSimply</a></h3>
 
 <p>&ldquo;One of the main objectives for using the website
 was evaluation of the livesimply initiative. The initiative is calling people
@@ -112,7 +112,7 @@ background of the organisation.&rdquo;
 <p><img align="left" style="margin: 0 0.5em 0.5em 0" alt="Save The Sycamore"
 width="150" height="200"
 src="http://www.pledgebank.com/pics/SaveTheSycamore.jpeg"></p>
-<h3><a href="/SaveTheSycamore">SaveTheSycamore</a></h3>
+<h3><a href="/SaveTheSycamore">Campaign to save a local tree &ndash; SaveTheSycamore</a></h3>
 
 <p>&ldquo;The amount
 of elderly people who supported me in this pledge by writing and phoning the
@@ -123,7 +123,7 @@ truly am <strong>astounded</strong>!!!!!! With thanks from myself, family and my
 </div>
 
 <div>
-<h3><a href="/trees4kenya">trees4kenya</a></h3>
+<h3><a href="/trees4kenya">Raise money for charity &ndash; trees4kenya</a></h3>
 
 <p>&ldquo;I've followed MySociety's projects for some time, and when PledgeBank was
 announced, it sounded like a great idea so I got involved. Harnessing the power
@@ -143,7 +143,7 @@ representatives.&rdquo;
 </div>
 
 <div>
-<h3><a href="/give3hugsaday">give3hugsaday</a></h3>
+<h3><a href="/give3hugsaday">Make people smile &ndash; give3hugsaday</a></h3>
 
 <p>&ldquo;I started with a fairly simple pledge that most users would be able
 to sign on to and just see what happens&hellip; I also was really intrigued
@@ -155,7 +155,7 @@ enough to get it shown to the public, and from there people kept signing.&rdquo;
 </div>
 
 <div>
-<h3><a href="/showerpower">showerpower</a></h3>
+<h3><a href="/showerpower">Help the environment &ndash; showerpower</a></h3>
 
 <p>&ldquo;I heard about PledgeBank through reading Michael Norton's book 365
 Ways to Change the World - I bought this book for my sister and I, as we found

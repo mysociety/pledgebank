@@ -6,13 +6,14 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.44 2007-09-10 11:29:05 francis Exp $
+// $Id: facebook.php,v 1.45 2007-09-26 06:18:30 francis Exp $
 
 /*
 
 TODO:
 
 - Use the new <fb:request-form> for sending pledge invites
+- Peruse the new http://bugs.developers.facebook.com/
 - Experiment with notifications.send WITHOUT sending email - looks like that
   will be the only option left from the notifications API.
 

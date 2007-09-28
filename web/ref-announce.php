@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.59 2007-07-31 18:27:58 matthew Exp $
+ * $Id: ref-announce.php,v 1.60 2007-09-28 19:37:56 matthew Exp $
  * 
  */
 
@@ -186,7 +186,7 @@ $sentence = $p->sentence(array('firstperson'=>'includename'));
 $name = $p->creator_name();
 if ($succeeded) {
     $default_message = sprintf(_("\nHello, and thank you for signing our successful pledge!\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
-	// TRANS: The first %s is a pledge creator's name; the second %s is the pledge reference; the third %s is the instructions entered by the pledge creator, to be sent to signers' mobile phones as a text message
+        // TRANS: The first %s is a pledge creator's name; the second %s is the pledge reference; the third %s is the instructions entered by the pledge creator, to be sent to signers' mobile phones as a text message
     $default_sms = sprintf(_("%s here. The %s pledge has been successful! <%s>."), $name, $p->ref(), $fill_in);
 } elseif ($failed) {
     $default_message = sprintf(_("\nHello, and sorry that our pledge has failed.\n\n'%s'\n\n<%s>\n\nYours sincerely,\n\n%s\n\n"), $sentence, $fill_in, $name);
@@ -246,6 +246,9 @@ if ($q_submit) {
 if (!sizeof($errors) && $q_submit) {
     /* User mail must be submitted with \n line endings. */
     $q_message_body = str_replace("\r\n", "\n", $q_message_body);
+    $q_message_body .= sprintf("\n\n---------------\n\n" .
+        _("This message has been sent through PledgeBank by the pledge creator
+of a pledge you signed, '%s'. The pledge's URL is <%s>."), $sentence, $p->url_main());
     
     /* Got all the data we need. Just drop the announcement into the database
      * and let the frequentupdate script pass it to the signers. */
@@ -355,7 +358,7 @@ count_sms_characters();
             // Country is not an SMS one, would be annoying to request SMS text
             // of them just for rare case when a foreigner may have signed up
             // by SMS. So we set a default message. (Keep it short too)
-	    // TRANS: This is part of a standard text message sent to mobile phones. The first %s is the pledge name, and the second is the pledge creator.
+            // TRANS: This is part of a standard text message sent to mobile phones. The first %s is the pledge name, and the second is the pledge creator.
             $foreign_sms_case = sprintf("Pledge %s success! Email %s for more", $p->ref(), $p->creator_email());
             print '<input type="hidden" name="message_sms" value="'.htmlspecialchars($foreign_sms_case).'">';
         }

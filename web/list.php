@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.48 2007-09-25 13:30:21 matthew Exp $
+// $Id: list.php,v 1.49 2007-09-28 09:41:09 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -232,15 +232,14 @@ if ($ntotal > 0) {
         $pledge = new Pledge($row);
         if ($q_sort == "category") {
             $categories = $pledge->categories();
-	    $thiscategory = null;
+            $thiscategory = _("Miscellaneous");
+            $thiscategory_no = -1;
             foreach ($categories as $thiscategory_no => $thiscategory) {
                 # just let variables fill in with last one
             }
-            if ($thiscategory == null) 
-                $thiscategory = _("Miscellaneous");
             if ($lastdivision <> $thiscategory) {
                 if (!$rss)
-                    print "<h2 style=\"clear:both\">"._($thiscategory)."</h2> <!-- " . $thiscategory_no. "-->";
+                    print '<h2 style="clear:both">' . _($thiscategory) . "</h2> <!-- $thiscategory_no -->";
                 $c = 0;
                 $lastdivision = $thiscategory;
             }

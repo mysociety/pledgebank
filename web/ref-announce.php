@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.60 2007-09-28 19:37:56 matthew Exp $
+ * $Id: ref-announce.php,v 1.61 2007-09-28 20:03:31 matthew Exp $
  * 
  */
 
@@ -247,8 +247,7 @@ if (!sizeof($errors) && $q_submit) {
     /* User mail must be submitted with \n line endings. */
     $q_message_body = str_replace("\r\n", "\n", $q_message_body);
     $q_message_body .= sprintf("\n\n---------------\n\n" .
-        _("This message has been sent through PledgeBank by the pledge creator
-of a pledge you signed, '%s'. The pledge's URL is <%s>."), $sentence, $p->url_main());
+        _("This message has been sent through PledgeBank by the pledge creator of a pledge you signed, '%s' The pledge's URL is <%s>."), $sentence, $p->url_main());
     
     /* Got all the data we need. Just drop the announcement into the database
      * and let the frequentupdate script pass it to the signers. */

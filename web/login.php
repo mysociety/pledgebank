@@ -36,7 +36,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: login.php,v 1.84 2007-08-10 03:02:03 matthew Exp $
+ * $Id: login.php,v 1.85 2007-10-01 16:48:54 francis Exp $
  * 
  */
 
@@ -92,7 +92,7 @@ if (get_http_var("now")) {
 
                 ));
 
-    header("Location: /your");
+    header("Location: /my");
     exit;
 }
 
@@ -334,7 +334,7 @@ function login_form($errors = array()) {
 <p>
 <input type="radio" name="loginradio" value="SendEmailForgotten" id="loginradio3" <?=get_http_var("loginradio") == 'SendEmailForgotten' ? 'checked' : ''?>><label for="loginradio3"><?=_("I've forgotten or didn't set a password") ?></label>
 <br>
-<small><?=_("(we'll send an email, click the link in it to confirm your email is working.<br>if you like, you can then set a password on Your Pledges page)") ?></small>
+<small><?=_("(we'll send an email, click the link in it to confirm your email is working.<br>if you like, you can then set a password on My Pledges page)") ?></small>
 <br>
 </p>
 

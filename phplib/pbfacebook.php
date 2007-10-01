@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.45 2007-09-10 10:54:19 francis Exp $
+// $Id: pbfacebook.php,v 1.46 2007-10-01 16:48:54 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -349,7 +349,7 @@ function pbfacebook_render_frontpage($page = "") {
 
 ?>    <fb:tabs>
     <fb:tab-item title="Friends' pledges" <?=($page=="friends")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/friends" />
-    <fb:tab-item title="Your pledges" <?=($page=="your")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/your" />
+    <fb:tab-item title="My pledges" <?=($page=="my")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/my" />
     <fb:tab-item title="Featured pledges" <?=($page=="feature")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/feature" />
 <!--    <fb:tab-item title="Successful pledges" <?=($page=="success")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/success" /> -->
     </fb:tabs> <?
@@ -421,10 +421,10 @@ function pbfacebook_render_frontpage($page = "") {
             $friends_signed_joined = " AND pledges.id NOT IN (".join(",", $friends_signed).")";
     }
 
-    if ($page == "your" ) {
-        print "<fb:title>"."Your pledges"."</fb:title>";
+    if ($page == "my" || $page == "your" ) {
+        print "<fb:title>"."My pledges"."</fb:title>";
 
-        $facebook->require_login('/list/your');
+        $facebook->require_login('/list/my');
         $you_id = $facebook->get_loggedin_user();
         $got = 0;
 

@@ -14,7 +14,7 @@ green tick by it so everyone knows you've done your bit.
 
 Obviously, some pledges might take a while until you can carry them
 out; if so, you can keep this email safe until you do.  Or, you can
-say you've done a pledge at any time by going to Your Pledges.
+say you've done a pledge at any time by going to My Pledges.
 
 Just to remind you, the pledge, created by <?=$values['creator_name']?>, reads:
 '<?=$values['sentence_first']?>'

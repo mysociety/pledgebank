@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.168 2007-08-16 18:07:54 matthew Exp $
+// $Id: fns.php,v 1.169 2007-10-01 16:48:54 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -524,7 +524,7 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 }
 
 # Change/update your personal details
-# (called from phplib/page.php and web/your.php)
+# (called from phplib/page.php and web/my.php)
 function change_personal_details($yourpage = false) {
     global $q_UpdateDetails, $q_pw1, $q_pw2, $P;
     $idclass = 'id="setpassword"';
@@ -533,7 +533,7 @@ function change_personal_details($yourpage = false) {
     $has_password = $P->has_password();
     ?>
     <div class="noprint">
-    <form <?=$idclass?> name="setpassword" action="/your" method="post"><input type="hidden" name="UpdateDetails" value="1">
+    <form <?=$idclass?> name="setpassword" action="/my" method="post"><input type="hidden" name="UpdateDetails" value="1">
     <? if ($yourpage) { ?>
     <h2><?=$P->has_password() ? _('Change password') : _('Set password') ?></h2>
     <? } ?>

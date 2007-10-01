@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: your.php,v 1.31 2007-08-07 11:24:27 matthew Exp $
+// $Id: my.php,v 1.1 2007-10-01 16:48:54 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -19,7 +19,7 @@ $P = pb_person_signon(array(
                 'reason_email_subject' => _('View your pledges at PledgeBank.com')
             ));
 
-page_header(_("Your Pledges"), array('id'=>"yourpledges"));
+page_header(_("My Pledges"), array('id'=>"yourpledges"));
 
 
 // Pledges you might like (people who signed pledges you created/signed also signed these...)
@@ -133,7 +133,7 @@ function show_your_signed_pledges() {
                     print _('Have you done this pledge?');
                 }
                 print ' <input type="submit" value="' . _('Yes') . '"></p>';
-                print '<input type="hidden" name="r" value="your"></form>';
+                print '<input type="hidden" name="r" value="my"></form>';
             }
             if ($done == $pledge->ref()) {
                 print p('<em>' . _("That's great!") . '</em>');

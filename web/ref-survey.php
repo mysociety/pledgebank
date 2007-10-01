@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-survey.php,v 1.2 2007-07-30 12:18:21 matthew Exp $
+ * $Id: ref-survey.php,v 1.3 2007-10-01 16:48:54 francis Exp $
  * 
  */
 
@@ -51,7 +51,7 @@ db_commit();
 if (get_http_var('r') == 'pledge')
     $url = '/' . $pledge->ref() . '#signer' . $signer['id'];
 else
-    $url = '/your?done=' . $pledge->ref() . '#signed' . $pledge->id();
+    $url = '/my?done=' . $pledge->ref() . '#signed' . $pledge->id();
 
 header("Location: $url");
 ?>

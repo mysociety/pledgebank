@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.63 2007-06-06 16:54:58 matthew Exp $
+// $Id: alert.php,v 1.64 2007-10-01 16:48:54 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -39,7 +39,7 @@ if (get_http_var('subscribe_local_alert')) {
     if ($desc) {
         alert_unsubscribe($P->id(), $alert_id);
         print p(sprintf(_("Thanks!  You won't receive more email about %s."), $desc));
-        print(p(_("You might like to <a href=\"/alert/\">subscribe to a new local alert</a>, or <a href=\"/your\">manage all your alerts</a>.")));
+        print(p(_("You might like to <a href=\"/alert/\">subscribe to a new local alert</a>, or <a href=\"/my\">manage all your alerts</a>.")));
     } else {
         print p(_("Thanks!  You are already unsubscribed from that alert."));
     }

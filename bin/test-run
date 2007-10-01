@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.234 2007-08-17 09:31:23 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.235 2007-10-01 15:38:47 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -190,8 +190,8 @@ $wth->database_drop_reload('../db/schema.sql');
 $wth->database_load_schema('../db/ican-categories.sql');
 $wth->database_cycle_sequences(200);
 # XXX As services are deployed now for Ratty, comment this out
-my $eveld_bin = undef; # "$FindBin::Bin/../../services/EvEl/bin/eveld";
-# $eveld_bin = undef if ! -e $eveld_bin; # when running on servers rely on EvEl daemon, rather than calling EvEl binary directly XXX need more explicit way of distinguishing this case, than just checking evel isn't checked out in the same tree
+my $eveld_bin = "$FindBin::Bin/../../services/EvEl/bin/eveld";
+$eveld_bin = undef if ! -e $eveld_bin; # when running on servers rely on EvEl daemon, rather than calling EvEl binary directly as on Francis'' laptop XXX need more explicit way of distinguishing this case, than just checking evel isn't checked out in the same tree
 $wth->email_setup({ eveld_bin => $eveld_bin,
                     eveld_multispawn => $multispawn,
                     log_mailbox => "log_mailbox" });

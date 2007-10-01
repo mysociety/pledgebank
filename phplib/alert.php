@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.35 2007-05-10 15:52:10 timsk Exp $
+// $Id: alert.php,v 1.36 2007-10-01 17:14:28 francis Exp $
 
 require_once '../phplib/pbperson.php';
 require_once '../../phplib/mapit.php';
@@ -201,15 +201,25 @@ function alert_list_pledges_local($person_id) {
 /* alert_list_pledges_local PERSON_ID
  * Displays list of all local pledge alerts person has with unsubscribe button.
  */
-function alert_list_comments($person_id) {
-    $s = db_query('SELECT alert.* from alert where 
+function alert_list_comments($person_id, $all_comments = false) {
+    $limit = 3;
+    $query = 'SELECT alert.* from alert where 
             person_id = ? and event_code=\'comments/ref\'
-            and whendisabled is null', $person_id);
+            and whendisabled is null order by id desc';
+    if (!$all_comments) {
+        $query .= " LIMIT " . ($limit + 1);
+    }
+    $s = db_query($query, $person_id);
     if (0 != db_num_rows($s)) {
         print h2(_("Comment alerts"));
         print p(_("You will get email when there are:"));
-	print '<ul>';
+        print '<ul>';
+        $c = 0; 
         while ($row = db_fetch_array($s)) {
+            $c++;
+            if (!$all_comments && $c > $limit) {
+                break;
+            }
             $description = ucfirst(alert_h_description($row['id']));
     ?>
     <li>
@@ -222,6 +232,9 @@ function alert_list_comments($person_id) {
     <?
         }
         print "</ul>";
+        if (!$all_comments && $c > $limit) {
+            print '<p><a href="?allcomments=1">'._("Show all your comment alerts").'</a></p>';
+        }
     }
 }
 

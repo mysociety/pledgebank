@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: my.php,v 1.2 2007-10-01 17:01:29 francis Exp $
+// $Id: my.php,v 1.3 2007-10-01 17:14:28 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -159,7 +159,6 @@ function show_your_signed_pledges() {
 print '<div id="yourconnections">';
 change_personal_details(true);
 pledges_you_might_like();
-alert_list_comments($P->id());
 print '</div>';
 
 print '<div id="yoursignaturesandpledges">';
@@ -168,6 +167,7 @@ show_your_pledges('open');
 global $microsite;
 if ($microsite != 'o2')
     alert_list_pledges_local($P->id());
+alert_list_comments($P->id(), get_http_var('allcomments') ? true : false);
 show_your_pledges('closed');
 show_your_signed_pledges();
 print '</div>';

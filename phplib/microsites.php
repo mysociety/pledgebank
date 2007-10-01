@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.112 2007-09-25 16:26:19 matthew Exp $
+ * $Id: microsites.php,v 1.113 2007-10-01 15:55:01 francis Exp $
  * 
  */
 
@@ -85,6 +85,10 @@ function microsites_get_name() {
  * Whether or not to use our cross-site conversion tracking for this microsite.
  * See https://secure.mysociety.org/track/ for more information about this. */
 function microsites_user_tracking() {
+    if (OPTION_PB_STAGING) {
+        return false;
+    }
+
     global $microsite;
     if (!$microsite) 
         return true;

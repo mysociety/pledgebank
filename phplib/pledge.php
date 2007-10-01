@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.249 2007-09-19 17:32:42 matthew Exp $
+ * $Id: pledge.php,v 1.250 2007-10-01 15:55:01 francis Exp $
  * 
  */
 
@@ -256,6 +256,14 @@ class Pledge {
         $q = db_query('select category_id, category.name from pledge_category, category where pledge_id = ? and category_id = category.id', $this->id());
         while ($r = db_fetch_row($q))
             $c[$r[0]] = $r[1];
+        return $c;
+    }
+
+    function tags() {
+        $c = array();
+        $q = db_query('select tag from pledge_tag where pledge_id = ?', $this->id());
+        while ($r = db_fetch_row($q))
+            $c[] = $r[0];
         return $c;
     }
 

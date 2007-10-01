@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.154 2007-07-16 11:25:12 francis Exp $
+ * $Id: admin-pb.php,v 1.155 2007-10-01 15:55:01 francis Exp $
  * 
  */
 
@@ -312,6 +312,20 @@ class ADMIN_PAGE_PB_MAIN {
             }
             print '</form>';
         }
+
+        // Tags
+        print _('Tags:') . " ";
+        $tags = $pledge_obj->tags();
+        if ($tags) {
+            print "<strong>";
+            foreach ($tags as $tag) {
+                print $tag . " ";
+            }
+            print "</strong>";
+        } else {
+            print _('none');
+        }
+        print "<br>";
 
         // Prominence
         print '<form name="prominenceform" method="post" action="'.$this->self_link.'">';

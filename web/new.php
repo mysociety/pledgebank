@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.197 2007-08-09 16:56:16 matthew Exp $
+// $Id: new.php,v 1.198 2007-10-01 15:55:02 francis Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -128,6 +128,11 @@ function pledge_form_one($data = array(), $errors = array()) {
         $data['identity'] = 'picnic lover';
     }
 
+    // Can introduce initial tags via URL parameters
+    if (get_http_var('tags')) {
+        $data['tags'] = get_http_var('tags');
+    }
+
     global $pb_time;
     $P = pb_person_if_signed_on();
     if (!is_null($P)) {
@@ -163,17 +168,17 @@ my email address is <input<? if (array_key_exists('email', $errors)) print ' cla
 <p>as part of the <? display_categories($data); ?> part of the People Promise,</p>
 
 <?  } else { ?>
-<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="50"></p>
+<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="48"></p>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="3" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
 <input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="32" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
 
 <p><? if ($lang=='de') { ?>
 <input type="text" id="signup" name="signup"
-size="51" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>"> <strong><?=_('will') ?></strong>.
+size="48" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>"> <strong><?=_('will') ?></strong>.
 <? } else { ?>
 <strong><?=_('will') ?></strong> <input type="text" id="signup" name="signup"
-size="51" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
+size="48" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
 <? }
 ?></p>
 
@@ -454,8 +459,9 @@ function pledge_form_submitted() {
         else
             $data[$field] = get_http_var($field, true);
     }
-    if (array_key_exists('title', $data))
+    if (array_key_exists('title', $data)) {
         $data['lang'] = $lang;
+    }
     
     if (array_key_exists('data', $data)) {
         $alldata = unserialize(base64_decode($data['data']));
@@ -479,6 +485,8 @@ function pledge_form_submitted() {
     $data['target'] = str_replace($locale_info['thousands_sep'], '', $data['target']);
     $data['title'] = preg_replace('#^' . _('I will') . ' #i', '', $data['title']);
     $data['title'] = preg_replace('#^' . _('will') . ' #i', '', $data['title']);
+    if (!array_key_exists('tags', $data))
+        $data['tags'] = "";
     if (microsites_no_target()) { $data['target'] = 0; }
     list ($facebook_id, $facebook_id_sig, $facebook_name) = check_facebook_params($data);
     if (!$facebook_id) {
@@ -859,6 +867,16 @@ longer be valid."))?>
             : htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))) // XXX show enclosing cat?
     ?></strong></li>
 <?  }
+
+    if ($data['tags']) {
+       $tag_array = make_web20_tags($data['tags']);
+       print "<li>Tags: <strong>";
+       foreach ($tag_array as $tag) {
+       print $tag . " "; 
+       }
+       print "</strong></li>";
+    }
+
     if (microsites_private_allowed()) { ?>
     <li><?=_('Privacy status') ?>: <strong><?
     if ($v=='all') print _('Public');
@@ -991,11 +1009,19 @@ function create_new_pledge($P, $data) {
                     $data['facebook_id'] ? 't' : 'f'
                 ));
 
-        if ($data['category'] != -1)
+        if ($data['category'] != -1) {
             db_query('
                 insert into pledge_category (pledge_id, category_id)
                 values (?, ?)',
                 array($data['id'], $data['category']));
+        }
+
+        if ($data['tags']) {
+           $tag_array = make_web20_tags($data['tags']);
+           foreach ($tag_array as $tag) {
+                db_query('insert into pledge_tag (pledge_id, tag) values (?, ?)', $data['id'], $tag);
+           }
+        }
 
     }
 

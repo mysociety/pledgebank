@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.250 2007-10-01 15:55:01 francis Exp $
+ * $Id: pledge.php,v 1.251 2007-10-01 17:01:29 francis Exp $
  * 
  */
 
@@ -437,6 +437,7 @@ class Pledge {
     //     class - adds the given classes (space separated) to the division
     //     facebook-sign - add facebook sign button
     //     facebook-share - add facebook share button
+    //     creatorlinks - extra links for My Pledges page
 
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
@@ -560,6 +561,11 @@ class Pledge {
 <?
         }
 
+        if (array_key_exists('creatorlinks', $params) && $params['creatorlinks']) {
+?>
+    <p> <a href="<?=$this->url_announce()?>"><?=_('Send message to signers') ?></a> </p>
+<?
+        }
 
         if (array_key_exists('showdetails', $params) && $params['showdetails'] && isset($this->data['detail']) && $this->data['detail']) {
             $det = htmlspecialchars($this->data['detail']);

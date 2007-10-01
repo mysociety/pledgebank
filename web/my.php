@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: my.php,v 1.1 2007-10-01 16:48:54 francis Exp $
+// $Id: my.php,v 1.2 2007-10-01 17:01:29 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -94,7 +94,7 @@ function show_your_pledges($type) {
             print h2(_('Closed pledges you created'));
         while ($r = db_fetch_array($qrows)) {
             $pledge = new Pledge($r);
-            $pledge->render_box(array('class' => '', 'href'=>$pledge->url_main()));
+            $pledge->render_box(array('class' => '', 'href'=>$pledge->url_main(), 'creatorlinks' => true));
         }
     } elseif ($type == 'open') {
         print p(_('You have no open pledges. <a href="/new">Start a new pledge</a>.'));

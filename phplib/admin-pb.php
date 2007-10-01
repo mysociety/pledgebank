@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.155 2007-10-01 15:55:01 francis Exp $
+ * $Id: admin-pb.php,v 1.156 2007-10-01 17:29:33 francis Exp $
  * 
  */
 
@@ -352,7 +352,8 @@ class ADMIN_PAGE_PB_MAIN {
             print '<h2>Edit pledge text</h2>';
             print '<form name="editform" method="post" action="'.$this->self_link.'">';
             print 'I will <input type="text" name="title" value="'.htmlspecialchars($pdata['title']).'" size="60">';
-            print '<br>but only if ' . $pdata['target']. ' <input type="text" name="type" value="'.htmlspecialchars($pdata['type']).'" size="40">';
+            print '<br>but only if <input type="text" name="target" value="'.htmlspecialchars($pdata['target']).'" size="4">';
+            print ' <input type="text" name="type" value="'.htmlspecialchars($pdata['type']).'" size="40">';
             print '<br>will <input type="text" name="signup" value="'.htmlspecialchars($pdata['signup']).'" size="60">';
             print '<br>&mdash;<input type="text" name="name" value="'.htmlspecialchars($pdata['name']).'" size="20">, ';
             print '<input type="text" name="identity" value="'.htmlspecialchars($pdata['identity']).'" size="30">';
@@ -644,13 +645,20 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
     }
 
     function edit_pledge_text($pledge_id) {
+        $pledge = new Pledge($pledge_id);
+
         $title = get_http_var('title');
         $type = get_http_var('type');
         $signup = get_http_var('signup');
         $name = get_http_var('name');
         $identity = get_http_var('identity');
         $detail = get_http_var('detail');
-        db_query('update pledges set title = ?, type = ?, signup = ?, name = ?, identity = ?, detail = ? where id = ?', $title, $type, $signup, $name, $identity, $detail, $pledge_id);
+        $target = intval(get_http_var('target'));
+        if ($target <= $pledge->signers()) {
+            print p(_('<em>Pick a target larger than the number of signers please!</em>'));
+            return;
+        }
+        db_query('update pledges set title = ?, type = ?, signup = ?, name = ?, identity = ?, detail = ?, target = ? where id = ?', $title, $type, $signup, $name, $identity, $detail, $target, $pledge_id);
         db_commit();
         print p(_('<em>Pledge text updated. Check it in the pledge box preview on the right.</em>'));
     }

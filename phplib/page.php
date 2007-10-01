@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.170 2007-09-19 17:32:42 matthew Exp $
+// $Id: page.php,v 1.171 2007-10-01 11:34:04 francis Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -340,10 +340,23 @@ function page_footer($params = array()) {
     /* User tracking */
     if ($track = microsites_user_tracking()) {
         if (is_bool($track)) {
-            $extra = null;
-            if (array_key_exists('extra', $params) && $params['extra'])
-                $extra = $params['extra'];
-            track_event($extra);
+            // Temporarily use google analytics
+            if (true) {
+?>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2712333-1";
+urchinTracker();
+</script>
+<?
+            } else {
+                // Our own tracking - mostly broken
+                $extra = null;
+                if (array_key_exists('extra', $params) && $params['extra'])
+                    $extra = $params['extra'];
+                track_event($extra);
+            }
         } elseif (is_string($track)) {
             print $track;
         }

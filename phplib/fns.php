@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.170 2007-10-02 12:09:02 matthew Exp $
+// $Id: fns.php,v 1.171 2007-10-02 12:18:49 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -202,6 +202,7 @@ function pb_send_email_internal($to, $spec) {
     } else {
         $recips = $to;
     }
+    if (isset($spec['Bcc'])) $recips[] = $spec['Bcc'];
 
     $result = evel_send($spec, $recips);
     $error = evel_get_error($result);

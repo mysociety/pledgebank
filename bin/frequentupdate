@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.117 2007-08-30 17:34:49 matthew Exp $
+ * $Id: frequentupdate,v 1.118 2007-10-02 12:09:02 matthew Exp $
  *
  */
 
@@ -749,12 +749,12 @@ function send_pending_messages() {
         if (isset($msg['emailtemplatename'])) {
             verbose("sending message #${msg['id']} using email template '${msg['emailtemplatename']}'");
             locale_push($pledge->lang());
-            $f = pb_send_email_template(array($pledge->creator_email(), $pledge->creator_name()),
+            $f = pb_send_email_template(array(array($pledge->creator_email(), $pledge->creator_name())),
                 $msg['emailtemplatename'], $data, $headers);
             locale_pop();
         } else {
             verbose("sending message #${msg['id']} as raw email, subject '${msg['emailsubject']}'");
-            $f = pb_send_email(array($pledge->creator_email(), $pledge->creator_name()),
+            $f = pb_send_email(array(OPTION_CONTACT_EMAIL, array($pledge->creator_email(), $pledge->creator_name())),
                 $msg['emailsubject'], $msg['emailbody'], $headers);
         }
 
@@ -889,7 +889,7 @@ function send_pending_messages() {
             /* Send message using template. */
             if ($send_by == 'email') {
                 verbose("sending message #${r['id']} using email template '${r['emailtemplatename']}'");
-                $to = $r['signer_name'] ? array($r['signer_email'], $r['signer_name']) : $r['signer_email'];
+                $to = $r['signer_name'] ? array(array($r['signer_email'], $r['signer_name'])) : $r['signer_email'];
                 $f = pb_send_email_template($to, $r['emailtemplatename'], $data, $headers);
             } elseif ($send_by == 'facebook' && $r['circumstance'] != 'survey') {
                 verbose("sending message #${r['id']} by Facebook id ${r['signer_facebook_id']} template '${r['emailtemplatename']}'");
@@ -953,7 +953,7 @@ function send_pending_messages() {
             if ($send_it) {
                 if ($send_by == 'email') {
                     verbose("sending message #${r['id']} as raw email, subject '${r['emailsubject']}'");
-                    $to = $r['signer_name'] ? array($r['signer_email'], $r['signer_name']) : $r['signer_email'];
+                    $to = $r['signer_name'] ? array(array($r['signer_email'], $r['signer_name'])) : $r['signer_email'];
                     $f = pb_send_email($to, $r['emailsubject'], $emailbody, $headers);
                 } elseif ($send_by == 'facebook') {
                     verbose("sending message #${r['id']} by Facebook id ${r['signer_facebook_id']} subject '${r['emailsubject']}'");

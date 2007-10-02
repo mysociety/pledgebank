@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.169 2007-10-01 16:48:54 francis Exp $
+// $Id: fns.php,v 1.170 2007-10-02 12:09:02 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -193,9 +193,17 @@ function pb_send_email_internal($to, $spec) {
         $spec['From'] = array(OPTION_CONTACT_EMAIL, _('PledgeBank.com'));
     }
 
-    $spec['To'] = array($to);
-    $recip = is_array($to) ? $to[0] : $to;
-    $result = evel_send($spec, $recip);
+    $spec['To'] = $to;
+    $recips = array();
+    if (is_array($to)) {
+        foreach ($to as $t) {
+            $recips[] = (is_array($t) ? $t[0] : $t);
+        }
+    } else {
+        $recips = $to;
+    }
+
+    $result = evel_send($spec, $recips);
     $error = evel_get_error($result);
     if ($error) 
         error_log("pb_send_email_internal: " . $error);
@@ -586,7 +594,7 @@ function change_personal_details($yourpage = false) {
 function add_version($s) {
     if (OPTION_PB_STAGING) {
         $stat = stat(".$s");
-	$v = $stat['mtime'];
+        $v = $stat['mtime'];
     } else {
         $v = $resource_versions[$s];
     }

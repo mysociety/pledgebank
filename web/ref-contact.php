@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-contact.php,v 1.3 2007-08-14 16:30:08 matthew Exp $
+// $Id: ref-contact.php,v 1.4 2007-10-02 12:09:02 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -49,7 +49,7 @@ if (get_http_var('submit')) {
             $errors[] = _("I'm afraid that to prevent abuse we rate limit the usage of the
 Contact the pledge creator feature. Please try again tomorrow.");
         } else {
-            $success = pb_send_email_template(array($p->creator_email(), $p->creator_name()),
+            $success = pb_send_email_template(array(array($p->creator_email(), $p->creator_name())),
                 'email-creator', array_merge($p->data, array(
                 'from_name' => $data['name'], 
                 'message' => $data['message'],

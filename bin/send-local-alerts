@@ -7,7 +7,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: send-local-alerts,v 1.32 2007-08-10 03:02:02 matthew Exp $
+ * $Id: send-local-alerts,v 1.33 2007-10-02 12:09:02 matthew Exp $
  *
  */
 
@@ -173,7 +173,7 @@ function send_local_alerts() {
         $alert['pledges_count'] = $count;
         $alert['pledges_text'] = $text;
         $f = false;
-        $to = $alert['alerted_name'] ? array($alert['alerted_email'], $alert['alerted_name']) : $alert['alerted_email'];
+        $to = $alert['alerted_name'] ? array(array($alert['alerted_email'], $alert['alerted_name'])) : $alert['alerted_email'];
         if ($count > 1) {
             $f = pb_send_email_template($to, 'alert-local-multiple', $alert, array());
         } elseif ($count == 1) {

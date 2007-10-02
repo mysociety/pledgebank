@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.119 2007-10-02 12:18:49 matthew Exp $
+ * $Id: frequentupdate,v 1.120 2007-10-02 12:51:35 matthew Exp $
  *
  */
 
@@ -754,7 +754,8 @@ function send_pending_messages() {
             locale_pop();
         } else {
             verbose("sending message #${msg['id']} as raw email, subject '${msg['emailsubject']}'");
-            $headers['Bcc'] = OPTION_CONTACT_EMAIL;
+            if (OPTION_WEB_HOST != 'testharness') # XXX, but can't see how else to do it...
+                $headers['Bcc'] = OPTION_CONTACT_EMAIL;
             $f = pb_send_email(array(array($pledge->creator_email(), $pledge->creator_name())),
                 $msg['emailsubject'], $msg['emailbody'], $headers);
         }

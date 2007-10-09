@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.156 2007-10-01 17:29:33 francis Exp $
+ * $Id: admin-pb.php,v 1.157 2007-10-09 00:00:53 francis Exp $
  * 
  */
 
@@ -654,9 +654,16 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         $identity = get_http_var('identity');
         $detail = get_http_var('detail');
         $target = intval(get_http_var('target'));
-        if ($target <= $pledge->signers()) {
-            print p(_('<em>Pick a target larger than the number of signers please!</em>'));
-            return;
+        if ($pledge->target() > $pledge->signers()) {
+            if ($target <= $pledge->signers()) {
+                print p(_('<em>Pick a target larger than the number of signers please!</em>'));
+                return;
+            }
+        } else {
+            if ($target > $pledge->signers()) {
+                print p(_('<em>Pick a target smaller than or equal to the number of signers please!</em>'));
+                return;
+            }
         }
         db_query('update pledges set title = ?, type = ?, signup = ?, name = ?, identity = ?, detail = ?, target = ? where id = ?', $title, $type, $signup, $name, $identity, $detail, $target, $pledge_id);
         db_commit();

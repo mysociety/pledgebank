@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.45 2007-09-26 06:18:30 francis Exp $
+// $Id: facebook.php,v 1.46 2007-10-09 20:02:13 francis Exp $
 
 /*
 
@@ -30,6 +30,7 @@ TODO:
 - Add link to source code
 
 Improvements:
+- Show pledges which have lots of Facebook signers
 - Find pledges by people with similar interests, or who've signed similar pledges etc.
 - Include featured pledges on EVERYONE's profile
 - Link to creators of via facebook pledges, and show their photo

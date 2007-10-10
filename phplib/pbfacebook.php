@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.46 2007-10-01 16:48:54 francis Exp $
+// $Id: pbfacebook.php,v 1.47 2007-10-10 18:10:30 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -159,23 +159,19 @@ function pbfacebook_render_pledge($pledge) {
 
     // Fancy invitation section
     if (!$announce_messages) {
-        $invite_intro = "Invite your friends to also sign this pledge.";
-        if ($already_signed && !$pledge->finished()) {
-            print "<h2 style=\"text-align: center\">$invite_intro</h2>";
-            print '
-    <fb:editor action="" labelwidth="200">
-        <fb:editor-custom label="Friends">
-            <fb:multi-friend-input/>
-        </fb:editor-custom>
-        <fb:editor-buttonset>
-            <fb:editor-button value="Send Pledge"/>
-        </fb:editor-buttonset>
-        <input type="hidden" name="invite_friends" value="1">
-    </fb:editor>
-    ';
+        if ($already_signed && !$pledge->finished() && get_http_var('really_sign_in_facebook')) {
+            $invite_content = 
+                '<fb:name uid="'.$facebook->get_loggedin_user().'" firstnameonly="true" shownetwork="false"/> signed the '.
+                "'" . $pledge->ref() . "' pledge. Take a look and sign it too." . 
+                " <fb:req-choice url=\"".$pledge->url_facebook()."\" label=\"View Pledge\" />";
+
+            ?> <fb:request-form action="<?=$pledge->url_facebook()?>" method="POST" invite="true" type="Pledge" 
+                content="<?=htmlspecialchars($invite_content)?>" labelwidth = "200">
+                    <fb:multi-friend-selector showborder="false" actiontext="Invite your friends to sign this pledge.">
+               </fb:request-form> <p></p>  
+            <?
         }
     }
-
 
     // Announcement messages
     if ($announce_messages && $already_signed) {

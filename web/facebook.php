@@ -6,13 +6,12 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.47 2007-10-10 17:19:06 francis Exp $
+// $Id: facebook.php,v 1.48 2007-10-10 18:10:30 francis Exp $
 
 /*
 
 TODO:
 
-- Use the new <fb:request-form> for sending pledge invites
 - Peruse the new http://bugs.developers.facebook.com/
 - Experiment with notifications.send WITHOUT sending email - looks like that
   will be the only option left from the notifications API.
@@ -31,6 +30,7 @@ TODO:
 
 - Show explicitly on e.g. http://apps.facebook.com/pledgebank/list/friends
   that a pledge is closed.
+- And also that you have already signed it
 
 Improvements:
 - Show pledges which have lots of Facebook signers

@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.46 2007-10-09 20:02:13 francis Exp $
+// $Id: facebook.php,v 1.47 2007-10-10 17:19:06 francis Exp $
 
 /*
 
@@ -29,6 +29,9 @@ TODO:
 
 - Add link to source code
 
+- Show explicitly on e.g. http://apps.facebook.com/pledgebank/list/friends
+  that a pledge is closed.
+
 Improvements:
 - Show pledges which have lots of Facebook signers
 - Find pledges by people with similar interests, or who've signed similar pledges etc.
@@ -48,6 +51,9 @@ Improvements:
 - Show featured pledges in facebook via mutual signer connections
   (first need to fix connections to use Facebook ids as well as emails?)
 - Show pledges made by / signed by people in same network as you
+- Richard wants to be able to add app and link to existing PB account so can show pledges on his profile
+  And to be able to add it to show his willingness to use it, but without signing a pledge yet
+  link from profile message "has not signed any pledges in Facebook"
 
 Not so important:
 - Test what happens if you add app, but refuse each of the major permissions

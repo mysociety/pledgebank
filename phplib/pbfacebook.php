@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.51 2007-10-10 23:09:01 francis Exp $
+// $Id: pbfacebook.php,v 1.52 2007-10-10 23:29:46 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -215,63 +215,72 @@ style="display: none"
 
     // Show signers
     print '<div class="pb_signers">';
-    print '<h3 class="wallkit_title">Current Signatories</h3>';
 
     $friends_joined = pbfacebook_friends_list();
-    $q = db_query("SELECT facebook_id FROM signers LEFT JOIN person ON person.id = signers.person_id
-                WHERE signers.via_facebook AND person.facebook_id is not null
-                      AND signers.pledge_id = ?
-                ORDER BY (person.facebook_id in ($friends_joined)) DESC, signtime DESC", array($pledge->id()));
+
     $c = 0;
-    if (db_num_rows($q) > 0) {
-        // Grrr - annoyingly, fb:user-table only works in a profile.
-        $signers_per_rows = 4;
-        print '<table border="0"><tr>';
-        while ($r = db_fetch_array($q)) {
-            print "<td>";
-            print '<table border="0"><tr><td style="text-align: center">';
-            print '<fb:profile-pic uid="'.$r['facebook_id'].'" size="thumb" /> ';
-            print '</td></tr><tr><td style="text-align: center">';
-            print '<fb:userlink shownetwork="0" uid="'.$r['facebook_id'].'"/> ';
-            print "</td></tr></table>";
-            print "</td>";
-            $c++;
-            if ($c % $signers_per_rows == 0) {
-                print "</tr><tr>";
+    foreach (array(true, false) as $do_friend) {
+        $q = db_query("SELECT facebook_id
+                    FROM signers LEFT JOIN person ON person.id = signers.person_id
+                    WHERE signers.via_facebook AND person.facebook_id is not null
+                          AND signers.pledge_id = ?
+                          AND facebook_id ".(!$do_friend ? "not":"")." in ($friends_joined)
+                    ORDER BY signtime DESC", array($pledge->id()));
+        $lc = 0;
+        if (db_num_rows($q) > 0) {
+            if ($do_friend)
+                print '<h3 class="wallkit_title">Signers &ndash; Friends</h3>';
+            else
+                print '<h3 class="wallkit_title">Signers &ndash; via Facebook</h3>';
+            // Grrr - annoyingly, fb:user-table only works in a profile.
+            $signers_per_rows = 4;
+            print '<table border="0"><tr>';
+            while ($r = db_fetch_array($q)) {
+                print "<td>";
+                print '<table border="0"><tr><td style="text-align: center">';
+                print '<fb:profile-pic uid="'.$r['facebook_id'].'" size="thumb" /> ';
+                print '</td></tr><tr><td style="text-align: center">';
+                print '<fb:userlink shownetwork="0" uid="'.$r['facebook_id'].'"/> ';
+                print "</td></tr></table>";
+                print "</td>";
+                $c++;
+                $lc++;
+                if ($lc % $signers_per_rows == 0) {
+                    print "</tr><tr>";
+                }
             }
+            print "</tr></table><p></p>";
         }
-        print "</tr></table>";
     }
     $fb_c = $c;
     $remaining = $pledge->signers() - $c;
     if ($remaining > 0) {
-        print "<p>";
-        if ($c > 0) {
-            print " and ";
-        }
-
         $q = db_query("SELECT signers.name FROM signers LEFT JOIN person ON person.id = signers.person_id
                     WHERE (NOT signers.via_facebook OR person.facebook_id IS NULL)
                           AND showname AND signers.pledge_id = ?
                     ORDER BY signtime DESC", array($pledge->id()));
 
         if (db_num_rows($q) > 0) {
+            print '<h3 class="wallkit_title">Signers &ndash; via PledgeBank.com</h3>';
+            print "<p>";
+            $lc = 0;
             while ($r = db_fetch_array($q)) {
                 print htmlspecialchars($r['name']);
                 $c++;
-                if ($c != db_num_rows($q))
+                $lc++;
+                if ($lc != db_num_rows($q))
                     print ", ";
-                if ($c - $fb_c > 50) // only show 50 from outside
+                if ($lc > 50) // only show 50 from outside
                     break;
             }
-        }
 
-        $remaining = $pledge->signers() - $c;
-        if ($remaining > 0) {
-            print " plus $remaining " . make_plural($remaining, "other");
+            $remaining = $pledge->signers() - $c;
+            if ($remaining > 0) {
+                print " plus $remaining " . make_plural($remaining, "other");
+            }
+            print " by email at <a href=\"".$pledge->url_typein()."\">www.pledgebank.com/".$pledge->ref()."</a>.";
+            print "</p><p></p>";
         }
-        print " from <a href=\"".$pledge->url_typein()."\">outside Facebook</a>.";
-        print "</p>";
     }
     print "</div>";
 

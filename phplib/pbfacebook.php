@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.47 2007-10-10 18:10:30 francis Exp $
+// $Id: pbfacebook.php,v 1.48 2007-10-10 18:16:54 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -557,46 +557,6 @@ function pbfacebook_sign_pledge($pledge) {
     return $pledge;
 }
 
-// Send notification email to friends on Facebook
-function pbfacebook_send_to_friends($pledge, $friends) {
-    global $facebook;
-
-    $user = $facebook->get_loggedin_user();
-
-    // Requests version
-    $content = '<fb:name uid="'.$user.'" firstnameonly="true" capitalize="true"/> just signed this pledge, and would like you to take a look. ';
-    $content .= "
-<fb:req-choice url=\"".$pledge->url_facebook()."\" label=\"Go to the pledge\" />
-";
-    $ret = $facebook->api_client->notifications_sendRequest(join(",", $friends), "pledge", $content, 
-            $pledge->has_picture() ? $pledge->picture_url() : (OPTION_BASE_URL . "/pyramid.gif"), 
-            "invitation");
-    if (is_int($ret)) err("Error calling notifications_sendRequest: " . print_r($ret, TRUE));
-
-    // Email version
-/*
-    $content = '
-        <fb:notif-subject><fb:name uid="'.$user.'" firstnameonly="true" capitalize="true"/> pledged to do something...</fb:notif-subject> 
-        <fb:name uid="' . $user . '" firstnameonly="true" capitalize="true"/>
-        just signed a pledge on Facebook and thought you might be interested. 
-        <a href="'.OPTION_FACEBOOK_CANVAS.$pledge->ref().'">Click here</a>
-        to see the pledge.';
-#    print "Friend inviting not ready yet"; exit; 
-    $ret = $facebook->api_client->notifications_send(join(",", $friends), $content, FALSE);
-    if ($ret == 4) return false; // Special "sent too many" error
-    if (is_int($ret)) err("Error calling notifications_send: " . print_r($ret, TRUE));
-*/
-
-    if (!$ret) { 
-        # XXX maybe this happens when sending was successful, but Facebook 
-        # error reporting sucks in this regard so who knows.
-        err("Probably failed to send request to your friend.");
-   } 
-
-    $facebook->redirect($ret."&canvas=1");
-    return true;
-}
-
 // FBML header for all PledgeBank Facebook pages
 function pbfacebook_render_header() {
 ?> <div style="padding: 10px;" id="all_content">  <?
@@ -762,15 +722,6 @@ function pbfacebook_send_internal($to, $message) {
         err("Error calling feed_publishStoryToUser in pbfacebook_send_internal: " . print_r($ret, TRUE));
     }
 
-    # Frustratingly, this always requires URL confirmation, even when the users have added the application,
-    # so we can't use it from a cron job.
-    /*
-    $ret = $facebook->api_client->notifications_sendRequest($to, "pledge", $message, "http://www.mysociety.org/mysociety_sm.gif", "invitation");
-    #$ret = $facebook->api_client->notifications_send($to, $message, FALSE);
-    if (is_int($ret)) err("Error calling notifications_sendRequest in pb_send_facebook: " . print_r($ret, TRUE)); 
-    if ($ret) err("Need URL confirmation calling notifications_sendRequest in pb_send_facebook: " . print_r($ret, TRUE));
-    print "Success\n";
-    */
     return true;
 }
 

@@ -6,23 +6,14 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.48 2007-10-10 18:10:30 francis Exp $
+// $Id: facebook.php,v 1.49 2007-10-10 18:16:54 francis Exp $
 
 /*
 
 TODO:
 
-- Peruse the new http://bugs.developers.facebook.com/
 - Experiment with notifications.send WITHOUT sending email - looks like that
   will be the only option left from the notifications API.
-
-- "The news that you've signed could not be added to your feed." when Tom signed pledge
-- Post in news when new pledge created - doesn't seem to work?
-
-- Text on message for "share" links is not perfect.
-- Finish links from rest of PledgeBank site.
-
-- Add chivvy email about Facebook
 
 - Text that is shown by Facebook when you add application. (Heather to write)
 
@@ -31,6 +22,15 @@ TODO:
 - Show explicitly on e.g. http://apps.facebook.com/pledgebank/list/friends
   that a pledge is closed.
 - And also that you have already signed it
+
+- Check that after making new pledge takes you to share with friends dialog
+
+
+- Peruse the new http://bugs.developers.facebook.com/
+
+- Text on message for "share" links is not perfect.
+- Text on minifeed is not perfect
+- Finish links from rest of PledgeBank site.
 
 Improvements:
 - Show pledges which have lots of Facebook signers
@@ -54,6 +54,9 @@ Improvements:
 - Richard wants to be able to add app and link to existing PB account so can show pledges on his profile
   And to be able to add it to show his willingness to use it, but without signing a pledge yet
   link from profile message "has not signed any pledges in Facebook"
+
+Later:
+- Add chivvy email about Facebook
 
 Not so important:
 - Test what happens if you add app, but refuse each of the major permissions
@@ -121,15 +124,6 @@ if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) 
         pbfacebook_render_footer();
         exit;
     }
-    $no_send_error = false;
-    if (get_http_var("invite_friends")) {
-        $facebook->require_add('/'.$pledge->ref());
-        if (array_key_exists('ids', $_POST)) {
-            if (!pbfacebook_send_to_friends($pledge,$_POST['ids'])) {
-                $no_send_error = true;
-            }
-        }
-    }
 
     pbfacebook_render_header();
     pbfacebook_render_dashboard();
@@ -139,8 +133,6 @@ if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) 
             pbfacebook_sign_pledge($pledge);
         }
     }
-    if ($no_send_error)
-        print '<p class="errors">'."Sorry, couldn't send the pledge to your friends, probably because you've sent too many messages in too short a time.".'</p>';
     pbfacebook_render_pledge($pledge);
     pbfacebook_render_footer();
 }

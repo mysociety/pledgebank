@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.49 2007-10-10 23:01:37 francis Exp $
+// $Id: pbfacebook.php,v 1.50 2007-10-10 23:06:48 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -260,6 +260,8 @@ style="display: none"
                 $c++;
                 if ($c != db_num_rows($q))
                     print ", ";
+                if ($c > 50)
+                    break;
             }
         }
 

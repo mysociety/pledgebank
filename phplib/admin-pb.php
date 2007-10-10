@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.158 2007-10-10 09:08:39 francis Exp $
+ * $Id: admin-pb.php,v 1.159 2007-10-10 17:34:20 francis Exp $
  * 
  */
 
@@ -451,7 +451,7 @@ class ADMIN_PAGE_PB_MAIN {
             if ($list_limit && $c >= $list_limit) {
                 print "<p>... only $list_limit signers shown, "; 
                 print '<a href="'.$this->self_link.'&amp;pledge='.$pledge.'&amp;l=-1">show all</a>';
-                print ' (do not press if you are Tom, it will crash your computer :)</p>';
+                print '</p>';
             }
         } else {
             print '<p>Nobody has signed up to this pledge.</p>';

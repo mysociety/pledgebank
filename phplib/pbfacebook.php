@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.50 2007-10-10 23:06:48 francis Exp $
+// $Id: pbfacebook.php,v 1.51 2007-10-10 23:09:01 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -242,6 +242,7 @@ style="display: none"
         }
         print "</tr></table>";
     }
+    $fb_c = $c;
     $remaining = $pledge->signers() - $c;
     if ($remaining > 0) {
         print "<p>";
@@ -260,7 +261,7 @@ style="display: none"
                 $c++;
                 if ($c != db_num_rows($q))
                     print ", ";
-                if ($c > 50)
+                if ($c - $fb_c > 50) // only show 50 from outside
                     break;
             }
         }

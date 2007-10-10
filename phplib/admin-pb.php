@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.157 2007-10-09 00:00:53 francis Exp $
+ * $Id: admin-pb.php,v 1.158 2007-10-10 09:08:39 francis Exp $
  * 
  */
 
@@ -24,8 +24,8 @@ function facebook_display_name($facebook_id) {
     if (!$facebook)
         pbfacebook_init_cron(OPTION_FACEBOOK_ROBOT_ID);
     $facebook_name = pbfacebook_get_user_name($facebook_id);
-    if ($facebook_name) {
-        $facebook_name = "<Unknown>"; # due to Facebook privacy search settings hiding name from non-friends
+    if (!$facebook_name) {
+        $facebook_name = "<Unknown $facebook_id>"; # due to Facebook privacy search settings hiding name from non-friends
     }
     return '<a href="http://www.facebook.com/profile.php?id='.$facebook_id.'">'.htmlspecialchars($facebook_name).'</a> (Facebook)';
 }

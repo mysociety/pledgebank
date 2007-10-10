@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.49 2007-10-10 18:16:54 francis Exp $
+// $Id: facebook.php,v 1.50 2007-10-10 23:01:38 francis Exp $
 
 /*
 
@@ -32,6 +32,9 @@ TODO:
 - Text on minifeed is not perfect
 - Finish links from rest of PledgeBank site.
 
+- Call http://wiki.developers.facebook.com/index.php/Feed.publishTemplatizedAction
+  instead of PublishActionofUser
+
 Improvements:
 - Show pledges which have lots of Facebook signers
 - Find pledges by people with similar interests, or who've signed similar pledges etc.
@@ -42,7 +45,6 @@ Improvements:
 - Somehow actually send notifications for success, rather than news post
 - On profile page, highlight more successful pledges, and that you must do them.
 - Let people say "I've done it!" on the pledges on their profile.
-- Show comments (wall!) on Facebook pledges -- use fb:comments?
 - Aggregate multiple announce messages more intelligently - if user posts two messages
   within 12 hours, then only post once on news feed. Or link to specific messages from
   news feed, rather than to general pledge.

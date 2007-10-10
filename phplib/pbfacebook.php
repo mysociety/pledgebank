@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.48 2007-10-10 18:16:54 francis Exp $
+// $Id: pbfacebook.php,v 1.49 2007-10-10 23:01:37 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -274,7 +274,7 @@ style="display: none"
 
     // Comments
     print '<div class="pb_wall">';
-    print '<fb:comments xid="pledge_'.$pledge->ref().'_comments" canpost="true" candelete="false">';
+    print '<fb:comments xid="pledge_'.str_replace("-", "_", $pledge->ref()).'_comments" canpost="true" candelete="false">';
     print '<fb:title>The Wall</fb:title>';
     print '</fb:comments>';
     print '</div>';

@@ -6,9 +6,10 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.50 2007-10-10 23:01:38 francis Exp $
+// $Id: facebook.php,v 1.51 2007-10-11 02:55:13 francis Exp $
 
 /*
+
 
 TODO:
 
@@ -34,6 +35,7 @@ TODO:
 
 - Call http://wiki.developers.facebook.com/index.php/Feed.publishTemplatizedAction
   instead of PublishActionofUser
+  See http://www.facebook.com/topic.php?uid=2205007948&topic=13926&start=30&hash=503b3e81edba5aeff0c1ac98eb58a61a at end for PHP function to add to the API file
 
 Improvements:
 - Show pledges which have lots of Facebook signers

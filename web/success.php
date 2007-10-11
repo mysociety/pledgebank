@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.4 2007-09-25 16:39:32 matthew Exp $
+// $Id: success.php,v 1.5 2007-10-11 19:24:27 matthew Exp $
 
 require_once "../phplib/pb.php";
 page_header('Success Stories', array('id'=>'success'));
@@ -52,7 +52,7 @@ for me.</p>
 <p>&ldquo;My pledge was originally to raise some money to help pay for airfares to get
 to New Orleans to help with Hurricane Katrina Relief
 organisation CERMT (Emergency Relief Massage Therapy).</p>
-<p><a href="/success/airfarespledge">Continue reading&hellip;</p>
+<p><a href="/success/airfarespledge">Continue reading&hellip;</a></p>
 </div>
 
 <div>

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.258 2007-10-12 13:12:48 matthew Exp $
+// $Id: index.php,v 1.259 2007-10-12 15:01:23 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -44,9 +44,9 @@ function front_page() {
         echo '<div id="startblurb">
 <p id="start"><a href="./new"><strong>', _('Start your pledge'), '&nbsp;&raquo;</strong></a></p>
 <ul>
-<li>' . _('Page and tools to promote your pledge')
-. '<li>' . _('People can sign by SMS, the web, or in Facebook')
-. '<li>' . _('Change the world')
+<li>' . _('Get a unique page for your pledge')
+. '<li>' . _('Find tools to help promote your pledge')
+. '<li>' . _('Use positive peer pressure to change your community')
 . '</ul>
 </div>';
     }

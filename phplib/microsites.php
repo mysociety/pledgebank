@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.117 2007-10-12 14:39:53 matthew Exp $
+ * $Id: microsites.php,v 1.118 2007-10-12 15:01:23 matthew Exp $
  * 
  */
 
@@ -489,10 +489,10 @@ It&#8217;s your chance to make a difference, and you really can!</p>
 <?
     } else {
         # Main site
-	echo h2(_('PledgeBank successes'));
-	global $success_stories;
-        shuffle($success_stories);
-        echo $success_stories[0]['summary'];
+        echo h2(_('PledgeBank successes'));
+        global $success_summary;
+        shuffle($success_summary);
+        echo $success_summary[0];
         echo '<p align="right"><a href="/success">' . _('More success stories') . '</p>';
     }
 }

@@ -5,31 +5,13 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.2 2007-10-12 14:39:53 matthew Exp $
-
-$hugs = '<h3><a href="/give3hugsaday">' . _('Make people smile') . ' &ndash; give3hugsaday</a></h3>';
-$hugs .= p(_('&ldquo;I started with a fairly simple pledge that most users
-would be able to sign on to and just see what happens&hellip; I also was
-really intrigued by the idea of power in numbers and how this could be used
-for something with more significant, concrete results&hellip; I emailed it
-out to about 5 or 6 friends/family; and within a few hours 2 or 3 had
-joined.  This was apparently enough to get it shown to the public, and from
-there people kept signing.&rdquo;'));
-
-$first1000 = '
-<p><img class="r" alt="' . _('First1000 logo') . '"
-src="http://www.pledgebank.com/pics/First1000.gif" width="100" height="90"></p>
-<h3><a href="/First1000">' . _('Get 1000 people to move house') .' &ndash; First1000</a></h3>
-' . p(_('&ldquo;The membership of the
-Free State Project was very active in recruiting signers, and as a result
-of the pledge, 1000 people will be moving to New Hampshire by the end of
-2008 in order to become activists for liberty!&rdquo;'));
+// $Id: success.php,v 1.3 2007-10-12 15:01:23 matthew Exp $
 
 $success_stories = array(
 array('summary' => '
+<h3><a href="/success/airfarespledge">' . _('Organise aid trip to New Orleans') . ' &ndash; airfarespledge</a></h3>
 <p><img src="/i/airfarespledge.tn.jpeg" class="r" title="' . _('My best friend in Biloxi MS') . '"
-alt="' . _('The creator of the pledge with a friendly dog, tagged 595') . '">
-<h3><a href="/success/airfarespledge">' . _('Organise aid trip to New Orleans') . ' &ndash; airfarespledge</a></h3>' .
+alt="' . _('The creator of the pledge with a friendly dog, tagged 595') . '">' .
 p(_('&ldquo;After seeing the news about Hurricane Katrina, which had some
 pretty graphic pictures showing the damage, I thought of how I could
 help....Being a fan of Jazz music and knowing a lot about New Orleans,
@@ -82,18 +64,31 @@ title="ORG&rsquo;s report into the May 2007 elections">our 65-page
 report</a> which was recently launched with significant press
 coverage.&rdquo;')),
 ), array(
-'summary' => $first1000,
-'entry' => $first1000,
+'summary' => '
+<h3><a href="/First1000">' . _('Get 1000 people to move house') .' &ndash; First1000</a></h3>
+<p><img class="r" alt="' . _('First1000 logo') . '"
+src="http://www.pledgebank.com/pics/First1000.gif" width="100" height="90"></p>
+' . p(_('&ldquo;The membership of the
+Free State Project was very active in recruiting signers, and as a result
+of the pledge, 1000 people will be moving to New Hampshire by the end of
+2008 in order to become activists for liberty!&rdquo;')),
+'entry' => '
+<p><img class="r" alt="' . _('First1000 logo') . '"
+src="http://www.pledgebank.com/pics/First1000.gif" width="100" height="90"></p>
+<h3><a href="/First1000">' . _('Get 1000 people to move house') .' &ndash; First1000</a></h3>
+' . p(_('&ldquo;The membership of the
+Free State Project was very active in recruiting signers, and as a result
+of the pledge, 1000 people will be moving to New Hampshire by the end of
+2008 in order to become activists for liberty!&rdquo;')),
 ), array(
 'summary' => '
-<h3><a href="http://promise.livesimply.org.uk/">' . _('Changing lifestyles') . ' &ndash; LiveSimply</a></h3>
-' .
+<h3><a href="http://promise.livesimply.org.uk/">' . _('Changing lifestyles') . ' &ndash; LiveSimply</a></h3>' .
+p('<img class="r" alt="' . _('LiveSimply logo') . '"
+src="http://promise.livesimply.org.uk/microsites/livesimply/promise_banner_right.jpg">') .
 p(_('&ldquo;&hellip;having a website where you can get that colourful data
 of people&rsquo;s thoughts, experience and opinions can provide us with
 some insight in how people are changing their lives.')) .
-p('<img class="r" alt="' . _('LiveSimply logo') . '"
-src="http://promise.livesimply.org.uk/microsites/livesimply/promise_banner_right.jpg">'
-. _('&ldquo;The features PledgeBank has were suitable for our needs - we
+p(_('&ldquo;The features PledgeBank has were suitable for our needs - we
 wanted to create a community of people who make promises so that they can
 support each other.&rdquo;')),
 'entry' => '
@@ -121,9 +116,9 @@ wouldn&rsquo;t have to customize too much. mySociety was my choice because
 I like the ethical background of the organisation.&rdquo;')),
 ), array(
 'summary' => '
+<h3><a href="/SaveTheSycamore">' . _('Campaign to save a local tree') . ' &ndash; SaveTheSycamore</a></h3>
 <p><img class="r" alt="' . _('Save The Sycamore') . '" width="150" height="200"
-src="http://www.pledgebank.com/pics/SaveTheSycamore.jpeg"></p>
-<h3><a href="/SaveTheSycamore">' . _('Campaign to save a local tree') . ' &ndash; SaveTheSycamore</a></h3>' .
+src="http://www.pledgebank.com/pics/SaveTheSycamore.jpeg"></p>' .
 p(_('&ldquo;The amount of elderly people who supported me in this pledge by
 writing and phoning the council was phenomenal. Thank you so much for
 affording us a professional launch pad. My next pledge will be to promote
@@ -143,15 +138,6 @@ opportunity to make a difference. I truly am
 <strong>astounded</strong>!!!!!! With thanks from myself, family and my
 community.&rdquo;')),
 ), array(
-'summary' => '
-<h3><a href="/trees4kenya">' . _('Raise money for charity') . ' &ndash; trees4kenya</a></h3>' .
-p(_('&ldquo;Harnessing the power of collective action is made much easier
-by this easy-to-use tool. [&hellip;] &ldquo;As a result of the pledges, a
-vegetarian orphanage has an irrigation system, and areas of land have been
-converted to food production, so that the institution can be
-self-sufficient. We&rsquo;ve also raised money for scientific reports, and
-coordinated mass letter writing efforts to our elected
-representatives.&rdquo;')),
 'entry' => '
 <h3><a href="/trees4kenya">' ._('Raise money for charity') . ' &ndash; trees4kenya</a></h3>' .
 p(_('&ldquo;I&rsquo;ve followed MySociety&rsquo;s projects for some time,
@@ -170,22 +156,15 @@ production, so that the institution can be self-sufficient. We&rsquo;ve
 also raised money for scientific reports, and coordinated mass letter
 writing efforts to our elected representatives.&rdquo;')),
 ), array(
-'summary' => $hugs,
-'entry' => $hugs,
+'entry' => '<h3><a href="/give3hugsaday">' . _('Make people smile') . ' &ndash; give3hugsaday</a></h3>' .
+p(_('&ldquo;I started with a fairly simple pledge that most users
+would be able to sign on to and just see what happens&hellip; I also was
+really intrigued by the idea of power in numbers and how this could be used
+for something with more significant, concrete results&hellip; I emailed it
+out to about 5 or 6 friends/family; and within a few hours 2 or 3 had
+joined.  This was apparently enough to get it shown to the public, and from
+there people kept signing.&rdquo;')),
 ), array(
-'summary' => '
-<h3><a href="/showerpower">' . _('Help the environment') . ' &ndash; showerpower</a></h3>' .
-
-p(_('&ldquo;I heard about PledgeBank through reading Michael Norton&rsquo;s
-book 365 Ways to Change the World - I bought this book for my sister and I,
-as we found that in an evening we would often fall into the habit of
-bemoaning the problems of the world and feeling helpless to do anything
-about them. One of the major environmental issues in Australia is the lack
-of water. My sister and I started thinking if we personally could change
-our habits this would be a very small step in the right direction - then we
-read about PledgeBank and thought if we could get other individuals to
-change their habits this would start adding up!') . '&rdquo;') .
-p('<a href="/success#showerpower">' . _('Continue reading&hellip;') . '</a>'),
 'entry' => '
 <h3><a href="/showerpower">' . _('Help the environment') . ' &ndash; showerpower</a></h3>' . 
 
@@ -199,7 +178,7 @@ our habits this would be a very small step in the right direction - then we
 read about PledgeBank and thought if we could get other individuals to
 change their habits this would start adding up!')) .
 
-p('&ldquo;I suppose my great hope is that as individuals if we can regain a
+p(_('&ldquo;I suppose my great hope is that as individuals if we can regain a
 sense of personal responsibility for our actions and connection to the
 external environment, then the world would be a better place. As opposed to
 seeing these major world problems as something someone needs to address,
@@ -220,5 +199,11 @@ heading to the city.')) .
 
 p(_('&ldquo;A few people I don&rsquo;t know somewhere in the world signed
 the pledge&hellip;and that made me really happy.&rdquo;')),
-
+)
 );
+
+$success_summary = array();
+foreach ($success_stories as $story) {
+    if (isset($story['summary']))
+        $success_summary[] = $story['summary'];
+}

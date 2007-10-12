@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.69 2007-10-12 13:29:13 matthew Exp $
+ * $Id: comments.php,v 1.70 2007-10-12 13:42:09 matthew Exp $
  * 
  */
 
@@ -149,8 +149,8 @@ function comments_summary($r, $search = '') {
     $text = $r['text'];
     if (strlen($text) > 30) {
         if ($search) {
-            $start = strpos(strtolower($text), strtolower($search)) - 10;
-            $end = strlen($search) + 20;
+            $start = strpos(strtolower($text), strtolower($search)) - 20;
+            $end = strlen($search) + 50;
         } else {
             $start = 0;
             $end = 30;

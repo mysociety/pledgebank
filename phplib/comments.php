@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.66 2007-08-24 11:23:21 matthew Exp $
+ * $Id: comments.php,v 1.67 2007-10-12 13:12:47 matthew Exp $
  * 
  */
 
@@ -58,18 +58,18 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
     if (isset($comment['ref'])) {
         $r = '<a href="/' . $comment['ref'] . '">' . $comment['ref'] . '</a>';
         if (isset($comment['whenposted'])) {
-	    # TRANS: This appears immediately after a comment, to show who wrote it when, as: "To pledge <pledge reference> by <person's name>, <how long ago>."
-	    # TRANS: e.g. "blah, blah, this is a comment. - To pledge artnotads by Matthew, 3 hours ago."
+            # TRANS: This appears immediately after a comment, to show who wrote it when, as: "To pledge <pledge reference> by <person's name>, <how long ago>."
+            # TRANS: e.g. "blah, blah, this is a comment. - To pledge artnotads by Matthew, 3 hours ago."
             printf(_('To pledge %s by %s, %s.'), $r, $name, prettify_duration($comment['whenposted']));
         } else {
-	    # TRANS: This is a shortened version of the above string: "To pledge <pledge reference> by <person's name>."
+            # TRANS: This is a shortened version of the above string: "To pledge <pledge reference> by <person's name>."
             printf(_('To pledge %s by %s.'), $r, $name);
         }
     } else {
         /* Format the time sanely. */
         if (isset($comment['whenposted'])) {
-	    # TRANS: This appears immediately after a comment, to show who wrote it when, as: "<person's name>, <how long ago>."
-	    # TRANS: e.g. "Matthew, 4 minutes ago."
+            # TRANS: This appears immediately after a comment, to show who wrote it when, as: "<person's name>, <how long ago>."
+            # TRANS: e.g. "Matthew, 4 minutes ago."
             printf(_('%s, %s.'), $name, prettify_duration($comment['whenposted']));
         } else {
             print $name;
@@ -110,7 +110,7 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
         $id = db_getOne('select id from pledges where ref = ?', $pledge);
 
     if (is_null($id))
-	# TRANS: this is an error message meaning, "The pledge called '%s' doesn't exist.
+        # TRANS: this is an error message meaning, "The pledge called '%s' doesn't exist.
         err(sprintf(_("No pledge '%s'"), $pledge));
 
     $count = db_getOne('select count(id) from comment where pledge_id = ? and not ishidden', $id);
@@ -145,14 +145,25 @@ function comments_show($pledge, $noabuse = false, $limit = 0) {
 
 /* comments_summary COMMENT 
  * Display comment for index, such as front page or search results. */
-function comments_summary($r) {
+function comments_summary($r, $search = '') {
     $text = $r['text'];
-    if (strlen($text) > 20) $text = trim_characters($text, 0, 30);
-    $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . htmlspecialchars($text) . '</a>';
-    
+    if (strlen($text) > 30) {
+        if ($search) {
+            $start = strpos($text, $search) - 10;
+            $end = strpos($text, $search) + strlen($search) + 20;
+        } else {
+            $start = 0;
+            $end = 30;
+        }
+        $text = trim_characters($text, $start, $end);
+    }
+    $text = htmlspecialchars($text);
+    if ($search)
+        $text = str_replace($search, "<strong>$search</strong>", $text);
+    $text = '<a href="/' . $r['ref'] . '#comment_' . $r['id'] . '">' . $text . '</a>';
     # TRANS: This appears under "Latest comments" on the front page as: "<start of comment text...> by <name>, on <pledge reference link>, <how long ago>"
     # TRANS: e.g. "Most of my veg are British..." by Esther, on ukfood, 3 hours ago"
-    return sprintf(_('%s by %s, on %s, %s'), $text, htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify_duration($r['whenposted']));
+    return sprintf(_('%s by %s, on %s, %s'), "$text<br><small>", htmlspecialchars($r['name']), "<a href=\"/$r[ref]\">$r[ref]</a>", prettify_duration($r['whenposted']).'</small>');
 }
 
 /* comments_rss_entry COMMENT 
@@ -162,8 +173,8 @@ function comments_rss_entry($r) {
     if (strlen($text) > 250) $text = trim_characters($text, 0, 250);
     
     return array(
-	  # TRANS: this appears in an RSS feed as: "Comment on <pledge reference> pledge by <person's name>"
-	  # TRANS: e.g. "Comment on Electric pledge by Owen Blacker"
+          # TRANS: this appears in an RSS feed as: "Comment on <pledge reference> pledge by <person's name>"
+          # TRANS: e.g. "Comment on Electric pledge by Owen Blacker"
           'title' => sprintf(_('Comment on %s pledge by %s'), $r['ref'], htmlspecialchars($r['name'])),
           'link' => pb_domain_url(array('explicit'=>true, 'path'=>"/". $r['ref'] . '#comment_' . $r['id'])),
           'description' => htmlspecialchars($text),
@@ -227,7 +238,7 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
             ?><div id="comments">
 <a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss/comments"))?>"><img align="right" border="0" src="rss.gif" alt="<?=_('RSS feed of comments on all pledges') ?>"></a>
             <?=_('<h2>Latest comments</h2>') ?> <?  
-            print '<ul>';
+            print '<ul class="search_results">';
             while($r = db_fetch_array($q)) {
                 // Only show one comment from each person
                 if (array_key_exists($r['person_id'], $done))
@@ -323,13 +334,13 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 
 <? if (!microsites_intranet_site()) { ?>
 <div class="form_row">
-<label for="author_website"><?=_('Your web site address') ?>:</label> <small><i><?=_('(optional, will be shown publically)') ?></i></small>
+<label for="author_website"><?=_('Your web site address') ?>:</label> <small><i><?=_('(optional, will be shown publicly)') ?></i></small>
   <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="40">
 </div>
 <? } ?>
 
 <p><strong><?=_('Your comment') ?>:</strong>
-<br><textarea style="max-width: 100%" name="text" id="text" cols="40" rows="10"><?=$q_h_text?></textarea>
+<br><textarea name="text" id="text" cols="40" rows="10"><?=$q_h_text?></textarea>
 </p>
 
 <? if ($q_h_comment_id) { ?>
@@ -338,9 +349,9 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 <input type="hidden" name="n" value="<?=$nextn?>">
 <p><small><strong><?=_('Privacy note:')?></strong>
 <? if (microsites_intranet_site()) {
-    print 'Your name will be shown publically on this page with your comment. Your email address will not be shown.';
+    print 'Your name will be shown publicly on this page with your comment. Your email address will not be shown.';
 } else { 
-    print _('Your name (and web site address if given) will be shown publically on this page
+    print _('Your name (and web site address if given) will be shown publicly on this page
 with your comment. Your email address will not be shown. People searching for your
 name on the Internet may find your comment.');
 } ?></small></p> <p><input

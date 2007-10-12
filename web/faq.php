@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.58 2007-09-25 16:26:20 matthew Exp $
+// $Id: faq.php,v 1.59 2007-10-12 13:12:48 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -298,7 +298,7 @@ function default_faq() {
 
     print dd(_("All of them. We try to detect which country you are in
     automatically, and show you only pledges relevant to your country. To see what
-    PledgeBank looks like in other countries, click on '(change)' at the top of any
+    PledgeBank looks like in other countries, click on the country name at the top of any
     page, just right of the PledgeBank logo.  Please <a href=\"/contact\">contact
     us</a> if you'd like to help get more people in your country using PledgeBank."));
 
@@ -499,6 +499,12 @@ for the purposes set out above.</dd>
 ############################################################################
 
 page_header(_("Frequently Asked Questions"), array('cache-max-age' => 600));
+
+# Contact Us sidebar
+echo '<div id="sidebar"><h2>' . _('Contact Us') . '</h2>
+<p>' . _('If your question isn&rsquo;t answered here, or you just
+wanted to let us know something about the site, <a href="/contact">contact&nbsp;us</a>.')
+    . '</p></div>';
 
 if ($microsite && $microsite == 'livesimply') {
     livesimply_faq();

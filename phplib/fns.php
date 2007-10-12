@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.171 2007-10-02 12:18:49 matthew Exp $
+// $Id: fns.php,v 1.172 2007-10-12 13:12:47 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -239,7 +239,7 @@ function view_friends_form($p, $errors = array(), $track=null) {
     }
     $p->render_box(array('showdetails'=>false));
 ?>
-<form id="pledgeaction" name="pledge" action="<?=$p->url_main() ?>/email" method="post">
+<form name="pledge" action="<?=$p->url_main() ?>/email" method="post">
 <?  if ($track)
         print '<input type="hidden" name="track" value="' . htmlentities($track) . '">';
     if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
@@ -299,8 +299,6 @@ function pb_get_change_country_link($or_site = true) {
         }
     } elseif ($site_country)
         $change = _("change country");
-    else
-        $change = _("choose country");
     if ($change) {
         $change = ' (<a href="/where?r='.urlencode($_SERVER['REQUEST_URI']).'">' . $change . '</a>)';
     }
@@ -328,12 +326,8 @@ function pb_site_pledge_filter_main(&$sql_params) {
         return microsites_filter_main($sql_params);
     } else {
         $query_fragment = "(";
-        if ($site_country) {
-            $query_fragment .= "country = ?";
-            $sql_params[] = $site_country;
-        } else {
-            $query_fragment .= "1 = 0"; # get no pledges
-        }
+        $query_fragment .= "country = ?";
+        $sql_params[] = $site_country;
         # also show all Esperanto pledges when in Esperanto
         if ($lang == 'eo') {
             $query_fragment .= " or lang = ?";
@@ -370,12 +364,8 @@ function pb_site_pledge_filter_foreign(&$sql_params) {
         return microsites_filter_foreign($sql_params);
     } else {
         $locale_clause = "(";
-        if ($site_country) {
-            $locale_clause .= "country <> ?";
-            $sql_params[] = $site_country;
-        } else {
-            $locale_clause .= "1 = 0"; # get no pledges
-        }
+        $locale_clause .= "country <> ?";
+        $sql_params[] = $site_country;
         # Esperanto pledges already shown, so don't include again in foreign
         if ($lang == 'eo') {
             $locale_clause .= " and lang <> ?";
@@ -389,38 +379,35 @@ function pb_site_pledge_filter_foreign(&$sql_params) {
 /* Prints description of main OR general filter with links to change
  * country/language/microsite */
 function pb_print_filter_link_main_general($attrs = "") {
-    global $site_country, $lang, $langs, $microsite;
+    global $lang, $langs, $microsite;
     $change_country = pb_get_change_country_link();
     $change_language = pb_get_change_language_link();
     $langname = $langs[$lang];
 
     if ($microsite) {
-        print "<p $attrs>";
+        print "<p $attrs><small>";
         if ($microsite == 'everywhere') 
             printf(_('%s%s pledges listed'), microsites_get_name(), $change_country);
         elseif ($change_country)
             printf(_('%s%s pledges only listed'), microsites_get_name(), $change_country);
-        print '</p>';
+        print '</small></p>';
     }
     else {
-        print "<p $attrs>";
+        print "<p $attrs><small>";
         # TRANS: Worth thinking about word order here. The English reads e.g. "UK (change country) pledges and global English (change language) pledges listed. Even in English, and certainly in other languages, it'd probably be clearer as something like: "Listed below are pledges for the UK (change country) and global pledges written in English (change language)." (Tim Morley, 2005-11-27)
-        if ($site_country)
-            printf(_('%s%s pledges and global %s (%s) pledges listed'), pb_site_country_name('in'), $change_country, $langname, $change_language);
-        else
-            printf(_('%s%s pledges in %s (%s) only listed'), pb_site_country_name('in'), $change_country, $langname, $change_language);
-        print '</p>';
+        printf(_('%s pledges and global %s pledges listed'), pb_site_country_name('in'), $langname);
+        print '</small></p>';
     }
 }
 
 function pb_print_no_featured_link() {
     $change = pb_get_change_country_link();
-    print '<p>';
+    print '<p class="head_mast"><small>';
     if ($change)
         printf(_('There are no featured pledges for %s%s at the moment.'), pb_site_country_name('to'), $change);
     else
         print _('There are no featured pledges at the moment.');
-    print '</p>';
+    print '</small></p>';
 }
 
 /* pb_site_country_name
@@ -429,8 +416,6 @@ function pb_site_country_name($fr_prep = '') {
     global $countries_code_to_name, $site_country, $microsite; 
     if ($microsite)
         return microsites_get_name();
-    elseif (!$site_country)
-        return 'Global';
     else {
         if ($fr_prep == 'to')
             return countries_with_to($site_country);
@@ -523,8 +508,8 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 <input type="hidden" name="country" value="<?=$force_country?>">
 <span style="white-space: nowrap"><?=_('Postcode:')?>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <? } else { ?>
-<span style="white-space: nowrap"><?=_('Country:') ?> <? gaze_controls_print_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true)); ?></span>
-<span style="white-space: nowrap"><span id="place_postcode_label<?=($place_postcode_label ? $place_postcode_label : '')?>"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
+<?=_('Country:') ?>&nbsp;<? gaze_controls_print_country_choice(microsites_site_country(), null, array(), array('noglobal' => true, 'gazeonly' => true)); ?>
+ <span style="white-space: nowrap"><span id="place_postcode_label<?=($place_postcode_label ? $place_postcode_label : '')?>"><?=_('Town:')?></span>&nbsp;<input type="text" size="12" name="place" value="<?=htmlspecialchars($place)?>"></span>
 <? } ?>
 <input type="submit" name="submit" value="<?=_('Subscribe') ?>"> </p>
 </form>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.251 2007-10-01 17:01:29 francis Exp $
+ * $Id: pledge.php,v 1.252 2007-10-12 13:12:47 matthew Exp $
  * 
  */
 
@@ -437,7 +437,6 @@ class Pledge {
     //     class - adds the given classes (space separated) to the division
     //     facebook-sign - add facebook sign button
     //     facebook-share - add facebook share button
-    //     creatorlinks - extra links for My Pledges page
 
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
@@ -448,14 +447,17 @@ class Pledge {
             print '<div class="pledge';
             if ($params['class']) print ' ' . $params['class'];
             print '">';
+        } elseif (array_key_exists('id', $params)) {
+            print '<div id="' . $params['id'] . '">';
         } else
             print '<div id="pledge">';
 
         if (array_key_exists('facebook-share', $params) && $params['facebook-share']) {
             print $params['facebook-share'];
         }
+        print '<h2 style="margin-bottom:0.5em">' . sprintf(_('Pledge &ldquo;%s&rdquo;'), $this->ref()) . '</h2>';
 ?>
-<p style="margin-top: 0">
+<p class="head_mast">
 <?      if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->picture_url()."\" alt=\"\">"; } ?>
 &quot;<?=$this->sentence($sentence_params) ?>&quot;
 <?      if ($this->url_translate_pledge()) { ?>
@@ -558,12 +560,6 @@ class Pledge {
 ?>
 <div style="clear:both"></div>
 <form method="post" action="<?=OPTION_FACEBOOK_CANVAS?><?=$this->ref()?>?sign_in_facebook=1" name="sign_pledge" style="text-align: center; margin-top: 1em;"><input type="submit" value="Sign Pledge" class="inputsubmit"/> </form>
-<?
-        }
-
-        if (array_key_exists('creatorlinks', $params) && $params['creatorlinks']) {
-?>
-    <p> <a href="<?=$this->url_announce()?>"><?=_('Send message to signers') ?></a> </p>
 <?
         }
 
@@ -705,21 +701,22 @@ class Pledge {
     <input type="hidden" name="add_signatory" value="1">
     <input type="hidden" name="pledge" value="<?=htmlspecialchars($this->ref()) ?>">
     <input type="hidden" name="ref" value="<?=htmlspecialchars($this->ref()) ?>">
-    <?  print h2($this->byarea() ? _('Sign up where you live') : _('Sign up now'));
+    <?  print '<h2>' . ($this->byarea() ? _('Sign up where you live') : _('Sign up now')) . '</h2>';
         if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
-        $namebox = '<input size="20" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
-        print '<p><strong>';
-        printf(_('I, %s, sign up to the pledge.'), $namebox);
-        print '</strong><br></p>';
+        $namebox = '<input size="30" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
+        print '<p id="name_row"><label for="name">' . _('Your name:') . '</label> ' . $namebox . '</p>';
+        print '
+    <p id="email_row"><label for="email">' . _('Your email:') . '</label> <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" id="email" name="email" value="' . htmlspecialchars($email) . '"></p> <p id="email_blurb"><small>'.
+    _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>';
         if (microsites_intranet_site()) {
             print '<p><input type="hidden" name="showname" value="1">
     <small>People are able to search for Promises you have signed.</small></p>';
         } else {
-            print '<p>
-    <small>
-    <strong><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publically on this pledge.') . '</strong>
-    '._('People searching for your name on the Internet will be able
-    to find your signature, unless you uncheck this box.').'</small>
+            print '<p id="showname_row"><small>
+    <label style="float:none"><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publicly on this pledge.') . '</label><br>' . 
+    _('People searching for your name on the Internet might be able
+    to find your signature.').
+    '</small>
     </p>';
             }
         if ($this->byarea()) {
@@ -739,37 +736,58 @@ class Pledge {
                 <? } 
 ?> <div id="byarea_town_ajax"></div> <?
         }
-        print '
-    <p><strong>' . _('Your email:') . '</strong> <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" name="email" value="' . htmlspecialchars($email) . '"><br><small>'.
-    _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>';
         microsites_signup_extra_fields($errors);
-        print '<p><input type="submit" name="submit" value="' . ($this->byarea() ? _('Sign Pledge') : _('Sign Pledge')) . '"></p>';
+        print '<p id="signpledge_row"><input type="submit" name="submit" id="next_step" value="' . _('Sign Pledge') . '"></p>';
 
         $extras = array();
         // Display SMS if we are sure it makes sense - i.e. we support SMS for
         // the pledge country (or it is global) and we support SMS for the site
         // country.
         if ($this->has_sms() && sms_site_country() && microsites_has_sms()) {
-            $out = sprintf(_("Or, text '<strong>%s %s</strong>' to <strong>%s</strong>"), OPTION_PB_SMS_PREFIX, $this->ref(), OPTION_PB_SMS_DISPLAY_NUMBER);
+            $out = sprintf(_("Or text &lsquo;<strong>%s %s</strong>&rsquo; to <strong>%s</strong>"), OPTION_PB_SMS_PREFIX, $this->ref(), OPTION_PB_SMS_DISPLAY_NUMBER);
             $out .= " ";
             $out .= sprintf(_("(in %s only)"), sms_countries_description());
             $extras[] = $out;
         }
         // Display Facebook link if that is available
         if (OPTION_FACEBOOK_API_KEY) {
-            $out = sprintf(_('Or, share and sign this pledge <strong><a href="%s">in Facebook</a></strong>'), $this->url_facebook());
+            $out = sprintf(_('Share and sign this pledge <strong><a href="%s">in Facebook</a> <a href="%s"><img src="http://news.bbc.co.uk/shared/img/icons/bookmarks/facebook.gif" alt="" border="0"></a></strong>'), $this->url_facebook(), $this->url_facebook());
             $extras[] = $out;
         }
         if ($extras) {
-            print '<p>';
-            print join("\n<br>\n",$extras);
-            print '</p>';
+            print '<ul><li>';
+            print join('</li> <li>', $extras);
+            print '</li></ul>';
         }
 
         print '</form>';
     }
 
-    /* summary PLEDGE PARAMS
+    /* new_summary PARAMS
+     * Similar to summary, but buts status bit on a newline, smaller.
+     * XXX: Phase out summary()
+     *
+     *     creatorlinks - extra links for My Pledges page
+     */
+    function new_summary($params = array()) {
+        $text = '';
+        if (array_key_exists('showcountry', $params) && $params['showcountry'] && $this->country_code()) {
+            global $countries_code_to_name;
+            $text .= $countries_code_to_name[$this->country_code()] . ": ";
+        }
+        $text .= '<a href="' . $this->url_main() . '">';
+        $text .= $this->ref() . '</a>';
+	$text .= '<br>';
+        $text .= $this->sentence($params);
+        $text .= '<br><small>' . str_replace(array('(',')'),'',$this->status());
+        if (array_key_exists('creatorlinks', $params) && $params['creatorlinks']) {
+            $text .= ' <a href="' . $this->url_announce() . '">' . _('Send message to signers') . '</a>';
+        }
+	$text .= '</small>';
+        return $text;
+    }
+
+    /* summary PARAMS
      * Return pledge text in a format suitable for a (long) summary on a list of
      * pledges, such as the front page.  PLEDGE is an array of info about the
      * pledge.  PARAMS are passed to sentence, and also:
@@ -782,7 +800,12 @@ class Pledge {
             $text .= $countries_code_to_name[$this->country_code()] . ": ";
         }
         $params['firstperson'] = 'includename';
-        $text .= $this->sentence($params) . ' ';
+        $text .= $this->sentence($params) . ' ' . $this->status();
+        return $text;
+    }
+
+    function status() {
+        $text = '';
         if (microsites_no_target()) { # XXX O2
             if ($this->daysleft() == 0)
                 $text .= 'Promise open until midnight tonight, London time.';
@@ -1216,8 +1239,9 @@ function pledge_draw_status_plaque($p) {
     if ($p->data['notice']) {
         print '<p id="notice">' . comments_text_to_html($p->data['notice']) . '</p>';
     }
-    if (!$p->open()) {
-        print '<p class="finished">' . microsites_pledge_closed_text() . '</p>';
+
+    if ($p->finished() && $p->left() > 0) {
+        #print '<p class="finished">' . microsites_pledge_closed_text() . '</p>';
     }
     if ($p->byarea()) {
         if ($p->byarea_successes() > 0) {
@@ -1233,16 +1257,24 @@ function pledge_draw_status_plaque($p) {
             print '</p>';
         }
     } elseif ($p->left() <= 0 && !microsites_no_target()) {
-        print '<p class="success">';
+        $out = '';
         # TRANS: "This pledge was successful!" is used when the pledge succeeded recently, "This pledge has been successful!" is used when it succeeded more than 30 days ago.
-        if ($p->daysleft() > -30)
-            print _('This pledge has been successful!');
-        else
-            print _('This pledge was successful!');
-        if (!$p->finished()) {
-            print '<br>' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');
+        if ($p->daysleft() > -30) {
+            if ($p->finished()) {
+                #print _('This pledge has now closed; it was successful!');
+            } else
+                $out = _('This pledge has been successful!');
+        } else {
+            if ($p->finished()) {
+                #print _('This pledge has now closed; it was successful!');
+            } else
+                $out = _('This pledge was successful!');
         }
-        print '</p>';
+        if (!$p->finished()) {
+            $out .= ' ' . _('<strong>You can still add your name to it</strong>, because the deadline hasn\'t been reached yet.');
+        }
+        if ($out)
+            print '<p class="success">' . $out . '</p>';
     }
 }
 

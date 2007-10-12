@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: index.php,v 1.18 2007-09-22 11:18:03 francis Exp $
+ * $Id: index.php,v 1.19 2007-10-12 13:12:49 matthew Exp $
  * 
  */
 
@@ -32,9 +32,9 @@ $pages = array(
     null,
     new ADMIN_PAGE_RATTY(
         'pb-abuse',
-	'Contact form abuse',
-	'These rules apply to messages submitted through contact forms on PledgeBank. Currently only the Contact the Creator one.',
-	<<<EOF
+        'Contact form abuse',
+        'These rules apply to messages submitted through contact forms on PledgeBank. Currently only the Contact the Creator one.',
+        <<<EOF
 All abuses of the rules will simply be blocked for now.
 EOF
     ),

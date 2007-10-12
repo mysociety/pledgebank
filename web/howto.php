@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: howto.php,v 1.4 2005-12-06 19:26:27 matthew Exp $
+// $Id: howto.php,v 1.5 2007-10-12 13:12:48 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -44,7 +44,7 @@ money, to organising kickabouts.</p>
 <p>"I will arrange a weekly kickabout at Green Park, but only if  9 other
 people (or more) will pledge to come along when they can"</p>
 
-<p id="starthowto"><a href="/new/football">Start your own football pledge &nbsp;&raquo;</a></p>
+<p class="starthowto"><a href="/new/football">Start your own football pledge &nbsp;&raquo;</a></p>
 
 <p>Once you've made your pledge, we help you spread the word.
 
@@ -56,7 +56,7 @@ signing people up on the school bus, or at the office.</li>
 
 <p>Try it today!</p>
 
-<p id="starthowto" style="text-align: left"><a href="/new/football">Start your own football pledge' &nbsp;&raquo;</a></p>
+<p class="starthowto"><a href="/new/football">Start your own football pledge' &nbsp;&raquo;</a></p>
 
 <?
 } elseif ($what == 'residents') {
@@ -80,7 +80,7 @@ too. For example:</p>
 <p>"I will hold a meeting to set up a Residents' Association and provide
 tea and cake, but only if 5 local people will pledge to come along".</p>
 
-<p id="starthowto" style="text-align: left"><a href="/new/residents">Click here to start a pledge like this &nbsp;&raquo;</a></p>
+<p class="starthowto"><a href="/new/residents">Click here to start a pledge like this &nbsp;&raquo;</a></p>
 
 <p>Once you've set up your pledge, we help you to spread the word around
 your neighbours:</p>
@@ -101,7 +101,7 @@ then create a pledge when you feel ready?</p>
 <li><a href="http://www.bbc.co.uk/dna/actionnetwork/A2077823" target="_new">How we set up a tenants and residents assocation</a> (BBC Action Network)</li>
 </ul>
 
-<p id="starthowto" style="text-align: left"><a href="/new/residents">Then, click here to get started &nbsp;&raquo;</a></p>
+<p class="starthowto"><a href="/new/residents">Then, click here to get started &nbsp;&raquo;</a></p>
 
 <?
 } else {

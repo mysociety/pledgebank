@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.114 2007-10-01 16:48:54 francis Exp $
+ * $Id: microsites.php,v 1.115 2007-10-12 13:12:47 matthew Exp $
  * 
  */
 
@@ -201,7 +201,7 @@ function microsites_logo() {
     global $microsite, $lang;
     if ($microsite && $microsite == 'interface') {
         return '
-<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<h1><a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
 <span id="countrytitle"><img src="/microsites/interface-logo.gif" alt="interface">
 <a href="/where">' . _('(change)') . '</a></span></h1>';
 
@@ -225,7 +225,7 @@ function microsites_logo() {
 
     } elseif ($microsite && $microsite == 'london') {
         return '
-<h1><a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a>
+<h1><a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a>
 <span id="countrytitle"><a href="/where">' . _('(change)') . '</a></span></h1>';
 
     } elseif ($microsite && $microsite == 'catcomm') {
@@ -256,16 +256,16 @@ function microsites_logo() {
     } elseif ($lang == 'zh') {
         $country_name = pb_site_country_name();
         return '
-<h1><a href="/"><span id="logo_zh">' . _('Pledge') . _('Bank') . '</span>
+<h1 style="padding-bottom:0.25em;"><a id="logo" href="/"><span id="logo_zh">' . _('Pledge') . _('Bank') . '</span>
 <small><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></small></a>
-<span id="countrytitle">' . $country_name . '
-<a href="/where">' . _('(change)') . '</a></span></h1>';
+<span id="countrytitle"><a href="/where">' . $country_name . '</a></span>
+<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but only if you&rsquo;ll help') . '</small></span></h1>';
     } else {
         $country_name = pb_site_country_name();
         return '
-<h1><a href="/"><span id="logo_pledge">' . _('Pledge') . '</span><span id="logo_bank">' . _('Bank') . '</span></a>
-<span id="countrytitle">' . $country_name . '
-<a href="/where">' . _('(change)') . '</a></span></h1>';
+<h1><a id="logo" href="/"><span id="logo_pledge">' . _('Pledge') . '</span><span id="logo_bank">' . _('Bank') . '</span></a>
+<span id="countrytitle"><a href="/where">' . $country_name . '</a></span>
+<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but only if you&rsquo;ll help') . '</small></span></h1>';
     }
 }
 
@@ -320,30 +320,27 @@ function microsites_css_files() {
 function microsites_navigation_menu($contact_ref) {
     global $microsite;
 
+    $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
+    debug_timestamp(true, "retrieved person record");
+
     $menu = array();
-    $menu[_('Home')] = "/";
     if ($microsite && $microsite == 'livesimply') {
+        $menu['Home'] = '/';
         $menu['How <em>live</em>simply:promise works'] = "/explain";
         $menu['About <em>live</em>simply'] = 'http://www.progressio.org.uk/livesimply/AssociatesInternal/93008/about_live_simply/';
     }
     $menu[_('All Pledges')] = "/list";
     $menu[_('Start a Pledge')] = "/new";
+    if ($P)
+        $menu[_('My Pledges')] = "/my";
+    else
+        $menu[_('Login')] = "/my";
     if ($microsite != 'o2') {
         if ($microsite && $microsite == 'livesimply') {
             $menu['Frequently Asked Questions'] = "/faq";
         } else {
-            $menu['<acronym title="'._('Frequently Asked Questions').'">'._('FAQ').'</acronym>'] = "/faq";
+            $menu[_('About')] = "/faq";
         }
-    }
-    if ($microsite != 'o2')
-        $menu[_('Contact')] = '/contact' . $contact_ref;
-    $menu[_('My Pledges')] = "/my";
-    $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
-    debug_timestamp(true, "retrieved person record");
-    if ($P) {
-        $menu[_('Logout')] = "/logout";
-    } else {
-        $menu[_('Login')] = "/my";
     }
     if ($microsite && $microsite == 'livesimply') {
         $menu['www.livesimply.org.uk'] = 'http://www.livesimply.org.uk/';
@@ -389,12 +386,13 @@ function microsites_frontpage_has_intro() {
 function microsites_frontpage_intro() {
     global $microsite, $lang;
     $tom = false;
-    $audio_intro = true;
     if ($microsite == 'interface') {
-        $tom = "Hello, and welcome to the demo version of PledgeBank we've built for
-            internal use at Interface. PledgeBank is a handy tool which is good at
-            getting people to do social or environmental things they
-            want to do but normally never get round to.";
+        echo h2(_('&#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;'));
+?>
+<p>Hello, and welcome to the demo version of PledgeBank we've built for
+internal use at Interface. PledgeBank is a handy tool which is good at
+getting people to do social or environmental things they
+want to do but normally never get round to.</p><?
     } elseif ($microsite == '365act') {
         ?><h2>Pledge to change the world today!</h2>
 
@@ -429,6 +427,7 @@ function microsites_frontpage_intro() {
     problem, can find the inspiration and tools they need to implement
     the solution, learning from their peers. This site brings people
     together, forming a network of support for building this work...</p>
+    For technical help, contact us at <a href="mailto:techhelp@catcomm.org">techhelp@catcomm.org</a>.
         <?
     } elseif ($microsite == 'livesimply') {
         ?>
@@ -444,7 +443,6 @@ function microsites_frontpage_intro() {
     <p><a href="/explain">How does <em>live</em>simply:promise work?</a>
 
         <?
-        $audio_intro = false;
     } elseif ($microsite == 'o2') { ?>
 <h2>Welcome to O2&#8217;s Promise Bank!</h2>
 
@@ -489,47 +487,14 @@ to life, you really will be part of something special.</p>
 It&#8217;s your chance to make a difference, and you really can!</p>
 
 <?
-        $audio_intro = false;
     } else {
         # Main site
-        $tom = _('&ldquo;We all know what it is like to feel powerless, that our own
-        actions can\'t really change the things that we want to change.
-        PledgeBank is about beating that feeling&hellip;&rdquo;');
+	echo h2(_('PledgeBank successes'));
+	global $success_stories;
+        shuffle($success_stories);
+        echo _($success_stories[0]['summary']);
+        echo '<p align="right"><a href="/success">' . _('More success stories') . '</p>';
     }
-    
-    # Quote from Tom, and his photo
-    if ($tom) {
-        echo h2(_('&#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;'));
-        echo '<blockquote class="noindent">';
-        echo '<a href="';
-
-        if ($lang=='en-gb') print 'tom-on-pledgebank-vbr.mp3';
-        else print '/explain';
-
-        echo '">';
-        echo '<img src="tomsteinberg_small.jpg"
-alt="" style="vertical-align: top; float:left; margin:0 0.5em 0 0; border: solid 2px #9C7BBD;"></a> ';
-        echo $tom, '</blockquote>';
-    }
-
-    # Give how it works explanation
-    if ($audio_intro) {
-        if ($lang == 'en-gb') {
-            echo p('<a href="tom-on-pledgebank-vbr.mp3">Listen to how PledgeBank
-    works</a>, as explained by mySociety&rsquo;s director Tom Steinberg,
-    <a href="/explain">read a transcript</a>, or 
-    <a href="/success">read some success stories</a>.');
-        } else {
-            echo p(_('<a href="/explain">Find out how PledgeBank
-    works</a>'));
-        }  
-    }
-    
-    # Extra end text
-    if ($microsite == 'catcomm') {
-        echo ' For technical help, contact us at <a href="mailto:techhelp@catcomm.org">techhelp@catcomm.org</a>.';
-    }
-
 }
 
 /* microsites_frontpage_has_start_your_own
@@ -611,11 +576,11 @@ they could be inspirational, if others do, too!</li>
 function microsites_frontpage_sign_invitation_text() {
     global $microsite;
 
-    print "<h2>";
+    print '<h2 class="head_with_mast">';
     if ($microsite == 'livesimply') {
         print 'Act now. Sign up to a promise.';
     } else {
-        print _('Why not sign a live pledge?');
+        print _('Some live pledges');
     }
     print "</h2>";
 }
@@ -641,13 +606,6 @@ function microsites_frontpage_credit_footer() {
         <div id="sponsor"><img src="/microsites/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
 <?  } 
 
-}
-
-/* microsites_allpage_credit_footer
- * Display extra text at the bottom of every page.
- */
-function microsites_allpage_credit_footer() {
-    global $microsite;
 }
 
 /* microsites_new_pledges_toptips
@@ -759,7 +717,7 @@ function microsites_pledge_closed_text() {
     if ($microsite == 'livesimply') {
         return "The deadline for this promise has passed. Check if this promise has been set up with a new deadline &mdash; check out the \"All promises list\". You can always carry out your promise anyway. Or why not <a href=\"/new\">start your own promise</a>?";
     }
-    return _('This pledge is now closed, as its deadline has passed.');
+    return strong(_('This pledge is now closed, as its deadline has passed.'));
 }
 
 /* microsites_signup_extra_fields
@@ -809,7 +767,7 @@ function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors)
     permission of my parent, guardian or teacher to sign up, or I am at least
     18 years old. </strong>
 <p style="text-align: right;">
-<input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
+<input id="next_step" type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
 </p>
 <?
         return;
@@ -817,16 +775,19 @@ function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors)
 <input type="hidden" name="agreeterms" value="1">
 <p>When you're happy with your promise, <strong>click "Create"</strong> to confirm that you wish us to display the promise at the top of this page in your name.
 <p style="text-align: right;">
-<input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
+<input id="next_step" type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
 </p>
 <?
         return;
     }
 
-    print '<p>' . _('When you\'re happy with your pledge, <strong>click "Create"</strong> to confirm that you wish PledgeBank.com to display the pledge at the top of this page in your name, and that you agree to the terms and conditions below.');
+    print '<p>' . _('When you\'re happy with your pledge, enter your PledgeBank password, if you have one, and click &ldquo;Create Pledge&rdquo; to confirm that you wish PledgeBank to display the pledge in your name, and that you agree to the terms and conditions below.');
+
+print '<p><label for="password">' . _('Password:') . '</label> <input type="password" name="password" id="password" value="">
+<br>' . _('If you don&rsquo;t have a password, or have forgotten it, we&rsquo;ll send you a confirmation email instead.');
 ?>
 <p style="text-align: right;">
-<input type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
+<input id="next_step" type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
 </p>
 <?
     print h3(_('The Dull Terms and Conditions'));
@@ -1084,7 +1045,7 @@ function microsites_list_views() {
         return array('all_open'=>_('Open pledges'), 
         'all_closed'=>_('Closed pledges'));
     } else {
-        return array('open'=>_('Open pledges'), 'succeeded_open'=>_('Successful open pledges'), 
+        return array('open'=>_('Pledges which need signers'), 'succeeded_open'=>_('Successful open pledges'), 
         'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
     }
 }
@@ -1383,7 +1344,7 @@ function microsites_search_help() {
         if (!microsites_site_country() || microsites_site_country() == 'GB')
             print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
         print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
-        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publically"));
+        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publicly"));
         print "</ul>";
     }
 }
@@ -1395,4 +1356,29 @@ function microsites_has_survey() {
     return true;
 }
 
-?>
+function microsites_new_breadcrumbs($num) {
+    $steps = array(_('Basics'));
+    if (microsites_location_allowed())
+        $steps[] = _('Location');
+    if (microsites_categories_page3() || microsites_private_allowed())
+        $steps[] = _('Category/Privacy');
+    if (microsites_postal_address_allowed())
+        $steps[] = _('Address');
+    $steps[] = _('Preview');
+
+    $str = '<ol id="breadcrumbs">';
+    for ($i = 0; $i < sizeof($steps); ++$i) {
+        if ($i == $num - 1)
+            $str .= "<li class=\"hilight\"><em>";
+        else
+            $str .= "<li>";
+        $str .= '<!--[if lte IE 6]>' . ($i+1) . '. <![endif]-->';
+        $str .= htmlspecialchars($steps[$i]);
+        if ($i == $num - 1)
+            $str .= "</em>";
+        $str .= "</li>";
+    }
+    $str .= "</ol>";
+    print $str;
+}
+

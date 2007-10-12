@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.171 2007-10-01 11:34:04 francis Exp $
+// $Id: page.php,v 1.172 2007-10-12 13:12:47 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -71,8 +71,6 @@ function strip_title($title) {
  *  ref
  *      Optional pledge ref which will be saved for use in the contact link
  *      output by page_footer 
- *  pref 
- *      Optional URL to use in a link to "This pledge's permanent location".
  *  robots
  *      Optional content for a robots meta-tag.
  *  rss
@@ -198,19 +196,6 @@ function page_header($title, $params = array()) {
 
 ?><div id="pballheader"><? 
 
-    // Display link to main pledge page
-    if (array_key_exists('pref', $params)) {
-        $url = $params['pref'];
-        print '<p id="reference">';
-        print _('This pledge\'s permanent location: ');
-        if (!array_key_exists('noreflink', $params))
-            print '<a href="' . $url . '">';
-        print '<strong>'. str_replace('http://', '', $url) . '</strong>';
-        if (!array_key_exists('noreflink', $params))
-            print '</a>';
-        print '</p>';
-    }
-
     // Start flyers-printing again
     if (array_key_exists('noprint', $params) and $params['noprint'])
         print '</div> <!-- noprint -->';
@@ -228,9 +213,13 @@ function page_header($title, $params = array()) {
         print '</a>)</small></p>';
     }
 
-?></div><? # id="pballheader"
-?>
-<div id="pbcontent"><?    
+    echo '</div>'; # id="pballheader"
+    echo '<form id="nav_search" accept-charset="utf-8" action="/search" method="get">';
+    echo _('Search for pledges:') . ' <input type="text" id="q" name="q" size="25" value="'
+        . htmlspecialchars(get_http_var('q', true)) . '"><input type="submit" value="'
+        . _('Search') . '">
+</form>
+<div id="pbcontent">';
 
     // Warn that we are on a testing site
     $devwarning = array();
@@ -276,55 +265,48 @@ function page_footer($params = array()) {
         $params['nolocalsignup'] = true; // don't show local signup form as well
     }
 
-?></div><? # id="pbcontent"
-    microsites_allpage_credit_footer();
-?><div id="pballfooter"><? 
+    echo '</div> <div id="pballfooter">';
     if (!$microsite || $microsite != 'global-cool') {
         static $footer_outputted = 0; 
-        if (!$footer_outputted && (!array_key_exists('nonav', $params) or !$params['nonav'])) {
+        if (!$footer_outputted) {
             $footer_outputted = 1;
             debug_timestamp(true, "begin footer");
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <div id="navforms">
 <?
-    if (microsites_show_translate_blurb()) {
-        global $lang, $langs, $site_country;
-        print '<form action="/lang" method="get" name="language">
+            if (microsites_show_translate_blurb()) {
+                global $lang, $langs, $site_country;
+                print '<form action="/lang" method="get" name="language">
 <input type="hidden" name="r" value="' . htmlspecialchars($_SERVER['REQUEST_URI']) . '">
-<label for="language">' . _('Language:') . '</label> <select name="lang" id="language">';
-        foreach ($langs as $l => $pretty) {
-            $o = '<option value="' . $l . '"';
-            if ($l == $lang) $o .= ' selected';
-            $o .= ">$pretty</option>";
-            print $o;
-        }
-        print '<option value="translate">'._('Translate into your language...').'</option>
+<select name="lang" id="language">';
+                foreach ($langs as $l => $pretty) {
+                    $o = '<option value="' . $l . '"';
+                    if ($l == $lang) $o .= ' selected';
+                    $o .= ">$pretty</option>";
+                    print $o;
+                }
+                print '<option value="translate">'._('Translate into your language...').'</option>
         </select> <input type="submit" value="' . _('Change') . '"></form>';
-    }
-?>
-<form id="search" accept-charset="utf-8" action="/search" method="get">
-<label for="q"><?=_('Search') ?>:</label>
-<input type="text" id="q" name="q" size="25" value=""> <input type="submit" value="<?=_('Go') ?>">
-</form>
-<?
-    print '</div>'; # navforms
-    $menu = microsites_navigation_menu($contact_ref);
-    # remove all extraneous whitespace to avoid IE bug
-    print '<ul id="nav">';
-    foreach ($menu as $text => $link) {
-        print "<li>";
-        print '<a href="'.$link.'">';
-        print $text;
-        print "</a>";
-        print "</li>";
-    }
-    print '</ul>';
+            }
+            print '</div>'; # navforms
+            $menu = microsites_navigation_menu($contact_ref);
+            # remove all extraneous whitespace to avoid IE bug
+            print '<ul id="nav">';
+            foreach ($menu as $text => $link) {
+                print "<li>";
+                print '<a href="'.$link.'">';
+                print $text;
+                print "</a>";
+                print "</li>";
+            }
+            print '</ul>';
+            if (!array_key_exists('nonav', $params) or !$params['nonav']) {
 ?>
 <div class="noprint">
-<?  if (microsites_local_alerts() && (!array_key_exists('nolocalsignup', $params) || !$params['nolocalsignup']))
-        pb_view_local_alert_quick_signup("localsignupeverypage");
-        debug_timestamp(true, "local alert quick timestamp");
+<?              if (microsites_local_alerts() && (!array_key_exists('nolocalsignup', $params) || !$params['nolocalsignup']))
+                    pb_view_local_alert_quick_signup("localsignupeverypage");
+                debug_timestamp(true, "local alert quick timestamp");
         ?>
 <hr class="v">
 <div id="pbfooter">
@@ -333,7 +315,8 @@ function page_footer($params = array()) {
 <a href="http://www.easynet.net/publicsector/"><?=_('Powered by Easynet')?></a>.</div>
 </div>
 <?
-            debug_timestamp(true, "change language links");
+                debug_timestamp(true, "change language links");
+            }
         }
     }
 

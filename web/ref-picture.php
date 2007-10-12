@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-picture.php,v 1.32 2007-07-29 22:25:44 matthew Exp $
+ * $Id: ref-picture.php,v 1.33 2007-10-12 13:12:48 matthew Exp $
  * 
  */
 
@@ -174,7 +174,7 @@ $pledge->render_box(array('showdetails' => true));
 
 if ($picture_upload_allowed) {
 ?>
-    <form id="pledgeaction" enctype="multipart/form-data" action="/<?=$q_h_ref?>/picture" method="POST">
+    <form enctype="multipart/form-data" action="/<?=$q_h_ref?>/picture" method="POST">
 <?  if ($pledge->has_picture()) {
         print h2(_('Change pledge picture'));
     } else {
@@ -191,7 +191,7 @@ if ($picture_upload_allowed) {
     }
     print '</form>';
 } else {
-    print p(_("Pictures are not available for private pledges.  Please let us know if this is a problem."));
+    print p(_("Pictures are currently not available for private pledges.  Please let us know if this is a problem."));
 }
 
 page_footer();

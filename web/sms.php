@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: sms.php,v 1.45 2007-08-15 12:51:00 matthew Exp $
+ * $Id: sms.php,v 1.46 2007-10-12 13:12:48 matthew Exp $
  * 
  */
 
@@ -217,7 +217,7 @@ rather than sending an SMS.'));
 
     $showname = $q_showname ? ' checked' : '';
 
-    print '<form accept-charset="utf-8" id="pledgeaction" class="pledge" method="post" action="/sms" name="pledge">';
+    print '<form accept-charset="utf-8" class="pledge" method="post" action="/sms" name="pledge">';
     # TRANS: Heading of a form to get details to sign up
     print _('<h2>Get updates by email instead of SMS</h2>');
 ?>

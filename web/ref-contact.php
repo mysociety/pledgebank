@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-contact.php,v 1.4 2007-10-02 12:09:02 matthew Exp $
+// $Id: ref-contact.php,v 1.5 2007-10-12 13:12:48 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -90,7 +90,7 @@ function contact_creator_form($p, $errors, $data) {
     $p->render_box(array('showdetails' => true));
 
 ?>
-<form id="pledgeaction" name="pledge" action="<?=$p->url_contact_creator() ?>" method="post">
+<form name="pledge" action="<?=$p->url_contact_creator() ?>" method="post">
 <?
     if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
     print h2($title);

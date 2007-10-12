@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.109 2007-09-12 14:11:41 matthew Exp $
+# $Id: poster.cgi,v 1.110 2007-10-12 13:12:48 matthew Exp $
 #
 
 import sys
@@ -25,6 +25,7 @@ import sha
 import locale
 import gettext
 import re
+from types import ListType
 _ = gettext.gettext
 
 import PyRTF
@@ -370,6 +371,54 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
 ############################################################################
 # Flyers using reportlab.platypus for word wrapping
 
+def breakLinesCJK(self, width):
+    """Initially, the dumbest possible wrapping algorithm.
+    Cannot handle font variations."""
+
+    if type(width)!=ListType: maxWidths = [width]
+    else: maxWidths = width
+    lines = []
+    lineno = 0
+    style = self.style
+    fFontSize = float(style.fontSize)
+    maxWidth = maxWidths[0]
+    self.height = 0
+    frags = self.frags
+    nFrags= len(frags)
+    if nFrags==1:
+        f = frags[0]
+        if hasattr(f,'text'):
+            text = f.text
+        else:
+            text = ''.join(getattr(f,'words',[]))
+        from textsplit import wordSplit
+        lines = wordSplit(text, maxWidths[0], f.fontName, f.fontSize)
+        wrappedLines = [(sp, [line]) for (sp, line) in lines]
+        return f.clone(kind=0, lines=wrappedLines)
+    elif nFrags<=0:
+        return ParaLines(kind=0, fontSize=style.fontSize, fontName=style.fontName,
+            textColor=style.textColor, lines=[])
+    else:
+        if hasattr(self,'blPara') and getattr(self,'_splitpara',0):
+            #NB this is an utter hack that awaits the proper information
+            #preserving splitting algorithm
+            return self.blPara
+
+# XXX: Should probably upgrade properly!
+def rl2_wrap(self, availWidth, availHeight):
+    # work out widths array for breaking
+    self.width = availWidth
+    leftIndent = self.style.leftIndent
+    first_line_width = availWidth - (leftIndent+self.style.firstLineIndent) - self.style.rightIndent
+    later_widths = availWidth - leftIndent - self.style.rightIndent
+    if self.style.wordWrap == 'CJK':
+        self.blPara = self.breakLines([first_line_width, later_widths])
+        #self.blPara = breakLinesCJK(self, [first_line_width, later_widths])
+    else:
+        self.blPara = self.breakLines([first_line_width, later_widths])
+    self.height = len(self.blPara.lines) * self.style.leading
+    return (self.width, self.height)
+
 # Prints one copy of the flier at given coordinates, and font sizes.
 # Returns False if it didn't all fit, or True if it did.
 def flyer(c, x1, y1, x2, y2, size, **keywords):
@@ -399,33 +448,35 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         small_writing = 4
 
     # Set up styles
+    wordWrap = ''
     if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
         heading_font = 'Trebuchet MS'
         main_font = 'Georgia'
     elif iso_lang == 'zh_CN':
         heading_font = 'SimHei'
         main_font = 'SimHei'
+        wordWrap = 'CJK'
     else:
         heading_font = 'Transport'
         main_font = 'Rockwell'
 
     p_head = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 0, 
-        fontSize = small_writing, leading = small_writing*1.2, fontName = heading_font)
+        fontSize = small_writing, leading = small_writing*1.2, fontName = heading_font, wordWrap = wordWrap)
 
     p_normal = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*20, 
-        fontSize = small_writing, leading = small_writing*1.2, fontName = main_font)
+        fontSize = small_writing, leading = small_writing*1.2, fontName = main_font, wordWrap = wordWrap)
 
     p_detail = ParagraphStyle('detail', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*10, 
-        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font)
+        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font, wordWrap = wordWrap)
 
     p_nospaceafter = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 1, 
-        fontSize = small_writing, leading = small_writing*1.2, fontName = main_font)
+        fontSize = small_writing, leading = small_writing*1.2, fontName = main_font, wordWrap = wordWrap)
 
     p_footer = ParagraphStyle('normal', alignment = TA_RIGHT, spaceBefore = 0, spaceAfter = 0,
-        fontSize = h_purple*4/5, leading = 0, fontName = heading_font)
+        fontSize = h_purple*4/5, leading = 0, fontName = heading_font, wordWrap = wordWrap)
 
     p_smallprint = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 1, spaceAfter = 0,
-        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font)
+        fontSize = small_writing * 0.75, leading = small_writing * 0.9, fontName = main_font, wordWrap = wordWrap)
 
     # Big tick
     microsites_poster_watermark(c, x1, y1, w, h)
@@ -435,16 +486,17 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
     # Main body text
     dots_body_gap = w/30
+    allowed_width = w - dots_body_gap * 2
 
     if not live:
         # Check web domain fits, as that is long word that doesn't fit on
         # (and platypus/reportlab doesn't raise an error in that case)
         webdomain_text = '''<font size="+3" color="%s"><b>%s/%s</b></font>''' % (html_colour, pb_domain_url(), ref)
         webdomain_para = Paragraph(webdomain_text, p_normal)
-        webdomain_allowed_width = w - dots_body_gap * 2
-        webdomain_width = webdomain_para.wrap(webdomain_allowed_width, h)[0]
-        if webdomain_width > webdomain_allowed_width:
-            return False
+        webdomain_width = rl2_wrap(webdomain_para, allowed_width, h)[0]
+        print 'Website width:', allowed_width, webdomain_width
+        #if webdomain_width > allowed_width:
+        #    return False
     # print >>sys.stderr, "webdomain_width ", webdomain_width, w
 
     # Draw text
@@ -465,6 +517,10 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 ).encode('utf-8') % (
                 html_colour, pledge['title']
             ), p_head)
+    used_width = rl2_wrap(sentence, allowed_width, h)[0]
+    print "Sentence width:", used_width
+    #if used_width > allowed_width:
+    #    return False
 
     story = [
         sentence,
@@ -475,10 +531,14 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     ]
     
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
-        story.extend(
-            map(lambda text: Paragraph(text, p_detail), 
+        details = map(lambda text: Paragraph(text, p_detail), 
                 re.split("\r?\n\r?\n", _('<b>More details:</b> %s').encode('utf-8') % pledge['detail']))
-            )
+        for d in details:
+            used_width = rl2_wrap(d, allowed_width, h)[0]
+            print "Detail para width:", used_width
+            #if used_width > allowed_width:
+            #    return False
+        story.extend(details)
 
     if not live:
         if not has_sms(pledge):
@@ -554,6 +614,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     f.addFromList(story, c)
 
     # If it didn't fit, say so
+    print "Paragraphs left:", len(story)
     if len(story) > 0:
         return False
     return True
@@ -598,6 +659,7 @@ def flyers(number, papersize='A4', **keywords):
     size = 3.0
     while True:
         ok = flyer(dummyc, 0, 0, flyer_width, flyer_height, size, **keywords);
+        print size, ok
         if ok:
             break
         size = size * 19 / 20
@@ -631,7 +693,7 @@ while fcgi.isFCGI():
             path_info = path_info[0][1:].split('_')
             ref = path_info[0]
             size = (len(path_info)>1 and path_info[1]) and path_info[1] or 'A4'
-            type = (len(path_info)>2 and path_info[2]) and path_info[2] or 'flyers8'
+            ftype = (len(path_info)>2 and path_info[2]) and path_info[2] or 'flyers8'
             live = (len(path_info)>3 and path_info[3]) and '_%s' % path_info[3] or ''
         else:
             incgi = False
@@ -649,7 +711,7 @@ while fcgi.isFCGI():
     Files are cached in the directory PB_PDF_CACHE specified in conf/general.""")
             parser.add_option("--size", dest="size", default="A4",
                 help=", ".join(sizes));
-            parser.add_option("--type", dest="type", default="flyers4",
+            parser.add_option("--type", dest="ftype", default="flyers4",
                 help=", ".join(types));
             parser.add_option("--format", dest="format", default="pdf",
                 help=", ".join(formats));
@@ -663,14 +725,14 @@ while fcgi.isFCGI():
                 continue
             ref = args[0] 
             size = options.size
-            type = options.type 
+            ftype = options.ftype 
             format = options.format
             live = options.live
 
         if not size in sizes:
             raise Exception, "Unknown size '%s'" % size
-        if not type in types:
-            raise Exception, "Unknown type '%s'" % type
+        if not ftype in types:
+            raise Exception, "Unknown type '%s'" % ftype
         if not format in formats:
             raise Exception, "Unknown format '%s'" % format
 
@@ -792,13 +854,13 @@ while fcgi.isFCGI():
 
         outdir = mysociety.config.get("PB_PDF_CACHE")
         if microsite:
-            outpdf = "%s/%s_%s_%s_%s%s.pdf" % (outdir, microsite, ref, size, type, live)
+            outpdf = "%s/%s_%s_%s_%s%s.pdf" % (outdir, microsite, ref, size, ftype, live)
         else:
-            outpdf = "%s/%s_%s_%s%s.pdf" % (outdir, ref, size, type, live)
+            outpdf = "%s/%s_%s_%s%s.pdf" % (outdir, ref, size, ftype, live)
         if microsite:
-            outfile = "%s/%s_%s_%s_%s%s.%s" % (outdir, microsite, ref, size, type, live, format)
+            outfile = "%s/%s_%s_%s_%s%s.%s" % (outdir, microsite, ref, size, ftype, live, format)
         else:
-            outfile = "%s/%s_%s_%s%s.%s" % (outdir, ref, size, type, live, format)
+            outfile = "%s/%s_%s_%s%s.%s" % (outdir, ref, size, ftype, live, format)
 
         # Cache file checking
         if os.path.exists(outfile) and os.path.getsize(outfile)>0 and incgi and pledge['last_change'] < os.path.getmtime(outfile):
@@ -856,23 +918,24 @@ while fcgi.isFCGI():
             (canvasfileh, canvasfilename) = tempfile.mkstemp(dir=outdir,prefix='tmp')
             c = canvas.Canvas(canvasfilename, pagesize=papersizes[size])
             try:
-                if type == "flyers16":
+                if ftype == "flyers16":
                     flyers(16)
-                elif type == "flyers8":
+                elif ftype == "flyers8":
                     flyers(8, size)
-                elif type == "flyers4":
+                elif ftype == "flyers4":
                     flyers(4)
-                elif type == "flyers1" and (size=='A4' or size=='letter'):
+                elif ftype == "flyers1" and (size=='A4' or size=='letter'):
                     flyers(1, size, detail = True)
-                elif type == "flyers1":
+                elif ftype == "flyers1":
                     flyers(1, size)
                 else:
-                    raise Exception, "Unknown type '%s'" % type
+                    raise Exception, "Unknown type '%s'" % ftype
             except Exception, e:
+                raise
                 req.err.write(string.join(e.args,' '))
                 c.setStrokeColorRGB(0,0,0)
                 c.setFont("Helvetica", 15)
-                c.drawCentredString(10.5*cm, 25*cm, str(e))
+                c.drawCentredString(10.5*cm, 25*cm, e) #str(e))
             c.save()
             os.rename(canvasfilename, outpdf)
             os.chmod(outpdf, 0644)
@@ -903,9 +966,10 @@ while fcgi.isFCGI():
 
 
     except Exception, e:
+        raise
         req.out.write("Content-Type: text/plain\r\n\r\n")
         req.out.write(_("Sorry, we weren't able to make your poster.\n\n").encode('utf-8'))
-        req.out.write(str(e) + "\n")
+        #req.out.write(e)
 
     req.Finish()
 

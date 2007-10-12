@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-info.php,v 1.47 2007-09-25 13:30:21 matthew Exp $
+ * $Id: ref-info.php,v 1.48 2007-10-12 13:12:48 matthew Exp $
  * 
  */
 
@@ -66,7 +66,7 @@ debug_timestamp(true, "pledge info box");
 
 ?>
 
-<div id="pledgeaction">
+<div>
 <?=_('<h2>General pledge information</h2>') ?>
 <table border="0" cellpadding="3" cellspacing="0">
 <tr>

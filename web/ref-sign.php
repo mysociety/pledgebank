@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.61 2007-09-25 16:26:20 matthew Exp $
+// $Id: ref-sign.php,v 1.62 2007-10-12 13:12:48 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -128,7 +128,7 @@ function do_sign(&$location) {
                 // Display form with choice of signers
                 $pledge->render_box(array('showdetails'=>false));
 ?>
-    <form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=htmlspecialchars($pledge->ref()) ?>/sign" method="post">
+    <form accept-charset="utf-8" name="pledge" action="/<?=htmlspecialchars($pledge->ref()) ?>/sign" method="post">
     <input type="hidden" name="add_signatory" value="1">
     <input type="hidden" name="pledge" value="<?=htmlspecialchars($pledge->ref()) ?>">
     <input type="hidden" name="ref" value="<?=htmlspecialchars($pledge->ref()) ?>">
@@ -271,7 +271,7 @@ function sign_location_choose($p, $errors = array(), $location = array()) {
 
     // error_log("$email $name");
 ?>
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=htmlspecialchars($p->ref()) ?>/sign" method="post">
+<form accept-charset="utf-8" name="pledge" action="/<?=htmlspecialchars($p->ref()) ?>/sign" method="post">
 <input type="hidden" name="add_signatory" value="1">
 <input type="hidden" name="pledge" value="<?=htmlspecialchars($p->ref()) ?>">
 <input type="hidden" name="ref" value="<?=htmlspecialchars($p->ref()) ?>">

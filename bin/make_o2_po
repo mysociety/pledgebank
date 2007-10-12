@@ -67,7 +67,7 @@ while(<MAINPO>) {
         $buffer =~ s/\bPledge\b/Promise/g;
         $buffer =~ s/\bpledges\b/promises/g;
         $buffer =~ s/\bPledges\b/Promises/g;
-	$buffer =~ s/a O2 Promise Bank/an O2 Promise Bank/;
+        $buffer =~ s/a O2 Promise Bank/an O2 Promise Bank/;
 
         # Front page
         $buffer =~ s/"O2 Promise Bank is free and easy.*"/"What can you do to make the People Promise come alive? Your promise can be for you or for your whole team. Once you've decided:"/s;
@@ -81,7 +81,7 @@ while(<MAINPO>) {
         $buffer =~ s#<Date>#dd/mm/yy#;
         $buffer =~ s/More details about your promise: \(optional\)/Tell us more about your Promise: (optional, 100 characters maximum)/;
         $buffer =~ s/Change your postal address/Change your location/;
-	$buffer =~ s/tidyupthepark/Saythanks/;
+        $buffer =~ s/tidyupthepark/Saythanks/;
 
         # Pledge display
         $buffer =~ s/Deadline to sign up by:/My Promise will be completed by:/;

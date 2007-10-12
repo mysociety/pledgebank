@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: contact.php,v 1.65 2007-08-15 16:23:57 matthew Exp $
+// $Id: contact.php,v 1.66 2007-10-12 13:12:48 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -57,11 +57,6 @@ function contact_form($errors = array()) {
     print '<div id="tips">';
  
     if ($comment_id) {
-        print h2(_('Report abusive, suspicious or wrong comment'));
-    } else {
-        print h2(_('Contact Us'));
-    }
-    if ($comment_id) {
         print p(_('You are reporting the following comment to the PledgeBank team:'));
         print '<blockquote>';
         $row = db_getRow('select *,extract(epoch from ms_current_timestamp()-whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
@@ -90,9 +85,9 @@ function contact_form($errors = array()) {
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
     } ?>
-<form id="pledgeaction" name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>"><input type="hidden" name="referrer" value="<?=htmlspecialchars($referrer)?>"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($pledge_id)?>"><input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
+<form name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>"><input type="hidden" name="referrer" value="<?=htmlspecialchars($referrer)?>"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($pledge_id)?>"><input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
 <?  if ($comment_id) {
-        print h2(_("Report comment to PledgeBank"));
+        print h2(_('Report abusive, suspicious or wrong comment'));
         print p(_("Please let us know exactly what is wrong with the comment, and why you think it should be removed."));
     } else {
         print h2(_("Contact the PledgeBank team"));
@@ -112,7 +107,7 @@ function contact_form($errors = array()) {
 <p><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlspecialchars(get_http_var('subject', true)) ?>" size="48"></p>
 
 <p><label for="message"><?=_('Your message:') ?></label>
-<br><textarea rows="7" cols="60" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
+<br><textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
 
 <?  print '<p>';
     if (!$comment_id)

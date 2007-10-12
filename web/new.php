@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.198 2007-10-01 15:55:02 francis Exp $
+// $Id: new.php,v 1.199 2007-10-12 13:12:48 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -34,18 +34,12 @@ function has_step_addr() {
     return microsites_postal_address_allowed();
 }
 $number_of_steps = 2;
-if (has_step_2()) {
-    $number_of_steps++;
-}
-if (has_step_3()) {
-    $number_of_steps++;
-}
-if (has_step_addr()) {
-    $number_of_steps++;
-}
+if (has_step_2()) $number_of_steps++;
+if (has_step_3()) $number_of_steps++;
+if (has_step_addr()) $number_of_steps++;
 
 $page_title = _('Create a New Pledge');
-$page_params = array();
+$page_params = array('id'=>'new');
 ob_start();
 if (get_http_var('tostep1') || get_http_var('tostep2') || get_http_var('tostep3') || get_http_var('tostepaddr') || get_http_var('topreview') || get_http_var('tocreate') || get_http_var('donetargetwarning')) {
     pledge_form_submitted();
@@ -79,6 +73,9 @@ function check_facebook_params($data) {
 
 function pledge_form_one($data = array(), $errors = array()) {
     global $lang, $langs;
+
+    microsites_new_breadcrumbs(1);
+
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
@@ -145,10 +142,9 @@ function pledge_form_one($data = array(), $errors = array()) {
     global $number_of_steps;
 ?>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
-<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), 1, $number_of_steps)?></h2>
+<form accept-charset="utf-8" name="pledge" method="post" action="/new">
 
-<h3><?=_('Your Pledge')?></h3>
+<h2><?=_('New Pledge &ndash; Basics')?></h2>
 <?  if (microsites_show_translate_blurb() && !count($_POST)) { ?>
 <p><small><?=sprintf(_('(<a href="%s">Want your pledge in a language other than %s?</a>)'),
     "/lang?r=/new", $langs[$lang]) ?></small></p>
@@ -168,23 +164,24 @@ my email address is <input<? if (array_key_exists('email', $errors)) print ' cla
 <p>as part of the <? display_categories($data); ?> part of the People Promise,</p>
 
 <?  } else { ?>
-<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="48"></p>
+<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="40"></p>
 
-<p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="3" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
-<input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="32" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
+<p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="2" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
+<input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="24" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>
 
 <p><? if ($lang=='de') { ?>
 <input type="text" id="signup" name="signup"
 size="48" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>"> <strong><?=_('will') ?></strong>.
 <? } else { ?>
 <strong><?=_('will') ?></strong> <input type="text" id="signup" name="signup"
-size="48" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
+size="40" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
 <? }
 ?></p>
 
 <?  } ?>
 
-<p><?=_('The other people must sign up before') ?> <input<?
+<p><?=_('The other people must sign up before') ?>:
+<br><input<?
     if (array_key_exists('date', $errors)) print ' class="error"';
 ?> title="<?=_('Deadline date') ?>" type="text" id="date" name="date" value="<?
     if (isset($data['date'])) print htmlspecialchars($data['date']) ?>">
@@ -212,23 +209,22 @@ size="48" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 <input type="hidden" name="facebook_name" value="<?=htmlspecialchars($facebook_name)?>">
 <input type="hidden" name="name" value="<?=htmlspecialchars($facebook_name)?>">
 <?   } else { ?>
-<?=_('Your name:') ?> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
+<label for="name"><?=_('Your name:') ?></label> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> type="text" size="30" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">
 <?   } ?>
-<br><?=_('Email:') ?> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
+<br><label for="email"><?=_('Your email:') ?></label> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
 <? } ?>
 
 <p><?=_('On flyers and elsewhere, after your name, how would you like to be described?') . ' <small>' . _('(optional)') . '</small>' ?>
-<input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40">
-<br><small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
+<br><input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40">
+<small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
 </p>
 
 <?  if (sizeof($data)) {
         print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
     }
-    print '<p>';
-    print _("Did you read the tips on the left of the page? They'll help you make a successful pledge.");
-?> <input type="submit" name="<?
+    print p(_("Did you read the tips on the right of the page? They'll help you make a successful pledge."));
+?> <p align="right"><input type="submit" id="next_step" name="<?
     if (has_step_2()) print 'tostep2';
     elseif (has_step_3()) print 'tostep3';
     elseif (has_step_addr()) print 'tostepaddr';
@@ -240,27 +236,27 @@ size="48" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 
 function pledge_form_target_warning($data, $errors) {
 
-        if (sizeof($errors)) {
-                print '<div id="errors"><ul><li>';
-                print join ('</li><li>', array_values($errors));
-                print '</li></ul></div>';
+    $must_gather = $data['target'] * 0.025; # 2.5%, as in pb_pledge_prominence_calculated in db
+    if ($must_gather < 2)
+        $must_gather = 2;
+    $percent_successful_above_warn = percent_success_above(OPTION_PB_TARGET_WARNING);
+    
+    if (sizeof($errors)) {
+        print '<div id="errors"><ul><li>';
+        print join ('</li><li>', array_values($errors));
+        print '</li></ul></div>';
     }
 
-    print '<p>' . _('Your pledge looks like this so far:') . '</p>';
+    print '<div id="preview"><p>' . _('Your pledge looks like this so far:') . '</p>';
     $isodate = $data['parseddate']['iso'];
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
 
-    $must_gather = $data['target'] * 0.025; # 2.5%, as in pb_pledge_prominence_calculated in db
-    if ($must_gather < 2)
-        $must_gather = 2;
-    $percent_successful_above_warn = percent_success_above(OPTION_PB_TARGET_WARNING);
-
-    
 ?>
+</div>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
+<form accept-charset="utf-8" name="pledge" method="post" action="/new">
 
 <?  print h2(_('Please lower your target!'));
 
@@ -292,10 +288,10 @@ function pledge_form_target_warning($data, $errors) {
 for a larger and more ambitious one. You can mail your subscribers, and ask
 them to help you with something bigger.') ?></p>
 
-<p style="text-align: right;">
+<p>
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-
-<input class="topbutton" type="submit" name="donetargetwarning" value="<?=_('Next step') ?>"><br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
+<input style="float:right" id="next_step" class="topbutton" type="submit" name="donetargetwarning" value="<?=_('Next step') ?>">
+<br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>" style="float:left">
 </p>
 
 </form>
@@ -312,11 +308,15 @@ function pledge_form_two($data, $errors = array()) {
         unset($errors['gaze_place']); # remove NOTICE
     }
 
+    microsites_new_breadcrumbs(2);
+
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
+        echo '<div id="preview">';
     } else {
+        echo '<div id="preview">';
 ?>
 
 <p><?=_('Your pledge looks like this so far:') ?></p>
@@ -327,16 +327,21 @@ function pledge_form_two($data, $errors = array()) {
 
     global $number_of_steps;
 ?>
+</div>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
-<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), 2, $number_of_steps)?></h2>
+<form accept-charset="utf-8" name="pledge" method="post" action="/new">
+<h2><?=_('New Pledge &ndash; Location')?></h2>
+
+<p><?=_('If your pledge applies to a particular country,
+or place within a country, providing that information
+will help people who live nearby find your pledge, through
+our email alerts and location search.') ?></p>
 
 <p><?=_('Which country does your pledge apply to?') ?>
 <? gaze_controls_print_country_choice($data['country'], $data['state'], $errors); ?>
 </p>
 
 <p id="local_line"><?=_('Within that country, is your pledge specific to a local area or specific place?') ?>
-        <?=_('If so, we will help people who live nearby find your pledge.') ?>
 <br><input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_place_local(this, true)" type="radio" id="local1" name="local" value="1"<?=($local?' checked':'') ?>> <label onclick="this.form.elements['local1'].click()" for="local1"><?=_('Yes') ?></label>
 <input <? if (array_key_exists('local', $errors)) print ' class="error"' ?> onclick="update_place_local(this, true)" type="radio" id="local0" name="local" value="0"<?=($notlocal?' checked':'') ?>> <label onclick="this.form.elements['local0'].click()" for="local0"><?=_('No') ?></label>
 </p>
@@ -350,9 +355,10 @@ if ($data['state'])
 gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places'], $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null, array('midformnote'=>true)); 
 ?>
 
-<p style="text-align: right;">
+<p>
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="<?=has_step_3() ? "tostep3" : (has_step_addr() ? "tostepaddr" : "topreview") ?>" value="<?=_('Next step') ?>"><br><input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>">
+<input style="float:right" id="next_step" class="topbutton" type="submit" name="<?=has_step_3() ? "tostep3" : (has_step_addr() ? "tostepaddr" : "topreview") ?>" value="<?=_('Next step') ?>">
+<input type="submit" name="tostep1" value="<?=_('Back to step 1') ?>" style="float:left">
 </p>
 
 </form>
@@ -366,13 +372,17 @@ function pledge_form_three($data, $errors = array()) {
     }
     $isodate = $data['parseddate']['iso'];
 
+    microsites_new_breadcrumbs(3);
+
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
+	print '<div id="preview">';
     } else {
 ?>
 
+<div id="preview">
 <p><?=_('Your pledge looks like this so far:') ?></p>
 <?  }
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
@@ -381,9 +391,10 @@ function pledge_form_three($data, $errors = array()) {
 
     global $number_of_steps;
 ?>
+</div>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
-<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), 3, $number_of_steps)?></h2>
+<form accept-charset="utf-8" name="pledge" method="post" action="/new">
+<h2><?=_('New Pledge &ndash; Category / Privacy')?></h2>
 
 <?  if (microsites_categories_allowed()) { ?>
 <p><?=_('Which category does your pledge best fit into?') ?>
@@ -402,9 +413,10 @@ function pledge_form_three($data, $errors = array()) {
 <input type="hidden" name="visibility" value="all">
 <? } ?>
 
-<p style="text-align: right;">
+<p>
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?>"><br><input type="submit" name="tostep2" value="<?=_('Back to step 2') ?>">
+<input style="float:right" id="next_step" class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?>">
+<input style="float:left" type="submit" name="tostep2" value="<?=_('Back to step 2') ?>">
 </p>
 
 </form>
@@ -416,6 +428,9 @@ function pledge_form_three($data, $errors = array()) {
 # Live Simply only for now, will need updating if using for something else
 function pledge_form_addr($data = array(), $errors = array()) {
     global $lang, $langs, $number_of_steps;
+
+    microsites_new_breadcrumbs($curr_step);
+
     $isodate = $data['parseddate']['iso'];
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -429,21 +444,23 @@ function pledge_form_addr($data = array(), $errors = array()) {
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
+
+    $curr_step = has_step_2() ? (has_step_3() ? 4 : 3) : 2;
 ?>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
+<form accept-charset="utf-8" name="pledge" method="post" action="/new">
 <h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'),
-    has_step_2() ? (has_step_3() ? 4 : 3) : 2, $number_of_steps)?></h2>
+    $curr_step, $number_of_steps)?></h2>
 
 <?
     microsites_new_pledges_stepaddr($data, $errors);
     if (sizeof($data)) {
         print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
     } ?>
-<p style="text-align: right;">
+<p>
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<input class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?>">
-<br><input type="submit" name="<?=(has_step_3() ? "tostep3" : (has_step_2() ? "tostep2" : 'tostep1')) ?>" value="<?=sprintf(_('Back to step %s'), (has_step_3() ? 3 : (has_step_2() ? 2 : 1))) ?>">
+<input style="float:right" id="next_step" class="topbutton" type="submit" name="topreview" value="<?=_('Preview') ?>">
+<br><input style="float:left" type="submit" name="<?=(has_step_3() ? "tostep3" : (has_step_2() ? "tostep2" : 'tostep1')) ?>" value="<?=sprintf(_('Back to step %s'), (has_step_3() ? 3 : (has_step_2() ? 2 : 1))) ?>">
 </p>
 </form>
 <? 
@@ -595,7 +612,8 @@ function pledge_form_submitted() {
     /* User must have an account to do this. */
     $data['reason_web'] = _('Before creating your new pledge, we need to check that your email is working.');
     $data['template'] = 'pledge-confirm';
-    $P = pb_person_signon($data, $data['email'], $data['name']);
+    $P = pb_person_signon_without_redirect($data, $data['email'], $data['name'], get_http_var('password'));
+
     if ($data['facebook_id']) {
         $existing_facebook_person = db_getOne("select id from person where facebook_id = ?", $data['facebook_id']);
         $session_key = null;
@@ -727,8 +745,8 @@ function step2_error_check(&$data) {
         /* Validate country and/or state. */
         if (!array_key_exists($country, $countries_code_to_name))
             # TRANS: Ideally "none" will be translated here, but I can't see it as an entry in this .po file. How is this resolved? (Tim Morley, 2005-11-23)
-           $errors['country'] = _('Please choose a country, or "not specific to any location" if your pledge applies everywhere');
-        else if ($state && !array_key_exists($state, $countries_statecode_to_name[$country]))
+            $errors['country'] = _('Please choose a country, or "not specific to any location" if your pledge applies everywhere');
+        elseif ($state && !array_key_exists($state, $countries_statecode_to_name[$country]))
             $errors['country'] = _('Please choose a valid state within that country, or the country name itself');
         else {
             # Check gaze has this country
@@ -792,6 +810,8 @@ function preview_error_check($data) {
 }
 
 function preview_pledge($data, $errors) {
+    global $number_of_steps;
+
     $v = 'all';
     if (isset($data['visibility'])) {
         $v = $data['visibility']; if ($v!='pin') $v = 'all';
@@ -799,58 +819,20 @@ function preview_pledge($data, $errors) {
     $local = (isset($data['local'])) ? $data['local'] : '0';
     $isodate = $data['parseddate']['iso'];
 
+    microsites_new_breadcrumbs($number_of_steps);
+
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
     } #    $png_flyers1_url = url_new("../flyers/{$ref}_A7_flyers1.png", false);
 
-    print '<p>';
+    print '<div id="preview"><p>';
     printf(_('Your pledge, with short name <em>%s</em>, will look like this:'), $data['ref']);
     print '</p>';
 
-    global $number_of_steps;
     ?>
 
-<form accept-charset="utf-8" id="pledgeaction" name="pledge" method="post" action="/new">
-<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
-<h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'), $number_of_steps, $number_of_steps)?></h2>
-<?  print p(sprintf(_('
-Now please read your pledge (on the left) and check the details thoroughly.
-<strong>Read carefully</strong> - we can\'t ethically let you %schange the wording%s of your pledge once people have
-started to sign up to it.    
-'), '<a href="/faq#editpledge" id="changethewording" onclick="return toggleNewModifyFAQ()">', '</a>')
-);
-?>
-
-<div id="modifyfaq">
-<?=h3(_("Why can't I modify my pledge after I've made it?"))?>
-
-<?=p(_("People who sign up to a pledge are signing up to the specific wording of
-the pledge. If you change the wording, then their signatures would no
-longer be valid."))?>
-
-</div>
-
-<p style="text-align: right;">
-<input type="submit" name="tostep1" value="<?=_('Change pledge text') ?>">
-<? if (has_step_2()) { ?>
-<br><input type="submit" name="tostep2" value="<?=_('Change location') ?>">
-<? }
-   if (has_step_3()) { ?>
-<br><input type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
-<? }
-   if (has_step_addr()) { ?>
-<br><input type="submit" name="tostepaddr" value="<?=_('Change your postal address') ?>">
-<? } ?>
-</p>
-
-<?
-    microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors);
-?>
-</p>
-
-</form>
 <?
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
@@ -888,6 +870,47 @@ longer be valid."))?>
 ?>
     </ul>
     </div>
+</div>
+
+<form accept-charset="utf-8" name="pledge" method="post" action="/new">
+<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
+<h2><?=_('Preview')?></h2>
+<?  print p(sprintf(_('
+Now please read your pledge (on the right) and check the details thoroughly.
+<strong>Read carefully</strong> - we can\'t ethically let you %schange the wording%s of your pledge once people have
+started to sign up to it.    
+'), '<a href="/faq#editpledge" id="changethewording" onclick="return toggleNewModifyFAQ()">', '</a>')
+);
+?>
+
+<div id="modifyfaq">
+<?=h3(_("Why can't I modify my pledge after I've made it?"))?>
+
+<?=p(_("People who sign up to a pledge are signing up to the specific wording of
+the pledge. If you change the wording, then their signatures would no
+longer be valid."))?>
+
+</div>
+
+<p>
+<input class="topbutton" type="submit" name="tostep1" value="<?=_('Change pledge text') ?>">
+<? if (has_step_2()) { ?>
+ <input class="topbutton" type="submit" name="tostep2" value="<?=_('Change location') ?>">
+<? }
+   if (has_step_3()) { ?>
+ <input class="topbutton" type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
+<? }
+   if (has_step_addr()) { ?>
+ <input type="submit" name="tostepaddr" value="<?=_('Change your postal address') ?>">
+<? } ?>
+</p>
+
+<?
+    microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors);
+?>
+</p>
+
+</form>
 
 <?
     

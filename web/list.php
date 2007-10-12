@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: list.php,v 1.49 2007-09-28 09:41:09 matthew Exp $
+// $Id: list.php,v 1.50 2007-10-12 13:12:48 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -178,16 +178,18 @@ if ($limit_to_category) {
 
 if (!$rss) {
 ?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss".$_SERVER['REQUEST_URI']))?>"><img align="right" border="0" src="/rss.gif" alt="<?=_('RSS feed of ') . $heading ?>"></a><?
-    print h2($heading);
+    print '<div style="float:left;width:57%">';
+    print '<h2 class="head_with_mast">' . $heading . '</h2>';
 
-    pb_print_filter_link_main_general('align="center"');
+    pb_print_filter_link_main_general('class="head_mast" style="font-style:italic"');
+    print '</div>';
 
-    $views = "";
+    $views = '';
     $c = 0;
     foreach ($viewsarray as $s => $desc) {
         $c++;
-        if ($q_type != $s) $views .= "<a href=\"/list/$s\">$desc</a>"; else $views .= $desc;
-        if ($c != count($viewsarray)) $views .= ' | ';
+        if ($q_type == $s) continue;
+        $views .= "<li><a href=\"/list/$s\">" . str_replace(' ', '&nbsp;', $desc) . '</a>';
     }
 
     $sort = ($q_sort) ? '&amp;sort=' . $q_sort : '';
@@ -202,11 +204,11 @@ if (!$rss) {
         $n = $q_offset + PAGE_SIZE;
         $next = "<a href=\"?offset=$n$sort\">"._('Next page')." &raquo;</a>";
     }
-    $navlinks1 = '<p align="center">' . $views . "</p>\n";
+    $navlinks1 = '<ul style="margin-top:0; float:right; width:30%">' . $views . "</ul>\n";
     $navlinks2 = '';
     $navlinks3 = '';
     if ($ntotal > 0) {
-        $navlinks2 = '<p align="center" style="font-size: 89%">' . _('Sort by'). ': ';
+        $navlinks2 = '<p align="center" style="margin:0.5em 0;font-size: 89%">' . _('Sort by'). ': ';
         $arr = microsites_list_sort_options();
         $c = 0;
         foreach ($arr as $s => $desc) {
@@ -215,13 +217,13 @@ if (!$rss) {
             if ($c != count($arr)) $navlinks2 .= ' | ';
         }
         $navlinks2 .= '</p>';
-        $navlinks3 = '<p align="center">';
+        $navlinks3 = '<p align="center" style="margin:0.5em 0;">';
         $navlinks3 .= $prev . ' | '._('Pledges'). ' ' . ($q_offset + 1) . ' &ndash; ' . 
             ($q_offset + PAGE_SIZE > $ntotal ? $ntotal : $q_offset + PAGE_SIZE) . ' of ' .
             $ntotal . ' | ' . $next;
         $navlinks3 .= '</p>';
     }
-    print $navlinks1.$navlinks2.$navlinks3;
+    print $navlinks1.'<div style="clear:both"></div>'.$navlinks2.$navlinks3;
 }
 
 $rss_items = array();
@@ -271,8 +273,8 @@ if ($ntotal > 0) {
             $pledge->render_box($arr);
         $c++;
     }
-    if (!$rss && $ntotal > PAGE_SIZE)
-        print "<br style=\"clear: both;\">$navlinks3$navlinks2$navlinks1";
+    if (!$rss)
+        print "<br style=\"clear: both;\">$navlinks3$navlinks2";
 } else {
     if (!$rss)
         print p(_('There are currently none.'));

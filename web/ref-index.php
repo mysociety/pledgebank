@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.117 2007-09-19 17:32:42 matthew Exp $
+// $Id: ref-index.php,v 1.118 2007-10-12 13:12:48 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -58,9 +58,9 @@ deal_with_pin($p->url_main(), $p->ref(), $p->pin());
 function draw_spreadword($p) { ?>
     <div id="spreadword">
 <?  if (!$p->finished()) {
-        print '<h2>' . _('Spread the word on and offline') . '</h2>';
+        print h2(_('Spread the word on and offline'));
     } else {
-        print '<h2>' . _('Things to do with this pledge') . '</h2>';
+        print h2(_('Things to do with this pledge'));
     }
     print '<ul>';
     if (!$p->finished()) {
@@ -76,9 +76,6 @@ function draw_spreadword($p) { ?>
         print_link_with_pin('/' . $p->ref() . '/promote', '', _('Promote on your site or blog'));
         print '</li>';
     } 
-    print '<li>';
-    print_link_with_pin($p->url_contact_creator(), '', _('Contact the pledge creator'));
-    print '</li>';
     ?>
     <li><a href="/new/local/<?=$p->ref() ?>"><?=_('Create a local version of this pledge') ?></a></li>
     <li><small><?=_('Creator only:') ?> <a href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a>
@@ -272,7 +269,7 @@ define('MAX_PAGE_COMMENTS', '50');
 function draw_comments($p) {
     if (!$p->pin())
         print '<a href="' . $p->url_comments_rss() . '"><img align="right" border="0" src="rss.gif" alt="' . _('RSS feed of comments on this pledge') . '"></a>';
-    print '<h2><a name="comments">' . _('Comments on this pledge') . '</a></h2>';
+    print h2('<a name="comments">' . _('Comments on this pledge') . '</a>');
 
     $limit = 0;
     $showall_para = '';
@@ -367,8 +364,17 @@ function draw_connections_for_finished($p) {
     }
 
     if (count($pledges) > 0) {
-        print "\n\n" . '<div id="pledgeaction">' . 
-            _('You might be interested in these other pledges.');
+        print "\n\n" . '<div id="finished_connections" class="';
+        if ($p->left()<=0 && !microsites_no_target()) {
+            print 'success">';
+            print strong(_('This pledge has now closed; it was successful!'));
+            print ' ';
+        } else {
+            print 'finished">';
+	    print microsites_pledge_closed_text();
+            print ' ';
+        }
+        print _('You might be interested in these other pledges:');
         print '<ul>' . "\n\n";
         foreach ($pledges as $p2) {
             print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
@@ -377,7 +383,7 @@ function draw_connections_for_finished($p) {
         print "\n\n";
         print '</ul>';
 
-        print p(_('See <a href="/">more other pledges</a>, and all about how PledgeBank works.'));
+        print p(_('See <a href="/list">more pledges</a>, and all <a href="/faq">about how PledgeBank works</a>.'));
 
         print '</div>';
     }
@@ -400,7 +406,7 @@ page_header($title, $params);
 debug_comment_timestamp("after page_header()");
 pledge_draw_status_plaque($p);
 debug_comment_timestamp("after draw_status_plaque()");
-$p->render_box(array('showdetails' => true, 'reportlink' => true, 'showcontact' => true));
+$p->render_box(array('showdetails' => true, 'reportlink' => true, 'showcontact' => true, 'id' => 'pledge_main'));
 debug_comment_timestamp("after \$p->render_box()");
 print '<div id="col2">';
 if (!$p->finished())

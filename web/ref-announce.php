@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.61 2007-09-28 20:03:31 matthew Exp $
+ * $Id: ref-announce.php,v 1.62 2007-10-12 13:12:48 matthew Exp $
  * 
  */
 
@@ -285,7 +285,7 @@ if (!sizeof($errors) && $q_submit) {
 
 ?>
 
-<form action="announce" accept-charset="utf-8" class="pledge" name="pledge" id="pledgeaction" method="post">
+<form action="announce" accept-charset="utf-8" name="pledge" method="post">
 <h2><?=_('Send') . ' ' . $descr[$circumstance] . ($byarea_location_id ? " for " . $byarea_location_description : '')?></h2>
 <input type="hidden" name="message_id" value="<?=$q_h_message_id?>">
 <input type="hidden" name="location" value="<?=$byarea_location_id?>">
@@ -322,7 +322,7 @@ ways.')); ?>
 
 <p><label for="message_subject"><?=_('Subject') ?>:</label> <input name="message_subject" id="message_subject" size="40" value="<?=$q_h_message_subject?>"></p>
 
-<p><textarea style="max-width: 100%"
+<p><textarea
     name="message_body"
     id="message_body"
     cols="72"
@@ -336,7 +336,7 @@ ways.')); ?>
     <strong>Include contact details, such as your phone number or email address.</strong>
     Otherwise people who signed up by text won\'t be able to contact you again.'));
     ?>
-<p><textarea style="max-width: 100%"
+<p><textarea
     name="message_sms"
     id="message_sms"
     cols="72"

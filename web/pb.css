@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.css,v 1.134 2007-10-01 16:50:36 francis Exp $
+ * $Id: pb.css,v 1.135 2007-10-12 13:12:48 matthew Exp $
  * 
  */
 
@@ -19,47 +19,60 @@ body {
     color: #000000;
     background-color: #ffffff;
 }
+
 a:link { color: #522994; }
 a:visited { color: #7b52a5; }
-a:hover, a:active { color: #000000; }
-h1 a:link, h1 a:visited {
-    text-decoration: none;
-}
+a:hover, a:active, a:focus { color: #000000; }
+
 blockquote.noindent {
     font-style: normal;
     margin: 0;
 }
+
 th {
     text-align: right;
 }
+
+dl {
+    margin-left: 2em;
+}
+
 dt {
     font-weight: bold;
     margin-top: 0.5em;
 }
+
 form {
     margin: 0;
     padding: 3px;
 }
+
 form.buttonform {
     padding: 0;
 }
-input[type=text], input[type=password], textarea {
-    background-color: #ffffff;
-    color: #000000;
-    border: solid 2px #9c7bbd;
+
+textarea, input[type=text] {
+    max-width: 100%;
 }
-textarea:hover, textarea:focus, input[type=text]:hover, input[type=password]:hover, input[type=text]:focus, input[type=password]:focus {
-    border: solid 2px #522994;
-}
+
 input.topbutton {
     margin-bottom: 2px;
 }
-textarea {
-    max-width: 100%;
-}
+
 label {
     cursor: pointer;
 }
+
+#pledgeaction label {
+    float: left;
+    width: 8em;
+    font-weight: bold;
+}
+
+#pledgeaction select {
+    width: 12em;
+}
+
 ol li {
     margin: 0;
     padding: 0 0 0.5em 0;
@@ -70,11 +83,17 @@ ol li {
 h1 {
     font-size: 200%;
     margin: 0;
-    padding: 0.4em 10px;
+    padding: 0 10px 0.3em;
     text-align: left;
     color: #ffffff;
     background-color: #9c7bbd;
-    border-bottom: solid 2px #522994;
+    border-bottom: solid 1px #522994;
+}
+h1 #logo {
+    text-decoration: none;
+}
+h1 #logo:hover {
+    text-decoration: underline;
 }
 h1 span#logo_pledge {
     background-color: #9C7BBD;
@@ -94,16 +113,42 @@ h1 span#countrytitle {
     font-size: 40%;
     color: #ffffff;
 }
+
 h2 {
     margin-top: 0;
 }
-h3 {
+
+.head_with_mast {
+    margin-bottom: 0;
+}
+.head_mast {
+    margin-top: 0;
+}
+
+#pledgeaction h2 {
+    margin-bottom: 0.5em;
 }
 
 /* Site wide elements */
 
 .v {
     display: none;
+}
+
+#tagline {
+    font-size: 50%;
+    font-weight: normal;
+    font-style: italic;
+}
+
+#nav_search {
+    background-image: url('/i/grad.png');
+    background-repeat: repeat-x;
+    background-position: 0 0;
+    background-color: #ffffff;
+    padding-left: 2em;
+    text-align: left;
+    font-size:83%;
 }
 
 #navforms {
@@ -122,7 +167,7 @@ h3 {
 #pbcontent {
     clear: both;
     text-align: left;
-    padding: 5px 5% 10px;
+    padding: 5px 5% 0;
     margin: 1em auto 0;
     max-width: 70em;
     background-color: #ffffff;
@@ -146,6 +191,15 @@ h3 {
     margin-bottom: 2px;
 }
 
+#signedon {
+    float: right;
+    font-size: 83%;
+    padding: 8px 4px 0 0;
+    margin: 0;
+}
+
+/* Error and success messages */
+
 #error {
     width: 50%;
 }
@@ -156,7 +210,7 @@ h3 {
     padding: 3px;
 }
 .success, .finished {
-    margin: 1em auto 0;
+    margin: 0em auto 0;
     width: 80%;
     padding: 10px;
     text-align: center;
@@ -183,7 +237,7 @@ h3 {
 #formnote {
     margin: 0 auto 1em;
     background-color: #ccffcc;
-    border: solid 2px #009900;
+    border: solid 1px #009900;
     padding: 3px;
 }
 #formnote ul {
@@ -195,23 +249,61 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     background-color: #ffcccc;
 }
 
+#cancelled {
+    margin: 1em auto 0;
+    width: 80%;
+    padding: 10px;
+    text-align: center;
+    background-color: #ffcccc;
+    border: solid 2px #990000;
+}
+
+#notice {
+    margin: 1em auto 0;
+    width: 80%;
+    padding: 10px;
+    text-align: center;
+    background-color: #ffcc99;
+    border: solid 2px #ff9900;
+}
+
 /* Front page */
 
 #tellworld {
     float: left;
     width: 59%;
-    border: solid 2px #522994;
     padding: 10px;
     background-color: #ffffff;
 }
+#tellworld h2 {
+    margin-bottom: 0;
+}
+#tellworld h3 {
+    margin-top: 0.5em;
+}
+
 #startblurb {
     float: right;
     width: 32%;
-    border: solid 2px #522994;
-    background-color: #f6e5ff;
+    /*border: solid 2px #ffcc66;*/
+    background-color: #522994;
     padding: 10px;
-/*    -moz-border-radius: 8px 8px; */
+    /*border: solid 2px #83131B;
+    background-color: #9d1c20;*/
+    color: #ffffff;
+    -moz-border-radius: 2em;
+    margin: 1em 0;
 }
+#startblurb a {
+    color: #FFCC66;
+}
+#startblurb ul {
+    margin-left: 0;
+    margin-bottom: 0;
+    padding-left: 1.5em;
+    line-height: 1.5;
+}
+
 #extrablurb {
     float: right;
     width: 32%;
@@ -226,10 +318,39 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     text-align: center;
     font-size: 150%;
 }
-#starthowto {
+.starthowto {
     margin: 0;
     font-size: 150%;
 }
+
+#successfulpledges {
+    width: 59%;
+    float: left;
+}
+#currentpledges {
+    width: 32%;
+    float: right;
+    margin-top: 1em;
+    padding: 10px;
+}
+#currentpledges ul, #front #comments ul {
+    margin-left: 1em;
+}
+#currentpledges li:hover, #successfulpledges li:hover, #front #comments li:hover {
+    background-color: #f6e5ff;
+}
+
+#front #comments {
+    margin-top: 1em;
+    float: right;
+    clear: right;
+    font-size: 95%;
+    width: 32%;
+    padding: 10px;
+}
+
+/* Setting password/ logging in */
+
 #setpassword {
     text-align: left;
     border: solid 2px #522994;
@@ -247,6 +368,7 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 }
 
 /* Local alert signup boxes */
+
 #localsignupfrontpage p, #localsignupeverypage p,
 #localsignupyourpage p, #localsignupsearchpage p {
     margin: 0;
@@ -264,6 +386,9 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     text-align: center;
     margin-bottom: 1em;
 }
+#localsignupyourpage {
+    border: none;
+}
 #localsignupeverypage {
     text-align: center;
     margin: 1em auto 0;
@@ -274,106 +399,112 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     border-top: solid 1px #c6b5d3;
 }
 
-#currentpledges {
-    clear: left;
-    margin-top: 1em;
-}
-#currentpledges, #yoursignaturesandpledges {
+/* My Pledges page */
+
+#yoursignaturesandpledges {
     width: 59%;
     float: left;
 }
-#currentpledges li, #yoursignedpledges li, #yourconnections li {
-    padding-bottom: 0.5em;
-    border-bottom: dotted 1px #999999;
+#yoursignedpledges li, #yourconnections li {
     margin-bottom: 0.5em;
 }
 #yoursignedpledges p {
     text-align: right;
     margin: 0.5em 0 0;
 }
-
-#photo {
-    /* background: url("leaflet-phone-scissors-275px.png") no-repeat 50% 50%; */
-    margin-top: 1em;
-    border: solid 2px #522994;
-    float: right;
+#yourpledges h2 {
+    clear: left;
+}
+#yourconnections {
     clear: right;
-}
-#photo img {
-    border: none;
-}
-#photocaption {
     float: right;
     width: 32%;
-    margin: 0;
-    font-size: 150%;
-}
-#front #comments {
-    margin-top: 1em;
-    float: right;
-    clear: right;
-    font-size: 95%;
-    width: 32%;
-}
-#front #comments ul {
-    padding-left: 1.5em;
-    margin: 0;
-    list-style-type: disc;
-}
-
-/* Blurb underneath header */
-
-#reference, #signedon {
-    font-size: 83%;
-    padding: 2px;
-    margin: 0;
-}
-#reference {
-    float: left;
-    width: 60%;
-    text-align: left;
-}
-#signedon {
-    text-align: right;
 }
 
 /* Forms for signing up, new pledges, etc. */
 
-.pledge .c {
-    text-align: center;
-}
-.pledge, #pledgeaction {
-    border: solid 2px #522994;
-    margin: 0 auto 1em;
-    padding: 10px;
+#new #pbcontent form {
     background-color: #c6b5de;
-}
-.pledge p, #pledgeaction p {
-    margin-bottom: 0;
-}
-#pledgeaction {
-    margin: 1em 0 0.5em 0;
-    float: right;
+    border: solid 1px #522994;
     width: 45%;
+    float: left;
+    padding: 10px;
+    margin: 1em 0 0.5em 0;
 }
-#col2 #pledgeaction, #col2 #commentform {
+#new #preview {
+    float: right;
+    width: 47%;
+}
+#new #pledge {
     float: none;
     width: auto;
 }
 
-#pledgeaction select {
-    width: 12em;
+#modifyfaq {
+    display: none;
 }
+#otherdetails {
+    clear: left;
+}
+
+.pledge .c {
+    text-align: center;
+}
+.pledge {
+    border: solid 1px #522994;
+    margin: 0 auto 1em;
+    padding: 10px;
+    background-color: #c6b5de;
+}
+.pledge p, #pledgeaction p, #new form p, #finished_connections p {
+    margin-bottom: 0;
+}
+#pledgeaction {
+    border: solid 2px #522994;
+    background-color: #c6b5de;
+    padding: 10px;
+    margin: 0.5em 0 0.5em 0;
+    float: right;
+    width: 45%;
+    border: solid 1px #ff8429;
+    background-color: #ffffcc;
+}
+#pledgeaction #name_row {
+    margin-top: 0.5em;
+    margin-bottom: 0.25em;
+}
+#pledgeaction #email_row {
+    margin-top: 0.25em;
+    margin-bottom: 0;
+}
+#pledgeaction #email_blurb {
+    margin-top: 0;
+    margin-left: 4em;
+}
+#pledgeaction #showname_row {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+}
+#pledgeaction #signpledge_row {
+    margin-top: 0.5em;
+    text-align: right;
+}
+
+#col2 #pledgeaction, #col2 #commentform, #col2 #finished_connections {
+    float: none;
+    width: auto;
+}
+
 #tips {
-    float: left;
+    float: right;
     width: 45%;
     margin-top: 1em;
 }
-#tips, #pledge, #all .pledge, #yourpledges .pledge {
-    border: solid 2px #522994;
+#tips, #pledge, #pledge_main, #all .pledge, #yourpledges .pledge {
+    border: solid 1px #522994;
     background-color: #f6e5ff;
     margin-bottom: 1em;
-    padding: 10px;
+    padding: 8px;
 }
 #tips li {
     padding: 0;
@@ -393,11 +524,16 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 }
 
 #pledge {
-    text-align: center;
     width: 45%;
-    float: left;
-    margin: 1em auto;
+    float: right;
+    margin: 1em 0 0 2em;
 }
+#pledge_main {
+    float: left;
+    width: 45%;
+    margin: 0.5em auto 1em;
+}
+
 #moredetails {
     text-align: left;
     font-size: 95%; 
@@ -407,15 +543,50 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     font-size: 83%; 
     font-weight: bold;
 }
+
+img.creatorpicture {
+    float: left; 
+    display: inline;
+    margin-right: 10px;
+}
+
+#reportpledge {
+    font-size: 83%;
+    text-align: left;
+}
+
 #spreadword {
-    border: solid 2px #ff8429;
+    border: solid 1px #ff8429;
     background-color: #ffff99;
+    border: solid 1px #522994;
+    background-color: #c6b5de;
     padding: 10px;
     margin: 1em 0;
 }
 #spreadword h2 {
     font-size: 125%;
     margin-bottom: 0.5em;
+}
+
+#finished_connections {
+    padding: 10px;
+    margin: 0.5em 0 0.5em 0;
+    float: right;
+    width: 45%;
+    text-align: left;
+}
+#finished_connections.success {
+    background-color: #ccffcc;
+    border: solid 1px #009900;
+}
+#finished_connections.finished {
+    background-color: #ffcccc;
+    border: solid 1px #990000;
+}
+
+#pledgeaction ul, #finished_connections ul {
+    margin: 0.5em 0 0 0;
+    padding: 0 0 0 1.5em;
 }
 #spreadword ul {
     line-height: 1.4;
@@ -432,6 +603,12 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 }
 #signatories, #connections {
     margin-top: 1em;
+}
+
+.done {
+    background-color: #ffffff;
+    color: #006600;
+    list-style-image: url('http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png');
 }
 
 .location {
@@ -458,22 +635,6 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 }
 #signatories .location_success ul {
     clear: left;
-}
-
-#yourpledges h2 {
-    clear: left;
-}
-#yourconnections {
-    margin-top: 1em;
-    clear: right;
-    float: right;
-    width: 32%;
-}
-
-.done {
-    background-color: #ffffff;
-    color: #006600;
-    list-style-image: url('http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png');
 }
 
 /* Comments */
@@ -515,35 +676,6 @@ ul#comments li div {
     margin-bottom: 2px;
 }
 
-#cancelled {
-    margin: 1em auto 0;
-    width: 80%;
-    padding: 10px;
-    text-align: center;
-    background-color: #ffcccc;
-    border: solid 2px #990000;
-}
-
-#notice {
-    margin: 1em auto 0;
-    width: 80%;
-    padding: 10px;
-    text-align: center;
-    background-color: #ffcc99;
-    border: solid 2px #ff9900;
-}
-
-img.creatorpicture {
-    float: left; 
-    display: inline;
-    margin-right: 10px;
-}
-
-#reportpledge {
-    font-size: 83%;
-    text-align: left;
-}
-
 #oldannounce {
     float: right;
     width: 45%;
@@ -567,13 +699,14 @@ ul#nav li {
     padding: 1px 5px;
     text-align: center;
     position: relative;
-    top: 2px;
+    top: 1px;
     background-color: #ffffff;
+    /*background-color: #c6b5d3;*/
     color: #21004a;
     margin-left: 0.5em;
     display: inline;
     border: solid 1px #522994;
-    border-width: 2px 2px 0 2px;
+    border-width: 1px 1px 0 1px;
 /*    -moz-border-radius: 8px 8px 0 0; */
 }
 
@@ -595,6 +728,7 @@ ul#nav li {
 }
 
 /* All pledges page */
+
 .pledge-0 {
     float: left;
     clear: left;
@@ -606,8 +740,9 @@ ul#nav li {
     width: 45%;
 }
 #all .pledge {
-    text-align: center;
+    margin-top: 1em;
 }
+
 .greyed {
     color: #999999;
 }
@@ -623,18 +758,15 @@ input.greyed, textarea.greyed {
 #offline div {
     clear: both;
 }
-#offline img.l {
+img.l {
     float: left;
+    margin: 0 0.5em 0.5em 0;
+    border: solid 1px #666666;
 }
-#offline img.r {
+img.r {
     float: right;
-}
-
-#modifyfaq {
-    display: none;
-}
-#otherdetails {
-    clear: left;
+    margin: 0 0 0.5em 0.5em;
+    border: solid 1px #666666;
 }
 
 /* For /where */
@@ -650,4 +782,82 @@ input.greyed, textarea.greyed {
 #success #pbcontent div {
     clear: both;
     border-top: dotted 1px #522994;
+}
+
+/* Breadcrumbs when creating a pledge */
+
+ol#breadcrumbs {
+    font-size: 80%;
+    display: block;
+    padding: 0;
+    margin-bottom: 1em;
+    margin-top: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    counter-reset: item;
+}
+
+ol#breadcrumbs li {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 1em;
+    padding-right: 1em;
+    color: #888;
+    display: inline;
+}
+ol#breadcrumbs li:before {
+    counter-increment: item;
+    content: counter(item) ". ";
+}
+ol#breadcrumbs li.hilight {
+    color: #000;
+    background-color: #eee;
+}
+ol#breadcrumbs li.hilight em {
+    font-style: normal;
+}
+
+/* Search results (used to display pledge lists just about everywhere now, actually) */
+
+.search_results {
+    list-style-type: none;
+    padding-left: 0;
+    margin-left: 2em;
+}
+.search_results li {
+    margin-bottom: 0.5em;
+}
+.search_results small {
+    color: #666666;
+}
+
+#local_alert_search {
+    margin-left: 3em;
+    float: right;
+    clear: right;
+    margin-top: 1em;
+    width: 17em;
+}
+
+#next_step {
+    font-size: 150%;
+}
+
+#sidebar {
+    float: right;
+    width: 15em;
+    border: solid 1px #9c7bbd;
+    margin: 3em 0 3em 3em;
+}
+#sidebar h2 {
+    font-size: 120%;
+    padding: 2px;
+    margin: 0;
+    color: #ffffff;
+    background-color: #9c7bbd;
+}
+#sidebar p {
+    margin: 1em;
 }

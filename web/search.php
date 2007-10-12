@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.65 2007-05-11 11:45:49 matthew Exp $
+// $Id: search.php,v 1.66 2007-10-12 13:12:48 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -21,6 +21,8 @@ if (get_http_var('backpage'))
 $rss = get_http_var('rss') ? true : false;
 $rss_items = array();
 $pledges_output = array();
+
+# XXX: Header stuff will need changing
 $heading = sprintf(_("Search results for '%s'"), htmlspecialchars($search));
 if ($rss) 
     rss_header($heading, $heading, array());
@@ -30,7 +32,9 @@ else
                     $heading => pb_domain_url(array('explicit'=>true, 'path'=>'/rss'.$_SERVER['REQUEST_URI']))
                     ))
     );
-search($search);
+
+$shown_alert_box = search($search);
+
 if ($rss) {
     function compare_creationtime($a, $b) {
         return strcmp($b['creationtime'], $a['creationtime']);
@@ -39,8 +43,14 @@ if ($rss) {
     usort($rss_items, "compare_creationtime");
     rss_footer($rss_items);
 }
-else
-    page_footer();
+else {
+    $params = array();
+    if ($shown_alert_box)
+        $params['nolocalsignup'] = true;
+    page_footer($params);
+}
+
+# ---
 
 function get_location_results($pledge_select, $lat, $lon) {
     global $pb_today, $rss_items, $rss, $pledges_output, $backpage_clause;
@@ -64,14 +74,14 @@ function get_location_results($pledge_select, $lat, $lon) {
     $ret = "";
     if (db_num_rows($q)) {
         $success = 1;
-        $ret .= '<ul>';
+        $ret .= '<ul class="search_results">';
         while ($r = db_fetch_array($q)) {
             $pledge = new Pledge($r['ref']);
             $ret .= '<li>';
             $distance_line = pb_pretty_distance($r['distance'], microsites_site_country());
             $ret .= preg_replace('#^(.*)( away)$#', '<strong>$1</strong>$2: ', $distance_line);
             #$ret .= "<a href=\"/".$r['ref']."\">".htmlspecialchars($r['title'])."</a>"; # shorter version?
-            $ret .= $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
+            $ret .= $pledge->new_summary(array('firstperson'=>'includename'));
             $pledges_output[$r['ref']] = 1;
 
             if ($rss) {
@@ -105,6 +115,7 @@ function get_change_radius_link($search, $radius) {
 function search($search) {
     global $pb_today, $rss, $rss_items, $pledges_output;
     $success = 0;
+    $shown_alert_box = 0;
 
     if (!$rss) {
         // Blank searches
@@ -114,8 +125,10 @@ function search($search) {
             microsites_search_help();
             return;
         }
+        $rss_title = sprintf(_("RSS feed of pledges matching '%s'"), htmlspecialchars($search));
        
-?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss".$_SERVER['REQUEST_URI']))?>"><img align="right" border="0" src="/rss.gif" alt="<?=_('RSS feed of search for \'') . htmlspecialchars($search) ."'" ?>"></a><?
+?><a href="<?=pb_domain_url(array('explicit'=>true, 'path'=>"/rss".$_SERVER['REQUEST_URI']))?>"><img
+vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title="<?=$rss_title ?>"></a><?
     }
 
     // General query
@@ -132,8 +145,8 @@ function search($search) {
             $r = db_fetch_array($q);
             $pledge = new Pledge($r);
             print sprintf(p(_('Result <strong>exactly matching</strong> pledge <strong>%s</strong>:')), htmlspecialchars($search) );
-            print '<ul><li>';
-            print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
+            print '<ul class="search_results"><li>';
+            print $pledge->new_summary(array('firstperson'=>'includename'));
             $pledges_output[$r['ref']] = 1;
             print '</li></ul>';
         }
@@ -168,12 +181,33 @@ function search($search) {
     global $countries_code_to_name;
     $change_country = pb_get_change_country_link(false);
     if (microsites_site_country()) {
-        $places = gaze_find_places(microsites_site_country(), null, $search, 5, 70);
-        gaze_check_error($places);
+        $all_places = gaze_find_places(microsites_site_country(), null, $search, 5, 70);
+        gaze_check_error($all_places);
+
+        # If exact matches, just take them!
+        $places = array(); $alt_places = array();
+        foreach ($all_places as $p) {
+            list($name, $in, $near, $lat, $lon, $st, $score) = $p;
+            if (strtolower($name) == strtolower($search)) {
+                $places[] = $p;
+            } else {
+                $alt_places[] = $p;
+            }
+        }
+
         if (count($places) > 0) {
             $success = 1;
             $out = "";
             $max_radius = -1;
+            if (!$rss) {
+                if (microsites_local_alerts()) {
+                    print '<div id="local_alert_search">';
+                    pb_view_local_alert_quick_signup("localsignupsearchpage", 
+                        array('newflash'=>false, 'place'=>$search));
+                    $shown_alert_box = true;
+                    print '</div>';
+                }
+            }
             foreach ($places as $p) {
                 list($name, $in, $near, $lat, $lon, $st, $score) = $p;
                 $desc = $name;
@@ -187,7 +221,7 @@ function search($search) {
                         $out .= "<li>$desc";
                     else
                         # TRANS: For example: "Results for <strong>open pledges</strong> near places matching <strong>Bolton</strong>, United Kingdom (<a href="....">change country</a>):"
-                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s%s:"), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()], $change_country));
+                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s:"), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()]));
                     if ($location_results) {
                         $out .= $location_results;
                     } else {
@@ -197,16 +231,35 @@ function search($search) {
                 }
             }
             if (!$rss && count($places) > 1) {
-                print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s%s:"), get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[microsites_site_country()], $change_country));
-                print "<ul>";
+                print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s:"),
+                    get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[microsites_site_country()]));
+                print '<ul class="search_results">';
             }
             print $out;
             if (!$rss) {
                 if (count($places) > 1) print "</ul>";
-                if (microsites_local_alerts())
-                    pb_view_local_alert_quick_signup("localsignupsearchpage", 
-                        array('newflash'=>false, 'place'=>$search));
             }
+        }
+        if (!$rss && $alt_places) {
+            if ($places)
+                print '<p><small>' . sprintf(_('Other similar places to %s'), htmlspecialchars($search)) . ': ';
+            else
+                print '<p>' . _('Did you mean:') . ' ';
+            $descs = array();
+            foreach ($alt_places as $p) {
+                list($name, $in, $near, $lat, $lon, $st, $score) = $p;
+                $desc = '<a href="/search?q=' . urlencode($name) . '">';
+                $desc .= $name . '</a>';
+                if ($in) $desc .= ", $in";
+                if ($st) $desc .= ", $st";
+                if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
+                $descs[] = $desc;
+            }
+            print join('; ', $descs);
+            if ($places)
+                print '</small></p>';
+            else
+                print '?</p>';
         }
     } elseif ($change_country) {
         if (!$rss)
@@ -233,11 +286,8 @@ function search($search) {
             if (array_key_exists($r['ref'], $pledges_output))
                 continue;
             $pledge = new Pledge($r);
-        
-            $text = '<li>';
-            $text .= $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
+            $text = '<li>' . $pledge->new_summary(array('firstperson'=>'includename')) . '</li>';
             $pledges_output[$r['ref']] = 1;
-            $text .= '</li>';
             if ($r['open']=='t') {
                 $open .= $text;
             } else {
@@ -256,17 +306,16 @@ function search($search) {
     // Open pledges
     if ($open) {
         print sprintf(p(_('Results for <strong>open pledges</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
-        print '<ul>' . $open . '</ul>';
+        print '<ul class="search_results">' . $open . '</ul>';
     }
 
     // Closed pledges
     if ($closed) {
         print sprintf(p(_('Results for <strong>closed pledges</strong> matching <strong>%s</strong>:')), htmlspecialchars($search) );
-        print '<ul>' . $closed . '</ul>';
+        print '<ul class="search_results">' . $closed . '</ul>';
     }
 
     // Comments
-    $comments_to_show = 10;
     $q = db_query('SELECT comment.id,
                           extract(epoch from ms_current_timestamp()-whenposted) as whenposted,
                           text,comment.name,website,ref 
@@ -280,16 +329,16 @@ function search($search) {
     if (db_num_rows($q)) {
         $success = 1;
         print sprintf(p(_("Results for <strong>comments</strong> matching <strong>%s</strong>:")), htmlspecialchars($search) );
-        print '<ul>';
+        print '<ul class="search_results">';
         while($r = db_fetch_array($q)) {
             print '<li>';
-            print comments_summary($r);
+            print comments_summary($r, $search);
             print '</li>';
         }
         print '</ul>';
     }
 
-    // Signers and creators (NOT person table, as we only search for publically visible names)
+    // Signers and creators (NOT person table, as we only search for publicly visible names)
     $people = array();
     global $microsite; # XXX
     if ($microsite == 'o2') {
@@ -314,14 +363,16 @@ function search($search) {
         WHERE pin IS NULL ' . $backpage_clause .
         ' AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
         while ($r = db_fetch_array($q)) {
-            $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
+            if (preg_match("#\b$search\b#i", $r['name']))
+                $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
         }
         $q = db_query('SELECT ref, title, signers.name FROM signers,pledges
         WHERE showname AND pin IS NULL AND signers.pledge_id = pledges.id
         ' . $backpage_clause . ' AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name',
         $search);
         while ($r = db_fetch_array($q)) {
-            $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
+            if (preg_match("#\b$search\b#i", $r['name']))
+                $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
         }
     }
     if (sizeof($people)) {
@@ -344,6 +395,13 @@ function search($search) {
     if (!$success) {
         print sprintf(p(_('Sorry, we could find nothing that matched "%s".')), htmlspecialchars($search) );
     }
+?>
+<form id="search" accept-charset="utf-8" action="/search" method="get" style="text-align:center; padding: 1em 0; margin-top: 2em">
+<label for="q"><?=_('Search for pledges:') ?></label>
+<input type="text" id="q" name="q" size="25" value="<?=htmlspecialchars($search)?>">
+<input type="submit" value="<?=_('Search') ?>">
+</form>
+<?
+    return $shown_alert_box;
 }
 
-?>

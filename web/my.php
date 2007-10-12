@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: my.php,v 1.3 2007-10-01 17:14:28 francis Exp $
+// $Id: my.php,v 1.4 2007-10-12 13:12:48 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -62,16 +62,16 @@ function pledges_you_might_like() {
     if (0 != db_num_rows($s)) {
         print "\n\n" . '<h2><a name="connections">' . _('Suggested pledges') . '</a></h2>' . "\n\n";
         print p(_("People who signed the pledges you created or signed also signed these..."));
-        print '<ol>';
+        print '<ul class="search_results">';
         while (list($id, $strength) = db_fetch_row($s)) {
             $p2 = new Pledge(intval($id));
             print '<li>';
-            print $p2->summary(array('html'=>true, 'href'=>$p2->url_main()));
+            print $p2->new_summary(array('firstperson'=>true,'html'=>true, 'href'=>$p2->url_main()));
             print '</li>';
             print "<!-- strength $strength -->\n";
         }
         print "\n\n";
-        print '</ol>';
+        print '</ul>';
     }
 }
 
@@ -92,10 +92,12 @@ function show_your_pledges($type) {
     if (db_num_rows($qrows) > 0) {
         if ($type == 'closed')
             print h2(_('Closed pledges you created'));
+	echo '<ul class="search_results">';
         while ($r = db_fetch_array($qrows)) {
             $pledge = new Pledge($r);
-            $pledge->render_box(array('class' => '', 'href'=>$pledge->url_main(), 'creatorlinks' => true));
+            print '<li>' . $pledge->new_summary(array('firstperson'=>true, 'creatorlinks' => true));
         }
+	echo '</ul>';
     } elseif ($type == 'open') {
         print p(_('You have no open pledges. <a href="/new">Start a new pledge</a>.'));
     }
@@ -112,7 +114,7 @@ function show_your_signed_pledges() {
                     AND signers.person_id = ?
                     ORDER BY signtime DESC
                 ", $P->id());
-    print _("<h2>Pledges you signed</h2>");
+    print _("<h2>Pledges you have signed</h2>");
     $successful_ever = 0;
     if (db_num_rows($qrows) > 0) {
         print '<ol id="yoursignedpledges">';
@@ -158,18 +160,16 @@ function show_your_signed_pledges() {
 // Display everything
 print '<div id="yourconnections">';
 change_personal_details(true);
+alert_list_comments($P->id(), get_http_var('allcomments') ? true : false);
 pledges_you_might_like();
 print '</div>';
 
 print '<div id="yoursignaturesandpledges">';
 show_your_pledges('open');
-# XXX: microsites.php!
-global $microsite;
-if ($microsite != 'o2')
+if (microsites_local_alerts())
     alert_list_pledges_local($P->id());
-alert_list_comments($P->id(), get_http_var('allcomments') ? true : false);
-show_your_pledges('closed');
 show_your_signed_pledges();
+show_your_pledges('closed');
 print '</div>';
 
 page_footer();

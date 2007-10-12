@@ -7,9 +7,10 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbperson.php,v 1.4 2007-02-12 12:17:57 matthew Exp $
+// $Id: pbperson.php,v 1.5 2007-10-12 13:12:47 matthew Exp $
 
 require_once 'microsites.php';
+require_once '../phplib/login.php';
 
 require_once '../../phplib/person.php';
 
@@ -44,4 +45,29 @@ function pb_person_signon($template_data, $email = null, $name = null) {
     return person_signon($template_data, $email, $name, "pb_person_if_signed_on");
 }
 
+# XXX: This is rather horrible. Done so we can have a password
+# box within a completely different form
+function pb_person_signon_without_redirect($template_data, $email, $name, $password) {
+    $P = pb_person_if_signed_on();
+    if ($P)
+        return $P;
+
+    global $q_stash, $q_name, $q_email, $q_h_email;
+    $q_email = $email;
+    $q_h_email = htmlspecialchars($email);
+    $q_name = $name;
+    $q_stash = stash_request(rabx_serialise($template_data), $email);
+    db_commit();
+
+    if ($password) {
+        global $q_password;
+        $q_password = $password;
+        $_GET['loginradio'] = 'LogIn';
+        login_page();
+    } else {
+        $_GET['loginradio'] = 'SendEmail';
+        login_page();
+    }
+    exit;
+}
 

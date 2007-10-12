@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.118 2007-10-12 15:01:23 matthew Exp $
+ * $Id: microsites.php,v 1.119 2007-10-12 15:15:47 matthew Exp $
  * 
  */
 
@@ -781,15 +781,21 @@ function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors)
         return;
     }
 
-    print '<p>' . _('When you\'re happy with your pledge, enter your PledgeBank password, if you have one, and click &ldquo;Create Pledge&rdquo; to confirm that you wish PledgeBank to display the pledge in your name, and that you agree to the terms and conditions below.');
-
-print '<p><label for="password">' . _('Password:') . '</label> <input type="password" name="password" id="password" value="">
-<br>' . _('If you don&rsquo;t have a password, or have forgotten it, we&rsquo;ll send you a confirmation email instead.');
+    $P = person_if_signed_on();
+    if (!$P) {
+        print p(_('Do you have a PledgeBank password?'));
+        print '<p><input type="radio" name="loginradio" id="loginradio2"> <label for="password">' . _('Yes, please enter it:') . '</label> <input type="password" name="password" id="password" value=""
+onchange="check_login_password_radio()" onfocus="check_login_password_radio()"></p>
+<p id="email_row"><input type="radio" name="loginradio" id="loginradio1"> <label for="loginradio1">' . _('No, or you&rsquo;ve forgotten it') . '</label>'.
+    '<p id="email_blurb"><small>&mdash; ' . _('we&rsquo;ll send you a confirmation email instead.') . '</small>';
+    }
 ?>
 <p style="text-align: right;">
 <input id="next_step" type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
 </p>
 <?
+    print '<p><small>' . _('You confirm that you wish PledgeBank to display the pledge in your name, and that you agree to the terms and conditions below.') . '</small></p>';;
+
     print h3(_('The Dull Terms and Conditions'));
     print '<input type="hidden" name="agreeterms" value="1">';
 

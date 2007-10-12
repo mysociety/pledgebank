@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.115 2007-10-12 13:12:47 matthew Exp $
+ * $Id: microsites.php,v 1.116 2007-10-12 13:19:47 matthew Exp $
  * 
  */
 
@@ -301,7 +301,7 @@ function microsites_css_files() {
             ))) {
         $styles[] = "/microsites/autogen/$microsite.css";
     } else {
-        $styles[] = "/pb.css";
+        $styles[] = "/pb.2.css";
     }
 
     // Microsite cobranding style sheet

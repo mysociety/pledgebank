@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.120 2007-10-12 15:17:31 matthew Exp $
+ * $Id: microsites.php,v 1.121 2007-10-12 16:24:47 matthew Exp $
  * 
  */
 
@@ -580,7 +580,7 @@ function microsites_frontpage_sign_invitation_text() {
     if ($microsite == 'livesimply') {
         print 'Act now. Sign up to a promise.';
     } else {
-        print _('Some live pledges');
+        print _('Sign a pledge');
     }
     print "</h2>";
 }

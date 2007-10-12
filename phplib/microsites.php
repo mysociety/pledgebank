@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.121 2007-10-12 16:24:47 matthew Exp $
+ * $Id: microsites.php,v 1.122 2007-10-12 16:35:29 matthew Exp $
  * 
  */
 
@@ -493,7 +493,7 @@ It&#8217;s your chance to make a difference, and you really can!</p>
         global $success_summary;
         shuffle($success_summary);
         echo $success_summary[0];
-        echo '<p align="right"><a href="/success">' . _('More success stories') . '</p>';
+        echo '<p align="right"><a href="/success">' . _('More success stories') . '</a></p>';
     }
 }
 

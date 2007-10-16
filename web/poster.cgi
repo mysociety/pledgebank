@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.110 2007-10-12 13:12:48 matthew Exp $
+# $Id: poster.cgi,v 1.111 2007-10-16 15:40:40 matthew Exp $
 #
 
 import sys
@@ -494,7 +494,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         webdomain_text = '''<font size="+3" color="%s"><b>%s/%s</b></font>''' % (html_colour, pb_domain_url(), ref)
         webdomain_para = Paragraph(webdomain_text, p_normal)
         webdomain_width = rl2_wrap(webdomain_para, allowed_width, h)[0]
-        print 'Website width:', allowed_width, webdomain_width
+        #print 'Website width:', allowed_width, webdomain_width
         #if webdomain_width > allowed_width:
         #    return False
     # print >>sys.stderr, "webdomain_width ", webdomain_width, w
@@ -518,7 +518,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 html_colour, pledge['title']
             ), p_head)
     used_width = rl2_wrap(sentence, allowed_width, h)[0]
-    print "Sentence width:", used_width
+    #print "Sentence width:", used_width
     #if used_width > allowed_width:
     #    return False
 
@@ -535,7 +535,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 re.split("\r?\n\r?\n", _('<b>More details:</b> %s').encode('utf-8') % pledge['detail']))
         for d in details:
             used_width = rl2_wrap(d, allowed_width, h)[0]
-            print "Detail para width:", used_width
+            #print "Detail para width:", used_width
             #if used_width > allowed_width:
             #    return False
         story.extend(details)
@@ -614,7 +614,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     f.addFromList(story, c)
 
     # If it didn't fit, say so
-    print "Paragraphs left:", len(story)
+    #print "Paragraphs left:", len(story)
     if len(story) > 0:
         return False
     return True
@@ -659,7 +659,7 @@ def flyers(number, papersize='A4', **keywords):
     size = 3.0
     while True:
         ok = flyer(dummyc, 0, 0, flyer_width, flyer_height, size, **keywords);
-        print size, ok
+        #print size, ok
         if ok:
             break
         size = size * 19 / 20

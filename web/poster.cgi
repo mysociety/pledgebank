@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.111 2007-10-16 15:40:40 matthew Exp $
+# $Id: poster.cgi,v 1.112 2007-10-17 21:36:40 matthew Exp $
 #
 
 import sys
@@ -33,6 +33,11 @@ import PyRTF
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from reportlab.lib.pagesizes import A4, LETTER # only goes down to A6
+
+# for CJK wrapping
+from reportlab.platypus.paragraph import _getFragWords, _sameFrag, FragLine, ParaLines
+from reportlab.pdfbase.pdfmetrics import stringWidth
+
 papersizes = {}
 papersizesRTF = {}
 papersizes['A4'] = A4
@@ -131,7 +136,7 @@ def microsites_poster_watermark(c, x1, y1, w, h):
             ticksize = w*1.2
         else:
             ticksize = h
-        p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize)
+        p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize, wordWrap='')
         story = [ Paragraph('<font color="#f4f1f8">3</font>', p_tick) ]
         if (w<h):
             f = Frame(x1, y1, w, h, showBoundary = 0)
@@ -197,6 +202,154 @@ db = PgSQL.connect(mysociety.config.get('PB_DB_HOST') + ':' + mysociety.config.g
 types = ["flyers16", "flyers4", "flyers1", "flyers8"]
 sizes = ["A4", "A7", "letter"]
 formats = ["pdf", "png", "gif", "rtf"]
+
+# Subclass to get better wrapping
+class Paragraph(Paragraph):
+    def wrap(self, availWidth, availHeight):
+        # work out widths array for breaking
+        self.width = availWidth
+        leftIndent = self.style.leftIndent
+        first_line_width = availWidth - (leftIndent+self.style.firstLineIndent) - self.style.rightIndent
+        later_widths = availWidth - leftIndent - self.style.rightIndent
+        if self.style.wordWrap == 'CJK':
+            self.blPara = self.breakLinesCJK([first_line_width, later_widths])
+        else:
+            self.blPara = self.breakLines([first_line_width, later_widths])
+        self.height = len(self.blPara.lines) * self.style.leading
+        return (self.width, self.height)
+    
+    def breakLinesCJK(self, width):
+        """Initially, the dumbest possible wrapping algorithm.
+        Cannot handle font variations."""
+
+        if type(width)!=ListType: maxWidths = [width]
+        else: maxWidths = width
+        lines = []
+        lineno = 0
+        style = self.style
+        fFontSize = float(style.fontSize)
+        maxWidth = maxWidths[0]
+        self.height = 0
+        frags = self.frags
+        nFrags= len(frags)
+        if nFrags==1:
+            f = frags[0]
+            if hasattr(f,'text'):
+                text = f.text
+            else:
+                text = ''.join(getattr(f,'words',[]))
+            from textsplit import wordSplit
+            lines = wordSplit(text, maxWidths[0], f.fontName, f.fontSize)
+            wrappedLines = [(sp, [line]) for (sp, line) in lines]
+            return f.clone(kind=0, lines=wrappedLines)
+        elif nFrags<=0:
+            return ParaLines(kind=0, fontSize=style.fontSize, fontName=style.fontName,
+                textColor=style.textColor, lines=[])
+        else:
+            if hasattr(self,'blPara') and getattr(self,'_splitpara',0):
+                #NB this is an utter hack that awaits the proper information
+                #preserving splitting algorithm
+                return self.blPara
+            from textsplit import wordSplit
+            n = 0
+            for w in _getFragWords(frags):
+                spaceWidth = stringWidth(' ',w[-1][0].fontName, w[-1][0].fontSize)
+                if n==0:
+                    currentWidth = -spaceWidth
+                    words = []
+                    maxSize = 0
+                wordWidth = w[0]
+                f = w[1][0]
+                if wordWidth > 0:
+                    newWidth = currentWidth + spaceWidth + wordWidth
+                else:
+                    newWidth = currentWidth
+                #print "Current =", currentWidth, "New =", newWidth, "Max=", maxWidth, "Text =", ''.join([ www[1] for www in w[1:] ])
+                if newWidth <= maxWidth:
+                    n = n + 1
+                    maxSize = max(maxSize, f.fontSize)
+                    nText = w[1][1]
+                    if words==[]:
+                        g = f.clone()
+                        words = [g]
+                        g.text = nText
+                    elif not _sameFrag(g,f):
+                        if currentWidth>0 and ((nText!='' and nText[0]!=' ') or hasattr(f,'cbDefn')):
+                            if hasattr(g, 'cbDefn'):
+                                i = len(words)-1
+                                while hasattr(words[i],'cbDefn'): i = i-1
+                                words[i].text = words[i].text + ' '
+                            else:
+                                g.text = g.text + ' '
+                        g = f.clone()
+                        words.append(g)
+                        g.text = nText
+                    else:
+                        if nText!='' and nText[0]!=' ':
+                            g.text = g.text + ' ' + nText
+                    for i in w[2:]:
+                        g = i[0].clone()
+                        g.text=i[1]
+                        words.append(g)
+                        maxSize = max(maxSize, g.fontSize)
+                    currentWidth = newWidth
+                else:
+                    for ww in w[1:]:
+                        # Try to fit as much as possible on the current line
+                        f = ww[0]
+                        nText = ww[1]
+                        Mlines = wordSplit(nText, maxWidth - currentWidth, f.fontName, f.fontSize)
+                        if Mlines[0][0]<0:
+                            Mlines = wordSplit(nText, maxWidth - currentWidth - spaceWidth, f.fontName, f.fontSize)
+                        fit_text = Mlines[0][1]
+                        fit_text_width = stringWidth(fit_text, f.fontName, f.fontSize)
+                        currentWidth = currentWidth + fit_text_width
+                        g = f.clone()
+                        g.text = fit_text
+                        words.append(g)
+                        n = n + 1
+                        maxSize = max(maxSize, f.fontSize)
+
+                        if len(Mlines)>1:
+                            # Remove the bit we fitted in
+                            nText = ''.join([ www[1] for www in Mlines[1:] ])
+                            wordWidth = wordWidth - fit_text_width
+                    
+                            if currentWidth>self.width: self.width = currentWidth
+                            lines.append(FragLine(extraSpace=(maxWidth - currentWidth),wordCount=n, words=words, fontSize=maxSize))
+
+                            lineno = lineno + 1
+                            try:
+                                maxWidth = maxWidths[lineno]
+                            except IndexError:
+                                maxWidth = maxWidths[-1]
+
+                            # Is what we have left more than an entire line?
+                            # If so, output as many whole lines as possible
+                            if wordWidth > maxWidth:
+                                Mlines = wordSplit(nText, maxWidth, f.fontName, f.fontSize)
+                                if Mlines[0][0]<0:
+                                    Mlines = wordSplit(nText, maxWidth - currentWidth - spaceWidth, f.fontName, f.fontSize)
+                                for i in Mlines[0:-1]:
+                                    g = f.clone()
+                                    g.text = i[1]
+                                    words = [g]
+                                    lines.append(FragLine(extraSpace=i[0],wordCount=1, words=words, fontSize=maxSize))
+                                nText = Mlines[-1][1]
+                                wordWidth = wordWidth % maxWidth
+
+                            # Okay, we've dealt with the word fragment as much as possible
+                            currentWidth = wordWidth
+                            n = 1
+                            g = f.clone()
+                            words = [g]
+                            g.text = nText
+
+            if words<>[]:
+                if currentWidth>self.width: self.width = currentWidth
+                lines.append(ParaLines(extraSpace=(maxWidth - currentWidth),wordCount=n, words=words, fontSize=maxSize))
+            return ParaLines(kind=1, lines=lines)
+
 
 # return 1st, 2nd, 3rd etc.
 def ordinal(day):
@@ -371,54 +524,6 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
 ############################################################################
 # Flyers using reportlab.platypus for word wrapping
 
-def breakLinesCJK(self, width):
-    """Initially, the dumbest possible wrapping algorithm.
-    Cannot handle font variations."""
-
-    if type(width)!=ListType: maxWidths = [width]
-    else: maxWidths = width
-    lines = []
-    lineno = 0
-    style = self.style
-    fFontSize = float(style.fontSize)
-    maxWidth = maxWidths[0]
-    self.height = 0
-    frags = self.frags
-    nFrags= len(frags)
-    if nFrags==1:
-        f = frags[0]
-        if hasattr(f,'text'):
-            text = f.text
-        else:
-            text = ''.join(getattr(f,'words',[]))
-        from textsplit import wordSplit
-        lines = wordSplit(text, maxWidths[0], f.fontName, f.fontSize)
-        wrappedLines = [(sp, [line]) for (sp, line) in lines]
-        return f.clone(kind=0, lines=wrappedLines)
-    elif nFrags<=0:
-        return ParaLines(kind=0, fontSize=style.fontSize, fontName=style.fontName,
-            textColor=style.textColor, lines=[])
-    else:
-        if hasattr(self,'blPara') and getattr(self,'_splitpara',0):
-            #NB this is an utter hack that awaits the proper information
-            #preserving splitting algorithm
-            return self.blPara
-
-# XXX: Should probably upgrade properly!
-def rl2_wrap(self, availWidth, availHeight):
-    # work out widths array for breaking
-    self.width = availWidth
-    leftIndent = self.style.leftIndent
-    first_line_width = availWidth - (leftIndent+self.style.firstLineIndent) - self.style.rightIndent
-    later_widths = availWidth - leftIndent - self.style.rightIndent
-    if self.style.wordWrap == 'CJK':
-        self.blPara = self.breakLines([first_line_width, later_widths])
-        #self.blPara = breakLinesCJK(self, [first_line_width, later_widths])
-    else:
-        self.blPara = self.breakLines([first_line_width, later_widths])
-    self.height = len(self.blPara.lines) * self.style.leading
-    return (self.width, self.height)
-
 # Prints one copy of the flier at given coordinates, and font sizes.
 # Returns False if it didn't all fit, or True if it did.
 def flyer(c, x1, y1, x2, y2, size, **keywords):
@@ -493,10 +598,10 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         # (and platypus/reportlab doesn't raise an error in that case)
         webdomain_text = '''<font size="+3" color="%s"><b>%s/%s</b></font>''' % (html_colour, pb_domain_url(), ref)
         webdomain_para = Paragraph(webdomain_text, p_normal)
-        webdomain_width = rl2_wrap(webdomain_para, allowed_width, h)[0]
-        #print 'Website width:', allowed_width, webdomain_width
-        #if webdomain_width > allowed_width:
-        #    return False
+        webdomain_width = webdomain_para.wrap(allowed_width, h)[0]
+        #print "Webdomain", webdomain_width, allowed_width
+        if webdomain_width > allowed_width:
+            return False
     # print >>sys.stderr, "webdomain_width ", webdomain_width, w
 
     # Draw text
@@ -517,10 +622,9 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 ).encode('utf-8') % (
                 html_colour, pledge['title']
             ), p_head)
-    used_width = rl2_wrap(sentence, allowed_width, h)[0]
-    #print "Sentence width:", used_width
-    #if used_width > allowed_width:
-    #    return False
+    used_width = sentence.wrap(allowed_width, h)[0]
+    if used_width > allowed_width:
+        return False
 
     story = [
         sentence,
@@ -534,10 +638,9 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         details = map(lambda text: Paragraph(text, p_detail), 
                 re.split("\r?\n\r?\n", _('<b>More details:</b> %s').encode('utf-8') % pledge['detail']))
         for d in details:
-            used_width = rl2_wrap(d, allowed_width, h)[0]
-            #print "Detail para width:", used_width
-            #if used_width > allowed_width:
-            #    return False
+            used_width = d.wrap(allowed_width, h)[0]
+            if used_width > allowed_width:
+                return False
         story.extend(details)
 
     if not live:
@@ -614,7 +717,6 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     f.addFromList(story, c)
 
     # If it didn't fit, say so
-    #print "Paragraphs left:", len(story)
     if len(story) > 0:
         return False
     return True
@@ -659,7 +761,6 @@ def flyers(number, papersize='A4', **keywords):
     size = 3.0
     while True:
         ok = flyer(dummyc, 0, 0, flyer_width, flyer_height, size, **keywords);
-        #print size, ok
         if ok:
             break
         size = size * 19 / 20

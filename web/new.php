@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.199 2007-10-12 13:12:48 matthew Exp $
+// $Id: new.php,v 1.200 2007-10-17 22:36:17 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -429,6 +429,7 @@ function pledge_form_three($data, $errors = array()) {
 function pledge_form_addr($data = array(), $errors = array()) {
     global $lang, $langs, $number_of_steps;
 
+    $curr_step = has_step_2() ? (has_step_3() ? 4 : 3) : 2;
     microsites_new_breadcrumbs($curr_step);
 
     $isodate = $data['parseddate']['iso'];
@@ -436,17 +437,19 @@ function pledge_form_addr($data = array(), $errors = array()) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
+	print '<div id="preview">';
     } else {
 ?>
 
+<div id="preview">
 <p><?=_('Your pledge looks like this so far:') ?></p>
 <?  }
     $row = $data; unset($row['parseddate']); $row['date'] = $isodate;
     $partial_pledge = new Pledge($row);
     $partial_pledge->render_box(array('showdetails' => true));
 
-    $curr_step = has_step_2() ? (has_step_3() ? 4 : 3) : 2;
 ?>
+</div>
 
 <form accept-charset="utf-8" name="pledge" method="post" action="/new">
 <h2><?=sprintf(_('New Pledge &#8211; Step %s of %s'),

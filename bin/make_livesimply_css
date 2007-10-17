@@ -13,7 +13,7 @@ my $selector = "";
 while(<MAINCSS>) {
     if (m/^(.*) {/) { $selector = $1 }
 
-    next if ($selector =~ m/ul#nav/ || $selector eq 'h1');
+    next if ($selector =~ m/ul#nav/ || $selector eq 'h1' || $selector eq '#nav_search' || $selector eq '#startblurb');
 
     s/pb.css/livesimply.css/;
     s/Top-level style sheet for PledgeBank.com/Custom style sheet for Live Simply version of PledgeBank/;
@@ -21,11 +21,10 @@ while(<MAINCSS>) {
     $_ = "    font-family: verdana, arial, helvetica, sans-serif;\n" if m/font-family/;
 
     # Overall look
-    s/top: 2px; right: 2px;/top: 4px; right: 4px;/ if ($selector eq "#search");
     s/margin: 1em auto 0;/margin: 1em 0 0 16em;/ if ($selector eq "#pbcontent");
 
     # Link colours
-    s/#522994/#0000ff/gi if (!m/border/);  # link colour
+    s/#522994/#0000ff/gi if (!m/border|background/);  # link colour
     s/#7b52a5/#0000aa/gi;  # visited link colour
     s/#21004a/#000000/gi;  # purple lettering/thin-borders 
     s/#522994/#000000/gi if (m/border/);  # border colour
@@ -33,8 +32,9 @@ while(<MAINCSS>) {
     s/#999999/#cccccc/g if ($selector eq '.greyed');
 
     # Pledge box etc. colours and borders
-    s/#9c7bbd/#000000/gi if ($selector =~ m/input/);
+    s/#9c7bbd/#000000/gi;
     #s/background-color: #9c7bbd;/background-image: url(\/livesimply-body.gif);/i;
+    s/#522994/#cecfce/gi if (m/background/);  # startblurb boc
     s/#f6e5ff/#cecfce/gi;  # lighter pink plaque background
     s/#c6b5de/#00aab5/gi;  # darker pink plaque background
     s/#ffff99/#ffffee/gi;  # "spread the word" yellow
@@ -53,6 +53,24 @@ while(<MAINCSS>) {
 print LIVESIMPLYCSS "\nh2 { color: #000000; }\n";
 
 print LIVESIMPLYCSS <<END;
+
+#startblurb {
+    float: right;
+    width: 32%;
+    padding: 10px;
+    border: solid 1px #000000;
+    background-color: #cecfce;
+    color: #000000;
+    -moz-border-radius: 2em;
+    margin: 1em 0;
+}
+#nav_search {
+    position: absolute;
+    padding-left: 2em;
+    text-align: left;
+    font-size:83%;
+    top: 4px; right: 4px;
+}
 
 h1 {
     margin: 0;

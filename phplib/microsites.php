@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.122 2007-10-12 16:35:29 matthew Exp $
+ * $Id: microsites.php,v 1.123 2007-10-17 22:36:17 matthew Exp $
  * 
  */
 
@@ -41,6 +41,7 @@ $microsites_list = array('everywhere' => _('Everywhere'),
 if (OPTION_PB_STAGING) {
     # Francis's local test domains
     $microsites_from_extra_domains = array('pledge.global-cool' => 'global-cool',
+                                           #'matthew.pledgebank.com' => 'livesimply', 
                                            'promise.livesimply' => 'livesimply'); 
 } else {
     # If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
@@ -923,7 +924,7 @@ information you provide us will help us in evaluating the success of the
 <br><strong><?=_('Postcode:') ?></strong> 
 <br><input<? if (array_key_exists('address_postcode', $errors)) print ' class="error"' ?> type="text" name="address_postcode" id="address_postcode" value="<? if (isset($data['address_postcode'])) print htmlspecialchars($data['address_postcode']) ?>" size="20">
 <br><strong><?=_('Country:') ?></strong> 
-<? 
+<br><? 
     gaze_controls_print_country_choice(microsites_site_country(), null, $errors, array('noglobal'=>true, 'fieldname' => 'address_country')); ?>
 </p>
 

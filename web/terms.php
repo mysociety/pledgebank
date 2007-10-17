@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: terms.php,v 1.3 2007-06-28 08:43:24 matthew Exp $
+// $Id: terms.php,v 1.4 2007-10-17 22:36:17 matthew Exp $
 
 require_once "../phplib/pb.php";
 
@@ -41,6 +41,8 @@ racially, religiously, ethnically or in any other way offensive.</li>
 <li>Don't pretend you are someone else.</li>
 <li>Do not incite people to commit any crime.</li>
 <li>If you are under 18 you need to ask your parent/guardian or teacher for permission to start a promise</li>
+<li>Please no advertising of products or companies which are not endorsed
+by the livesimply coalition members.
 </ol>
 
 <p>When commenting to other promises or other people's comments to your promise:</p>
@@ -55,6 +57,8 @@ racially, religiously, ethnically or in any other way offensive.</li>
 <li>Do not post comments that are unlawful, harassing, defamatory, abusive, threatening, harmful, obscene, profane, sexually oriented or racially offensive.</li>
 <li>Don't publish personal information.</li>
 <li>If you are under 18 you need to ask your parent/guardian or teacher for permission to post comments.</li>
+<li>Please no advertising of products or companies which are not
+endorsed by the livesimply coalition members.
 </ol>
 
 <p>Violation of any of the rules above may lead to your membership account/promise being temporarily suspended or terminated.</p>

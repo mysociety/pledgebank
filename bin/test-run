@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.236 2007-10-01 16:48:53 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.237 2007-10-18 15:26:36 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -403,7 +403,7 @@ sub create_pledge {
 
     # Make new pledge, step 1
     $wth->browser_get($locale_url_redirected); # We need the language, and hopefully not the country!
-    $wth->browser_follow_link(text_regex => qr/(Start your own pledge|Crie sua promessa)/);
+    $wth->browser_follow_link(text_regex => qr/(Start your pledge|Crie sua promessa)/);
     $wth->browser_check_contents(qr/(New Pledge|Nova promessa)/);
     $wth->browser_submit_form(form_name => 'pledge', fields => $page1,
         button => 'tostep2') or die "Failed to submit creating form step 1";
@@ -414,7 +414,7 @@ sub create_pledge {
     }
 
     # Step 2
-    $wth->browser_check_contents(qr/(Step 2|Passo 2)/);
+    $wth->browser_check_contents(qr/(New Pledge &ndash; Location|Passo 2)/);
     my $gaze_place;
     if ($page2->{gaze_place}) {
         $gaze_place = $page2->{gaze_place};
@@ -432,13 +432,13 @@ sub create_pledge {
     }
 
     # Step 3
-    $wth->browser_check_contents(qr/(Step 3|Passo 3)/);
+    $wth->browser_check_contents(qr#(New Pledge &ndash; Category / Privacy|Passo 3)#);
     $wth->browser_submit_form(form_name => 'pledge',
         fields => $page3,
         button => 'topreview') or die "Failed to submit creating form step 3";
 
     # Preview
-    $wth->browser_check_contents(qr/(Step 4)|(Passo 4)/);
+    $wth->browser_check_contents(qr/(Now please read your pledge)|(Passo 4)/);
     $wth->browser_submit_form(form_name => 'pledge',
         fields => {},
         button => 'tocreate') or die "Failed to submit creating form step 4";

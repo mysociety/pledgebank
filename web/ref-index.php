@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.118 2007-10-12 13:12:48 matthew Exp $
+// $Id: ref-index.php,v 1.119 2007-10-18 22:57:39 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -363,18 +363,16 @@ function draw_connections_for_finished($p) {
         $pledges = array_merge($pledges, $extra_pledges);
     }
 
-    if (count($pledges) > 0) {
-        print "\n\n" . '<div id="finished_connections" class="';
-        if ($p->left()<=0 && !microsites_no_target()) {
-            print 'success">';
-            print strong(_('This pledge has now closed; it was successful!'));
-            print ' ';
-        } else {
-            print 'finished">';
+    print "\n\n" . '<div id="finished_connections" class="';
+    if ($p->left()<=0 && !microsites_no_target()) {
+        print 'success">';
+        print strong(_('This pledge has now closed; it was successful!'));
+    } else {
+        print 'finished">';
 	    print microsites_pledge_closed_text();
-            print ' ';
-        }
-        print _('You might be interested in these other pledges:');
+    }
+    if (count($pledges) > 0) {
+        print ' ' . _('You might be interested in these other pledges:');
         print '<ul>' . "\n\n";
         foreach ($pledges as $p2) {
             print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
@@ -382,11 +380,9 @@ function draw_connections_for_finished($p) {
         }
         print "\n\n";
         print '</ul>';
-
-        print p(_('See <a href="/list">more pledges</a>, and all <a href="/faq">about how PledgeBank works</a>.'));
-
-        print '</div>';
     }
+    print p(_('See <a href="/list">more pledges</a>, and all <a href="/faq">about how PledgeBank works</a>.'));
+    print '</div>';
 }
 
 locale_push($p->lang());

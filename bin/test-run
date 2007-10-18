@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.237 2007-10-18 15:26:36 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.238 2007-10-18 22:57:39 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -321,7 +321,7 @@ sub perform_login_action {
         $login_action eq "suspend" || $login_action eq "resume") {
 
         # Request confirmation email (unless we are resuming request)
-        if ($login_action ne "resume") {
+        if ($login_action ne "resume" && $login_action ne 'abandon') { # Won't work for SIGNING
             $wth->browser_check_contents(qr/(I've never used PledgeBank before|Nunca usei o EuPrometo antes)/);
             $login_fields->{'loginradio'} = 'SendEmail';
             $wth->browser_submit_form(form_name => 'login',
@@ -379,14 +379,12 @@ sub perform_login_action {
             fields => $login_fields,
             button => 'loginsubmit') or die "Failed to try to log in with password";
         $wth->browser_check_contents("Either your email or password weren't recognised");
-    } elsif ($login_action eq "resume") {
-        die "Calling function should handle resumes";
     } else {
         die "Unknown login action '$login_action'";
     }
 }
 
-# create_pledge WHO PAGE1 PAGE2 LOGIN_ACTION
+# create_pledge WHO PAGE1 PAGE2 PAGE3 LOGIN_ACTION
 # Creates a new pledge, setter is person number WHO.  PAGE1,
 # PAGE2 and PAGE3 contain parameters for each page of the sign-up form.
 # LOGIN_ACTION is passed on to perform_login_action.  If PAGE2 contains
@@ -439,16 +437,28 @@ sub create_pledge {
 
     # Preview
     $wth->browser_check_contents(qr/(Now please read your pledge)|(Passo 4)/);
+    my $fields = {};
+    if ($login_action eq 'password') {
+        $fields->{password} = password_n($who);
+    }
     $wth->browser_submit_form(form_name => 'pledge',
-        fields => {},
+        fields => $fields,
         button => 'tocreate') or die "Failed to submit creating form step 4";
 
     # Requires authentication
-    perform_login_action($who, $login_options, ["to confirm that you", "para confirmar que deseja"]);
+    if ($login_action eq 'viaemail') {
+        $login_options->{action} = 'resume'; # As the new form has done the first bit
+    }
+
+    if ($login_action ne 'password') {
+        perform_login_action($who, $login_options, ["to confirm that you", "para confirmar que deseja"]);
+    }
+
     if ($login_action eq "abandon" || $login_action eq "suspend" || $login_action eq "wrongpassword") {
         verbose("Done creating pledge ". $page1->{'ref'} . " ($login_action)");
         return;
     }
+
     $wth->browser_check_contents(qr/(Thank you for creating your pledge|Obrigado por criar sua promessa)/);
     verbose("Done creating pledge ". $page1->{'ref'} . " ($login_action)");
     return;
@@ -555,7 +565,7 @@ sub find_and_sign_pledge {
                 $wth->browser_follow_link(text_regex => qr/All Pledges/) or die "Failed to find 'All Pledges' link";
             }
             if ($find_type eq 'list_succeeded_open') {
-                $wth->browser_follow_link(text_regex => qr/Successful open/) or die "Failed to find 'Successful open' link";
+                $wth->browser_follow_link(text_regex => qr/Successful\xa0open/) or die "Failed to find 'Successful open' link";
             }
             $wth->browser_follow_link(text_regex => qr/$find_string/) or die "Failed to find '$find_string' link";
         }
@@ -630,7 +640,7 @@ sub do_unconfirmed_pledge {
 sub do_public_succeeding_pledge {
     comment("Change to US URL (link on /where not there yet, as no pledges)");
     lock_locale_url("http://us.$stub_url");
-    $wth->browser_follow_link(text_regex => qr/Home/);
+    $wth->browser_follow_link(text_regex => qr/Pledge/);
 
     comment("Sign up to local alert");
     $wth->browser_get($locale_url);
@@ -656,6 +666,7 @@ sub do_public_succeeding_pledge {
         button => 'submit');
     perform_login_action(11, {action=>"viaemail"}, ["emailed whenever a new"]);
     $wth->browser_check_contents("Thanks for subscribing!");
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
 
     comment("Make the pledge");
     set_pb_date('1982-02-01');
@@ -812,7 +823,7 @@ sub do_public_succeeding_pledge {
 #print "Press RETURN to continue"; readline(*STDIN);
     $wth->browser_get($locale_url);
     $wth->browser_check_contents("Target met, pledge still open for 9 days");
-    $wth->browser_follow_link(text_regex => qr/$pledge_action_completion/);
+    $wth->browser_follow_link(text_regex => qr/$pledge_ref/);
     $wth->browser_check_contents("This pledge has been successful!");
     $wth->browser_check_contents("1 person who did not want to give their name");
     comment("Check for late mid-pledge announce message");
@@ -889,9 +900,9 @@ sub do_public_succeeding_pledge {
     set_pb_date('1982-02-11');
     comment("Pledge should say closed and successful");
     $wth->browser_get($locale_url . "/$pledge_ref");
-    $wth->browser_check_contents("This pledge is now closed");
+    $wth->browser_check_contents("This pledge has now closed");
     $wth->browser_check_no_contents("Sign up now");
-    $wth->browser_check_contents("This pledge has been successful!");
+    $wth->browser_check_contents("it was successful!");
     $wth->browser_check_contents(name_n(4));
     $wth->browser_check_no_contents(name_n(5));
 
@@ -912,6 +923,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_get($locale_url . "/$pledge_ref");
     $wth->browser_check_contents('class="done">' . name_n(3));
     $wth->email_check_none_left();
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
 
     comment("Change back to global URL");
     lock_locale_url($base_url);
@@ -1066,7 +1078,7 @@ sub do_private_failing_pledge {
     $wth->browser_get($locale_url . "/$pledge_ref/announce");
     $wth->browser_check_contents("You have already sent 1 failure announcement");
 
-    $wth->browser_follow_link(text_regex => qr/Logout/);
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->browser_check_contents("now logged out");
 }
 
@@ -1239,6 +1251,7 @@ sub do_chivvy_testing {
         $wth->email_get_containing('%Subject: Your pledge%To: "' . name_n($i) . '" <' . email_n($i) . '>%'); # failed
     }
     $wth->email_check_none_left();
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
 }
 
 #############################################################################
@@ -1413,6 +1426,7 @@ sub do_sms_pledge {
 
     comment("Check nothing left");
     sms_check_none_left();
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->email_check_none_left();
 }
 
@@ -1433,6 +1447,7 @@ sub do_login_tests {
         button => 'submit');
     perform_login_action(250, {action=>"viaemail"}, ["emailed whenever a new"]);
     $wth->browser_check_contents("Thanks for subscribing!");
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
 
     # Make the pledge
     set_pb_date('1983-06-06');
@@ -1458,7 +1473,7 @@ sub do_login_tests {
     $wth->browser_get($locale_url);
     $wth->browser_check_contents("Hello, " . name_n(200));
     $wth->browser_check_no_contents("Login");
-    $wth->browser_follow_link(text_regex => qr/Logout/);
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->browser_check_contents("now logged out");
     $wth->browser_check_no_contents(name_n(200));
 
@@ -1473,7 +1488,7 @@ sub do_login_tests {
     );
     comment("Log out again");
     $wth->browser_get($locale_url);
-    $wth->browser_follow_link(text_regex => qr/Logout/);
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->browser_check_contents("now logged out");
 
     comment("Third pledge, use password to log in");
@@ -1487,14 +1502,14 @@ sub do_login_tests {
     );
     comment("Log out again");
     $wth->browser_get($locale_url);
-    $wth->browser_follow_link(text_regex => qr/Logout/);
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->browser_check_contents("now logged out");
 
     comment("Log in explicitly with 'login' link");
     $wth->browser_get($locale_url);
     comment("... first update pledge connections (to test that a bit on my pledges page)");
     call_findpledgeconnections();
-    $wth->browser_follow_link(text_regex => qr/My Pledges/);
+    $wth->browser_follow_link(text_regex => qr/Login/);
     perform_login_action(200, {action=>"password", giveemail=>1}, undef);
     comment("... check gone to My Pledges page correctly");
     $wth->browser_check_contents("Open pledges you created");
@@ -1518,17 +1533,17 @@ sub do_login_tests {
     $wth->email_check_none_left();
 
     comment("Sign all the pledges as another user");
-    $wth->browser_follow_link(text_regex => qr/Logout/);
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->browser_check_contents("now logged out");
     find_and_sign_pledge("ref", $pledge_ref_1, 201, 1, {action=>"viaemail",setpassword=>1}, "signed");
-    $wth->browser_follow_link(text_regex => qr/Logout/);
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->browser_check_contents("now logged out");
     comment("... takes a second go to get the set password form");
     find_and_sign_pledge("ref", $pledge_ref_2, 201, 1, {action=>"password"}, "signed");
     comment("Now we can sign as already logged in");
     find_and_sign_pledge("ref", $pledge_ref_3, 201, 1, {action=>"loggedin"}, "signed");
     comment("Logout again (in order to log in with password)");
-    $wth->browser_follow_link(text_regex => qr/Logout/);
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->browser_check_contents("now logged out");
     comment("... try with wrong password");
     find_and_sign_pledge("ref", $pledge_ref_4, 201, 1, {action=>"wrongpassword"}, "signed");
@@ -1538,6 +1553,7 @@ sub do_login_tests {
     comment("Check local alert for two pledges at once works");
     call_frequentupdate(); # update prominence cache
     call_send_alerts();
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->email_get_containing('%To: ' . email_n(250) . '%2 new pledge%login1%login2%');
     $wth->email_check_none_left();
 
@@ -1587,8 +1603,7 @@ sub do_category_tests {
     call_frequentupdate(); # update prominence cache
 
     comment("Change to Portugal pages");
-    $wth->browser_get($locale_url_redirected);
-    $wth->browser_follow_link(text => "(change)");
+    $wth->browser_get($locale_url_redirected . "/where"); # Not sure what country we're in...
     $wth->browser_follow_link(text => "Portugal");
     lock_locale_url();
 
@@ -1597,6 +1612,7 @@ sub do_category_tests {
     $wth->browser_check_contents("desde que 3 other monoglots");
     $wth->browser_check_contents("but only if 3 other polyglots");
 
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     comment("Change to normal pages again");
     $wth->browser_get($base_url);
     lock_locale_url();
@@ -1716,6 +1732,7 @@ sub do_byarea_tests {
     $wth->email_get_containing( '%To: "' . name_n(603) . '" <' . email_n(603) . '>%From: "' . name_n(600) . '"%It went badly in Hexham%');
     $wth->email_get_containing( '%To: "' . name_n(600) . '" <' . email_n(600) . '>%From: '.$name_admin.'%[ This is a copy of the message%It went badly in Hexham%');
 
+    $wth->browser_follow_link(text_regex => qr/this isn't you/);
     $wth->email_check_none_left();
 }
 
@@ -1723,7 +1740,8 @@ sub do_byarea_tests {
 sub do_admin_tests {
     comment("Send contact message");
     $wth->browser_get($locale_url);
-    $wth->browser_follow_link(text_regex => qr/Contact/);
+    $wth->browser_follow_link(text_regex => qr/About/);
+    $wth->browser_follow_link(text_regex => qr/contact us/);
     $wth->browser_check_contents("Was it useful?");
     $wth->browser_submit_form(form_name => 'contact',
             fields => { 
@@ -1791,8 +1809,7 @@ sub do_admin_tests {
 #############################################################################
 sub do_final_checks {
     comment("Change to UK");
-    $wth->browser_get($base_url);
-    $wth->browser_follow_link(text_regex => qr/(change)/, n => 1);
+    $wth->browser_get($base_url . "/where"); # Could be any country
     $wth->browser_follow_link(text => "United Kingdom");
 
     comment("Check RSS works and has vaguely correct entries");

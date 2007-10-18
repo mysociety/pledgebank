@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.112 2007-10-17 21:36:40 matthew Exp $
+# $Id: poster.cgi,v 1.113 2007-10-18 22:57:39 matthew Exp $
 #
 
 import sys
@@ -1036,7 +1036,7 @@ while fcgi.isFCGI():
                 req.err.write(string.join(e.args,' '))
                 c.setStrokeColorRGB(0,0,0)
                 c.setFont("Helvetica", 15)
-                c.drawCentredString(10.5*cm, 25*cm, e) #str(e))
+                c.drawCentredString(10.5*cm, 25*cm, str(e))
             c.save()
             os.rename(canvasfilename, outpdf)
             os.chmod(outpdf, 0644)
@@ -1067,10 +1067,9 @@ while fcgi.isFCGI():
 
 
     except Exception, e:
-        raise
         req.out.write("Content-Type: text/plain\r\n\r\n")
         req.out.write(_("Sorry, we weren't able to make your poster.\n\n").encode('utf-8'))
-        #req.out.write(e)
+        req.out.write(str(e) + "\n")
 
     req.Finish()
 

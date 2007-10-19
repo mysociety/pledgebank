@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.113 2007-10-18 22:57:39 matthew Exp $
+# $Id: poster.cgi,v 1.114 2007-10-19 20:27:48 matthew Exp $
 #
 
 import sys
@@ -698,7 +698,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
                 Paragraph(_(u'Open until %s \u2014 <font color="%s">Sign this pledge</font>!%s').encode('utf-8') % (pledge['date'], html_colour, sms_text), p_normal)
             )
         else:
-            story.append(Paragraph(_('Closed on <font color="%s">%s</font>') % (html_colour, pledge['date']), p_normal))
+            story.append(Paragraph(_('Closed on <font color="%s">%s</font>').encode('utf-8') % (html_colour, pledge['date']), p_normal))
 
     remember = microsites_poster_remember_text(pledge)
     if remember:

@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.120 2007-10-02 12:51:35 matthew Exp $
+ * $Id: frequentupdate,v 1.121 2007-10-19 16:51:15 francis Exp $
  *
  */
 
@@ -754,7 +754,7 @@ function send_pending_messages() {
             locale_pop();
         } else {
             verbose("sending message #${msg['id']} as raw email, subject '${msg['emailsubject']}'");
-            if (OPTION_WEB_HOST != 'testharness') # XXX, but can't see how else to do it...
+            if (!OPTION_PB_STAGING) // don't send carbon copy of success/failure mails to admin for staging sites
                 $headers['Bcc'] = OPTION_CONTACT_EMAIL;
             $f = pb_send_email(array(array($pledge->creator_email(), $pledge->creator_name())),
                 $msg['emailsubject'], $msg['emailbody'], $headers);

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.119 2007-10-18 22:57:39 matthew Exp $
+// $Id: ref-index.php,v 1.120 2007-10-19 17:32:12 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -61,6 +61,11 @@ function draw_spreadword($p) { ?>
         print h2(_('Spread the word on and offline'));
     } else {
         print h2(_('Things to do with this pledge'));
+    }
+    if (!$p->finished()) {
+        print '<div id="digg">';
+        print '<script src="http://digg.com/tools/diggthis.js" type="text/javascript"></script>';
+        print '</div>';
     }
     print '<ul>';
     if (!$p->finished()) {

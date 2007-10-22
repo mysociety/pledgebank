@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.114 2007-10-19 20:27:48 matthew Exp $
+# $Id: poster.cgi,v 1.115 2007-10-22 09:45:54 matthew Exp $
 #
 
 import sys
@@ -568,6 +568,9 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     p_head = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = 0, 
         fontSize = small_writing, leading = small_writing*1.2, fontName = heading_font, wordWrap = wordWrap)
 
+    p_normal_nowrap = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*20, 
+        fontSize = small_writing, leading = small_writing*1.2, fontName = main_font, wordWrap = '')
+
     p_normal = ParagraphStyle('normal', alignment = TA_LEFT, spaceBefore = 0, spaceAfter = size*20, 
         fontSize = small_writing, leading = small_writing*1.2, fontName = main_font, wordWrap = wordWrap)
 
@@ -597,7 +600,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         # Check web domain fits, as that is long word that doesn't fit on
         # (and platypus/reportlab doesn't raise an error in that case)
         webdomain_text = '''<font size="+3" color="%s"><b>%s/%s</b></font>''' % (html_colour, pb_domain_url(), ref)
-        webdomain_para = Paragraph(webdomain_text, p_normal)
+        webdomain_para = Paragraph(webdomain_text, p_normal_nowrap)
         webdomain_width = webdomain_para.wrap(allowed_width, h)[0]
         #print "Webdomain", webdomain_width, allowed_width
         if webdomain_width > allowed_width:

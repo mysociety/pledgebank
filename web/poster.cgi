@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.115 2007-10-22 09:45:54 matthew Exp $
+# $Id: poster.cgi,v 1.116 2007-10-22 10:00:02 matthew Exp $
 #
 
 import sys
@@ -665,7 +665,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
         story.append(
             Paragraph('''%s%s%s%s''' % 
-                (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal)
+                (sms_to_text, pledge_at_text, webdomain_text, pin_text), p_normal_nowrap)
         )
 
         story.append(

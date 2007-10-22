@@ -6,12 +6,15 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.51 2007-10-11 02:55:13 francis Exp $
+// $Id: facebook.php,v 1.52 2007-10-22 05:30:18 francis Exp $
 
 /*
 
 
 TODO:
+
+- 64 bit ids
+http://developers.facebook.com/news.php?blog=1&story=45
 
 - Experiment with notifications.send WITHOUT sending email - looks like that
   will be the only option left from the notifications API.

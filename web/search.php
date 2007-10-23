@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.68 2007-10-23 15:14:40 matthew Exp $
+// $Id: search.php,v 1.69 2007-10-23 16:12:10 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -271,7 +271,7 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
                 list($desc, $url) = display_place_name($name, $in, $near, $state, $statecounts[$state]);
                 $out .= '<li><a href="/search?q=' . urlencode($url) . '">' . $desc . '</a></li>';
             }
-            echo p(sprintf(_("We found more than one location matching <strong>%s</strong>, %s:"),
+            echo p(sprintf(_("We found more than one location matching <strong>%s</strong>, %s. Pick your town from the list to see pledges in your area:"),
                 htmlspecialchars($search), $countries_code_to_name[microsites_site_country()]));
             echo '<ul>' . $out . '</ul>';
         } elseif (count($places) == 1) {

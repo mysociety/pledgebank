@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.67 2007-10-23 14:48:03 matthew Exp $
+// $Id: search.php,v 1.68 2007-10-23 15:14:40 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -206,7 +206,7 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
     global $countries_code_to_name, $countries_name_to_statecode;
     $change_country = pb_get_change_country_link(false);
     if (microsites_site_country()) {
-        preg_match('#^(.*?)(?:, (.*?))?(?:, (.*?))?(?: \((.*?)\))?$#', $search, $m);
+        preg_match('#^(.*?)(?:,\s*(.*?))?(?:,\s*(.*?))?(?:\s*\((.*?)\))?$#', $search, $m);
         $parts = array(
             'name' => $m[1],
             'in' => isset($m[2]) ? $m[2] : '',

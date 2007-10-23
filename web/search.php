@@ -5,13 +5,14 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.66 2007-10-12 13:12:48 matthew Exp $
+// $Id: search.php,v 1.67 2007-10-23 14:48:03 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/comments.php';
 require_once '../../phplib/mapit.php';
 require_once "../../phplib/votingarea.php";
+require_once "../../phplib/countries.php";
 
 $search = trim(get_http_var('q', true));
 if (!$search) $search = trim(get_http_var('s', true));
@@ -176,69 +177,128 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
         }
     }
 
+    // Zipcodes
+    if (preg_match('#^\d{5}$#', $search) && microsites_site_country() == 'US') {
+        $success = 1;
+        $key = OPTION_GOOGLE_MAPS_API_KEY;
+        $url = 'http://maps.google.com/maps/geo?key=' . $key . '&q=' . $search;
+        #$url = 'http://ws.geonames.org/postalCodeSearch?country=US&postalcode=' . $search;
+        $f = @file_get_contents($url);
+        #if (preg_match('#<lat>(.*?)</lat>\s*<lng>(.*?)</lng>#', $f, $m)) {
+        if (preg_match('#"coordinates":\[(.*?),(.*?),#', $f, $m)) {
+            #$lat = $m[1]; $lon = $m[2];
+            $lon = $m[1]; $lat = $m[2];
+            list($location_results, $radius) = get_location_results($pledge_select, $lat, $lon);
+            if (!$rss) {
+                print sprintf(p(_('Results for <strong>open pledges</strong> within %s %s of US zipcode <strong>%s</strong>:')), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($search) );
+                if ($location_results) {
+                    print $location_results;
+                } else {
+                    print "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
+                }
+            }
+        } elseif (!$rss) {
+            print p(_("We couldn't find that zipcode, please try again."));
+        }
+    }
 
     // Places
-    global $countries_code_to_name;
+    global $countries_code_to_name, $countries_name_to_statecode;
     $change_country = pb_get_change_country_link(false);
     if (microsites_site_country()) {
-        $all_places = gaze_find_places(microsites_site_country(), null, $search, 5, 70);
+        preg_match('#^(.*?)(?:, (.*?))?(?:, (.*?))?(?: \((.*?)\))?$#', $search, $m);
+        $parts = array(
+            'name' => $m[1],
+            'in' => isset($m[2]) ? $m[2] : '',
+            'state' => isset($m[3]) ? $m[3]: '',
+            'near' => isset($m[4]) ? $m[4] : '',
+        );
+        if (isset($countries_name_to_statecode[microsites_site_country()][strtolower($parts['state'])]))
+            $parts['state'] = $countries_name_to_statecode[microsites_site_country()][strtolower($parts['state'])];
+        if (isset($countries_name_to_statecode[microsites_site_country()][strtolower($parts['in'])])) {
+            $parts['state'] = $countries_name_to_statecode[microsites_site_country()][strtolower($parts['in'])];
+            $parts['in'] = '';
+        }
+        if (strlen($parts['in'])==2) {
+            $parts['state'] = $parts['in'];
+            $parts['in'] = '';
+        }
+        $all_places = gaze_find_places(microsites_site_country(), null, $parts['name'], 5, 70);
         gaze_check_error($all_places);
 
         # If exact matches, just take them!
         $places = array(); $alt_places = array();
+        $statecounts = array();
         foreach ($all_places as $p) {
-            list($name, $in, $near, $lat, $lon, $st, $score) = $p;
-            if (strtolower($name) == strtolower($search)) {
+            list($name, $in, $near, $lat, $lon, $state, $score) = $p;
+            $match_name = strtolower($name) == strtolower($parts['name']);
+	    $match = $match_name;
+            if ($parts['in']) {
+                $match_in = strtolower($in) == strtolower($parts['in']);
+	        $match &= $match_in;
+	    }
+            if ($parts['near']) {
+                $match_near = strtolower($near) == strtolower($parts['near']);
+	        $match &= $match_near;
+	    }
+            if ($parts['state']) {
+                $match_state = strtolower($state) == strtolower($parts['state']);
+	        $match &= $match_state;
+	    }
+            if ($match) {
                 $places[] = $p;
-            } else {
+            } elseif (!$match_name || ($parts['in'] && !$match_in) || ($parts['near'] && !$match_near) || ($parts['state'] && !$match_state)) {
                 $alt_places[] = $p;
             }
+	    if (!isset($statecounts[$state])) $statecounts[$state] = 0;
+            if ($state)
+                $statecounts[$state]++;
         }
 
-        if (count($places) > 0) {
+        if (!$rss && count($places) > 1) {
             $success = 1;
             $out = "";
-            $max_radius = -1;
+            if (microsites_local_alerts()) {
+                print '<div id="local_alert_search">';
+                pb_view_local_alert_quick_signup("localsignupsearchpage", 
+                    array('newflash'=>false, 'place'=>$parts['name'])); # XXX Should be whole thing, but /alert can't yet cope
+                $shown_alert_box = true;
+                print '</div>';
+            }
+            usort($places, 'by_state');
+            foreach ($places as $p) {
+                list($name, $in, $near, $lat, $lon, $state, $score) = $p;
+                list($desc, $url) = display_place_name($name, $in, $near, $state, $statecounts[$state]);
+                $out .= '<li><a href="/search?q=' . urlencode($url) . '">' . $desc . '</a></li>';
+            }
+            echo p(sprintf(_("We found more than one location matching <strong>%s</strong>, %s:"),
+                htmlspecialchars($search), $countries_code_to_name[microsites_site_country()]));
+            echo '<ul>' . $out . '</ul>';
+        } elseif (count($places) == 1) {
+            $success = 1;
+            $out = '';
             if (!$rss) {
                 if (microsites_local_alerts()) {
                     print '<div id="local_alert_search">';
                     pb_view_local_alert_quick_signup("localsignupsearchpage", 
-                        array('newflash'=>false, 'place'=>$search));
+                        array('newflash'=>false, 'place'=>$parts['name']));
                     $shown_alert_box = true;
                     print '</div>';
                 }
             }
-            foreach ($places as $p) {
-                list($name, $in, $near, $lat, $lon, $st, $score) = $p;
-                $desc = $name;
-                if ($in) $desc .= ", $in";
-                if ($st) $desc .= ", $st";
-                if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
-                list ($location_results, $radius) = get_location_results($pledge_select, $lat, $lon);
-                $max_radius = max($radius, $max_radius);
-                if (!$rss) {
-                    if (count($places) > 1) 
-                        $out .= "<li>$desc";
-                    else
-                        # TRANS: For example: "Results for <strong>open pledges</strong> near places matching <strong>Bolton</strong>, United Kingdom (<a href="....">change country</a>):"
-                        $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s:"), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()]));
-                    if ($location_results) {
-                        $out .= $location_results;
-                    } else {
-                        $out .= "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
-                    }
-                    if (count($places) > 1) $out .= "</li>";
+            list($name, $in, $near, $lat, $lon, $state, $score) = $places[0];
+	    list($desc, $url) = display_place_name($name, $in, $near, $state, $statecounts[$state]);
+            list($location_results, $radius) = get_location_results($pledge_select, $lat, $lon);
+            if (!$rss) {
+                # TRANS: For example: "Results for <strong>open pledges</strong> near places matching <strong>Bolton</strong>, United Kingdom:"
+                $out .= p(sprintf(_("Results for <strong>open pledges</strong> within %s %s of <strong>%s</strong>, %s:"), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($desc), $countries_code_to_name[microsites_site_country()]));
+                if ($location_results) {
+                    $out .= $location_results;
+                } else {
+                    $out .= "<ul><li>". _("No nearby open pledges. Why not <a href=\"/new\">make one</a>?")."</li></ul>";
                 }
             }
-            if (!$rss && count($places) > 1) {
-                print p(sprintf(_("Results for <strong>open pledges near</strong> %s places matching <strong>%s</strong>, %s:"),
-                    get_change_radius_link($search, $max_radius), htmlspecialchars($search), $countries_code_to_name[microsites_site_country()]));
-                print '<ul class="search_results">';
-            }
             print $out;
-            if (!$rss) {
-                if (count($places) > 1) print "</ul>";
-            }
         }
         if (!$rss && $alt_places) {
             if ($places)
@@ -246,14 +306,11 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
             else
                 print '<p>' . _('Did you mean:') . ' ';
             $descs = array();
+	    usort($alt_places, 'by_state');
             foreach ($alt_places as $p) {
-                list($name, $in, $near, $lat, $lon, $st, $score) = $p;
-                $desc = '<a href="/search?q=' . urlencode($name) . '">';
-                $desc .= $name . '</a>';
-                if ($in) $desc .= ", $in";
-                if ($st) $desc .= ", $st";
-                if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
-                $descs[] = $desc;
+                list($name, $in, $near, $lat, $lon, $state, $score) = $p;
+		list($desc, $url) = display_place_name($name, $in, $near, $state, $statecounts[$state]);
+                $descs[] = '<a href="/search?q=' . urlencode($url) . '">' . $desc . '</a>';
             }
             print join('; ', $descs);
             if ($places)
@@ -403,5 +460,30 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
 </form>
 <?
     return $shown_alert_box;
+}
+
+function display_place_name($name, $in, $near, $state, $statecount) {
+    global $countries_statecode_to_name;
+    $desc = $name;
+    if ($in && $statecount>1) $desc .= ", $in";
+    if ($state) {
+        $desc .= ', ';
+        if (isset($countries_statecode_to_name[microsites_site_country()][$state]))
+            $desc .= $countries_statecode_to_name[microsites_site_country()][$state];
+        else
+            $desc .= $state;
+    }
+    $url = $desc;
+    if ($near) {
+        $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
+        $url .= " ($near)";
+    }
+    return array($desc, $url);
+}
+
+function by_state($a, $b) {
+    if ($a[5] > $b[5]) return 1;
+    elseif ($a[5] < $b[5]) return -1;
+    return 0;
 }
 

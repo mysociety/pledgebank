@@ -71,6 +71,9 @@ print LIVESIMPLYCSS <<END;
     font-size:83%;
     top: 4px; right: 4px;
 }
+#nav_search input {
+    max-width: none;
+}
 
 h1 {
     margin: 0;

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.69 2007-10-23 16:12:10 matthew Exp $
+// $Id: search.php,v 1.70 2007-10-24 14:01:32 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -465,7 +465,7 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
 function display_place_name($name, $in, $near, $state, $statecount) {
     global $countries_statecode_to_name;
     $desc = $name;
-    if ($in && $statecount>1) $desc .= ", $in";
+    if ($in && (!$state || $statecount>1)) $desc .= ", $in";
     if ($state) {
         $desc .= ', ';
         if (isset($countries_statecode_to_name[microsites_site_country()][$state]))

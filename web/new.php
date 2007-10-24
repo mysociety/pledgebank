@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.200 2007-10-17 22:36:17 matthew Exp $
+// $Id: new.php,v 1.201 2007-10-24 14:01:32 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -972,7 +972,7 @@ function create_new_pledge($P, $data) {
                 err('Invalid postcode while creating pledge; please check and try again.');
             $location_id = db_getOne("select nextval('location_id_seq')");
             db_query("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", array($location_id, $data['postcode'], $location['wgs84_lat'], $location['wgs84_lon'], $data['postcode']));
-        } else if ($data['gaze_place']) {
+        } elseif ($data['gaze_place']) {
             list($lat, $lon, $desc) = explode('|', $data['gaze_place'], 3);
             $location_id = db_getOne("select nextval('location_id_seq')");
             $a = array();
@@ -981,7 +981,7 @@ function create_new_pledge($P, $data) {
             if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
                 list($x, $country, $state) = $a;
             db_query("insert into location (id, country, state, method, input, latitude, longitude, description) values (?, ?, ?, 'Gaze', ?, ?, ?, ?)", array($location_id, $country, $state, $data['place'], $lat, $lon, $desc));
-        } else if ($data['country'] <> 'Global') {
+        } elseif ($data['country'] <> 'Global') {
             $location_id = db_getOne("select nextval('location_id_seq')");
             $a = array();
             $country = $data['country'];

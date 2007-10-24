@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.73 2007-10-24 21:57:07 matthew Exp $
+// $Id: search.php,v 1.74 2007-10-24 22:39:44 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -239,7 +239,7 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
             if (microsites_local_alerts()) {
                 print '<div id="local_alert_search">';
                 pb_view_local_alert_quick_signup("localsignupsearchpage", 
-                    array('newflash'=>false, 'place'=>$parts['name'])); # XXX Should be whole thing, but /alert can't yet cope
+                    array('newflash'=>false, 'place'=>$search));
                 $shown_alert_box = true;
                 print '</div>';
             }

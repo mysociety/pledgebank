@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: abuse.php,v 1.1 2007-08-10 16:32:42 matthew Exp $
+// $Id: abuse.php,v 1.2 2007-10-24 23:03:27 matthew Exp $
 
 require_once '../../phplib/utility.php';
 require_once '../../phplib/ratty.php';
@@ -24,8 +24,15 @@ function abuse_test($vars) {
     $vars['IPADDR'] = array($_SERVER['REMOTE_ADDR'], "IP address");
     $vars['SERVER'] = array($_SERVER['SERVER_NAME'], "Web server");
     $vars['PAGE'] = array($_SERVER['SCRIPT_NAME'], "Web page");
+
+    # If test suite, bypass so we can not be rate limited.
+    # But not staging, as they can get spam...
+    if (OPTION_WEB_HOST == 'testharness')
+        return false;
+
     $result = ratty_test('pb-abuse', $vars);
     if ($result)
         return true;
+
     return false;
 }

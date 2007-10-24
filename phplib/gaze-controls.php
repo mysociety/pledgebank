@@ -8,7 +8,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.18 2007-10-24 18:15:37 matthew Exp $
+// $Id: gaze-controls.php,v 1.19 2007-10-24 21:57:07 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -227,7 +227,7 @@ function gaze_controls_print_place_choice($selected_place, $selected_gaze_place,
      * possible places from Gaze. */
     if (!$select_place) {
         ?>
-           <?=_('Place name:') ?>
+           <span id="place_name_label"><?=_('Place name:') ?></span>
         <?
     } else {
         gaze_controls_print_places_choice($places, $selected_place, $selected_gaze_place);
@@ -330,6 +330,13 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
             }
         } else
             $location['postcode'] = canonicalise_partial_postcode($location['postcode']);
+    } elseif ($location['country'] == 'US' && preg_match('#^\d{5}$#', $location['place'])) {
+        $zip = lookup_zipcode($location['place']);
+        if (isset($zip['lon'])) {
+            $location['gaze_place'] = "$zip[lat]|$zip[lon]|$location[place]";
+            return;
+        }
+        $errors['place'] = "I'm afraid we did not recognise that zip code.";
     } elseif ($location['place']) {
         if (!$location['gaze_place']) {
             $errors['gaze_place'] = "NOTICE";
@@ -369,7 +376,7 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
         if (preg_match('/^(.+), ([^,]+)$/', $location['gaze_place'], $a)) {
             list($x, $location['gaze_place'], $location['state']) = $a;
             if (isset($countries_name_to_statecode[$location['country']][strtolower($location['state'])]))
-	        $location['state'] = $countries_name_to_statecode[$location['country']][strtolower($location['state'])];
+                $location['state'] = $countries_name_to_statecode[$location['country']][strtolower($location['state'])];
         }
     }
     
@@ -431,3 +438,19 @@ function gaze_controls_split_name($s) {
     }
     return $parts;
 }
+
+function lookup_zipcode($zip) {
+    $key = OPTION_GOOGLE_MAPS_API_KEY;
+    $url = 'http://maps.google.com/maps/geo?key=' . $key . '&q=' . $zip . ',+US';
+    #$url = 'http://ws.geonames.org/postalCodeSearch?country=US&postalcode=' . $search;
+    $f = @file_get_contents($url);
+    #if (preg_match('#<lat>(.*?)</lat>\s*<lng>(.*?)</lng>#', $f, $m)) {
+    if (preg_match('#"coordinates":\[(.*?),(.*?),#', $f, $m)) {
+        #$lat = $m[1]; $lon = $m[2];
+        $lon = $m[1]; $lat = $m[2];
+        return array('lon' => $lon, 'lat' => $lat);
+    } else {
+        return array();
+    }
+}
+

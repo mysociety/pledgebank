@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.41 2007-08-09 16:56:16 matthew Exp $
+ * $Id: pb.js,v 1.42 2007-10-24 21:57:07 matthew Exp $
  * 
  */
 
@@ -126,10 +126,25 @@ function update_place_local(item, optionclick) {
     var place_postcode_label = document.getElementById('place_postcode_label')
     if (place_postcode_label) {
         var current = place_postcode_label.childNodes[0].nodeValue
-        if (current == _('Town:') && countryPicked == 'GB') {
+        if (current != _('Postcode or town:') && countryPicked == 'GB') {
             place_postcode_label.childNodes[0].nodeValue = _('Postcode or town:')
+        } else if (current != _('Town or zipcode:') && countryPicked == 'US') {
+            place_postcode_label.childNodes[0].nodeValue = _('Town or zipcode:')
         } else if (current == _('Postcode or town:') && countryPicked != 'GB') {
             place_postcode_label.childNodes[0].nodeValue = _('Town:')
+        } else if (current == _('Town or zipcode:') && countryPicked != 'US') {
+            place_postcode_label.childNodes[0].nodeValue = _('Town:')
+        }
+    }
+
+    // Gaze lookup box
+    var place_name_label = document.getElementById('place_name_label')
+    if (place_name_label) {
+        var current = place_name_label.childNodes[0].nodeValue
+        if (current != _('Place name or zipcode:') && countryPicked == 'US') {
+            place_name_label.childNodes[0].nodeValue = _('Place name or zipcode:')
+        } else if (current == _('Place name or zipcode:') && countryPicked != 'US') {
+            place_name_label.childNodes[0].nodeValue = _('Place name:')
         }
     }
 }

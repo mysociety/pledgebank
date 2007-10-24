@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.72 2007-10-24 18:15:37 matthew Exp $
+// $Id: search.php,v 1.73 2007-10-24 21:57:07 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -180,15 +180,9 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
     // Zipcodes
     if (preg_match('#^\d{5}$#', $search) && microsites_site_country() == 'US') {
         $success = 1;
-        $key = OPTION_GOOGLE_MAPS_API_KEY;
-        $url = 'http://maps.google.com/maps/geo?key=' . $key . '&q=' . $search;
-        #$url = 'http://ws.geonames.org/postalCodeSearch?country=US&postalcode=' . $search;
-        $f = @file_get_contents($url);
-        #if (preg_match('#<lat>(.*?)</lat>\s*<lng>(.*?)</lng>#', $f, $m)) {
-        if (preg_match('#"coordinates":\[(.*?),(.*?),#', $f, $m)) {
-            #$lat = $m[1]; $lon = $m[2];
-            $lon = $m[1]; $lat = $m[2];
-            list($location_results, $radius) = get_location_results($pledge_select, $lat, $lon);
+        $zip = lookup_zipcode($search);
+        if (isset($zip['lon'])) {
+            list($location_results, $radius) = get_location_results($pledge_select, $zip['lat'], $zip['lon']);
             if (!$rss) {
                 print sprintf(p(_('Results for <strong>open pledges</strong> within %s %s of US zipcode <strong>%s</strong>:')), pb_pretty_distance($radius, microsites_site_country(), false), get_change_radius_link($search, $radius), htmlspecialchars($search) );
                 if ($location_results) {

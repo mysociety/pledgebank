@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.201 2007-10-24 14:01:32 matthew Exp $
+// $Id: new.php,v 1.202 2007-10-24 16:48:55 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -350,8 +350,14 @@ our email alerts and location search.') ?></p>
 print _('If yes, choose where.');
 
 $gaze_with_state = $data['gaze_place'];
-if ($data['state'])
-    $gaze_with_state .= ", " . $data['state'];
+if ($data['state']) {
+    global $countries_statecode_to_name;
+    $gaze_with_state .= ', ';
+    if (isset($countries_statecode_to_name[$data['country']][$data['state']]))
+        $gaze_with_state .= $countries_statecode_to_name[$data['country']][$data['state']];
+    else
+        $gaze_with_state .= $data['state'];
+}
 gaze_controls_print_place_choice($data['place'], $gaze_with_state, $data['places'], $errors, array_key_exists('postcode', $data) ? $data['postcode'] : null, array('midformnote'=>true)); 
 ?>
 
@@ -378,7 +384,7 @@ function pledge_form_three($data, $errors = array()) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', $errors);
         print '</li></ul></div>';
-	print '<div id="preview">';
+        print '<div id="preview">';
     } else {
 ?>
 
@@ -437,7 +443,7 @@ function pledge_form_addr($data = array(), $errors = array()) {
         print '<div id="errors"><ul><li>';
         print join ('</li><li>', array_values($errors));
         print '</li></ul></div>';
-	print '<div id="preview">';
+        print '<div id="preview">';
     } else {
 ?>
 
@@ -762,7 +768,7 @@ function step2_error_check(&$data) {
             /* Can only check local stuff if a valid country is selected. */
             if (!array_key_exists('local', $data) || ($data['local'] != '1' && $data['local'] != '0'))
                 $errors['local'] = _('Please choose whether the pledge is local or not');
-            else if ($data['local']) {
+            elseif ($data['local']) {
                 gaze_controls_validate_location($data, $errors);
             }
         }

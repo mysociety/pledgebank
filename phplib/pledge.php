@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.253 2007-10-12 15:01:23 matthew Exp $
+ * $Id: pledge.php,v 1.254 2007-10-24 16:48:55 matthew Exp $
  * 
  */
 
@@ -282,7 +282,7 @@ class Pledge {
     function country_code() { return $this->data['country']; }
     function microsite() { return $this->data['microsite']; }
     function h_country() { 
-        global $countries_code_to_name;
+        global $countries_code_to_name, $countries_statecode_to_name;
         if (isset($this->data['country'])) {
             $country = $this->data['country'];
             if (array_key_exists('state', $this->data))
@@ -293,8 +293,13 @@ class Pledge {
             if (preg_match('/^([A-Z]{2}),(.+)$/', $country, $a))
                 list($x, $country, $state) = $a;
             $ret = htmlspecialchars($countries_code_to_name[$country]); 
-            if ($state)
-                $ret .= ", " . htmlspecialchars($state);
+            if ($state) {
+                $ret .= ', ';
+                if (isset($countries_statecode_to_name[$country][$state]))
+                    $ret .= htmlspecialchars($countries_statecode_to_name[$country][$state]);
+                else
+                    $ret .= htmlspecialchars($state);
+            }
             return $ret;
         } else
             return 'Global';
@@ -777,13 +782,13 @@ class Pledge {
         }
         $text .= '<a href="' . $this->url_main() . '">';
         $text .= $this->ref() . '</a>';
-	$text .= '<br>';
+        $text .= '<br>';
         $text .= $this->sentence($params);
         $text .= '<br><small>' . str_replace(array('(',')'),'',$this->status());
         if (array_key_exists('creatorlinks', $params) && $params['creatorlinks']) {
             $text .= ' <a href="' . $this->url_announce() . '">' . _('Send message to signers') . '</a>';
         }
-	$text .= '</small>';
+        $text .= '</small>';
         return $text;
     }
 

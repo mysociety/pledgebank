@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.70 2007-10-24 14:01:32 matthew Exp $
+// $Id: search.php,v 1.71 2007-10-24 15:51:38 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -223,8 +223,7 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
             $parts['state'] = $parts['in'];
             $parts['in'] = '';
         }
-        $all_places = gaze_find_places(microsites_site_country(), null, $parts['name'], 5, 70);
-        gaze_check_error($all_places);
+        $all_places = gaze_controls_find_places(microsites_site_country(), null, $parts['name'], 10, 70);
 
         # If exact matches, just take them!
         $places = array(); $alt_places = array();
@@ -232,25 +231,25 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
         foreach ($all_places as $p) {
             list($name, $in, $near, $lat, $lon, $state, $score) = $p;
             $match_name = strtolower($name) == strtolower($parts['name']);
-	    $match = $match_name;
+            $match = $match_name;
             if ($parts['in']) {
                 $match_in = strtolower($in) == strtolower($parts['in']);
-	        $match &= $match_in;
-	    }
+                $match &= $match_in;
+            }
             if ($parts['near']) {
                 $match_near = strtolower($near) == strtolower($parts['near']);
-	        $match &= $match_near;
-	    }
+                $match &= $match_near;
+            }
             if ($parts['state']) {
                 $match_state = strtolower($state) == strtolower($parts['state']);
-	        $match &= $match_state;
-	    }
+                $match &= $match_state;
+            }
             if ($match) {
                 $places[] = $p;
             } elseif (!$match_name || ($parts['in'] && !$match_in) || ($parts['near'] && !$match_near) || ($parts['state'] && !$match_state)) {
                 $alt_places[] = $p;
             }
-	    if (!isset($statecounts[$state])) $statecounts[$state] = 0;
+            if (!isset($statecounts[$state])) $statecounts[$state] = 0;
             if ($state)
                 $statecounts[$state]++;
         }
@@ -265,10 +264,10 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
                 $shown_alert_box = true;
                 print '</div>';
             }
-            usort($places, 'by_state');
+            usort($places, 'gaze_controls_sort_places');
             foreach ($places as $p) {
                 list($name, $in, $near, $lat, $lon, $state, $score) = $p;
-                list($desc, $url) = display_place_name($name, $in, $near, $state, $statecounts[$state]);
+                list($desc, $url) = gaze_controls_get_place_details($p, $statecounts, true);
                 $out .= '<li><a href="/search?q=' . urlencode($url) . '">' . $desc . '</a></li>';
             }
             echo p(sprintf(_("We found more than one location matching <strong>%s</strong>, %s. Pick your town from the list to see pledges in your area:"),
@@ -287,7 +286,7 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
                 }
             }
             list($name, $in, $near, $lat, $lon, $state, $score) = $places[0];
-	    list($desc, $url) = display_place_name($name, $in, $near, $state, $statecounts[$state]);
+            list($desc, $url) = gaze_controls_get_place_details($places[0], $statecounts, true);
             list($location_results, $radius) = get_location_results($pledge_select, $lat, $lon);
             if (!$rss) {
                 # TRANS: For example: "Results for <strong>open pledges</strong> near places matching <strong>Bolton</strong>, United Kingdom:"
@@ -306,10 +305,10 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
             else
                 print '<p>' . _('Did you mean:') . ' ';
             $descs = array();
-	    usort($alt_places, 'by_state');
+            usort($alt_places, 'gaze_controls_sort_places');
             foreach ($alt_places as $p) {
                 list($name, $in, $near, $lat, $lon, $state, $score) = $p;
-		list($desc, $url) = display_place_name($name, $in, $near, $state, $statecounts[$state]);
+                list($desc, $url) = gaze_controls_get_place_details($p, $statecounts, true);
                 $descs[] = '<a href="/search?q=' . urlencode($url) . '">' . $desc . '</a>';
             }
             print join('; ', $descs);
@@ -460,30 +459,5 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
 </form>
 <?
     return $shown_alert_box;
-}
-
-function display_place_name($name, $in, $near, $state, $statecount) {
-    global $countries_statecode_to_name;
-    $desc = $name;
-    if ($in && (!$state || $statecount>1)) $desc .= ", $in";
-    if ($state) {
-        $desc .= ', ';
-        if (isset($countries_statecode_to_name[microsites_site_country()][$state]))
-            $desc .= $countries_statecode_to_name[microsites_site_country()][$state];
-        else
-            $desc .= $state;
-    }
-    $url = $desc;
-    if ($near) {
-        $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
-        $url .= " ($near)";
-    }
-    return array($desc, $url);
-}
-
-function by_state($a, $b) {
-    if ($a[5] > $b[5]) return 1;
-    elseif ($a[5] < $b[5]) return -1;
-    return 0;
 }
 

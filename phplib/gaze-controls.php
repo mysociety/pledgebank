@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.15 2007-07-24 10:41:29 matthew Exp $
+// $Id: gaze-controls.php,v 1.16 2007-10-24 15:51:37 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -21,21 +21,47 @@ $gaze_controls_nearby_distance = 10;
 function gaze_controls_find_places($country, $state, $query, $maxresults = null, $minscore = null) {
     $ret = gaze_find_places($country, $state, $query, $maxresults, $minscore);
     gaze_check_error($ret);
+    foreach ($ret as $k => $p) {
+        $ret[$k][7] = $country;
+    }
     return $ret;
 }
 
 // Given a row returned from gaze, returns a list of (description, radio button value)
-function gaze_controls_get_place_details($p) {
-    list($name, $in, $near, $lat, $lon, $st, $score) = $p;
+function gaze_controls_get_place_details($p, $statecounts = array(), $justdesc = false) {
+    global $countries_statecode_to_name;
+    list($name, $in, $near, $lat, $lon, $state, $score, $country) = $p;
     $desc = $name;
-    if ($in) $desc .= ", $in";
-    if ($st) $desc .= ", $st";
-    if ($near) $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
+    if ($in && (!$state || $statecounts[$state]>1)) $desc .= ", $in";
+    if ($state) {
+        $desc .= ', ';
+        if (isset($countries_statecode_to_name[$country][$state]))
+            $desc .= $countries_statecode_to_name[$country][$state];
+        else
+            $desc .= $state;
+    }
+    $url = $desc;
+    if ($near) {
+        $desc .= " (" . _('near') . " " . htmlspecialchars($near) . ")";
+        $url .= " ($near)";
+    }
+    if ($justdesc)
+        return array($desc, $url);
     locale_push('en-gb');
     $t = htmlspecialchars("$lat|$lon|$desc");
     locale_pop();
     if ($score) $desc .= "<!--($score%)-->";
     return array($desc, $t);
+}
+
+function gaze_controls_sort_places($a, $b) {
+    # Score
+    if ($a[6] > $b[6]) return -1;
+    elseif ($a[6] < $b[6]) return 1;
+    # State
+    if ($a[5] > $b[5]) return 1;
+    elseif ($a[5] < $b[5]) return -1;
+    return 0;
 }
 
 // Prints HTML for radio buttons to select a list of places drawn from Gaze
@@ -51,8 +77,16 @@ function gaze_controls_print_places_choice($places, $place, $selected_gaze_place
         printf(_("Sorry, we don't know where '%s' is. We know about these places with similar names, please choose one if it is right:"), $place);
     print "</strong><br>";
     $nn = 0;
+    $statecounts = array();
     foreach ($places as $p) {
-        list($desc, $t) = gaze_controls_get_place_details($p);
+        $state = $p[5];
+        if (!isset($statecounts[$state])) $statecounts[$state] = 0;
+        if ($state)
+            $statecounts[$state]++;
+    }
+    usort($places, 'gaze_controls_sort_places');
+    foreach ($places as $p) {
+        list($desc, $t) = gaze_controls_get_place_details($p, $statecounts);
         $checked = '';
         if ($t == $selected_gaze_place) {
             $checked = 'checked';
@@ -311,7 +345,8 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
         $places = gaze_controls_find_places($location['country'], $location['state'], $location['place'], $gaze_controls_nearby_distance, 0);
         list ($have_exact, $anymatches) = _gaze_controls_exact_match($places, $location['place']);
         if ($have_exact) {
-            list($desc, $radio_name) = gaze_controls_get_place_details($have_exact);
+            $statecounts = array($have_exact[5] => 1);
+            list($desc, $radio_name) = gaze_controls_get_place_details($have_exact, $statecounts);
             $location['gaze_place'] = $radio_name;
             unset($errors['gaze_place']);
             #print "have exact $desc $radio_name\n"; exit;
@@ -352,7 +387,7 @@ function _gaze_controls_exact_match($places, $typed_place) {
     $got = null;
     $anymatches = false;
     foreach ($places as $place) {
-        if (trim(strtolower($place['0'])) == trim(strtolower($typed_place))) {
+        if (trim(strtolower($place[0])) == trim(strtolower($typed_place))) {
             $got = $place;
             $gotcount++;
             $anymatches = true;

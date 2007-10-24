@@ -1,6 +1,6 @@
 Subject: Your pledge - '<?=$values['title']?>' at PledgeBank.com
 
-Unfotunately, the pledge to which you signed up did not meet its target in the
+Unfortunately, the pledge to which you signed up did not meet its target in the
 required time.  It required <?=$values['target']?> <?=$values['type']?>, but
 achieved only <?=$values['actual']?>.
 

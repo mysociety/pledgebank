@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.238 2007-10-18 22:57:39 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.239 2007-10-24 15:55:48 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -653,12 +653,12 @@ sub do_public_succeeding_pledge {
         },
         button => 'submit');
     # More recent Gaze has different coordinate for Reno
-    my $reno_field = '39.52972|-119.81278|Reno, Washoe County, NV';
-    my $sparks_field = '39.535|-119.75167|Sparks, Washoe County, NV';
+    my $reno_field = '39.52972|-119.81278|Reno, Nevada';
+    my $sparks_field = '39.535|-119.75167|Sparks, Nevada';
     my $content = $wth->browser_content();
     if ($content !~ m/\Q$reno_field/) {
-        $reno_field = '39.5296329|-119.8138027|Reno, Washoe County, NV';
-        $sparks_field = '39.5349112|-119.7526886|Sparks, Washoe County, NV';
+        $reno_field = '39.5296329|-119.8138027|Reno, Nevada';
+        $sparks_field = '39.5349112|-119.7526886|Sparks, Nevada';
     }
     $wth->browser_submit_form(form_name => 'pledge',
         fields => {

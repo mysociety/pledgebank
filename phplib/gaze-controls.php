@@ -6,7 +6,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.16 2007-10-24 15:51:37 matthew Exp $
+// $Id: gaze-controls.php,v 1.17 2007-10-24 16:09:36 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -353,12 +353,14 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
         }
     }
 
-    global $countries_statecode_to_name;
+    global $countries_statecode_to_name, $countries_name_to_statecode;
     if (array_key_exists($location['country'], $countries_statecode_to_name)) {
         // Split out state in case where they picked US from dropdown, but place with state from gaze
         $a = array();
         if (preg_match('/^(.+), ([^,]+)$/', $location['gaze_place'], $a)) {
             list($x, $location['gaze_place'], $location['state']) = $a;
+            if (isset($countries_name_to_statecode[$location['country']][strtolower($location['state'])]))
+	        $location['state'] = $countries_name_to_statecode[$location['country']][strtolower($location['state'])];
         }
     }
     

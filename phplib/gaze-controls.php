@@ -2,11 +2,13 @@
 // gaze-controls.php:
 // Let someone enter the name of a town (or postcode) and country,
 // and select a choice of matching towns from Gaze, the gazetteer.
+// Also uses MaPit, and Google Maps API for zipcodes, so gaze_controls
+// probably a bit of a misnomer.
 //
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.17 2007-10-24 16:09:36 matthew Exp $
+// $Id: gaze-controls.php,v 1.18 2007-10-24 18:15:37 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -32,7 +34,7 @@ function gaze_controls_get_place_details($p, $statecounts = array(), $justdesc =
     global $countries_statecode_to_name;
     list($name, $in, $near, $lat, $lon, $state, $score, $country) = $p;
     $desc = $name;
-    if ($in && (!$state || $statecounts[$state]>1)) $desc .= ", $in";
+    if ($in && (!$state || $statecounts[$state][$name]>1)) $desc .= ", $in";
     if ($state) {
         $desc .= ', ';
         if (isset($countries_statecode_to_name[$country][$state]))
@@ -79,10 +81,11 @@ function gaze_controls_print_places_choice($places, $place, $selected_gaze_place
     $nn = 0;
     $statecounts = array();
     foreach ($places as $p) {
-        $state = $p[5];
-        if (!isset($statecounts[$state])) $statecounts[$state] = 0;
+        $name = $p[0]; $state = $p[5];
+        if (!isset($statecounts[$state])) $statecounts[$state] = array();
+        if (!isset($statecounts[$state][$name])) $statecounts[$state][$name] = 0;
         if ($state)
-            $statecounts[$state]++;
+            $statecounts[$state][$name]++;
     }
     usort($places, 'gaze_controls_sort_places');
     foreach ($places as $p) {
@@ -282,6 +285,12 @@ function gaze_controls_get_location($params = array()) {
         $location['place'] = null;
     }
 
+    $parts = gaze_controls_split_name($location['place']);
+    if ($parts['state']) {
+        $location['place'] = $parts['name'];
+        $location['state'] = $parts['state'];
+    }
+
     # Only allow postcode in the UK, and don't allow it if in townonly mode (for byarea pledges)
     if ($location['country'] && $location['country'] != 'GB') $location['postcode'] = '';
     if (array_key_exists('townonly', $params) && $params['townonly']) $location['postcode'] = '';
@@ -345,7 +354,7 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
         $places = gaze_controls_find_places($location['country'], $location['state'], $location['place'], $gaze_controls_nearby_distance, 0);
         list ($have_exact, $anymatches) = _gaze_controls_exact_match($places, $location['place']);
         if ($have_exact) {
-            $statecounts = array($have_exact[5] => 1);
+            $statecounts = array($have_exact[5] => array($have_exact[0] => 1));
             list($desc, $radio_name) = gaze_controls_get_place_details($have_exact, $statecounts);
             $location['gaze_place'] = $radio_name;
             unset($errors['gaze_place']);
@@ -401,5 +410,24 @@ function _gaze_controls_exact_match($places, $typed_place) {
         return array(null, $anymatches);
 }
 
-
-
+function gaze_controls_split_name($s) {
+    global $countries_name_to_statecode;
+    preg_match('#^(.*?)(?:,\s*(.*?))?(?:,\s*(.*?))?(?:\s*\((.*?)\))?$#', $s, $m);
+    $parts = array(
+        'name' => $m[1],
+        'in' => isset($m[2]) ? $m[2] : '',
+        'state' => isset($m[3]) ? $m[3]: '',
+        'near' => isset($m[4]) ? $m[4] : '',
+    );
+    if (isset($countries_name_to_statecode[microsites_site_country()][strtolower($parts['state'])]))
+        $parts['state'] = $countries_name_to_statecode[microsites_site_country()][strtolower($parts['state'])];
+    if (isset($countries_name_to_statecode[microsites_site_country()][strtolower($parts['in'])])) {
+        $parts['state'] = $countries_name_to_statecode[microsites_site_country()][strtolower($parts['in'])];
+        $parts['in'] = '';
+    }
+    if (strlen($parts['in'])==2) {
+        $parts['state'] = $parts['in'];
+        $parts['in'] = '';
+    }
+    return $parts;
+}

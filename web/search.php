@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: search.php,v 1.71 2007-10-24 15:51:38 matthew Exp $
+// $Id: search.php,v 1.72 2007-10-24 18:15:37 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -203,26 +203,10 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
     }
 
     // Places
-    global $countries_code_to_name, $countries_name_to_statecode;
+    global $countries_code_to_name;
     $change_country = pb_get_change_country_link(false);
     if (microsites_site_country()) {
-        preg_match('#^(.*?)(?:,\s*(.*?))?(?:,\s*(.*?))?(?:\s*\((.*?)\))?$#', $search, $m);
-        $parts = array(
-            'name' => $m[1],
-            'in' => isset($m[2]) ? $m[2] : '',
-            'state' => isset($m[3]) ? $m[3]: '',
-            'near' => isset($m[4]) ? $m[4] : '',
-        );
-        if (isset($countries_name_to_statecode[microsites_site_country()][strtolower($parts['state'])]))
-            $parts['state'] = $countries_name_to_statecode[microsites_site_country()][strtolower($parts['state'])];
-        if (isset($countries_name_to_statecode[microsites_site_country()][strtolower($parts['in'])])) {
-            $parts['state'] = $countries_name_to_statecode[microsites_site_country()][strtolower($parts['in'])];
-            $parts['in'] = '';
-        }
-        if (strlen($parts['in'])==2) {
-            $parts['state'] = $parts['in'];
-            $parts['in'] = '';
-        }
+        $parts = gaze_controls_split_name($search);
         $all_places = gaze_controls_find_places(microsites_site_country(), null, $parts['name'], 10, 70);
 
         # If exact matches, just take them!
@@ -249,9 +233,10 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
             } elseif (!$match_name || ($parts['in'] && !$match_in) || ($parts['near'] && !$match_near) || ($parts['state'] && !$match_state)) {
                 $alt_places[] = $p;
             }
-            if (!isset($statecounts[$state])) $statecounts[$state] = 0;
+            if (!isset($statecounts[$state])) $statecounts[$state] = array();
+            if (!isset($statecounts[$state][$name])) $statecounts[$state][$name] = 0;
             if ($state)
-                $statecounts[$state]++;
+                $statecounts[$state][$name]++;
         }
 
         if (!$rss && count($places) > 1) {

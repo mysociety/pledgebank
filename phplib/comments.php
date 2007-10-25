@@ -6,11 +6,10 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: comments.php,v 1.70 2007-10-12 13:42:09 matthew Exp $
+ * $Id: comments.php,v 1.71 2007-10-25 15:41:37 francis Exp $
  * 
  */
 
-require_once('pb.php');
 require_once('pbperson.php');
 require_once('../../phplib/utility.php');
 require_once('../../phplib/db.php');

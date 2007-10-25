@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.52 2007-10-22 05:30:18 francis Exp $
+// $Id: facebook.php,v 1.53 2007-10-25 16:31:47 francis Exp $
 
 /*
 
@@ -25,10 +25,11 @@ http://developers.facebook.com/news.php?blog=1&story=45
 
 - Show explicitly on e.g. http://apps.facebook.com/pledgebank/list/friends
   that a pledge is closed.
-- And also that you have already signed it
+- And also that you have already signed it. Say something about, have
+   you don it yet.
+- "you has created these pledges" on profile
 
 - Check that after making new pledge takes you to share with friends dialog
-
 
 - Peruse the new http://bugs.developers.facebook.com/
 
@@ -39,6 +40,10 @@ http://developers.facebook.com/news.php?blog=1&story=45
 - Call http://wiki.developers.facebook.com/index.php/Feed.publishTemplatizedAction
   instead of PublishActionofUser
   See http://www.facebook.com/topic.php?uid=2205007948&topic=13926&start=30&hash=503b3e81edba5aeff0c1ac98eb58a61a at end for PHP function to add to the API file
+
+- Let creators of pledges use fancy form to share it.
+
+- Announce message shouldn't link to pledgebank.com, but to facebook.com
 
 Improvements:
 - Show pledges which have lots of Facebook signers
@@ -110,6 +115,11 @@ if (get_http_var("test")) {
     do_test();
 }
 $ref = get_http_var("ref");
+if ($ref == 'new') {
+    // Redirect to PledgeBank.com to make new pledges 
+    $facebook->redirect(pbfacebook_new_pledge_url());
+    exit;
+}
 if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     pbfacebook_render_header();
     pbfacebook_render_dashboard();

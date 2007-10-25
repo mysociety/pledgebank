@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.52 2007-10-10 23:29:46 francis Exp $
+// $Id: pbfacebook.php,v 1.53 2007-10-25 16:31:46 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -314,8 +314,9 @@ function pbfacebook_render_share_pledge($pledge) {
     return $out;
 }
 
-// Render common top of PledgeBank pages on Facebook
-function pbfacebook_render_dashboard() {
+// Return URL for making a new pledge - if logged in, then sends association
+// with Facebook login id to the new pledge.0
+function pbfacebook_new_pledge_url() {
     global $facebook;
     $urlpart = "";
     if ($facebook->get_loggedin_user()) {
@@ -323,10 +324,17 @@ function pbfacebook_render_dashboard() {
         $sig = auth_sign_with_shared_secret($facebook->get_loggedin_user().":".$facebook_name, OPTION_CSRF_SECRET);
         $urlpart = "?facebook_id=" . $facebook->get_loggedin_user() . "&facebook_name=".urlencode($facebook_name)."&facebook_id_sig=" . $sig;
     }
+
+    return pb_domain_url(array('path'=>'/new'.$urlpart));
+}
+
+// Render common top of PledgeBank pages on Facebook
+function pbfacebook_render_dashboard() {
+    global $facebook;
 ?>
 <fb:dashboard>
   <fb:action href="<?=OPTION_FACEBOOK_CANVAS?>">Browse Pledges</fb:action>
-  <fb:action href="<?=pb_domain_url(array('path'=>'/new'.$urlpart))?>">Create a New Pledge</fb:action>
+  <fb:action href="<?=OPTION_FACEBOOK_CANVAS?>new">Create a New Pledge</fb:action>
   <fb:help href="<?=pb_domain_url(array('path'=>'/faq'))?>" title="Need help">Help</fb:help>
 </fb:dashboard>
 <?
@@ -716,29 +724,19 @@ function pbfacebook_send_internal($to, $message) {
     $to_info = $facebook->api_client->users_getInfo($to, array("name"));
     #print "pbfacebook_send_internal: ". $message. "\nTo:". $to_info[0]['name'];
 
-    # Publish feed story
-    $lines = split("\n", $message);
-    $feed_title = array_shift($lines);
-    $feed_body = join("\n", $lines);
-
-    $ret = $facebook->api_client->feed_publishStoryToUser($feed_title, $feed_body);
-    if (!$ret) {
-        print("Calling feed_publishStoryToUser failed; maybe due to 1 msg / 12 hour limit, or length limit: " . print_r($ret, TRUE)) . "\n";
+    # Setting the to ids to "" means it goes to the current logged in user, but
+    # without prefixing with their name. XXX This is subject to change by Facebook.
+    # See: http://bugs.developers.facebook.com/show_bug.cgi?id=123 for more details.
+    $ret = $facebook->api_client->notifications_send("", $message, $message);
+    if (is_int($ret)) {
+        print("Error calling notifications_send in pbfacebook_send_internal: " . print_r($ret, TRUE)); 
         return false;
-    } elseif ($ret[0] == 0) {
-        print("Calling feed_publishStoryToUser failed; permissions error, user probably disallows app from posting to feed\n");
-        return false;
-    } elseif ($ret[0] == 1) {
-        // OK
-    } else {
-        err("Error calling feed_publishStoryToUser in pbfacebook_send_internal: " . print_r($ret, TRUE));
     }
-
+    if ($ret) {
+        print("Need URL confirmation calling notifications_send in pbfacebook_send_internal: " . print_r($ret, TRUE));
+        return false;
+    }
     return true;
 }
 
-/*
-    $csrf_sig = auth_sign_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET);
-    $verified = auth_verify_with_shared_secret($pledge->id().":".$facebook->get_loggedin_user(), OPTION_CSRF_SECRET, get_http_var("csrf"));
-*/
 

@@ -1,6 +1,28 @@
-Pledge successful! Now do your part.
+<fb:notif-email>
+<fb:notif-subject>Pledge successful! - <?=$values['title']?></fb:notif-subject> 
 
-The <?=$values['signers_ordinal']?> person has signed the pledge! Now it's your
-turn to do what you pledged. 
+<p>Congratulations!</p>
 
-The pledge is: '<a href="<?=$values['pledge_facebook_url']?>"><?=$values['facebook_short_title']?></a>'.
+<p>We are pleased to tell you that the pledge you signed up to has been a success!</p>
+
+<p>The pledge, created by <?=$values['creator_name']?>, reads:
+'<a href="<?=$values['pledge_facebook_url']?>"><?=$values['sentence_first']?></a>' 
+The <?=$values['signers_ordinal']?> person has signed the pledge, just moments ago!</p>
+
+<p>Now it's your turn to do what you pledged.  <?=$values['creator_name']?> will
+contact you soon to give you any further information you need and to help
+plan some next steps. And while you're at it, Why not take some photos of you
+fulfilling your pledge - we love pics :) Send any pictures to 
+<a href="mailto:team@pledgebank.com">team@pledgebank.com</a>.</p>
+
+<p><?=$values['signature']?></p>
+</fb:notif-email>
+
+<fb:notif-page>
+Congratulations! The pledge 
+'<a href="<?=$values['pledge_facebook_url']?>"><?=$values['ref']?></a>' 
+that you signed was successful! Now it's your turn to 
+<a href="<?=$values['pledge_facebook_url']?>">do what you pledged</a>.
+</fb:notif-page>
+
+

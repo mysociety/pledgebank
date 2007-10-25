@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.121 2007-10-19 16:51:15 francis Exp $
+ * $Id: frequentupdate,v 1.122 2007-10-25 16:31:46 francis Exp $
  *
  */
 
@@ -22,6 +22,7 @@ require_once '../phplib/pledge.php';
 require_once "../phplib/pbperson.php";
 require_once '../phplib/microsites.php';
 require_once '../phplib/pbfacebook.php';
+require_once '../phplib/comments.php';
 require_once '../../phplib/db.php';
 require_once '../../phplib/utility.php';
 
@@ -912,11 +913,21 @@ function send_pending_messages() {
             /* Check if this is being sent to a late signer */
             $send_it = true;
             if ($send_by == 'facebook') {
-                /* Facebook case. We link to the pledge itself where the full message is shown,
-                 * as you can't fit the full message in the news feed! */
+                /* Facebook case - we have to format the email as FBML and prepare a notification.. 
+                 * The *** is nasty, but Facebook doesn't let us even put bold in the message. */
                 locale_push($pledge->lang());
-                $emailbody = "Message from pledge creator!
-<a href=\"".$pledge->url_facebook()."\">Read the message</a> for instructions about the pledge that you signed. The pledge is: '<a href=\"".$pledge->url_facebook()."\">".htmlspecialchars(trim_characters($pledge->title(), 0, 50))."</a>'.";
+                $emailbody = 
+                    "<fb:notif-email>"
+                  . "<fb:notif-subject>".$r['emailsubject']."</fb:notif-subject>"
+                  . "<p>*** The following message is from the creator of a pledge that you signed. DO NOT HIT REPLY.
+                  To reply to the creator, please email <a href=\"mailto:".htmlspecialchars($pledge->creator_email())."\">".htmlspecialchars($pledge->creator_email())."</a>. ***</p>"
+                  . comments_text_to_html($emailbody)
+                  . "</fb:notif-email>"
+                  . "<fb:notif-page>"
+                  . "You have an <a href=\"".$pledge->url_facebook()."\">important message</a> about the pledge '".$pledge->ref()."' that you signed."
+                  . "</fb:notif-page>"
+                  ;
+
                 locale_pop();
             } 
             if ($r['islatesigner'] == 't') {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.172 2007-10-12 13:12:47 matthew Exp $
+// $Id: fns.php,v 1.173 2007-10-25 16:31:46 francis Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -154,6 +154,7 @@ function pb_message_add_template_values($values) {
         $values['signers_ordinal'] = ordinal($values['signers']);
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
     $values['pledgebank_url'] = pb_domain_url(array('path'=>'/'));
+    $values['pledgebank_facebook_url'] = OPTION_FACEBOOK_CANVAS;
         
     $values['signature'] = _("-- the PledgeBank.com team");
 

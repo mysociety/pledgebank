@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.202 2007-10-24 16:48:55 matthew Exp $
+// $Id: new.php,v 1.203 2007-10-25 12:56:58 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -913,7 +913,10 @@ longer be valid."))?>
  <input type="submit" name="tostepaddr" value="<?=_('Change your postal address') ?>">
 <? } ?>
 </p>
+</form>
 
+<form accept-charset="utf-8" name="pledge" method="post" action="/new">
+<input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 <?
     microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors);
 ?>

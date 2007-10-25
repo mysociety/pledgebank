@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.203 2007-10-25 12:56:58 matthew Exp $
+// $Id: new.php,v 1.204 2007-10-25 12:58:07 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -881,7 +881,7 @@ function preview_pledge($data, $errors) {
     </div>
 </div>
 
-<form accept-charset="utf-8" name="pledge" method="post" action="/new">
+<form accept-charset="utf-8" method="post" action="/new">
 <input type="hidden" name="data" value="<?=base64_encode(serialize($data)) ?>">
 <h2><?=_('Preview')?></h2>
 <?  print p(sprintf(_('

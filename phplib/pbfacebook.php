@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.53 2007-10-25 16:31:46 francis Exp $
+// $Id: pbfacebook.php,v 1.54 2007-10-26 00:54:54 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -558,8 +558,8 @@ function pbfacebook_sign_pledge($pledge) {
             $feed_title .= 'a pledge.';
         $feed_body = $pledge->summary(array('html'=>true, 'href'=>$pledge->url_facebook(), 'showcountry'=>false));
         $ret = $facebook->api_client->feed_publishActionOfUser($feed_title, $feed_body);
-        if (!$ret) {
-            print '<p class="errors">'._('The news that you\'ve signed could not be added to your feed.').'</p>';
+        if (!$ret || $ret[0] == 0) {
+            //print '<p class="errors">'._('The news that you\'ve signed could not be added to your feed.').'</p>';
         } else {
             if ($ret[0] != 1) err("Error calling feed_publishActionOfUser: " . print_r($ret, TRUE));
         }

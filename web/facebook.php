@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.53 2007-10-25 16:31:47 francis Exp $
+// $Id: facebook.php,v 1.54 2007-10-26 01:03:04 francis Exp $
 
 /*
 
@@ -46,6 +46,7 @@ http://developers.facebook.com/news.php?blog=1&story=45
 - Announce message shouldn't link to pledgebank.com, but to facebook.com
 
 Improvements:
+- Cache names of Facebook signers in the person table
 - Show pledges which have lots of Facebook signers
 - Find pledges by people with similar interests, or who've signed similar pledges etc.
 - Include featured pledges on EVERYONE's profile

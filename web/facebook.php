@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.54 2007-10-26 01:03:04 francis Exp $
+// $Id: facebook.php,v 1.55 2007-10-26 11:14:01 francis Exp $
 
 /*
 
@@ -44,6 +44,8 @@ http://developers.facebook.com/news.php?blog=1&story=45
 - Let creators of pledges use fancy form to share it.
 
 - Announce message shouldn't link to pledgebank.com, but to facebook.com
+
+- Maybe you aren't getting infinite session ids for all users?
 
 Improvements:
 - Cache names of Facebook signers in the person table

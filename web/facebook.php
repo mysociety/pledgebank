@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.56 2007-10-29 12:41:41 francis Exp $
+// $Id: facebook.php,v 1.57 2007-10-29 12:54:47 francis Exp $
 
 /*
 
@@ -103,6 +103,8 @@ function do_test() {
 
 // Beginning of main code
 pbfacebook_init_webpage();
+
+# print "<pre>";print_r($_POST);print "</pre>";
 
 if (get_http_var("test")) {
     do_test();

@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.56 2007-10-29 13:59:35 francis Exp $
+// $Id: pbfacebook.php,v 1.57 2007-10-29 17:03:01 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -512,7 +512,7 @@ function pbfacebook_render_frontpage($page = "") {
         }
     }
 
-    print '<p class="pb_visit">Want to see more? Visit the full <a href="<?=OPTION_BASE_URL?>">PledgeBank site</a>!</p>';
+    print '<p class="pb_visit">Want to see more? Visit the full <a href="'.OPTION_BASE_URL.'">PledgeBank site</a>!</p>';
 
     return;
 }
@@ -731,6 +731,7 @@ function pbfacebook_send_internal($to, $message) {
     # without prefixing with their name. XXX This is subject to change by Facebook.
     # See: http://bugs.developers.facebook.com/show_bug.cgi?id=123 for more details.
     $ret = $facebook->api_client->notifications_send("", $message, $message);
+    print "ret:"; print_r($ret);
     if (is_int($ret)) {
         print("Error calling notifications_send in pbfacebook_send_internal: " . print_r($ret, TRUE)); 
         return false;

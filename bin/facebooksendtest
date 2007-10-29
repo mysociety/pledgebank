@@ -1,0 +1,30 @@
+#!/usr/bin/php -q
+<?php
+/* 
+ * facebooksendtest:
+ * Send test message to Facebook id.
+ *
+ * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
+ * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: facebooksendtest,v 1.1 2007-10-29 17:03:01 francis Exp $
+ *
+ */
+
+$short_opts = '';
+$long_opts = array();
+
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once "../phplib/pbfacebook.php";
+
+$args = $options[1];
+if (count($args) == 0)
+    err("Please specify arguments of ids of Facebook users to send test message to.");
+
+foreach ($args as $arg) {
+    print "Sending to facebook id $arg...";
+    pbfacebook_send_internal($arg, "This is a test message sent by facebooksendtest.");
+    print " done\n";
+}
+

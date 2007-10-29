@@ -6,12 +6,14 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.57 2007-10-29 12:54:47 francis Exp $
+// $Id: facebook.php,v 1.58 2007-10-29 17:06:25 francis Exp $
 
 /*
 
 
 TODO:
+
+- Matthew doesn't get notifications :(
 
 - 64 bit ids http://developers.facebook.com/news.php?blog=1&story=45
 

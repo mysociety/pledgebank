@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.254 2007-10-24 16:48:55 matthew Exp $
+ * $Id: pledge.php,v 1.255 2007-10-29 13:59:35 francis Exp $
  * 
  */
 
@@ -1236,7 +1236,15 @@ function pledge_get_frontpage_list($pledges_required_fp, $pledges_required_n) {
 
 
 # Draw part at top of pledge page which says pledge has succeeded/failed etc.
-function pledge_draw_status_plaque($p) {
+# always_show_success - set to true to always show success/failed. Otherwise
+# certain messages aren't shown, so they can be merged with the recommendation
+# dialog on the pledge page.
+function pledge_draw_status_plaque($p, $params = array()) {
+    $always_show_success = false;
+    if (array_key_exists('always_show_success', $params) && $params['always_show_success']) {
+        $always_show_success = true;
+    }
+
     if ($p->is_cancelled()) {
         print '<p id="cancelled">' . comments_text_to_html($p->data['cancelled']) . '</p>';
         return;
@@ -1246,7 +1254,8 @@ function pledge_draw_status_plaque($p) {
     }
 
     if ($p->finished() && $p->left() > 0) {
-        #print '<p class="finished">' . microsites_pledge_closed_text() . '</p>';
+        if ($always_show_success)
+            print '<p class="finished">' . microsites_pledge_closed_text() . '</p>';
     }
     if ($p->byarea()) {
         if ($p->byarea_successes() > 0) {
@@ -1266,12 +1275,14 @@ function pledge_draw_status_plaque($p) {
         # TRANS: "This pledge was successful!" is used when the pledge succeeded recently, "This pledge has been successful!" is used when it succeeded more than 30 days ago.
         if ($p->daysleft() > -30) {
             if ($p->finished()) {
-                #print _('This pledge has now closed; it was successful!');
+                if ($always_show_success)
+                    $out = _('This pledge has now closed; it was successful!');
             } else
                 $out = _('This pledge has been successful!');
         } else {
             if ($p->finished()) {
-                #print _('This pledge has now closed; it was successful!');
+                if ($always_show_success)
+                    $out = _('This pledge has now closed; it was successful!');
             } else
                 $out = _('This pledge was successful!');
         }

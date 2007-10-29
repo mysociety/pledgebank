@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.54 2007-10-26 00:54:54 francis Exp $
+// $Id: pbfacebook.php,v 1.55 2007-10-29 13:02:28 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -363,7 +363,8 @@ function pbfacebook_render_frontpage($page = "") {
         $page = "friends";
     }
 
-?>    <fb:tabs>
+?>   
+    <fb:tabs>
     <fb:tab-item title="Friends' pledges" <?=($page=="friends")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/friends" />
     <fb:tab-item title="My pledges" <?=($page=="my")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/my" />
     <fb:tab-item title="Featured pledges" <?=($page=="feature")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/feature" />
@@ -510,6 +511,8 @@ function pbfacebook_render_frontpage($page = "") {
             }
         }
     }
+
+    print '<p class="pb_visit">Want to see more? Visit the full <a href="<?=OPTION_BASE_URL?>">PledgeBank site</a>!</p>';
 
     return;
 }

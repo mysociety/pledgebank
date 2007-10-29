@@ -6,20 +6,14 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.55 2007-10-26 11:14:01 francis Exp $
+// $Id: facebook.php,v 1.56 2007-10-29 12:41:41 francis Exp $
 
 /*
 
 
 TODO:
 
-- 64 bit ids
-http://developers.facebook.com/news.php?blog=1&story=45
-
-- Experiment with notifications.send WITHOUT sending email - looks like that
-  will be the only option left from the notifications API.
-
-- Text that is shown by Facebook when you add application. (Heather to write)
+- 64 bit ids http://developers.facebook.com/news.php?blog=1&story=45
 
 - Add link to source code
 
@@ -29,23 +23,18 @@ http://developers.facebook.com/news.php?blog=1&story=45
    you don it yet.
 - "you has created these pledges" on profile
 
-- Check that after making new pledge takes you to share with friends dialog
-
-- Peruse the new http://bugs.developers.facebook.com/
-
 - Text on message for "share" links is not perfect.
 - Text on minifeed is not perfect
-- Finish links from rest of PledgeBank site.
-
-- Call http://wiki.developers.facebook.com/index.php/Feed.publishTemplatizedAction
-  instead of PublishActionofUser
-  See http://www.facebook.com/topic.php?uid=2205007948&topic=13926&start=30&hash=503b3e81edba5aeff0c1ac98eb58a61a at end for PHP function to add to the API file
 
 - Let creators of pledges use fancy form to share it.
 
 - Announce message shouldn't link to pledgebank.com, but to facebook.com
 
-- Maybe you aren't getting infinite session ids for all users?
+- Extra login dialog which you get if you try to sign a pledge you haven't seen before
+
+- Richard (and others) want to be able to add app and link to existing PB account so can show pledges on his profile
+  And to be able to add it to show his willingness to use it, but without signing a pledge yet
+  link from profile message "has not signed any pledges in Facebook"
 
 Improvements:
 - Cache names of Facebook signers in the person table
@@ -58,20 +47,21 @@ Improvements:
 - Somehow actually send notifications for success, rather than news post
 - On profile page, highlight more successful pledges, and that you must do them.
 - Let people say "I've done it!" on the pledges on their profile.
-- Aggregate multiple announce messages more intelligently - if user posts two messages
-  within 12 hours, then only post once on news feed. Or link to specific messages from
-  news feed, rather than to general pledge.
 - Show fastest growing pledges
 - Let people remove pledges from their profile page
 - Show featured pledges in facebook via mutual signer connections
   (first need to fix connections to use Facebook ids as well as emails?)
 - Show pledges made by / signed by people in same network as you
-- Richard wants to be able to add app and link to existing PB account so can show pledges on his profile
-  And to be able to add it to show his willingness to use it, but without signing a pledge yet
-  link from profile message "has not signed any pledges in Facebook"
+- Call http://wiki.developers.facebook.com/index.php/Feed.publishTemplatizedAction
+  instead of PublishActionofUser
+  See http://www.facebook.com/topic.php?uid=2205007948&topic=13926&start=30&hash=503b3e81edba5aeff0c1ac98eb58a61a at end for PHP function to add to the API file
+
 
 Later:
 - Add chivvy email about Facebook
+- Aggregate multiple announce messages more intelligently - if user posts two messages
+  within 12 hours, then only post once on news feed. Or link to specific messages from
+  news feed, rather than to general pledge.
 
 Not so important:
 - Test what happens if you add app, but refuse each of the major permissions

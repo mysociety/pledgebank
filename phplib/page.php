@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.172 2007-10-12 13:12:47 matthew Exp $
+// $Id: page.php,v 1.173 2007-11-02 15:36:07 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -92,7 +92,7 @@ function page_header($title, $params = array()) {
     if (!is_array($params))
         err("PARAMS must be an array in page_header");
     foreach ($params as $k => $v) {
-        if (!preg_match('/^(nonav|noprint|noreflink|last-modified|etag|cache-max-age|id|pref|ref|robots|rss|override)$/', $k))
+        if (!preg_match('/^(nonav|noprint|noreflink|last-modified|etag|cache-max-age|id|pref|ref|robots|rss|css|override)$/', $k))
             err("bad key '$k' with value '$v' in PARAMS argument to page_header");
     }
 
@@ -128,22 +128,24 @@ function page_header($title, $params = array()) {
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <?  if (array_key_exists('robots', $params)) { ?>
 <meta name="robots" content="<?=$params['robots']?>">
-<?  } ?>
-<title><?
+<?  }
+
+    echo '<title>';
     if ($title) 
         print strip_title($title) . " - ";
-        /* XXX @import url('...') uses single-quotes to hide the style-sheet
-         * from Mac IE. Ugly, but it works. */
-?> <?=strip_title(_('PledgeBank'))?><?if (!$title) print " - " . microsites_html_title_slogan() ?></title>
-<?
+    echo strip_title(_('PledgeBank'));
+    if (!$title) print ' - ' . microsites_html_title_slogan();
+    echo '</title>';
+
+    /* XXX @import url('...') uses single-quotes to hide the style-sheet
+     * from Mac IE. Ugly, but it works. */
     foreach (microsites_css_files() as $microsite_file) {
-?>
-<style type="text/css" media="all">@import url('<?=$microsite_file?>');</style>
-<?
+        echo '<style type="text/css" media="all">@import url(\'' . $microsite_file . '\');</style>';
     }
-?>
-<link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
-<?
+    echo '<link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">';
+    if (array_key_exists('css', $params)) {
+	echo '<style type="text/css" media="all">@import url(\'' . $params['css'] . '\');</style>';
+    }
 
     if (array_key_exists('rss', $params)) {
         foreach ($params['rss'] as $rss_title => $rss_url) {
@@ -162,7 +164,7 @@ function page_header($title, $params = array()) {
         $js_file = null;
     if ($js_file) { ?>
 <script type="text/javascript" src="/<?=$js_file?>"></script>
-<? } ?>
+<?  } ?>
 <script type="text/javascript" src="/pb.js"></script>
 <script type="text/javascript" src="/jslib/utils.js"></script>
 <script type="text/javascript" src="/jquery.js"></script>

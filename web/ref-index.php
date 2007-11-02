@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.120 2007-10-19 17:32:12 francis Exp $
+// $Id: ref-index.php,v 1.121 2007-11-02 15:36:07 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -26,6 +26,7 @@ require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
+require_once '../phplib/share.php';
 require_once '../../phplib/utility.php';
 
 $ref = get_http_var('ref');
@@ -68,10 +69,17 @@ function draw_spreadword($p) { ?>
         print '</div>';
     }
     print '<ul>';
-    if (!$p->finished()) {
+    if (!$p->pin()) {
+        echo '<li><a href="/', $p->ref(), '/share" onclick="share(this); return false;" title="',
+            _('E-mail this, post to del.icio.us, etc.'), '" class="share_link" rel="nofollow">',
+            _('Share this'), '</a>';
+        share_form($p);
+    } else {
         print '<li>';
         print_link_with_pin($p->url_email(), "", _("Email your friends"));
         print '</li>';
+    }
+    if (!$p->finished()) {
         if (microsites_has_flyers()) {
             print '<li>';
             print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers"));
@@ -374,7 +382,7 @@ function draw_connections_for_finished($p) {
         print strong(_('This pledge has now closed; it was successful!'));
     } else {
         print 'finished">';
-	    print microsites_pledge_closed_text();
+            print microsites_pledge_closed_text();
     }
     if (count($pledges) > 0) {
         print ' ' . _('You might be interested in these other pledges:');
@@ -394,15 +402,16 @@ locale_push($p->lang());
 $title = "'" . _('I will') . ' ' . $p->h_title() . "'";
 locale_pop();
 $params = array(
-            'ref'=>$p->ref(),
-            'pref' => $p->url_typein(),
-            'noreflink' => 1,
-            'last-modified' => $p->last_change_time(),
-            'etag' => $etag,
-        );
+    'ref'=>$p->ref(),
+    'pref' => $p->url_typein(),
+    'noreflink' => 1,
+    'last-modified' => $p->last_change_time(),
+    'etag' => $etag,
+    'css' => '/share/share.css',
+);
 if (microsites_comments_allowed() && !$p->pin())
     $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());
-    
+ 
 page_header($title, $params);
 debug_comment_timestamp("after page_header()");
 pledge_draw_status_plaque($p);

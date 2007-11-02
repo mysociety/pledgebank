@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.173 2007-10-25 16:31:46 francis Exp $
+// $Id: fns.php,v 1.174 2007-11-02 15:36:06 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -238,7 +238,7 @@ function view_friends_form($p, $errors = array(), $track=null) {
     } else {
         # <p>Here's a reminder of the pledge you're telling people about:</p> - Not sure this is necessary
     }
-    $p->render_box(array('showdetails'=>false));
+    $p->render_box(array('showdetails'=>true));
 ?>
 <form name="pledge" action="<?=$p->url_main() ?>/email" method="post">
 <?  if ($track)

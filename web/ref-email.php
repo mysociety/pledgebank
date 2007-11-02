@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.30 2007-08-09 16:56:16 matthew Exp $
+// $Id: ref-email.php,v 1.31 2007-11-02 15:36:07 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -34,9 +34,19 @@ if (get_http_var('submit')) {
     for ($i = 1; $i <= 5; $i++) {
         if (get_http_var("e$i")) {
             $email = trim(get_http_var("e$i"));
-            $emails[] = $email;
-            if (!validate_email($email)) {
-                $errors['e'.$i] = _("Please correct the email address '".htmlspecialchars($email)."', which is not a valid address.");
+            if (strstr($email, ',') || strstr($email, ';')) {
+                $email = preg_split('#\s*[;,]\s*#', $email, -1, PREG_SPLIT_NO_EMPTY);
+                $emails = array_merge($emails, $email);
+                foreach ($email as $e) {
+                    if (!validate_email($e)) {
+                        $errors['e'.$i] = sprintf(_("Please correct the email address '%s', which is not a valid address."), htmlspecialchars($e));
+                    }
+                }
+            } else {
+                $emails[] = $email;
+                if (!validate_email($email)) {
+                    $errors['e'.$i] = sprintf(_("Please correct the email address '%s', which is not a valid address."), htmlspecialchars($email));
+                }
             }
         }
     }

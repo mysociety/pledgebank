@@ -7,7 +7,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: share.php,v 1.1 2007-11-02 15:36:07 matthew Exp $
+ * $Id: share.php,v 1.2 2007-11-06 14:28:35 matthew Exp $
  * 
  */
 
@@ -127,6 +127,9 @@ function share_form_email($ref) {
 <label><?=_('Your email:') ?></label>
 <input type="text" name="fromat" value="<?php print(htmlspecialchars($email)); ?>" class="share_text">
 </li>
+<li><?=_('Add a message, if you want:') ?>
+
+<textarea name="frommessage" rows="8" cols="40"></textarea>
 <li>
 <input type="submit" name="submit" value="<?=_('Send message') ?>">
 </li>

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-email.php,v 1.31 2007-11-02 15:36:07 matthew Exp $
+// $Id: ref-email.php,v 1.32 2007-11-06 14:28:35 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -28,25 +28,22 @@ $fromname = get_http_var('fromname', true);
 $fromemail = trim(get_http_var('fromat'));
 $frommessage = get_http_var('frommessage', true);
 $errors = array();
-$emails = array();
 
 if (get_http_var('submit')) {
+    $emails = array();
+    if (preg_match('#[;, ]#', get_http_var('e1'))) {
+        $email = preg_split('#[;,\s]+#', get_http_var('e1'), -1, PREG_SPLIT_NO_EMPTY);
+	$i = 1;
+        foreach ($email as $e) {
+	    $_GET['e' . $i++] = $e;
+        }
+    }
     for ($i = 1; $i <= 5; $i++) {
         if (get_http_var("e$i")) {
             $email = trim(get_http_var("e$i"));
-            if (strstr($email, ',') || strstr($email, ';')) {
-                $email = preg_split('#\s*[;,]\s*#', $email, -1, PREG_SPLIT_NO_EMPTY);
-                $emails = array_merge($emails, $email);
-                foreach ($email as $e) {
-                    if (!validate_email($e)) {
-                        $errors['e'.$i] = sprintf(_("Please correct the email address '%s', which is not a valid address."), htmlspecialchars($e));
-                    }
-                }
-            } else {
-                $emails[] = $email;
-                if (!validate_email($email)) {
-                    $errors['e'.$i] = sprintf(_("Please correct the email address '%s', which is not a valid address."), htmlspecialchars($email));
-                }
+            $emails[] = $email;
+            if (!validate_email($email)) {
+                $errors['e'.$i] = sprintf(_("Please correct the email address '%s', which is not a valid address."), htmlspecialchars($email));
             }
         }
     }

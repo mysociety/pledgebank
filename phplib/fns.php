@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.174 2007-11-02 15:36:06 matthew Exp $
+// $Id: fns.php,v 1.175 2007-11-06 14:28:35 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -258,7 +258,7 @@ We will not give or sell either your or their email address to anyone else.')); 
 <div class="formrow"><input <? if (array_key_exists('e5', $errors)) print ' class="error"' ?> type="text" name="e5" value="<? if (get_http_var('e5')) print htmlentities(get_http_var('e5'));?>" size="40"></div>
 
 <p><strong><?=_('Add a message, if you want:') ?></strong></p>
-<div class="formrow"><textarea <? if (array_key_exists('frommessage', $errors)) print ' class="error"' ?> name="frommessage" rows="8" cols="40"></textarea></div>
+<div class="formrow"><textarea <? if (array_key_exists('frommessage', $errors)) print ' class="error"' ?> name="frommessage" rows="8" cols="40"><?=htmlspecialchars(get_http_var('frommessage')) ?></textarea></div>
 
 <p>
 <div class="formrow"><strong><?=_('Your name:') ?></strong> <input <? if (array_key_exists('fromname', $errors)) print ' class="error"' ?> type="text" name="fromname" value="<?=htmlspecialchars($name) ?>" size="20">

@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.58 2007-10-29 17:06:25 francis Exp $
+// $Id: facebook.php,v 1.59 2007-11-06 13:36:31 francis Exp $
 
 /*
 
@@ -38,28 +38,32 @@ TODO:
   And to be able to add it to show his willingness to use it, but without signing a pledge yet
   link from profile message "has not signed any pledges in Facebook"
 
+- Use friend request form (mini?) rather than share link everywhere, as has confused people
+  by starting a large thread. Maybe have "invite your friends" link explicitly?
+
 Improvements:
-- Cache names of Facebook signers in the person table
 - Show pledges which have lots of Facebook signers
-- Find pledges by people with similar interests, or who've signed similar pledges etc.
-- Include featured pledges on EVERYONE's profile
 - Link to creators of via facebook pledges, and show their photo
 - Show in "friends pledges" section ones created by friends separately
 - Show on http://apps.facebook.com/pledgebank ones you've already signed clearer
-- Somehow actually send notifications for success, rather than news post
 - On profile page, highlight more successful pledges, and that you must do them.
 - Let people say "I've done it!" on the pledges on their profile.
-- Show fastest growing pledges
 - Let people remove pledges from their profile page
+- Include featured pledges on EVERYONE's profile optionally
+
 - Show featured pledges in facebook via mutual signer connections
   (first need to fix connections to use Facebook ids as well as emails?)
 - Show pledges made by / signed by people in same network as you
+- Show fastest growing pledges
+- Find pledges by people with similar interests
+
 - Call http://wiki.developers.facebook.com/index.php/Feed.publishTemplatizedAction
   instead of PublishActionofUser
   See http://www.facebook.com/topic.php?uid=2205007948&topic=13926&start=30&hash=503b3e81edba5aeff0c1ac98eb58a61a at end for PHP function to add to the API file
-
+- Tidy up display when lots of signers http://apps.facebook.com/pledgebank/Pauls-100mill
 
 Later:
+- Cache names of Facebook signers in the person table
 - Add chivvy email about Facebook
 - Aggregate multiple announce messages more intelligently - if user posts two messages
   within 12 hours, then only post once on news feed. Or link to specific messages from

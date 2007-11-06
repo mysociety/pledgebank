@@ -7,7 +7,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: share.php,v 1.2 2007-11-06 14:28:35 matthew Exp $
+ * $Id: share.php,v 1.3 2007-11-06 14:30:03 matthew Exp $
  * 
  */
 
@@ -96,7 +96,7 @@ function share_form_social($p) {
             array(urlencode($p->url_typein()), urlencode('PledgeBank pledge ' . $p->ref())),
             $data['url']
         );
-        print '<li><a href="' . $url . '" id="share_' . $key . '">'
+        print '<li><a href="' . htmlspecialchars($url) . '" id="share_' . $key . '">'
             . str_replace(' ', '&nbsp;', $data['name']) . '</a></li>' . "\n";
     }
     echo '</ul> <div class="clear"></div> </div>';

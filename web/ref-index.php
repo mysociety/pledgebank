@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.121 2007-11-02 15:36:07 matthew Exp $
+// $Id: ref-index.php,v 1.122 2007-11-06 16:27:23 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -73,7 +73,7 @@ function draw_spreadword($p) { ?>
         echo '<li><a href="/', $p->ref(), '/share" onclick="share(this); return false;" title="',
             _('E-mail this, post to del.icio.us, etc.'), '" class="share_link" rel="nofollow">',
             _('Share this'), '</a>';
-        share_form($p);
+        pb_share_form($p);
     } else {
         print '<li>';
         print_link_with_pin($p->url_email(), "", _("Email your friends"));
@@ -407,7 +407,7 @@ $params = array(
     'noreflink' => 1,
     'last-modified' => $p->last_change_time(),
     'etag' => $etag,
-    'css' => '/share/share.css',
+    'css' => '/jslib/share/share.css',
 );
 if (microsites_comments_allowed() && !$p->pin())
     $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());

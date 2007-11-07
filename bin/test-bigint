@@ -1,0 +1,38 @@
+#!/usr/bin/php -q
+<?php
+/* 
+ * test-bigint:
+ * Fiddle with 64 bit integers and PHP and PostgreSQL.
+ *
+ * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: test-bigint,v 1.1 2007-11-07 13:10:42 francis Exp $
+ *
+ */
+
+// Do this: create table fooble ( barble bigint );
+
+
+$short_opts = '';
+$long_opts = array('verbose','help');
+
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once '../phplib/fns.php';
+require_once '../phplib/pledge.php';
+require_once "../phplib/pbperson.php";
+require_once '../phplib/microsites.php';
+require_once '../phplib/pbfacebook.php';
+require_once '../phplib/comments.php';
+require_once '../../phplib/db.php';
+require_once '../../phplib/utility.php';
+
+db_query("insert into fooble values (98765432109876)");
+$q = db_query("select * from fooble where barble = 98765432109876");
+
+while ($row = db_fetch_array($q)) {
+    print_r($row);
+    print gettype($row[0]) . "\n";
+}
+

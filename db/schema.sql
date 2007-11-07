@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.226 2007-10-01 15:55:01 francis Exp $
+-- $Id: schema.sql,v 1.227 2007-11-07 13:11:01 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -122,7 +122,7 @@ create table person (
     website text,
     numlogins integer not null default 0,
     mobile text,
-    facebook_id integer,
+    facebook_id bigint, 
 
     check ( email is not null or mobile is not null or facebook_id is not null),
 
@@ -139,6 +139,8 @@ create table person (
 create unique index person_email_idx on person(email);
 create unique index person_email_lower_idx on person(lower(email));
 create unique index person_mobile_idx on person(mobile);
+-- watch for performance issues with 64 bit indices, not sure if they will effect us
+-- http://www.postgresql.org/docs/7.4/interactive/datatype.html#DATATYPE-INT
 create unique index person_facebook_id_idx on person(facebook_id);
 
 -- extra information about Facebook users

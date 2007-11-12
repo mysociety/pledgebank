@@ -8,7 +8,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.19 2007-10-24 21:57:07 matthew Exp $
+// $Id: gaze-controls.php,v 1.20 2007-11-12 18:31:01 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -421,7 +421,7 @@ function gaze_controls_split_name($s) {
     global $countries_name_to_statecode;
     preg_match('#^(.*?)(?:,\s*(.*?))?(?:,\s*(.*?))?(?:\s*\((.*?)\))?$#', $s, $m);
     $parts = array(
-        'name' => $m[1],
+        'name' => isset($m[1]) ? $m[1] : '',
         'in' => isset($m[2]) ? $m[2] : '',
         'state' => isset($m[3]) ? $m[3]: '',
         'near' => isset($m[4]) ? $m[4] : '',

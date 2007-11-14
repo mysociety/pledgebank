@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.62 2007-10-12 13:12:48 matthew Exp $
+ * $Id: ref-announce.php,v 1.63 2007-11-14 17:09:30 matthew Exp $
  * 
  */
 
@@ -28,6 +28,20 @@ if (!is_null($err))
 page_check_ref($q_ref);
 $p = new Pledge($q_ref);
 microsites_redirect($p);
+
+# XXX: Is this the best place for this?
+if (get_http_var('unsubscribe')) {
+    $P = pb_person_if_signed_on();
+    if (!$P) 
+        err(_('Unexpectedly not signed on after following unsubscribe link'));
+    db_query('update signers set optout=true where pledge_id=? and person_id=?',
+        $p->id(), $P->id());
+    page_header(_('Pledge announce unsubscribe'));
+    print p(_("Okay, you won't receive any more emails from the pledge creator of this pledge."));
+    print p('<a href="/' . $p->ref() . '">' . _('Back to pledge page') . '</a>.');
+    page_footer();
+    exit;
+}
 
 /* Lock the pledge here, before we do any other checks. */
 $p->lock();

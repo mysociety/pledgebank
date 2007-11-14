@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.240 2007-11-02 15:41:18 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.241 2007-11-14 17:09:30 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -801,7 +801,15 @@ sub do_public_succeeding_pledge {
     comment("Check all announcements arrived");
     $wth->email_get_containing( '%To: "' . name_n(0) . '" <' . email_n(0) . '>%From: '.$name_admin.  '%[ This is a copy of the message%Love and kisses%');
     $wth->email_get_containing( '%To: "' . name_n(1) . '" <' . email_n(1) . '>%From: "' . name_n(0) . '"%Love and kisses%');
-    $wth->email_get_containing( '%To: "' . name_n(2) . '" <' . email_n(2) . '>%From: "' . name_n(0) . '"%Love and kisses%');
+    $content = $wth->email_get_containing( '%To: "' . name_n(2) . '" <' . email_n(2) . '>%From: "' . name_n(0) . '"%Love and kisses%');
+    die "Unsubscribe email link not found\n" if ($content !~ m#^\s*(http://.*$)#m);
+    $unsub_link = $1;
+
+    comment("Unsubscribe one signer from announce messages");
+    display_url("Unsubscribe from announcements URL", $unsub_link);
+    $wth->browser_get($unsub_link);
+    $wth->browser_check_contents("won't receive any more emails");
+
     call_frequentupdate();
     $wth->email_check_none_left();
 
@@ -860,6 +868,7 @@ sub do_public_succeeding_pledge {
     call_frequentupdate();
     comment("Check all success messages arrived");
     for (my $i = 1; $i <= 3; ++$i) {
+        next if $i == 2; # Signer 2 unsubscribed
         my $success_email = $wth->email_get_containing( 
             '%To: "' . name_n($i) . '" <' . email_n($i) . '>%From: "' . name_n(0) . '"%By merely partaking%');
     }
@@ -878,7 +887,7 @@ sub do_public_succeeding_pledge {
     comment("They won't get the earlier success announcement message, instead a URL...");
     call_frequentupdate();
     my $late_success_announce_email = $wth->email_get_containing( '%To: "' . name_n(4) . '" <' . email_n(4) . '>%You signed this pledge after this message was%By merely partaking%');
-    die $late_success_announce_email . "\n\nUnsubscribe link not found" if ($late_success_announce_email !~ m#\b(http://.*/L/.*)\b#m);
+    die $late_success_announce_email . "\n\nRead more link not found" if ($late_success_announce_email !~ m#\b(http://.*/L/.*)\b#m);
     my $announce_archive_link = $1;
     comment("... follow it to get other messages");
     $wth->browser_get($announce_archive_link);

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.227 2007-11-07 13:11:01 francis Exp $
+-- $Id: schema.sql,v 1.228 2007-11-14 17:09:30 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -607,6 +607,7 @@ create table signers (
 
     -- whether they want their name public
     showname boolean not null default false,
+    optout boolean not null default false,
 
     -- if they signed this via Facebook
     via_facebook boolean not null default false,

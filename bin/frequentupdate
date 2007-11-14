@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.122 2007-10-25 16:31:46 francis Exp $
+ * $Id: frequentupdate,v 1.123 2007-11-14 17:09:30 matthew Exp $
  *
  */
 
@@ -782,6 +782,7 @@ function send_pending_messages() {
                 select message.*,
                     signers.id as signer_id,
                     signers.name as signer_name,
+                    signers.optout,
                     signer_person.email as signer_email,
                     signer_person.mobile as signer_mobile,
                     signer_person.facebook_id as signer_facebook_id,
@@ -907,7 +908,10 @@ function send_pending_messages() {
 
             locale_pop();
         } else {
-            /* Send raw mail. */
+            /* Send raw mail - this is just announce messages from the creator currently */
+
+            if ($r['optout'] == 't') continue;
+
             $emailbody = $r['emailbody'];
 
             /* Check if this is being sent to a late signer */
@@ -966,6 +970,9 @@ function send_pending_messages() {
             if ($send_it) {
                 if ($send_by == 'email') {
                     verbose("sending message #${r['id']} as raw email, subject '${r['emailsubject']}'");
+                    $unsubscribe_url = pb_person_make_signon_url(null, $r['signer_email'],
+                        'GET', $pledge->url_announce(), array('unsubscribe'=>'1'), $pledge->microsite());
+                    $emailbody .= "\n\n" . sprintf(_("To stop receiving messages from the pledge creator, please follow this link: %s"), $unsubscribe_url);
                     $to = $r['signer_name'] ? array(array($r['signer_email'], $r['signer_name'])) : $r['signer_email'];
                     $f = pb_send_email($to, $r['emailsubject'], $emailbody, $headers);
                 } elseif ($send_by == 'facebook') {

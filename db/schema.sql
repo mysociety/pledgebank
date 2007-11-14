@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.228 2007-11-14 17:09:30 matthew Exp $
+-- $Id: schema.sql,v 1.229 2007-11-14 17:51:07 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -122,7 +122,8 @@ create table person (
     website text,
     numlogins integer not null default 0,
     mobile text,
-    facebook_id bigint, 
+    --facebook_id bigint, 
+    facebook_id integer, 
 
     check ( email is not null or mobile is not null or facebook_id is not null),
 

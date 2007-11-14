@@ -6,13 +6,15 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.59 2007-11-06 13:36:31 francis Exp $
+// $Id: facebook.php,v 1.60 2007-11-14 00:12:53 francis Exp $
 
 /*
 
 
 TODO:
 
+- Check out notifications.sendEmail, which doesn't seem documented yet
+    http://wiki.developers.facebook.com/index.php/Push_Changes_-_Nov_13_2007
 - Matthew doesn't get notifications :(
 
 - 64 bit ids http://developers.facebook.com/news.php?blog=1&story=45

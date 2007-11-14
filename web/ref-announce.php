@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.63 2007-11-14 17:09:30 matthew Exp $
+ * $Id: ref-announce.php,v 1.64 2007-11-14 17:42:26 matthew Exp $
  * 
  */
 
@@ -36,6 +36,7 @@ if (get_http_var('unsubscribe')) {
         err(_('Unexpectedly not signed on after following unsubscribe link'));
     db_query('update signers set optout=true where pledge_id=? and person_id=?',
         $p->id(), $P->id());
+    db_commit();
     page_header(_('Pledge announce unsubscribe'));
     print p(_("Okay, you won't receive any more emails from the pledge creator of this pledge."));
     print p('<a href="/' . $p->ref() . '">' . _('Back to pledge page') . '</a>.');

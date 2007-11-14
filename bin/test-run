@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.242 2007-11-14 17:11:15 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.243 2007-11-14 17:42:25 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -800,8 +800,8 @@ sub do_public_succeeding_pledge {
     call_frequentupdate();
     comment("Check all announcements arrived");
     $wth->email_get_containing( '%To: "' . name_n(0) . '" <' . email_n(0) . '>%From: '.$name_admin.  '%[ This is a copy of the message%Love and kisses%');
-    $wth->email_get_containing( '%To: "' . name_n(1) . '" <' . email_n(1) . '>%From: "' . name_n(0) . '"%Love and kisses%');
-    $content = $wth->email_get_containing( '%To: "' . name_n(2) . '" <' . email_n(2) . '>%From: "' . name_n(0) . '"%Love and kisses%');
+    $content = $wth->email_get_containing( '%To: "' . name_n(1) . '" <' . email_n(1) . '>%From: "' . name_n(0) . '"%Love and kisses%');
+    $wth->email_get_containing( '%To: "' . name_n(2) . '" <' . email_n(2) . '>%From: "' . name_n(0) . '"%Love and kisses%');
     die "Unsubscribe email link not found\n" if ($content !~ m#^\s*(http://.*$)#m);
     my $unsub_link = $1;
 
@@ -867,8 +867,7 @@ sub do_public_succeeding_pledge {
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
     call_frequentupdate();
     comment("Check all success messages arrived");
-    for (my $i = 1; $i <= 3; ++$i) {
-        next if $i == 2; # Signer 2 unsubscribed
+    for (my $i = 2; $i <= 3; ++$i) {
         my $success_email = $wth->email_get_containing( 
             '%To: "' . name_n($i) . '" <' . email_n($i) . '>%From: "' . name_n(0) . '"%By merely partaking%');
     }

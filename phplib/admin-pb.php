@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.159 2007-10-10 17:34:20 francis Exp $
+ * $Id: admin-pb.php,v 1.160 2007-11-14 17:49:30 francis Exp $
  * 
  */
 
@@ -358,8 +358,8 @@ class ADMIN_PAGE_PB_MAIN {
             print '<br>&mdash;<input type="text" name="name" value="'.htmlspecialchars($pdata['name']).'" size="20">, ';
             print '<input type="text" name="identity" value="'.htmlspecialchars($pdata['identity']).'" size="30">';
             print '<br>More details: <textarea type="text" name="detail" cols="70" rows="7">'.htmlspecialchars($pdata['detail']).'</textarea>';
-            #cancelled
-            #notice
+            print '<br>Notice: <input type="text" name="notice" value="'.htmlspecialchars($pdata['notice']).'" size="60">';
+            print '<br>Cancelled text (also cancels pledge): <input type="text" name="cancelled" value="'.htmlspecialchars($pdata['cancelled']).'" size="60">';
             print '<input type="hidden" name="edit_pledge_text_id" value="' . $pdata['id'] . '">';
             print '<input type="hidden" name="edit_pledge_text" value="1">';
             print '<input type="hidden" name="edit" value="1">';
@@ -653,6 +653,8 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         $name = get_http_var('name');
         $identity = get_http_var('identity');
         $detail = get_http_var('detail');
+        $notice = get_http_var('notice');
+        $cancelled = get_http_var('cancelled');
         $target = intval(get_http_var('target'));
         if ($pledge->target() > $pledge->signers()) {
             if ($target <= $pledge->signers()) {
@@ -665,7 +667,7 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
                 return;
             }
         }
-        db_query('update pledges set title = ?, type = ?, signup = ?, name = ?, identity = ?, detail = ?, target = ? where id = ?', $title, $type, $signup, $name, $identity, $detail, $target, $pledge_id);
+        db_query('update pledges set title = ?, type = ?, signup = ?, name = ?, identity = ?, detail = ?, target = ?, notice = ?, cancelled = ? where id = ?', $title, $type, $signup, $name, $identity, $detail, $target, $notice, $cancelled, $pledge_id);
         db_commit();
         print p(_('<em>Pledge text updated. Check it in the pledge box preview on the right.</em>'));
     }

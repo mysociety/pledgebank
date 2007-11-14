@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: where.php,v 1.15 2007-07-29 22:25:44 matthew Exp $
+// $Id: where.php,v 1.16 2007-11-14 18:31:11 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -70,7 +70,7 @@ foreach ($countries_name_to_code as $name => $code) {
         print "<h3>$firstchar</h3><p>\n";
     }
     $url = pb_domain_url(array('country'=>$code, 'path'=>$r));
-    print "<a href=\"".$url."\">".$name."</a>";
+    print '<a href="' . $url . '">' . $countries_code_to_name[$code] . '</a>';
     print " <!-- pledges: " . $country_count[$code] . " --> ";
     print "<br>\n";
     $n++;

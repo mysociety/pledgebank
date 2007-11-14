@@ -9,7 +9,8 @@ achieved only <?=$values['actual']?>.</p>
 '<a href="<?=$values['pledge_facebook_url']?>"><?=$values['sentence_first']?></a>'</p>
 
 <p>Depending on the pledge, you can feel free to either move forward with your
-part of the pledge or withdraw your pledge. As a next step, feel free to
+part of the pledge anyway or withdraw your pledge (in which case, you need do
+nothing). As a next step, feel free to
 <a href="<?=$values['pledgebank_url']?>alert">sign up to local alerts</a> to
 find out when someone creates a new pledge near you, 
 <a href="<?=$values['pledgebank_facebook_url']?>">browse the pledges</a> or

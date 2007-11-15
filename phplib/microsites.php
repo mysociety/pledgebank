@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.123 2007-10-17 22:36:17 matthew Exp $
+ * $Id: microsites.php,v 1.124 2007-11-15 09:50:03 francis Exp $
  * 
  */
 
@@ -260,13 +260,13 @@ function microsites_logo() {
 <h1 style="padding-bottom:0.25em;"><a id="logo" href="/"><span id="logo_zh">' . _('Pledge') . _('Bank') . '</span>
 <small><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></small></a>
 <span id="countrytitle"><a href="/where">' . $country_name . '</a></span>
-<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but only if you&rsquo;ll help') . '</small></span></h1>';
+<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>';
     } else {
         $country_name = pb_site_country_name();
         return '
 <h1><a id="logo" href="/"><span id="logo_pledge">' . _('Pledge') . '</span><span id="logo_bank">' . _('Bank') . '</span></a>
 <span id="countrytitle"><a href="/where">' . $country_name . '</a></span>
-<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but only if you&rsquo;ll help') . '</small></span></h1>';
+<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>';
     }
 }
 

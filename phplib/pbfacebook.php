@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.58 2007-11-06 13:36:29 francis Exp $
+// $Id: pbfacebook.php,v 1.59 2007-11-15 10:32:33 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -57,7 +57,7 @@ function pbfacebook_update_profile_box($uid) {
             array($uid));
     if (db_num_rows($q) > 0) {
         $got = 1;
-        $out .= "<fb:name uid=\"$uid\"/> has created these Pledges.";
+        $out .= "<fb:name uid=\"$uid\" useyou=\"false\"/> has created these Pledges.";
         $out .= '<ol>';
         while ($r = db_fetch_array($q)) {
             $pledge = new Pledge($r);
@@ -83,7 +83,7 @@ function pbfacebook_update_profile_box($uid) {
             array($uid));
     if (db_num_rows($q) > 0) {
         $got = 1;
-        $out .= "<fb:name uid=\"$uid\"/> has signed these Pledges.";
+        $out .= "<fb:name uid=\"$uid\" useyou=\"false\"/> has signed these Pledges.";
         $out .= '<ol>';
         while ($r = db_fetch_array($q)) {
             $pledge = new Pledge($r);

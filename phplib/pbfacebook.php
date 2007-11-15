@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.60 2007-11-15 10:41:52 francis Exp $
+// $Id: pbfacebook.php,v 1.61 2007-11-15 10:52:04 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -515,6 +515,7 @@ function pbfacebook_render_frontpage($page = "") {
     }
 
     print '<p class="pb_visit">Want to see more? Visit the full <a href="'.OPTION_BASE_URL.'">PledgeBank site</a>!</p>';
+    print '<p class="pb_visit">PledgeBank is open source, get the <a href="https://secure.mysociety.org/cvstrac/dir?d=mysociety/pb">source code</a>.</p>';
 
     return;
 }
@@ -669,8 +670,9 @@ img.creatorpicture {
 function pbfacebook_render_footer() {
 ?> 
 <div style="clear: both;"/>
-</div> <?
+</div> 
 
+<?
 }
 
 // Call from Facebook callbook hook pages

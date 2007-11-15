@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.59 2007-11-15 10:32:33 francis Exp $
+// $Id: pbfacebook.php,v 1.60 2007-11-15 10:41:52 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -103,7 +103,9 @@ function pbfacebook_update_profile_box($uid) {
     }
 
     $ret = $facebook->api_client->profile_setFBML($out, $uid);
-    if ($ret != 1) err("Error calling profile_setFBML for $uid: ". print_r($ret, TRUE) . "\n");
+    if ($ret != 1) 
+        return false;
+    return true;
 }
 
 // Draw pledge index page within Facebook
@@ -551,7 +553,9 @@ function pbfacebook_sign_pledge($pledge) {
         }
 
         # Show on their profile that they have signed it
-        pbfacebook_update_profile_box($user);
+        if (!pbfacebook_update_profile_box($user)) {
+            # profile not updated, not much can do about it really
+        }
 
         # Publish feed story
         $feed_title = '<fb:userlink uid="'.$user.'" shownetwork="false"/> signed '; 

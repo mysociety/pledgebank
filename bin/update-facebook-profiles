@@ -1,0 +1,65 @@
+#!/usr/bin/php -q
+<?php
+/* 
+ * update-facebook-profiles:
+ * Update wrapping profile text for each person's profile. Doesn't need calling
+ * unless the code has changed.
+ *
+ * See also update-facebook-stuff
+ *
+ * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
+ * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
+ *
+ * $Id: update-facebook-profiles,v 1.1 2007-11-15 10:41:52 francis Exp $
+ *
+ */
+
+$short_opts = '';
+$long_opts = array('verbose','help');
+
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once '../phplib/pledge.php';
+require_once '../phplib/pbfacebook.php';
+
+function verbose($str) {
+    global $verbose;
+    if ($verbose) 
+        fwrite(STDERR, "update-facebook-profiles ".posix_getpid().": $str\n");
+}
+function error($str) {
+    fwrite(STDERR, "update-facebook-profiles: ERROR: $str\n");
+}
+
+$switches = $options[0];
+$args = $options[1];
+$verbose = 0; 
+foreach ($switches as $switch) {
+    if ($switch[0]=='--verbose') $verbose = 1;
+    if ($switch[0]=='--help') {
+?>
+
+PledgeBank Facebook profiles update script.
+
+Usage: update-facebook-profiles [--verbose]
+
+--help      Display this help message
+--verbose   Display more information
+
+<?
+        exit;
+    }
+}
+
+# Update profile text for each user
+$q = db_query("select * from person where facebook_id is not null order by random()");
+while ($person = db_fetch_array($q)) {
+    verbose("updating profile of Facebook person " . $person['facebook_id']);
+    pbfacebook_init_cron($person['facebook_id']); 
+    if (!pbfacebook_update_profile_box($person['facebook_id'])) {
+        print "failed to update " . $person['facebook_id'] . "\n";
+    }
+}
+
+
+

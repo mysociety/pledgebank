@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.60 2007-11-14 00:12:53 francis Exp $
+// $Id: facebook.php,v 1.61 2007-11-15 10:41:53 francis Exp $
 
 /*
 
@@ -91,21 +91,8 @@ $page_plain_headers = true;
 // Test function
 function do_test() {
     global $facebook;
-#    $facebook->require_login();
-#    pbfacebook_update_profile_box($facebook->get_loggedin_user());
     print "Doing test...";
-
-#    $ret = pbfacebook_send_internal(582616613, "Hello you");
-#    print_r($ret);
-
-#    $notifications = $facebook->api_client->friends_get();
-    #$notifications = $facebook->api_client->notifications_get();
-#    print_r($notifications);
-
-#    $ret = $facebook->api_client->notifications_send(703090157 /*582616613*/, "Notification from Opera!", "Wouldn't it ROCK if you could click here and sign up to the awesomest pledge.");
-#    print_r($ret);
-#    print "<p>Done";
-
+    print "Nothing";
     exit;
 }
 

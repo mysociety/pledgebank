@@ -2,13 +2,15 @@
 <?php
 /* 
  * update-facebook-stuff:
- * Update all the static FBML on everyone's profiles, to reflect new signatures
- * on pledges and whether they are successful or not.
+ * Update all the static FBML which is used on everyone's profiles, to reflect
+ * new signatures on pledges and whether they are successful or not.
+ *
+ * See also update-facebook-profiles.
  *
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: update-facebook-stuff,v 1.6 2007-07-07 01:48:07 francis Exp $
+ * $Id: update-facebook-stuff,v 1.7 2007-11-15 10:41:52 francis Exp $
  *
  */
 
@@ -37,7 +39,7 @@ foreach ($switches as $switch) {
     if ($switch[0]=='--help') {
 ?>
 
-PledgeBank Facebook update script.
+PledgeBank Facebook pledge-on-profile-text update script.
 
 Usage: update-facebook-stuff [--verbose]
 
@@ -60,14 +62,3 @@ while ($pdata = db_fetch_array($q)) {
     pbfacebook_init_cron(OPTION_FACEBOOK_ROBOT_ID);
     pbfacebook_update_fbmlref_profilepledge($pledge);
 }
- 
-# We use FBML ref stuff now, so don't need to update each user's profile
-/*
-$q = db_query("select * from person where facebook_id is not null order by random()");
-while ($person = db_fetch_array($q)) {
-    verbose("updating profile of Facebook person " . $person['facebook_id']);
-    pbfacebook_init_cron($person['facebook_id']); 
-    pbfacebook_update_profile_box($person['facebook_id']);
-}
-*/
-

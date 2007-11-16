@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.256 2007-11-02 15:36:07 matthew Exp $
+ * $Id: pledge.php,v 1.257 2007-11-16 11:13:07 francis Exp $
  * 
  */
 
@@ -572,6 +572,19 @@ class Pledge {
             $det = htmlspecialchars($this->data['detail']);
             $det = ms_make_clickable($det, array('contract'=>true, 'nofollow'=>true));
             $det = str_replace("\n", "<br>\n", $det);
+
+            // XXX put this and unsubscribe-me.html in the database, in a table with width/height
+            // (haven't done yet as not sure what all the use cases will be exactly)
+            if ($this->ref() == 'unsubscribe-me') {
+                // Embed video etc.
+                print '<iframe src="/unsubscribe-me.html" ';
+                print ' style="border: 0px none ; margin: 0px; padding: 0px; overflow: hidden; width: 100%; height: 400px;" ';
+                print ' frameborder="0" scrolling="no" ';
+                print '>';
+                print '</iframe>';
+            }
+
+            // More details
             print '<p id="moredetails"><strong>' . _('More details') . '</strong><br>' . $det . '</p>';
         }
 ?>

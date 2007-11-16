@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.122 2007-11-06 16:27:23 matthew Exp $
+// $Id: ref-index.php,v 1.123 2007-11-16 11:24:25 francis Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -63,7 +63,8 @@ function draw_spreadword($p) { ?>
     } else {
         print h2(_('Things to do with this pledge'));
     }
-    if (!$p->finished()) {
+    // Now we have "share this" button, only show digg on pledges that asked for it
+    if (!$p->finished() && $p->ref() == 'us-patriot-drive') {
         print '<div id="digg">';
         print '<script src="http://digg.com/tools/diggthis.js" type="text/javascript"></script>';
         print '</div>';

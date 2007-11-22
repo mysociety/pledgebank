@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.62 2007-11-15 11:21:00 francis Exp $
+// $Id: facebook.php,v 1.63 2007-11-22 12:20:30 francis Exp $
 
 /*
 TODO:
@@ -64,6 +64,8 @@ TODO:
 - Call http://wiki.developers.facebook.com/index.php/Feed.publishTemplatizedAction
   instead of PublishActionofUser
   See http://www.facebook.com/topic.php?uid=2205007948&topic=13926&start=30&hash=503b3e81edba5aeff0c1ac98eb58a61a at end for PHP function to add to the API file
+- This gives some tips on news feeds.
+  http://developers.facebook.com/news.php?blog=1&story=55
 
 Not so important:
 - Cache names of Facebook signers in the person table

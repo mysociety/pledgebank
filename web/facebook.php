@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.63 2007-11-22 12:20:30 francis Exp $
+// $Id: facebook.php,v 1.64 2007-11-22 16:17:01 francis Exp $
 
 /*
 TODO:
@@ -24,6 +24,7 @@ TODO:
     * pledges made by / signed by people in same network (e.g. university) as you
     * fastest growing pledges
     * pledges signed by people with similar interests to you
+    * your country (hometown OR current location)
 - Show in "friends pledges" section ones *created* by friends separately
 
 - Show explicitly on e.g. http://apps.facebook.com/pledgebank/list/friends

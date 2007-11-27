@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.205 2007-11-15 10:41:53 francis Exp $
+// $Id: new.php,v 1.206 2007-11-27 00:54:53 timsk Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -1090,9 +1090,15 @@ function create_new_pledge($P, $data) {
     <p class="loudmessage"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
 <? } ?>
 <?  if (microsites_new_pledges_prominence() != 'backpage') { ?>
-    <p class="noisymessage"><?=_('Your pledge will <strong>not succeed</strong> unless people find out about it.  So get out there and tell your friends and colleagues about your pledge &mdash; for ways to do this check out the "Spread the Word" section of your pledge webpage.') ?></p>
+    <p class="noisymessage"><? printf(_('Your pledge needs <strong>your support</strong> if it is to succeed, so <br />print some %s now and hand them out today.<br />Put a %s up in the canteen.<br />%s straightaway!'),
+	'<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">flyers</a>',
+	'<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">poster</a>',
+	'<a href="'.$url.'/share">Spread the word online</a>') ?></p>
 <?  } else { ?>
-    <p class="noisymessage"><?=_('Your pledge will <strong>not be publicised</strong> elsewhere on the site until a few people have signed it.  So get out there and tell your friends and neighbours about your pledge.') ?></p>
+    <p class="noisymessage"><? printf(_('Your pledge will <strong>not</strong> appear on the All Pledges page until <strong>you</strong> have recruited the first few signers.<br />Print some %s now and hand them out today.<br />Put a %s up in the canteen.<br />%s straightaway!'),
+	'<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">flyers</a>',
+	'<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">poster</a>',
+	'<a href="'.$url.'/share">Spread the word online</a>') ?></p>
 <?  }
 
     if ($site_country == 'US') {

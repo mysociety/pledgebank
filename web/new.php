@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.207 2007-11-27 01:09:05 timsk Exp $
+// $Id: new.php,v 1.208 2007-11-28 00:04:37 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -1090,12 +1090,12 @@ function create_new_pledge($P, $data) {
     <p class="loudmessage"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
 <? } ?>
 <?  if (microsites_new_pledges_prominence() != 'backpage') { ?>
-    <p class="noisymessage"><? printf(_('Your pledge needs <strong>your support</strong> if it is to succeed, so <br />print some %s now and hand them out today.<br />Put a %s up in the canteen.<br />%s straightaway!'),
+    <p class="noisymessage"><? printf(_('Your pledge needs <strong>your support</strong> if it is to succeed, so <br>print some %s now and hand them out today.<br>Put a %s up in the canteen.<br>%s straightaway!'),
 	'<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
 	'<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
 	'<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
 <?  } else { ?>
-    <p class="noisymessage"><? printf(_('Your pledge will <strong>not</strong> appear on the All Pledges page until <strong>you</strong> have recruited the first few signers.<br />Print some %s now and hand them out today.<br />Put a %s up in the canteen.<br />%s straightaway!'),
+    <p class="noisymessage"><? printf(_('Your pledge will <strong>not</strong> appear on the All Pledges page until <strong>you</strong> have recruited the first few signers.<br>Print some %s now and hand them out today.<br>Put a %s up in the canteen.<br>%s straightaway!'),
 	'<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
 	'<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
 	'<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>

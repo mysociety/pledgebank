@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: howto.php,v 1.5 2007-10-12 13:12:48 matthew Exp $
+// $Id: howto.php,v 1.6 2007-11-30 16:16:12 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -15,7 +15,7 @@ require_once '../phplib/fns.php';
 
 $what = get_http_var('what');
 if (!$what)
-    err('Please specify what you want to know how to use PledgeBank for.');
+    err('Please specify what you want to know how to use PledgeBank for.', E_USER_NOTICE);
 
 if ($what == 'football') {
     $heading = "Want to organise a kickabout?";

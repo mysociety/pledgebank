@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.61 2007-11-15 10:52:04 francis Exp $
+// $Id: pbfacebook.php,v 1.62 2007-12-16 15:32:42 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -740,10 +740,6 @@ function pbfacebook_send_internal($to, $message) {
     #print "ret:"; print_r($ret);
     if (is_int($ret)) {
         print("Error calling notifications_send in pbfacebook_send_internal: " . print_r($ret, TRUE)); 
-        return false;
-    }
-    if ($ret) {
-        print("Need URL confirmation calling notifications_send in pbfacebook_send_internal: " . print_r($ret, TRUE));
         return false;
     }
     return true;

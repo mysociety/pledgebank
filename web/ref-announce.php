@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-announce.php,v 1.64 2007-11-14 17:42:26 matthew Exp $
+ * $Id: ref-announce.php,v 1.65 2007-12-27 17:30:46 matthew Exp $
  * 
  */
 
@@ -44,6 +44,23 @@ if (get_http_var('unsubscribe')) {
     exit;
 }
 
+# Make sure we're logged in, and are the petition creator
+$P = pb_person_if_signed_on();
+if (!$P) {
+    $P = pb_person_signon(array(
+         "reason_web" => _("Before you can send a message to all the signers, we need to check that you created the pledge."),
+         "reason_email" => _("Then you will be able to send a message to everyone who has signed your pledge."),
+         "reason_email_subject" => _("Send a message to your pledge signers at PledgeBank.com"))
+    );
+}
+if ($P->id() != $p->creator_id()) {
+    page_header(_("Pledge creator's page"));
+    print _("You must be the pledge creator to send a message to all signers.
+        Please <a href=\"/logout\">log out</a> and try again.");
+    page_footer();
+    exit;
+}
+
 /* Lock the pledge here, before we do any other checks. */
 $p->lock();
 
@@ -74,25 +91,6 @@ if ($p->byarea()) {
         $succeeded = false;
     }
 }
-
-
-$P = pb_person_if_signed_on();
-if (!$P) {
-    $P = pb_person_signon(array(
-                    "reason_web" => _("Before you can send a message to all the signers, we need to check that you created the pledge."),
-                    "reason_email" => _("Then you will be able to send a message to everyone who has signed your pledge."),
-                    "reason_email_subject" => _("Send a message to your pledge signers at PledgeBank.com"))
-
-                );
-}
-if ($P->id() != $p->creator_id()) {
-    page_header(_("Pledge creator's page"));
-    print _("You must be the pledge creator to send a message to all signers.
-        Please <a href=\"/logout\">log out</a> and try again.");
-    page_footer();
-    exit;
-}
-
 
 $descr = array(
                 # TRANS: These all appear as part of a heading: "Send <phrase>", e.g. "Send success announcement message"

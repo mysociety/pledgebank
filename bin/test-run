@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.243 2007-11-14 17:42:25 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.244 2007-12-31 14:12:03 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -401,8 +401,8 @@ sub create_pledge {
 
     # Make new pledge, step 1
     $wth->browser_get($locale_url_redirected); # We need the language, and hopefully not the country!
-    $wth->browser_follow_link(text_regex => qr/(Start your pledge|Crie sua promessa)/);
-    $wth->browser_check_contents(qr/(New Pledge|Nova promessa)/);
+    $wth->browser_follow_link(text_regex => qr/(Start your pledge|Criar sua promessa)/);
+    $wth->browser_check_contents(qr/(New Pledge|nova promessa)/);
     $wth->browser_submit_form(form_name => 'pledge', fields => $page1,
         button => 'tostep2') or die "Failed to submit creating form step 1";
     if ($page1->{target} >= 20) {

@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.244 2007-12-31 14:12:03 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.245 2007-12-31 14:25:26 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -430,13 +430,13 @@ sub create_pledge {
     }
 
     # Step 3
-    $wth->browser_check_contents(qr#(New Pledge &ndash; Category / Privacy|Passo 3)#);
+    $wth->browser_check_contents(qr#(New Pledge &ndash; Category / Privacy|Nova Promessa &ndash; Categoria / Privacidade)#);
     $wth->browser_submit_form(form_name => 'pledge',
         fields => $page3,
         button => 'topreview') or die "Failed to submit creating form step 3";
 
     # Preview
-    $wth->browser_check_contents(qr/(Now please read your pledge)|(Passo 4)/);
+    $wth->browser_check_contents(qr/(Now please read your pledge)|(Agora leia sua promessa)/);
     my $fields = {};
     if ($login_action eq 'password') {
         $fields->{password} = password_n($who);

@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.245 2007-12-31 14:25:26 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.246 2007-12-31 14:45:32 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -412,7 +412,7 @@ sub create_pledge {
     }
 
     # Step 2
-    $wth->browser_check_contents(qr/(New Pledge &ndash; Location|Passo 2)/);
+    $wth->browser_check_contents(qr/(New Pledge &ndash; Location|Nova Promessa &ndash; Localidade)/);
     my $gaze_place;
     if ($page2->{gaze_place}) {
         $gaze_place = $page2->{gaze_place};

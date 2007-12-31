@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.64 2007-11-22 16:17:01 francis Exp $
+// $Id: facebook.php,v 1.65 2007-12-31 13:58:17 francis Exp $
 
 /*
 TODO:
@@ -58,6 +58,9 @@ TODO:
 - Somehow remove extra login dialog which you get if you try to sign a pledge
   you haven't seen before, that is caused by post button. Not sure can be done
   really.
+
+- Let you log into PledgeBank.com using your Facebook ID. i.e. Let you click
+  through to the original my pledges pages, etc. Maybe.
 
 - Link to creators of via facebook pledges, and show their photo
 - Tidy up display when lots of signers http://apps.facebook.com/pledgebank/Pauls-100mill

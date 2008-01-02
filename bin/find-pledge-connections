@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.20 2007-09-16 15:32:28 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.21 2008-01-02 01:16:42 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -26,58 +26,54 @@ BEGIN {
     mySociety::Config::set_file("$FindBin::Bin/../conf/general");
 }
 use mySociety::DBHandle qw(dbh);
-
 use PB;
 
-sub do_connections ($) {
-    my $np = shift;
-    foreach my $p (values %$np) {
-        next unless (@$p > 1);
-        my @pledges = sort { $a <=> $b } @$p;
-        for (my $i = 0; $i < @pledges - 1; ++$i) {
-            for (my $j = $i + 1; $j < @pledges; ++$j) {
-                if (1 != dbh()->do('update pledge_connection set strength = strength + 1 where a_pledge_id = ? and b_pledge_id = ?', {}, $pledges[$i], $pledges[$j])) {
-                    dbh()->do('insert into pledge_connection (a_pledge_id, b_pledge_id, strength) values (?, ?, 1)', {}, $pledges[$i], $pledges[$j]);
-                }
+# Fetch snapshot of data
+my %name_pledges;
+fetch_data("select pledge_id, signers.person_id, signers.name
+    from signers
+        join pledges on pledges.id = pledge_id
+    where signers.person_id is not null
+        and signers.showname
+        and pledges.pin is null
+        and pledges.cached_prominence <> 'backpage'");
+fetch_data("select id, person_id, name
+    from pledges
+    where pin is null
+        and cached_prominence <> 'backpage'");
+
+# Tot up connections between pledges
+my (%connection, $name_pledge, $p, @pledges, $i, $j);
+foreach $name_pledge (values %name_pledges) {
+    foreach $p (values %$name_pledge) {
+        next unless @$p > 1;
+        @pledges = sort { $a <=> $b } @$p;
+        for ($i = 0; $i < @pledges - 1; ++$i) {
+            for ($j = $i + 1; $j < @pledges; ++$j) {
+                ++$connection{$pledges[$i]}{$pledges[$j]};
             }
         }
     }
 }
 
+# Insert new data
 dbh()->do('delete from pledge_connection');
-my %name_pledges;
-
-my $s = dbh()->prepare("
-                select pledge_id, signers.person_id, signers.name
-                from signers, pledges
-                where pledges.id = pledge_id
-                    and signers.person_id is not null
-                    and pledges.pin is null
-                    and signers.showname
-                    and pledges.cached_prominence <> 'backpage'
-                order by signers.person_id");
-$s->execute();
-while (my ($pledge_id, $person_id, $name) = $s->fetchrow_array()) {
-    $name = lc($name);
-    $name =~ s/[^a-z-]//g;
-    push(@{$name_pledges{$person_id}{$name}}, $pledge_id);
+foreach my $a (keys %connection) {
+    foreach my $b (keys %{$connection{$a}}) {
+        dbh()->do('insert into pledge_connection (a_pledge_id, b_pledge_id, strength) values (?, ?, ?)',
+            {}, $a, $b, $connection{$a}{$b});
+    }
 }
-
-$s = dbh()->prepare("
-                select id, person_id, name
-                from pledges
-                where pin is null
-                    and cached_prominence <> 'backpage'
-                order by person_id");
-$s->execute();
-while (my ($pledge_id, $person_id, $name) = $s->fetchrow_array()) {
-    $name = lc($name);
-    $name =~ s/[^a-z-]//g;
-    push(@{$name_pledges{$person_id}{$name}}, $pledge_id);
-}
-
-foreach my $name_pledge (values %name_pledges) {
-    do_connections($name_pledge);
-}
-
 dbh()->commit();
+
+sub fetch_data {
+    my $q = shift;
+    my $s = dbh()->prepare($q);
+    $s->execute();
+    while (my ($pledge_id, $person_id, $name) = $s->fetchrow_array()) {
+        $name = lc($name);
+        $name =~ s/[^a-z-]//g;
+        push(@{$name_pledges{$person_id}{$name}}, $pledge_id);
+    }
+}
+

@@ -11,7 +11,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.21 2008-01-02 01:16:42 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: find-pledge-connections,v 1.22 2008-01-02 01:30:25 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -57,11 +57,15 @@ foreach $name_pledge (values %name_pledges) {
 }
 
 # Insert new data
-dbh()->do('delete from pledge_connection');
 foreach my $a (keys %connection) {
     foreach my $b (keys %{$connection{$a}}) {
-        dbh()->do('insert into pledge_connection (a_pledge_id, b_pledge_id, strength) values (?, ?, ?)',
-            {}, $a, $b, $connection{$a}{$b});
+        if (1 != dbh()->do('update pledge_connection set strength=?
+	    where a_pledge_id=? and b_pledge_id=?', {},
+            $connection{$a}{$b}, $a, $b))
+        {
+            dbh()->do('insert into pledge_connection (a_pledge_id, b_pledge_id, strength)
+	        values (?, ?, ?)', {}, $a, $b, $connection{$a}{$b});
+        }
     }
 }
 dbh()->commit();

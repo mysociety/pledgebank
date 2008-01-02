@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.123 2007-11-16 11:24:25 francis Exp $
+// $Id: ref-index.php,v 1.124 2008-01-02 02:03:36 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -317,9 +317,11 @@ function draw_comments($p) {
     comments_form($p->id(), 1, false, $p->closed_for_comments());
 }
 
-function draw_connections($p) {
-    global $pb_today;
-    $s = db_query("SELECT a_pledge_id, b_pledge_id, strength 
+$connections = array();
+function fetch_connection_data($id) {
+    global $connections, $pb_today;
+    if (!$connections)
+        $connections = db_getAll("SELECT a_pledge_id as a, b_pledge_id as b, strength 
         FROM pledge_connection 
             LEFT JOIN pledges AS a_pledges ON a_pledge_id = a_pledges.id
             LEFT JOIN pledges AS b_pledges ON b_pledge_id = b_pledges.id
@@ -327,15 +329,20 @@ function draw_connections($p) {
             (a_pledge_id = ? AND b_pledges.date >= '$pb_today' AND b_pledges.whensucceeded is null) or
             (b_pledge_id = ? AND a_pledges.date >= '$pb_today' AND a_pledges.whensucceeded is null)
         ORDER BY strength DESC,RANDOM() 
-        LIMIT 8", array($p->id(), $p->id()));
-    if (0 == db_num_rows($s))
-        return;
+        LIMIT 8", array($id, $id));
+    return $connections;
+}
+
+function draw_connections($p) {
+    $s = fetch_connection_data($p->id());
+    if (!count($s)) return;
 
     print "\n\n" . '<div id="connections"><h2><a name="connections">' . 
         _('Suggested pledges') . ' </a></h2>'.
         p(_('Some of the people who signed this pledge also signed these pledges...')) . '<ul>' . "\n\n";
-    while (list($a, $b, $strength) = db_fetch_row($s)) {
-        $id = $a == $p->id() ? $b : $a;
+    foreach ($s as $row) {
+        $id = $row['a'] == $p->id() ? $row['b'] : $row['a'];
+        $strength = $row['strength'];
         $p2 = new Pledge(intval($id));
         print '<li><a href="/' . htmlspecialchars($p2->ref()) . '">' . $p2->h_title() . '</a>';
         print ' (';
@@ -352,29 +359,25 @@ function draw_connections($p) {
 // people, or else featured ones)
 function draw_connections_for_finished($p) {
     $try_pledges_required = 4;
-
-    global $pb_today;
-    $s = db_query("SELECT a_pledge_id, b_pledge_id, strength 
-        FROM pledge_connection 
-            LEFT JOIN pledges AS a_pledges ON a_pledge_id = a_pledges.id
-            LEFT JOIN pledges AS b_pledges ON b_pledge_id = b_pledges.id
-        WHERE
-            (a_pledge_id = ? AND b_pledges.date >= '$pb_today' AND b_pledges.whensucceeded is null) or
-            (b_pledge_id = ? AND a_pledges.date >= '$pb_today' AND a_pledges.whensucceeded is null)
-        ORDER BY STRENGTH DESC 
-        LIMIT $try_pledges_required", array($p->id(), $p->id()));
-
     $pledges = array();
-    if (0 != db_num_rows($s)) {
-        while (list($a, $b, $strength) = db_fetch_row($s)) {
-            $id = $a == $p->id() ? $b : $a;
+    $s = fetch_connection_data($p->id());
+    if (count($s)) {
+        $k = 0;
+        foreach ($s as $row) {
+            $id = $row['a'] == $p->id() ? $row['b'] : $row['a'];
             $p2 = new Pledge(intval($id));
             $pledges[] = $p2;
+            if ($k++ == 4) break;
         }
     } 
     if (count($pledges) < $try_pledges_required) {
         list($extra_pledges, $more) = pledge_get_frontpage_list($try_pledges_required - count($pledges), $try_pledges_required - count($pledges));
-        $pledges = array_merge($pledges, $extra_pledges);
+        foreach ($extra_pledges as $ep) {
+            foreach ($pledges as $pp) {
+                if ($pp->id() == $ep->id()) continue 2; 
+            }
+            $pledges[] = $ep;
+        }
     }
 
     print "\n\n" . '<div id="finished_connections" class="';

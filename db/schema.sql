@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.229 2007-11-14 17:51:07 francis Exp $
+-- $Id: schema.sql,v 1.230 2008-01-03 17:14:52 francis Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -214,9 +214,11 @@ create table pledges (
     -- comment) is displayed at the top of the pledge page, and the pledge 
     -- counts as "finished".
     cancelled text, -- LLL
+    check ( cancelled is null or cancelled <> '' ),
     -- Notice puts an extra text banner at the top of the pledge (like cancelled
     -- but without stopping signups)
     notice text, -- LLL
+    check ( notice is null or notice <> '' ),
     -- No longer taking new comments
     closed_for_comments boolean not null default false,
 

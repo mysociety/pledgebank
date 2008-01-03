@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.160 2007-11-14 17:49:30 francis Exp $
+ * $Id: admin-pb.php,v 1.161 2008-01-03 17:14:52 francis Exp $
  * 
  */
 
@@ -654,7 +654,9 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         $identity = get_http_var('identity');
         $detail = get_http_var('detail');
         $notice = get_http_var('notice');
+        if (!$notice) $notice = null;
         $cancelled = get_http_var('cancelled');
+        if (!$cancelled) $cancelled = null;
         $target = intval(get_http_var('target'));
         if ($pledge->target() > $pledge->signers()) {
             if ($target <= $pledge->signers()) {

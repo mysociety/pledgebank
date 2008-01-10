@@ -37,7 +37,7 @@
 #   Log in with wrong password
 #   Private pledges: info page, announcearchive page
 
-my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.246 2007-12-31 14:45:32 francis Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-run,v 1.247 2008-01-10 17:26:01 francis Exp $';
 
 use strict;
 require 5.8.0;
@@ -802,7 +802,7 @@ sub do_public_succeeding_pledge {
     $wth->email_get_containing( '%To: "' . name_n(0) . '" <' . email_n(0) . '>%From: '.$name_admin.  '%[ This is a copy of the message%Love and kisses%');
     $content = $wth->email_get_containing( '%To: "' . name_n(1) . '" <' . email_n(1) . '>%From: "' . name_n(0) . '"%Love and kisses%');
     $wth->email_get_containing( '%To: "' . name_n(2) . '" <' . email_n(2) . '>%From: "' . name_n(0) . '"%Love and kisses%');
-    die "Unsubscribe email link not found\n" if ($content !~ m#^\s*(http://.*$)#m);
+    die "Unsubscribe email link not found\n" if ($content !~ m#^\s*(http://.*/L/.*$)#m);
     my $unsub_link = $1;
 
     comment("Unsubscribe one signer from announce messages");

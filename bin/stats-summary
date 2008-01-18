@@ -1,0 +1,89 @@
+#!/usr/bin/php -q
+<?php
+# Stats for Heather.
+# from is inclusive, to is exclusive
+
+$short_opts = '';
+$long_opts = array('from=', 'to=');
+
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once '../../phplib/db.php';
+
+$from = ''; $to = '';
+foreach ($options[0] as $switch) {
+    if ($switch[0]=='--from')
+        $from = $switch[1];
+    if ($switch[0]=='--to')
+        $to = $switch[1];
+}
+if (!$from || !$to || !preg_match('#^\d{4}-\d\d-\d\d$#', $from) || !preg_match('#^\d{4}-\d\d-\d\d$#', $to)) {
+    print "Need to specify ISO dates for --from and --to\n";
+    exit;
+}
+
+db_connect();
+
+$sql_common_pledges = " from pledges left join location on location.id=location_id where creationtime>='$from' and creationtime<'$to' ";
+$sql_common_signers = " from signers join pledges on pledges.id=pledge_id left join location on location.id=location_id where signtime>='$from' and signtime<'$to' ";
+$sql_common_succeeded = "select count(*) from pledges left join location on location.id=location_id where whensucceeded>='$from' and whensucceeded<'$to' ";
+$sql_countries = array('us'=>"='US'", 'global'=>'is null', 'ca'=>"='CA'");
+
+$sql_new_person = " and person_id not in (select person_id from pledges where creationtime<'$from') ";
+$sql_pledge_all = "select count(*) $sql_common_pledges";
+$sql_pledge_people = "select count(distinct(person_id)) $sql_common_pledges";
+$sql_signatures = "select count(*) $sql_common_signers";
+$sql_signers = "select count(distinct(signers.person_id)) $sql_common_signers";
+
+$pledges['all'] = db_getOne($sql_pledge_all);
+$pledge_creators['all'] = db_getOne($sql_pledge_people);
+$new_pledge_creators['all'] = db_getOne($sql_pledge_people . $sql_new_person);
+$new_pledge_creators_pledges['all'] = db_getOne($sql_pledge_all . $sql_new_person);
+$signatures['all'] = db_getOne($sql_signatures);
+$signers['all'] = db_getOne($sql_signers);
+$succeeded['all'] = db_getOne($sql_common_succeeded);
+
+$both = db_getOne($sql_pledge_people . "and country='US' and person_id in (select person_id from pledges where creationtime>='$from' and creationtime<'$to' and location_id is null)");
+
+foreach ($sql_countries as $key => $sql_country) {
+    $sql_country = "and country $sql_country";
+    $pledges[$key] = db_getOne($sql_pledge_all . $sql_country);
+    $pledge_creators[$key] = db_getOne($sql_pledge_people . $sql_country);
+    $new_pledge_creators[$key] = db_getOne($sql_pledge_people . $sql_new_person . $sql_country);
+    $new_pledge_creators_pledges[$key] = db_getOne($sql_pledge_all . $sql_new_person . $sql_country);
+    $signatures[$key] = db_getOne($sql_signatures . $sql_country);
+    $signers[$key] = db_getOne($sql_signers . $sql_country);
+    $succeeded[$key] = db_getOne($sql_common_succeeded . $sql_country);
+}
+
+print <<<EOF
+$from - $to
+
+* There were $pledges[all] pledges created in total, from $pledge_creators[all] different pledge
+creators. $new_pledge_creators[all] of those had not created a pledge before $from, and they
+created $new_pledge_creators_pledges[all] pledges during the time period. There were $signatures[all] signatures from
+$signers[all] different email addresses. During this time period, $succeeded[all] pledges
+succeeded.
+
+* There were $pledges[us] pledges located in the US created, from $pledge_creators[us] different
+pledge creators. $new_pledge_creators[us] of those had not created a pledge before $from,
+and they created $new_pledge_creators_pledges[us] of the pledges. There were $signatures[us] signatures to
+US-located pledges, from $signers[us] different email addresses. During this time
+period, $succeeded[us] US-located pledges succeeded.
+
+* There were $pledges[global] pledges "not specific to any location" created, from $pledge_creators[global] different
+pledge creators. $new_pledge_creators[global] of those had not created a pledge before $from,
+and they created $new_pledge_creators_pledges[global] of the pledges. There were $signatures[global] signatures
+from $signers[global] different email addresses. During this time
+period, $succeeded[global] non-located pledges succeeded.
+
+* $both people created both a US and a global pledge. 
+
+* There were $pledges[ca] pledges located in Canada created, from $pledge_creators[ca] different
+pledge creators. $new_pledge_creators[ca] of those had not created a pledge before $from,
+and they created $new_pledge_creators_pledges[ca] of the pledges. There were $signatures[ca] signatures to
+from $signers[ca] different email addresses. During this time
+period, $succeeded[ca] Canada-located pledges succeeded.
+
+EOF;
+

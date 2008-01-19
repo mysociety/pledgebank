@@ -29,7 +29,8 @@ $sql_common_signers = " from signers join pledges on pledges.id=pledge_id left j
 $sql_common_succeeded = "select count(*) from pledges left join location on location.id=location_id where whensucceeded>='$from' and whensucceeded<'$to' ";
 $sql_countries = array('us'=>"='US'", 'global'=>'is null', 'ca'=>"='CA'");
 
-$sql_new_person = " and person_id not in (select person_id from pledges where creationtime<'$from') ";
+$sql_new_person_pledges = " and person_id not in (select person_id from pledges where creationtime<'$from') ";
+$sql_new_person_signers = " and person_id not in (select person_id from signers where signtime<'$from') ";
 $sql_pledge_all = "select count(*) $sql_common_pledges";
 $sql_pledge_people = "select count(distinct(person_id)) $sql_common_pledges";
 $sql_signatures = "select count(*) $sql_common_signers";
@@ -37,8 +38,8 @@ $sql_signers = "select count(distinct(signers.person_id)) $sql_common_signers";
 
 $pledges['all'] = db_getOne($sql_pledge_all);
 $pledge_creators['all'] = db_getOne($sql_pledge_people);
-$new_pledge_creators['all'] = db_getOne($sql_pledge_people . $sql_new_person);
-$new_pledge_creators_pledges['all'] = db_getOne($sql_pledge_all . $sql_new_person);
+$new_pledge_creators['all'] = db_getOne($sql_pledge_people . $sql_new_person_pledges);
+$new_pledge_creators_pledges['all'] = db_getOne($sql_pledge_all . $sql_new_person_pledges);
 $signatures['all'] = db_getOne($sql_signatures);
 $signers['all'] = db_getOne($sql_signers);
 $succeeded['all'] = db_getOne($sql_common_succeeded);
@@ -49,10 +50,12 @@ foreach ($sql_countries as $key => $sql_country) {
     $sql_country = "and country $sql_country";
     $pledges[$key] = db_getOne($sql_pledge_all . $sql_country);
     $pledge_creators[$key] = db_getOne($sql_pledge_people . $sql_country);
-    $new_pledge_creators[$key] = db_getOne($sql_pledge_people . $sql_new_person . $sql_country);
-    $new_pledge_creators_pledges[$key] = db_getOne($sql_pledge_all . $sql_new_person . $sql_country);
+    $new_pledge_creators[$key] = db_getOne($sql_pledge_people . $sql_new_person_pledges . $sql_country);
+    $new_pledge_creators_pledges[$key] = db_getOne($sql_pledge_all . $sql_new_person_pledges . $sql_country);
     $signatures[$key] = db_getOne($sql_signatures . $sql_country);
     $signers[$key] = db_getOne($sql_signers . $sql_country);
+    $new_signers[$key] = db_getOne($sql_signers . $sql_new_person_signers . $sql_country);
+    $new_signatures[$key] = db_getOne($sql_signatures . $sql_new_person_signers . $sql_country);
     $succeeded[$key] = db_getOne($sql_common_succeeded . $sql_country);
 }
 
@@ -68,7 +71,8 @@ succeeded.
 * There were $pledges[us] pledges located in the US created, from $pledge_creators[us] different
 pledge creators. $new_pledge_creators[us] of those had not created a pledge before $from,
 and they created $new_pledge_creators_pledges[us] of the pledges. There were $signatures[us] signatures to
-US-located pledges, from $signers[us] different email addresses. During this time
+US-located pledges, from $signers[us] different email addresses. $new_signers[us] of those had not
+signed a pledge before $from, and they created $new_signatures[us] of the signatures. During this time
 period, $succeeded[us] US-located pledges succeeded.
 
 * There were $pledges[global] pledges "not specific to any location" created, from $pledge_creators[global] different

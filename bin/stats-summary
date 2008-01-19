@@ -30,7 +30,7 @@ $sql_common_succeeded = "select count(*) from pledges left join location on loca
 $sql_countries = array('us'=>"='US'", 'global'=>'is null', 'ca'=>"='CA'");
 
 $sql_new_person_pledges = " and person_id not in (select person_id from pledges where creationtime<'$from') ";
-$sql_new_person_signers = " and person_id not in (select person_id from signers where signtime<'$from') ";
+$sql_new_person_signers = " and signers.person_id not in (select person_id from signers where signtime<'$from') ";
 $sql_pledge_all = "select count(*) $sql_common_pledges";
 $sql_pledge_people = "select count(distinct(person_id)) $sql_common_pledges";
 $sql_signatures = "select count(*) $sql_common_signers";

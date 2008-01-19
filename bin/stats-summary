@@ -29,8 +29,14 @@ $sql_common_signers = " from signers join pledges on pledges.id=pledge_id left j
 $sql_common_succeeded = "select count(*) from pledges left join location on location.id=location_id where whensucceeded>='$from' and whensucceeded<'$to' ";
 $sql_countries = array('us'=>"='US'", 'global'=>'is null', 'ca'=>"='CA'");
 
+$q = db_getAll("select distinct(person_id) as p from signers where signtime<'$from'");
+$old_signers = array();
+foreach ($q as $r) {
+    $old_signers[] = $r['p'];
+}
+$old_signers = ',' . join(',', $old_signers) . ',';
+
 $sql_new_person_pledges = " and person_id not in (select person_id from pledges where creationtime<'$from') ";
-$sql_new_person_signers = " and signers.person_id not in (select person_id from signers where signtime<'$from') ";
 $sql_pledge_all = "select count(*) $sql_common_pledges";
 $sql_pledge_people = "select count(distinct(person_id)) $sql_common_pledges";
 $sql_signatures = "select count(*) $sql_common_signers";
@@ -54,8 +60,19 @@ foreach ($sql_countries as $key => $sql_country) {
     $new_pledge_creators_pledges[$key] = db_getOne($sql_pledge_all . $sql_new_person_pledges . $sql_country);
     $signatures[$key] = db_getOne($sql_signatures . $sql_country);
     $signers[$key] = db_getOne($sql_signers . $sql_country);
-    $new_signers[$key] = db_getOne($sql_signers . $sql_new_person_signers . $sql_country);
-    $new_signatures[$key] = db_getOne($sql_signatures . $sql_new_person_signers . $sql_country);
+
+    $q = db_getAll("select signers.person_id $sql_common_signers $sql_country");
+    $new_signers[$key] = 0;
+    $new_signatures[$key] = 0;
+    $pids_seen = array();
+    foreach ($q as $r) {
+        if (preg_match("#,$r[person_id],#", $old_signers)) continue;
+        $new_signatures[$key]++;
+        if (in_array($r['person_id'], $pids_seen)) continue;
+        $new_signers[$key]++;
+        $pids_seen[] = $r['person_id'];
+    }
+
     $succeeded[$key] = db_getOne($sql_common_succeeded . $sql_country);
 }
 

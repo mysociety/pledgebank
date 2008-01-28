@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.65 2007-12-31 13:58:17 francis Exp $
+// $Id: facebook.php,v 1.66 2008-01-28 13:32:01 angie Exp $
 
 /*
 TODO:
@@ -19,7 +19,7 @@ TODO:
 - 64 bit ids http://developers.facebook.com/news.php?blog=1&story=45
 
 - On pledge listing pages play with showing:
-    * pledges which have lots of Facebook signers
+    * pledges which have lots of Facebook signers : popular pledges / what's hot -> sub divide by fastest growing, most pledged
     * featured pledges in facebook via mutual signer connections (first need to fix connections to use Facebook ids as well as emails?)
     * pledges made by / signed by people in same network (e.g. university) as you
     * fastest growing pledges
@@ -112,6 +112,23 @@ if ($ref == 'new') {
     $facebook->redirect(pbfacebook_new_pledge_url());
     exit;
 }
+
+$q = get_http_var('q');
+    $searchparams = array(
+        'search' => get_http_var('q'),
+        'pledgestatus' => get_http_var('pledgestatus'),
+    );
+
+if ($q) {
+    $heading = sprintf(_("Search results for '%s'"), htmlspecialchars($q));
+    pbfacebook_render_header();
+    pbfacebook_render_dashboard();
+    pbfacebook_render_search($searchparams);
+    pbfacebook_render_footer();
+    exit;
+}
+
+
 if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) {
     pbfacebook_render_header();
     pbfacebook_render_dashboard();
@@ -119,7 +136,9 @@ if (!$ref || is_null(db_getOne('select ref from pledges where ref = ?', $ref))) 
         print "<p class=\"formnote\">"._("Thanks for sending the pledge to your friends!").
             "<br/>"._("Here are some more pledges you might like.")."</p>";
     }
-    pbfacebook_render_frontpage(get_http_var("list"));
+    
+    
+    pbfacebook_render_frontpage(get_http_var("list"), $searchparams);
     pbfacebook_render_footer();
 } else {
     $pledge = new Pledge($ref);

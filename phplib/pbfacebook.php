@@ -5,17 +5,17 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.62 2007-12-16 15:32:42 francis Exp $
+// $Id: pbfacebook.php,v 1.63 2008-01-28 13:32:01 angie Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
 $GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
 
 require_once '../../phplib/facebookphp4/facebook.php';
-
 // Find anyone's name. Well, anyone who hasn't turned off their visibility
 // from Facebook search results by people who aren't their friends - returns
 // untrue value for those.
+
 function pbfacebook_get_user_name($facebook_id) {
     global $facebook;
     $facebook_info = $facebook->api_client->users_getInfo(array($facebook_id), array('name'));
@@ -339,7 +339,45 @@ function pbfacebook_render_dashboard() {
   <fb:action href="<?=OPTION_FACEBOOK_CANVAS?>new">Create a New Pledge</fb:action>
   <fb:help href="<?=pb_domain_url(array('path'=>'/faq'))?>" title="Need help">Help</fb:help>
 </fb:dashboard>
+
+  <?
+}
+
+function pbfacebook_render_substrip($params) {
+    print '<div id="substrip">';
+    if (isset($params['search'])) {
+        $searchterm = $params['search'];
+    }
+?>
+<div id="pb_searchbox">
+<form id="nav_search" accept-charset="utf-8" action="<?=OPTION_FACEBOOK_CANVAS?>search" method="post">
+<label for="q">Search for pledges:</label>
+<input type="text" id="q" name="q" size="10" class="pbbox" value="<?=$searchterm?>">
+<input type="submit" class="btn" value="Search">
+</form>
+</div>
 <?
+    if (isset($params['buttons']) && $params['buttons']) {
+        print '<div id="refinebtns"><span class="showlabel">Show Only:</span>';
+        $i = 0;
+        print "<ul>";
+        foreach ($params['buttons'] as $label => $path) {
+            $liclass = '';
+            if (!$i) {$liclass = ' class="first"';} 
+            print '<li' . $liclass . '><a href="' . $path . '">' . $label . '</a></li>';
+            $i++;
+        }
+        print "</ul>";
+    }
+    
+    print '</div>';
+    
+    print '</div>';
+
+    if (isset($params['message'])) {
+        print '<p class="center">' . $params['message'] . '</p>';
+    }
+
 }
 
 // See if pledge has already been signed, or was created by, the user
@@ -355,7 +393,7 @@ function pbfacebook_already_signed($pledge) {
 }
 
 // Render frontpage of PledgeBank on Facebook
-function pbfacebook_render_frontpage($page = "") {
+function pbfacebook_render_frontpage($page = "", $searchparams) {
     global $facebook, $pb_today;
 
     if ($page == "" && !$facebook->get_loggedin_user()) {
@@ -371,8 +409,11 @@ function pbfacebook_render_frontpage($page = "") {
     <fb:tab-item title="My pledges" <?=($page=="my")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/my" />
     <fb:tab-item title="Featured pledges" <?=($page=="feature")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/feature" />
 <!--    <fb:tab-item title="Successful pledges" <?=($page=="success")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/success" /> -->
-    </fb:tabs> <?
+    </fb:tabs> 
+    <?
 
+    pbfacebook_render_substrip($searchparams);
+    
     $friends_signed_joined = "";
     if ($page == "friends" ) {
         print "<fb:title>"."Friends' pledges"."</fb:title>";
@@ -585,6 +626,126 @@ function pbfacebook_sign_pledge($pledge) {
     return $pledge;
 }
 
+
+function pbfacebook_render_tabs($page) {
+?>   
+    <fb:tabs>
+    <fb:tab-item title="Friends' pledges" <?=($page=="friends")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/friends" />
+    <fb:tab-item title="My pledges" <?=($page=="my")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/my" />
+    <fb:tab-item title="Featured pledges" <?=($page=="feature")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/feature" />
+<!--    <fb:tab-item title="Successful pledges" <?=($page=="success")?'selected="true"':''?> href="<?=OPTION_FACEBOOK_CANVAS?>list/success" /> -->
+    </fb:tabs> 
+    <?    
+}
+
+function pbfacebook_render_search($searchparams) {
+    global $facebook;
+    require_once '../phplib/search.php';
+
+    pbfacebook_render_tabs('search');
+    
+    $substrip = array();
+    
+    $hashout = search($searchparams);
+    
+    if ($hashout['notfound_message']) {
+        $substrip['message'] = $hashout['notfound_message'];
+    } else {
+        if ($hashout['exact_message']) {
+            $substrip['message'] = $hashout['exact_message'];
+        }
+        if ($hashout['postcode_message']) {
+            $substrip['message'] = $hashout['postcode_message'];
+        }
+        if ($hashout['zipcode_message']) {
+            $substrip['message'] = $hashout['zipcode_message'];
+        }
+        if ($hashout['bystring_message_open']) {
+            $substrip['message']  = $hashout['bystring_message_open'];
+        }
+        if ($hashout['bystring_message_closed'] && $searchparams['pledgestatus']) {
+            $substrip['message'] = $hashout['bystring_message_closed'];
+        }
+    }
+    
+    $buttons = array();
+    if ($hashout['bystring_pledges_open']) {
+        $buttons['Closed Pledges'] = 'search?q=' . $searchparams['search'] . '&amp;pledgestatus=closed';
+    }
+    if ($hashout['bystring_pledges_closed']) {
+        $buttons['Open Pledges'] = 'search?q=' . $searchparams['search'] . '&amp;pledgestatus=open';
+    }
+    
+
+    $substrip['buttons'] = $buttons;
+    $substrip['search'] = $searchparams['search'];
+    pbfacebook_render_substrip($substrip);
+
+    if (!$hashout['notfound_message']) {
+        // Exact match output
+        if ($hashout['exact']) {
+            $pledges = $hashout['exact'];
+            if ($pledges) {
+                foreach ($pledges as $pledge)  {
+                    $already_signed = pbfacebook_already_signed($pledge);
+                    $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                            'facebook-sign'=>!$pledge->finished() && !$already_signed,
+                            'href'=>$pledge->url_facebook()));
+                }
+            }
+        }
+        // Postcode search output
+        if ($hashout['postcode']) {
+            $pledges = $hashout['postcode'];
+            if ($pledges) {
+                foreach ($pledges as $pledge)  {
+                    $already_signed = pbfacebook_already_signed($pledge);
+                    $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                            'facebook-sign'=>!$pledge->finished() && !$already_signed,
+                            'href'=>$pledge->url_facebook()));
+                }
+            }
+        }
+        // Zipcode search output
+        if ($hashout['zipcode']) {
+            $pledges = $hashout['zipcode'];
+            if ($pledges) {
+                foreach ($pledges as $pledge)  {
+                    $already_signed = pbfacebook_already_signed($pledge);
+                    $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                            'facebook-sign'=>!$pledge->finished() && !$already_signed,
+                            'href'=>$pledge->url_facebook()));
+                }
+            }
+        }
+        
+        if ($hashout['bystring_pledges_open']) {
+            $pledges = $hashout['bystring_pledges_open'];
+                foreach ($pledges as $pledge)  {
+                    $already_signed = pbfacebook_already_signed($pledge);
+                    $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                            'facebook-sign'=>!$pledge->finished() && !$already_signed,
+                            'href'=>$pledge->url_facebook()));
+                }
+        }
+
+        if ($hashout['bystring_pledges_closed']) {
+            if ($hashout['bystring_message_closed'] && !$searchparams['pledgestatus']) {
+                print '<p class="center">' . $hashout['bystring_message_closed']  . '</p>';
+            }
+            $pledges = $hashout['bystring_pledges_closed'];
+                foreach ($pledges as $pledge)  {
+                    $already_signed = pbfacebook_already_signed($pledge);
+                    $pledge->render_box(array('class'=>'', 'facebook-share' => pbfacebook_render_share_pledge($pledge),
+                            'facebook-sign'=>!$pledge->finished() && !$already_signed,
+                            'href'=>$pledge->url_facebook()));
+                }
+        }
+        
+    }
+    
+}
+
 // FBML header for all PledgeBank Facebook pages
 function pbfacebook_render_header() {
 ?> <div style="padding: 10px;" id="all_content">  <?
@@ -601,12 +762,14 @@ PledgeBank</a> application.</i>
 <? 
 #    print file_get_contents("pb.css"); 
 ?>
+
 .pledge {
     margin: 2em 10%;
     border: solid 2px #522994;
     background-color: #f6e5ff;
     padding: 10px;
 }
+
 .pledge p {
     margin-bottom: 0;
     text-align: center;
@@ -660,6 +823,92 @@ img.creatorpicture {
 .pb_visit {
     clear: both;
     text-align: center;
+}
+
+#pb_searchbox {
+    float: left;
+    clear: none;
+}
+#pb_searchbox  input
+{
+    border-width: 1px;
+    border-style: solid;
+    border-color: #898989;
+}
+
+#pb_searchbox input.btn
+{
+    border-color: #3B5998;
+	color:#3B5998;
+	background-color: #FFF;
+    font-size: 0.9em;
+    padding: 1px;
+}
+
+#pb_searchbox input.pbbox
+{
+    border-color: #898989;
+    font-size: 0.9em;
+    padding: 2px;
+}
+
+.center {
+    text-align:center;
+}
+
+#substrip {
+    width: 620px;
+    border-width: 0px 1px 1px 1px;
+    border-style: solid;
+    border-color: #CCCCCC;
+    padding: 4px 2px 2px 2px;
+    overflow: auto;
+}
+
+#substrip p{
+    float: left;
+    clear: none;
+}
+
+#refinebtns {
+    float: right;
+    clear: none;
+}
+
+#refinebtns a {
+    background:#F1F1F1;
+    color:#333333;
+    font-weight:bold;
+    padding:2px 8px 3px 9px;
+}
+
+#refinebtns a.selected {
+    background: #6D84B4;
+    color:#FFFFFF;
+}
+
+#refinebtns ul {
+    list-style: none;
+    padding-left:7px;
+    margin: 0px;
+}
+
+#refinebtns * {
+    float: left;
+}
+
+#refinebtns li {
+    border-color: #898989;
+    border-style:solid solid solid none;
+    border-width:1px 1px 1px 0pt;
+}
+
+#refinebtns li.first {
+    border:1px solid #898989;
+}
+
+.showlabel {
+    margin-top:0.2em;
 }
 </style>
 

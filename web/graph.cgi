@@ -7,7 +7,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.31 2008-02-02 18:30:34 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: graph.cgi,v 1.32 2008-02-02 19:42:54 matthew Exp $';
 
 use strict;
 
@@ -128,10 +128,10 @@ sub g ($) {
 # FastCGI signal handling
 my $exit_requested = 0;
 my $handling_request = 0;
-$SIG{TERM} = $SIG{USR1} = sub {
-    $exit_requested = 1;
-    # exit(0) unless $handling_request;
-};
+#$SIG{TERM} = $SIG{USR1} = sub {
+#    $exit_requested = 1;
+#    # exit(0) unless $handling_request;
+#};
 
 my $W = new mySociety::WatchUpdate();
 while (my $q = new CGI::Fast()) {

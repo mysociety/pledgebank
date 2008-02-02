@@ -15,7 +15,7 @@
 #       http://geometryalgorithms.com/Archive/algorithm_0205/
 # Cross reference country names to ISO codes http://ws.geonames.org/countryInfo?
 
-my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.12 2008-02-02 18:30:34 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: byarea-map.cgi,v 1.13 2008-02-02 19:42:54 matthew Exp $';
 
 my $bitmap_size = 300;
 my $margin_extra = 0.05;
@@ -297,10 +297,10 @@ if (-e "$map_dir/countries.storable" && -e "$map_dir/countries_extents.storable"
 # FastCGI signal handling
 my $exit_requested = 0;
 my $handling_request = 0;
-$SIG{TERM} = $SIG{USR1} = sub {
-    $exit_requested = 1;
-    # exit(0) unless $handling_request;
-};
+#$SIG{TERM} = $SIG{USR1} = sub {
+#    $exit_requested = 1;
+#    # exit(0) unless $handling_request;
+#};
 
 # Main FastCGI loop
 while (my $q = new CGI::Fast()) {

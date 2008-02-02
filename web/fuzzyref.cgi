@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.8 2008-02-02 18:30:34 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.9 2008-02-02 19:42:54 matthew Exp $';
 
 use strict;
 
@@ -72,10 +72,10 @@ my $last_indexed = 0;
 # FastCGI signal handling
 my $exit_requested = 0;
 my $handling_request = 0;
-$SIG{TERM} = $SIG{USR1} = sub {
-    $exit_requested = 1;
-    # exit(0) unless $handling_request;
-};
+#$SIG{TERM} = $SIG{USR1} = sub {
+#    $exit_requested = 1;
+#    # exit(0) unless $handling_request;
+#};
 
 while (my $q = new CGI::Fast()) {
     my $ref = $q->param('ref');

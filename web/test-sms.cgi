@@ -9,7 +9,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-sms.cgi,v 1.3 2008-02-02 18:30:34 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-sms.cgi,v 1.4 2008-02-02 19:42:54 matthew Exp $';
 
 use strict;
 
@@ -35,10 +35,10 @@ use PB::SMS;
 # FastCGI signal handling
 my $exit_requested = 0;
 my $handling_request = 0;
-$SIG{TERM} = $SIG{USR1} = sub {
-    $exit_requested = 1;
-    # exit(0) unless $handling_request;
-};
+#$SIG{TERM} = $SIG{USR1} = sub {
+#    $exit_requested = 1;
+#    # exit(0) unless $handling_request;
+#};
 
 while (my $q = new CGI::Fast()) {
     $handling_request = 1;

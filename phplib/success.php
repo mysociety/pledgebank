@@ -5,9 +5,49 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.4 2007-10-12 16:39:20 matthew Exp $
+// $Id: success.php,v 1.5 2008-02-04 23:56:56 matthew Exp $
 
 $success_stories = array(
+array('summary' => '
+<h3><a href="/Bakul-Library">' . _('Donate books to build a library') . ' &ndash; Bakul-Library</a></h3>
+<p><a href="/Bakul-Library"><img class="r" alt="' . _('Bakul Library') . '" width="282" height="211"
+src="/i/Bakul-Library-small.jpeg"></a></p>' .
+p(_('&ldquo;&hellip;the pledge campaign was just perfect. And we told the
+skeptics that they anyway did not have to contribute if they did not find a
+thousand others foolish enough to believe in it. As we neared our target, more
+and more people got involved in the mobilization as even the skeptics wanted
+this idea to succeed. As a result of that campaign now we have one of the best
+children\'s libraries in India, and set up entirely with the small
+contributions of a thousand-odd people.&rdquo;')).
+p('<a href="/success#bakul">' . _('Read more about this amazing story&hellip;') . '</a>'),
+'entry' => '
+<p><a name="bakul" href="/Bakul-Library"><img class="l" alt="' . _('Bakul Library') . '" width="282" height="211"
+src="/i/Bakul-Library-small.jpeg"></a></p>
+<h3><a href="/Bakul-Library">' . _('Donate books to build a library') . ' &ndash; Bakul-Library</a></h3>' .
+p(_('&ldquo;Let me thank you first for making the story of Bakul into the Bakul
+Story that people want to talk about. After you talked about Bakul at the Net
+Squared Conference and to Idealist, of course the podcast happened. And after
+that, we became a case study on social entrepreneurship at IIM Calcutta, one of
+the premier Business Schools in India and at Delhi University, the premier
+University of India. But it all started with you. Thanks once again for that.')) .
+p(_('&ldquo;Anyway...Bakul is an attempt to pool together the small individual
+contributions of people interested in the social development of India. It is an
+attempt to beat the cynicism that nothing can happen because we can only
+contribute in small ways and they cannot change anything. That is why, when we
+discovered Pledge Bank, we were excited. Here was a forum that was trying to do
+a similar thing. So, it was kind of a perfect tool for us in our campaign.')) .
+p(_('&ldquo;Moreover, when we started the campaign, "Donate Books: Build a
+Library", we got many incredulous responses. Many thought it sounded too good
+to be true and doubted its feasibility though they wanted it to happen. We also
+did not have a bank account to accept contributions and no space to store
+donations of books.  So, the pledge campaign was just perfect. And we told the
+skeptics that they anyway did not have to contribute if they did not find a
+thousand others foolish enough to believe in it. As we neared our target, more
+and more people got involved in the mobilization as even the skeptics wanted
+this idea to succeed. As a result of that campaign now we have one of the best
+children\'s libraries in India, and set up entirely with the small
+contributions of a thousand-odd people.')),
+),
 array('summary' => '
 <h3><a href="/success/airfarespledge">' . _('Organise aid trip to New Orleans') . ' &ndash; airfarespledge</a></h3>
 <p><a href="/success/airfarespledge"><img src="/i/airfarespledge.tn.jpeg" class="r" title="' . _('My best friend in Biloxi MS') . '"

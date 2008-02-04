@@ -9,7 +9,7 @@
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: test-sms.cgi,v 1.4 2008-02-02 19:42:54 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: test-sms.cgi,v 1.5 2008-02-04 22:50:29 matthew Exp $';
 
 use strict;
 
@@ -21,7 +21,7 @@ BEGIN {
 }
 
 use CGI;
-use CGI::Fast;
+use mySociety::CGIFast;
 use DateTime::Format::Strptime;
 use Encode;
 use Error qw(:try);
@@ -32,16 +32,7 @@ use mySociety::DBHandle qw(dbh);
 use PB;
 use PB::SMS;
 
-# FastCGI signal handling
-my $exit_requested = 0;
-my $handling_request = 0;
-#$SIG{TERM} = $SIG{USR1} = sub {
-#    $exit_requested = 1;
-#    # exit(0) unless $handling_request;
-#};
-
-while (my $q = new CGI::Fast()) {
-    $handling_request = 1;
+while (my $q = new mySociety::CGIFast()) {
     binmode(STDOUT, ':utf8');
     try {
         throw PB::Error("No REQUEST_METHOD; this program must be run in a CGI/FastCGI environment")
@@ -106,7 +97,5 @@ while (my $q = new CGI::Fast()) {
                     -content_length => length($resp)
                 ), $resp;
     } 
-    $handling_request = 0;
-    last if $exit_requested;
 }
 

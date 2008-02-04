@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.9 2008-02-02 19:42:54 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.10 2008-02-04 22:50:29 matthew Exp $';
 
 use strict;
 
@@ -23,7 +23,7 @@ BEGIN {
 }
 
 use CGI;
-use CGI::Fast;
+use mySociety::CGIFast;
 use Digest::SHA1 qw(sha1);
 use MIME::Base64;
 use POSIX;
@@ -69,15 +69,7 @@ sub do_index() {
 
 my $last_indexed = 0;
 
-# FastCGI signal handling
-my $exit_requested = 0;
-my $handling_request = 0;
-#$SIG{TERM} = $SIG{USR1} = sub {
-#    $exit_requested = 1;
-#    # exit(0) unless $handling_request;
-#};
-
-while (my $q = new CGI::Fast()) {
+while (my $q = new mySociety::CGIFast()) {
     my $ref = $q->param('ref');
     # only called as a GET and with a ref= param
     if ('GET' ne $q->request_method() || !$ref) {
@@ -121,5 +113,4 @@ while (my $q = new CGI::Fast()) {
     $ser =~ s/=+$//;
 
     print $q->redirect("/bogusref?ser=$ser");
-    last if $exit_requested;
 }

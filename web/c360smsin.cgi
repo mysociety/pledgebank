@@ -18,7 +18,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.7 2008-02-02 19:42:54 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: c360smsin.cgi,v 1.8 2008-02-04 22:50:29 matthew Exp $';
 
 use strict;
 
@@ -30,7 +30,7 @@ BEGIN {
 }
 
 use CGI;
-use CGI::Fast;
+use mySociety::CGIFast;
 use DateTime::Format::Strptime;
 use Encode;
 use Error qw(:try);
@@ -49,16 +49,7 @@ my $D = new DateTime::Format::Strptime(
                 # XXX locale and timezone?
             );
 
-# FastCGI signal handling
-my $exit_requested = 0;
-my $handling_request = 0;
-#$SIG{TERM} = $SIG{USR1} = sub {
-#    $exit_requested = 1;
-#    # exit(0) unless $handling_request;
-#};
-
-while (my $q = new CGI::Fast()) {
-    $handling_request = 1;
+while (my $q = new mySociety::CGIFast()) {
     binmode(STDOUT, ':utf8');
     try {
         throw PB::Error("No REQUEST_METHOD; this program must be run in a CGI/FastCGI environment")
@@ -132,6 +123,4 @@ while (my $q = new CGI::Fast()) {
 #        warn "Error: $t\n";
     };  # any other kind of error will kill the script and return HTTP 500 
         # to the client, which is what we want. - XXX No it isn't!
-    $handling_request = 0;
-    last if $exit_requested;
 }

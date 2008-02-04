@@ -6,7 +6,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 
-my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.9 2008-02-02 19:42:54 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: ref-rsscomments.cgi,v 1.10 2008-02-04 22:50:29 matthew Exp $';
 
 use strict;
 require 5.8.0;
@@ -26,29 +26,18 @@ use mySociety::Web qw(ent);
 use PB;
 use XML::RSS;
 use CGI::Carp;
-use CGI::Fast qw(-no_xhtml);
+use mySociety::CGIFast qw(-no_xhtml);
 
 my %CONF = ( number_of_comments => 20,
              base_url => mySociety::Config::get('BASE_URL') . '/',
              contact_email => mySociety::Config::get('CONTACT_EMAIL')
             );
 
-# FastCGI signal handling
-my $exit_requested = 0;
-my $handling_request = 0;
-#$SIG{TERM} = $SIG{USR1} = sub {
-#    $exit_requested = 1;
-#    # exit(0) unless $handling_request;
-#};
-
 my $W = new mySociety::WatchUpdate();
 our $request;
-while ($request = new CGI::Fast()) {
-    $handling_request = 1;
+while ($request = new mySociety::CGIFast()) {
     run();
     $W->exit_if_changed();
-    $handling_request = 0;
-    last if $exit_requested;
 }
 
 sub run {

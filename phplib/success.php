@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.5 2008-02-04 23:56:56 matthew Exp $
+// $Id: success.php,v 1.6 2008-02-05 00:15:38 matthew Exp $
 
 $success_stories = array(
 array('summary' => '
@@ -46,7 +46,7 @@ thousand others foolish enough to believe in it. As we neared our target, more
 and more people got involved in the mobilization as even the skeptics wanted
 this idea to succeed. As a result of that campaign now we have one of the best
 children\'s libraries in India, and set up entirely with the small
-contributions of a thousand-odd people.')),
+contributions of a thousand-odd people.&rdquo;')),
 ),
 array('summary' => '
 <h3><a href="/success/airfarespledge">' . _('Organise aid trip to New Orleans') . ' &ndash; airfarespledge</a></h3>

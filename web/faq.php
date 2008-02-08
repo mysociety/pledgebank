@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.59 2007-10-12 13:12:48 matthew Exp $
+// $Id: faq.php,v 1.60 2008-02-08 17:30:13 francis Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -127,7 +127,7 @@ function default_faq() {
     print dt(_('Where\'s the "source code" to PledgeBank?'));
 
     print dd(_('The software behind PledgeBank is open source, and available to you
-    mainly under the Affero GPL software license. You can <a
+    mainly under the GNU Affero GPL software license. You can <a
     href="https://secure.mysociety.org/cvstrac/dir?d=mysociety">download the source
     code</a> (look under \'pb\') and help us develop it. You\'re welcome to use it
     in your own projects, although you must also make available the source code to

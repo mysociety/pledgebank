@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.2.css,v 1.4 2008-02-04 23:56:57 matthew Exp $
+ * $Id: pb.2.css,v 1.5 2008-02-11 19:12:41 matthew Exp $
  * 
  */
 
@@ -181,7 +181,7 @@ h2 {
 #pbfooter {
     clear: both;
     padding: 3px;
-    border-top: solid 1px #c6b5d3;
+    border-top: solid 1px #c6b5de;
     font-size: 90%;
     width: 50%;
     margin: 0 auto;
@@ -269,33 +269,71 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 
 /* Front page */
 
+#banner {
+    margin-top: 0.5em;
+    text-align: center;
+    /* background-color: #502993; */
+}
+#banner img {
+    border: solid 4px black;
+    border-width: 4px 4px 4px 2px;
+}
+
 #tellworld {
     float: left;
     width: 59%;
     padding: 10px;
     background-color: #ffffff;
+    background-image: url('/i/people-yay.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
 }
 #tellworld h2 {
     margin-bottom: 0;
+    padding-left: 55px;
 }
 #tellworld h3 {
     margin-top: 0.5em;
+    padding-left: 55px;
+}
+
+#col {
+    width: 33%;
+    float: right;
+}
+
+#startblurb1 {
+    background-image: url('/i/person-idea.png');
+    background-repeat: no-repeat;
+    background-position: 100% 100%;
+}
+#startbubble {
+    background-image: url('/i/speechbubble-8bit-nomatt.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    width: 97px;
+    height: 89px;
+    position: absolute;
+    left: -2em;
+    top: -2em;
 }
 
 #startblurb {
-    float: right;
-    width: 32%;
+    position: relative;
     /*border: solid 2px #ffcc66;*/
-    background-color: #522994;
-    padding: 10px;
     /*border: solid 2px #83131B;
     background-color: #9d1c20;*/
+    background-color: #9C7BBD;
     color: #ffffff;
     -moz-border-radius: 2em;
-    margin: 1em 0;
+    border: solid 10px #522994;
+    margin: 1em 55px 1em 0;
+    padding: 15px 10px 10px;
 }
 #startblurb a {
     color: #FFCC66;
+    color: #ffffff;
+    padding-left: 30px;
 }
 #startblurb ul {
     margin-left: 0;
@@ -305,8 +343,6 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 }
 
 #extrablurb {
-    float: right;
-    width: 32%;
     border: solid 2px #522994;
     background-color: #9C7BBD;
     padding: 10px;
@@ -326,26 +362,80 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
 #successfulpledges {
     width: 59%;
     float: left;
+    padding: 10px;
+    margin-top: 1em;
+    background-image: url('/i/person-yay.png');
+    background-repeat: no-repeat;
+    background-position: 90% 0;
 }
+#successfulpledges ul {
+    margin-left: 0;
+    padding-left: 0;
+}
+#successfulpledges li {
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    padding-left: 60px;
+}
+#successfulpledges li.even {
+    background-image: url('/i/iwill-light.png');
+}
+#successfulpledges li.odd {
+    background-image: url('/i/iwill-dark.png');
+}
+#success_more {
+    background-image: url('/i/people-hands.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    padding-left: 75px;
+    height: 54px;
+}
+
 #currentpledges {
-    width: 32%;
-    float: right;
+    clear: right;
     margin-top: 1em;
     padding: 10px;
 }
-#currentpledges ul, #front #comments ul {
-    margin-left: 1em;
+#currentpledges ul {
+    margin-left: 0;
+    padding-left: 0;
+}
+#currentpledges li {
+    background-image: url('/i/person-iwill.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    padding-left: 55px;
 }
 #currentpledges li:hover, #successfulpledges li:hover, #front #comments li:hover {
     background-color: #f6e5ff;
 }
 
+#front {
+    background-image: url('/i/light-bg.png');
+    background-repeat: no-repeat;
+    background-position: 5% 85%;
+}
+
 #front #comments {
     margin-top: 1em;
-    float: right;
     clear: right;
     font-size: 95%;
-    width: 32%;
+    padding: 10px;
+}
+#front #comments ul {
+    margin-left: 0;
+    padding-left: 0;
+}
+#front #comments li {
+    background-image: url('/i/comment-bubble.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    padding-left: 40px;
+}
+
+#blogexcerpt {
+    clear: right;
+    margin-top: 1em;
     padding: 10px;
 }
 
@@ -396,7 +486,11 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     padding: 10px;
     clear: both;
     width: 90%;
-    border-top: solid 1px #c6b5d3;
+    border-top: solid 1px #c6b5de;
+    background-image: url('/i/person-envelope.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    min-height: 70px;
 }
 
 /* My Pledges page */
@@ -460,8 +554,6 @@ input.error, input[type=text].error, select.error, input[type=radio].error {
     margin-bottom: 0;
 }
 #pledgeaction {
-    border: solid 2px #522994;
-    background-color: #c6b5de;
     padding: 10px;
     margin: 0.5em 0 0.5em 0;
     float: right;
@@ -556,8 +648,6 @@ img.creatorpicture {
 }
 
 #spreadword {
-    border: solid 1px #ff8429;
-    background-color: #ffff99;
     border: solid 1px #522994;
     background-color: #c6b5de;
     padding: 10px;
@@ -705,7 +795,7 @@ ul#nav li {
     position: relative;
     top: 1px;
     background-color: #ffffff;
-    /*background-color: #c6b5d3;*/
+    /*background-color: #c6b5de;*/
     color: #21004a;
     margin-left: 0.5em;
     display: inline;

@@ -4,12 +4,5 @@ BINPATH=`dirname $0`
 cd $BINPATH
 mkdir -p ../web/microsites/autogen
 
-./make_365act_css
-./make_glastonbury_css
-./make_interface_css
-./make_london_css
-./make_globalcool_css
-./make_catcomm_css
-./make_livesimply_css
-./make_o2_css
+./make_microsites_css
 

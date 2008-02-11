@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.259 2007-10-12 15:01:23 matthew Exp $
+// $Id: index.php,v 1.260 2008-02-11 19:12:41 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -17,21 +17,24 @@ require_once '../phplib/success.php';
 require_once '../../phplib/utility.php';
 
 page_header(null, 
-            array('rss'=> array(
-                    _('New Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list')),
-                    _('Successful Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list/succeeded')),
-                    _('Comments on All Pledges PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/comments'))
-                    ), 
-                'id'=>'front',
-                'cache-max-age' => 600)
-            );
+    array(
+        'rss'=> array(
+            _('New Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list')),
+            _('Successful Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list/succeeded')),
+            _('Comments on All Pledges PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/comments'))
+        ), 
+        'id' => 'front',
+        'cache-max-age' => 600,
+        'banner' => $microsite ? '' : '<p id="banner"><img src="/i/howitworks.png" alt="How PledgeBank works: PledgeBank is a free site to help people get things done - especially things that require several people. It is very simple - you make a pledge, set a target, find people to agree and sign the pledge, and succeed!"></p>',
+    )
+);
 debug_comment_timestamp("after page_header()");
 front_page();
 debug_comment_timestamp("after front_page()");
 page_footer();
 
 function front_page() {
-    global $lang;
+    global $lang, $microsite;
 
     if (microsites_frontpage_has_intro()) {
         echo '<div id="tellworld">';
@@ -40,23 +43,45 @@ function front_page() {
     }
     debug_comment_timestamp("after microsites_frontpage_intro()");
 
+    echo '<div id="col">';
+
     if (microsites_frontpage_has_start_your_own()) {
-        echo '<div id="startblurb">
+        echo '<div id="startblurb1"><div id="startblurb">
+<div id="startbubble"></div>
 <p id="start"><a href="./new"><strong>', _('Start your pledge'), '&nbsp;&raquo;</strong></a></p>
 <ul>
-<li>' . _('Get a unique page for your pledge')
-. '<li>' . _('Find tools to help promote your pledge')
+<li>' . _('Get your own page')
+. '<li>' . _('Help with promotion')
 . '<li>' . _('Use positive peer pressure to change your community')
 . '</ul>
-</div>';
+</div></div>';
     }
 
     microsites_frontpage_extra_blurb();
+
+    if (!$microsite) {
+        $news = file_get_contents('http://www.mysociety.org/category/pledgebank/feed/');
+        if (preg_match('#<item>.*?<title>(.*?)</title>.*?<link>(.*?)</link>.*?<description><!\[CDATA\[(.*?)\]\]></description>#s', $news, $m)) {
+	    $link = str_replace('www.mysociety.org', 'www.pledgebank.com/blog', $m[2]);
+            $excerpt = preg_replace('#\s+\[\.\.\.\]#', '&hellip; <a href="'
+                . $link . '">' . _('more') . '</a>', $m[3]);
+            echo '<div id="blogexcerpt">',
+                 h2(_('Latest from our blog')), ' <h3 class="head_with_mast">',
+                 $m[1], '</h3> <p class="head_mast">', $excerpt, '</div>';
+        }
+    }
 
     echo '<div id="currentpledges">';
     list_frontpage_pledges();
     debug_comment_timestamp("after list_frontpage_pledges()");
     echo '</div>';
+
+    if (microsites_comments_allowed()) {
+        comments_show_latest();
+        debug_comment_timestamp("after comments_show_latest()");
+    }
+
+    echo '</div>'; # col
 
     if (!microsites_no_target()) {
         echo '<div id="successfulpledges">';
@@ -66,19 +91,21 @@ function front_page() {
     }
     debug_comment_timestamp("after list_successful_pledges()");
 
-    if (microsites_comments_allowed()) {
-        comments_show_latest();
-        debug_comment_timestamp("after comments_show_latest()");
-    }
-
     microsites_frontpage_credit_footer();
 }
 
 function format_pledge_list($pledges, $params) {
     $out = '<ul class="search_results">';
     $params['firstperson'] = 'includename';
+    $c = 0;
     foreach ($pledges as $pledge)  {
-        $out .= '<li>' . $pledge->new_summary($params) . '</li>';
+        $out .= '<li';
+        if (isset($params['swap'])) {
+            $out .= ' class="';
+            $out .= ($c++%2) ? 'even' : 'odd';
+            $out .= '"';
+        }
+        $out .= '>' . $pledge->new_summary($params) . '</li>';
     }
     $out .= '</ul>';
     return $out;
@@ -151,12 +178,13 @@ function list_successful_pledges() {
             array_pop($pledges);
         }
         pb_print_filter_link_main_general('class="head_mast"');
-        print format_pledge_list($pledges, array('showcountry'=>false));
+        print format_pledge_list($pledges, array('showcountry'=>false, 'swap'=>true));
     }
 
     if ($more) {
         $succeeded_url = pb_domain_url(array('path'=>'/list/succeeded'));
-        print p("<a href=\"$succeeded_url\">"._('More successful pledges...')."</a>");
+        print "<p id='success_more'><a href='$succeeded_url'>" .
+            _('More successful pledges...') . '</a></p>';
     }
 }
 

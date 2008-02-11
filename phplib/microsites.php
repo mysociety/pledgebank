@@ -18,7 +18,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: microsites.php,v 1.124 2007-11-15 09:50:03 francis Exp $
+ * $Id: microsites.php,v 1.125 2008-02-11 19:12:41 matthew Exp $
  * 
  */
 
@@ -204,8 +204,8 @@ function microsites_logo() {
         return '
 <h1><a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
 <span id="countrytitle"><img src="/microsites/interface-logo.gif" alt="interface">
-<a href="/where">' . _('(change)') . '</a></span></h1>';
-
+<a href="/where">' . _('(change)') . '</a></span>
+<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>';
     } elseif ($microsite && $microsite == '365act') {
         return '
 <a href="http://www.365act.com"><img src="/microsites/365-logo-small.png" alt="365 Act" align="left"
@@ -219,15 +219,16 @@ function microsites_logo() {
     margin: 10px;
     "></a>
 <h1>
-<a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
 <span id="countrytitle"><a href="/where">' . _('(other PledgeBanks)') . '</a></span>
-</h1>
+<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>
 ';
 
     } elseif ($microsite && $microsite == 'london') {
         return '
 <h1><a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a>
-<span id="countrytitle"><a href="/where">' . _('(change)') . '</a></span></h1>';
+<span id="countrytitle"><a href="/where">' . _('(change)') . '</a></span>
+<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>';
 
     } elseif ($microsite && $microsite == 'catcomm') {
         return '
@@ -242,8 +243,9 @@ function microsites_logo() {
     margin: 10px;
     "></a>
 <h1>
-<a href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
+<a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
 <span id="countrytitle"><a href="/where">' . _('(other PledgeBanks)') . '</a></span>
+<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span>
 </h1>
 ';
     } elseif ($microsite && $microsite == 'livesimply') {

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.173 2007-11-02 15:36:07 matthew Exp $
+// $Id: page.php,v 1.174 2008-02-11 19:12:41 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -92,7 +92,7 @@ function page_header($title, $params = array()) {
     if (!is_array($params))
         err("PARAMS must be an array in page_header");
     foreach ($params as $k => $v) {
-        if (!preg_match('/^(nonav|noprint|noreflink|last-modified|etag|cache-max-age|id|pref|ref|robots|rss|css|override)$/', $k))
+        if (!preg_match('/^(nonav|noprint|noreflink|last-modified|etag|cache-max-age|id|pref|ref|robots|rss|css|override|banner)$/', $k))
             err("bad key '$k' with value '$v' in PARAMS argument to page_header");
     }
 
@@ -220,8 +220,11 @@ function page_header($title, $params = array()) {
     echo _('Search for pledges:') . ' <input type="text" id="q" name="q" size="25" value="'
         . htmlspecialchars(get_http_var('q', true)) . '"><input type="submit" value="'
         . _('Search') . '">
-</form>
-<div id="pbcontent">';
+</form>';
+    if (isset($params['banner'])) {
+        echo $params['banner'];
+    }
+    echo '<div id="pbcontent">';
 
     // Warn that we are on a testing site
     $devwarning = array();

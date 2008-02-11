@@ -144,19 +144,19 @@ foreach my $site (@sites) {
 sub catcomm_changes {
     my $selector = shift;
     if ($selector eq '#col') {
-        s#float: right##gi;
-        s#width: 33%##gi;
+        s#float: right;##gi;
+        s#width: 33%;##gi;
     }
 }
 
 sub catcomm_extra {
     print NEWCSS <<EOF;
-#currentpledges {
+#currentpledges, #front #comments {
     float: left;
     clear: none;
     width: 59%;
 }
-#startblurb1, #extrablurb, #front #comments {
+#startblurb1, #extrablurb {
     float: right;
     width: 32%;
 }

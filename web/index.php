@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.260 2008-02-11 19:12:41 matthew Exp $
+// $Id: index.php,v 1.261 2008-02-12 10:22:17 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -25,7 +25,7 @@ page_header(null,
         ), 
         'id' => 'front',
         'cache-max-age' => 600,
-        'banner' => $microsite ? '' : '<p id="banner"><img src="/i/howitworks.png" alt="How PledgeBank works: PledgeBank is a free site to help people get things done - especially things that require several people. It is very simple - you make a pledge, set a target, find people to agree and sign the pledge, and succeed!"></p>',
+        'banner' => $microsite ? '' : '<p id="banner"><img src="/i/howitworks.png" alt="' . _('How PledgeBank works: PledgeBank is a free site to help people get things done - especially things that require several people. It is very simple - you make a pledge, set a target, find people to agree and sign the pledge, and succeed!') . '"></p>',
     )
 );
 debug_comment_timestamp("after page_header()");

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.161 2008-01-03 17:14:52 francis Exp $
+ * $Id: admin-pb.php,v 1.162 2008-02-25 23:40:02 matthew Exp $
  * 
  */
 
@@ -669,7 +669,10 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
                 return;
             }
         }
-        db_query('update pledges set title = ?, type = ?, signup = ?, name = ?, identity = ?, detail = ?, target = ?, notice = ?, cancelled = ? where id = ?', $title, $type, $signup, $name, $identity, $detail, $target, $notice, $cancelled, $pledge_id);
+        db_query('update pledges set title = ?, type = ?, signup = ?, name = ?,
+            identity = ?, detail = ?, target = ?, notice = ?, cancelled = ?,
+            changetime = ms_current_timestamp()
+            where id = ?', $title, $type, $signup, $name, $identity, $detail, $target, $notice, $cancelled, $pledge_id);
         db_commit();
         print p(_('<em>Pledge text updated. Check it in the pledge box preview on the right.</em>'));
     }

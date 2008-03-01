@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.6 2008-02-05 00:15:38 matthew Exp $
+// $Id: success.php,v 1.7 2008-03-01 13:52:03 timsk Exp $
 
 $success_stories = array(
 array('summary' => '
@@ -163,7 +163,7 @@ p(_('&ldquo;The amount of elderly people who supported me in this pledge by
 writing and phoning the council was phenomenal. Thank you so much for
 affording us a professional launch pad. My next pledge will be to promote
 Pledgebank - I am so grateful. I cannot thank you enough for giving me the
-opportunity to make a difference. I truly am 
+opportunity to make a difference. I truly am
 <strong>astounded</strong>!!!!!! With thanks from myself, family and my
 community.&rdquo;')),
 'entry' => '

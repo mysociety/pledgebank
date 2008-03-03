@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.60 2008-02-08 17:30:13 francis Exp $
+// $Id: faq.php,v 1.61 2008-03-03 01:24:04 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -131,8 +131,7 @@ function default_faq() {
     href="https://secure.mysociety.org/cvstrac/dir?d=mysociety">download the source
     code</a> (look under \'pb\') and help us develop it. You\'re welcome to use it
     in your own projects, although you must also make available the source code to
-    any such projects.
-    '));
+    any such projects.'));
 
     print dt(_('People build things, not organisations. Who <em>actually</em> built it?'));
 
@@ -145,8 +144,7 @@ function default_faq() {
     Etienne Pollard,
     Richard Pope,
     Matthew Somerville,
-    Tom Steinberg.
-    '));
+    Tom Steinberg.'));
 
     print dd(_('<strong>Translations by</strong>
     Nic Dafis (Welsh),
@@ -159,8 +157,7 @@ function default_faq() {
     maidan.org.ua team (Ukrainian),
     Hugo Lamoureux (French),
     Oliver Ding, Isaac Mao, Danny Yu, Nan Yang, Jacky Peng (Chinese),
-    Aliaksej Lavońčyk (Belarusian).
-    '));
+    Aliaksej Lavońčyk (Belarusian).'));
 
     print dd(_('<strong>Thanks also to</strong>
     <a href="http://www.tangentlabs.co.uk/">Tangent Labs</a> (for SMS in the UK), 
@@ -173,9 +170,7 @@ function default_faq() {
     <a href="http://www.easynet.net/publicsector/">Easynet</a> (who kindly host all
     our servers).
 
-    Let us know if we\'ve missed anyone.
-
-    '));
+    Let us know if we\'ve missed anyone.'));
 
 
     print "</dl>\n";
@@ -213,7 +208,7 @@ function default_faq() {
     organisations who ask - just contact us if you want to launch a bigger pledge."));
     */
 
-    print dt('<a name="allpledges">'._('Why does my new pledge not appear on the All Pledges page?').'</a>');
+    print dt('<a name="allpledges">'._('Why does my new pledge not appear on the All Pledges page or in search results?').'</a>');
 
     print dd(_("New pledges have just their own page, and are not shown elsewhere on
     the site, until a few people have signed up to them. This is to make
@@ -307,8 +302,7 @@ function default_faq() {
     print dd(_("We'd be happy to talk to anyone who could help us extend
     the postcode search overseas&mdash;please <a
     href=\"https://secure.mysociety.org/admin/lists/mailman/listinfo/internationalisation\">join this
-    email list</a> to help us out.
-    "));
+    email list</a> to help us out."));
 
     print dt(_('... and SMS?'));
 

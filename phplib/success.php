@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.9 2008-03-04 17:19:52 matthew Exp $
+// $Id: success.php,v 1.10 2008-03-04 17:21:06 matthew Exp $
 
 $success_stories = array(
 array('summary' => '
@@ -77,9 +77,9 @@ organisation CERMT (Emergency Relief Massage Therapy).&rdquo;')) .
 p('<a href="/success/airfarespledge">' . _('Continue reading&hellip;') . '</a>'),
 ), array(
 'summary' => '
-<h3><a href="/Undies4Liberia">' . _('Collect underwear for orphans') . ' &ndash; Undies4Liberia</a></h3>
 <p><a href="/Undies4Liberia"><img class="r" alt="' . _('The pledge creator stood by a huge pile of underwear') .'"
-src="/i/Undies4Liberia-small.jpeg"></a></p>' .
+src="/i/Undies4Liberia-small.jpeg"></a></p>
+<h3><a href="/Undies4Liberia">' . _('Collect underwear for orphans') . ' &ndash; Undies4Liberia</a></h3>' .
 p(_('&ldquo;&hellip;I set up my pledge, expecting a few family members and friends to sign up. I never thought my pledge would be successful, and that so many total strangers would get involved!
 My goal for a successful pledge should have produced 450 pairs of undies; but the final count is 753 pairs of new, clean undies for the children of Liberia!')) .
 p('<a href="/success#undies">' . _('Read more about this amazing story&hellip;') . '</a>'),

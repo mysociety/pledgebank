@@ -11,6 +11,7 @@
 var translation = {
 "Town:":"Горад/мястэчка:",
 "(choose one)":"(абярыце штосьці)",
+"Place name:":"Назоў:",
 "other local people":"асобам",
 "<Enter your name>":"<Увядзіце Вашае імя>",
 "<Enter your pledge>":"<Увядзіце абяцаньне>",
@@ -20,6 +21,8 @@ var translation = {
 "Global":"Глябальна",
 "(separator)":"(знак разьдзелу)",
 "Postcode or town:":"Індэкс або места:",
+"Town or zipcode:":"Места або паштовы індэкс:",
+"Place name or zipcode:":"Імя месца або код:",
 "You have used %d characters; %d remain.":"Скарыстана %d сымбаляў; засталося %d.",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Паведамленьне ўтрымлівае %d сымбаляў, што на %d болей, чым зьмяшчае адна смска. Калі ласка, скараціце паведамленьне."
 }

@@ -11,6 +11,7 @@
 var translation = {
 "Town:":"Tref:",
 "(choose one)":"(dewiswch un)",
+"Place name:":"Enw lle:",
 "other local people":"o bobl lleol eraill",
 "<Enter your name>":"<Rhowch eich enw yma>",
 "<Enter your pledge>":"<Rhowch eich addewid yma>",
@@ -20,6 +21,8 @@ var translation = {
 "Global":"Byd eang",
 "(separator)":"(nodyn gwahanu)",
 "Postcode or town:":"C&ocirc;d post neu dref",
+"Town or zipcode:":"",
+"Place name or zipcode:":"",
 "You have used %d characters; %d remain.":"Defnyddir %d o nodiadau; %d ar &ocirc;l",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Defnyddiwyd %d o nodiadau, sy'n %d fwy nag sy'n ffito mewn neges destun. Cwtogwch eich neges, os gwelwch yn dda."
 }

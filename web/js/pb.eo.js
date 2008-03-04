@@ -11,6 +11,7 @@
 var translation = {
 "Town:":"Urbo:",
 "(choose one)":"(elektu unu)",
+"Place name:":"Lokonomo",
 "other local people":"aliaj lokaj personoj",
 "<Enter your name>":"<Entajpu vian nomon>",
 "<Enter your pledge>":"<Entajpu vian promeson>",
@@ -20,6 +21,8 @@ var translation = {
 "Global":"Tutmonda",
 "(separator)":"(disigilo)",
 "Postcode or town:":"Poŝtkodo aŭ urbo:",
+"Town or zipcode:":"Urbo aŭ poŝtkodo:",
+"Place name or zipcode:":"Lokonomo aŭ poŝtkodo:",
 "You have used %d characters; %d remain.":"Vi uzis %d signojn; restas %d.",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Vi uzis %d signojn, kaj tio estas %d pli ol la maksimumo por SMS. Bonvolu malplilongigi vian mesaĝon."
 }

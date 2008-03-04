@@ -11,6 +11,7 @@
 var translation = {
 "Town:":"Stadt",
 "(choose one)":"(eins auswählen)",
+"Place name:":"Ort:",
 "other local people":"andere Menschen aus dem gleichen Ort",
 "<Enter your name>":"<IHR NAME>",
 "<Enter your pledge>":"<Geben Sie Ihr Versprechen ein>",
@@ -20,6 +21,8 @@ var translation = {
 "Global":"Weltweit",
 "(separator)":" (Trenner)",
 "Postcode or town:":"Postleitzahl oder Stadt",
+"Town or zipcode:":"",
+"Place name or zipcode:":"",
 "You have used %d characters; %d remain.":"Sie haben %d Zeichen benutzt; %d verfügbar.",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Sie haben %d Zeichen benutzt, %d mehr, als in eine SMS passen. Bitte kürzen Sie die Nachricht."
 }

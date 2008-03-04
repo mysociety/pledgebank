@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.259 2008-03-04 16:56:35 matthew Exp $
+ * $Id: pledge.php,v 1.260 2008-03-04 17:31:41 matthew Exp $
  * 
  */
 
@@ -871,8 +871,9 @@ class Pledge {
                 $hours = 24 - date('G');
                 $text .= '(';
                 $text .= sprintf(ngettext('Just %d hour left', 'Just %d hours left', $hours), $hours);
-                $text .= sprintf(ngettext(', %d signature', ', %d signatures', $this->left()), $this->left());
-		$text .= sprintf(_(' short of the target of %d'), $this->target()); // Tim's
+                $text .= sprintf(ngettext(', %d more signature needed', ', %d more signatures needed', $this->left()), $this->left());
+                #$text .= sprintf(ngettext(', %d signature', ', %d signatures', $this->left()), $this->left());
+                #$text .= sprintf(_(' short of the target of %d'), $this->target()); // Tim's
                 $text .= ')';
             } elseif ($this->daysleft() < 0)
                 $text .= _('Deadline expired, pledge failed.');
@@ -883,8 +884,9 @@ class Pledge {
                 } else {
                     $text .= sprintf(ngettext('%d day left', '%d days left', $this->daysleft()), $this->daysleft());
                 }
-                $text .= sprintf(ngettext(', %d signature', ', %d signatures', $this->left()), $this->left());
-		$text .= sprintf(_(' short of the target of %d'), $this->target()); // Tim's
+                $text .= sprintf(ngettext(', %d more signature needed', ', %d more signatures needed', $this->left()), $this->left());
+                #$text .= sprintf(ngettext(', %d signature', ', %d signatures', $this->left()), $this->left());
+                #$text .= sprintf(_(' short of the target of %d'), $this->target()); // Tim's
                 $text .= ')';
             }
         }

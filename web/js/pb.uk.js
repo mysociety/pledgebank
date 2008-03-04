@@ -11,6 +11,7 @@
 var translation = {
 "Town:":"Місто",
 "(choose one)":"(виберіть одне)",
+"Place name:":"Назва місця:",
 "other local people":"інших людей",
 "<Enter your name>":"<Вкажіть ваше ім’я>",
 "<Enter your pledge>":"<Напишіть ваш заклик>",
@@ -20,6 +21,8 @@ var translation = {
 "Global":"Глобально",
 "(separator)":"(розмежування)",
 "Postcode or town:":"Поштовий індекс, або населений пункт",
+"Town or zipcode:":"",
+"Place name or zipcode:":"",
 "You have used %d characters; %d remain.":"Ви використали %d символів; %d залишилось.",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter."
 }

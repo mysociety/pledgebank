@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.258 2008-03-01 13:52:03 timsk Exp $
+ * $Id: pledge.php,v 1.259 2008-03-04 16:56:35 matthew Exp $
  * 
  */
 
@@ -44,7 +44,7 @@ class Pledge {
         if (gettype($ref) == "integer" or (gettype($ref) == "string" and preg_match('/^[1-9]\d*$/', $ref))) {
             $q = db_query("$main_query_part WHERE pledges.id = ?", array($ref));
             if (!db_num_rows($q))
-                err(_('PledgeBank reference not known'));
+                err(_('PledgeBank reference not known'), E_USER_NOTICE);
             $this->data = db_fetch_array($q);
         } elseif (gettype($ref) == "string") {
             $q = db_query("$main_query_part WHERE lower(ref) = ?", array(strtolower($ref)));

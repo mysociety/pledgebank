@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.7 2008-03-01 13:52:03 timsk Exp $
+// $Id: success.php,v 1.8 2008-03-04 16:56:35 matthew Exp $
 
 $success_stories = array(
 array('summary' => '
@@ -239,7 +239,27 @@ heading to the city.')) .
 
 p(_('&ldquo;A few people I don&rsquo;t know somewhere in the world signed
 the pledge&hellip;and that made me really happy.&rdquo;')),
-)
+),
+
+array(
+'summary' => '
+<h3><a href="/WIPTintern">' . _('Fund a technology scholarship') . ' &ndash; WIPTintern</a></h3>'
+. p(_('&ldquo;Having signed a pledge on Pledgebank before, I decided it could be a really
+effective tool in helping me empower and mobilize others. We decided that we
+would raise some money to provide a small working stipend for a young woman
+intern. Within the first 48 hours, I had reached my goal of pledgers. It was
+profoundly exciting, and really helped energize our modest fundraising
+effort.&rdquo;')),
+'entry' => '
+<h3><a href="/WIPTintern">' . _('Fund a technology scholarship') . ' &ndash; WIPTintern</a></h3>'
+. p(_('&ldquo;Having signed a pledge on Pledgebank before, I decided it could be a really
+effective tool in helping me empower and mobilize others. We decided that we
+would raise some money to provide a small working stipend for a young woman
+intern. Within the first 48 hours, I had reached my goal of pledgers. It was
+profoundly exciting, and really helped energize our modest fundraising
+effort.&rdquo;'))
+),
+
 );
 
 $success_summary = array();

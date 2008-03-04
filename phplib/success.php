@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.8 2008-03-04 16:56:35 matthew Exp $
+// $Id: success.php,v 1.9 2008-03-04 17:19:52 matthew Exp $
 
 $success_stories = array(
 array('summary' => '
@@ -75,6 +75,22 @@ p(_('&ldquo;My pledge was originally to raise some money to help pay for
 airfares to get to New Orleans to help with Hurricane Katrina Relief
 organisation CERMT (Emergency Relief Massage Therapy).&rdquo;')) .
 p('<a href="/success/airfarespledge">' . _('Continue reading&hellip;') . '</a>'),
+), array(
+'summary' => '
+<h3><a href="/Undies4Liberia">' . _('Collect underwear for orphans') . ' &ndash; Undies4Liberia</a></h3>
+<p><a href="/Undies4Liberia"><img class="r" alt="' . _('The pledge creator stood by a huge pile of underwear') .'"
+src="/i/Undies4Liberia-small.jpeg"></a></p>' .
+p(_('&ldquo;&hellip;I set up my pledge, expecting a few family members and friends to sign up. I never thought my pledge would be successful, and that so many total strangers would get involved!
+My goal for a successful pledge should have produced 450 pairs of undies; but the final count is 753 pairs of new, clean undies for the children of Liberia!')) .
+p('<a href="/success#undies">' . _('Read more about this amazing story&hellip;') . '</a>'),
+'entry' => '
+<p><a name="undies" href="/Undies4Liberia"><img class="r" src="/i/Undies4Liberia-large.jpeg"
+alt="' . _('The pledge creator stood by a huge pile of underwear') . '"></a>
+<h3><a href="/Undies4Liberia">' . _('Collect underwear for orphans') . ' &ndash; Undies4Liberia</a></h3>' . 
+p(_('&ldquo;The idea of just wanting a new, clean pair of undies sounds crazy to most of us, but for orphans in Liberia, this is a luxury! After spending a month working at an orphanage in Liberia last year, I noticed most of the kids only had one pair of underwear, which was usually falling apart at the seams. I know I take my clean, comfortable undies for granted, but it felt like such a natural, easy way for people to get involved!')) .
+p(_('&ldquo;I actually stumbled upon PledgeBank while I was trying to find another website, but thought it was a great way to get people involved in something that&rsquo;s very close to my heart! I set up my pledge, expecting a few family members and friends to sign up. I never thought my pledge would be successful, and that so many total strangers would get involved!')) .
+p(_('&ldquo;My goal for a successful pledge should have produced 450 pairs of undies; but the final count is 753 pairs of new, clean undies for the children of Liberia! The response was so great that not only will the children at one orphanage benefit from the generosity of strangers, but I will be able to give new undies to multiple orphanages! I just put all of the undies on a shipping container this week, which will arrive in Monrovia around the beginning of April. I&rsquo;m leaving for Liberia on March 24th to spend 6 months there working with a wonderful organization called Orphan Relief and Rescue. ORR works with 80+ orphanages in and around Monrovia, so there will be plenty of children to give all of the donated undies to!')) .
+p(_('&ldquo;Even though the pledge is closed, people are still contacting me to send undies and giftcards! So, in the end, over 750 pairs of undies will be going to the orphans of Liberia because of the kind-hearted people who use PledgeBank! To say &lsquo;thank you&rsquo; is not enough; but to see the children smile because someone cares says it all!&rdquo;'))
 ), array(
 'summary' => '
 <h3><a href="/electionwatch07">' . _('Gather people to monitor elections') . ' &ndash; electionwatch07</a></h3>

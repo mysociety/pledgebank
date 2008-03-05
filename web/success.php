@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.6 2007-10-12 13:12:48 matthew Exp $
+// $Id: success.php,v 1.7 2008-03-05 14:51:35 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/success.php';
@@ -25,10 +25,18 @@ page_footer();
 # ---
 
 function story_front() {
-    global $success_stories;
+    global $success_stories, $success_titles;
 ?>
 
 <h2>Success Stories</h2>
+
+<ul>
+<?
+    foreach ($success_titles as $link => $story) {
+        print "<li><a href='#$link'>$story</a>";
+    }
+?>
+</ul>
 
 <p>Here at PledgeBank, we&rsquo;re quite proud of the actions people have taken to
 improve their communities. Each of the successful pledges on the site mark

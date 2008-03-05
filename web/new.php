@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.209 2007-12-21 15:38:05 matthew Exp $
+// $Id: new.php,v 1.210 2008-03-05 14:20:45 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -189,7 +189,7 @@ size="40" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 
 <p><?=_('Choose a short name for your pledge (6 to 16 letters):') ?>
 <input<? if (array_key_exists('ref', $errors) || array_key_exists('ref2', $errors)) print ' class="error"' ?> onkeyup="checklength(this)" type="text" size="16" maxlength="16" id="ref" name="ref" value="<? if (isset($data['ref'])) print htmlspecialchars($data['ref']) ?>"> 
-<small>(<?=sprintf(_('This gives your pledge an easy web address. e.g. %s/tidyupthepark'), OPTION_WEB_HOST.".".OPTION_WEB_DOMAIN) ?>)</small>
+<small>(<?=sprintf(_('This gives your pledge an easy web address. e.g. %stidyupthepark'), pb_domain_url()) ?>)</small>
 </p>
 
 <p id="moreinfo"><?=_('More details about your pledge:') . ' <small>' . _('(optional)') . '</small>' ?>

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.260 2008-03-04 17:31:41 matthew Exp $
+ * $Id: pledge.php,v 1.261 2008-03-13 10:27:41 matthew Exp $
  * 
  */
 
@@ -769,7 +769,7 @@ class Pledge {
         }
         // Display Facebook link if that is available
         if (OPTION_FACEBOOK_API_KEY) {
-            $out = sprintf(_('Sign this pledge <strong><a href="%s">in Facebook</a> <a href="%s"><img src="/share/facebook.gif" alt="" border="0"></a></strong>'), $this->url_facebook(), $this->url_facebook());
+            $out = sprintf(_('Sign this pledge <strong><a href="%s">in Facebook</a> <a href="%s"><img src="/jslib/share/facebook.gif" alt="" border="0"></a></strong>'), $this->url_facebook(), $this->url_facebook());
             $extras[] = $out;
         }
         if ($extras) {

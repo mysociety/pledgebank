@@ -21,8 +21,8 @@ var translation = {
 "Global":"全球",
 "(separator)":"(separator)",
 "Postcode or town:":"邮编或地名：",
-"Town or zipcode:":"",
-"Place name or zipcode:":"",
+"Town or zipcode:":"城镇或邮编",
+"Place name or zipcode:":"地名或邮编：",
 "You have used %d characters; %d remain.":"你已经输入了 %d 个字符；还可以输入%d 个字符。",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"你已经输入了%d个字符，比一条短信可输入的数目多出了%d 个。请简短你的信息。"
 }

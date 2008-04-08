@@ -8,7 +8,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.20 2007-11-12 18:31:01 matthew Exp $
+// $Id: gaze-controls.php,v 1.21 2008-04-08 10:14:36 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -23,9 +23,12 @@ $gaze_controls_nearby_distance = 10;
 function gaze_controls_find_places($country, $state, $query, $maxresults = null, $minscore = null) {
     $ret = gaze_find_places($country, $state, $query, $maxresults, $minscore);
     gaze_check_error($ret);
+    $wales = -1;
     foreach ($ret as $k => $p) {
+        if ($ret[$k][0] == 'Wales') $wales = $k;
         $ret[$k][7] = $country;
     }
+    if ($wales >= 0) unset($ret[$wales]);
     return $ret;
 }
 

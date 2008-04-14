@@ -13,7 +13,7 @@
 # Email: chris@mysociety.org; WWW: http://www.mysociety.org/
 #
 
-my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.10 2008-02-04 22:50:29 matthew Exp $';
+my $rcsid = ''; $rcsid .= '$Id: fuzzyref.cgi,v 1.11 2008-04-14 08:24:04 francis Exp $';
 
 use strict;
 
@@ -59,7 +59,7 @@ sub do_index() {
     %pledge_ref_part = ( );
     my $stmt = dbh()->prepare("
                     select id, ref from pledges
-                        where pin is null and prominence <> 'backpage'");
+                        where pin is null and cached_prominence <> 'backpage'");
     $stmt->execute();
     while (my ($id , $ref) = $stmt->fetchrow_array()) {
         index_pledge($id, $ref);

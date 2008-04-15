@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.124 2007-12-16 15:44:35 francis Exp $
+ * $Id: frequentupdate,v 1.125 2008-04-15 11:00:51 francis Exp $
  *
  */
 
@@ -972,7 +972,9 @@ function send_pending_messages() {
                     verbose("sending message #${r['id']} as raw email, subject '${r['emailsubject']}'");
                     $unsubscribe_url = pb_person_make_signon_url(null, $r['signer_email'],
                         'GET', $pledge->url_announce(), array('unsubscribe'=>'1'), $pledge->microsite());
+                    locale_push($pledge->lang());
                     $emailbody .= "\n\n" . sprintf(_("To stop receiving messages from the pledge creator, please follow this link: %s"), $unsubscribe_url);
+                    locale_pop();
                     $to = $r['signer_name'] ? array(array($r['signer_email'], $r['signer_name'])) : $r['signer_email'];
                     $f = pb_send_email($to, $r['emailsubject'], $emailbody, $headers);
                 } elseif ($send_by == 'facebook') {

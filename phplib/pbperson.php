@@ -7,7 +7,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbperson.php,v 1.5 2007-10-12 13:12:47 matthew Exp $
+// $Id: pbperson.php,v 1.6 2008-05-13 15:10:02 matthew Exp $
 
 require_once 'microsites.php';
 require_once '../phplib/login.php';
@@ -52,11 +52,13 @@ function pb_person_signon_without_redirect($template_data, $email, $name, $passw
     if ($P)
         return $P;
 
-    global $q_stash, $q_name, $q_email, $q_h_email;
+    global $q_stash, $q_h_stash, $q_name, $q_h_name, $q_email, $q_h_email;
     $q_email = $email;
-    $q_h_email = htmlspecialchars($email);
+    $q_h_email = htmlspecialchars($q_email);
     $q_name = $name;
+    $q_h_name = htmlspecialchars($q_name);
     $q_stash = stash_request(rabx_serialise($template_data), $email);
+    $q_h_stash = htmlspecialchars($q_stash);
     db_commit();
 
     if ($password) {

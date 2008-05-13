@@ -13,7 +13,7 @@ var translation = {
 "(choose one)":"",
 "Place name:":"",
 "other local people":"",
-"<Enter your name>":"",
+"<Enter your name>":"0182<お名前を入力してください>",
 "<Enter your pledge>":"",
 "<Enter town or keyword>":"",
 "<Date>":"",

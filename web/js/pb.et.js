@@ -21,7 +21,7 @@ var translation = {
 "Global":"Ülemaailmne",
 "(separator)":"(eraldaja)",
 "Postcode or town:":"Postiindeks või asula:",
-"Town or zipcode:":"",
+"Town or zipcode:":"Linn või postiindeks:",
 "Place name or zipcode:":"",
 "You have used %d characters; %d remain.":"Oled kasutanud %d tähemärki; %d on järgi.",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Oleda kasutanud %d tähemärki, mis on %d rohkem, kui mahub SMSi. Palun tee oma teade lühemaks."

@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.230 2008-01-03 17:14:52 francis Exp $
+-- $Id: schema.sql,v 1.231 2008-05-21 15:03:03 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -185,6 +185,10 @@ create table pledges (
     name text not null,
     identity text not null default '', -- LLL
     via_facebook boolean not null default false,
+    
+    -- true if the pledge creator can access signer email adresses
+    email_access boolean not null default false,
+
     -- metadata
     creationtime timestamp not null,
     -- changes which are not caught by signtime, comment whenposted etc.

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.262 2008-03-13 11:57:01 matthew Exp $
+ * $Id: pledge.php,v 1.263 2008-05-21 15:03:03 matthew Exp $
  * 
  */
 
@@ -724,8 +724,9 @@ class Pledge {
         $namebox = '<input size="30" type="text" name="name" id="name" value="' . htmlspecialchars($name) . '">';
         print '<p id="name_row"><label for="name">' . _('Your name:') . '</label> ' . $namebox . '</p>';
         print '
-    <p id="email_row"><label for="email">' . _('Your email:') . '</label> <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" id="email" name="email" value="' . htmlspecialchars($email) . '"></p> <p id="email_blurb"><small>'.
-    _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>';
+    <p id="email_row"><label for="email">' . _('Your email:') . '</label> <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" id="email" name="email" value="' . htmlspecialchars($email) . '"></p>';
+        if ($this->data['email_access'] == 'f')
+            echo '<p id="email_blurb"><small>' . _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>';
         if (microsites_intranet_site()) {
             print '<p><input type="hidden" name="showname" value="1">
     <small>People are able to search for Promises you have signed.</small></p>';
@@ -736,7 +737,17 @@ class Pledge {
     to find your signature.').
     '</small>
     </p>';
-            }
+        }
+
+        if ($this->data['email_access'] == 't') {
+            print '<p>By signing this pledge, you agree that '
+                . $this->data['identity'] . ' can have access to your name and
+email address. PledgeBank will only use your details to tell you when the
+pledge is completed and to let the pledge creator tell you about the next step
+to take; ' . $this->data['identity'] . ' has agreed not to spam you and to give
+you the option to unsubscribe from their list at any time.</p>';
+        }
+
         if ($this->byarea()) {
             // Pledges where target is per town, rather than overall
             if ($this->is_global()) {

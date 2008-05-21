@@ -1,0 +1,12 @@
+#ms_logo {
+    display: none;
+}
+
+#ms_logo_ie {
+    width: 133px;
+    height: 26px;
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/i/mysociety-dark+50.png');
+    display: inline-block;
+    margin-right: 1em;
+    cursor: pointer;
+}

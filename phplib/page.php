@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.176 2008-04-03 13:07:27 matthew Exp $
+// $Id: page.php,v 1.177 2008-05-21 15:28:13 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -143,6 +143,7 @@ function page_header($title, $params = array()) {
         echo '<style type="text/css" media="all">@import url(\'' . $microsite_file . '\');</style>';
     }
     echo '<link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">';
+    echo '<!--[if LT IE 7]><style type="text/css">@import url("/css/ie6.css");</style><![endif]-->';
     if (array_key_exists('css', $params)) {
 	echo '<style type="text/css" media="all">@import url(\'' . $params['css'] . '\');</style>';
     }
@@ -281,6 +282,7 @@ function page_footer($params = array()) {
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <div id="navforms">
+<a href="http://www.mysociety.org/"><img id="ms_logo" align="top" src="/i/mysociety-dark+50.png"><span id="ms_logo_ie"></span></a>
 <?
             if (microsites_show_translate_blurb()) {
                 global $lang, $langs, $site_country;

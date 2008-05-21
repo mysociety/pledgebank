@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.177 2008-05-21 15:28:13 matthew Exp $
+// $Id: page.php,v 1.178 2008-05-21 15:45:46 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -282,7 +282,7 @@ function page_footer($params = array()) {
 ?>
 <hr class="v"><h2 class="v"><?=_('Navigation') ?></h2>
 <div id="navforms">
-<a href="http://www.mysociety.org/"><img id="ms_logo" align="top" src="/i/mysociety-dark+50.png"><span id="ms_logo_ie"></span></a>
+<a href="http://www.mysociety.org/"><img id="ms_logo" align="top" alt="Visit mySociety.org" src="/i/mysociety-dark+50.png"><span id="ms_logo_ie"></span></a>
 <?
             if (microsites_show_translate_blurb()) {
                 global $lang, $langs, $site_country;

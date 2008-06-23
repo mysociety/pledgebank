@@ -9,7 +9,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org; WWW: http://www.mysociety.org
  *
- * $Id: pb.php,v 1.84 2007-09-22 11:18:03 francis Exp $
+ * $Id: pb.php,v 1.85 2008-06-23 07:10:18 matthew Exp $
  * 
  */
 
@@ -118,7 +118,7 @@ locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
 # Redirect to promesobanko.com etc. if appropriate
 global $no_language_redirects;
 if ($lang && array_key_exists($lang, $language_domains)
-        && $lang != $top_domain_lang && !$no_language_redirects) {
+        && $lang != $top_domain_lang && !$no_language_redirects && !OPTION_PB_STAGING) {
     $url = pb_domain_url(array('country' => $domain_country, 'lang' => $lang));
     #print $url;exit;
     header('Location: ' . $url);

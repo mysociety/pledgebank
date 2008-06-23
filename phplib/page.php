@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.179 2008-06-10 17:31:38 francis Exp $
+// $Id: page.php,v 1.180 2008-06-23 07:10:18 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -147,7 +147,7 @@ function page_header($title, $params = array()) {
     if (array_key_exists('css', $params)) {
 	echo '<style type="text/css" media="all">@import url(\'' . $params['css'] . '\');</style>';
     }
-    if ($lang == 'zh') {
+    if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr') {
 	echo '<style type="text/css" media="all">@import url(\'/css/pb.' . $lang . '.css\');</style>';
     }
 

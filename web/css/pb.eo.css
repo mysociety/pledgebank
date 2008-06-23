@@ -1,0 +1,35 @@
+/*
+ * pb.eo.css
+ * Esperanto specific CSS overrides.
+ * 
+ * Copyright (c) 2008 UK Citizens Online Democracy. All rights reserved.
+ * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
+ *
+ * $Id: pb.eo.css,v 1.1 2008-06-23 07:10:17 matthew Exp $
+ * 
+ */
+
+#startbubble {
+    background-image: url('/i/eo.speechbubble-8bit-nomatt.png');
+}
+
+#successfulpledges li {
+    padding-left: 85px;
+}
+#successfulpledges li.even {
+    background-image: url('/i/eo.iwill-light.png');
+}
+
+#successfulpledges li.odd {
+    background-image: url('/i/eo.iwill-dark.png');
+}
+
+#currentpledges li {
+    background-image: url('/i/eo.person-iwill.png');
+    padding-left: 85px;
+}
+
+#front {
+    background-image: url('/i/eo.light-bg.png');
+}
+

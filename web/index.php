@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: index.php,v 1.262 2008-04-03 08:01:28 matthew Exp $
+// $Id: index.php,v 1.263 2008-06-23 07:10:16 matthew Exp $
 
 // Load configuration file
 require_once "../phplib/pb.php";
@@ -17,7 +17,9 @@ require_once '../phplib/success.php';
 require_once '../../phplib/utility.php';
 
 $banner_src = 'howitworks.png';
-if ($lang == 'zh') $banner_src = 'howitworks_zh.png';
+if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr')
+    $banner_src = 'howitworks_' . $lang . '.png';
+
 page_header(null, 
     array(
         'rss'=> array(

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.175 2007-11-06 14:28:35 matthew Exp $
+// $Id: fns.php,v 1.176 2008-07-01 17:45:17 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -28,7 +28,7 @@ function dd($s) { print "<dd>$s</dd>\n"; }
 function li($s) { return "<li>$s</li>\n"; }
 
 // Language domains, such as promessotheque.com. 
-if (OPTION_WEB_DOMAIN == 'pledgebank.com') {
+if (OPTION_WEB_DOMAIN == 'pledgebank.com' && OPTION_WEB_HOST == 'www') {
     $language_domains = array(
         'eo' => 'promesobanko.com',
         'fr' => 'promessotheque.com',

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.180 2008-06-23 07:10:18 matthew Exp $
+// $Id: page.php,v 1.181 2008-08-08 16:59:16 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -337,8 +337,7 @@ function page_footer($params = array()) {
             if (true) {
 ?>
 <!-- Piwik -->
-<a href="http://piwik.org" title="Web analytics" onclick="window.open(this.href);return(false);">
-<script language="javascript" src="http://piwik.mysociety.org/piwik.js" type="text/javascript"></script>
+<script src="http://piwik.mysociety.org/piwik.js" type="text/javascript"></script>
 <script type="text/javascript">
 <!--
 piwik_action_name = '';
@@ -346,9 +345,8 @@ piwik_idsite = 1;
 piwik_url = 'http://piwik.mysociety.org/piwik.php';
 piwik_log(piwik_action_name, piwik_idsite, piwik_url);
 //-->
-</script><object>
-<noscript><p>Web analytics <img src="http://piwik.mysociety.org/piwik.php" style="border:0" alt="piwik"/></p>
-</noscript></object></a>
+</script>
+<noscript><img src="http://piwik.mysociety.org/piwik.php" style="border:0" alt="piwik"></noscript>
 <!-- /Piwik --> 
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>

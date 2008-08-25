@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: alert.php,v 1.36 2007-10-01 17:14:28 francis Exp $
+// $Id: alert.php,v 1.37 2008-08-25 19:58:06 matthew Exp $
 
 require_once '../phplib/pbperson.php';
 require_once '../../phplib/mapit.php';
@@ -77,6 +77,7 @@ function alert_signup($person_id, $event_code, $params) {
 
         /* Guard against double-insertion. */
         db_query('lock table alert in share mode');
+        locale_push('en-gb');
         $already = db_getRow("select alert.id, alert.whendisabled 
                 from alert left join location on location.id = alert.location_id
                 where person_id = ? and event_code = ?
@@ -111,6 +112,7 @@ function alert_signup($person_id, $event_code, $params) {
             db_query("update alert set whendisabled = null, whensubscribed = ms_current_timestamp()
                 where id = ?", array($already['id']));
         }
+        locale_pop();
     } else {
         err("Unknown alert event '$event_code'");
     }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: new.php,v 1.210 2008-03-05 14:20:45 matthew Exp $
+// $Id: new.php,v 1.211 2008-08-25 19:58:06 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
@@ -980,7 +980,9 @@ function create_new_pledge($P, $data) {
                 /* This error should never happen, as earlier postcode validation in form will stop it */
                 err('Invalid postcode while creating pledge; please check and try again.');
             $location_id = db_getOne("select nextval('location_id_seq')");
+            locale_push('en-gb');
             db_query("insert into location (id, country, method, input, latitude, longitude, description) values (?, 'GB', 'MaPit', ?, ?, ?, ?)", array($location_id, $data['postcode'], $location['wgs84_lat'], $location['wgs84_lon'], $data['postcode']));
+            locale_pop();
         } elseif ($data['gaze_place']) {
             list($lat, $lon, $desc) = explode('|', $data['gaze_place'], 3);
             $location_id = db_getOne("select nextval('location_id_seq')");
@@ -1092,14 +1094,14 @@ function create_new_pledge($P, $data) {
 <? } ?>
 <?  if (microsites_new_pledges_prominence() != 'backpage') { ?>
     <p class="noisymessage"><? printf(_('Your pledge needs <strong>your support</strong> if it is to succeed, so <br>print some %s now and hand them out today.<br>Put a %s up in the canteen.<br>%s straightaway!'),
-	'<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
-	'<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
-	'<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
+        '<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
+        '<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
+        '<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
 <?  } else { ?>
     <p class="noisymessage"><? printf(_('Your pledge will <strong>not</strong> appear on the All Pledges page until <strong>you</strong> have recruited the first few signers.<br>Print some %s now and hand them out today.<br>Put a %s up in the canteen.<br>%s straightaway!'),
-	'<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
-	'<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
-	'<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
+        '<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
+        '<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
+        '<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
 <?  }
 
     if ($site_country == 'US') {

@@ -5,7 +5,7 @@
 // Copyright (c) 2008 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: blog.php,v 1.1 2008-02-11 19:12:41 matthew Exp $
+// $Id: blog.php,v 1.2 2008-08-25 18:53:21 matthew Exp $
 
 require_once "../phplib/pb.php";
 
@@ -16,10 +16,10 @@ if (!$ref)
     err('No blog reference given', E_USER_NOTICE);
 
 $f = file_get_contents('http://www.mysociety.org/' . $ref);
-preg_match('#<div class="item_head".*?<a.*?>(.*?)</a>.*?<div class="meta">(.*?)</div>.*?<div class="item">(.*?)</div>#s', $f, $m);
+preg_match('#<h2>(.*?)</h2>\s*<div class="entry">\s*(.*?)<p class="postmetadata[^>]*>\s*<small>\s*(.*?)and is filed#s', $f, $m);
 $title = $m[1];
-$meta = $m[2];
-$content = $m[3];
+$content = $m[2];
+$meta = $m[3];
 
 page_header(_("PledgeBank blog") . ": $title", array('cache-max-age' => 600));
 

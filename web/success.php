@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.8 2008-04-08 10:41:49 matthew Exp $
+// $Id: success.php,v 1.9 2008-09-13 21:30:17 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/success.php';
@@ -79,7 +79,7 @@ month, which was January, the month of his birthday!'));
     echo p(_('&ldquo;As for the experience...I will describe it as an emotional rollercoaster.  Our
 accomodation was "Camping out" in winter colder than we\'ve had before, which,
 we didn\'t mind at all. As long as we didn\'t have to bring our own tent.  We
-helped many devistated families by cleaning up, helped stranded animals and
+helped many devastated families by cleaning up, helped stranded animals and
 most of all helped the people that were helping others, by massage and
 relaxation, we even found ourselves in the kitchen, cooking for 100 + people.
 We also took part in the Martin Luther King jr parade, holding an Australian

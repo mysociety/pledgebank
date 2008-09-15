@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.119 2008-09-15 14:15:43 timsk Exp $
+# $Id: poster.cgi,v 1.120 2008-09-15 14:27:51 timsk Exp $
 #
 
 import sys
@@ -678,17 +678,17 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
         left = pledge['target'] - pledge['signers']
         if not pledge['open']:
-            status = _n('<font color="%s">%s</font> person signed up', '<font color="%s">%s</font> people signed up', pledge['signers']) % (html_colour, pledge['signers'])
+            status = _n('<font color="%s">%s</font> person signed up', '<font color="%s">%s</font> people signed up', pledge['signers']).encode('utf-8') % (html_colour, pledge['signers'])
         else:
-            status = _n('<font color="%s">%s</font> person has signed up', '<font color="%s">%s</font> people have signed up', pledge['signers']) % (html_colour, pledge['signers'])
+            status = _n('<font color="%s">%s</font> person has signed up', '<font color="%s">%s</font> people have signed up', pledge['signers']).encode('utf-8') % (html_colour, pledge['signers'])
         if left <= 0:
             status += _(u' (%d over target) \u2014 success!').encode('utf-8') % -left
         else:
             status += ', '
             if not pledge['open']:
-                status += _n('<font color="%s">%d</font> more was needed', '<font color="%s">%d</font> more were needed', left) % (html_colour, left)
+                status += _n('<font color="%s">%d</font> more was needed', '<font color="%s">%d</font> more were needed', left).encode('utf-8') % (html_colour, left)
             else:
-                status += _n('<font color="%s">%d</font> more needed', '<font color="%s">%d</font> more needed', left) % (html_colour, left)
+                status += _n('<font color="%s">%d</font> more needed', '<font color="%s">%d</font> more needed', left).encode('utf-8') % (html_colour, left)
         story.append(
             Paragraph('<font size="+3">%s</font>' % status, p_normal)
         )

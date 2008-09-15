@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.117 2008-09-15 09:32:36 matthew Exp $
+# $Id: poster.cgi,v 1.118 2008-09-15 13:34:29 matthew Exp $
 #
 
 import sys
@@ -912,7 +912,7 @@ while fcgi.isFCGI():
             pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         elif iso_lang == 'eo_XX':
             pledge['date'] = date.strftime("la %e-a de %B %Y")
-        elif iso_lang == 'sk_SK':
+        elif iso_lang == 'de_DE' or iso_lang == 'sk_SK':
             pledge['date'] = date.strftime("%e. %B %Y")
         elif iso_lang == 'zh_CN':
             pledge['date'] = date.strftime("%Y\xe5\xb9\xb4%m\xe6\x9c\x88%d\xe6\x97\xa5")

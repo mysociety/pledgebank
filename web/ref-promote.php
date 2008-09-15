@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: ref-promote.php,v 1.5 2007-08-09 16:56:16 matthew Exp $
+ * $Id: ref-promote.php,v 1.6 2008-09-15 10:00:20 timsk Exp $
  */
 
 include_once '../phplib/pb.php';
@@ -25,13 +25,7 @@ page_header(_('Promoting your pledge'), $params);
 print h2(_('Promoting your pledge'));
 
 ?>
-<style type="text/css">
-li {
-    margin: 1em 0;
-}
-</style>
-
-<ul>
+<ul id="promote">
 <!--
 <li>As a simple first step, why not <a href="<?=$p->url_email()?>">email your friends</a>?
 
@@ -42,7 +36,7 @@ li {
 <p><strong><?=_('MySpace, LiveJournal') ?></strong>
 <small><?=_("(and other sites that don't allow JavaScript)") ?></small>:
 <?=_('Copy the text from the box below to have this automatically updating image:') ?></p>
-<a style="float:right" href="<?=$p->url_typein()?>"><img border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="<?=_('Sign my pledge at PledgeBank') ?>"></a>
+<a href="<?=$p->url_typein()?>"><img align="right" border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="<?=_('Sign my pledge at PledgeBank') ?>"></a>
 <textarea rows="8" cols="45" onclick="this.select()">
 <a href="<?=$p->url_typein()?>"><img border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="<?=_('Sign my pledge at PledgeBank') ?>"></a>
 </textarea>

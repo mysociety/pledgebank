@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.118 2008-09-15 13:34:29 matthew Exp $
+# $Id: poster.cgi,v 1.119 2008-09-15 14:15:43 timsk Exp $
 #
 
 import sys
@@ -678,17 +678,17 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
         left = pledge['target'] - pledge['signers']
         if not pledge['open']:
-            status = gettext.ngettext('<font color="%s">%s</font> person signed up', '<font color="%s">%s</font> people signed up', pledge['signers']) % (html_colour, pledge['signers'])
+            status = _n('<font color="%s">%s</font> person signed up', '<font color="%s">%s</font> people signed up', pledge['signers']) % (html_colour, pledge['signers'])
         else:
-            status = gettext.ngettext('<font color="%s">%s</font> person has signed up', '<font color="%s">%s</font> people have signed up', pledge['signers']) % (html_colour, pledge['signers'])
+            status = _n('<font color="%s">%s</font> person has signed up', '<font color="%s">%s</font> people have signed up', pledge['signers']) % (html_colour, pledge['signers'])
         if left <= 0:
             status += _(u' (%d over target) \u2014 success!').encode('utf-8') % -left
         else:
             status += ', '
             if not pledge['open']:
-                status += gettext.ngettext('<font color="%s">%d</font> more was needed', '<font color="%s">%d</font> more were needed', left) % (html_colour, left)
+                status += _n('<font color="%s">%d</font> more was needed', '<font color="%s">%d</font> more were needed', left) % (html_colour, left)
             else:
-                status += gettext.ngettext('<font color="%s">%d</font> more needed', '<font color="%s">%d</font> more needed', left) % (html_colour, left)
+                status += _n('<font color="%s">%d</font> more needed', '<font color="%s">%d</font> more needed', left) % (html_colour, left)
         story.append(
             Paragraph('<font size="+3">%s</font>' % status, p_normal)
         )
@@ -897,10 +897,12 @@ while fcgi.isFCGI():
         domain = mysociety.config.get('PB_GETTEXT_DOMAIN')
         if iso_lang == 'en_GB' and domain == 'PledgeBank':
             _ = lambda x: x
+	    _n = lambda x, y, n: n==1 and x or y
         else:
             translator = gettext.translation(domain, '../../locale', [iso_lang + '.UTF-8'])
             translator.install(unicode = 1)
             _ = translator.ugettext
+	    _n = translator.ungettext
         locale.setlocale(locale.LC_ALL, iso_lang + '.UTF-8')
         #raise Exception, "Language '%s' %s" % (iso_lang, _("Start your own pledge"))
 

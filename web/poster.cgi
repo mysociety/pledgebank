@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.116 2007-10-22 10:00:02 matthew Exp $
+# $Id: poster.cgi,v 1.117 2008-09-15 09:32:36 matthew Exp $
 #
 
 import sys
@@ -554,7 +554,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
     # Set up styles
     wordWrap = ''
-    if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
+    if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU' or iso_lang == 'sk_SK':
         heading_font = 'Trebuchet MS'
         main_font = 'Georgia'
     elif iso_lang == 'zh_CN':
@@ -912,6 +912,8 @@ while fcgi.isFCGI():
             pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
         elif iso_lang == 'eo_XX':
             pledge['date'] = date.strftime("la %e-a de %B %Y")
+        elif iso_lang == 'sk_SK':
+            pledge['date'] = date.strftime("%e. %B %Y")
         elif iso_lang == 'zh_CN':
             pledge['date'] = date.strftime("%Y\xe5\xb9\xb4%m\xe6\x9c\x88%d\xe6\x97\xa5")
         else:

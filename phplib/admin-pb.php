@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.163 2008-09-18 15:48:03 francis Exp $
+ * $Id: admin-pb.php,v 1.164 2008-09-18 15:55:23 francis Exp $
  * 
  */
 
@@ -220,16 +220,26 @@ class ADMIN_PAGE_PB_MAIN {
         print '<p><a href="'.$this->self_link.'">' . _('List of all pledges') . '</a></p>';
 
         $person = new Person($person_id);
+
+        $q = db_query('SELECT person.*,
+                (SELECT count(*) FROM signers WHERE person_id=person.id) AS signers,
+                (SELECT count(*) FROM comment WHERE person_id=person.id AND NOT ishidden) AS comments,
+                (SELECT count(*) FROM pledges WHERE person_id=person.id) AS pledges
+            FROM person 
+            WHERE id = ?', $person_id);
+        $pdata = db_fetch_array($q);
         
         print "<h2>Person '" . htmlspecialchars($person->name_or_blank()) . "'</h2>";
         print "<p>Name: " . ($person->has_name() ? htmlspecialchars($person->name()) : "<unknown>");
         print "<br>Email: <a href=\"mailto:" . htmlspecialchars($person->email()) . "\">" . htmlspecialchars($person->email()) . '</a>';
-        print "<br>Has password: " . ($person->has_password() ? "true" : "false");
+        print "<br>Mobile: " . htmlspecialchars($pdata['mobile']);
+        print "<br>Facebook: " . htmlspecialchars($pdata['facebook_id']);
+
+        print "<p>Has password: " . ($person->has_password() ? "true" : "false");
         print "<br>Number of logins: " . htmlspecialchars($person->numlogins());
         print '<br>Website: <a href="'.htmlspecialchars($person->website_or_blank()).'">' . htmlspecialchars($person->website_or_blank()) . "</a>";
 
-        # XXX show facebook_id, mobile, extra live simply promise data which is
-        # in db but not in the person class.
+        print '<p>' . $pdata['signers'] . " signatures, " . $pdata['pledges'] . " pledges, " . $pdata['comments'] . " comments";
 
         print "<h2>Edit person</h2>";
 

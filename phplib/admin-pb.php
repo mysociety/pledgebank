@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.165 2008-09-18 16:49:58 francis Exp $
+ * $Id: admin-pb.php,v 1.166 2008-09-18 16:51:26 francis Exp $
  * 
  */
 
@@ -304,7 +304,7 @@ class ADMIN_PAGE_PB_MAIN {
         while ($r = db_fetch_array($q)) {
             print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
                 htmlspecialchars($r['ref']) . '</a>';
-            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>)';
+            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>) ';
         }
 
         print "<h2>Pledges signed</h2>";
@@ -312,7 +312,7 @@ class ADMIN_PAGE_PB_MAIN {
         while ($r = db_fetch_array($q)) {
             print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
                 htmlspecialchars($r['ref']) . '</a>';
-            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>)';
+            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>) ';
         }
 
         print "<h2>Pledges commented on</h2>";
@@ -320,7 +320,7 @@ class ADMIN_PAGE_PB_MAIN {
         while ($r = db_fetch_array($q)) {
             print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
                 htmlspecialchars($r['ref']) . '</a>';
-            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>)';
+            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>) ';
         }
 
          print "<h2>Edit person</h2>";

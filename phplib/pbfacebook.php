@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.64 2008-09-18 10:57:36 francis Exp $
+// $Id: pbfacebook.php,v 1.65 2008-09-18 11:05:29 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -959,6 +959,7 @@ function pbfacebook_send($to, $message) {
 
 // Like pb_send_email_template in pb/phplib/fns.php
 function pbfacebook_send_template($to, $template_name, $values, $headers = array()) {
+
     global $pbfacebook_values;
     $pbfacebook_values = pb_message_add_template_values($values);
 
@@ -973,6 +974,9 @@ function pbfacebook_send_template($to, $template_name, $values, $headers = array
 
 // XXX this calls pbfacebook_init_cron so perhaps should be in frequentupdate
 function pbfacebook_send_internal($to, $message) {
+    # Disabled as infinite session keys don't work
+    return false;
+
     global $facebook;
 
     // 703090157 = Francis Irving

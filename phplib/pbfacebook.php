@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.63 2008-01-28 13:32:01 angie Exp $
+// $Id: pbfacebook.php,v 1.64 2008-09-18 10:57:36 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -980,7 +980,7 @@ function pbfacebook_send_internal($to, $message) {
 
     pbfacebook_init_cron($to); 
     $to_info = $facebook->api_client->users_getInfo($to, array("name"));
-    #print "pbfacebook_send_internal: ". $message. "\nTo:". $to_info[0]['name'];
+    print "pbfacebook_send_internal: ". $message. "\nTo:". $to_info[0]['name'];
 
     # Setting the to ids to "" means it goes to the current logged in user, but
     # without prefixing with their name. XXX This is subject to change by Facebook.

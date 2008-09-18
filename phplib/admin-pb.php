@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.162 2008-02-25 23:40:02 matthew Exp $
+ * $Id: admin-pb.php,v 1.163 2008-09-18 15:48:03 francis Exp $
  * 
  */
 
@@ -214,6 +214,34 @@ class ADMIN_PAGE_PB_MAIN {
         print '<p>';
     }
 
+    function show_one_person($person_id) {
+        $person_id = intval($person_id);
+
+        print '<p><a href="'.$this->self_link.'">' . _('List of all pledges') . '</a></p>';
+
+        $person = new Person($person_id);
+        
+        print "<h2>Person '" . htmlspecialchars($person->name_or_blank()) . "'</h2>";
+        print "<p>Name: " . ($person->has_name() ? htmlspecialchars($person->name()) : "<unknown>");
+        print "<br>Email: <a href=\"mailto:" . htmlspecialchars($person->email()) . "\">" . htmlspecialchars($person->email()) . '</a>';
+        print "<br>Has password: " . ($person->has_password() ? "true" : "false");
+        print "<br>Number of logins: " . htmlspecialchars($person->numlogins());
+        print '<br>Website: <a href="'.htmlspecialchars($person->website_or_blank()).'">' . htmlspecialchars($person->website_or_blank()) . "</a>";
+
+        # XXX show facebook_id, mobile, extra live simply promise data which is
+        # in db but not in the person class.
+
+        print "<h2>Edit person</h2>";
+
+        print '<form name="editperson" method="post" action="'.$this->self_link.'">';
+        print 'Email: <input type="text" name="email" value="'.htmlspecialchars($person->email).'" size="40">';
+        print '<input type="hidden" name="edit_person_id" value="' . $person_id . '">';
+        print '<input type="hidden" name="edit_person" value="1">';
+        print '<input type="hidden" name="edit" value="1">';
+        print '<br><input type="submit" name="edit_person" value="Save updates"> ';
+        print "</form>";
+     }
+
     function show_one_pledge($pledge) {
         print '<p><a href="'.$this->self_link.'">' . _('List of all pledges') . '</a></p>';
 
@@ -233,7 +261,8 @@ class ADMIN_PAGE_PB_MAIN {
                 location.country, location.state, location.description,
                 location.longitude, location.latitude, location.method,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id AND NOT ishidden) AS comments
+                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id AND NOT ishidden) AS comments,
+                person.id as person_id
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id 
             LEFT JOIN location ON location.id = pledges.location_id
@@ -253,7 +282,9 @@ class ADMIN_PAGE_PB_MAIN {
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
         print "</h2>";
 
-        print "<p>Set by: <b>" . htmlspecialchars($pdata['name']) . " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</b>";
+        print "<p>Set by: <b>" .
+              '<a href="?page=pb&person=' . $pdata['person_id'] .'">' . htmlspecialchars($pdata['name']) . "</a>" .
+            " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</b>";
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
         print "<br>Target: <b>" . $pdata['target'] . " " .  htmlspecialchars($pdata['type']) . "</b>";
@@ -376,7 +407,8 @@ class ADMIN_PAGE_PB_MAIN {
                          person.mobile as signmobile, person.facebook_id as signfacebook_id,
                          date_trunc(\'second\',signtime) AS signtime,
                          showname, signers.id AS signid,
-                         location.description AS location_description
+                         location.description AS location_description,
+                         person.id as signperson_id
                    FROM signers 
                    LEFT JOIN person ON person.id = signers.person_id
                    LEFT JOIN location ON location.id = signers.byarea_location_id
@@ -394,7 +426,7 @@ class ADMIN_PAGE_PB_MAIN {
             $r = array_map('htmlspecialchars', $r);
             $e = array();
             if ($r['signname'])
-                array_push($e, $r['signname']);
+                array_push($e, '<a href="?page=pb&person=' . $r['signperson_id'] .'">' . $r['signname'] . "</a>");
             if ($r['signemail'])
                 array_push($e, $r['signemail']);
             if ($r['signmobile'])
@@ -677,11 +709,23 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         print p(_('<em>Pledge text updated. Check it in the pledge box preview on the right.</em>'));
     }
 
+    function edit_person($person_id) {
+        $person = new Person($person_id);
+
+        $email = get_http_var('email');
+
+        db_query('update person set email = ? where id = ?', $email, $person_id);
+        db_commit();
+        print p(_('<em>Person updated.</em>'));
+    }
+
+
     function display($self_link) {
         db_connect();
 
         $pledge = get_http_var('pledge');
         $pledge_id = null;
+        $person_id = get_http_var('person');
 
         // Perform actions
         if (get_http_var('update_prom')) {
@@ -735,6 +779,11 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
             if (ctype_digit($pledge_id)) {
                 $this->edit_pledge_text($pledge_id);
             }
+        } elseif (get_http_var('edit_person')) {
+            $person_id = get_http_var('edit_person_id');
+            if (ctype_digit($person_id)) {
+                $this->edit_person($person_id);
+            }
         }
 
         // Display page
@@ -743,6 +792,8 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         }
         if ($pledge) {
             $this->show_one_pledge($pledge);
+        } elseif ($person_id) {
+            $this->show_one_person($person_id);
         } else {
             $this->list_all_pledges();
         }

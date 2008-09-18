@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.164 2008-09-18 15:55:23 francis Exp $
+ * $Id: admin-pb.php,v 1.165 2008-09-18 16:49:58 francis Exp $
  * 
  */
 
@@ -53,7 +53,48 @@ class ADMIN_PAGE_PB_SUMMARY {
 class ADMIN_PAGE_PB_MAIN {
     function ADMIN_PAGE_PB_MAIN () {
         $this->id = "pb";
-        $this->navname = _("Pledges and Signers");
+        $this->navname = _("Main Admin");
+    }
+
+    function search_people() {
+        $this->show_menu();
+
+        print '<p><form name="editperson" method="post" action="'.$this->self_link.'&people=1">';
+        print 'Search: <input type="text" name="q" value="'.htmlspecialchars(get_http_var('q')).'" size="40">';
+        print '<input type="hidden" name="person_search" value="1">';
+        print '<input type="submit" name="search" value="Search"> (by substring of name, email and mobile)';
+        print "</form></p>";
+
+        if (!get_http_var('q'))
+            return;
+
+        $q = db_query("SELECT person.*,
+                (SELECT count(*) FROM signers WHERE person_id=person.id) AS signers,
+                (SELECT count(*) FROM comment WHERE person_id=person.id AND NOT ishidden) AS comments,
+                (SELECT count(*) FROM pledges WHERE person_id=person.id) AS pledges
+            FROM person 
+            WHERE name ilike '%'||?||'%'
+            or email ilike '%'||?||'%'
+            or mobile ilike '%'||?||'%'
+            ", get_http_var('q'), get_http_var('q'), get_http_var('q'));
+
+        print '<p><table border="1" cellpadding="3" cellspacing="0"><tr>';
+        print '<th>Name</th><th>Email</th><th>Signings</th><th>Pledges</th><th>Comments</th>';
+        print '</tr>';
+        $a = 0;
+        while ($r = db_fetch_array($q)) {
+            $row = "";
+            $row .= '<td><a href="?page=pb&person=' . $r['id'] .'">' . htmlspecialchars($r['name']) . "</a></td>";
+            $row .= '<td>'.htmlspecialchars($r['email']).'</td>';
+            $row .= '<td>'.htmlspecialchars($r['signers']).'</td>';
+            $row .= '<td>'.htmlspecialchars($r['comments']).'</td>';
+            $row .= '<td>'.htmlspecialchars($r['pledges']).'</td>';
+
+            print '<tr'.($a++%2==0?' class="v"':'').'>';
+            print $row;
+            print '</tr>'."\n";
+        }
+        print '</table></p>';
     }
 
     function pledge_header($sort, $openness_url) {
@@ -68,10 +109,10 @@ class ADMIN_PAGE_PB_MAIN {
             'p'=>'Promin.', 
             'l'=>'Microsite<br>Place',
             'g'=>'Lang',
-            'e'=>'Creator', 
-            'c'=>'Creation Time', 
-            'u'=>'Success Time',
-        );
+                'e'=>'Creator', 
+                'c'=>'Creation Time', 
+                'u'=>'Success Time',
+            );
         foreach ($cols as $s => $col) {
             print '<th>';
             if ($sort != $s) print '<a href="'.$this->self_link.'&amp;s='.$s.$openness_url.'">';
@@ -84,6 +125,8 @@ class ADMIN_PAGE_PB_MAIN {
     }
 
     function list_all_pledges() {
+        $this->show_menu();
+
         global $found, $pb_today;
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^ratdecspuolgz]/', $sort)) $sort = 'c';
@@ -214,10 +257,25 @@ class ADMIN_PAGE_PB_MAIN {
         print '<p>';
     }
 
+    function show_menu() {
+        print '<p>';
+        if (false /*!get_http_var('people')*/) {
+            print _('Pledges');
+        } else {
+            print '<a href="'.$this->self_link.'">' . _('Pledges') . '</a>';
+        }
+        print ' | ';
+        if (get_http_var('people')) {
+            print _('People');
+        } else {
+            print '<a href="'.$this->self_link.'&people=1">' . _('People') . '</a>';
+        }
+        print '</p>';
+    }
+
     function show_one_person($person_id) {
         $person_id = intval($person_id);
-
-        print '<p><a href="'.$this->self_link.'">' . _('List of all pledges') . '</a></p>';
+        $this->show_menu();
 
         $person = new Person($person_id);
 
@@ -241,7 +299,31 @@ class ADMIN_PAGE_PB_MAIN {
 
         print '<p>' . $pdata['signers'] . " signatures, " . $pdata['pledges'] . " pledges, " . $pdata['comments'] . " comments";
 
-        print "<h2>Edit person</h2>";
+        print "<h2>Pledges created</h2>";
+        $q = db_query('SELECT * from pledges where person_id = ?', $person_id);
+        while ($r = db_fetch_array($q)) {
+            print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
+                htmlspecialchars($r['ref']) . '</a>';
+            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>)';
+        }
+
+        print "<h2>Pledges signed</h2>";
+        $q = db_query('SELECT * from pledges where id in (select pledge_id from signers where person_id = ?)', $person_id);
+        while ($r = db_fetch_array($q)) {
+            print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
+                htmlspecialchars($r['ref']) . '</a>';
+            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>)';
+        }
+
+        print "<h2>Pledges commented on</h2>";
+        $q = db_query('SELECT * from pledges where id in (select pledge_id from comment where person_id = ?)', $person_id);
+        while ($r = db_fetch_array($q)) {
+            print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
+                htmlspecialchars($r['ref']) . '</a>';
+            print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>)';
+        }
+
+         print "<h2>Edit person</h2>";
 
         print '<form name="editperson" method="post" action="'.$this->self_link.'">';
         print 'Email: <input type="text" name="email" value="'.htmlspecialchars($person->email).'" size="40">';
@@ -253,7 +335,7 @@ class ADMIN_PAGE_PB_MAIN {
      }
 
     function show_one_pledge($pledge) {
-        print '<p><a href="'.$this->self_link.'">' . _('List of all pledges') . '</a></p>';
+        $this->show_menu();
 
         $sort = get_http_var('s');
         if (!$sort || preg_match('/[^etcn]/', $sort)) $sort = 't';
@@ -804,6 +886,8 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
             $this->show_one_pledge($pledge);
         } elseif ($person_id) {
             $this->show_one_person($person_id);
+        } elseif (get_http_var('people')) {
+            $this->search_people();
         } else {
             $this->list_all_pledges();
         }

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.124 2008-01-02 02:03:36 matthew Exp $
+// $Id: ref-index.php,v 1.125 2008-09-18 08:59:02 matthew Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -114,8 +114,10 @@ function display_anonymous_signers($p, &$anon, &$anon_done, &$mobilesigners, &$f
         }
         if ($anon) {
             print "<li>" . sprintf(ngettext('%d person who did not want to give their name', '%d people who did not want to give their names', $anon), $anon);
-            if ($anon_done == $anon)
+            if ($anon_done == $anon && $anon>1)
                 print _(', all of whom have done the pledge');
+            elseif ($anon_done == $anon)
+                print _(', who has done the pledge');
             elseif ($anon_done)
                 printf(ngettext(', %d of whom has done the pledge', ', %d of whom have done the pledge', $anon_done), $anon_done);
             print "</li>";

@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: admin-pb.php,v 1.166 2008-09-18 16:51:26 francis Exp $
+ * $Id: admin-pb.php,v 1.167 2008-09-18 16:59:27 francis Exp $
  * 
  */
 
@@ -87,8 +87,8 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '<td><a href="?page=pb&person=' . $r['id'] .'">' . htmlspecialchars($r['name']) . "</a></td>";
             $row .= '<td>'.htmlspecialchars($r['email']).'</td>';
             $row .= '<td>'.htmlspecialchars($r['signers']).'</td>';
-            $row .= '<td>'.htmlspecialchars($r['comments']).'</td>';
             $row .= '<td>'.htmlspecialchars($r['pledges']).'</td>';
+            $row .= '<td>'.htmlspecialchars($r['comments']).'</td>';
 
             print '<tr'.($a++%2==0?' class="v"':'').'>';
             print $row;

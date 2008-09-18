@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: pbfacebook.php,v 1.65 2008-09-18 11:05:29 francis Exp $
+// $Id: pbfacebook.php,v 1.66 2008-09-18 11:59:36 francis Exp $
 
 if (OPTION_PB_STAGING) 
     $GLOBALS['facebook_config']['debug'] = true;
@@ -974,7 +974,7 @@ function pbfacebook_send_template($to, $template_name, $values, $headers = array
 
 // XXX this calls pbfacebook_init_cron so perhaps should be in frequentupdate
 function pbfacebook_send_internal($to, $message) {
-    # Disabled as infinite session keys don't work
+    # XXX Disabled as infinite session keys don't work any more
     return false;
 
     global $facebook;

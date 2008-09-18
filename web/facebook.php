@@ -6,7 +6,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: facebook.php,v 1.66 2008-01-28 13:32:01 angie Exp $
+// $Id: facebook.php,v 1.67 2008-09-18 11:59:37 francis Exp $
 
 /*
 TODO:
@@ -106,6 +106,14 @@ pbfacebook_init_webpage();
 if (get_http_var("test")) {
     do_test();
 }
+
+// Just redirect to main site if we don't have an API key
+if (!OPTION_FACEBOOK_API_KEY) {
+    $redir = OPTION_BASE_URL . str_replace("/facebook", "", $_SERVER['REQUEST_URI']);
+    $facebook->redirect($redir);
+    exit;
+}
+
 $ref = get_http_var("ref");
 if ($ref == 'new') {
     // Redirect to PledgeBank.com to make new pledges 

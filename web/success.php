@@ -5,7 +5,7 @@
 // Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: success.php,v 1.9 2008-09-13 21:30:17 timsk Exp $
+// $Id: success.php,v 1.10 2008-09-19 18:06:13 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/success.php';
@@ -27,7 +27,7 @@ page_footer();
 function story_front() {
     global $success_stories, $success_titles;
     echo h2(_('Success Stories'));
-    echo '<ul>';
+    echo '<ul id="success_list">';
     foreach ($success_titles as $link => $story) {
         print "<li><a href='#$link'>$story</a>";
     }

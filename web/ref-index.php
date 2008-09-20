@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.125 2008-09-18 08:59:02 matthew Exp $
+// $Id: ref-index.php,v 1.126 2008-09-20 00:08:49 timsk Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -143,7 +143,7 @@ function draw_signatories($p) {
 <?
     $title = '<a name="signers">' . _('Current signatories') . '</a>';
     if (microsites_has_survey()) {
-        $title .= ' <span style="font-size:50%; font-weight:normal">(<span style="color:#006600"><img alt="Green text " src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png">= they\'ve done it</span>)</span>';
+        $title .= ' <span style="font-size:50%; font-weight:normal">(<span style="color:#006600"><img alt="Green text " src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png">= ' ._("they've done it").'</span>)</span>';
     }
     print h2($title);
 

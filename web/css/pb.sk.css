@@ -5,7 +5,7 @@
  * Copyright (c) 2008 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.sk.css,v 1.1 2008-09-24 14:27:57 matthew Exp $
+ * $Id: pb.sk.css,v 1.2 2008-09-24 14:36:45 matthew Exp $
  * 
  */
 
@@ -24,7 +24,7 @@
 }
 
 #currentpledges li {
-    background-image: url('/i/sk.person-iwill.png');
+    background-image: url('/i/sk.person-will.png');
 }
 
 #front {

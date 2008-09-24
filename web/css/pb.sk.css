@@ -1,0 +1,33 @@
+/*
+ * pb.sk.css
+ * Slovakian specific CSS overrides.
+ * 
+ * Copyright (c) 2008 UK Citizens Online Democracy. All rights reserved.
+ * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
+ *
+ * $Id: pb.sk.css,v 1.1 2008-09-24 14:27:57 matthew Exp $
+ * 
+ */
+
+#startbubble {
+    background-image: url('/i/sk.speechbubble-8bit-nomatt.png');
+}
+
+#successfulpledges li {
+}
+#successfulpledges li.even {
+    background-image: url('/i/sk.iwill-light.png');
+}
+
+#successfulpledges li.odd {
+    background-image: url('/i/sk.iwill-dark.png');
+}
+
+#currentpledges li {
+    background-image: url('/i/sk.person-iwill.png');
+}
+
+#front {
+    background-image: url('/i/sk.light-bg.png');
+}
+

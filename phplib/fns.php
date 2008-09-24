@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.176 2008-07-01 17:45:17 matthew Exp $
+// $Id: fns.php,v 1.177 2008-09-24 14:27:56 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -156,7 +156,10 @@ function pb_message_add_template_values($values) {
     $values['pledgebank_url'] = pb_domain_url(array('path'=>'/'));
     $values['pledgebank_facebook_url'] = OPTION_FACEBOOK_CANVAS;
         
-    $values['signature'] = _("-- the PledgeBank.com team");
+    $values['signature'] = _("Yours,  \nthe PledgeBank.com team");
+    if (OPTION_PB_STAGING) {
+        $values['signature'] .= ' - DEVELOPMENT SITE, NOT LIVE';
+    }
 
     if (array_key_exists('title', $values))
         $values['facebook_short_title'] = trim_characters($values['title'], 0, 50);

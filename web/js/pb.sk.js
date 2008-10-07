@@ -10,8 +10,8 @@
 
 var translation = {
 "Town:":"Mesto:",
-"(choose one)":"(vyberte si jednu možnosť)",
-"Place name:":"Názov miesta:",
+"(choose one)":"(vyberte si 1 možnosť)",
+"Place name:":"Názov lokality:",
 "other local people":"ďalší ľudia z okolia",
 "<Enter your name>":"<Napíšte svoje meno>",
 "<Enter your pledge>":"<Napíšte svoj sľub>",

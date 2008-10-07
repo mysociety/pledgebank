@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: howto.php,v 1.6 2007-11-30 16:16:12 matthew Exp $
+// $Id: howto.php,v 1.7 2008-10-07 17:02:41 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -98,7 +98,7 @@ access is required. </li>
 then create a pledge when you feel ready?</p>
 
 <ul>
-<li><a href="http://www.bbc.co.uk/dna/actionnetwork/A2077823" target="_new">How we set up a tenants and residents assocation</a> (BBC Action Network)</li>
+<li><a href="http://www.bbc.co.uk/dna/collective/A26100505" target="_new">How we set up a tenants and residents assocation</a> (BBC Action Network)</li>
 </ul>
 
 <p class="starthowto"><a href="/new/residents">Then, click here to get started &nbsp;&raquo;</a></p>

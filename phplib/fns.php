@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: fns.php,v 1.177 2008-09-24 14:27:56 matthew Exp $
+// $Id: fns.php,v 1.178 2008-10-20 11:06:42 matthew Exp $
 
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
@@ -32,6 +32,7 @@ if (OPTION_WEB_DOMAIN == 'pledgebank.com' && OPTION_WEB_HOST == 'www') {
     $language_domains = array(
         'eo' => 'promesobanko.com',
         'fr' => 'promessotheque.com',
+        'sk' => 'slubowebka.com',
     );
 } elseif (OPTION_WEB_DOMAIN == 'pledgebank.cat') {
     // Francis's test ones

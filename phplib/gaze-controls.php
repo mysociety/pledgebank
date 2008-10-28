@@ -8,7 +8,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.21 2008-04-08 10:14:36 matthew Exp $
+// $Id: gaze-controls.php,v 1.22 2008-10-28 14:59:29 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -320,7 +320,7 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
             $errors['place'] = _("Please enter either a place name or a postcode area, but not both");
     } else {
         if ($location['postcode'])
-            $errors['postcode'] = _("You can only enter a postcode area if your pledge applies to the UK");
+            $errors['postcode'] = _("You can only enter a postcode area if you have selected the UK");
     }
     if ($location['postcode']) {
         if (!validate_partial_postcode($location['postcode']) && !validate_postcode($location['postcode']))

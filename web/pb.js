@@ -5,7 +5,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: pb.js,v 1.43 2007-11-02 15:36:07 matthew Exp $
+ * $Id: pb.js,v 1.44 2008-10-30 11:57:32 matthew Exp $
  * 
  */
 
@@ -61,7 +61,6 @@ function fadeout(thi) {
     }
 }
 
-addEvent(window, 'load', greyOutInputs);
 function greyOutInputs() {
     if (!document) return
     if (document.getElementById) {

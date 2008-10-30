@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.184 2008-09-24 14:36:44 matthew Exp $
+// $Id: page.php,v 1.185 2008-10-30 11:57:32 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -370,6 +370,9 @@ urchinTracker();
     if (!$microsite || $microsite != 'global-cool') {
 ?></div><? # id="pballfooter"
 ?>
+<script type="text/javascript">
+greyOutInputs();
+</script>
 </body></html>
 <?  
     } else {

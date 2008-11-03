@@ -20,9 +20,9 @@ var translation = {
 "other local person":"person lleol arall",
 "Global":"Byd eang",
 "(separator)":"(nodyn gwahanu)",
-"Postcode or town:":"C&ocirc;d post neu dref",
+"Postcode or town:":"Côd post neu dref",
 "Town or zipcode:":"",
 "Place name or zipcode:":"",
-"You have used %d characters; %d remain.":"Defnyddir %d o nodiadau; %d ar &ocirc;l",
+"You have used %d characters; %d remain.":"Defnyddir %d o nodiadau; %d ar ôl",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Defnyddiwyd %d o nodiadau, sy'n %d fwy nag sy'n ffito mewn neges destun. Cwtogwch eich neges, os gwelwch yn dda."
 }

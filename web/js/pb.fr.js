@@ -9,9 +9,9 @@
  */
 
 var translation = {
-"Town:":"Ville&nbsp;:",
+"Town:":"Ville†:",
 "(choose one)":"(en s√©lectionner un)",
-"Place name:":"Ville&nbsp;:",
+"Place name:":"Ville†:",
 "other local people":"autres personnes de la r√©gion",
 "<Enter your name>":"<Entrez votre nom>",
 "<Enter your pledge>":"<Entrez votre promesse>",
@@ -20,9 +20,9 @@ var translation = {
 "other local person":"autre personne de la r√©gion",
 "Global":"Global",
 "(separator)":"(s√©parateur)",
-"Postcode or town:":"Code postal ou ville&nbsp;:",
-"Town or zipcode:":"Ville ou code postal&nbsp;:",
-"Place name or zipcode:":"Ville ou code postal&nbsp;:",
+"Postcode or town:":"Code postal ou ville†:",
+"Town or zipcode:":"Ville ou code postal†:",
+"Place name or zipcode:":"Ville ou code postal†:",
 "You have used %d characters; %d remain.":"Vous avez utilis√© %d caract√®res; il vous en reste %d.",
 "You have used %d characters, which is %d more than will fit in an SMS. Please make your message shorter.":"Vous avez utilis√© %d caract√®res, donc %d de trop pour tenir dans un message SMS. Veuillez raccourcir votre message."
 }

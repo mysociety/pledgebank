@@ -1,6 +1,9 @@
 #!/usr/bin/php
 <?php
 
+echo "Edit the pledge number, check input names.csv is right.\n";
+exit;
+
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 require_once "../phplib/pbcli.php";
 require_once "../phplib/pbperson.php";

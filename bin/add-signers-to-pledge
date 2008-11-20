@@ -1,0 +1,28 @@
+#!/usr/bin/php
+<?php
+
+chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../phplib/pbcli.php";
+require_once "../phplib/pbperson.php";
+require_once '../../phplib/db.php';
+require_once '../../phplib/validate.php';
+
+function add_person_to_pledge($pledge_id, $email, $name = null) {
+    $new_person = person_get_or_create($email, $name);
+    $showname = 't';
+    db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge_id, $name, $new_person->id(), $showname, null, null));
+    db_commit();
+}
+
+$handle = fopen("names.csv", "r");
+while ((list($name, $email) = fgetcsv($handle, 2000, ",")) !== FALSE) {
+    if (!validate_email($email)) {
+        print "$email is not a valid email, name $name\n";
+    } else {
+        add_person_to_pledge(5464, $email, $name);
+    }
+}
+fclose($handle);
+
+?>
+

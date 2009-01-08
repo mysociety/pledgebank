@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: my.php,v 1.6 2009-01-07 15:57:17 timsk Exp $
+// $Id: my.php,v 1.7 2009-01-08 16:59:58 angie Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -123,27 +123,33 @@ function show_your_signed_pledges() {
             $pledge = new Pledge($r);
             print '<li id="signed' . $pledge->id() . '"';
             if ($r['done']=='t')
-                print ' class="done">';
-            elseif (microsites_has_survey())
-                print '><form method="post" action="' . $pledge->url_survey() . '">';
+                print ' class="done"';
+            print '><form method="post" action="' . $pledge->url_survey() . '">';
             print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
-            if (microsites_has_survey() && $r['done']=='f') {
+            if (microsites_has_survey()) {
                 print '<p>';
-                if ($pledge->failed()) {
-                    print _('Have you now done what you pledged anyway?');
-                } else {
-                    print _('Have you now done what you pledged?');
+                if ($r['done']=='f') {
+                    if ($pledge->failed()) {
+                        print _('Have you now done what you pledged anyway?');
+                    } else {
+                        print _('Have you now done what you pledged?');
+                    }
+                    print ' <input type="submit" value="' . _('Yes') . '"></p>';
                 }
-                print ' <input type="submit" value="' . _('Yes') . '"></p>';
-                print '<input type="hidden" name="r" value="my"></form>';
-            }
-            if ($done == $pledge->ref()) {
-                print p('<em>' . _("That's great!") . '</em>');
-                ?>
+                if ($done == $pledge->ref() && $r['done']=='t') {
+                    print p('<em>' . _("That's great!") . '</em>');
+                    ?>
 <script type="text/javascript">
     highlight_fade('signed<?=$pledge->id()?>');
 </script>
 <?
+                }
+                if ($r['done']=='t') {
+                    print '<p>' . _('Have you done this pledge?');
+                    print ' <input type="submit" value="' . _('No') . '"></p>';
+                    print '<input type="hidden" name="undopledge" value="1">';
+                }
+                print '<input type="hidden" name="r" value="my"></form>';
             }
             print '</li>';
             if ($r['whensucceeded']) 

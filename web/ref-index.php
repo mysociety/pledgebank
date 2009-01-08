@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.133 2009-01-08 15:49:38 angie Exp $
+// $Id: ref-index.php,v 1.134 2009-01-08 16:18:51 angie Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -247,16 +247,18 @@ function draw_signatories($p) {
                 print '<li id="signer' . $r['id'] . '"';
                 if ($r['done']=='t') print ' class="done"';
                 print '>';
-                if (microsites_has_survey() && $r['done']=='f' && !is_null($P) && $r['person_id'] == $P->id()) {
+                if (microsites_has_survey() && !is_null($P) && $r['person_id'] == $P->id()) {
                     print '<form method="post" action="' . $p->url_survey() . '"><input type="hidden" name="r" value="pledge">';
-                    print htmlspecialchars($r['name']);
-                    print ' &ndash; <input type="submit" value="'._("I have now done what I pledged").'"></form>';
+                    if ($r['done']=='f' ) {
+                        print ' &ndash; <input type="submit" value="'._("I have now done what I pledged").'">';                    
+                    } else {
+                        print ' &ndash; <input type="hidden" name="undopledge" value="1"><input type="submit" value="'._("I have NOT done what I pledged").'">';                
+                    }
+                    print '</form>';
                 }
-                if (microsites_has_survey() && $r['done']=='t' && !is_null($P) && $r['person_id'] == $P->id()) {
-                    print '<form method="post" action="' . $p->url_survey() . '"><input type="hidden" name="r" value="pledge">';
-                    print htmlspecialchars($r['name']);
-                    print ' &ndash; <input type="hidden" name="undopledge" value="1"><input type="submit" value="'._("I have NOT done what I pledged").'"></form>';
-                }
+                print htmlspecialchars($r['name']);
+
+                
                 print '</li>';
             } else {
                 err('showname set but no name');

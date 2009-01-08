@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-index.php,v 1.134 2009-01-08 16:18:51 angie Exp $
+// $Id: ref-index.php,v 1.135 2009-01-08 16:19:23 angie Exp $
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
@@ -252,13 +252,11 @@ function draw_signatories($p) {
                     if ($r['done']=='f' ) {
                         print ' &ndash; <input type="submit" value="'._("I have now done what I pledged").'">';                    
                     } else {
-                        print ' &ndash; <input type="hidden" name="undopledge" value="1"><input type="submit" value="'._("I have NOT done what I pledged").'">';                
+                        print ' &ndash; <input type="hidden" name="undopledge" value="1"><input type="submit" value="'._("I have NOT done what I pledged").'">';
                     }
                     print '</form>';
                 }
                 print htmlspecialchars($r['name']);
-
-                
                 print '</li>';
             } else {
                 err('showname set but no name');

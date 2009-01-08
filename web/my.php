@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: my.php,v 1.7 2009-01-08 16:59:58 angie Exp $
+// $Id: my.php,v 1.8 2009-01-08 17:24:03 matthew Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -92,12 +92,12 @@ function show_your_pledges($type) {
     if (db_num_rows($qrows) > 0) {
         if ($type == 'closed')
             print h2(_('Closed pledges you created'));
-	echo '<ul class="search_results">';
+        echo '<ul class="search_results">';
         while ($r = db_fetch_array($qrows)) {
             $pledge = new Pledge($r);
             print '<li>' . $pledge->new_summary(array('firstperson'=>true, 'creatorlinks' => true));
         }
-	echo '</ul>';
+        echo '</ul>';
     } elseif ($type == 'open') {
         print p(_('You have no open pledges. <a href="/new">Start a new pledge</a>.'));
     }
@@ -124,7 +124,9 @@ function show_your_signed_pledges() {
             print '<li id="signed' . $pledge->id() . '"';
             if ($r['done']=='t')
                 print ' class="done"';
-            print '><form method="post" action="' . $pledge->url_survey() . '">';
+            print '>';
+            if (microsites_has_survey())
+                print '<form method="post" action="' . $pledge->url_survey() . '">';
             print $pledge->summary(array('html'=>true, 'href'=>$r['ref']));
             if (microsites_has_survey()) {
                 print '<p>';
@@ -145,7 +147,7 @@ function show_your_signed_pledges() {
 <?
                 }
                 if ($r['done']=='t') {
-                    print '<p>' . _('Have you done this pledge?');
+                    print '<p>' . _('Have you not done what you pledged yet?');
                     print ' <input type="submit" value="' . _('No') . '"></p>';
                     print '<input type="hidden" name="undopledge" value="1">';
                 }

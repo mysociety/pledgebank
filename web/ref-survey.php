@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-survey.php,v 1.3 2007-10-01 16:48:54 francis Exp $
+ * $Id: ref-survey.php,v 1.4 2009-01-08 15:12:55 angie Exp $
  * 
  */
 
@@ -39,14 +39,19 @@ $signer = db_getRow('select id, showname from signers where pledge_id=? and pers
 if (!count($signer)) {
     page_header(_("PledgeBank pledge survey"),
         array('ref'=>$pledge->ref(), 'pref' => $pledge->url_typein()));
-    print p(_("You did not sign this pledge, so cannot say that you have done it!"));
+    print p(_("You did not sign this pledge, so cannot say that you have or have not done it!"));
     page_footer();
     exit;
 }
 
 # Mark pledge as done!
-db_query("update signers set done='t',donetime=ms_current_timestamp() where id=?", $signer['id']);
-db_commit();
+if (get_http_var('undopledge')) {
+    db_query("update signers set done='f',donetime=ms_current_timestamp() where id=?", $signer['id']);
+    db_commit();
+} else {
+    db_query("update signers set done='t',donetime=ms_current_timestamp() where id=?", $signer['id']);
+    db_commit();    
+}
 
 if (get_http_var('r') == 'pledge')
     $url = '/' . $pledge->ref() . '#signer' . $signer['id'];

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: ref-sign.php,v 1.62 2007-10-12 13:12:48 matthew Exp $
+// $Id: ref-sign.php,v 1.63 2009-01-10 12:36:41 matthew Exp $
 
 require_once '../phplib/pb.php';
 require_once '../phplib/pledge.php';
@@ -231,7 +231,7 @@ function do_sign(&$location) {
                     location where location.id = ?", $byarea_location_id);
             printf(_('Thanks for signing up to this pledge in %s!'), $byarea_location_description);
         } else
-            print _('Thanks for signing up to this pledge!');
+            printf(_('Thanks for signing up to the <a href="%s">%s pledge</a>!'), '/' . htmlspecialchars($pledge->ref()), $pledge->ref());
 
         print '</p>';
 

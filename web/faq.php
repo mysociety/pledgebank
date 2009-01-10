@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: faq.php,v 1.63 2008-10-06 11:39:13 matthew Exp $
+// $Id: faq.php,v 1.64 2009-01-10 18:27:05 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -223,7 +223,7 @@ function default_faq() {
     print dd(_("PledgeBank reserves the right to 'backpage' any pledge which we
     consider to be inappropriate. This means that your pledge will work, but will
     not show up on the all page, or in the search. We will normally backpage
-    pledges which are really nothing more than advertising or propoganda, or which
+    pledges which are really nothing more than advertising or propaganda, or which
     are entirely frivolous. We will also delete pledges which promote or incite
     illegal behaviour."));
 

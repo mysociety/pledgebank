@@ -6,7 +6,7 @@
  * Copyright (c) 2007 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: ref-survey.php,v 1.4 2009-01-08 15:12:55 angie Exp $
+ * $Id: ref-survey.php,v 1.5 2009-01-10 12:31:05 matthew Exp $
  * 
  */
 
@@ -46,7 +46,7 @@ if (!count($signer)) {
 
 # Mark pledge as done!
 if (get_http_var('undopledge')) {
-    db_query("update signers set done='f',donetime=ms_current_timestamp() where id=?", $signer['id']);
+    db_query("update signers set done='f',donetime=null where id=?", $signer['id']);
     db_commit();
 } else {
     db_query("update signers set done='t',donetime=ms_current_timestamp() where id=?", $signer['id']);

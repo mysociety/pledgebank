@@ -8,7 +8,7 @@
 // Copyright (c) 2006 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-controls.php,v 1.22 2008-10-28 14:59:29 matthew Exp $
+// $Id: gaze-controls.php,v 1.23 2009-02-08 21:56:35 matthew Exp $
 
 // TODO: 
 // - Adapt this so it can be in global phplib for use on other sites
@@ -447,8 +447,9 @@ function lookup_zipcode($zip) {
     $url = 'http://maps.google.com/maps/geo?key=' . $key . '&q=' . $zip . ',+US';
     #$url = 'http://ws.geonames.org/postalCodeSearch?country=US&postalcode=' . $search;
     $f = @file_get_contents($url);
+    print $f;
     #if (preg_match('#<lat>(.*?)</lat>\s*<lng>(.*?)</lng>#', $f, $m)) {
-    if (preg_match('#"coordinates":\[(.*?),(.*?),#', $f, $m)) {
+    if (preg_match('#"coordinates": *\[(.*?), *(.*?),#', $f, $m)) {
         #$lat = $m[1]; $lon = $m[2];
         $lon = $m[1]; $lat = $m[2];
         return array('lon' => $lon, 'lat' => $lat);

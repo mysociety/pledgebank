@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: my.php,v 1.8 2009-01-08 17:24:03 matthew Exp $
+// $Id: my.php,v 1.9 2009-08-08 20:35:10 timsk Exp $
 
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
@@ -147,8 +147,8 @@ function show_your_signed_pledges() {
 <?
                 }
                 if ($r['done']=='t') {
-                    print '<p>' . _('Have you not done what you pledged yet?');
-                    print ' <input type="submit" value="' . _('No') . '"></p>';
+                    print '<p>' . _('If, in fact, you have NOT yet done your bit for this pledge, you need to click this button:');
+                    print ' <input type="submit" value="' . _('I HAVE NOT DONE THIS YET!') . '"></p>';
                     print '<input type="hidden" name="undopledge" value="1">';
                 }
                 print '<input type="hidden" name="r" value="my"></form>';

@@ -4,7 +4,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.21 2008-09-24 16:21:13 francis Exp $
+# $Id: crontab.ugly,v 1.22 2009-09-01 09:34:21 matthew Exp $
 
 PATH=/usr/local/bin:/usr/bin:/bin
 !!(* if ($vhost eq "matthew.pledgebank.com") { *)!!
@@ -19,17 +19,17 @@ MAILTO=team@pledgebank.com
 ## machine now.
 !!(* if (($hostname eq "bitter" && !$staging) || ($staging && $vhost eq 'matthew.pledgebank.com')) { *)!!
 # Frequently
-0-59/20 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate || echo "stalled?"
+0-59/20 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate || echo "frequentupdate is still running after 20 minutes - this might just mean the previous run is taking a long time. Only worry if you get this email a few times in a row."
 
 # Once a day, early morning
-0 8 * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts || echo "stalled?"
+0 8 * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts || echo "send-comment-alerts has apparently been running for 24 hours. This is probably not true, please investigate."
 !!(* } *)!!
 
 
 ## These scripts definitely aren't concurrent, and should only be run on one machine
 !!(* if (($hostname eq "bitter" && !$staging) || ($staging && $vhost eq 'matthew.pledgebank.com')) { *)!!
 # Once an hour
-33 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "stalled?" )
+33 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "find-pledge-connections has been running for over an hour. Probably nothing to worry about." )
 #03 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/update-facebook-stuff.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/update-facebook-stuff || echo "stalled?" )
 # Once a day, early morning
 0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts

@@ -1,18 +1,15 @@
 #!/usr/bin/php -q
 <?php
 // gaze.js.gen
-// 
+// Generates a JavaScript list of Gaze countries for use by PledgeBank local alert front-end.
 //
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-js-gen,v 1.8 2006-06-05 13:44:42 chris Exp $
+// $Id: gaze-js-gen,v 1.9 2009-09-01 14:16:55 matthew Exp $
 
-
-$long_opts = $short_opts = '';
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
-require_once "../phplib/pbcli.php";
 require_once '../../phplib/gaze.php';
 require_once '../../phplib/utility.php';
 

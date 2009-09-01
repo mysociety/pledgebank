@@ -4,7 +4,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org. WWW: http://www.mysociety.org/
 #
-# $Id: crontab.ugly,v 1.22 2009-09-01 09:34:21 matthew Exp $
+# $Id: crontab.ugly,v 1.23 2009-09-01 14:16:55 matthew Exp $
 
 PATH=/usr/local/bin:/usr/bin:/bin
 !!(* if ($vhost eq "matthew.pledgebank.com") { *)!!
@@ -38,7 +38,7 @@ MAILTO=team@pledgebank.com
 
 
 ## These scripts run on all machines, as they write to filesystem
-32 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
+32 3 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
 # Remove old unaccessed graphs/posters
 01 6 * * * !!(*= $user *)!! /usr/sbin/tmpreaper 28d /data/vhost/!!(*= $vhost *)!!/graphs
 01 6 * * * !!(*= $user *)!! /usr/sbin/tmpreaper 28d /data/vhost/!!(*= $vhost *)!!/posters

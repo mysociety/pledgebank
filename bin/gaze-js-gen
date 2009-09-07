@@ -6,10 +6,11 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: francis@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: gaze-js-gen,v 1.9 2009-09-01 14:16:55 matthew Exp $
+// $Id: gaze-js-gen,v 1.10 2009-09-07 09:52:18 matthew Exp $
 
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
+require_once "../conf/general";
 require_once '../../phplib/gaze.php';
 require_once '../../phplib/utility.php';
 

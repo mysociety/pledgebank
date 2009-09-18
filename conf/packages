@@ -1,2 +1,5 @@
 libdatetime-format-strptime-perl
 libcairo-perl
+python2.5-pgsql
+python2.4-pyrtf
+python-reportlab

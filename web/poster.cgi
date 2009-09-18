@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.121 2009-09-18 20:15:41 matthew Exp $
+# $Id: poster.cgi,v 1.122 2009-09-18 20:34:23 matthew Exp $
 #
 
 import sys
@@ -1051,7 +1051,7 @@ while fcgi.isFCGI():
             # Generate any other file type
             if format != 'pdf':
                 # Call out to "convert" from ImageMagick
-                cmd = "gs-afpl -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outfile
+                cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outfile
                 child = popen2.Popen3(cmd, True) # capture stderr
                 child.tochild.close()
                 # no need for stdout in log file, so ignore this

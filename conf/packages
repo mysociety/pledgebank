@@ -3,3 +3,5 @@ libcairo-perl
 python-pgsql
 python2.4-pyrtf
 python-reportlab
+libdate-calc-perl
+libmath-round-perl

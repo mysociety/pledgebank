@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.120 2008-09-15 14:27:51 timsk Exp $
+# $Id: poster.cgi,v 1.121 2009-09-18 20:15:41 matthew Exp $
 #
 
 import sys
@@ -434,7 +434,7 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
 
     # Set up styles
     # leading generally small * 1.2, 0.9 on detail and smallprint, though, and 0 on footer
-#    if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
+#    if iso_lang == 'eo' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
 #        heading_font = ss.Fonts.TrebuchetMS
 #        main_font = ss.Fonts.Georgia
 #    else:
@@ -554,7 +554,7 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
 
     # Set up styles
     wordWrap = ''
-    if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU' or iso_lang == 'sk_SK':
+    if iso_lang == 'eo' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU' or iso_lang == 'sk_SK':
         heading_font = 'Trebuchet MS'
         main_font = 'Georgia'
     elif iso_lang == 'zh_CN':
@@ -912,7 +912,7 @@ while fcgi.isFCGI():
         day = date.day
         if iso_lang == 'en_GB':
             pledge['date'] = "%d%s %s" % (day, ordinal(day), date.strftime("%B %Y"))
-        elif iso_lang == 'eo_XX':
+        elif iso_lang == 'eo':
             pledge['date'] = date.strftime("la %e-a de %B %Y")
         elif iso_lang == 'de_DE' or iso_lang == 'sk_SK':
             pledge['date'] = date.strftime("%e. %B %Y")
@@ -983,7 +983,7 @@ while fcgi.isFCGI():
 
             ss = PyRTF.StyleSheet()
             ss.Colours.append(microsites_poster_rtf_colour()) 
-#            if iso_lang == 'eo_XX' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
+#            if iso_lang == 'eo' or iso_lang == 'uk_UA' or iso_lang == 'ru_RU':
 #                heading_font = 'Trebuchet MS'
 #                main_font = 'Georgia'
 #            else:

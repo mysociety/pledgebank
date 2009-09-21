@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.122 2009-09-18 20:34:23 matthew Exp $
+# $Id: poster.cgi,v 1.123 2009-09-21 15:01:00 matthew Exp $
 #
 
 import sys
@@ -18,7 +18,7 @@ import os
 import popen2
 from time import time
 from pyPgSQL import PgSQL
-import fcgi
+import fcgi, cgi
 import tempfile
 import string
 import sha
@@ -615,15 +615,15 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         sentence = Paragraph(_(
                     '''<font color="%s">I</font> will %s <b>but only if</b> <font color="%s">%s</font> %s will %s. '''
                 ).encode('utf-8') % (
-                html_colour, pledge['title'],
+                html_colour, cgi.escape(pledge['title']),
                 html_colour, format_integer(pledge['target']), 
-                pledge['type'], pledge['signup']
+                cgi.escape(pledge['type']), cgi.escape(pledge['signup'])
             ), p_head)
     else:
         sentence = Paragraph(_(
                     '''<font color="%s">I</font> will %s. '''
                 ).encode('utf-8') % (
-                html_colour, pledge['title']
+                html_colour, cgi.escape(pledge['title'])
             ), p_head)
     used_width = sentence.wrap(allowed_width, h)[0]
     if used_width > allowed_width:
@@ -633,13 +633,13 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
         sentence,
         Paragraph(u'''<para align="right">\u2014 
             <font color="%s">%s%s</font></para>'''.encode('utf-8') 
-            % (html_colour, pledge['name'], identity), p_head),
+            % (html_colour, cgi.escape(pledge['name']), cgi.escape(identity)), p_head),
         Paragraph('', p_detail),
     ]
     
     if 'detail' in keywords and keywords['detail'] and pledge['detail']:
         details = map(lambda text: Paragraph(text, p_detail), 
-                re.split("\r?\n\r?\n", _('<b>More details:</b> %s').encode('utf-8') % pledge['detail']))
+                re.split("\r?\n\r?\n", _('<b>More details:</b> %s').encode('utf-8') % cgi.escape(pledge['detail'])))
         for d in details:
             used_width = d.wrap(allowed_width, h)[0]
             if used_width > allowed_width:

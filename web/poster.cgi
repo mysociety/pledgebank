@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.123 2009-09-21 15:01:00 matthew Exp $
+# $Id: poster.cgi,v 1.124 2009-09-21 15:31:57 matthew Exp $
 #
 
 import sys
@@ -137,7 +137,7 @@ def microsites_poster_watermark(c, x1, y1, w, h):
         else:
             ticksize = h
         p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize, wordWrap='')
-        story = [ Paragraph('<font color="#f4f1f8">3</font>', p_tick) ]
+        story = [ Paragraph(u'<font color="#f4f1f8">\u2713</font>', p_tick) ]
         if (w<h):
             f = Frame(x1, y1, w, h, showBoundary = 0)
         else:

@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.185 2008-10-30 11:57:32 matthew Exp $
+// $Id: page.php,v 1.186 2009-09-24 16:16:54 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -22,14 +22,19 @@ $page_plain_headers = false;
 
 /* page_send_vary_header
  * Emit an appropriate Vary: header for PledgeBank. */
-function page_send_vary_header() {
+function page_send_vary_header($params = array()) {
     global $page_vary_header_sent;
     if ($page_vary_header_sent)
         return;
     /* We must tell caches what headers alter the behaviour of the pages.
      * This list is conservative (it may contain headers which don't affect a
      * particular page), and we may wish to optimise this later. */
-    header('Vary: Cookie, Accept-Encoding, Accept-Language, X-GeoIP-Country');
+    if (isset($params['id']) && $params['id'] == 'front') {
+        header('Vary: Cookie, Accept-Encoding, Accept-Language, X-Forwarded-For');
+    } else {
+        header('Vary: Cookie, Accept-Encoding, Accept-Language');
+    }
+
     $etag = '';
     foreach (array('COOKIE', 'ACCEPT_ENCODING', 'ACCEPT_LANGUAGE', 'X_GEOIP_COUNTRY') as $h) {
         if (isset($_SERVER['HTTP_'.$h])) $etag .= $_SERVER['HTTP_'.$h];
@@ -346,7 +351,7 @@ piwik_url = 'http://piwik.mysociety.org/piwik.php';
 piwik_log(piwik_action_name, piwik_idsite, piwik_url);
 //-->
 </script>
-<noscript><img src="http://piwik.mysociety.org/piwik.php?i=1" style="border:0" alt=""></noscript>
+<noscript><img src="http://piwik.mysociety.org/piwik.php?idsite=1" style="border:0" alt=""></noscript>
 <!-- /Piwik --> 
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>
@@ -453,7 +458,7 @@ function rss_footer($items) {
 }
 
 function page_cache_headers($params) {
-    page_send_vary_header();
+    page_send_vary_header($params);
     if (OPTION_PB_CACHE_HEADERS) {
         /* Send Last-Modified: and ETag: headers, if we have enough information to
          * do so. */

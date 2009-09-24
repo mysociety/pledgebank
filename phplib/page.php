@@ -5,7 +5,7 @@
 // Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 //
-// $Id: page.php,v 1.186 2009-09-24 16:16:54 matthew Exp $
+// $Id: page.php,v 1.187 2009-09-24 16:49:11 matthew Exp $
 
 require_once '../../phplib/conditional.php';
 require_once '../../phplib/db.php';
@@ -30,7 +30,7 @@ function page_send_vary_header($params = array()) {
      * This list is conservative (it may contain headers which don't affect a
      * particular page), and we may wish to optimise this later. */
     if (isset($params['id']) && $params['id'] == 'front') {
-        header('Vary: Cookie, Accept-Encoding, Accept-Language, X-Forwarded-For');
+        header('Vary: *');
     } else {
         header('Vary: Cookie, Accept-Encoding, Accept-Language');
     }

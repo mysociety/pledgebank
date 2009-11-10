@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.126 2009-11-10 16:03:27 duncan Exp $
+ * $Id: frequentupdate,v 1.127 2009-11-10 16:07:56 duncan Exp $
  *
  */
 
@@ -806,6 +806,12 @@ function send_pending_messages() {
                     and (message.byarea_location_id is null or 
                          message.byarea_location_id = signers.byarea_location_id)
                 order by whencreated desc');
+    /* As of 2009-11-10, sending these messages is turned off if the
+     * only contact method we have is facebook.
+     * to re-enable sending to facebook 
+     * add signer_person.facebook_id is not null to the line starting
+     * and (message.sms is not null. */
+
         /* XXX ugly. For a raw email we will transmit the (possibly large)
          * body of the mail over the wire once for each row. Should do a
          * subquery for it and cache the result. */

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env python
 #
 # poster.cgi:
 # Creates posters for printing out, caching them in a directory.
@@ -8,7 +8,7 @@
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: matthew@mysociety.org; WWW: http://www.mysociety.org/
 #
-# $Id: poster.cgi,v 1.124 2009-09-21 15:31:57 matthew Exp $
+# $Id: poster.cgi,v 1.125 2009-11-25 15:25:12 matthew Exp $
 #
 
 import sys

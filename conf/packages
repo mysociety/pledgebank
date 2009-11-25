@@ -1,7 +1,7 @@
 libdatetime-format-strptime-perl
 libcairo-perl
 python-pgsql
-python2.4-pyrtf
+python-pyrtf
 python-reportlab
 libdate-calc-perl
 libmath-round-perl

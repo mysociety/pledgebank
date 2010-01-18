@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: francis@mysociety.org. WWW: http://www.mysociety.org
  *
- * $Id: index.php,v 1.19 2007-10-12 13:12:49 matthew Exp $
+ * $Id: index.php,v 1.20 2010-01-18 12:03:04 louise Exp $
  * 
  */
 
@@ -22,7 +22,7 @@ require_once "../../phplib/admin-serverinfo.php";
 require_once "../../phplib/admin-configinfo.php";
 require_once "../../phplib/admin-embed.php";
 require_once "../../phplib/admin.php";
-require_once '../../services/Ratty/phplib/admin-ratty.php';
+require_once '../../phplib/admin-ratty.php';
 
 $pages = array(
     new ADMIN_PAGE_PB_LATEST,

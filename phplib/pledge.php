@@ -6,7 +6,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
- * $Id: pledge.php,v 1.265 2009-05-05 09:41:20 matthew Exp $
+ * $Id: pledge.php,v 1.266 2010-01-18 02:41:30 timsk Exp $
  * 
  */
 
@@ -582,6 +582,16 @@ class Pledge {
                 print ' frameborder="0" scrolling="no" ';
                 print '>';
                 print '</iframe>';
+            }
+
+            if ($this->ref() == 'HelpLailaLois') {
+                // Embed ChipIn widget
+                print '<iframe src="http://www.chipin.com/widget/id/d535d458a81a0c9a" ';
+                print ' style="border: 0px none ; margin: 0px; padding: 0px; overflow: hidden; width: 225px; height: 225px;" ';
+                print ' frameborder="0" scrolling="no" ';
+                print '>';
+                print '</iframe>';
+
             }
 
             // More details

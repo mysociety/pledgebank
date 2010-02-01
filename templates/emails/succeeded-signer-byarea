@@ -3,8 +3,8 @@ Subject: Pledge successful in <?=$values['location_description']?> - '<?=$values
 Congratulations!
 
 We are pleased to tell you that the pledge you signed up to has been a success
-in your town, <?=$values['location_description']?>. There are currently
-<?=$values['byarea_success_count']?> towns where the pledge has been successful.
+in your town, <?=$values['location_description']?>.
+<?=$values['byarea_success_sentence']?>
 
 The pledge, created by <?=$values['creator_name']?>, reads:
 '<?=$values['sentence_first']?>' The <?=$values['signers_ordinal']?> person

@@ -12,8 +12,7 @@ what you want them to do next.
 
 <?=$values['url']?>
 
-There are now <?=$values['byarea_success_count']?> places where your pledge has
-been successful.
+<?=$values['byarea_success_sentence']?>
 
 We love getting photos of people fulfilling their pledges, so why not
 ask them to take some pics? Send any pictures to team@pledgebank.com

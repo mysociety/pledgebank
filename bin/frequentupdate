@@ -8,7 +8,7 @@
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: matthew@mysociety.org. WWW: http://www.mysociety.org/
  *
- * $Id: frequentupdate,v 1.127 2009-11-10 16:07:56 duncan Exp $
+ * $Id: frequentupdate,v 1.128 2010-02-01 13:05:04 matthew Exp $
  *
  */
 
@@ -174,6 +174,9 @@ function mark_byarea_pledges_successful() {
                 set whensucceeded = '$pb_timestamp'
                 where pledge_id = ? and byarea_location_id = ?", 
                 array($pledge['id'], $pledge['byarea_location_id']));
+        db_query("
+                update pledges set changetime = '$pb_timestamp'
+                where pledge_id = ?", array($pledge['id']));
         
         /* Set up messages to go to creator and signers. */
         db_query("

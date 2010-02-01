@@ -4,7 +4,7 @@
 -- Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 -- Email: francis@mysociety.org; WWW: http://www.mysociety.org/
 --
--- $Id: schema.sql,v 1.231 2008-05-21 15:03:03 matthew Exp $
+-- $Id: schema.sql,v 1.232 2010-02-01 13:05:03 matthew Exp $
 --
 
 -- LLL - means that field requires storing in potentially multiple languages
@@ -1117,6 +1117,7 @@ create function pb_delete_comment(integer)
 
 
 -- XXX: This is broken for cascading pledges, as success only changes byarea_location table
+-- frequentupdate now updates changetime upon any byarea success, unsure if that covers everything.
 
 -- pledge_last_change_time PLEDGE
 -- Return the time of the last change to PLEDGE.

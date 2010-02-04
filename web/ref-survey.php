@@ -11,13 +11,13 @@
  */
 
 require_once '../phplib/pb.php';
-#require_once '../../phplib/db.php';
+#require_once '../commonlib/phplib/db.php';
 
 #require_once '../phplib/page.php';
 #require_once '../phplib/pbperson.php';
 #require_once '../phplib/pledge.php';
 
-require_once '../../phplib/importparams.php';
+require_once '../commonlib/phplib/importparams.php';
 
 $err = importparams(
     array('ref',   '/./',   '')

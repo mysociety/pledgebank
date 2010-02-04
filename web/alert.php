@@ -12,8 +12,8 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
 require_once '../phplib/pbperson.php';
-require_once '../../phplib/utility.php';
-require_once '../../phplib/gaze.php';
+require_once '../commonlib/phplib/utility.php';
+require_once '../commonlib/phplib/gaze.php';
 
 // Get any inputs and process a bit
 $email = get_http_var('email');

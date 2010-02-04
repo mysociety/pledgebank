@@ -8,7 +8,7 @@
 // $Id: translate.php,v 1.11 2008-09-13 21:30:17 timsk Exp $
 
 require_once "../phplib/pb.php";
-require_once '../../phplib/utility.php';
+require_once '../commonlib/phplib/utility.php';
 
 page_header(_('Translate PledgeBank into your own language')); ?>
 

@@ -11,11 +11,11 @@ require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
 require_once '../phplib/microsites.php';
 require_once '../phplib/pbperson.php';
-require_once "../../phplib/evel.php";
-require_once '../../phplib/utility.php';
-require_once '../../phplib/gaze.php';
-require_once '../../phplib/datetime.php';
-require_once '../../phplib/importparams.php';
+require_once "../commonlib/phplib/evel.php";
+require_once '../commonlib/phplib/utility.php';
+require_once '../commonlib/phplib/gaze.php';
+require_once '../commonlib/phplib/datetime.php';
+require_once '../commonlib/phplib/importparams.php';
 require_once "pledge.php";
 
 // HTML shortcuts

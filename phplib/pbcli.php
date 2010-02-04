@@ -12,10 +12,10 @@
  */
 
 require_once "../conf/general";
-require_once '../../phplib/phpcli.php';
-require_once '../../phplib/db.php';
-require_once '../../phplib/locale.php';
-require_once '../../phplib/countries.php';
+require_once '../commonlib/phplib/phpcli.php';
+require_once '../commonlib/phplib/db.php';
+require_once '../commonlib/phplib/locale.php';
+require_once '../commonlib/phplib/countries.php';
 
 /* Date which PledgeBank application believes it is */
 $pb_today = db_getOne('select ms_current_date()');

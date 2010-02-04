@@ -10,7 +10,7 @@
  * 
  */
 
-require_once '../../phplib/sharethis.php';
+require_once '../commonlib/phplib/sharethis.php';
 
 function pb_share_details($p) {
     $name = ''; $email = '';

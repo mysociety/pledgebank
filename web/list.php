@@ -10,7 +10,7 @@
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 
-require_once '../../phplib/importparams.php';
+require_once '../commonlib/phplib/importparams.php';
 
 define('PAGE_SIZE', 50);
 

@@ -13,7 +13,7 @@
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 require_once "../phplib/pbcli.php";
-require_once '../../phplib/db.php';
+require_once '../commonlib/phplib/db.php';
 
 db_connect();
 db_query("update pledges set closed_for_comments = 't' where now() - date > '1 year'::interval and closed_for_comments='f'");

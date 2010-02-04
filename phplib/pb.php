@@ -16,8 +16,8 @@
 // Load configuration file
 require_once "../conf/general";
 // Some early config files - put most config files after language negotiation below
-require_once "../../phplib/error.php";
-require_once "../../phplib/locale.php";
+require_once "../commonlib/phplib/error.php";
+require_once "../commonlib/phplib/locale.php";
 require_once 'page.php';
 
 // Googlebot is crawling all our domains for different languages/codes at 
@@ -129,11 +129,11 @@ if ($lang && array_key_exists($lang, $language_domains)
 # are translated in them
 require_once 'microsites.php';
 microsites_for_locale();
-require_once '../../phplib/countries.php';
-require_once '../../phplib/db.php';
-require_once '../../phplib/stash.php';
-require_once "../../phplib/utility.php";
-require_once "../../phplib/gaze.php";
+require_once '../commonlib/phplib/countries.php';
+require_once '../commonlib/phplib/db.php';
+require_once '../commonlib/phplib/stash.php';
+require_once "../commonlib/phplib/utility.php";
+require_once "../commonlib/phplib/gaze.php";
 
 # Redirect to domain without country code in it, and set country in the cookie
 # (we keep language in the URL)

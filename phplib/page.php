@@ -7,9 +7,9 @@
 //
 // $Id: page.php,v 1.187 2009-09-24 16:49:11 matthew Exp $
 
-require_once '../../phplib/conditional.php';
-require_once '../../phplib/db.php';
-require_once '../../phplib/tracking.php';
+require_once '../commonlib/phplib/conditional.php';
+require_once '../commonlib/phplib/db.php';
+require_once '../commonlib/phplib/tracking.php';
 require_once 'pbperson.php';
 require_once 'pledge.php'; # XXX: I don't think this is needed?
 

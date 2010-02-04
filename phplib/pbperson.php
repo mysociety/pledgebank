@@ -12,7 +12,7 @@
 require_once 'microsites.php';
 require_once '../phplib/login.php';
 
-require_once '../../phplib/person.php';
+require_once '../commonlib/phplib/person.php';
 
 // Special version of person_make_signon_url which uses fancy PledgeBank domain URLs
 function pb_person_make_signon_url($data, $email, $method, $url, $params, $microsite = '') { # XXX Ugh

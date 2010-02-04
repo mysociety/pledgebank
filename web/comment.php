@@ -11,7 +11,7 @@
 
 require_once('../phplib/pb.php');
 
-require_once('../../phplib/importparams.php');
+require_once('../commonlib/phplib/importparams.php');
 
 require_once('../phplib/pbperson.php');
 require_once('../phplib/pledge.php');

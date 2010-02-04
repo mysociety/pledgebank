@@ -11,8 +11,8 @@
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 require_once "../conf/general";
-require_once '../../phplib/gaze.php';
-require_once '../../phplib/utility.php';
+require_once '../commonlib/phplib/gaze.php';
+require_once '../commonlib/phplib/utility.php';
 
 $gazejs = fopen('../web/gaze.js', 'w');
 

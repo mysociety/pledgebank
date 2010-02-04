@@ -11,8 +11,8 @@
  */
 
 require_once '../phplib/pb.php';
-require_once '../../phplib/conditional.php';
-require_once '../../phplib/db.php';
+require_once '../commonlib/phplib/conditional.php';
+require_once '../commonlib/phplib/db.php';
 
 $file = get_http_var('file');
 if (!$file)

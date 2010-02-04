@@ -11,7 +11,7 @@ require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pbperson.php';
 
-require_once '../../phplib/importparams.php';
+require_once '../commonlib/phplib/importparams.php';
 
 $P = pb_person_signon(array(
                 'reason_web' => _("To view your pledges, we need to check your email address."),

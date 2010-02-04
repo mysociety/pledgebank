@@ -25,8 +25,8 @@ require_once "../phplib/pbperson.php";
 require_once '../phplib/microsites.php';
 require_once '../phplib/pbfacebook.php';
 require_once '../phplib/comments.php';
-require_once '../../phplib/db.php';
-require_once '../../phplib/utility.php';
+require_once '../commonlib/phplib/db.php';
+require_once '../commonlib/phplib/utility.php';
 
 db_query("insert into fooble values (98765432109876)");
 $q = db_query("select * from fooble where barble = 98765432109876");

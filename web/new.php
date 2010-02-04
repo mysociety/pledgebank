@@ -14,11 +14,11 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/alert.php';
 require_once '../phplib/gaze-controls.php';
 require_once '../phplib/pbfacebook.php';
-require_once '../../phplib/utility.php';
-require_once '../../phplib/mapit.php';      # To test validity of postcodes
-require_once "../../phplib/votingarea.php";
-require_once '../../phplib/countries.php';
-require_once '../../phplib/gaze.php';
+require_once '../commonlib/phplib/utility.php';
+require_once '../commonlib/phplib/mapit.php';      # To test validity of postcodes
+require_once "../commonlib/phplib/votingarea.php";
+require_once '../commonlib/phplib/countries.php';
+require_once '../commonlib/phplib/gaze.php';
 
 # Whether the pledge location step is shown
 function has_step_2() {

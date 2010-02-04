@@ -8,7 +8,7 @@ $long_opts = array('from=', 'to=');
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 require_once "../phplib/pbcli.php";
-require_once '../../phplib/db.php';
+require_once '../commonlib/phplib/db.php';
 
 $from = ''; $to = '';
 foreach ($options[0] as $switch) {

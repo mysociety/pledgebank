@@ -42,15 +42,15 @@
 
 require_once '../phplib/pb.php';
 
-require_once '../../phplib/auth.php';
+require_once '../commonlib/phplib/auth.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/page.php';
 require_once '../phplib/pbperson.php';
 require_once '../phplib/login.php';
-require_once '../../phplib/stash.php';
-require_once '../../phplib/rabx.php';
+require_once '../commonlib/phplib/stash.php';
+require_once '../commonlib/phplib/rabx.php';
 
-require_once '../../phplib/importparams.php';
+require_once '../commonlib/phplib/importparams.php';
 
 /* As a first step try to set a cookie and read it on redirect, so that we can
  * warn the user explicitly if they appear to be refusing cookies. */

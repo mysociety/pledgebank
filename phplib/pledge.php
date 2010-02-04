@@ -14,9 +14,9 @@ require_once 'fns.php';
 require_once 'gaze-controls.php'; // for sign_box
 require_once 'pbperson.php';
 
-require_once '../../phplib/db.php';
-require_once '../../phplib/utility.php';
-require_once '../../phplib/rabx.php';
+require_once '../commonlib/phplib/db.php';
+require_once '../commonlib/phplib/utility.php';
+require_once '../commonlib/phplib/rabx.php';
 
 class Pledge {
     // Associative array of parameters about the pledge, taken from database

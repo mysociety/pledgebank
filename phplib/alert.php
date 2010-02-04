@@ -8,8 +8,8 @@
 // $Id: alert.php,v 1.37 2008-08-25 19:58:06 matthew Exp $
 
 require_once '../phplib/pbperson.php';
-require_once '../../phplib/mapit.php';
-require_once "../../phplib/votingarea.php";
+require_once '../commonlib/phplib/mapit.php';
+require_once "../commonlib/phplib/votingarea.php";
 
 /* alert_signup PERSON EVENT PARAMS
  * Signs PERSON up to receive alerts to an event. EVENT may be:

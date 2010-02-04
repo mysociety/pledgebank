@@ -9,8 +9,8 @@
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
-require_once '../../phplib/conditional.php';
-require_once '../../phplib/db.php';
+require_once '../commonlib/phplib/conditional.php';
+require_once '../commonlib/phplib/db.php';
 
 /* Short-circuit the conditional GET as soon as possible -- parsing the rest of
  * the includes is costly. */
@@ -27,7 +27,7 @@ require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../phplib/share.php';
-require_once '../../phplib/utility.php';
+require_once '../commonlib/phplib/utility.php';
 
 $ref = get_http_var('ref');
 

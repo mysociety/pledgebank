@@ -12,8 +12,8 @@
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
-require_once '../../phplib/conditional.php';
-require_once '../../phplib/db.php';
+require_once '../commonlib/phplib/conditional.php';
+require_once '../commonlib/phplib/db.php';
 
 /* Short-circuit the conditional GET as soon as possible -- parsing the rest of
  * the includes is costly. */
@@ -30,8 +30,8 @@ require_once '../phplib/pb.php';
 require_once '../phplib/page.php';
 require_once '../phplib/pledge.php';
 
-require_once '../../phplib/utility.php';
-require_once '../../phplib/importparams.php';
+require_once '../commonlib/phplib/utility.php';
+require_once '../commonlib/phplib/importparams.php';
 
 $err = importparams( array('ref',        '/./',              ''));
 

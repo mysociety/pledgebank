@@ -13,7 +13,7 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../phplib/pbperson.php';
 require_once '../phplib/abuse.php';
-require_once '../../phplib/utility.php';
+require_once '../commonlib/phplib/utility.php';
 
 $params = array();
 if (get_http_var('ref') || get_http_var('pledge_id') || get_http_var('comment_id'))

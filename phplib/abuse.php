@@ -7,8 +7,8 @@
 //
 // $Id: abuse.php,v 1.2 2007-10-24 23:03:27 matthew Exp $
 
-require_once '../../phplib/utility.php';
-require_once '../../phplib/ratty.php';
+require_once '../commonlib/phplib/utility.php';
+require_once '../commonlib/phplib/ratty.php';
 
 function abuse_test($vars) {
     if (array_key_exists('message', $vars)) {

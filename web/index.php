@@ -14,7 +14,7 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../phplib/pbperson.php';
 require_once '../phplib/success.php';
-require_once '../../phplib/utility.php';
+require_once '../commonlib/phplib/utility.php';
 
 $banner_src = 'howitworks.png';
 if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr' || $lang == 'sk')

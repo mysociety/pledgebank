@@ -11,7 +11,7 @@ if (OPTION_PB_STAGING)
     $GLOBALS['facebook_config']['debug'] = true;
 $GLOBALS['facebook_config']['debug'] = false; # comment out for debug of FB calls
 
-require_once '../../phplib/facebookphp4/facebook.php';
+require_once '../commonlib/phplib/facebookphp4/facebook.php';
 // Find anyone's name. Well, anyone who hasn't turned off their visibility
 // from Facebook search results by people who aren't their friends - returns
 // untrue value for those.

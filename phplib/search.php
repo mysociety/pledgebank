@@ -10,9 +10,9 @@
 require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/comments.php';
-require_once '../../phplib/mapit.php';
-require_once "../../phplib/votingarea.php";
-require_once "../../phplib/countries.php";
+require_once '../commonlib/phplib/mapit.php';
+require_once "../commonlib/phplib/votingarea.php";
+require_once "../commonlib/phplib/countries.php";
 
 global $pb_today;
 global $pledge_select;

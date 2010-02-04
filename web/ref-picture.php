@@ -11,13 +11,13 @@
  */
 
 require_once '../phplib/pb.php';
-require_once '../../phplib/db.php';
+require_once '../commonlib/phplib/db.php';
 
 require_once '../phplib/page.php';
 require_once '../phplib/pbperson.php';
 require_once '../phplib/pledge.php';
 
-require_once '../../phplib/importparams.php';
+require_once '../commonlib/phplib/importparams.php';
 
 $picture_size_limit = 1000; // kilobytes
 $picture_dimension_limit = 250; // pixels, width and height limit

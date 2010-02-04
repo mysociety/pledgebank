@@ -7,8 +7,8 @@ exit;
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 require_once "../phplib/pbcli.php";
 require_once "../phplib/pbperson.php";
-require_once '../../phplib/db.php';
-require_once '../../phplib/validate.php';
+require_once '../commonlib/phplib/db.php';
+require_once '../commonlib/phplib/validate.php';
 
 function add_person_to_pledge($pledge_id, $email, $name = null) {
     $new_person = person_get_or_create($email, $name);

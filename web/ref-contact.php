@@ -11,7 +11,7 @@ require_once "../phplib/pb.php";
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/abuse.php';
-require_once '../../phplib/utility.php';
+require_once '../commonlib/phplib/utility.php';
 
 page_check_ref(get_http_var('ref'));
 $p = new Pledge(get_http_var('ref'));

@@ -11,8 +11,8 @@
  */
 
 require_once('pbperson.php');
-require_once('../../phplib/utility.php');
-require_once('../../phplib/db.php');
+require_once('../commonlib/phplib/utility.php');
+require_once('../commonlib/phplib/db.php');
 
 /* comments_text_to_html TEXT
  * Convert TEXT to HTML. To start with we just turn line-feeds into <br>s and

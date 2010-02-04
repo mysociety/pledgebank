@@ -928,7 +928,7 @@ sub do_public_succeeding_pledge {
         }
     }
     $wth->browser_get($locale_url . "/$pledge_ref");
-    $wth->browser_check_contents('class="done">' . name_n(3));
+    $wth->browser_check_contents('value="pledge">' . name_n(3)); # there is a form round the new signer now, hence the value="pledge" bit, which is part of that form
     $wth->email_check_none_left();
     $wth->browser_follow_link(text_regex => qr/this isn't you/);
 

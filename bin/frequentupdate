@@ -176,7 +176,7 @@ function mark_byarea_pledges_successful() {
                 array($pledge['id'], $pledge['byarea_location_id']));
         db_query("
                 update pledges set changetime = '$pb_timestamp'
-                where pledge_id = ?", array($pledge['id']));
+                where id = ?", array($pledge['id']));
         
         /* Set up messages to go to creator and signers. */
         db_query("

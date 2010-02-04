@@ -200,8 +200,8 @@ sms_setup();
 
 # Syntax check all .php files
 date_print("Syntax check all PHP files...");
-$wth->php_check_syntax("../../pb/");
-$wth->php_check_syntax("../../pb/templates/emails/", qr//);
+$wth->php_check_syntax("../../pledgebank/");
+$wth->php_check_syntax("../../pledgebank/templates/emails/", qr//);
 
 # Setup error log watching
 $wth->log_watcher_setup($httpd_error_log);
@@ -1264,7 +1264,7 @@ sub do_chivvy_testing {
 #############################################################################
 
 sub sms_setup {
-    # Create table for outgoing SMS messages to be stored in (by pb/web/test-sms.cgi)
+    # Create table for outgoing SMS messages to be stored in (by pledgebank/web/test-sms.cgi)
     dbh()->do("create table testharness_sms (
       id serial not null primary key,
       mobile text not null,

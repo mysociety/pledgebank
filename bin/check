@@ -2,7 +2,7 @@
 #
 # check:
 # Checks database configuration and config files are up to date in the
-# present CVS working copy.
+# present git working copy.
 #
 # Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
 # Email: francis@mysociety.org; WWW: http://www.mysociety.org/
@@ -14,9 +14,9 @@ set -e
 
 # Check who and where we are, and include useful functions
 PB_BIN=`pwd`
-MYSOCIETY_BIN=$PB_BIN/../../bin
-SCRIPT_COMMAND=pb/bin/check
-. ../../shlib/deployfns
+MYSOCIETY_BIN=$PB_BIN/../commonlib/bin
+SCRIPT_COMMAND=bin/check
+. ../commonlib/shlib/deployfns
 check_who_where "" ""
 
 # User to load test schema

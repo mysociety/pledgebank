@@ -19,26 +19,26 @@ MAILTO=team@pledgebank.com
 ## machine now.
 !!(* if (!$staging || ($staging && $vhost eq 'matthew.pledgebank.com')) { *)!!
 # Frequently
-0-59/20 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/frequentupdate || echo "frequentupdate is still running after 20 minutes - this might just mean the previous run is taking a long time. Only worry if you get this email a few times in a row."
+0-59/20 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/frequentupdate.lock /data/vhost/!!(*= $vhost *)!!/pledgebank/bin/frequentupdate || echo "frequentupdate is still running after 20 minutes - this might just mean the previous run is taking a long time. Only worry if you get this email a few times in a row."
 
 # Once a day, early morning
-0 8 * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-comment-alerts || echo "send-comment-alerts has apparently been running for 24 hours. This is probably not true, please investigate."
+0 8 * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-comment-alerts.lock /data/vhost/!!(*= $vhost *)!!/pledgebank/bin/send-comment-alerts || echo "send-comment-alerts has apparently been running for 24 hours. This is probably not true, please investigate."
 !!(* } *)!!
 
 
 ## These scripts definitely aren't concurrent, and should only be run on one machine
 !!(* if (!$staging || ($staging && $vhost eq 'matthew.pledgebank.com')) { *)!!
 # Once an hour
-33 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/find-pledge-connections || echo "find-pledge-connections has been running for over an hour. Probably nothing to worry about." )
-#03 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/update-facebook-stuff.lock /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/update-facebook-stuff || echo "stalled?" )
+33 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/find-pledge-connections.lock /data/vhost/!!(*= $vhost *)!!/pledgebank/bin/find-pledge-connections || echo "find-pledge-connections has been running for over an hour. Probably nothing to worry about." )
+#03 * * * * !!(*= $user *)!! ( run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/update-facebook-stuff.lock /data/vhost/!!(*= $vhost *)!!/pledgebank/bin/update-facebook-stuff || echo "stalled?" )
 # Once a day, early morning
-0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/send-local-alerts
-0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/close-comments
+0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/pledgebank/bin/send-local-alerts
+0 7 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/pledgebank/bin/close-comments
 !!(* } *)!!
 
 
 ## These scripts run on all machines, as they write to filesystem
-32 3 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/mysociety/pb/bin/gaze-js-gen
+32 3 * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/pledgebank/bin/gaze-js-gen
 # Remove old unaccessed graphs/posters
 01 6 * * * !!(*= $user *)!! /usr/sbin/tmpreaper 28d /data/vhost/!!(*= $vhost *)!!/graphs
 01 6 * * * !!(*= $user *)!! /usr/sbin/tmpreaper 28d /data/vhost/!!(*= $vhost *)!!/posters

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w -I../perllib -I../../perllib
+#!/usr/bin/perl -w -I../perllib -I../commonlib/perllib
 #
 # fuzzyref.cgi:
 # Bogus pledge ref fuzzy match.

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w -I../perllib -I../../perllib
+#!/usr/bin/perl -w -I../perllib -I../commonlib/perllib
 #
 # c360smsin.cgi:
 # Process received SMS messages.

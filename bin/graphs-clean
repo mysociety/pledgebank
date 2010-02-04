@@ -15,7 +15,7 @@ require 5.8.0;
 
 use FindBin;
 use lib "$FindBin::Bin/../perllib";
-use lib "$FindBin::Bin/../../perllib";
+use lib "$FindBin::Bin/../commonlib/perllib";
 
 use File::Find qw(find);
 use File::stat;

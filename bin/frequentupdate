@@ -731,7 +731,7 @@ function send_pending_messages() {
             $data['byarea_success_sentence'] = sprintf(
                 ngettext('There is now %d place where your pledge has been successful.',
                     'There are now %d places where your pledge has been successful.',
-                    $data['byarea_success_count']), $data['byarea_success_count'
+                    $data['byarea_success_count']), $data['byarea_success_count']
             );
             $data['location_signers'] = db_getOne("select count(*) from
                 signers where pledge_id = ? and byarea_location_id = ?", 
@@ -903,7 +903,7 @@ function send_pending_messages() {
                 $data['byarea_success_sentence'] = sprintf(
                     ngettext('There is currently %d town where the pledge has been successful.',
                         'There are currently %d towns where the pledge has been successful.',
-                        $data['byarea_success_count']), $data['byarea_success_count'
+                        $data['byarea_success_count']), $data['byarea_success_count']
                 );
                 $data['location_signers'] = db_getOne("select count(*) from
                     signers where pledge_id = ? and byarea_location_id = ?", 

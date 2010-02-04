@@ -899,7 +899,7 @@ while fcgi.isFCGI():
             _ = lambda x: x
 	    _n = lambda x, y, n: n==1 and x or y
         else:
-            translator = gettext.translation(domain, '../../locale', [iso_lang + '.UTF-8'])
+            translator = gettext.translation(domain, '../locale', [iso_lang + '.UTF-8'])
             translator.install(unicode = 1)
             _ = translator.ugettext
 	    _n = translator.ungettext

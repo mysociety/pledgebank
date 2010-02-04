@@ -6,3 +6,4 @@ python-reportlab
 libdate-calc-perl
 libmath-round-perl
 libgeo-shapefile-perl
+libnet-netmask-perl

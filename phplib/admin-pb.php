@@ -59,7 +59,7 @@ class ADMIN_PAGE_PB_MAIN {
     function search_people() {
         $this->show_menu();
 
-        print '<p><form name="editperson" method="post" action="'.$this->self_link.'&people=1">';
+        print '<p><form name="editperson" method="post" action="'.$this->self_link.'&amp;people=1">';
         print 'Search: <input type="text" name="q" value="'.htmlspecialchars(get_http_var('q')).'" size="40">';
         print '<input type="hidden" name="person_search" value="1">';
         print '<input type="submit" name="search" value="Search"> (by substring of name, email and mobile)';
@@ -268,7 +268,7 @@ class ADMIN_PAGE_PB_MAIN {
         if (get_http_var('people')) {
             print _('People');
         } else {
-            print '<a href="'.$this->self_link.'&people=1">' . _('People') . '</a>';
+            print '<a href="'.$this->self_link.'&amp;people=1">' . _('People') . '</a>';
         }
         print '</p>';
     }

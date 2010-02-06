@@ -84,7 +84,7 @@ class ADMIN_PAGE_PB_MAIN {
         $a = 0;
         while ($r = db_fetch_array($q)) {
             $row = "";
-            $row .= '<td><a href="?page=pb&person=' . $r['id'] .'">' . htmlspecialchars($r['name']) . "</a></td>";
+            $row .= '<td><a href="?page=pb&amp;person=' . $r['id'] .'">' . htmlspecialchars($r['name']) . "</a></td>";
             $row .= '<td>'.htmlspecialchars($r['email']).'</td>';
             $row .= '<td>'.htmlspecialchars($r['signers']).'</td>';
             $row .= '<td>'.htmlspecialchars($r['pledges']).'</td>';
@@ -375,7 +375,7 @@ class ADMIN_PAGE_PB_MAIN {
         print "</h2>";
 
         print "<p>Set by: <b>" .
-              '<a href="?page=pb&person=' . $pdata['person_id'] .'">' . htmlspecialchars($pdata['name']) . "</a>" .
+              '<a href="?page=pb&amp;person=' . $pdata['person_id'] .'">' . htmlspecialchars($pdata['name']) . "</a>" .
             " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</b>";
         print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
         print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
@@ -518,7 +518,7 @@ class ADMIN_PAGE_PB_MAIN {
             $r = array_map('htmlspecialchars', $r);
             $e = array();
             if ($r['signname'])
-                array_push($e, '<a href="?page=pb&person=' . $r['signperson_id'] .'">' . $r['signname'] . "</a>");
+                array_push($e, '<a href="?page=pb&amp;person=' . $r['signperson_id'] .'">' . $r['signname'] . "</a>");
             if ($r['signemail'])
                 array_push($e, $r['signemail']);
             if ($r['signmobile'])

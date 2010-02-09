@@ -54,7 +54,7 @@ and install it.') ?>
 Save the following link to somewhere on your computer
 (normally by right-clicking on the link and selecting
 "Save Target As..." or "Save Link As..."):
-<a href="https://secure.mysociety.org/cvstrac/getfile/mysociety/locale/PledgeBank.po">Translation file</a>.
+<a href="http://github.com/mysociety/pledgebank/raw/master/locale/PledgeBank.po">Translation file</a>.
 (If you left click on the link, you can File-&gt;Save As... and then click Back to get back here.)') ?>
 
 <li><?=_('<strong>Opening the file:</strong>
@@ -101,7 +101,7 @@ in your translation (hopefully it won\'t :) ) :') ?>
 Save the following link to somewhere on your computer
 (normally by right-clicking on the link and selecting
 "Save Target As..." or "Save Link As..."):
-<a href="https://secure.mysociety.org/cvstrac/getfile/mysociety/locale/PledgeBank.po">Translation file</a>.
+<a href="http://github.com/mysociety/pledgebank/raw/master/locale/PledgeBank.po">Translation file</a>.
 (If you left click on the link, you can File-&gt;Save As... and then click Back to get back here.)') ?>
 
 <li><?=_('<strong>Opening the file:</strong>

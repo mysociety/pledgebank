@@ -556,7 +556,7 @@ function pbfacebook_render_frontpage($page = "", $searchparams) {
     }
 
     print '<p class="pb_visit">Want to see more? Visit the full <a href="'.OPTION_BASE_URL.'">PledgeBank site</a>!</p>';
-    print '<p class="pb_visit">PledgeBank is open source, get the <a href="https://secure.mysociety.org/cvstrac/dir?d=mysociety/pb">source code</a>.</p>';
+    print '<p class="pb_visit">PledgeBank is open source, get the <a href="http://github.com/mysociety/pledgebank">source code</a>.</p>';
 
     return;
 }

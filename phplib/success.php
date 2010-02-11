@@ -13,7 +13,6 @@ $success_titles = array(
     'undies' => _('Collect underwear for orphans'),
     'electionwatch07' => _('Gather people to monitor elections'),
     'First1000' => _('Get 1,000 people to move house'),
-    'LiveSimply' => _('Changing lifestyles'),
     'SaveTheSycamore' => _('Campaign to save a local tree'),
     'trees4kenya' => _('Raise money for charity'),
     'give3hugsaday' => _('Make people smile'),
@@ -150,40 +149,6 @@ src="http://www.pledgebank.com/pics/First1000.gif" width="100" height="90"></a><
 Free State Project was very active in recruiting signers, and as a result
 of the pledge, 1000 people will be moving to New Hampshire by the end of
 2008 in order to become activists for liberty!&rdquo;')),
-), array(
-'summary' => '
-<h3><a href="http://promise.livesimply.org.uk/">' . $success_titles['LiveSimply'] . ' &ndash; LiveSimply</a></h3>' .
-p('<a href="http://promise.livesimply.org.uk/"><img class="r" alt="' . _('LiveSimply logo') . '"
-src="http://promise.livesimply.org.uk/microsites/livesimply/promise_banner_right.jpg"></a>') .
-p(_('&ldquo;&hellip;having a website where you can get that colourful data
-of people&rsquo;s thoughts, experience and opinions can provide us with
-some insight in how people are changing their lives.')) .
-p(_('&ldquo;The features PledgeBank has were suitable for our needs - we
-wanted to create a community of people who make promises so that they can
-support each other.&rdquo;')),
-'entry' => '
-<h3><a name="LiveSimply" href="http://promise.livesimply.org.uk/">' . $success_titles['LiveSimply'] . ' &ndash; LiveSimply</a></h3>
-' .
-p(_('&ldquo;One of the main objectives for using the website was evaluation
-of the livesimply initiative. The initiative is calling people to change
-their lifestyle, which is a qualitative objective (i.e it&rsquo;s hard to
-measure it with numbers). So having a website where you can get that
-colourful data of people&rsquo;s thoughts, experience and opinions can
-provide us with some insight in how people are changing their lives.')) .
-p('<a href="http://promise.livesimply.org.uk/"><img class="r" alt="' . _('LiveSimply logo') . '"
-src="http://promise.livesimply.org.uk/microsites/livesimply/promise_banner_right.jpg"></a>'
-. _('&ldquo;The features PledgeBank has were suitable for our needs - we
-wanted to create a community of people who make promises so that they can
-support each other. We could just go for a simpler system where people
-could only make a promise. But we wanted to make sure that they feel that
-there is a bit more to it. So the fact that PledgeBank requires you to make
-a promise with someone - hence you need to promote it - and the fact that
-it has the system for nudging people about their promise (reminding them
-about deadlines, the number of sign-ups etc) is what made PledgeBank a very
-appropriate tool for us.')) .
-p(_('&ldquo;Also, we wanted to use the system that was tested and which we
-wouldn&rsquo;t have to customize too much. mySociety was my choice because
-I like the ethical background of the organisation.&rdquo;')),
 ), array(
 'summary' => '
 <h3><a href="/SaveTheSycamore">' . $success_titles['SaveTheSycamore'] . ' &ndash; SaveTheSycamore</a></h3>

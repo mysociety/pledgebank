@@ -6619,7 +6619,7 @@ msgid ""
 "Save the following link to somewhere on your computer\n"
 "(normally by right-clicking on the link and selecting\n"
 "\"Save Target As...\" or \"Save Link As...\"):\n"
-"<a href=\"https://secure.mysociety.org/cvstrac/getfile/mysociety/locale/PledgeBank.po\">Translation file</a>.\n"
+"<a href=\"http://github.com/mysociety/pledgebank/raw/master/locale/PledgeBank.po\">Translation file</a>.\n"
 "(If you left click on the link, you can File-&gt;Save As... and then click Back to get back here.)"
 msgstr ""
 

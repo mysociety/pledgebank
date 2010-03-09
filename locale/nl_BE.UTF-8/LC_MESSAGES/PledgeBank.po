@@ -3635,11 +3635,11 @@ msgstr "Waar is de \"brontekst\" van PledgeBank?"
 msgid ""
 "The software behind PledgeBank is open source, and available to you\n"
 "    mainly under the GNU Affero GPL software license. You can <a\n"
-"    href=\"https://secure.mysociety.org/cvstrac/dir?d=mysociety\">download the source\n"
+"    href=\"http://github.com/mysociety/pledgebank\">download the source\n"
 "    code</a> (look under 'pb') and help us develop it. You're welcome to use it\n"
 "    in your own projects, although you must also make available the source code to\n"
 "    any such projects."
-msgstr "De programmatie achter PledgeBank is vrij en werd uitgegeven vooral door de GPL-vergunning van Affero. U kan<a href=\"https://secure.mysociety.org/cvstrac/dir?d=mysociety\"> de broncode ophalen </a> (zoek onder 'pb') en ons helpen ze verder te ontwikkelen. Het staat u helemaal vrij ze te gebruiken in uw eigen projecten, maar u moet altijd de broncode van die projecten ter beschikking stellen.\n"
+msgstr "De programmatie achter PledgeBank is vrij en werd uitgegeven vooral door de GPL-vergunning van Affero. U kan<a href=\"http://github.com/mysociety/pledgebank\"> de broncode ophalen </a> (zoek onder 'pb') en ons helpen ze verder te ontwikkelen. Het staat u helemaal vrij ze te gebruiken in uw eigen projecten, maar u moet altijd de broncode van die projecten ter beschikking stellen.\n"
 
 #: pb/web/faq.php:136
 msgid "People build things, not organisations. Who <em>actually</em> built it?"

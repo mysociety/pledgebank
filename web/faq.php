@@ -128,8 +128,8 @@ function default_faq() {
 
     print dd(_('The software behind PledgeBank is open source, and available to you
     mainly under the GNU Affero GPL software license. You can <a
-    href="https://secure.mysociety.org/cvstrac/dir?d=mysociety">download the source
-    code</a> (look under \'pb\') and help us develop it. You\'re welcome to use it
+    href="http://github.com/mysociety/pledgebank">download the source
+    code</a> and help us develop it. You\'re welcome to use it
     in your own projects, although you must also make available the source code to
     any such projects.'));
 

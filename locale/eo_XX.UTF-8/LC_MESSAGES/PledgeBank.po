@@ -2,7 +2,7 @@
 # Copyright (C) 2005 UK Citizens Online Democracy
 # This file is distributed under the same license as the main PledgeBank code.
 # Matthew Somerville <matthew@mysociety.org>, 2005-08-13.
-# ĉĝĵŝŭ
+# ĉĝĵŝŭ testy stuff
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"

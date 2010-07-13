@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TF\n"
 "Report-Msgid-Bugs-To: matthew@mysociety.org\n"
 "POT-Creation-Date: 2009-08-08 21:51+0100\n"
-"PO-Revision-Date: 2010-02-24 17:07+0200\n"
+"PO-Revision-Date: 2010-03-18 13:56+0200\n"
 "PO-Revision-Date: 2009-11-27 11:11+0200\n"
 "PO-Revision-Date: 2009-11-26 17:02+0200\n"
 "Last-Translator: juriskarkls@inbox.com <juriskarkls@inbox.com>\n"
@@ -2168,7 +2168,7 @@ msgstr ""
 
 #: pb/phplib/page.php:240
 msgid "Note: On this test site, the date is faked to be"
-msgstr ""
+msgstr "Piezīme: Šajā testa lapā datums nav īsts lai"
 
 #: pb/phplib/page.php:283
 msgid "Navigation"
@@ -3137,6 +3137,14 @@ msgid ""
 "joined.  This was apparently enough to get it shown to the public, and from\n"
 "there people kept signing.&rdquo;\n"
 msgstr ""
+"&ldquo;Es sāku ar diezgan vienkāršu apņemšanos, lai lielākā \n"
+"lietotāju daļa varētu uz to pieteikties un lai es tādā veidā vienkārši \n"
+"redzētu, kas notiek.&hellip; Tāpat mani ieintriģēja daudzskaitlīguma\n"
+"spēks un tas kā tas varētu tikt izmantots kaut kam ar nozīmīgākiem\n"
+"un konkrētākiem rezultātiem&hellip; Es to nosūtīju kādiem 5 vai 6\n"
+"draugiem/radiniekiem.; un dažu stundu laikā 2 vao 3 bija pieteikušies.\n"
+"Acīmredzot ar to bija pietiekami, lai apņemšanās tiktu publiskota, un\n"
+"no tā brīža cilvēki turpināja pieteikties;\n"
 
 #: pb/phplib/success.php:241
 msgid ""
@@ -3862,14 +3870,14 @@ msgstr "Kur ir PledgeBank \"izejas kods\"?"
 msgid ""
 "The software behind PledgeBank is open source, and available to you\n"
 "    mainly under the GNU Affero GPL software license. You can <a\n"
-"    href=\"http://github.com/mysociety/pledgebank\">download the source\n"
+"    href=\"https://secure.mysociety.org/cvstrac/dir?d=mysociety\">download the source\n"
 "    code</a> (look under 'pb') and help us develop it. You're welcome to use it\n"
 "    in your own projects, although you must also make available the source code to\n"
 "    any such projects."
 msgstr ""
 "PledgeBank programmatūra ir atvērtā koda tipa un pieejama Tev\n"
 "    galvenokārt ar GNU Affero GPL licensi. Tu vari \n"
-"   <ahref=\"http://github.com/mysociety/pledgebank\">lejuplādēt izdejas kodu\n"
+"   <ahref=\"https://secure.mysociety.org/cvstrac/dir?d=mysociety\">lejuplādēt izdejas kodu\n"
 " (meklē zem 'pb') un palīdzēt mums\n"
 "    attīstīt to tālāk. Esi laipni aicināts izmantot to savos projektos, \n"
 "    tomēr Tev arī ir jāpadara šis izejas kods brīvi pieejams jebkādam\n"
@@ -6602,7 +6610,7 @@ msgstr ""
 
 #: pb/web/translate.php:44
 msgid "Using poEdit"
-msgstr ""
+msgstr "Lietojot poEdit"
 
 #: pb/web/translate.php:48
 msgid ""
@@ -6611,6 +6619,10 @@ msgid ""
 "(if running Windows, just get the simple installer version)\n"
 "and install it."
 msgstr ""
+"<strong>PoEdit uzstādīšana:</strong>\n"
+"Lējuplādē PoEdit no <a href=\"http://www.poedit.net/\">PoEdit mājaslapas</a>\n"
+"(priekš Windows vienkārši izvēlies instalāciju)\n"
+"un uzstādi to."
 
 #: pb/web/translate.php:53
 #: pb/web/translate.php:100
@@ -6619,9 +6631,15 @@ msgid ""
 "Save the following link to somewhere on your computer\n"
 "(normally by right-clicking on the link and selecting\n"
 "\"Save Target As...\" or \"Save Link As...\"):\n"
-"<a href=\"http://github.com/mysociety/pledgebank/raw/master/locale/PledgeBank.po\">Translation file</a>.\n"
+"<a href=\"https://secure.mysociety.org/cvstrac/getfile/mysociety/locale/PledgeBank.po\">Translation file</a>.\n"
 "(If you left click on the link, you can File-&gt;Save As... and then click Back to get back here.)"
 msgstr ""
+"<strong>Oriģinālfaila iegūšana:</strong>\n"
+"Saglabā to savā datorā no šīs saites\n"
+"(parasti vienkārši pietiek ar peles labā poga klikšķi uz saites un izvēlies\n"
+"\"Save Target As...\" vai \"Save Link As...\"):\n"
+"<a href=\"https://secure.mysociety.org/cvstrac/getfile/mysociety/locale/PledgeBank.po\">Tūlkojuma fails</a>.\n"
+"(Ja Tu izmanto kreiso peles taustiņu uz linka, tad vari veikt File-&gt;Save As... un tad spied Back, lai nokļūtu atpakaļ šeit.)"
 
 #: pb/web/translate.php:60
 msgid ""
@@ -6632,6 +6650,12 @@ msgid ""
 "us what you have done &ndash; the site will simply default\n"
 "to English for anything yet to be translated."
 msgstr ""
+"<strong>Faila atvēršana:</strong>\n"
+"Atver poEdit (Start-&gt;Programs-&gt;poEdit-&gt;poEdit). Ja šī ir pirmā reizi, kad palaid šo programmu, tad tā prasīs ievadīt Tavu vārdu un e-pasta adresi, lai izmantotu tos tulkojuma failā. Pēc tam ej uz File-&gt;Open un atver failu, kuru tikko lejuplādēji.\n"
+"<em>Nesatraucies par tulkojamo rindu skaitu!</em>\n"
+"Tev nav jāpārtulko katra rinda pirms faila nosūtīšanas mums\n"
+"&ndash; lapa vienkārši rādīs angļu valodu pēc noklusējuma \n"
+"visur, kur vēl nav tūlkojuma."
 
 #: pb/web/translate.php:67
 msgid ""
@@ -6640,6 +6664,10 @@ msgid ""
 "poEdit will also tell you if a sentence has a plural (ie. needs a different translation depending on the number of things being printed out). This should be straightforward.\n"
 "File-&gt;Save or the Save button will save your translations to the same file."
 msgstr ""
+"<strong>Tulkošanas pamati:</strong>\n"
+"Augšējā rāmī izvēlies rindu, kuru vēlies tūlkot, un apakšējā rāmī ievadi tulkojumu. poEdit atcerās kuras rindas vēl nav iztulkotas un kuri ir \"netīri\" tulkojumi (automātiskie tulkojumi, kas var būt kļūdaini un kuri ir jāpārbauda).\n"
+"Tāpat poEdit pats Tev pateiks, ja teikumam ir daudzskaitlis (piemēram ir vajadzīgs savādāks tulkojums atkarībā no lapu skaita, kas tiek izdrukātas. Tiktāl vajadzētu būt skaidrs. \n"
+"File-&gt;Save vai Save button saglabās Tavus tulkojumus tajā pašā failā."
 
 #: pb/web/translate.php:72
 msgid ""
@@ -6650,6 +6678,12 @@ msgid ""
 "means a number, %s means some more text. For example, a sentence to\n"
 "give the colour of a cat and its size, in Spanish:"
 msgstr ""
+"<strong>% - vietu norādītāji:</strong>\n"
+"Diemžēl, šie ir mazliet sarežģītāki.\n"
+"Vispirms ir  %&nbsp;vietu norādītāji.\n"
+"Tie parādās tekstā un apzīmē kaut ko, kas trūkst &ndash; %d\n"
+"apzīmē ciparus, %s apzīmē kādu tekstu. Piemēram, teikums, lai \n"
+"aprakstītu kaķa krāsu un tā lielumu Spāniski:"
 
 #: pb/web/translate.php:82
 #: pb/web/translate.php:161
@@ -6660,11 +6694,16 @@ msgid ""
 "placeholder goes where. Here's an example, but ask if this comes up\n"
 "in your translation (hopefully it won't :) ) :"
 msgstr ""
+"Krāsas tiks tulkotas atsevišķi - citur šajā failā.\n"
+"Ja rodas situācija, kad Tev jāatsaucās uz % vietu apzīmējumiem\n"
+"citā secībā nekā tas ir angļu valodā, tad Tev jānorāda kurš vietu\n"
+"apzīmējums kur iederas. Šeit būs piemērs, bet jautā, ja šāda situācija\n"
+"rodas tulkošanas procesā (cerams neradīsies :) ):"
 
 #: pb/web/translate.php:92
 #: pb/web/translate.php:180
 msgid "Email me with as much or as little as you have done, and I will get it up and running as soon as possible. :-)"
-msgstr "Sūti ar e-pastu tiklīdz esi kaut vai kādu daļu pārtūlkojis un es to cik ātri vien iespējams pieslēgšu. :)"
+msgstr "Sūti ar e-pastu tiklīdz esi kaut vai kādu daļu pārtulkojis un es to cik ātri vien iespējams pieslēgšu. :)"
 
 #: pb/web/translate.php:96
 msgid "Manually"
@@ -6679,6 +6718,12 @@ msgid ""
 "us what you have done &ndash; the site will simply default\n"
 "to English for anything yet to be translated."
 msgstr ""
+"<strong>Faila atvēršana:</strong>\n"
+"Atver Notepad (Start-&gt;Programs-&gt;Accessories-&gt;Notepad), ej uz File-&gt;Open un atver failu, kuru tikko lejuplādēji.\n"
+"<em>Nesatraucies par šī faila izmēru!</em>\n"
+"Tev nav jāpārtulko katra rinda pirms faila nosūtīšanas mums\n"
+"&ndash; lapa vienkārši rādīs angļu valodu pēc noklusējuma \n"
+"visur, kur vēl nav tulkojuma."
 
 #: pb/web/translate.php:114
 msgid ""
@@ -6688,6 +6733,11 @@ msgid ""
 "the Last-Translator line to be your name and email address, \n"
 "and the Language-Team line to your language."
 msgstr ""
+"<strong>Faila versijas informācijas maiņa:</strong>\n"
+"Labo sekojošas rindas &ndash; PO-Revision-Date rindā\n"
+"norādi tekošo datumu un laiku, Last-Translator \n"
+"(Pēdējais tulkotājs) rindā norādi savu vārdu un e-pasta \n"
+"adresi, kā arī norādi Language Team rindas informāciju."
 
 #: pb/web/translate.php:120
 msgid ""
@@ -6698,6 +6748,11 @@ msgid ""
 "The line following that (beginning \"<kbd>msgstr</kbd>\") should contain the translation,\n"
 "within the double quotes (\")."
 msgstr ""
+"<strong>Tulkošanas pamati:</strong>\n"
+"Rindas, kas sākas ar <kbd>#</kbd> ir komentāri un tos var droši ignorēt.\n"
+"Normāliem teikumiem, tulkošana notiek sekojošā veidā. Rindas, kas sākas\n"
+"ar \"<kbd>msgid</kbd>\" ir teksts Angļu valodā, kas ir jātulko.\n"
+"Rindām, kas seko (sākas ar \"<kbd>msgstr</kbd>\") jāsatur tulkojums dubūltpēdiņās (\")"
 
 #: pb/web/translate.php:126
 msgid "For example, in French:"
@@ -6705,7 +6760,7 @@ msgstr "Piemēram, Franciski:"
 
 #: pb/web/translate.php:129
 msgid "If the translated line needs to include a double quote, you put a slash before it. For example, in German:"
-msgstr ""
+msgstr "Ja pārtulkotajai rindai nepieciešamas dubūltpēdiņas, liec slash pirms tām. Piemēram vāciski:"
 
 #: pb/web/translate.php:132
 msgid ""
@@ -6714,6 +6769,10 @@ msgid ""
 "\" is used to mean a new\n"
 "line. For example, in Italian:"
 msgstr ""
+"Jā ir jāpārtulko liels teksta bloks, tad būs vairāk par vienu rindu. Lai to norādītu, pirmā rinda ir\n"
+"tukša \"\", oriģinālais vai pārtulkotais teksts ir nākamajās rindās; \"\\n"
+"\" tiek lietots, lai norādītu jaunu\n"
+"rindu. Piemēram Itāliski:"
 
 #: pb/web/translate.php:145
 msgid ""
@@ -6723,6 +6782,11 @@ msgid ""
 "\":# pb/web/faq.php\" is from the FAQ page. This might be useful in\n"
 "providing context for the text."
 msgstr ""
+"<strong>Faila nosaukumu komentāri:</strong>\n"
+"Komentāru rinda pirms \"msgid\" rindas ir fails vai faili, kuros\n"
+"ir šis konkrētais teksts. Tātad viss, kam šajā komentāru rindā ir\n"
+"\":# pb/web/faq.php\" ir no BUJ lapas. Šis var būt noderīgi, jo\n"
+"nodrošina kontekstu tulkojamajam tekstam."
 
 #: pb/web/translate.php:151
 msgid ""
@@ -6733,6 +6797,12 @@ msgid ""
 "means a number, %s means some more text. For example, a sentence to\n"
 "give the colour of a cat and its size, in Spanish:"
 msgstr ""
+"<strong>% vietu apzīmējumi:</strong>\n"
+"Diemžēl, ir dažas lietas, kas padara visu mazliet sarežģītāku.\n"
+"Pirmkārt ir %&nbsp;vietu apzīmējumi.\n"
+"Tie atrodas tekstā un nozīmē, ka kaut kas trūkst &ndash; %d\n"
+"nozīmē ciparus, %s nozīmē tekstu. Piemēram, teikumā, lai \n"
+"aprakstītu kaķa krāsu un izmērus Spāniski:"
 
 #: pb/web/translate.php:171
 msgid ""
@@ -6746,7 +6816,7 @@ msgstr ""
 
 #: pb/web/translate.php:178
 msgid "Some languages have three plurals &ndash; simply add a msgstr[2] line for the third, and I can sort out making sure it uses the right one."
-msgstr ""
+msgstr "Dažās valodās ir trīs daudzskaitļu formas &ndash; vienkārši pievieno msgstr[2] rindu trešajai daudzskaitļa formai, un es varēšu tos atfiltrēt un pārliecināties, ka tiek lietots īstais. "
 
 #: pb/web/translate.php:184
 msgid "Matthew Somerville<br>13<sup>th</sup> November 2005"

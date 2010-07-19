@@ -31,10 +31,10 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          '365act' => '365 Ways',
                          'glastonbury' => 'Glastonbury',
                          'interface' => 'Interface',
-                         'global-cool' => 'Global Cool',
+                         #'global-cool' => 'Global Cool', # no longer used, can remove all its code at some point
                          'catcomm' => 'CatComm',
-                         'livesimply' => '<em>live</em>simply:promise',
-                         'o2' => 'O2',
+                         #'livesimply' => '<em>live</em>simply:promise', # no longer used, can remove all its code at some point
+                         #'o2' => 'O2', # no longer used, can remove all its code at some point
 );
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
@@ -42,11 +42,13 @@ if (OPTION_PB_STAGING) {
     # Francis's local test domains
     $microsites_from_extra_domains = array('pledge.global-cool' => 'global-cool',
                                            #'matthew.pledgebank.com' => 'livesimply', 
-                                           'promise.livesimply' => 'livesimply'); 
+                                           'promise.livesimply' => 'livesimply'
+    ); 
 } else {
     # If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
     $microsites_from_extra_domains = array('pledge.global-cool.com' => 'global-cool',
-                                           'promise.livesimply.org.uk' => 'livesimply');
+                                           'promise.livesimply.org.uk' => 'livesimply'
+    );
 }
 $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 

@@ -98,12 +98,13 @@ function microsites_user_tracking() {
     if ($microsite == 'everywhere' || $microsite == 'london')
         return true;
 
-    if ($microsite == 'livesimply') {
-        return <<<EOF
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
-<script type="text/javascript"> _uacct = "UA-1849208-2"; urchinTracker(); </script>
-EOF;
-    }
+#    if ($microsite == 'livesimply') {
+# Disabled, but left as example for future use:
+#        return <<<EOF
+#<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+#<script type="text/javascript"> _uacct = "UA-1849208-2"; urchinTracker(); </script>
+#EOF;
+#    }
 
     /* Don't do any cross site tracking on other sites, to avoid breaking
      * any privacy policies of organisations using the microsites. */

@@ -337,8 +337,7 @@ function page_footer($params = array()) {
     /* User tracking */
     if ($track = microsites_user_tracking()) {
         if (is_bool($track)) {
-            // Temporarily use google analytics
-            // Hopefully permanently use piwik :)
+            // Use piwik :)
             if (true) {
 ?>
 
@@ -354,12 +353,6 @@ piwikTracker.enableLinkTracking();
 } catch( err ) {}
 </script><noscript><p><img src="http://piwik.mysociety.org/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
 <!-- End Piwik Tag --> 
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2712333-1";
-urchinTracker();
-</script>
 <?
             } else {
                 // Our own tracking - mostly broken

@@ -26,7 +26,7 @@ require_once '../phplib/pb.php';
 require_once '../phplib/fns.php';
 require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
-require_once '../phplib/share.php';
+#require_once '../phplib/share.php';
 require_once '../commonlib/phplib/utility.php';
 
 $ref = get_http_var('ref');
@@ -71,10 +71,10 @@ function draw_spreadword($p) { ?>
     }
     print '<ul>';
     if (!$p->pin()) {
-        echo '<li><a href="/', $p->ref(), '/share" onclick="share(this); return false;" title="',
-            _('E-mail this, post to del.icio.us, etc.'), '" class="share_link" rel="nofollow">',
-            _('Share this'), '</a>';
-        pb_share_form($p);
+        echo '<li>
+        <a href="http://twitter.com/share" class="twitter-share-button" data-url="' . $p->url_typein() . '" data-count="none">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+        <a name="fb_share" type="button" share_url="' . $p->url_typein() . '" href="http://www.facebook.com/sharer.php">Share</a><script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
+        ';
     } else {
         print '<li>';
         print_link_with_pin($p->url_email(), "", _("Email your friends"));
@@ -420,7 +420,7 @@ $params = array(
     'noreflink' => 1,
     'last-modified' => $p->last_change_time(),
     'etag' => $etag,
-    'css' => '/jslib/share/share.css',
+    #'css' => '/jslib/share/share.css',
 );
 if (microsites_comments_allowed() && !$p->pin())
     $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());

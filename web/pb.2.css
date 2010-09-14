@@ -974,3 +974,7 @@ ul#promote li {
     margin: 1em 0;
 }
 
+.fb_share {
+    position: relative;
+    top: -6px;
+}

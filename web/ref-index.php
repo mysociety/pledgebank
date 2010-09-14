@@ -73,7 +73,7 @@ function draw_spreadword($p) { ?>
     if (!$p->pin()) {
         echo '<li>
         <a href="http://twitter.com/share" class="twitter-share-button" data-url="' . $p->url_typein() . '" data-count="none">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
-        <a name="fb_share" type="button" share_url="' . $p->url_typein() . '" href="http://www.facebook.com/sharer.php">Share</a><script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
+        <a class="fb_share" name="fb_share" type="button" share_url="' . $p->url_typein() . '" href="http://www.facebook.com/sharer.php">Share</a><script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
         ';
     } else {
         print '<li>';

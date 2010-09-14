@@ -29,7 +29,7 @@ $fromemail = trim(get_http_var('fromat'));
 $frommessage = get_http_var('frommessage', true);
 $errors = array();
 
-if (get_http_var('submit')) {
+if (0 && get_http_var('submit')) {
     $emails = array();
     if (preg_match('#[;, ]#', get_http_var('e1'))) {
         $email = preg_split('#[;,\s]+#', get_http_var('e1'), -1, PREG_SPLIT_NO_EMPTY);

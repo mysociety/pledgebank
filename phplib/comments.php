@@ -76,7 +76,7 @@ function comments_show_one($comment, $noabuse = false, $admin = false) {
     }
 
     if (isset($comment['id']) && !$noabuse)
-        print ' <a href="/contact?pledge_id=' . $comment['pledge_id'] . '&amp;comment_id=' . $comment['id'] . '">' . _('Abusive? Report it!') . '</a>';
+        print ' <a rel="nofollow" href="/contact?pledge_id=' . $comment['pledge_id'] . '&amp;comment_id=' . $comment['id'] . '">' . _('Abusive? Report it!') . '</a>';
     if (isset($comment['id']) && $admin) {
         print '<select name="deletecomment_status">';
         print '<option value="0"' . ($comment['ishidden'] == 'f'?' selected':'') . '>Visible</option>';

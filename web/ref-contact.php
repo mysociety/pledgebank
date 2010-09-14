@@ -18,6 +18,11 @@ $p = new Pledge(get_http_var('ref'));
 microsites_redirect($p);
 deal_with_pin($p->url_email(), $p->ref(), $p->pin());
 
+if ($p->closed_for_comments()) {
+    header("Location: /" . $p->ref());
+    exit;
+}
+
 $title = _("Contact the pledge creator");
 page_header($title, array('ref'=>$p->ref(),'pref' => $p->url_typein() ));
 

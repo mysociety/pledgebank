@@ -125,6 +125,12 @@ if ($lang && array_key_exists($lang, $language_domains)
     exit;
 }
 
+if ($domain_lang && !array_key_exists($domain_lang, $langs)) {
+    $url = pb_domain_url(array('lang' => ''));
+    header('Location: ' . $url);
+    exit;
+}
+
 # Do includes after language negotiation, so translated globals
 # are translated in them
 require_once 'microsites.php';

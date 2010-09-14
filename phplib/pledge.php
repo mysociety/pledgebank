@@ -476,8 +476,8 @@ class Pledge {
 <?      if (!$this->byarea()) { ?>
 <p style="text-align: right">&mdash; <?=$this->h_name_and_identity() ?> 
 
-<?          if (array_key_exists('showcontact', $params) && $params['showcontact']) { ?>
-(<a href="<?=$this->url_contact_creator()?>"><?=_("contact")?></a>)
+<?          if (array_key_exists('showcontact', $params) && $params['showcontact'] && !$this->closed_for_comments()) { ?>
+(<a rel="nofollow" href="<?=$this->url_contact_creator()?>"><?=_("contact")?></a>)
 <?          }       ?>
 </p>
 <?      }

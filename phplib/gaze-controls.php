@@ -447,7 +447,6 @@ function lookup_zipcode($zip) {
     $url = 'http://maps.google.com/maps/geo?key=' . $key . '&q=' . $zip . ',+US';
     #$url = 'http://ws.geonames.org/postalCodeSearch?country=US&postalcode=' . $search;
     $f = @file_get_contents($url);
-    print $f;
     #if (preg_match('#<lat>(.*?)</lat>\s*<lng>(.*?)</lng>#', $f, $m)) {
     if (preg_match('#"coordinates": *\[(.*?), *(.*?),#', $f, $m)) {
         #$lat = $m[1]; $lon = $m[2];

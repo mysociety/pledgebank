@@ -31,7 +31,7 @@ function li($s) { return "<li>$s</li>\n"; }
 if (OPTION_WEB_DOMAIN == 'pledgebank.com' && OPTION_WEB_HOST == 'www') {
     $language_domains = array(
         'eo' => 'promesobanko.com',
-        'fr' => 'promessotheque.com',
+        # 'fr' => 'promessotheque.com', # we lost the domain, for now :(
         'sk' => 'slubowebka.com',
     );
 } elseif (OPTION_WEB_DOMAIN == 'pledgebank.cat') {

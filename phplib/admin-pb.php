@@ -191,7 +191,7 @@ class ADMIN_PAGE_PB_MAIN {
             $row .= '<td>';
             if ($r['microsite']) {
                 global $microsites_list;
-                $row .= $microsites_list[$r['microsite']] . '<br>';
+                $row .= $r['microsite'] . '<br>';
             }
             if ($r['country']) {
                 global $countries_code_to_name;

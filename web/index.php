@@ -28,7 +28,7 @@ page_header(null,
             _('Comments on All Pledges PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/comments'))
         ), 
         'id' => 'front',
-        'cache-max-age' => 600,
+        #'cache-max-age' => 600,
         'banner' => $microsite ? '' : '<p id="banner"><img src="/i/' . $banner_src . '" alt="' . _('How PledgeBank works: PledgeBank is a free site to help people get things done - especially things that require several people. It is very simple - you make a pledge, set a target, find people to agree and sign the pledge, and succeed!') . '"></p>',
     )
 );

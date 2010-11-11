@@ -28,7 +28,6 @@
 /* Codes of microsites, and name displayed next to PledgeBank logo */
 $microsites_list = array('everywhere' => _('Everywhere'),
                          'london' => 'London',
-                         'glastonbury' => 'Glastonbury',
                          'interface' => 'Interface',
                          #'global-cool' => 'Global Cool', # no longer used, can remove all its code at some point
                          'catcomm' => 'CatComm',
@@ -278,7 +277,6 @@ function microsites_css_files() {
     // Microsite PledgeBank style sheet
     if ($microsite && in_array($microsite, array(
                 'interface', 
-                'glastonbury', 
                 'london', 
                 'global-cool',
                 'catcomm',

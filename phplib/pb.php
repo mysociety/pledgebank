@@ -191,7 +191,7 @@ if (array_key_exists(strtolower($_SERVER['HTTP_HOST']), $microsites_from_extra_d
 
 # If we had something other than the default, a microsite, or a country in the domain, redirect!
 if ($domain_country != 'WWW' && !$microsite && !$site_country) {
-    $url = pb_domain_url();
+    $url = pb_domain_url(array());
     header('Location: ' . $url);
     exit;
 }

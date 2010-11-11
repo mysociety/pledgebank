@@ -93,7 +93,7 @@ if (OPTION_WEB_HOST == 'www') {
     elseif (preg_match('#^([^.]+)\.(?:..(?:-..)?\.)?'.OPTION_WEB_HOST.'\.#', strtolower($_SERVER['HTTP_HOST']), $m))
         $domain_country = strtoupper($m[1]);
     else
-        $domain_country = OPTION_WEB_HOST; # e.g. for interface.pledgebank.com
+        $domain_country = strtoupper(OPTION_WEB_HOST); # e.g. for interface.pledgebank.com
 }
 
 # Check for promesobanko.com etc.
@@ -188,6 +188,14 @@ if (array_key_exists(strtolower($_SERVER['HTTP_HOST']), $microsites_from_extra_d
 } elseif (array_key_exists(strtolower($domain_country), $microsites_list)) {
     $microsite = strtolower($domain_country);
 }
+
+# If we had something other than the default, a microsite, or a country in the domain, redirect!
+if ($domain_country != 'WWW' && !$microsite && !$site_country) {
+    $url = pb_domain_url();
+    header('Location: ' . $url);
+    exit;
+}
+
 if (!$site_country) {
     $site_country = isset($_COOKIE['country']) ? $_COOKIE['country'] : null;
     if (!array_key_exists($site_country, $countries_code_to_name))

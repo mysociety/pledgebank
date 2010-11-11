@@ -28,6 +28,3 @@ locale_change();
 locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
 
 $microsite = null;
-if (OPTION_WEB_HOST == 'promise') { # XXX: Can't use microsites() as not running "on" a site
-    $microsite = 'livesimply';
-}

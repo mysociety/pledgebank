@@ -61,7 +61,7 @@ microsites_from_extra_domains = {}
 # Return True if posters for that microsite look different from default posters
 # This is used to work out what to name the cache files.
 def microsites_poster_different_look(microsite):
-    return microsite in ('london', 'livesimply')
+    return microsite in ('london')
 def microsites_has_target():
     return True
 def microsites_has_sms():
@@ -71,24 +71,18 @@ def microsites_has_sms():
 def microsites_poster_box_fill_colour():
     if microsite == 'london':
         return (0.93, 0.2, 0.22)
-    elif microsite == 'livesimply':
-        return (0.00, 0.67, 0.71)
     else:
         return (0.6, 0.45, 0.7)
 # Colour for key words and numbers in text
 def microsites_poster_html_highlight_colour():
     if microsite == 'london':
         return '#31659c'
-    elif microsite == 'livesimply':
-        return '#00aab5'
     else:
         return '#522994'
 # Colour on RTF posters
 def microsites_poster_rtf_colour():
     if microsite == 'london':
         return PyRTF.Colour('pb', 49, 101, 156) # 31659c
-    elif microsite == 'livesimply':
-        return PyRTF.Colour('pb', 0, 170, 181) # 00aab5
     else:
         return PyRTF.Colour('pb', 82, 41, 148) # 522994
 # Draw the logo at the bottom - x1 and y1
@@ -97,49 +91,32 @@ def microsites_poster_logo(c, x1, y1, w, h_purple, p_footer):
     c.setFillColorRGB(*microsites_poster_box_fill_colour())
     c.rect(x1, y1, w, h_purple, fill=1, stroke=0)
 
-    if microsite == "livesimply":
-        # Logo for Live Simply promise
-        # ... left hand text part
-        livesimply_banner_l_w = 672 * (h_purple / 120)
-        c.drawInlineImage("microsites/livesimply/promise_banner_left.jpg", x1, y1, width=livesimply_banner_l_w,height=h_purple)
-        # ... right hand fish part, if it fits
-        livesimply_banner_r_w = 268 * (h_purple / 120)
-        if w - livesimply_banner_r_w > livesimply_banner_l_w:
-            c.drawInlineImage("microsites/livesimply/promise_banner_right.jpg", x1 + w - livesimply_banner_r_w, y1, width=livesimply_banner_r_w,height=h_purple)
-    else:
-        # Logo for main PledgeBank
-        story = [
-            Paragraph(_('<font color="#ffffff">Pledge</font>Bank.com').encode('utf-8'), p_footer)
-        ]
-        f = Frame(x1, y1+0.1*h_purple, w, h_purple, showBoundary = 0, id='Footer',
-                topPadding = 0, bottomPadding = 0)
-        f.addFromList(story, c)
+    # Logo for main PledgeBank
+    story = [
+        Paragraph(_('<font color="#ffffff">Pledge</font>Bank.com').encode('utf-8'), p_footer)
+    ]
+    f = Frame(x1, y1+0.1*h_purple, w, h_purple, showBoundary = 0, id='Footer',
+            topPadding = 0, bottomPadding = 0)
+    f.addFromList(story, c)
+
 # Draw the background image (a tick by default)
 def microsites_poster_watermark(c, x1, y1, w, h):
-    if microsite == 'livesimply':
-        # Fish watermark for livesimply
-        watersiz = w/2
-        c.drawInlineImage("microsites/livesimply/promise_watermark.jpg", x1 + (w - watersiz) / 2, y1 + (h - watersiz) / 4, width=watersiz,height=watersiz)
-        pass
+    # Tick watermark for main PledgeBank
+    if (w<h):
+        ticksize = w*1.2
     else:
-        # Tick watermark for main PledgeBank
-        if (w<h):
-            ticksize = w*1.2
-        else:
-            ticksize = h
-        p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize, wordWrap='')
-        story = [ Paragraph(u'<font color="#f4f1f8">\u2713</font>', p_tick) ]
-        if (w<h):
-            f = Frame(x1, y1, w, h, showBoundary = 0)
-        else:
-            f = Frame(x1, y1+h/6, w, h, showBoundary = 0)
-        f.addFromList(story, c)
+        ticksize = h
+    p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize, wordWrap='')
+    story = [ Paragraph(u'<font color="#f4f1f8">\u2713</font>', p_tick) ]
+    if (w<h):
+        f = Frame(x1, y1, w, h, showBoundary = 0)
+    else:
+        f = Frame(x1, y1+h/6, w, h, showBoundary = 0)
+    f.addFromList(story, c)
+
 # Text that goes at the bottom of the poster
 def microsites_poster_remember_text(pledge):
-    if microsite == 'livesimply':
-        return u'''Remember,  if you promote your promise to others, you'll be helping create a community action. Not only are you being the best you can be, you're encouraging others to do the same.''' # Not translated
-    else:
-        return _(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.') % pledge['target']
+    return _(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.') % pledge['target']
 
 # this is a special function to be able to use bold and italic in ttfs
 # see may 2004 reportlab users mailing list

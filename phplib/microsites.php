@@ -30,7 +30,6 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'london' => 'London',
                          'interface' => 'Interface',
                          'catcomm' => 'CatComm',
-                         #'livesimply' => '<em>live</em>simply:promise', # no longer used, can remove all its code at some point
 );
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
@@ -87,14 +86,6 @@ function microsites_user_tracking() {
         return true;
     if ($microsite == 'everywhere' || $microsite == 'london')
         return true;
-
-#    if ($microsite == 'livesimply') {
-# Disabled, but left as example for future use:
-#        return <<<EOF
-#<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
-#<script type="text/javascript"> _uacct = "UA-1849208-2"; urchinTracker(); </script>
-#EOF;
-#    }
 
     /* Don't do any cross site tracking on other sites, to avoid breaking
      * any privacy policies of organisations using the microsites. */
@@ -178,7 +169,7 @@ function microsites_redirect($p) {
 function microsites_site_country() {
     global $site_country, $microsite;
     if ($microsite) {
-        if ($microsite == 'london' || $microsite == 'livesimply') # *not* O2
+        if ($microsite == 'london')
             return 'GB';
         return null;
     }
@@ -223,10 +214,6 @@ function microsites_logo() {
 <span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span>
 </h1>
 ';
-    } elseif ($microsite && $microsite == 'livesimply') {
-        return '
-<h1><a href="/"><img width="1009" height="143" src="/microsites/livesimply/livesimplypromiseheader.jpg" alt="livesimply:promise" border="0"></a></h1>
-';
     } elseif ($lang == 'zh') {
         $country_name = pb_site_country_name();
         return '
@@ -248,12 +235,8 @@ function microsites_logo() {
 function microsites_html_title_slogan() {
     global $microsite;
 
-    if ($microsite == "livesimply") {
-        return "Promise to live simply and get others involved"; # deliberately not translated
-    } else {
-        # TRANS: 'PledgeBank' here is the first part of the HTML title which appears on browser windows, and search engines
-        return _("Tell the world \"I'll do it, but only if you'll help\"");
-    }
+    # TRANS: 'PledgeBank' here is the first part of the HTML title which appears on browser windows, and search engines
+    return _("Tell the world \"I'll do it, but only if you'll help\"");
 }
  
 /* microsites_css_files
@@ -267,7 +250,6 @@ function microsites_css_files() {
                 'interface', 
                 'london', 
                 'catcomm',
-                'livesimply',
             ))) {
         $styles[] = "/microsites/autogen/$microsite.css";
     } else {
@@ -294,25 +276,13 @@ function microsites_navigation_menu($contact_ref) {
     debug_timestamp(true, "retrieved person record");
 
     $menu = array();
-    if ($microsite && $microsite == 'livesimply') {
-        $menu['Home'] = '/';
-        $menu['How <em>live</em>simply:promise works'] = "/explain";
-        $menu['About <em>live</em>simply'] = 'http://www.progressio.org.uk/livesimply/AssociatesInternal/93008/about_live_simply/';
-    }
     $menu[_('Start a Pledge')] = "/new";
     $menu[_('All Pledges')] = "/list";
     if ($P)
         $menu[_('My Pledges')] = "/my";
     else
         $menu[_('Login')] = "/my";
-    if ($microsite && $microsite == 'livesimply') {
-        $menu['Frequently Asked Questions'] = "/faq";
-    } else {
-        $menu[_('About')] = "/faq";
-    }
-    if ($microsite && $microsite == 'livesimply') {
-        $menu['www.livesimply.org.uk'] = 'http://www.livesimply.org.uk/';
-    }
+    $menu[_('About')] = "/faq";
 
     return $menu;
 }
@@ -378,20 +348,6 @@ want to do but normally never get round to.</p><?
     together, forming a network of support for building this work...</p>
     For technical help, contact us at <a href="mailto:techhelp@catcomm.org">techhelp@catcomm.org</a>.
         <?
-    } elseif ($microsite == 'livesimply') {
-        ?>
-
-    <p>Want to make the
-    world a better place for everyone? Then start here by taking a <em>live</em>simply:
-    promise. Make a simple change in your life and get others to do the same! </p>
-
-    <p>livesimply is a challenge to look hard at our lifestyles and to choose
-    to live simply, sustainably and in solidarity with people in poverty. Be
-    the best you can be, and help other people do the same. </p>
-
-    <p><a href="/explain">How does <em>live</em>simply:promise work?</a>
-
-        <?
     } else {
         # Main site
         echo h2(_('PledgeBank successes'));
@@ -407,8 +363,6 @@ want to do but normally never get round to.</p><?
  */
 function microsites_frontpage_has_start_your_own() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return false;
     return true;
 }
 
@@ -417,19 +371,7 @@ function microsites_frontpage_has_start_your_own() {
 function microsites_frontpage_extra_blurb() {
     global $microsite;
 
-    if ($microsite == 'livesimply') {
-        // Use the "startblurb" here, as we microsites_frontpage_has_start_your_own is false
-        // and we want it in the same place as that. XXX tidy that up by making
-        // microsites_frontpage_has_start_your_own display its content?
-?><div id="startblurb"><?
-        # Count the number of signatures, including pledge creators.
-        # (We don't try to count distinct people using person_id as that can
-        # give privacy leaks, as indeed could doing it my distinct person.name
-        # since some signers' names are hidden)
-        $na = db_getOne('select count(*) from signers');
-        $nb = db_getOne('select count(*) from pledges');
-        ?> <div id="simplycounter"><strong>Together, we've made <?=$na + $nb?> promises. What are you going to promise?</strong></div> </div> <?
-    } elseif ($microsite == 'catcomm') {
+    if ($microsite == 'catcomm') {
 ?>
 <div id="extrablurb">
 <h2>About CatComm</h2>
@@ -482,11 +424,7 @@ function microsites_frontpage_sign_invitation_text() {
     global $microsite;
 
     print '<h2 class="head_with_mast">';
-    if ($microsite == 'livesimply') {
-        print 'Act now. Sign up to a promise.';
-    } else {
-        print _('Sign a pledge');
-    }
+    print _('Sign a pledge');
     print "</h2>";
 }
 
@@ -495,8 +433,6 @@ function microsites_frontpage_sign_invitation_text() {
  */
 function microsites_frontpage_has_offline_secrets() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return false;
     return true;
 }
 
@@ -518,31 +454,7 @@ function microsites_frontpage_credit_footer() {
 function microsites_new_pledges_toptips() {
     global $microsite;
     print '<div id="tips">';
-    if ($microsite == 'livesimply') { ?>
-        <h2>Top Tips for Successful Promises</h2>
-        <ol>
-
-        <li>Keep your targets modest — We recommend you pick a low target, but
-        with enough people to motivate you to carry out your side of the
-        bargain! This makes it most likely your pledge will succeed, and more
-        people than you expected can always sign up. </li>
-
-        <li>Get ready to sell your promise, hard. Promises don't sell
-        themselves just by sitting on this site. In fact your promise won't
-        even appear to general site visitors until you've got a few people to
-        sign up to it yourself. Think hard about whether people you know would
-        want to sign up to your promise! </li>
-
-        <li>Think about how your promise reads. How will it look to someone who
-        picks up a flyer from their doormat? Read your promise to the person
-        next to you, or to your mother, and see if they understand what you're
-        talking about. If they don't, you need to rewrite it. </li>
-
-        </ol>
-        <?
-    } else {
-        print microsites_toptips_normal();
-    }
+    print microsites_toptips_normal();
     print '</div>';
 }
 
@@ -585,19 +497,14 @@ online, rather than sending a check." . '</li>';
  */
 function microsites_contact_intro() {
     global $microsite;
-    if ($microsite == 'livesimply') { ?>
-<p>If you need help with your promise or you have other questions or comments use this form to contact us.</p>
-<?
-    } else {
-        print "<p>";
-        print _('Was it useful?  How could it be better?
+    print "<p>";
+    print _('Was it useful?  How could it be better?
     We make PledgeBank and thrive off feedback, good and bad.
     Use this form to contact us.');
-        $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
-        print ' ';
-        printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
-        print "</p>";
-    }
+    $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
+    print ' ';
+    printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
+    print "</p>";
 }
 
 /* microsites_pledge_closed_text
@@ -605,9 +512,6 @@ function microsites_contact_intro() {
  */
 function microsites_pledge_closed_text() {
     global $microsite;
-    if ($microsite == 'livesimply') {
-        return "The deadline for this promise has passed. Check if this promise has been set up with a new deadline &mdash; check out the \"All promises list\". You can always carry out your promise anyway. Or why not <a href=\"/new\">start your own promise</a>?";
-    }
     return strong(_('This pledge is now closed, as its deadline has passed.'));
 }
 
@@ -616,18 +520,6 @@ function microsites_pledge_closed_text() {
  */
 function microsites_signup_extra_fields($errors) {
     global $microsite;
-    if ($microsite == 'livesimply') {
-        $agreeterms = '';
-        if (get_http_var('agreeterms'))
-            $agreeterms = ' checked';
-?>
-    <strong><input type="checkbox" name="agreeterms" value="1" <?=$agreeterms?> <?=array_key_exists('agreeterms', $errors) ? ' class="error"' : ''?> > 
-    I have read the <a href="/terms">terms and conditions</a>. I have the
-    permission of my parent, guardian or teacher to sign up, or I am at least
-    18 years old. 
-    </strong>
-<?
-    }
 }
 
 /* microsites_signup_extra_fields_validate
@@ -635,34 +527,10 @@ function microsites_signup_extra_fields($errors) {
  */
 function microsites_signup_extra_fields_validate(&$errors) {
     global $microsite;
-    if ($microsite == 'livesimply') {
-        if (!get_http_var('agreeterms')) {
-            $errors['agreeterms'] = 'Please confirm that you have read the terms and conditions and that you have permission to sign the pledge or are old enough not to need it.';
-        }
-    }
-
 }
 
 function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors) {
     global $microsite;
-
-    if ($microsite == 'livesimply') {
-        $agreeterms = '';
-        if (get_http_var('agreeterms'))
-            $agreeterms = ' checked';
-?>    
-    <p>When you're happy with your promise, confirm that you agree to the terms
-    and conditions and click "Create promise".</p>
-    <strong><input type="checkbox" name="agreeterms" value="1" <?=$agreeterms?> <?=array_key_exists('agreeterms', $errors) ? ' class="error"' : ''?> > 
-    I have read the <a href="/terms">terms and conditions</a>. I have the
-    permission of my parent, guardian or teacher to sign up, or I am at least
-    18 years old. </strong>
-<p style="text-align: right;">
-<input id="next_step" type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
-</p>
-<?
-        return;
-    }
 
     $P = person_if_signed_on();
     if (!$P) {
@@ -710,7 +578,7 @@ function microsites_location_allowed() {
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
     global $microsite;
-    if ($microsite == 'interface' || $microsite == 'livesimply')
+    if ($microsite == 'interface')
         return false;
     return true;
 }
@@ -719,7 +587,6 @@ function microsites_private_allowed() {
  * Returns whether categories are used for this microsite at all */
 function microsites_categories_allowed() {
     global $microsite;
-    if ($microsite == 'livesimply') return false;
     return true;
 }
 
@@ -736,10 +603,7 @@ function microsites_categories_page3() {
  * dialog. */
 function microsites_postal_address_allowed() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return true;
-    else
-        return false;
+    return false;
 }
 
 /* For displaying the address fetching page (LiveSimply and O2 only) */
@@ -773,10 +637,7 @@ information you provide us will help us in evaluating the success of the
  */
 function microsites_new_pledges_prominence() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return 'frontpage';
-    else
-        return 'calculated';
+    return 'calculated';
 }
 
 /* microsites_other_people 
@@ -791,8 +652,6 @@ function microsites_other_people() {
         return 'other Londoners'; // deliberately not translated
     elseif ($microsite == 'catcomm')
         return 'other CatComm supporters'; // deliberately not translated
-    elseif ($microsite == 'livesimply')
-        return 'other people'; // deliberately not translated
     else
         return _('other local people');
 }
@@ -877,13 +736,8 @@ function microsites_normal_prominences() {
  */
 function microsites_list_views() {
     global $microsite;
-    if ($microsite == 'livesimply') {
-        return array('all_open'=>_('Open pledges'), 
-        'all_closed'=>_('Closed pledges'));
-    } else {
-        return array('open'=>_('Pledges which need signers'), 'succeeded_open'=>_('Successful open pledges'), 
+    return array('open'=>_('Pledges which need signers'), 'succeeded_open'=>_('Successful open pledges'), 
         'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
-    }
 }
 
 # Valid sort options for the All Pledges page
@@ -983,8 +837,6 @@ function microsites_display_login() {
  */
 function microsites_change_microsite_allowed() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return false;
     return true;
 }
 
@@ -994,8 +846,6 @@ function microsites_change_microsite_allowed() {
  */
 function microsites_show_translate_blurb() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return false;
     return true;
 }
 
@@ -1005,8 +855,6 @@ function microsites_show_translate_blurb() {
  */
 function microsites_show_alert_advert() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return false;
     return true;
 } 
 
@@ -1015,8 +863,6 @@ function microsites_show_alert_advert() {
  */
 function microsites_display_favicon() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        print '<link rel="shortcut icon" href="/microsites/livesimply/favicon.ico">';
 }
 
 /* microsites_sort_by_signers
@@ -1084,8 +930,6 @@ function microsites_search_help() {
 
 function microsites_has_survey() {
     global $microsite;
-    if ($microsite == 'livesimply')
-        return false;
     return true;
 }
 

@@ -52,14 +52,6 @@ if ($q_type == 'failed') {
     $open = null; $succeeded = '>=';
     $open_byarea = null; $succeeded_byarea = ' > 0';
     if ($q_sort == "default") $q_sort = $rss ? "whensucceeded" : "creationtime";
-} elseif ($q_type == 'all_open') {
-    $open = '>='; $succeeded = null;
-    $open_byarea = '>='; $succeeded_byarea = ' < 0'; # never allowed
-    if ($q_sort == "default") $q_sort = $rss ? "creationtime" : "percentcomplete";
-} elseif ($q_type == 'all_closed') {
-    $open = '<'; $succeeded = null;
-    $open_byarea = '>='; $succeeded_byarea = ' < 0'; # never allowed
-    if ($q_sort == "default") $q_sort = "date";
 } else { // open
     $open = '>='; $succeeded = '<';
     $open_byarea = '>='; $succeeded_byarea = null;
@@ -150,10 +142,6 @@ if ($q_type == 'open') {
     $heading = _("Successful pledges");
 } elseif ($q_type == 'failed') {
     $heading = _("Failed pledges");
-} elseif ($q_type == 'all_open') {
-    $heading = _("Open pledges"); # maybe ambiguous name relative to 'open' type, but fine for livesimply
-} elseif ($q_type == 'all_closed') {
-    $heading = _("Closed pledges");
 } else {
     err('Unknown type ' . $q_type);
 }

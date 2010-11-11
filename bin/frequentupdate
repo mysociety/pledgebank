@@ -380,9 +380,8 @@ function send_automatic_failure_messages_overall() {
     while ($pledge = db_fetch_array($q)) {
         verbose("pledge #${pledge['id']} (${pledge['ref']}) has failed");
 
-        $ls = ($pledge['microsite'] && $pledge['microsite'] == 'livesimply');
         $zero = $pledge['signers']==0 ? '-zero' : '';
-        $email_template = $ls ? "failed-creator-livesimply$zero" : "failed-creator$zero";
+        $email_template = "failed-creator$zero";
         db_query("
                 insert into message (
                     pledge_id, circumstance,
@@ -403,7 +402,7 @@ function send_automatic_failure_messages_overall() {
         $sms = sprintf(_("PledgeBank here. Sorry, the %s pledge has failed. Better luck next time!"), $pledge['ref']);
         locale_pop();
 
-        $email_template = ($pledge['microsite'] && $pledge['microsite'] == 'livesimply') ? 'failed-signer-livesimply' : 'failed-signer';
+        $email_template = 'failed-signer';
         db_query("
                 insert into message (
                     pledge_id, circumstance,

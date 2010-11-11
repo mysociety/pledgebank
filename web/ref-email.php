@@ -61,7 +61,7 @@ if (0 && get_http_var('submit')) {
             if (!$email)
                 continue;
             global $microsite;
-            $success &= pb_send_email_template($email, ($microsite && $microsite == 'livesimply') ? 'email-friends-livesimply' : 'email-friends', # XXX put condition in microsites.php
+            $success &= pb_send_email_template($email, 'email-friends',
                 array_merge($p->data, array(
                     'from_name' => $fromname, 
                     'from_email' => $fromemail, 

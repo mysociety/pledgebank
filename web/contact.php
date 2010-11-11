@@ -70,12 +70,7 @@ function contact_form($errors = array()) {
     }
 
     if (!$comment_id) {
-        # XXX
-        $blurb = '';
-        global $microsite;
-        if ($microsite == 'livesimply')
-            $blurb = " If that doesn't help either you can fill in the form below or get in touch with Mark Woods, <em>live</em>simply Project Co-ordinator on 01293 541334.";
-        print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.' . $blurb));
+        print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
     }
 
     print "</div>";

@@ -8,7 +8,7 @@ chdir $FindBin::Bin;
 my $outdir = '../web/microsites/autogen/';
 mkdir $outdir;
 
-my @sites = qw( interface catcomm london livesimply );
+my @sites = qw( interface catcomm london );
 
 my %has_people = (
     london => 1,
@@ -19,7 +19,6 @@ my %purple_text = (
     #interface => '000000',
     catcomm => '000000',
     london => '000000',
-    livesimply => '000000',
 );
 
 # 522994 - Link colour,  and lots of borders
@@ -34,14 +33,12 @@ my %visited_colour = (
     interface => '666666',
     catcomm => '004488',
     london => '004488',
-    livesimply => '0000aa',
 );
 
 # 9c7bbd - header background, "start" background
 my %head_back = (
     catcomm => '99ccff',
     london => 'ee3438',
-    livesimply => '000000',
 );
 
 # c6b5de - new form background, spreadword background
@@ -49,7 +46,6 @@ my %form_back = (
     interface => 'c6bcc2',
     catcomm => '99ccff',
     london => '9999ff',
-    livesimply => '00aab5',
 );
 
 # f6e5ff - Pledge background, tips background, box hover
@@ -57,19 +53,16 @@ my %pledge_back = (
     interface => 'eeeeee',
     catcomm => 'd7ebff',
     london => 'ccccff',
-    livesimply => 'cecfce',
 );
 
 # ff8429 - Sign box border
 my %sign_border = (
     interface => 'ffbb88',
-    livesimply => 'ffbb88',
 );
 
 # ffffcc - Sign box background
 my %sign_back = (
     interface => 'ffffee',
-    livesimply => 'ffffee',
 );
 
 open(MAINCSS, "../web/pb.2.css") or die "";
@@ -160,173 +153,3 @@ sub london_extra {
     print NEWCSS "\n#sponsor { text-align: center; clear: both; }\n";
 }
 
-sub livesimply_changes {
-    my $selector = shift;
-
-    return 'next' if ($selector =~ m/ul#nav/ || $selector eq 'h1' || $selector eq '#nav_search' || $selector eq '#startblurb');
-
-    $_ = "    font-family: verdana, arial, helvetica, sans-serif;\n" if m/font-family/;
-
-    # Overall look
-    s/margin: 1em auto 0;/margin: 1em 0 0 16em;/ if ($selector eq "#pbcontent");
-
-    # Link colours
-    s/#522994/#0000ff/gi if (!m/border|background/);  # link colour
-    s/#522994/#000000/gi if (m/border/);  # border colour
-    s/#522994/#cecfce/gi if (m/background/);  # startblurb boc
-
-    s/#999999/#cccccc/g if ($selector eq '.greyed');
-
-    # Headings
-    print NEWCSS "    font-size: 120%;\n" if (m/^}/ && $selector eq 'h2');
-    print NEWCSS "    font-size: 100%;\n" if (m/^}/ && $selector eq 'h3');
-
-    # Body
-    print NEWCSS "    font-size: 0.8em;\n" if (m/^}/ && $selector eq 'body');
-}
-
-sub livesimply_extra {
-    print NEWCSS "\nh2 { color: #000000; }\n";
-    print NEWCSS <<END;
-
-#startblurb {
-    padding: 10px;
-    border: solid 1px #000000;
-    background-color: #cecfce;
-    color: #000000;
-    -moz-border-radius: 2em;
-    margin: 1em 0;
-}
-#nav_search {
-    position: absolute;
-    padding-left: 2em;
-    text-align: left;
-    font-size:83%;
-    top: 4px; right: 4px;
-}
-#nav_search input {
-    max-width: none;
-}
-
-h1 {
-    margin: 0;
-    padding: 0;
-    text-align: left;
-}
-
-#pballfooter {
-    margin: 0em 0 0 16em;
-}
-#pballheader{
-    margin: 0em 0 0 19.5em;
-}
-
-
-/* From Partnerbasic.css */
-
-#nav ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    background-color:#ffffff;
-    color: black;
-}
-
-#nav {
-    font-size: 90%;
-    position: absolute;
-    top: 181px;
-    left: 4px; 
-    clear: right;
-}
-
-/* From Partnerlevel2.css */
-
-/* NAVIGATION */
-/* Left nav */
-.Line{
-    border-bottom: 2px solid white;
-}
-
-ul#nav{
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    width: 19em;
-}
-
-ul#nav li{
-    list-style-type: none;
-    vertical-align: text-top;
-    text-align: left;
-    text-transform: lowercase;
-    padding-bottom: 2px;
-}
-
-ul#nav a{
-    color: white;
-    display: block;
-    padding: 3px 3px 3px 8px;
-    background-color: #9C9A9C;
-    font-weight: bold;
-    vertical-align: text-top;
-    text-decoration: none;
-}
-
-ul#nav strong{
-    display: block;
-    padding: 3px 3px 3px 8px;
-    color: white;
-    vertical-align: text-top;
-    background-color: #636563;
-}
-
-ul#nav a:hover{
-    background-color: #636563;
-    text-decoration: none;
-    color: white;
-}
-
-ul#nav ul{
-    margin: 0 0 0 22px;
-    padding: 0;
-}
-
-/* ul#nav li{
-    list-style-image: url(/images/sub/Disc_Bullet.gif);
-}
-
-ul#nav li.Plus{
-    list-style-image: url(/images/sub/Plus_Bullet.gif);
-}
-
-ul#nav li.Arrow{
-    list-style-image: url(/images/sub/Arrow_Bullet.gif);
-} */
-
-ul#nav ul a{
-    font-weight: normal;
-}
-
-ul#nav ul a,  ul#nav ul strong{
-    color: black;
-    width: 100%;
-    padding: 3px 3px 3px 0;
-    background-color: white;
-}
-
-ul#nav ul a:hover{
-    background-color: white;
-    text-decoration: underline;
-    color: black;
-}
-
-ul#nav ul ul{
-    margin-left: 16px;
-}
-
-/* END NAVIGATION */
-
-END
-
-}

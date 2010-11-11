@@ -28,7 +28,6 @@
 /* Codes of microsites, and name displayed next to PledgeBank logo */
 $microsites_list = array('everywhere' => _('Everywhere'),
                          'london' => 'London',
-                         'interface' => 'Interface',
                          'catcomm' => 'CatComm',
 );
 
@@ -184,13 +183,7 @@ function microsites_site_country() {
  * Returns HTML to use for logo of microsite, or country. */
 function microsites_logo() {
     global $microsite, $lang;
-    if ($microsite && $microsite == 'interface') {
-        return '
-<h1><a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
-<span id="countrytitle"><img src="/microsites/interface-logo.gif" alt="interface">
-<a href="/where">' . _('(change)') . '</a></span>
-<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>';
-    } elseif ($microsite && $microsite == 'london') {
+    if ($microsite && $microsite == 'london') {
         return '
 <h1><a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a>
 <span id="countrytitle"><a href="/where">' . _('(change)') . '</a></span>
@@ -247,7 +240,6 @@ function microsites_css_files() {
     $styles = array();
     // Microsite PledgeBank style sheet
     if ($microsite && in_array($microsite, array(
-                'interface', 
                 'london', 
                 'catcomm',
             ))) {
@@ -320,14 +312,7 @@ function microsites_frontpage_has_intro() {
 function microsites_frontpage_intro() {
     global $microsite, $lang;
     $tom = false;
-    if ($microsite == 'interface') {
-        echo h2(_('&#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;'));
-?>
-<p>Hello, and welcome to the demo version of PledgeBank we've built for
-internal use at Interface. PledgeBank is a handy tool which is good at
-getting people to do social or environmental things they
-want to do but normally never get round to.</p><?
-    } elseif ($microsite == 'london') {
+    if ($microsite == 'london') {
         ?><h2>Tell Londoners &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
         <p>In the summer of 2012 the eyes of the world will be on London for a
         fortnight as the Olympics games return to the capital for the third
@@ -578,8 +563,6 @@ function microsites_location_allowed() {
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
     global $microsite;
-    if ($microsite == 'interface')
-        return false;
     return true;
 }
 
@@ -646,9 +629,7 @@ function microsites_new_pledges_prominence() {
  */
 function microsites_other_people() {
     global $microsite;
-    if ($microsite == 'interface')
-        return 'other Interfacers'; // deliberately not translated
-    elseif ($microsite == 'london')
+    if ($microsite == 'london')
         return 'other Londoners'; // deliberately not translated
     elseif ($microsite == 'catcomm')
         return 'other CatComm supporters'; // deliberately not translated

@@ -8,7 +8,7 @@ chdir $FindBin::Bin;
 my $outdir = '../web/microsites/autogen/';
 mkdir $outdir;
 
-my @sites = qw( interface catcomm london );
+my @sites = qw( catcomm london );
 
 my %has_people = (
     london => 1,
@@ -16,21 +16,18 @@ my %has_people = (
 
 # 21004a - "Bank" in the heading, and nav. colour
 my %purple_text = (
-    #interface => '000000',
     catcomm => '000000',
     london => '000000',
 );
 
 # 522994 - Link colour,  and lots of borders
 my %link_colour = (
-    interface => '8f8f8f',
     catcomm => '31659c',
     london => '31659c',
 );
 
 # 7b52a5 - visited link colour
 my %visited_colour = (
-    interface => '666666',
     catcomm => '004488',
     london => '004488',
 );
@@ -43,26 +40,22 @@ my %head_back = (
 
 # c6b5de - new form background, spreadword background
 my %form_back = (
-    interface => 'c6bcc2',
     catcomm => '99ccff',
     london => '9999ff',
 );
 
 # f6e5ff - Pledge background, tips background, box hover
 my %pledge_back = (
-    interface => 'eeeeee',
     catcomm => 'd7ebff',
     london => 'ccccff',
 );
 
 # ff8429 - Sign box border
 my %sign_border = (
-    interface => 'ffbb88',
 );
 
 # ffffcc - Sign box background
 my %sign_back = (
-    interface => 'ffffee',
 );
 
 open(MAINCSS, "../web/pb.2.css") or die "";
@@ -131,22 +124,6 @@ sub catcomm_extra {
     width: 32%;
 }
 EOF
-}
-
-sub interface_changes {
-    my $selector = shift;
-
-    s/#ffffff/#888888/gi if $selector eq "h1 span#logo_pledge";
-    s/#ffffff/#000000/gi if $selector =~ /^h1/ || $selector =~ /^#startblurb/;
-
-    s/#000000/#222222/gi;  # text colour
-    s/#21004a/#000000/gi;  # purple lettering, done after so above line doesn't get it
-
-    s/background-color: #9c7bbd;/background-image: url(\/interface-body.gif);/i;
-}
-
-sub interface_extra {
-    print NEWCSS "\nh2 { color: #000000; }\n";
 }
 
 sub london_extra {

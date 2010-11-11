@@ -29,7 +29,6 @@
 $microsites_list = array('everywhere' => _('Everywhere'),
                          'london' => 'London',
                          'interface' => 'Interface',
-                         #'global-cool' => 'Global Cool', # no longer used, can remove all its code at some point
                          'catcomm' => 'CatComm',
                          #'livesimply' => '<em>live</em>simply:promise', # no longer used, can remove all its code at some point
                          #'o2' => 'O2', # no longer used, can remove all its code at some point
@@ -38,22 +37,16 @@ $microsites_list = array('everywhere' => _('Everywhere'),
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 if (OPTION_PB_STAGING) {
     # Francis's local test domains
-    $microsites_from_extra_domains = array('pledge.global-cool' => 'global-cool',
-                                           #'matthew.pledgebank.com' => 'livesimply', 
-                                           'promise.livesimply' => 'livesimply'
-    ); 
+    $microsites_from_extra_domains = array();
 } else {
     # If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
-    $microsites_from_extra_domains = array('pledge.global-cool.com' => 'global-cool',
-                                           'promise.livesimply.org.uk' => 'livesimply'
-    );
+    $microsites_from_extra_domains = array();
 }
 $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 
 /* These are listed on /where */
 $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countries in all languages'),
                                 'london' => _('London (United Kingdom)'),
-                                /* 'global-cool' => _('Global Cool (One by One, Ton by Ton)'), */
                                 'catcomm' => _('Catalytic Communities')
                                 );
 
@@ -162,7 +155,7 @@ function microsites_redirect($p) {
 
     # Microsites for which all pledges marked in the database as belonging to
     # that microsite do a redirect
-    $redirect_microsites = array('global-cool');
+    $redirect_microsites = array();
     if (in_array($p->microsite(), $redirect_microsites)) {
         $redirect_microsite = $p->microsite();
     }
@@ -278,7 +271,6 @@ function microsites_css_files() {
     if ($microsite && in_array($microsite, array(
                 'interface', 
                 'london', 
-                'global-cool',
                 'catcomm',
                 'livesimply',
                 'o2',
@@ -346,8 +338,7 @@ function microsites_local_alerts() {
  */
 function microsites_frontpage_has_local_emails() {
     global $microsite;
-    if ($microsite == 'global-cool' || $microsite == 'catcomm'
-        || !microsites_local_alerts())
+    if ($microsite == 'catcomm' || !microsites_local_alerts())
         return false;
     return true;
 }
@@ -358,8 +349,6 @@ function microsites_frontpage_has_local_emails() {
  */
 function microsites_frontpage_has_intro() {
     global $microsite;
-    if ($microsite == 'global-cool')
-        return false;
     return true;
 }
 
@@ -471,7 +460,7 @@ It&#8217;s your chance to make a difference, and you really can!</p>
  */
 function microsites_frontpage_has_start_your_own() {
     global $microsite;
-    if ($microsite == 'global-cool' || $microsite == 'livesimply')
+    if ($microsite == 'livesimply')
         return false;
     return true;
 }
@@ -559,8 +548,7 @@ function microsites_frontpage_sign_invitation_text() {
  */
 function microsites_frontpage_has_offline_secrets() {
     global $microsite;
-    if ($microsite == 'global-cool' || $microsite == 'livesimply'
-        || $microsite=='o2')
+    if ($microsite == 'livesimply' || $microsite=='o2')
         return false;
     return true;
 }
@@ -797,7 +785,7 @@ function microsites_location_allowed() {
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
     global $microsite;
-    if ($microsite == 'interface' || $microsite == 'global-cool' || $microsite == 'livesimply' || $microsite == 'o2')
+    if ($microsite == 'interface' || $microsite == 'livesimply' || $microsite == 'o2')
         return false;
     return true;
 }
@@ -906,8 +894,6 @@ function microsites_new_pledges_prominence() {
     global $microsite;
     if ($microsite == 'livesimply' || $microsite == 'o2')
         return 'frontpage';
-    elseif ($microsite == 'global-cool')
-        return 'backpage';
     else
         return 'calculated';
 }
@@ -922,8 +908,6 @@ function microsites_other_people() {
         return 'other Interfacers'; // deliberately not translated
     elseif ($microsite == 'london')
         return 'other Londoners'; // deliberately not translated
-    elseif ($microsite == 'global-cool')
-        return 'other cool people'; // deliberately not translated
     elseif ($microsite == 'catcomm')
         return 'other CatComm supporters'; // deliberately not translated
     elseif ($microsite == 'livesimply' || $microsite == 'o2')
@@ -937,8 +921,6 @@ function microsites_other_people() {
  */
 function microsites_comments_allowed() {
     global $microsite;
-    if ($microsite == 'global-cool')
-        return false;
     return true;
 }
 
@@ -992,8 +974,6 @@ function microsites_filter_foreign(&$sql_params) {
         return "(1=0)";
     if ($microsite == 'london')
         return "(pledges.id not in (select pledge_id from pledge_find_nearby(51.5,-0.1166667, 25)))";
-    if ($microsite == 'global-cool')
-        return "(1=0)"; # Show nothing else on global cool site
     $sql_params[] = $microsite;
     return "(microsite <> ? or microsite is null)";
 }
@@ -1004,7 +984,7 @@ function microsites_filter_foreign(&$sql_params) {
  */
 function microsites_normal_prominences() {
     global $microsite;
-    if ($microsite == 'global-cool' || $microsite == 'catcomm')
+    if ($microsite == 'catcomm')
         return " (cached_prominence = 'normal' or cached_prominence = 'backpage') ";
     return " (cached_prominence = 'normal') ";
 }
@@ -1064,50 +1044,6 @@ function microsites_read_external_auth() {
     if ($microsites_external_auth_person)
         return true;
 
-    if ($microsite == 'global-cool') {
-        if (false) {
-            $params = array('email' => 'francis@flourish.org', 'name' => 'Francis Irving', 'remember' => 'yes', 'signedIn' => 'yes'); // for testing
-        } else {
-            // Read cookie
-            if (!array_key_exists('auth', $_COOKIE))
-                 return true;
-            $cool_cookie = $_COOKIE['auth'];
-            $cool_cookie = base64_decode($cool_cookie);
-
-            // Decrypt cookie
-            $td = mcrypt_module_open('tripledes', '', 'ecb', '');
-            if (!$td) err('Failed to mcrypt_module_open');
-            $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-            mcrypt_generic_init($td, OPTION_GLOBALCOOL_SECRET, $iv);
-            $cool_cookie = mdecrypt_generic($td, $cool_cookie);
-            mcrypt_generic_deinit($td);
-            mcrypt_module_close($td);
-
-            // Read parameters out of Global Cool cookie
-            $raw_params = split("\|", $cool_cookie);
-            $params = array();
-            foreach ($raw_params as $raw_param) {
-                list($param, $value) = split("=", $raw_param, 2);
-                $params[$param] = trim($value);
-            }
-        }
-
-        if ($params['signedIn'] != "yes") {
-            // They have logged out from Global Cool
-            return true;
-        }
-        if (!validate_email($params['email'])) {
-            error_log("Invalid email '" . $params['email']. "' in global-cool cookie");
-            return true;
-        }
-
-        // Create user, or get existing user from database
-        $microsites_external_auth_person = person_get_or_create($params['email'], $params['name']);
-        // TODO: record that a login via global cool auth happened here (something analogous to like $P->inc_numlogins())
-        db_commit();
-        return true;
-    }
-
     // Use normal authentication
     return false;
 }
@@ -1117,25 +1053,6 @@ function microsites_read_external_auth() {
  * Return false if normal auth is to be used.*/
 function microsites_redirect_external_login() {
     global $microsite;
-    if ($microsite == 'global-cool') {
-        // See if we are on redirect back from Global Cool login system
-        if (get_http_var('stashpost')) {
-            if (!pb_person_if_signed_on())
-                err('Sorry! Something went wrong while logging into Global Cool. Please check that you have cookies enabled on your browser.');
-            stash_redirect(get_http_var('stashpost'));
-            exit;
-        }
-        // Otherwise, redirect to Global Cool login system, with stash key to get back here
-        $url = "http://".$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"];
-        $st = stash_new_request('POST', $url, $_POST);
-        db_commit();
-        if (strstr($_SERVER["REQUEST_URI"], '?'))
-            $url .= "&stashpost=$st";
-        else
-            $url .= "?stashpost=$st";
-        header("Location: http://www.global-cool.com/auth/?next=" . urlencode($url));
-        exit;
-    }
     return false;
 }
 
@@ -1197,8 +1114,6 @@ function microsites_new_pledges_preview_extras($data) {
  */
 function microsites_display_login() {
     global $microsite;
-    if ($microsite == 'global-cool')
-        return false;
     return true;
 }
 

@@ -8,7 +8,7 @@ chdir $FindBin::Bin;
 my $outdir = '../web/microsites/autogen/';
 mkdir $outdir;
 
-my @sites = qw( interface catcomm o2 global-cool london livesimply );
+my @sites = qw( interface catcomm o2 london livesimply );
 
 my %has_people = (
     london => 1,
@@ -28,7 +28,6 @@ my %link_colour = (
     interface => '8f8f8f',
     catcomm => '31659c',
     o2 => '000066',
-    globalcool => '3399cc',
     london => '31659c',
 );
 
@@ -37,7 +36,6 @@ my %visited_colour = (
     interface => '666666',
     catcomm => '004488',
     o2 => '2385c2',
-    globalcool => '6699cc',
     london => '004488',
     livesimply => '0000aa',
 );
@@ -57,7 +55,6 @@ my %form_back = (
     o2 => 'caddee',
     london => '9999ff',
     livesimply => '00aab5',
-    globalcool => 'ecf7ff',
 );
 
 # f6e5ff - Pledge background, tips background, box hover
@@ -67,7 +64,6 @@ my %pledge_back = (
     o2 => 'caddee',
     london => 'ccccff',
     livesimply => 'cecfce',
-    globalcool => 'efefef',
 );
 
 # ff8429 - Sign box border
@@ -148,16 +144,6 @@ sub catcomm_extra {
     width: 32%;
 }
 EOF
-}
-
-sub globalcool_changes {
-    my $selector = shift;
-    if ($selector eq "#pbcontent") {
-        s/padding: 5px 5% 10px;/padding: 5px 0% 10px;/;
-    }
-    if ($selector eq "#currentpledges, #yoursignedpledges") {
-        s/width: 59%;/width: 100%;/;
-    }
 }
 
 sub interface_changes {

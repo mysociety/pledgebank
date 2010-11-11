@@ -55,9 +55,7 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 boilerplate_sms_smallprint = _("SMS operated by charity UKCOD. Available in UK only. Sign-up message costs your normal text rate. Further messages are free. ")
 
 # If you alter this, also alter phplib/microsites.php
-microsites_from_extra_domains = { 'pledge.global-cool.com' : 'global-cool',
-                                  'promise.livesimply.org.uk' : 'livesimply' };
-                                               
+microsites_from_extra_domains = {}
 
 ## Microsite cusomisation (XXX put in pb/pylib/microsites.py I guess)
 # Return True if posters for that microsite look different from default posters

@@ -375,40 +375,20 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
 
     // Signers and creators (NOT person table, as we only search for publicly visible names)
     $people = array();
-    global $microsite; # XXX
-    if ($microsite == 'o2') {
-        $q = db_query("SELECT ref, title, pledges.name FROM pledges, person
-        WHERE pledges.person_id = person.id $backpage_clause
-          AND (pledges.name ILIKE '%' || ? || '%'
-          OR person.email ILIKE '%' || ? || '%') ORDER BY pledges.name", $search, $search);
-        while ($r = db_fetch_array($q)) {
+    $q = db_query('SELECT ref, title, name FROM pledges
+    WHERE pin IS NULL ' . $backpage_clause .
+    ' AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
+    while ($r = db_fetch_array($q)) {
+        if (preg_match("#\b$search\b#i", $r['name']))
             $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
-        }
-        $q = db_query("SELECT ref, title, signers.name FROM signers,pledges, person
-        WHERE showname AND signers.pledge_id = pledges.id
-        AND signers.person_id = person.id
-        $backpage_clause AND (signers.name ILIKE '%' || ? || '%'
-        OR person.email ILIKE '%' || ? || '%') ORDER BY signers.name",
-        $search, $search);
-        while ($r = db_fetch_array($q)) {
+    }
+    $q = db_query('SELECT ref, title, signers.name FROM signers,pledges
+    WHERE showname AND pin IS NULL AND signers.pledge_id = pledges.id
+    ' . $backpage_clause . ' AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name',
+    $search);
+    while ($r = db_fetch_array($q)) {
+        if (preg_match("#\b$search\b#i", $r['name']))
             $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
-        }
-    } else {
-        $q = db_query('SELECT ref, title, name FROM pledges
-        WHERE pin IS NULL ' . $backpage_clause .
-        ' AND name ILIKE \'%\' || ? || \'%\' ORDER BY name', $search);
-        while ($r = db_fetch_array($q)) {
-            if (preg_match("#\b$search\b#i", $r['name']))
-                $people[$r['name']][] = array($r['ref'], $r['title'], 'creator');
-        }
-        $q = db_query('SELECT ref, title, signers.name FROM signers,pledges
-        WHERE showname AND pin IS NULL AND signers.pledge_id = pledges.id
-        ' . $backpage_clause . ' AND signers.name ILIKE \'%\' || ? || \'%\' ORDER BY name',
-        $search);
-        while ($r = db_fetch_array($q)) {
-            if (preg_match("#\b$search\b#i", $r['name']))
-                $people[$r['name']][] = array($r['ref'], $r['title'], 'signer');
-        }
     }
     if (sizeof($people)) {
         $success = 1;

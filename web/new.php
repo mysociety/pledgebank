@@ -150,20 +150,6 @@ function pledge_form_one($data = array(), $errors = array()) {
     "/lang?r=/new", $langs[$lang]) ?></small></p>
 <? } ?>
 
-<?
-    # XXX: Put in microsites.php
-    global $microsite;
-    if ($microsite == 'o2') { ?>
-<p><strong>I am</strong> <input<? if (array_key_exists('name', $errors)) print ' class="error"' ?> type="text" size="20" name="name" id="name" value="<? if (isset($data['name'])) print htmlspecialchars($data['name']) ?>">,
-my email address is <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">.
-</p>
-
-<p><strong>I promise that I will</strong>
-<input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="72"></p>
-
-<p>as part of the <? display_categories($data); ?> part of the People Promise,</p>
-
-<?  } else { ?>
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="40"></p>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="2" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
@@ -177,8 +163,6 @@ size="48" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 size="40" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_('do the same')) ?>">.
 <? }
 ?></p>
-
-<?  } ?>
 
 <p><?=_('The other people must sign up before') ?>:
 <br><input<?
@@ -196,7 +180,6 @@ size="40" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 <br><?=microsites_new_pledges_detail_textarea($data) ?>
 <br><small><?=_('(links and email addresses will be automatically made clickable, no "markup" needed)') ?></small>
 
-<? if ($microsite != 'o2') { ?>
 <h3><?=_('About You') ?></h3>
 <p style="margin-bottom: 1em;">
 <? 
@@ -213,7 +196,6 @@ size="40" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 <?   } ?>
 <br><label for="email"><?=_('Your email:') ?></label> <input<? if (array_key_exists('email', $errors)) print ' class="error"' ?> type="text" size="30" name="email" id="email" value="<? if (isset($data['email'])) print htmlspecialchars($data['email']) ?>">
 <br><small><?=_('(we need your email so we can get in touch with you when your pledge completes, and so on)') ?></small>
-<? } ?>
 
 <p><?=_('On flyers and elsewhere, after your name, how would you like to be described?') . ' <small>' . _('(optional)') . '</small>' ?>
 <br><input<? if (array_key_exists('identity', $errors)) print ' class="error"' ?> type="text" name="identity" value="<? if (isset($data['identity'])) print htmlspecialchars($data['identity']) ?>" size="40" maxlength="40">
@@ -1134,9 +1116,7 @@ function display_categories($data) { ?>
                     (is_null($parent_id) ? '' : '&nbsp;-&nbsp;'),
                     htmlspecialchars(_($name)));
     }
-    global $microsite; # XXX
-    if ($microsite != 'o2')
-        uksort($out, 'strcoll');
+    uksort($out, 'strcoll');
     foreach ($out as $n => $s) {
         print $s;
     } ?>

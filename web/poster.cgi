@@ -61,23 +61,18 @@ microsites_from_extra_domains = {}
 # Return True if posters for that microsite look different from default posters
 # This is used to work out what to name the cache files.
 def microsites_poster_different_look(microsite):
-    return microsite in ('london', 'livesimply', 'o2')
+    return microsite in ('london', 'livesimply')
 def microsites_has_target():
-    if microsite == 'o2':
-        return False
     return True
 def microsites_has_sms():
-    if microsite == 'o2':
-        return False
     return True
+
 # Fill colour for background of logo
 def microsites_poster_box_fill_colour():
     if microsite == 'london':
         return (0.93, 0.2, 0.22)
     elif microsite == 'livesimply':
         return (0.00, 0.67, 0.71)
-    elif microsite == 'o2':
-        return (0.00, 0.00, 0.4)
     else:
         return (0.6, 0.45, 0.7)
 # Colour for key words and numbers in text
@@ -86,8 +81,6 @@ def microsites_poster_html_highlight_colour():
         return '#31659c'
     elif microsite == 'livesimply':
         return '#00aab5'
-    elif microsite == 'o2':
-        return '#000066'
     else:
         return '#522994'
 # Colour on RTF posters
@@ -145,8 +138,6 @@ def microsites_poster_watermark(c, x1, y1, w, h):
 def microsites_poster_remember_text(pledge):
     if microsite == 'livesimply':
         return u'''Remember,  if you promote your promise to others, you'll be helping create a community action. Not only are you being the best you can be, you're encouraging others to do the same.''' # Not translated
-    elif microsite == 'o2':
-        return ''
     else:
         return _(u'Remember, you only have to act if %d other people sign up \u2013 that\u2019s what PledgeBank is all about.') % pledge['target']
 

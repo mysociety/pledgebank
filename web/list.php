@@ -117,10 +117,6 @@ if ($q_sort == 'creationtime' || $q_sort == 'whensucceeded' || $q_sort == 'signe
     $sort_phrase = "coalesce ((SELECT name FROM pledge_category, category WHERE 
             pledge_category.category_id = category.id AND parent_category_id IS NULL AND 
             pledge_category.pledge_id = pledges.id LIMIT 1), '"._("Miscellaneous")."')";
-} elseif ($q_sort == 'site') {
-    $sort_phrase = 'address_postcode';
-} elseif ($q_sort == 'directorate') {
-    $sort_phrase = 'address_1';
 } else {
     $sort_phrase = $q_sort;
 }
@@ -244,26 +240,6 @@ if ($ntotal > 0) {
                     print '<h2 style="clear:both">' . _($thiscategory) . "</h2> <!-- $thiscategory_no -->";
                 $c = 0;
                 $lastdivision = $thiscategory;
-            }
-        } elseif ($q_sort == 'site') {
-            $pc = $row['address_postcode'];
-            $lookup = o2_postcode_lookup();
-            if (!isset($lookup[$pc]))
-                continue;
-            if ($lastdivision <> $pc) {
-                if (!$rss) {
-                    $heading = $lookup[$pc];
-                    print '<h2 style="clear:both">'.$heading."</h2>";
-                }
-                $c = 0;
-                $lastdivision = $row['address_postcode'];
-            }
-        } elseif ($q_sort == 'directorate') {
-            if ($lastdivision <> $row['address_1']) {
-                if (!$rss)
-                    print '<h2 style="clear:both">'.$row['address_1']."</h2>";
-                $c = 0;
-                $lastdivision = $row['address_1'];
             }
         }
         $arr = array('class'=>"pledge-".$c%2, 'href' => $pledge->url_main() );

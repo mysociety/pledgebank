@@ -482,16 +482,6 @@ class Pledge {
 </p>
 <?      }
 
-        global $microsite; # XXX
-        if ($microsite == 'o2') {
-            $cat_name = '';
-            if (isset($this->data['category']))
-                $cat_name = db_getOne('select name from category where id=?', $this->data['category']);
-            else
-                $cat_name = join('', $this->categories());
-            if ($cat_name)
-                print '<p>My Promise is about <strong>' . $cat_name . '</strong></p>';
-        }
 ?>
 
 <p>

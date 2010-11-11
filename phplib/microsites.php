@@ -31,7 +31,6 @@ $microsites_list = array('everywhere' => _('Everywhere'),
                          'interface' => 'Interface',
                          'catcomm' => 'CatComm',
                          #'livesimply' => '<em>live</em>simply:promise', # no longer used, can remove all its code at some point
-                         #'o2' => 'O2', # no longer used, can remove all its code at some point
 );
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
@@ -228,10 +227,6 @@ function microsites_logo() {
         return '
 <h1><a href="/"><img width="1009" height="143" src="/microsites/livesimply/livesimplypromiseheader.jpg" alt="livesimply:promise" border="0"></a></h1>
 ';
-    } elseif ($microsite && $microsite == 'o2') {
-        return '
-<h1><a href="/"><img src="/microsites/o2-logo.jpg" alt="O2 Promise Bank" border="0" width="386" height="66"></a></h1>
-';
     } elseif ($lang == 'zh') {
         $country_name = pb_site_country_name();
         return '
@@ -273,7 +268,6 @@ function microsites_css_files() {
                 'london', 
                 'catcomm',
                 'livesimply',
-                'o2',
             ))) {
         $styles[] = "/microsites/autogen/$microsite.css";
     } else {
@@ -311,12 +305,10 @@ function microsites_navigation_menu($contact_ref) {
         $menu[_('My Pledges')] = "/my";
     else
         $menu[_('Login')] = "/my";
-    if ($microsite != 'o2') {
-        if ($microsite && $microsite == 'livesimply') {
-            $menu['Frequently Asked Questions'] = "/faq";
-        } else {
-            $menu[_('About')] = "/faq";
-        }
+    if ($microsite && $microsite == 'livesimply') {
+        $menu['Frequently Asked Questions'] = "/faq";
+    } else {
+        $menu[_('About')] = "/faq";
     }
     if ($microsite && $microsite == 'livesimply') {
         $menu['www.livesimply.org.uk'] = 'http://www.livesimply.org.uk/';
@@ -328,7 +320,6 @@ function microsites_navigation_menu($contact_ref) {
 # Whether a site has local alerts at all!
 function microsites_local_alerts() {
     global $microsite;
-    if ($microsite == 'o2') return false;
     return true;
 }
 
@@ -401,50 +392,6 @@ want to do but normally never get round to.</p><?
     <p><a href="/explain">How does <em>live</em>simply:promise work?</a>
 
         <?
-    } elseif ($microsite == 'o2') { ?>
-<h2>Welcome to O2&#8217;s Promise Bank!</h2>
-
-<p>Welcome to the Promise Bank! It&#8217;s your chance to make a promise
-(or several!) to support one or more elements of the People Promise.</p>
-
-<p>Over a thousand conversations between O2 people took place last year
-asking what would make O2 the best place to work.  Now we&#8217;ve
-captured everyone&#8217;s ideas &mdash; in their own words &mdash; as
-our People Promise.  It describes the O2 we want to be.</p>
-
-<p>While we don&#8217;t live up to all of it yet, we&#8217;re clear about
-where we&#8217;re going.  So how do we start the journey?  Quite simply
-by living the People Promise.</p>
-
-<p>And that&#8217;s where Promise Bank comes in.  You&#8217;re in the
-right place to promise to do your bit &mdash; big or small &mdash; to
-bring the People Promise to life around you.  You&#8217;ll notice the
-difference and so will others.</p>
-
-<p>Just read the People Promise on Vital o2 (insert link) or in the
-latest strategy booklet and think about what you can do to support
-one of the elements:</p>
-
-<ul>
-<li>A warm welcome
-<li>Part of something special
-<li>A great place to work
-<li>The opportunity to get on
-<li>Trusted to do a great job
-<li>Managing with a human touch
-<li>Thanks for a job well done
-</ul>
-
-<p>Then, just use the Promise Bank to make your Promise. It&#8217;s easy!</p>
-
-<p>You can make a Promise for yourself or on behalf of your team. The
-most important thing is that you make a Promise and then keep it &mdash;
-if 11,000 people each promise to do something to bring the People Promise
-to life, you really will be part of something special.</p>
-
-It&#8217;s your chance to make a difference, and you really can!</p>
-
-<?
     } else {
         # Main site
         echo h2(_('PledgeBank successes'));
@@ -548,7 +495,7 @@ function microsites_frontpage_sign_invitation_text() {
  */
 function microsites_frontpage_has_offline_secrets() {
     global $microsite;
-    if ($microsite == 'livesimply' || $microsite=='o2')
+    if ($microsite == 'livesimply')
         return false;
     return true;
 }
@@ -593,19 +540,6 @@ function microsites_new_pledges_toptips() {
 
         </ol>
         <?
-    } elseif ($microsite == 'o2') { ?>
-<h2>Top Promise Tips</h2>
-<ol>
-<li><strong>Really think about what you can do to make your People Promise
-come alive</strong> &mdash; this is your commitment, promise to do
-something that you think will make O2 a better place to work</li>
-<li><strong>You're not on your own!</strong> Your Promise can be
-individual or you can share it with others. You might agree as a team to
-do something together. It's up to you!</li>
-<li><strong>You can promise more than once</strong> &mdash; there's no
-limit to the number of Promises you make</li>
-</ol>
-<?
     } else {
         print microsites_toptips_normal();
     }
@@ -728,14 +662,6 @@ function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors)
 </p>
 <?
         return;
-    } elseif ($microsite == 'o2') { ?>
-<input type="hidden" name="agreeterms" value="1">
-<p>When you're happy with your promise, <strong>click "Create"</strong> to confirm that you wish us to display the promise at the top of this page in your name.
-<p style="text-align: right;">
-<input id="next_step" type="submit" name="tocreate" value="<?=_('Create pledge') ?>">
-</p>
-<?
-        return;
     }
 
     $P = person_if_signed_on();
@@ -777,7 +703,6 @@ greater publicity and a greater chance of succeeding.');
 
 function microsites_location_allowed() {
     global $microsite;
-    if ($microsite == 'o2') return false;
     return true;
 }
 
@@ -785,7 +710,7 @@ function microsites_location_allowed() {
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
     global $microsite;
-    if ($microsite == 'interface' || $microsite == 'livesimply' || $microsite == 'o2')
+    if ($microsite == 'interface' || $microsite == 'livesimply')
         return false;
     return true;
 }
@@ -802,7 +727,7 @@ function microsites_categories_allowed() {
  * Returns whether categories are offered in the usual place in the new pledge dialog. */
 function microsites_categories_page3() {
     global $microsite;
-    if ($microsite == 'o2' || !microsites_categories_allowed()) return false;
+    if (!microsites_categories_allowed()) return false;
     return true;
 }
 
@@ -811,60 +736,16 @@ function microsites_categories_page3() {
  * dialog. */
 function microsites_postal_address_allowed() {
     global $microsite;
-    if ($microsite == 'livesimply' || $microsite == 'o2')
+    if ($microsite == 'livesimply')
         return true;
     else
         return false;
 }
 
-function o2_postcode_lookup() {
-    $pcs = array(''=>'(choose one)',
-        'BL9 9QL' => 'Bury', 'G3 8EP' => 'Glasgow',
-        'LS11 0NE' => 'Leeds', 'WA7 3QA' => 'Preston Brook',
-        'SL1 4DX' => 'Slough');
-    return $pcs;
-}
-
 /* For displaying the address fetching page (LiveSimply and O2 only) */
 function microsites_new_pledges_stepaddr($data, $errors) {
     global $microsite;
-    if ($microsite == 'o2') {
-        $postcode = isset($data['address_postcode']) ? $data['address_postcode'] : '';
-        $directorate = isset($data['address_1']) ? $data['address_1'] : '';
 ?>
-
-<p>Please could you provide your location and directorate:</p>
-
-<p><strong>Location:</strong>
-<select name="address_postcode" style="width:auto">
-<?      $pcs = o2_postcode_lookup();
-        foreach ($pcs as $pc => $str) {
-            print '<option';
-            if ($pc == $postcode) print ' selected';
-            print ' value="' . $pc . '">' . $str;
-        }
-?>
-</select></p>
-<p>or other postcode:
-<input type="text" name="address_postcode_override" id="address_postcode_override" value="<? if (isset($data['address_postcode_override'])) print htmlspecialchars($data['address_postcode_override']) ?>" size="20">
-</p>
-
-<p><strong>Directorate:</strong>
-<select name="address_1" style="width:auto">
-<?      $ds = array('(choose one)', 'Capability & Innovation',
-            'COO', 'Customer Directorate', 'Finance',
-            'Human Resources', 'Marketing', 'Sales & Retail');
-        foreach ($ds as $d) {
-            print '<option';
-            if ($d == $directorate) print ' selected';
-            if ($d == '(choose one)') print ' value=""';
-            print '>' . htmlspecialchars($d);
-        }
-?>
-</select>
-</p>
-
-<?  } else { ?>
 <p>Please take a moment to fill in this form. It's not obligatory but the
 information you provide us will help us in evaluating the success of the
 <em>live</em>simply challenge.
@@ -884,7 +765,7 @@ information you provide us will help us in evaluating the success of the
     gaze_controls_print_country_choice(microsites_site_country(), null, $errors, array('noglobal'=>true, 'fieldname' => 'address_country')); ?>
 </p>
 
-<?  }
+<?
 }
 
 /* microsites_new_pledges_prominence
@@ -892,7 +773,7 @@ information you provide us will help us in evaluating the success of the
  */
 function microsites_new_pledges_prominence() {
     global $microsite;
-    if ($microsite == 'livesimply' || $microsite == 'o2')
+    if ($microsite == 'livesimply')
         return 'frontpage';
     else
         return 'calculated';
@@ -910,7 +791,7 @@ function microsites_other_people() {
         return 'other Londoners'; // deliberately not translated
     elseif ($microsite == 'catcomm')
         return 'other CatComm supporters'; // deliberately not translated
-    elseif ($microsite == 'livesimply' || $microsite == 'o2')
+    elseif ($microsite == 'livesimply')
         return 'other people'; // deliberately not translated
     else
         return _('other local people');
@@ -996,7 +877,7 @@ function microsites_normal_prominences() {
  */
 function microsites_list_views() {
     global $microsite;
-    if ($microsite == 'livesimply' || $microsite == 'o2') {
+    if ($microsite == 'livesimply') {
         return array('all_open'=>_('Open pledges'), 
         'all_closed'=>_('Closed pledges'));
     } else {
@@ -1018,10 +899,6 @@ function microsites_list_sort_options() {
         $sort['category'] = _('Category');
     if (microsites_sort_by_signers())
         $sort['signers'] = 'Signers';
-    if ($microsite == 'o2') {
-        $sort['site'] = 'Site';
-        $sort['directorate'] = 'Directorate';
-    }
     return $sort;
 }
 
@@ -1063,20 +940,14 @@ function microsites_redirect_external_login() {
  */
 function microsites_invalid_email_address($email) {
     global $microsite;
-    if ($microsite != 'o2') return false;
-    if (preg_match('#@o2\.com$#', $email)) return false;
-    return 'You must enter an email address @o2.com.';
+    return false;
 }
 
 # Display the More Details box during pledge creation
 function microsites_new_pledges_detail_textarea($data) {
     global $microsite;
     $detail = isset($data['detail']) ? htmlspecialchars($data['detail']) : '';
-    if ($microsite == 'o2') {
-        return '<input type="text" size="60" name="detail" value="' . $detail . '">';
-    } else {
-        return '<textarea name="detail" rows="10" cols="40">' . $detail . '</textarea>';
-    }
+    return '<textarea name="detail" rows="10" cols="40">' . $detail . '</textarea>';
 }
 
 # Extra checks for step 1 of pledge creation for microsites;
@@ -1086,24 +957,13 @@ function microsites_step1_error_check($data) {
     if ($email_err = microsites_invalid_email_address($data['email']))
         $error['email'] = $email_err;
     $detail = preg_replace('#\W#', '', $data['detail']);
-    if ($microsite == 'o2') {
-        if (strlen($detail)>100)
-            $error['detail'] = 'Please limit your more information to 100 characters';
-        if (!isset($data['category']) || !$data['category'] || $data['category'] == -1)
-            $error['category'] = 'Please select a part of the People Promise';
-    }
     return $error;
 }
 
 # For displaying extra bits on the preview pledge page
 function microsites_new_pledges_preview_extras($data) {
     global $microsite;
-    if ($microsite != 'o2') return;
-    $loc = $data['address_postcode'];
-    $lookup = o2_postcode_lookup();
-    if (isset($lookup[$loc])) $loc = $lookup[$loc];
-    print '<li>Location: <strong>' . $loc . '</strong></li>';
-    print '<li>Directorate: <strong>' . $data['address_1'] . '</strong></li>';
+    return;
 }
 
 /* microsites_display_login
@@ -1123,7 +983,7 @@ function microsites_display_login() {
  */
 function microsites_change_microsite_allowed() {
     global $microsite;
-    if ($microsite == 'o2' || $microsite == 'livesimply')
+    if ($microsite == 'livesimply')
         return false;
     return true;
 }
@@ -1134,7 +994,7 @@ function microsites_change_microsite_allowed() {
  */
 function microsites_show_translate_blurb() {
     global $microsite;
-    if ($microsite == 'o2' || $microsite == 'livesimply')
+    if ($microsite == 'livesimply')
         return false;
     return true;
 }
@@ -1145,7 +1005,7 @@ function microsites_show_translate_blurb() {
  */
 function microsites_show_alert_advert() {
     global $microsite;
-    if ($microsite == 'o2' || $microsite == 'livesimply')
+    if ($microsite == 'livesimply')
         return false;
     return true;
 } 
@@ -1164,7 +1024,6 @@ function microsites_display_favicon() {
  */
 function microsites_sort_by_signers() {
     global $microsite;
-    if ($microsite == 'o2') return true;
     return false;
 }
 
@@ -1172,76 +1031,60 @@ function microsites_sort_by_signers() {
  */
 function microsites_example_date() {
     global $microsite, $pb_time, $lang;
-    if ($microsite == 'o2')
-        print date('d/m/Y', $pb_time+60*60*24*28);
-    else {
-        print '"';
-        if ($lang=='en-gb')
-            print date('jS F Y', $pb_time+60*60*24*28); // 28 days
-        elseif ($lang=='eo')
-            print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
-        elseif ($lang=='de' || $lang=='sk')
-            print strftime('%e. %B %Y', $pb_time+60*60*24*28);
-        elseif ($lang=='zh')
-            print strftime('%Y&#24180;%m&#26376;%d&#26085;', $pb_time+60*60*24*28);
-        else
-            print strftime('%e %B %Y', $pb_time+60*60*24*28);
-        print '"';
-    }
+    print '"';
+    if ($lang=='en-gb')
+        print date('jS F Y', $pb_time+60*60*24*28); // 28 days
+    elseif ($lang=='eo')
+        print strftime('la %e-a de %B %Y', $pb_time+60*60*24*28);
+    elseif ($lang=='de' || $lang=='sk')
+        print strftime('%e. %B %Y', $pb_time+60*60*24*28);
+    elseif ($lang=='zh')
+        print strftime('%Y&#24180;%m&#26376;%d&#26085;', $pb_time+60*60*24*28);
+    else
+        print strftime('%e %B %Y', $pb_time+60*60*24*28);
+    print '"';
 }
 
 # Return true if this is an intranet installed site
 function microsites_intranet_site() {
     global $microsite;
-    if ($microsite == 'o2') return true;
     return false;
 }
 
 # Return true if all target functionality should be disabled
 function microsites_no_target() {
     global $microsite;
-    if ($microsite == 'o2') return true;
     return false;
 }
 
 # Return true if microsite has SMS at all
 function microsites_has_sms() {
     global $microsite;
-    if ($microsite == 'o2') return false;
     return true;
 }
 
 # Return true if microsite has flyers
 function microsites_has_flyers() {
     global $microsite;
-    if ($microsite == 'o2') return false;
     return true;
 }
 
 # Help for blank searches
 function microsites_search_help() {
     global $microsite;
-    if ($microsite == 'o2') {
-        print p(_('You can search for:'));
-        print "<ul>";
-        print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
-        print li("The name or email address of <strong>a person</strong>, to find pledges they have made or signed");
-        print "</ul>";
-    } else {
-        print p(_('You can search for:'));
-        print "<ul>";
-        print li(_("The name of a <strong>town or city</strong> near you, to find pledges in your area"));
-        if (!microsites_site_country() || microsites_site_country() == 'GB')
-            print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
-        print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
-        print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publicly"));
-        print "</ul>";
-    }
+    print p(_('You can search for:'));
+    print "<ul>";
+    print li(_("The name of a <strong>town or city</strong> near you, to find pledges in your area"));
+    if (!microsites_site_country() || microsites_site_country() == 'GB')
+        print li(_("A <strong>postcode</strong> or postcode area, if you are in the United Kingdom"));
+    print li(_("<strong>Any words</strong>, to find pledges and comments containing those words"));
+    print li(_("The name of <strong>a person</strong>, to find pledges they made or signed publicly"));
+    print "</ul>";
 }
 
 function microsites_has_survey() {
     global $microsite;
-    if ($microsite == 'o2' || $microsite == 'livesimply')
+    if ($microsite == 'livesimply')
         return false;
     return true;
 }

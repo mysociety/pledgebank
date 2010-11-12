@@ -505,7 +505,6 @@ function microsites_step1_error_check($data) {
     $error = array();
     if ($email_err = microsites_invalid_email_address($data['email']))
         $error['email'] = $email_err;
-    $detail = preg_replace('#\W#', '', $data['detail']);
     return $error;
 }
 
@@ -575,6 +574,8 @@ function microsites_no_target() {
 
 # Return true if microsite has SMS at all
 function microsites_has_sms() {
+    global $microsite;
+    if ($microsite == 'barnet') return false;
     return true;
 }
 

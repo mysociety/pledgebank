@@ -61,6 +61,7 @@ microsites_from_extra_domains = {}
 # Return True if posters for that microsite look different from default posters
 # This is used to work out what to name the cache files.
 def microsites_poster_different_look(microsite):
+    if microsite == 'barnet': return True
     return False
 
 def microsites_has_target():
@@ -71,14 +72,20 @@ def microsites_has_sms():
 
 # Fill colour for background of logo
 def microsites_poster_box_fill_colour():
+    if microsite == 'barnet':
+        return (0, 0.506, 0.518)
     return (0.6, 0.45, 0.7)
 
 # Colour for key words and numbers in text
 def microsites_poster_html_highlight_colour():
+    if microsite == 'barnet':
+        return '#008184'
     return '#522994'
 
 # Colour on RTF posters
 def microsites_poster_rtf_colour():
+    if microsite == 'barnet':
+        return PyRTF.Colour('pb', 0, 129, 132)
     return PyRTF.Colour('pb', 82, 41, 148) # 522994
 
 # Draw the logo at the bottom - x1 and y1
@@ -103,7 +110,10 @@ def microsites_poster_watermark(c, x1, y1, w, h):
     else:
         ticksize = h
     p_tick = ParagraphStyle('normal', fontName='ZapfDingbats', alignment = TA_RIGHT, fontSize = ticksize, wordWrap='')
-    story = [ Paragraph(u'<font color="#f4f1f8">\u2713</font>', p_tick) ]
+    if microsite == 'barnet':
+        story = [ Paragraph(u'<font color="#D8EBEB">\u2713</font>', p_tick) ]
+    else:
+        story = [ Paragraph(u'<font color="#f4f1f8">\u2713</font>', p_tick) ]
     if (w<h):
         f = Frame(x1, y1, w, h, showBoundary = 0)
     else:

@@ -291,12 +291,16 @@ function microsites_location_allowed() {
 /* microsites_private_allowed
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
+    global $microsite;
+    if ($microsite == 'barnet') return false;
     return true;
 }
 
 /* microsites_categories_allowed
  * Returns whether categories are used for this microsite at all */
 function microsites_categories_allowed() {
+    global $microsite;
+    if ($microsite == 'barnet') return false;
     return true;
 }
 

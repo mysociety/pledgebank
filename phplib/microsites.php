@@ -64,25 +64,6 @@ function microsites_get_name() {
     return null;
 }
 
-/* microsites_user_tracking
- * Whether or not to use our cross-site conversion tracking for this microsite.
- * See https://secure.mysociety.org/track/ for more information about this. */
-function microsites_user_tracking() {
-    if (OPTION_PB_STAGING) {
-        return false;
-    }
-
-    global $microsite;
-    if (!$microsite) 
-        return true;
-    if ($microsite == 'everywhere')
-        return true;
-
-    /* Don't do any cross site tracking on other sites, to avoid breaking
-     * any privacy policies of organisations using the microsites. */
-    return false;
-}
-
 /* microsites_google_conversion_tracking LABEL
  * Whether to use Google AdWords conversion tracking for signers/new pledges.
  * Outputs Javascript code if yes.  Label is the code used by adverts, things
@@ -168,8 +149,6 @@ function microsites_site_country() {
  * Returns array of text to links for the main site navigation menu.
  */
 function microsites_navigation_menu($contact_ref) {
-    global $microsite;
-
     $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
     debug_timestamp(true, "retrieved person record");
 
@@ -187,7 +166,6 @@ function microsites_navigation_menu($contact_ref) {
 
 # Whether a site has local alerts at all!
 function microsites_local_alerts() {
-    global $microsite;
     return true;
 }
 
@@ -195,7 +173,6 @@ function microsites_local_alerts() {
  * Tips on making a pledge that will work, for top of new pledge page.
  */
 function microsites_new_pledges_toptips() {
-    global $microsite;
     print '<div id="tips">';
     print microsites_toptips_normal();
     print '</div>';
@@ -239,7 +216,6 @@ online, rather than sending a check." . '</li>';
  * Description at top of contact page.
  */
 function microsites_contact_intro() {
-    global $microsite;
     print "<p>";
     print _('Was it useful?  How could it be better?
     We make PledgeBank and thrive off feedback, good and bad.
@@ -254,7 +230,6 @@ function microsites_contact_intro() {
  * Text to display in red box when a pledge is closed.
  */
 function microsites_pledge_closed_text() {
-    global $microsite;
     return strong(_('This pledge is now closed, as its deadline has passed.'));
 }
 
@@ -262,19 +237,15 @@ function microsites_pledge_closed_text() {
  * Add any extra input fields or text to the pledge signup box.
  */
 function microsites_signup_extra_fields($errors) {
-    global $microsite;
 }
 
 /* microsites_signup_extra_fields_validate
  * Validate the values of any extra fields during signup.
  */
 function microsites_signup_extra_fields_validate(&$errors) {
-    global $microsite;
 }
 
 function microsites_new_pledges_terms_and_conditions($data, $v, $local, $errors) {
-    global $microsite;
-
     $P = person_if_signed_on();
     if (!$P) {
         print p(_('Do you have a PledgeBank password?'));
@@ -313,28 +284,24 @@ greater publicity and a greater chance of succeeding.');
 # Features
 
 function microsites_location_allowed() {
-    global $microsite;
     return true;
 }
 
 /* microsites_private_allowed
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
-    global $microsite;
     return true;
 }
 
 /* microsites_categories_allowed
  * Returns whether categories are used for this microsite at all */
 function microsites_categories_allowed() {
-    global $microsite;
     return true;
 }
 
 /* microsites_categories_page3
  * Returns whether categories are offered in the usual place in the new pledge dialog. */
 function microsites_categories_page3() {
-    global $microsite;
     if (!microsites_categories_allowed()) return false;
     return true;
 }
@@ -343,13 +310,11 @@ function microsites_categories_page3() {
  * Returns whether the creator's postal address is asked for in new pledge
  * dialog. */
 function microsites_postal_address_allowed() {
-    global $microsite;
     return false;
 }
 
 /* For displaying the address fetching page (LiveSimply and O2 only) */
 function microsites_new_pledges_stepaddr($data, $errors) {
-    global $microsite;
 ?>
 <p>Please take a moment to fill in this form. It's not obligatory but the
 information you provide us will help us in evaluating the success of the
@@ -377,7 +342,6 @@ information you provide us will help us in evaluating the success of the
  * Returns prominence that new pledges have by default.
  */
 function microsites_new_pledges_prominence() {
-    global $microsite;
     return 'calculated';
 }
 
@@ -397,7 +361,6 @@ function microsites_other_people() {
  * Whether or not comments are displayed for the microsite.
  */
 function microsites_comments_allowed() {
-    global $microsite;
     return true;
 }
 
@@ -468,14 +431,12 @@ function microsites_normal_prominences() {
  * text to describe them as.
  */
 function microsites_list_views() {
-    global $microsite;
     return array('open'=>_('Pledges which need signers'), 'succeeded_open'=>_('Successful open pledges'), 
         'succeeded_closed'=>_('Successful closed pledges'), 'failed' => _('Failed pledges'));
 }
 
 # Valid sort options for the All Pledges page
 function microsites_list_sort_options() {
-    global $microsite;
     $sort = array(
         'creationtime' => _('Start date'), 
         'date'=>_('Deadline')
@@ -503,7 +464,7 @@ $microsites_external_auth_person = null;
  * Return false if normal PledgeBank should be used if external one fails.
  */ 
 function microsites_read_external_auth() {
-    global $microsite, $microsites_external_auth_person;
+    global $microsites_external_auth_person;
 
     if ($microsites_external_auth_person)
         return true;
@@ -516,7 +477,6 @@ function microsites_read_external_auth() {
  * Return true if auth has been redirected to elsewhere.
  * Return false if normal auth is to be used.*/
 function microsites_redirect_external_login() {
-    global $microsite;
     return false;
 }
 
@@ -526,20 +486,17 @@ function microsites_redirect_external_login() {
  * user if it is invalid.
  */
 function microsites_invalid_email_address($email) {
-    global $microsite;
     return false;
 }
 
 # Display the More Details box during pledge creation
 function microsites_new_pledges_detail_textarea($data) {
-    global $microsite;
     $detail = isset($data['detail']) ? htmlspecialchars($data['detail']) : '';
     return '<textarea name="detail" rows="10" cols="40">' . $detail . '</textarea>';
 }
 
 # Extra checks for step 1 of pledge creation for microsites;
 function microsites_step1_error_check($data) {
-    global $microsite;
     $error = array();
     if ($email_err = microsites_invalid_email_address($data['email']))
         $error['email'] = $email_err;
@@ -549,7 +506,6 @@ function microsites_step1_error_check($data) {
 
 # For displaying extra bits on the preview pledge page
 function microsites_new_pledges_preview_extras($data) {
-    global $microsite;
     return;
 }
 
@@ -558,7 +514,6 @@ function microsites_new_pledges_preview_extras($data) {
  * links around the place.
  */
 function microsites_change_microsite_allowed() {
-    global $microsite;
     return true;
 }
 
@@ -567,7 +522,6 @@ function microsites_change_microsite_allowed() {
  * and "translate into your own language" at the bottom of every page.
  */
 function microsites_show_translate_blurb() {
-    global $microsite;
     return true;
 }
 
@@ -576,7 +530,6 @@ function microsites_show_translate_blurb() {
  * just signed up for an email alert
  */
 function microsites_show_alert_advert() {
-    global $microsite;
     return true;
 } 
 
@@ -584,14 +537,13 @@ function microsites_show_alert_advert() {
  * If a microsite has an extra sort-by-signers option on list pages
  */
 function microsites_sort_by_signers() {
-    global $microsite;
     return false;
 }
 
 /* For if a microsite has a special example date on the new pledge page
  */
 function microsites_example_date() {
-    global $microsite, $pb_time, $lang;
+    global $pb_time, $lang;
     print '"';
     if ($lang=='en-gb')
         print date('jS F Y', $pb_time+60*60*24*28); // 28 days
@@ -608,31 +560,26 @@ function microsites_example_date() {
 
 # Return true if this is an intranet installed site
 function microsites_intranet_site() {
-    global $microsite;
     return false;
 }
 
 # Return true if all target functionality should be disabled
 function microsites_no_target() {
-    global $microsite;
     return false;
 }
 
 # Return true if microsite has SMS at all
 function microsites_has_sms() {
-    global $microsite;
     return true;
 }
 
 # Return true if microsite has flyers
 function microsites_has_flyers() {
-    global $microsite;
     return true;
 }
 
 # Help for blank searches
 function microsites_search_help() {
-    global $microsite;
     print p(_('You can search for:'));
     print "<ul>";
     print li(_("The name of a <strong>town or city</strong> near you, to find pledges in your area"));
@@ -644,7 +591,6 @@ function microsites_search_help() {
 }
 
 function microsites_has_survey() {
-    global $microsite;
     return true;
 }
 

@@ -18,23 +18,11 @@ function default_faq() {
     print h2(_('Frequently Asked Questions'));
     print "<dl>\n";
 
-    # XXX move this question into microsites.php
-    if ($microsite && $microsite == 'london') {
-        print dt('What is PledgeBank London for?');
-        print dd("PledgeBank London is a site to help Londoners to work together to
-        improve the quality of life in their city. It is based on PledgeBank,
-        a global website, but it only shows Pledges specific to London.");
-        
-        print dt(_('What does PledgeBank do for me? Why should I use it?'));
-        print dd(_('PledgeBank gives you the reassurance that if you decide to do
-        something for the wider community you won\'t be doing it alone.'));
-    } else {
-        print dt(_('What is PledgeBank for?'));
-        print dd(_("PledgeBank is a site to help people get things done, especially things
+    print dt(_('What is PledgeBank for?'));
+    print dd(_("PledgeBank is a site to help people get things done, especially things
         that require several people. We think that the world needs such a
         service: lots of good things don't happen because there aren't enough
         organised people to do them."));
-    }
 
     print dt(_('Can you give me some examples?'));
     print dd(_("Sure. 'I will start recycling if 100 people in my town will do the
@@ -115,8 +103,6 @@ function default_faq() {
     core developers were paid for by the 
     <acronym title="Office of the Deputy Prime Minister">ODPM</acronym>\'s 
     e-innovations fund in partnership with West Sussex County Council.');
-    if ($lang == 'en-gb')
-        $paid .= ' The <a href="http://www.williampears.co.uk/found.htm">Pears Foundation</a> sponsored the <a href="http://london.pledgebank.com/">London version of PledgeBank</a>.';
     print dd($paid);
 
     print dt(_('Do you need any help with the project?'));

@@ -489,21 +489,15 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
         $place = $params['place'];
 
     # Microsite specific changes
-    $london = false;
     $any_country = true;
     $force_country = false;
-    if ($microsite && $microsite == 'london') {
-        $london = true;
-        $any_country = false;
-        $force_country = 'GB';
-    }
 ?>
 <form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">
 <?  if (array_key_exists('track', $params) && $params['track'])
         print '<input type="hidden" name="track" value="' . htmlentities($params['track']) . '">';
 ?>
-<p><strong><?=$london ? 'Sign up for emails when people make pledges in your part of London' : _('Sign up for emails when people make pledges in your local area')?> 
+<p><strong><?=_('Sign up for emails when people make pledges in your local area')?> 
 <? if ($any_country) { ?>
 <?=$newflash?'&mdash;':''?> <?=$newflash?_('Works in any country!'):''?> 
 <? } ?>

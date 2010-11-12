@@ -8,46 +8,39 @@ chdir $FindBin::Bin;
 my $outdir = '../web/microsites/autogen/';
 mkdir $outdir;
 
-my @sites = qw( catcomm london );
+my @sites = qw( catcomm );
 
 my %has_people = (
-    london => 1,
 );
 
 # 21004a - "Bank" in the heading, and nav. colour
 my %purple_text = (
     catcomm => '000000',
-    london => '000000',
 );
 
 # 522994 - Link colour,  and lots of borders
 my %link_colour = (
     catcomm => '31659c',
-    london => '31659c',
 );
 
 # 7b52a5 - visited link colour
 my %visited_colour = (
     catcomm => '004488',
-    london => '004488',
 );
 
 # 9c7bbd - header background, "start" background
 my %head_back = (
     catcomm => '99ccff',
-    london => 'ee3438',
 );
 
 # c6b5de - new form background, spreadword background
 my %form_back = (
     catcomm => '99ccff',
-    london => '9999ff',
 );
 
 # f6e5ff - Pledge background, tips background, box hover
 my %pledge_back = (
     catcomm => 'd7ebff',
-    london => 'ccccff',
 );
 
 # ff8429 - Sign box border
@@ -124,9 +117,5 @@ sub catcomm_extra {
     width: 32%;
 }
 EOF
-}
-
-sub london_extra {
-    print NEWCSS "\n#sponsor { text-align: center; clear: both; }\n";
 }
 

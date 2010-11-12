@@ -61,30 +61,26 @@ microsites_from_extra_domains = {}
 # Return True if posters for that microsite look different from default posters
 # This is used to work out what to name the cache files.
 def microsites_poster_different_look(microsite):
-    return microsite in ('london')
+    return False
+
 def microsites_has_target():
     return True
+
 def microsites_has_sms():
     return True
 
 # Fill colour for background of logo
 def microsites_poster_box_fill_colour():
-    if microsite == 'london':
-        return (0.93, 0.2, 0.22)
-    else:
-        return (0.6, 0.45, 0.7)
+    return (0.6, 0.45, 0.7)
+
 # Colour for key words and numbers in text
 def microsites_poster_html_highlight_colour():
-    if microsite == 'london':
-        return '#31659c'
-    else:
-        return '#522994'
+    return '#522994'
+
 # Colour on RTF posters
 def microsites_poster_rtf_colour():
-    if microsite == 'london':
-        return PyRTF.Colour('pb', 49, 101, 156) # 31659c
-    else:
-        return PyRTF.Colour('pb', 82, 41, 148) # 522994
+    return PyRTF.Colour('pb', 82, 41, 148) # 522994
+
 # Draw the logo at the bottom - x1 and y1
 def microsites_poster_logo(c, x1, y1, w, h_purple, p_footer):
     # Draw purple bar

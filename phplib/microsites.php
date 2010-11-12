@@ -27,7 +27,6 @@
 
 /* Codes of microsites, and name displayed next to PledgeBank logo */
 $microsites_list = array('everywhere' => _('Everywhere'),
-                         'london' => 'London',
                          'catcomm' => 'CatComm',
 );
 
@@ -43,7 +42,6 @@ $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 
 /* These are listed on /where */
 $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countries in all languages'),
-                                'london' => _('London (United Kingdom)'),
                                 'catcomm' => _('Catalytic Communities')
                                 );
 
@@ -60,7 +58,6 @@ function microsites_for_locale() {
  * field in the pledges table. */
 $microsites_no_pledge_field = array(
     'everywhere', 
-    'london' // London pledges are those in a certain geographical area, they aren't marked in this field
 );
 
 /* microsites_get_name 
@@ -83,7 +80,7 @@ function microsites_user_tracking() {
     global $microsite;
     if (!$microsite) 
         return true;
-    if ($microsite == 'everywhere' || $microsite == 'london')
+    if ($microsite == 'everywhere')
         return true;
 
     /* Don't do any cross site tracking on other sites, to avoid breaking
@@ -103,7 +100,7 @@ function microsites_google_conversion_tracking($label) {
     if (OPTION_BASE_URL != "http://www.pledgebank.com")
         return false;
 
-    if (!$microsite || $microsite == 'everywhere' || $microsite == 'london') {
+    if (!$microsite || $microsite == 'everywhere') {
 ?>
 <!-- Google Code for signup Conversion Page -->
 <script language="JavaScript" type="text/javascript">
@@ -137,11 +134,6 @@ function microsites_redirect($p) {
     global $microsite;
     $redirect_microsite = $microsite;
 
-    # Specific pledges which redirect to certain microsite
-    if ($p->ref() == 'Sportclubpatrons') {
-        $redirect_microsite = 'london';
-    }
-
     # Microsites for which all pledges marked in the database as belonging to
     # that microsite do a redirect
     $redirect_microsites = array();
@@ -168,8 +160,6 @@ function microsites_redirect($p) {
 function microsites_site_country() {
     global $site_country, $microsite;
     if ($microsite) {
-        if ($microsite == 'london')
-            return 'GB';
         return null;
     }
     return $site_country;
@@ -183,13 +173,7 @@ function microsites_site_country() {
  * Returns HTML to use for logo of microsite, or country. */
 function microsites_logo() {
     global $microsite, $lang;
-    if ($microsite && $microsite == 'london') {
-        return '
-<h1><a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span> <span id="logo_pledge">London</span></a>
-<span id="countrytitle"><a href="/where">' . _('(change)') . '</a></span>
-<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>';
-
-    } elseif ($microsite && $microsite == 'catcomm') {
+    if ($microsite && $microsite == 'catcomm') {
         return '
 <a href="http://www.catcomm.org"><img src="/microsites/catcomm-logo.png" alt="Catalytic Communities" align="left"
     style="
@@ -240,7 +224,6 @@ function microsites_css_files() {
     $styles = array();
     // Microsite PledgeBank style sheet
     if ($microsite && in_array($microsite, array(
-                'london', 
                 'catcomm',
             ))) {
         $styles[] = "/microsites/autogen/$microsite.css";
@@ -312,15 +295,7 @@ function microsites_frontpage_has_intro() {
 function microsites_frontpage_intro() {
     global $microsite, $lang;
     $tom = false;
-    if ($microsite == 'london') {
-        ?><h2>Tell Londoners &#8220;I&#8217;ll do it, but only if you&#8217;ll help me do it&#8221;</h2>
-        <p>In the summer of 2012 the eyes of the world will be on London for a
-        fortnight as the Olympics games return to the capital for the third
-        time in its history. This site is collecting pledges encouraging
-        Londoners to work together on projects to turn London from a great city
-        to the greatest city in the world by 2012.</p>
-        <?
-    } elseif ($microsite == 'catcomm') {
+    if ($microsite == 'catcomm') {
         ?><h2>
     
     Tell the world &#8220;I&#8217;ll support communities working to solve local problems, but only if you will too!&#8221;</h2>
@@ -426,11 +401,6 @@ function microsites_frontpage_has_offline_secrets() {
  */
 function microsites_frontpage_credit_footer() {
     global $microsite;
-    if ($microsite == 'london') {
-?>
-        <div id="sponsor"><img src="/microsites/pearsfoundation_solid.jpg" border="0" alt="Supported by The Pears Foundation"></div>
-<?  } 
-
 }
 
 /* microsites_new_pledges_toptips
@@ -629,9 +599,7 @@ function microsites_new_pledges_prominence() {
  */
 function microsites_other_people() {
     global $microsite;
-    if ($microsite == 'london')
-        return 'other Londoners'; // deliberately not translated
-    elseif ($microsite == 'catcomm')
+    if ($microsite == 'catcomm')
         return 'other CatComm supporters'; // deliberately not translated
     else
         return _('other local people');
@@ -665,8 +633,6 @@ function microsites_filter_main(&$sql_params) {
 
     if ($microsite == 'everywhere')
         return "(1=1)";
-    if ($microsite == 'london')
-        return "(pledges.id in (select pledge_id from pledge_find_nearby(51.5,-0.1166667, 25)))";
     $sql_params[] = $microsite;
     return "(microsite = ?)";
 }
@@ -693,8 +659,6 @@ function microsites_filter_foreign(&$sql_params) {
 
     if ($microsite == 'everywhere')
         return "(1=0)";
-    if ($microsite == 'london')
-        return "(pledges.id not in (select pledge_id from pledge_find_nearby(51.5,-0.1166667, 25)))";
     $sql_params[] = $microsite;
     return "(microsite <> ? or microsite is null)";
 }

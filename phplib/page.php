@@ -56,13 +56,8 @@ function strip_title($title) {
  * with special characters encoded as entities. This prints up to the
  * start of the "pbcontent" <div>. Optionally, PARAMS specifies other featurs
  * of the page; possible keys in PARAMS are:
- *  nonav
- *      If true, suppresses display of the top title and navigation.
  *  noprint
  *      If true, suppresses printing of the top title and navication
- *  noreflink
- *      If true, suppresses display of link to "this pledge's permanent
- *      location".
  *  last-modified
  *      Optionally gives the last-modified time of the page as seconds since
  *      the epoch.
@@ -96,15 +91,34 @@ function page_header($title, $params = array()) {
 
     if (!is_array($params))
         err("PARAMS must be an array in page_header");
+    $default_params = array(
+        'noprint' => '',
+        'id' => '',
+        'robots' => '',
+        'rss' => array(),
+        'css' => '',
+        'banner' => '',
+    );
+    foreach ($default_params as $k => $v) {
+        if (!array_key_exists($k, $params))
+            $params[$k] = $v;
+    }
     foreach ($params as $k => $v) {
-        if (!preg_match('/^(nonav|noprint|noreflink|last-modified|etag|cache-max-age|id|pref|ref|robots|rss|css|override|banner)$/', $k))
+        if (!preg_match('/^(noprint|last-modified|etag|cache-max-age|id|pref|ref|robots|rss|css|override|banner)$/', $k))
             err("bad key '$k' with value '$v' in PARAMS argument to page_header");
+        if ($k == 'id' && $v)
+            $params['id'] = ' id="' . $params['id'] . '"';
+        if ($k == 'robots' && $v)
+            $params['robots'] = '<meta name="robots" content="' . $params['robots'] . '">';
+        if ($k == 'css' && $v)
+            $params['css'] = '<style type="text/css" media="all">@import url(\'' . $params['css'] . '\');</style>';
     }
 
     static $header_outputted = 0;
     if ($header_outputted && !array_key_exists('override', $params)) {
         return;
     }
+    $header_outputted = 1;
 
     global $contact_ref;
     $contact_ref = '';
@@ -112,56 +126,12 @@ function page_header($title, $params = array()) {
         $contact_ref = "?ref=" . htmlspecialchars($params['ref']);
     }
 
-    // The http-equiv in the HTML below doesn't always seem to override HTTP
-    // header, so we say that we are UTF-8 in the HTTP header as well (Case
-    // where this was required: On my laptop, Apache wasn't setting UTF-8 in
-    // header by default as on live server, and FireFox was defaulting to
-    // latin-1 -- Francis)
-    header('Content-Type: text/html; charset=utf-8');
-    page_cache_headers($params);
-
     /* On an error page don't do anything complicated like check login */
     global $err_handling_error;
     $P = null;
     if (!$err_handling_error) 
         $P = pb_person_if_signed_on(true); /* Don't renew any login cookie. */
 
-    $header_outputted = 1;
-?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="<?=$lang ?>">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<?  if (array_key_exists('robots', $params)) { ?>
-<meta name="robots" content="<?=$params['robots']?>">
-<?  }
-
-    echo '<title>';
-    if ($title) 
-        print strip_title($title) . " - ";
-    echo strip_title(_('PledgeBank'));
-    if (!$title) print ' - ' . microsites_html_title_slogan();
-    echo '</title>';
-
-    /* XXX @import url('...') uses single-quotes to hide the style-sheet
-     * from Mac IE. Ugly, but it works. */
-    foreach (microsites_css_files() as $microsite_file) {
-        echo '<style type="text/css" media="all">@import url(\'' . $microsite_file . '\');</style>';
-    }
-    echo '<link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">';
-    echo '<!--[if LT IE 7]><style type="text/css">@import url("/css/ie6.css");</style><![endif]-->';
-    if (array_key_exists('css', $params)) {
-	echo '<style type="text/css" media="all">@import url(\'' . $params['css'] . '\');</style>';
-    }
-    if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr' || $lang == 'sk') {
-	echo '<style type="text/css" media="all">@import url(\'/css/pb.' . $lang . '.css\');</style>';
-    }
-
-    if (array_key_exists('rss', $params)) {
-        foreach ($params['rss'] as $rss_title => $rss_url) {
-            print '<link rel="alternate" type="application/rss+xml" title="' . $rss_title . '" href="'.$rss_url.'">' . "\n";
-        }
-    }
-    // Find appropriate translated Javascript file
     $js_file = "js/pb.$lang.js";
     if ($microsite) {
         $microsite_js_file = "js/pb.$lang.$microsite.js";
@@ -169,62 +139,17 @@ function page_header($title, $params = array()) {
             $js_file = $microsite_js_file;
         }
     }
-    if (!file_exists($js_file)) 
-        $js_file = null;
-    if ($js_file) { ?>
-<script type="text/javascript" src="/<?=$js_file?>"></script>
-<?  } ?>
-<script type="text/javascript" src="/pb.js"></script>
-<script type="text/javascript" src="/jslib/utils.js"></script>
-<script type="text/javascript" src="/jquery.js"></script>
-<?  //this was conditional, but now we need it nearly always for bottom of page local alert signups
-    //if (array_key_exists('gazejs', $params)) { ?>
-<script type="text/javascript" src="/gaze.js"></script>
-<? //}
-    microsites_display_favicon();
-?>
-</head>
-<body<? if (array_key_exists('id', $params)) print ' id="' . $params['id'] . '"'; ?>>
-<?
-        // On the "print flyers from in-page image" page, these top parts are hidden from printing
-        if (array_key_exists('noprint', $params) and $params['noprint'])
-            print '<div class="noprint">';
+    if (file_exists($js_file))
+        $params['js_file'] = '<script type="text/javascript" src="/' . $js_file . '"></script>';
+    else
+        $params['js_file'] = '';
 
-        // Display title bar
-        if (!array_key_exists('nonav', $params) or !$params['nonav']) {
-        ?>
-        <?=microsites_logo()?>
-        <hr class="v"><?
-        }
-
-?><div id="pballheader"><? 
-
-    // Start flyers-printing again
-    if (array_key_exists('noprint', $params) and $params['noprint'])
-        print '</div> <!-- noprint -->';
-
-    // Display who is logged in 
-    if (microsites_display_login() && $P) {
-        print '<p id="signedon" class="noprint">';
-        if ($P->has_name())
-		printf(_('Hello, %s'), htmlspecialchars($P->name));
-	else
-		printf(_('Hello, %s'), htmlspecialchars($P->email));
-        print ' <small>(<a href="/logout">';
-        print _('this isn\'t you?  click here');
-        print '</a>)</small></p>';
-    }
-
-    echo '</div>'; # id="pballheader"
-    echo '<form id="nav_search" accept-charset="utf-8" action="/search" method="get">';
-    echo _('Search for pledges:') . ' <input type="text" id="q" name="q" size="25" value="'
-        . htmlspecialchars(get_http_var('q', true)) . '"><input type="submit" value="'
-        . _('Search') . '">
-</form>';
-    if (isset($params['banner'])) {
-        echo $params['banner'];
-    }
-    echo '<div id="pbcontent">';
+    # Okay, actual output
+    header('Content-Type: text/html; charset=utf-8');
+    page_cache_headers($params);
+    $site = $microsite;
+    if (!$site) $site = 'website';
+    include_once "../templates/$site/header.php";
 
     // Warn that we are on a testing site
     $devwarning = array();
@@ -455,8 +380,8 @@ function page_cache_headers($params) {
         }
 
         /* Ditto a max-age if specified. */
-        if (array_key_exists('cache-max-age', $params))
-            header('Cache-Control: max-age=' . $params['cache-max-age']);
+        #if (array_key_exists('cache-max-age', $params))
+        #    header('Cache-Control: max-age=' . $params['cache-max-age']);
     }
 }
 

@@ -31,13 +31,8 @@ $microsites_list = array('everywhere' => _('Everywhere'),
 );
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
-if (OPTION_PB_STAGING) {
-    # Francis's local test domains
-    $microsites_from_extra_domains = array();
-} else {
-    # If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
-    $microsites_from_extra_domains = array();
-}
+# If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
+$microsites_from_extra_domains = array();
 $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 
 /* These are listed on /where */
@@ -168,78 +163,6 @@ function microsites_site_country() {
 
 #############################################################################
 # Styling
-
-/* microsites_logo
- * Returns HTML to use for logo of microsite, or country. */
-function microsites_logo() {
-    global $microsite, $lang;
-    if ($microsite && $microsite == 'catcomm') {
-        return '
-<a href="http://www.catcomm.org"><img src="/microsites/catcomm-logo.png" alt="Catalytic Communities" align="left"
-    style="
-    margin-top: -10px; 
-    margin-left: -0.4em 
-    background-color: #ffffff;
-    float: left;
-    border: solid 2px #21004a;
-    padding: 0px;
-    margin: 10px;
-    "></a>
-<h1>
-<a id="logo" href="/"><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></a><span id="beta">Beta</span>
-<span id="countrytitle"><a href="/where">' . _('(other PledgeBanks)') . '</a></span>
-<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span>
-</h1>
-';
-    } elseif ($lang == 'zh') {
-        $country_name = pb_site_country_name();
-        return '
-<h1 style="padding-bottom:0.25em;"><a id="logo" href="/"><span id="logo_zh">' . _('Pledge') . _('Bank') . '</span>
-<small><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></small></a>
-<span id="countrytitle"><a href="/where">' . $country_name . '</a></span>
-<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>';
-    } else {
-        $country_name = pb_site_country_name();
-        return '
-<h1><a id="logo" href="/"><span id="logo_pledge">' . _('Pledge') . '</span><span id="logo_bank">' . _('Bank') . '</span></a>
-<span id="countrytitle"><a href="/where">' . $country_name . '</a></span>
-<span id="tagline"><small><br>' . _('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help') . '</small></span></h1>';
-    }
-}
-
-/* microsites_html_title_slogan
- * On the front page, slogon to display before site name */
-function microsites_html_title_slogan() {
-    global $microsite;
-
-    # TRANS: 'PledgeBank' here is the first part of the HTML title which appears on browser windows, and search engines
-    return _("Tell the world \"I'll do it, but only if you'll help\"");
-}
- 
-/* microsites_css_files
- * Return array of URLs for CSS files */
-function microsites_css_files() {
-    global $microsite;
-
-    $styles = array();
-    // Microsite PledgeBank style sheet
-    if ($microsite && in_array($microsite, array(
-                'catcomm',
-            ))) {
-        $styles[] = "/microsites/autogen/$microsite.css";
-    } else {
-        $styles[] = "/pb.2.css";
-    }
-
-    // Microsite cobranding style sheet
-    if ($microsite) {
-        if ($microsite == 'XXX') { // example, remove if you use this
-            $styles[] = "/microsites/XXX/YYY.css";
-        }
-    }
-
-    return $styles;
-}
 
 /* microsites_navigation_menu
  * Returns array of text to links for the main site navigation menu.
@@ -630,17 +553,6 @@ function microsites_new_pledges_preview_extras($data) {
     return;
 }
 
-/* microsites_display_login
- * Return whether or not to display the "Hello, Victor Papanek" message at
- * the top of the page. If you are overriding the login functions above,
- * the microsite header may be displaying this, so shouldn't be duplicated
- * in the PledgeBank header.
- */
-function microsites_display_login() {
-    global $microsite;
-    return true;
-}
-
 /* microsites_change_microsite_allowed
  * Returns whether or not you should display the "change/choose site"
  * links around the place.
@@ -667,13 +579,6 @@ function microsites_show_alert_advert() {
     global $microsite;
     return true;
 } 
-
-/* microsites_display_favicon
- * If a microsite has a special favicon, output it now.
- */
-function microsites_display_favicon() {
-    global $microsite;
-}
 
 /* microsites_sort_by_signers
  * If a microsite has an extra sort-by-signers option on list pages

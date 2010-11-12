@@ -417,7 +417,6 @@ locale_pop();
 $params = array(
     'ref'=>$p->ref(),
     'pref' => $p->url_typein(),
-    'noreflink' => 1,
     'last-modified' => $p->last_change_time(),
     'etag' => $etag,
     #'css' => '/jslib/share/share.css',

@@ -28,6 +28,7 @@
 /* Codes of microsites, and name displayed next to PledgeBank logo */
 $microsites_list = array('everywhere' => _('Everywhere'),
                          'catcomm' => 'CatComm',
+                         'barnet' => 'Barnet',
 );
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */

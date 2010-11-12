@@ -33,70 +33,11 @@ page_header(null,
     )
 );
 debug_comment_timestamp("after page_header()");
-front_page();
+$site = $microsite;
+if (!$site) $site = 'website';
+include_once "../templates/$site/index.php";
 debug_comment_timestamp("after front_page()");
 page_footer();
-
-function front_page() {
-    global $lang, $microsite;
-
-    if (microsites_frontpage_has_intro()) {
-        echo '<div id="tellworld">';
-        microsites_frontpage_intro();
-        echo '</div>';
-    }
-    debug_comment_timestamp("after microsites_frontpage_intro()");
-
-    echo '<div id="col">';
-
-    if (microsites_frontpage_has_start_your_own()) {
-        echo '<div id="startblurb1"><div id="startblurb">
-<div id="startbubble"></div>
-<p id="start"><a href="./new"><strong>', _('Start your pledge'), '&nbsp;&raquo;</strong></a></p>
-<ul>
-<li>' . _('Get your own page')
-. '<li>' . _('Help with promotion')
-. '<li>' . _('Use positive peer pressure to change your community')
-. '</ul>
-</div></div>';
-    }
-
-    microsites_frontpage_extra_blurb();
-
-    if (!$microsite) {
-        $news = file_get_contents('http://www.mysociety.org/category/pledgebank/feed/');
-        if (preg_match('#<item>.*?<title>(.*?)</title>.*?<link>(.*?)</link>.*?<description><!\[CDATA\[(.*?)\]\]></description>#s', $news, $m)) {
-	    $link = str_replace('www.mysociety.org', 'www.pledgebank.com/blog', $m[2]);
-            $excerpt = preg_replace('#\s+\[\.\.\.\]#', '&hellip; <a href="'
-                . $link . '">' . _('more') . '</a>', $m[3]);
-            echo '<div id="blogexcerpt">',
-                 h2(_('Latest from our blog')), ' <h3 class="head_with_mast">',
-                 $m[1], '</h3> <p class="head_mast">', $excerpt, '</div>';
-        }
-    }
-
-    echo '<div id="currentpledges">';
-    list_frontpage_pledges();
-    debug_comment_timestamp("after list_frontpage_pledges()");
-    echo '</div>';
-
-    if (microsites_comments_allowed()) {
-        comments_show_latest();
-        debug_comment_timestamp("after comments_show_latest()");
-    }
-
-    echo '</div>'; # col
-
-    if (!microsites_no_target()) {
-        echo '<div id="successfulpledges">';
-        list_closing_pledges();
-        list_successful_pledges();
-        echo '</div>';
-    }
-    debug_comment_timestamp("after list_successful_pledges()");
-
-    microsites_frontpage_credit_footer();
-}
 
 function format_pledge_list($pledges, $params) {
     $out = '<ul class="search_results">';
@@ -119,7 +60,9 @@ function list_frontpage_pledges() {
     global $pb_today;
     echo '<a href="', pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list")),
         '"><img align="right" border="0" src="rss.gif" alt="', _('RSS feed of new pledges'), '"></a>';
-    echo microsites_frontpage_sign_invitation_text();
+    print '<h2 class="head_with_mast">';
+    print _('Sign a pledge');
+    print "</h2>";
 
     list($pledges, $more) = pledge_get_frontpage_list(3, 3);
 

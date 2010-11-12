@@ -11,14 +11,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <?=$params['robots']?>
-<title>
-<?
-    if ($title) 
-        print strip_title($title) . " - ";
-    echo strip_title(_('PledgeBank'));
-    if (!$title) print ' - ' . _("Tell the world \"I'll do it, but only if you'll help\"");
-?>
-</title>
+<title><?=$title?></title>
 <style type="text/css" media="all">@import url('/microsites/autogen/catcomm.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <!--[if LT IE 7]><style type="text/css">@import url("/css/ie6.css");</style><![endif]-->

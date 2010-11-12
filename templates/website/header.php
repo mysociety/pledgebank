@@ -13,14 +13,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <?=$params['robots']?>
-<title><?
-    if ($title) 
-        print strip_title($title) . " - ";
-    echo strip_title(_('PledgeBank'));
-    # TRANS: 'PledgeBank' here is the first part of the HTML title which appears on browser windows, and search engines
-    if (!$title) print ' - ' . _("Tell the world \"I'll do it, but only if you'll help\"");
-?>
-</title>
+<title><?=$title?></title>
 
 <style type="text/css" media="all">@import url('/pb.2.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">

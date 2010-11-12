@@ -50,7 +50,7 @@
 
 <link rel="stylesheet" type="text/css" href="/assets/barnet/css.css">
 
-    <title>PARAM_TITLE</title>
+    <title><?=$title?></title>
     
   	<style type="text/css">
   	  h2, .nounderline{border: none;} /* nounderline for h2 is from more recent Barnet CSS, perhaps?  */
@@ -93,6 +93,6 @@
 
       <div id="wrap">
           <div id="content">
-              <h1 style="margin-bottom:0.666em;">PARAM_TITLE</h1>
+              <h1 style="margin-bottom:0.666em;">PledgeBank</h1>
               <!-- end of head -->
               

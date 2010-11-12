@@ -445,6 +445,9 @@ class Pledge {
 
     function render_box($params = array()) {
         $sentence_params = array('firstperson'=>true, 'html'=>true);
+        global $microsite;
+        if ($microsite == 'barnet')
+            $sentence_params['firstperson'] = 'onlyname';
         if (array_key_exists('href', $params)) {
             $sentence_params['href'] = $params['href'];
         }
@@ -469,11 +472,11 @@ class Pledge {
     (<a title="<?=_("Roughly translate the pledge into your language (using Altavista's Babel Fish machine translator)")?>" href="<?=htmlspecialchars($this->url_translate_pledge())?>"><?=_("translate")?></a>)
 <?      }
         $P = pb_person_if_signed_on();
-        if (!is_null($P) && !is_null($P->email()) && preg_match('/(@mysociety.org$)|(^francis@flourish.org$)/', $P->email())) { ?>
+        if (!is_null($P) && !is_null($P->email()) && preg_match('/@mysociety.org$/', $P->email())) { ?>
     (<a href="<?=OPTION_ADMIN_URL?>?page=pb&amp;pledge=<?=$this->ref()?>"><?=_("admin")?></a>)
 <?      } ?>
 </p>
-<?      if (!$this->byarea()) { ?>
+<?      if (!$this->byarea() && $microsite != 'barnet') { ?>
 <p style="text-align: right">&mdash; <?=$this->h_name_and_identity() ?> 
 
 <?          if (array_key_exists('showcontact', $params) && $params['showcontact'] && !$this->closed_for_comments()) { ?>
@@ -650,6 +653,8 @@ class Pledge {
             } else {
                 $s = sprintf(_("I will %s."), $title);
             }
+        } elseif ($firstperson === "onlyname") {
+            $s = sprintf(_("%s will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify_num($r['target']), $r['type'], $signup);
         } elseif ($firstperson === "includename") {
             $s = sprintf(_("I, %s, will %s but only if <strong>%s</strong> %s will %s."), $r['name'], $title, prettify_num($r['target']), $r['type'], $signup);
         } else {

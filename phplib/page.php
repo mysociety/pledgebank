@@ -144,6 +144,15 @@ function page_header($title, $params = array()) {
     else
         $params['js_file'] = '';
 
+    if ($title) {
+        $title = strip_title($title) . " - ";
+        $title .= strip_title(_('PledgeBank'));
+    } else {
+        $title = strip_title(_('PledgeBank'));
+        # TRANS: 'PledgeBank' here is the first part of the HTML title which appears on browser windows, and search engines
+        $title .= ' - ' . _("Tell the world \"I'll do it, but only if you'll help\"");
+    }
+
     # Okay, actual output
     header('Content-Type: text/html; charset=utf-8');
     page_cache_headers($params);

@@ -292,6 +292,7 @@ define('MAX_PAGE_COMMENTS', '50');
 function draw_comments($p) {
     if (!$p->pin())
         print '<a href="' . $p->url_comments_rss() . '"><img align="right" border="0" src="rss.gif" alt="' . _('RSS feed of comments on this pledge') . '"></a>';
+    print '<div id="comments">';
     print h2('<a name="comments">' . _('Comments on this pledge') . '</a>');
 
     $limit = 0;
@@ -323,6 +324,7 @@ function draw_comments($p) {
         print p($showall_para);
     }*/
 
+    print '</div>';
     comments_form($p->id(), 1, false, $p->closed_for_comments());
 }
 
@@ -425,28 +427,8 @@ if (microsites_comments_allowed() && !$p->pin())
     $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());
  
 page_header($title, $params);
-debug_comment_timestamp("after page_header()");
-pledge_draw_status_plaque($p);
-debug_comment_timestamp("after draw_status_plaque()");
-$p->render_box(array('showdetails' => true, 'reportlink' => true, 'showcontact' => true, 'id' => 'pledge_main'));
-debug_comment_timestamp("after \$p->render_box()");
-print '<div id="col2">';
-if (!$p->finished())
-    $p->sign_box();
-else
-    draw_connections_for_finished($p);
-draw_spreadword($p);
-debug_comment_timestamp("after draw_spreadword()");
-if (microsites_comments_allowed())
-    draw_comments($p);
-print '</div>';
-debug_comment_timestamp("after draw_comments()");
-print '<div id="col1">';
-draw_signatories($p);
-debug_comment_timestamp("after draw_signatories()");
-draw_connections($p);
-debug_comment_timestamp("after draw_connections()");
-print '</div>';
-
+$site = $microsite;
+if (!$site) $site = 'website';
+include_once "../templates/$site/ref-index.php";
 page_footer();
-?>
+

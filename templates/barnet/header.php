@@ -48,7 +48,7 @@
 <script type="text/javascript" src="http://barnet.fixmystreet.com/cobrands/barnet/javascript/jquery-cookie-min.js"></script>
 <script type="text/javascript" src="http://barnet.fixmystreet.com/cobrands/barnet/javascript/2008-portsurf.js"></script>
 
-<link rel="stylesheet" type="text/css" href="/assets/barnet/css.css">
+<link rel="stylesheet" type="text/css" href="/microsites/barnet/css.css">
 
     <title><?=$title?></title>
     
@@ -93,6 +93,6 @@
 
       <div id="wrap">
           <div id="content">
-              <h1 style="margin-bottom:0.666em;">PledgeBank</h1>
+              <!-- <h1 style="margin-bottom:0.666em;">PledgeBank</h1> -->
               <!-- end of head -->
               

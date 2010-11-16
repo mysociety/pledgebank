@@ -1,0 +1,278 @@
+
+  #content{
+    background-color: #001100;
+    background-image: url('whitefieldsat.jpg');
+    background-repeat: repeat;
+    background-position: top left;
+    margin-right:0;
+    margin-top: 0px;
+    padding-top: 20px;
+    position: relative;
+  }
+  #pledge_main{
+	-moz-border-radius: 6px;
+    border-radius: 6px;
+    background-color: #003300;
+	color:white;
+    margin-left: 20px;
+    margin-right: 320px;
+    margin-top:24px;
+    padding: 0 24px;
+  }
+  #pledge_main p{
+    padding: 8px;
+  }
+  #pledge_main h2{
+    display: none; /* don't show */
+    font-size: 200%;
+    background-color: white;
+    margin:0;
+    padding-left: 30px;
+  }
+  p.head_mast{
+    font-size:150%;
+    line-height: 2em;
+    margin: 0.5em 0;
+    color: #d8ebeb;
+  }
+  p.head_mast span{
+    color: #ffffff;
+  }
+  .ms-signers-finished, .ms-signers-unfinished{
+    margin: 0px 150px 0 20px;
+    color: #ffffff;
+  }
+
+   /* join of ms-signed-up and ms-target is problematic cross-browser: much better to
+      do this with a single elment, with the texts inside it. Hindsight. */
+  .ms-signed-up{
+	font-weight: bold;
+	height:40px;
+	line-height: 40px;
+	margin-left: 85px;
+	padding-left:20px;
+	display: block;
+	float:left;
+    font-size: 80%;
+    background-image: url('top-arrow-right.png');
+    background-repeat: repeat-x;
+    background-position: center right;
+  }
+  .ms-target{
+	font-weight: bold;
+    background-image: url('top-arrow-right.png');
+    background-repeat: repeat-x;
+    background-position: center left;
+    display: block;	
+    height: 40px;
+	line-height: 40px;
+    text-align: right;
+    margin-right: 20px;
+    padding-right: 55px;
+    font-size: 80%;
+  }
+  .ms-signers-unfinished{
+    font-size:180%;
+    position:relative;
+    height: 40px;
+  }
+  .ms-pledger{ /* e.g., Barnet council */
+    font-size:80%;
+  }
+  .ms-pledger-action{ /* e.g., will offer 2 sacks of bulbs */
+    font-size: 200%;
+  }
+  .ms-pledge-people{ /* e.g., <span class='ms-qty'>12</span> people */
+    font-size: 150%;
+  }
+  .ms-signatory-action{ /* e.g., will plant them */
+    font-size: 175%;
+    font-weight: bold;
+  }
+  .ms-qty{
+    font-size:300%;
+    font-weight: bold;
+    font-style: normal;
+    vertical-align: middle;
+    margin-top:10px;
+    margin-bottom:10px;
+    display: block;
+  }
+  .ms-pledge-people .ms-qty{
+     /* display: inline; */ /* not in IE you don't */
+  }
+  .ms-signers-unfinished .ms-signed-up .ms-qty{
+    display: block;
+	position: absolute;
+	top: -40px;
+	left:-20px;
+    margin:0;
+    padding:0;
+    background-image: url('number-green.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    border:10px solid black;
+    line-height: 100px;
+    font-size: 80px;
+    height: 100px;
+    width: 100px;
+    text-align: center;
+    vertical-align: middle;
+    color: #ffffff;
+    -moz-border-radius: 60px;
+    border-radius: 60px;
+  }
+  .ms-signers-unfinished .ms-target .ms-qty{
+    display: block;
+	position: absolute;
+	top:-40px;
+	right:-50px;
+    margin:0;
+    padding:0;
+    background-image: url('number-red.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    border:10px solid black;
+    line-height: 100px;
+    font-size: 80px;
+    height: 100px;
+    width: 100px;
+    text-align: center;
+    vertical-align: middle;
+    color: #ffffff;
+    -moz-border-radius: 60px;
+    border-radius: 60px;
+  }
+  .ms-deadline{
+	margin:50px 0 0 0;
+	font-size: 140%;
+    text-align:center;
+    padding-top:0px;
+    color: #ffffff;
+    background-image: url('deadline.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+	width:280px;
+	height:143px;
+  }
+  .ms-deadline p{
+	text-align:center;
+	line-height:1.1em;
+	padding:40px 0;
+  }
+  .ms-place{
+    font-size: 100%;
+    color:white;
+    text-align:right;
+   }
+
+  #ms-right-col{
+    width: 280px;
+    float:right;
+    margin:0 20px 0 0;
+    padding-bottom:0;
+  }
+  #ms-signup-box{
+    background-image: url('arrow-down.png');
+    background-repeat: repeat-y;
+    background-position: top center;
+    padding: 0px;
+    margin: 0 0 20px 0;
+    width:280px;
+	border:1px solid transparent; /* invisible border needed to show background image(?) */
+  }
+  .ms-signup-img{
+    margin-top:104px;	
+    width:280px;
+    height:157px;
+  }
+  #ms-signup-box h2{
+	border: 1px dotted yellow;
+	padding: 2px;
+    margin: 100px 0 0 0;
+    height: 140px;
+    color: #ffffff;
+    text-align: center;
+/*
+    background-image: url('sign-here.png');
+    background-repeat: no-repeat;
+    background-position: top center;
+*/
+  }
+  #ms-signup-box form {
+    display: block;
+    position: relative;
+    color:#ffffff;	
+    margin:-10px 0 0 0;
+    padding: 0 18px 18px 18px;
+    background-image: url('sign-up-form.jpg');
+    background-repeat: no-repeat;
+    background-position: bottom center;
+ }
+  #ms-signup-box form p{
+    margin:4px 0;	
+  }
+  #ms-signup-reveal{
+    display: none;	
+  }
+  #signatories h2, #comments h2, #spreadword h2 {
+	color:white;
+	margin: -8px -8px 8px -8px;
+	padding:4px;
+	border-bottom:4px solid white;
+	background-color: #008184;
+	-moz-border-top-left-radius: 6px;
+    border-top-left-radius: 6px;
+	-moz-border-top-right-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  #signatories h2 a, #comments h2 a{ /* inert anchor tag */
+	color: white;
+	text-decoration: none;
+  }
+  #signatories ul li{
+    list-style-type:disc;
+    line-height: 1.2em; /* wee bit tighter than Barnet's setting */
+    background: none; /* override Barnet's setting */
+    list-style-position: inside;
+    font-size: 120%;
+  }
+  
+  #col1{
+	-moz-border-radius: 6px;
+    border-radius: 6px;
+     background: #D8EBEB;
+     color: black;
+     padding: 8px;
+     margin-top:60px;
+  }
+  #col2{
+	-moz-border-radius: 6px;
+    border-radius: 6px;
+    background: #D8EBEB;
+    color: black;
+    margin-left: 20px;
+    margin-right: 320px;
+    margin-top:44px;
+    padding:8px;
+  }
+  #spreadword{
+    clear: both;
+	-moz-border-radius: 6px;
+    border-radius: 6px;
+    background: #D8EBEB;
+    color: black;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top:44px;
+    margin-bottom:30px;
+    padding:8px;
+  }
+
+  #spreadword ul {
+	list-style-type: none;
+  }
+  #spreadword ul li{
+    display: inline;
+  }
+

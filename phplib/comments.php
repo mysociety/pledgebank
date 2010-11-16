@@ -331,12 +331,10 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
   <input type="text" id="author_email" name="author_email" value="<?=$q_h_author_email?>" size="30">
 </div>
 
-<? if (!microsites_intranet_site()) { ?>
 <div class="form_row">
 <label for="author_website"><?=_('Your web site address') ?>:</label> <small><i><?=_('(optional, will be shown publicly)') ?></i></small>
   <input type="text" id="author_website" name="author_website" value="<?=$q_h_author_website?>" size="40">
 </div>
-<? } ?>
 
 <p><strong><?=_('Your comment') ?>:</strong>
 <br><textarea name="text" id="text" cols="40" rows="10"><?=$q_h_text?></textarea>
@@ -347,13 +345,11 @@ function comments_form($pledge_id, $nextn, $allow_post, $closed_for_comments) {
 <? } ?>
 <input type="hidden" name="n" value="<?=$nextn?>">
 <p><small><strong><?=_('Privacy note:')?></strong>
-<? if (microsites_intranet_site()) {
-    print 'Your name will be shown publicly on this page with your comment. Your email address will not be shown.';
-} else { 
-    print _('Your name (and web site address if given) will be shown publicly on this page
+<?
+print _('Your name (and web site address if given) will be shown publicly on this page
 with your comment. Your email address will not be shown. People searching for your
 name on the Internet may find your comment.');
-} ?></small></p> <p><input
+?></small></p> <p><input
 type="checkbox" name="comment_alert_signup" <?=$q_comment_alert_signup ?
 "checked" : ""?>>
 <?=_(' Email me future comments on this pledge') ?></p>

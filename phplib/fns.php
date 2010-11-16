@@ -249,10 +249,7 @@ function view_friends_form($p, $errors = array(), $track=null) {
         print '<input type="hidden" name="track" value="' . htmlentities($track) . '">';
     if (get_http_var('pin', true)) print '<input type="hidden" name="pin" value="'.htmlspecialchars(get_http_var('pin', true)).'">';
 print h2(_('Email this pledge'));
-if (microsites_intranet_site())
-    print p('Please enter these details so that we can send your message to your contacts.');
-else
-    print p(_('Please enter these details so that we can send your message to your contacts.
+print p(_('Please enter these details so that we can send your message to your contacts.
 We will not give or sell either your or their email address to anyone else.')); ?>
 <p><strong><?=_('Other people\'s email addresses:') ?></strong></p>
 <div class="formrow"><input <? if (array_key_exists('e1', $errors)) print ' class="error"' ?> type="text" name="e1" value="<? if (get_http_var('e1')) print htmlentities(get_http_var('e1'));?>" size="40"></div>

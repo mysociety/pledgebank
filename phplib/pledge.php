@@ -732,17 +732,12 @@ class Pledge {
     <p id="email_row"><label for="email">' . _('Your email:') . '</label> <input'. (array_key_exists('email', $errors) ? ' class="error"' : '').' type="text" size="30" id="email" name="email" value="' . htmlspecialchars($email) . '"></p>';
         if ($this->data['email_access'] == 'f')
             echo '<p id="email_blurb"><small>' . _('(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)') . '</small> </p>';
-        if (microsites_intranet_site()) {
-            print '<p><input type="hidden" name="showname" value="1">
-    <small>People are able to search for Promises you have signed.</small></p>';
-        } else {
-            print '<p id="showname_row"><small>
+        print '<p id="showname_row"><small>
     <label style="float:none"><input type="checkbox" name="showname" value="1"' . $showname . '> ' . _('Show my name publicly on this pledge.') . '</label><br>' . 
     _('People searching for your name on the Internet might be able
     to find your signature.').
     '</small>
     </p>';
-        }
 
         if ($this->data['email_access'] == 't') {
             print '<p>By signing this pledge, you agree that '

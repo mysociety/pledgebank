@@ -562,11 +562,6 @@ function microsites_example_date() {
     print '"';
 }
 
-# Return true if this is an intranet installed site
-function microsites_intranet_site() {
-    return false;
-}
-
 # Return true if all target functionality should be disabled
 function microsites_no_target() {
     return false;

@@ -43,12 +43,12 @@ pledge_draw_status_plaque($p); # XXX
       <input type="hidden" name="pledge" value="<?=$p->ref()?>">
       <input type="hidden" name="ref" value="<?=$p->ref()?>">
       <p id="name_row">
-        <label for="name">Your name:</label> <input size="30" type="text" name="name" id="name" value="">
+        <label for="name">Your name:</label> <input size="20" type="text" name="name" id="name" value="">
       </p>
 
       <div id="ms-signup-reveal"><!-- hide until the form is focussed -->
         <p id="email_row">
-          <label for="email">Your email:</label> <input type="text" size="30" id="email" name="email" value="">
+          <label for="email">Your email:</label> <input type="text" size="20" id="email" name="email" value="">
         </p>
         <p id="email_blurb">
           <small>(we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)</small> 
@@ -86,61 +86,11 @@ pledge_draw_status_plaque($p); # XXX
         (<span style="color:#006600"><img alt="Green text " src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png">= they've done it</span>)
       
 <?
-    $P = pb_person_if_signed_on();
     $nsigners = db_getOne('select count(id) from signers where pledge_id = ?', $p->id());
     if ($nsigners == 0) {
         print p('No one so far.');
-    }
-
-    $anon = 0;
-    $anon_done = 0;
-    $mobilesigners = 0;
-    $facebooksigners = 0;
-    
-    $query = "SELECT signers.*, person.mobile as mobile
-        from signers 
-        LEFT JOIN person on person.id = signers.person_id 
-        WHERE signers.pledge_id = ? ORDER BY id";
-    $q = db_query($query, $p->id());
-    $in_ul = false;
-    while ($r = db_fetch_array($q)) {
-        $showname = ($r['showname'] == 't');
-        if (!$in_ul) {
-            print "<ul>";
-            $in_ul = true;
-        }
-        if ($showname) {
-            if (isset($r['name'])) {
-                print '<li id="signer' . $r['id'] . '"';
-                if ($r['done']=='t') print ' class="done"';
-                print '>';
-                if (microsites_has_survey() && !is_null($P) && $r['person_id'] == $P->id()) {
-                    print '<form method="post" action="' . $p->url_survey() . '"><input type="hidden" name="r" value="pledge">';
-                }
-                print htmlspecialchars($r['name']);
-                if (microsites_has_survey() && !is_null($P) && $r['person_id'] == $P->id()) {                
-                    if ($r['done']=='f' ) {
-                        print ' &ndash; <input type="submit" value="'._("I have now done what I pledged").'">';                    
-                    } else {
-                        print ' &ndash; <input type="hidden" name="undopledge" value="1"><input type="submit" value="'._("Click this button if in fact you have NOT done what you pledged").'">';
-                    }
-                    print '</form>';
-                }
-                print '</li>';
-            } else {
-                err('showname set but no name');
-            }
-        } elseif (isset($r['mobile'])) {
-            $mobilesigners++;
-        } else {
-            $anon++;
-            if ($r['done']=='t') $anon_done++;
-        }
-    }
-    display_anonymous_signers($p, $anon, $anon_done, $mobilesigners, $facebooksigners, $in_ul);
-    if ($in_ul) {
-        print "</ul>";
-        $in_ul = false;
+    } else {
+        draw_signatories_list($p, $nsigners, false);
     }
 ?>
 
@@ -161,6 +111,21 @@ pledge_draw_status_plaque($p); # XXX
     </p>
 </div>
 
+<div id="spreadword">
+<ul>
+<li>
+    <a href="http://twitter.com/share" class="twitter-share-button" data-url="<?=$p->url_typein()?>" data-count="none">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    <a class="fb_share" name="fb_share" type="button" share_url="<?=$p->url_typein()?>" href="http://www.facebook.com/sharer.php">Share</a><script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
+</li>
+<?
+    if (!$p->finished()) {
+        print '<li><a href="' . $p->url_flyers() . '" title="Stick them places">Print out customised flyers</a></li>';
+        print '<li><a href="/' . $p->ref() . '/promote">Promote on your site or blog</a></li>';
+    } 
+?>
+</ul>
+</div>
+
 <div id="col2">
 <?
     draw_comments($p);
@@ -172,7 +137,4 @@ pledge_draw_status_plaque($p); # XXX
         $('#name').focus(function() {$('#ms-signup-reveal').slideDown('slow')});
     });
 </script>
-
-<?
-    draw_spreadword($p);
 

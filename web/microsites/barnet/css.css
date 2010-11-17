@@ -17,7 +17,7 @@ body.WhitefieldSat #content {
     margin-left: 20px;
     margin-right: 320px;
     margin-top:24px;
-    padding: 0 24px;
+    padding: 0 12px;
   }
   #pledge_main p{
     padding: 8px;
@@ -30,9 +30,9 @@ body.WhitefieldSat #content {
     padding-left: 30px;
   }
   p.head_mast{
-    font-size:150%;
-    line-height: 2em;
-    margin: 0.5em 0;
+    font-size: 195%;
+    line-height: 1.5em;
+    margin: 2.5em 0 0;
     color: #d8ebeb;
   }
   p.head_mast span{
@@ -77,26 +77,13 @@ body.WhitefieldSat #content {
     height: 40px;
   }
   .ms-pledger{ /* e.g., Barnet council */
-    font-size:80%;
   }
   .ms-pledger-action{ /* e.g., will offer 2 sacks of bulbs */
-    font-size: 200%;
   }
   .ms-pledge-people{ /* e.g., <span class='ms-qty'>12</span> people */
-    font-size: 150%;
   }
   .ms-signatory-action{ /* e.g., will plant them */
-    font-size: 175%;
     font-weight: bold;
-  }
-  .ms-qty{
-    font-size:300%;
-    font-weight: bold;
-    font-style: normal;
-    vertical-align: middle;
-    margin-top:10px;
-    margin-bottom:10px;
-    display: block;
   }
   .ms-pledge-people .ms-qty{
      /* display: inline; */ /* not in IE you don't */
@@ -212,6 +199,11 @@ body.WhitefieldSat #content {
   #ms-signup-box form p{
     margin:4px 0;	
   }
+
+#ms-signup-box input {
+    margin-left: 1em;
+}
+
   #ms-signup-reveal{
     display: none;	
   }
@@ -257,16 +249,15 @@ body.WhitefieldSat #content {
     padding:8px;
   }
   #spreadword{
-    clear: both;
 	-moz-border-radius: 6px;
     border-radius: 6px;
     background: #D8EBEB;
     color: black;
     margin-left: 20px;
-    margin-right: 20px;
+    margin-right: 320px;
     margin-top:44px;
     margin-bottom:30px;
-    padding:8px;
+    padding: 1px;
   }
 
   #spreadword ul {

@@ -7,6 +7,9 @@
 //
 // $Id: ref-index.php,v 1.138 2010-02-01 12:50:32 matthew Exp $
 
+define('MAX_PAGE_SIGNERS', '500');
+define('MAX_PAGE_COMMENTS', '50');
+
 require_once '../conf/general';
 require_once '../phplib/page.php';
 require_once '../commonlib/phplib/conditional.php';
@@ -56,54 +59,26 @@ if (cond_maybe_respond($p->last_change_time(), $etag))
 
 deal_with_pin($p->url_main(), $p->ref(), $p->pin());
 
-function draw_spreadword($p) { ?>
-    <div id="spreadword">
-<?  if (!$p->finished()) {
-        print h2(_('Spread the word on and offline'));
-    } else {
-        print h2(_('Things to do with this pledge'));
-    }
-    // Now we have "share this" button, only show digg on pledges that asked for it
-    if (!$p->finished() && $p->ref() == 'us-patriot-drive') {
-        print '<div id="digg">';
-        print '<script src="http://digg.com/tools/diggthis.js" type="text/javascript"></script>';
-        print '</div>';
-    }
-    print '<ul>';
-    if (!$p->pin()) {
-        echo '<li>
-        <a href="http://twitter.com/share" class="twitter-share-button" data-url="' . $p->url_typein() . '" data-count="none">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
-        <a class="fb_share" name="fb_share" type="button" share_url="' . $p->url_typein() . '" href="http://www.facebook.com/sharer.php">Share</a><script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
-        ';
-    } else {
-        print '<li>';
-        print_link_with_pin($p->url_email(), "", _("Email your friends"));
-        print '</li>';
-    }
-    if (!$p->finished()) {
-        if (microsites_has_flyers()) {
-            print '<li>';
-            print_link_with_pin($p->url_flyers(), _("Stick them places!"), _("Print out customised flyers"));
-            print '</li>';
-        }
-        print '<li>';
-        print_link_with_pin('/' . $p->ref() . '/promote', '', _('Promote on your site or blog'));
-        print '</li>';
-    } 
-    ?>
-    <li><a rel="nofollow" href="/new/local/<?=$p->ref() ?>"><?=_('Create a local version of this pledge') ?></a></li>
-    <li><small><?=_('Creator only:') ?> <a rel="nofollow" href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a>
-<?  if (!$p->finished()) {
-        print ' | <a rel="nofollow" href="' . $p->url_picture() . '" title="' . _('Only if you made this pledge') . '">';
-        print $p->has_picture() ? _('Change picture') : _('Add a picture');
-        print '</a>';
-    }
-    print '</small></li>';
-    print '</ul>';
-    print '</div>';
-}
-
-define('MAX_PAGE_SIGNERS', '500');
+# Okay, main display activity
+locale_push($p->lang());
+$title = "'" . _('I will') . ' ' . $p->h_title() . "'";
+locale_pop();
+$params = array(
+    'ref' => $p->ref(),
+    'pref' => $p->url_typein(),
+    'last-modified' => $p->last_change_time(),
+    'etag' => $etag,
+    'body_class' => $p->ref(),
+    #'css' => '/jslib/share/share.css',
+);
+if (microsites_comments_allowed() && !$p->pin())
+    $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());
+ 
+page_header($title, $params);
+$site = $microsite;
+if (!$site) $site = 'website';
+include_once "../templates/$site/ref-index.php";
+page_footer();
 
 // Internal
 function display_anonymous_signers($p, &$anon, &$anon_done, &$mobilesigners, &$facebooksigners, &$in_ul) {
@@ -134,25 +109,8 @@ function display_anonymous_signers($p, &$anon, &$anon_done, &$mobilesigners, &$f
     }
 }
 
-function draw_signatories($p) {
+function draw_signatories_list($p, $nsigners, $include_creator=true) {
     $P = pb_person_if_signed_on();
-
-    $nsigners = db_getOne('select count(id) from signers where pledge_id = ?', $p->id());
-?>
-<div id="signatories">
-<?
-    $title = '<a name="signers">' . _('Current signatories') . '</a>';
-    if (microsites_has_survey()) {
-        $title .= ' <span style="font-size:50%; font-weight:normal">(<span style="color:#006600"><img alt="Green text " src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png">= ' ._("they've done it").'</span>)</span>';
-    }
-    print h2($title);
-
-    if ($nsigners == 0) {
-        print p(sprintf(_('So far, only %s, the Pledge Creator, has signed this pledge.'),
-            htmlspecialchars($p->creator_name())))
-            . '</div>';
-        return;
-    }
 
     /* XXX need to do something about layout here -- it breaks badly when the
      * height of the comments column is greater than that of the signers
@@ -163,7 +121,6 @@ function draw_signatories($p) {
     if ($nsigners > MAX_PAGE_SIGNERS) {
         if (!get_http_var('showall')) {
             $showall_para = sprintf(_("Because there are so many signers, only the most recent %d are shown on this page."), MAX_PAGE_SIGNERS);
-
             $showall_nav = sprintf("<a href=\"/%s?showall=1\">"
                     . htmlspecialchars(_("Show all signers"))
                     . "</a>",
@@ -180,7 +137,7 @@ function draw_signatories($p) {
         print '<img src="/byarea-map.cgi?pledge_id='.$p->id().'" alt="">';
         print '</p>';
     } else {
-        if (!$limit) {
+        if (!$limit && $include_creator) {
             print '<p>';
             print sprintf(_('%s, the Pledge Creator, joined by:'), htmlspecialchars($p->creator_name()));
             print '</p>';
@@ -283,12 +240,8 @@ function draw_signatories($p) {
         print p($showall_nav);
         print p($showall_para);
     }
-    print '<p>';
-    print_link_with_pin($p->url_info(), "", _("View signup rate graph"));
-    print '</div>';
 }
 
-define('MAX_PAGE_COMMENTS', '50');
 function draw_comments($p) {
     if (!$p->pin())
         print '<a href="' . $p->url_comments_rss() . '"><img align="right" border="0" src="rss.gif" alt="' . _('RSS feed of comments on this pledge') . '"></a>';
@@ -412,23 +365,4 @@ function draw_connections_for_finished($p) {
     print p(_('See <a href="/list">more pledges</a>, and all <a href="/faq">about how PledgeBank works</a>.'));
     print '</div>';
 }
-
-locale_push($p->lang());
-$title = "'" . _('I will') . ' ' . $p->h_title() . "'";
-locale_pop();
-$params = array(
-    'ref'=>$p->ref(),
-    'pref' => $p->url_typein(),
-    'last-modified' => $p->last_change_time(),
-    'etag' => $etag,
-    #'css' => '/jslib/share/share.css',
-);
-if (microsites_comments_allowed() && !$p->pin())
-    $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());
- 
-page_header($title, $params);
-$site = $microsite;
-if (!$site) $site = 'website';
-include_once "../templates/$site/ref-index.php";
-page_footer();
 

@@ -139,5 +139,9 @@
 
         </div><!-- end iewrap -->
 
+    <script type="text/javascript">
+        document.body.className = (document.body.className +' '||'') + 'js';
+    </script>
+
   </body>
 </html>

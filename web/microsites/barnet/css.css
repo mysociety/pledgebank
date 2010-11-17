@@ -204,9 +204,10 @@ body.WhitefieldSat #content {
     margin-left: 1em;
 }
 
-  #ms-signup-reveal{
-    display: none;	
-  }
+body.js #ms-signup-reveal {
+    display: none;
+}
+
   #signatories h2, #comments h2, #spreadword h2 {
 	color:white;
 	margin: -8px -8px 8px -8px;

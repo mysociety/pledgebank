@@ -1,5 +1,4 @@
-
-  #content{
+body.WhitefieldSat #content {
     background-color: #001100;
     background-image: url('whitefieldsat.jpg');
     background-repeat: repeat;
@@ -8,7 +7,8 @@
     margin-top: 0px;
     padding-top: 20px;
     position: relative;
-  }
+}
+
   #pledge_main{
 	-moz-border-radius: 6px;
     border-radius: 6px;

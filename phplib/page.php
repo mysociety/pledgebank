@@ -93,7 +93,8 @@ function page_header($title, $params = array()) {
         err("PARAMS must be an array in page_header");
     $default_params = array(
         'noprint' => '',
-        'id' => '',
+        'body_id' => '',
+        'body_class' => '',
         'robots' => '',
         'rss' => array(),
         'css' => '',
@@ -104,10 +105,12 @@ function page_header($title, $params = array()) {
             $params[$k] = $v;
     }
     foreach ($params as $k => $v) {
-        if (!preg_match('/^(noprint|last-modified|etag|cache-max-age|id|pref|ref|robots|rss|css|override|banner)$/', $k))
+        if (!preg_match('/^(noprint|last-modified|etag|cache-max-age|id|body_id|body_class|pref|ref|robots|rss|css|override|banner)$/', $k))
             err("bad key '$k' with value '$v' in PARAMS argument to page_header");
         if ($k == 'id' && $v)
-            $params['id'] = ' id="' . $params['id'] . '"';
+            $params['body_id'] = ' id="' . $params['id'] . '"';
+        if ($k == 'body_class' && $v)
+            $params['body_class'] = ' class="' . $params['body_class'] . '"';
         if ($k == 'robots' && $v)
             $params['robots'] = '<meta name="robots" content="' . $params['robots'] . '">';
         if ($k == 'css' && $v)

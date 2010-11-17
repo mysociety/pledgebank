@@ -56,7 +56,7 @@
   	  h2, .nounderline{border: none;} /* nounderline for h2 is from more recent Barnet CSS, perhaps?  */
   	</style>
   </head>
-  <body>
+  <body<?=$params['body_id']?><?=$params['body_class']?>>
 
   <div id="iewrap">
   <img id="print-logo" src="http://barnet.fixmystreet.com/cobrands/barnet/images/logo-barnet.gif" alt="">

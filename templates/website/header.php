@@ -33,7 +33,7 @@
 <script type="text/javascript" src="/jquery.js"></script>
 <script type="text/javascript" src="/gaze.js"></script>
 </head>
-<body<?=$params['id']?>>
+<body<?=$params['body_id']?><?=$params['body_class']?>>
 <?
     // On the "print flyers from in-page image" page, these top parts are hidden from printing
     if ($params['noprint']) print '<div class="noprint">';

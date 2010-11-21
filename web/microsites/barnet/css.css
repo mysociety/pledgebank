@@ -13,6 +13,13 @@ body.WhitefieldSat #content {
     background-position: top left;
 }
 
+body.BurntOakIT #content {
+    background-color: #001100;
+    background-image: url('burntoakit.jpg');
+    background-repeat: repeat;
+    background-position: top left;
+}
+
   #pledge_main{
 	-moz-border-radius: 6px;
     border-radius: 6px;
@@ -233,7 +240,7 @@ body.js #ms-signup-reveal {
 }  
 
 #col1 .ms-pledgbank-logo{
-	margin:10px 46px 10px 46px;width:188px;height:54px;
+	margin:10px 0px;width:280px;height:114px;
 }
 
 #comments h2{

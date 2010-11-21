@@ -95,7 +95,7 @@ pledge_draw_status_plaque($p); # XXX
 ?>
       <div id="ms-signatories-bottom"></div>
     </div>
-    <img src="/microsites/barnet/pledgebank.png" class="ms-pledgbank-logo">
+    <img src="/microsites/barnet/barnet-pb-small.jpg" class="ms-pledgbank-logo">
     
   </div>
 </div> <!-- ms-col-right -->

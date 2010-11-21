@@ -125,7 +125,6 @@ pledge_draw_status_plaque($p); # XXX
       print '<li><a href="/' . $p->ref() . '/promote" title="Promote on your site or blog"><img src="/microsites/barnet/icon-blog.png"  id="ms-icon-blog" alt="Promote on your site or blog"/></a></li>';
     } 
 ?>
- <!-- FIXME Dave is here! [][][][][][][][][][][][][][][][][][][][][][][][][][][][] -->
 </ul>
 </div>
 

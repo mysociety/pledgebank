@@ -121,10 +121,11 @@ pledge_draw_status_plaque($p); # XXX
 </li>
 <?
     if (!$p->finished()) {
-        print '<li><a href="' . $p->url_flyers() . '" title="Stick them places">Print out customised flyers</a></li>';
-        print '<li><a href="/' . $p->ref() . '/promote">Promote on your site or blog</a></li>';
+      print '<li><a href="' . $p->url_flyers() . '" title="Print out customised flyers"><img src="/microsites/barnet/icon-print-flyers.png" id="ms-icon-print-flyers" alt="Print flyers" /></a></li>';
+      print '<li><a href="/' . $p->ref() . '/promote" title="Promote on your site or blog"><img src="/microsites/barnet/icon-blog.png"  id="ms-icon-blog" alt="Promote on your site or blog"/></a></li>';
     } 
 ?>
+ <!-- FIXME Dave is here! [][][][][][][][][][][][][][][][][][][][][][][][][][][][] -->
 </ul>
 </div>
 
@@ -134,9 +135,34 @@ pledge_draw_status_plaque($p); # XXX
 ?>
 </div>
 
+<?
+    if (!$p->finished()) { /* fancy glowing on blog/print-flyer icons */
+?>
+  <div style="display:none;">
+    <img id="ms-icon-print-flyers-active" src="/microsites/barnet/icon-print-flyers-active.png" width="1px" height="1px" />
+    <img id="ms-icon-blog-active" src="/microsites/barnet/icon-blog-active.png" width="1px" height="1px" />
+  </div>
+  <script type="text/javascript">    
+      $(function() {
+        $('#ms-icon-blog').data('inactive', $('#ms-icon-blog').attr("src"));
+        $('#ms-icon-blog').data('active', $('#ms-icon-blog-active').attr("src"));
+        $('#ms-icon-print-flyers').data('inactive', $('#ms-icon-print-flyers').attr("src"));
+        $('#ms-icon-print-flyers').data('active', $('#ms-icon-print-flyers-active').attr("src"));
+
+        $('#ms-icon-print-flyers').hover(
+          function(){$(this).attr("src",$(this).data("active"))},
+          function(){$(this).attr("src",$(this).data("inactive"))}
+        )
+        $('#ms-icon-blog').hover(
+          function(){$(this).attr("src",$(this).data("active"))},
+          function(){$(this).attr("src",$(this).data("inactive"))}
+        )
+      });
+  </script>
+<? } ?>
+
 <script type="text/javascript">    
     $(function() {
         $('#name').focus(function() {$('#ms-signup-reveal').slideDown('slow')});
     });
 </script>
-

@@ -278,10 +278,6 @@ body.js #ms-signup-reveal {
 	background-position: top left;
   }
   #spreadword{
-	-moz-border-radius: 6px;
-    border-radius: 6px;
-    background: #D8EBEB;
-    color: black;
     margin-left: 20px;
     margin-right: 320px;
     margin-top:44px;
@@ -289,8 +285,10 @@ body.js #ms-signup-reveal {
     padding: 1px;
   }
 
-  #spreadword ul {
-	list-style-type: none;
+  #spreadword ul,  #spreadword ul li {
+  list-style-type:none;
+  background: none; /* override Barnet's setting */
+  list-style-position: inside;
   }
   #spreadword ul li{
     display: inline;

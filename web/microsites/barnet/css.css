@@ -176,19 +176,7 @@ body.WhitefieldSat #content {
     width:280px;
     height:157px;
   }
-  #ms-signup-box h2{
-	border: 1px dotted yellow;
-	padding: 2px;
-    margin: 100px 0 0 0;
-    height: 140px;
-    color: #ffffff;
-    text-align: center;
-/*
-    background-image: url('sign-here.png');
-    background-repeat: no-repeat;
-    background-position: top center;
-*/
-  }
+
   #ms-signup-box form {
     display: block;
     position: relative;
@@ -211,35 +199,69 @@ body.js #ms-signup-reveal {
     display: none;
 }
 
-  #signatories h2, #comments h2, #spreadword h2 {
+#signatories{
+  background-image: url('signatories-repeat-y.jpg');
+  background-repeat: repeat-y;
+  background-position: top center;
+  margin: 0 0 20px 0;
+  width:280px;
+  color: #000000;
+  padding: 0 0px;
+}
+.ms-signatories-img{
+  width:280px;
+  height:83px;
+}
+#ms-signatories-bottom{
+	width:280px;
+	height:34px;
+	background-image:url('signatories-bottom.jpg');
+}
+#signatories p{
+	margin: 0;
+	padding: 8px 20px;
+	text-align:center;
+}
+#signatories ul li{
+  list-style-type:disc;
+  line-height: 1.2em; /* wee bit tighter than Barnet's setting */
+  background: none; /* override Barnet's setting */
+  list-style-position: inside;
+  font-size: 120%;
+  margin-left:12px;
+}  
+
+#col1 .ms-pledgbank-logo{
+	margin:10px 46px 10px 46px;width:188px;height:54px;
+}
+
+#comments h2{
 	color:white;
 	margin: -8px -8px 8px -8px;
-	padding:4px;
+	padding:8px 4px 4px 4px;
 	border-bottom:4px solid white;
 	background-color: #008184;
 	-moz-border-top-left-radius: 6px;
     border-top-left-radius: 6px;
 	-moz-border-top-right-radius: 6px;
     border-top-right-radius: 6px;
+	background-image: url('heading-repeat-x.jpg');
+	background-repeat: repeat-x;
+	background-position: top left;
   }
-  #signatories h2 a, #comments h2 a{ /* inert anchor tag */
+  #comments h2 a{ /* inert anchor tag */
 	color: white;
 	text-decoration: none;
   }
-  #signatories ul li{
-    list-style-type:disc;
-    line-height: 1.2em; /* wee bit tighter than Barnet's setting */
-    background: none; /* override Barnet's setting */
-    list-style-position: inside;
-    font-size: 120%;
-  }
-  
   #col1{
+	/*
 	-moz-border-radius: 6px;
     border-radius: 6px;
      background: #D8EBEB;
      color: black;
      padding: 8px;
+*/
+     padding: 0px;
      margin-top:60px;
   }
   #col2{
@@ -251,6 +273,9 @@ body.js #ms-signup-reveal {
     margin-right: 320px;
     margin-top:44px;
     padding:8px;
+	background-image: url('under-heading-repeat-x.jpg');
+	background-repeat: repeat-x;
+	background-position: top left;
   }
   #spreadword{
 	-moz-border-radius: 6px;

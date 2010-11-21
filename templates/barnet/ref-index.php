@@ -78,12 +78,12 @@ pledge_draw_status_plaque($p); # XXX
   
   <div id="col1">
     <div id="signatories">
-      <h2>
-        <a name="signers">Current signatories</a> 
-      </h2>
+      <a name="signers"><img class="ms-signatories-img" src="/microsites/barnet/current-signatories.jpg" alt="Current Signatories"></a>
 
-      <!-- moved outside of the h2 -->
+      <!--<h2><a name="signers">Current signatories</a> </h2>-->
+      <p>
         (<span style="color:#006600"><img alt="Green text " src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Yes_check.svg/16px-Yes_check.svg.png">= they've done it</span>)
+      </p>
       
 <?
     $nsigners = db_getOne('select count(id) from signers where pledge_id = ?', $p->id());
@@ -93,8 +93,10 @@ pledge_draw_status_plaque($p); # XXX
         draw_signatories_list($p, $nsigners, false);
     }
 ?>
-
+      <div id="ms-signatories-bottom"></div>
     </div>
+    <img src="/microsites/barnet/pledgebank.png" class="ms-pledgbank-logo">
+    
   </div>
 </div> <!-- ms-col-right -->
 

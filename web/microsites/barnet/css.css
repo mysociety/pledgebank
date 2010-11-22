@@ -45,13 +45,13 @@ body.BurntOakIT #content {
     margin:0;
     padding-left: 30px;
   }
-  p.head_mast{
+  p.ms-barnet-ref-head-mast{
     font-size: 195%;
     line-height: 1.5em;
     margin: 2.5em 0 0;
     color: #d8ebeb;
   }
-  p.head_mast span{
+  p.ms-barnet-ref-head-mast span{
     color: #ffffff;
   }
   .ms-signers-finished, .ms-signers-unfinished{

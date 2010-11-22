@@ -29,21 +29,15 @@ echo '<div id="startblurb1"><div id="startblurb">
 </div></div>';
 */
 
-echo 'hello Ellie 1';
-
 echo '<div id="currentpledges">';
 list_frontpage_pledges();
 debug_comment_timestamp("after list_frontpage_pledges()");
 echo '</div>';
 
-echo 'hello Ellie 2';
-
 comments_show_latest();
 debug_comment_timestamp("after comments_show_latest()");
 
 echo '</div>'; # col
-
-echo 'hello Ellie 3';
 
 echo '<div id="successfulpledges">';
 list_closing_pledges();

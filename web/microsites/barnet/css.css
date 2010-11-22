@@ -16,6 +16,11 @@ body.WhitefieldSat #content {
 body.BurntOakIT #content {
     background-color: #001100;
     background-image: url('burntoakit.jpg');
+    /* 
+		photo source:
+		http://www.flickr.com/photos/26735917@N06/3157281101/
+		non-commercial attrib. Barnet Council
+	*/
     background-repeat: repeat;
     background-position: top left;
 }

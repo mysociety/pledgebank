@@ -62,7 +62,10 @@ pledge_draw_status_plaque($p); # XXX
         </p>
       </div>
       <p id="signpledge_row">
-        <input type="submit" name="submit" id="next_step" value="Sign Pledge">
+        <div id="ms-sign-pledge-button">
+          <input type="image" name="submit" id="next_step" value="Sign Pledge" src="/microsites/barnet/sign-pledge.jpg" />
+        </div>
+        <!-- type="submit" name="submit" id="next_step" value="Sign Pledge" -->
       </p>
     </form>
 
@@ -139,7 +142,7 @@ pledge_draw_status_plaque($p); # XXX
 <?
     if (!$p->finished()) { /* fancy glowing on blog/print-flyer icons */
 ?>
-  <div style="display:none;">
+  <div class="ms-preload-images">
     <img id="ms-icon-print-flyers-active" src="/microsites/barnet/icon-print-flyers-active.png" width="1px" height="1px" />
     <img id="ms-icon-blog-active" src="/microsites/barnet/icon-blog-active.png" width="1px" height="1px" />
   </div>
@@ -162,8 +165,22 @@ pledge_draw_status_plaque($p); # XXX
   </script>
 <? } ?>
 
+<div class="ms-preload-images">
+  <img src="/microsites/barnet/sign-pledge-depressed.jpg" alt="preloaded image" />
+  <img src="/microsites/barnet/sign-pledge-hover.jpg" alt="preloaded image" />
+</div>
+
 <script type="text/javascript">    
     $(function() {
         $('#name').focus(function() {$('#ms-signup-reveal').slideDown('slow')});
+
+        $('#next_step').mouseup(function(e){
+        	$(this).attr('src','/microsites/barnet/sign-pledge.jpg');
+        }).mousedown(function(e){
+        	$(this).attr('src','/microsites/barnet/sign-pledge-depressed.jpg');
+        }).hover(
+          function(e){$(this).attr('src','/microsites/barnet/sign-pledge-hover.jpg')},
+          function(e){$(this).attr('src','/microsites/barnet/sign-pledge.jpg')}	
+        );
     });
 </script>

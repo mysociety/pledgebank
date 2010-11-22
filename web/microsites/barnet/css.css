@@ -199,14 +199,17 @@ body.BurntOakIT #content {
     background-image: url('sign-up-form.jpg');
     background-repeat: no-repeat;
     background-position: bottom center;
- }
+  }
   #ms-signup-box form p{
     margin:4px 0;	
   }
-
-#ms-signup-box input {
+  #ms-signup-box input {
     margin-left: 1em;
-}
+  }
+  #ms-sign-pledge-button{
+	margin:10px 14px;
+	padding: 0; 
+  }
 
 body.js #ms-signup-reveal {
     display: none;
@@ -313,4 +316,6 @@ body.js #ms-signup-reveal {
     height:63px;
     width:71px;
   }
-
+  .ms-preload-images{
+	display: none;
+  }

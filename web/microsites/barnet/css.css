@@ -1,12 +1,16 @@
 #content {
     margin-right:0;
     margin-top: 0px;
-    padding-top: 20px;
+    padding-top: 290px;
     padding-bottom:20px;
     position: relative;
+    background-image:url('barnet-pb-big.jpg');
+    background-repeat: no-repeat;
+    background-position: top center;
 }
 
 body.WhitefieldSat #content {
+    padding-top: 20px;
     background-color: #001100;
     background-image: url('whitefieldsat.jpg');
     background-repeat: repeat;
@@ -14,6 +18,7 @@ body.WhitefieldSat #content {
 }
 
 body.BurntOakIT #content {
+    padding-top: 20px;
     background-color: #001100;
     background-image: url('burntoakit.jpg');
     /* 
@@ -206,10 +211,12 @@ body.BurntOakIT #content {
   #ms-signup-box input {
     margin-left: 1em;
   }
-  #ms-sign-pledge-button{
-	margin:10px 14px;
-	padding: 0; 
+  #signpledge_row{
+	text-align:center;
   }
+  #signpledge_row input {
+	margin-left:0;
+   }
 
 body.js #ms-signup-reveal {
     display: none;

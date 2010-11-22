@@ -62,9 +62,7 @@ pledge_draw_status_plaque($p); # XXX
         </p>
       </div>
       <p id="signpledge_row">
-        <div id="ms-sign-pledge-button">
-          <input type="image" name="submit" id="next_step" value="Sign Pledge" src="/microsites/barnet/sign-pledge.jpg" />
-        </div>
+        <input type="image" name="submit" id="next_step" value="Sign Pledge" src="/microsites/barnet/sign-pledge.jpg" />
         <!-- type="submit" name="submit" id="next_step" value="Sign Pledge" -->
       </p>
     </form>

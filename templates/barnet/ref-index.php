@@ -108,7 +108,7 @@ pledge_draw_status_plaque($p); # XXX
 <?
     $r = array_map('htmlspecialchars', $p->data);
 ?>
-    <p class="head_mast">
+    <p class="head_mast ms-barnet-ref-head-mast">
         <span class='ms-pledger'><?=$r['name']?></span> will
         <span class='ms-pledger-action'><strong><?=$r['title']?></strong></span>
         but only if <span class='ms-pledge-people'><span class='ms-qty'><strong><?=prettify_num($r['target'])?></strong></span>

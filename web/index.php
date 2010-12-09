@@ -41,7 +41,8 @@ page_footer();
 
 function format_pledge_list($pledges, $params) {
     $out = '<ul class="search_results">';
-    $params['firstperson'] = 'includename';
+    if (!array_key_exists('firstperson', $params))
+        $params['firstperson'] = 'includename';
     $c = 0;
     foreach ($pledges as $pledge)  {
         $out .= '<li';

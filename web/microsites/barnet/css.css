@@ -326,3 +326,11 @@ body.js #ms-signup-reveal {
   .ms-preload-images{
 	display: none;
   }
+
+#error, #errors, .finished {
+    color: #990000;
+    background-color: #ffcccc;
+    border: solid 2px #990000;
+    padding: 3px;
+}
+

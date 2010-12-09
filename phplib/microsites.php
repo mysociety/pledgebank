@@ -213,20 +213,6 @@ online, rather than sending a check." . '</li>';
     return $out;
 }
 
-/* microsites_contact_intro
- * Description at top of contact page.
- */
-function microsites_contact_intro() {
-    print "<p>";
-    print _('Was it useful?  How could it be better?
-    We make PledgeBank and thrive off feedback, good and bad.
-    Use this form to contact us.');
-    $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
-    print ' ';
-    printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
-    print "</p>";
-}
-
 /* microsites_pledge_closed_text
  * Text to display in red box when a pledge is closed.
  */

@@ -333,6 +333,10 @@ body.js #ms-signup-reveal {
     margin-right: 1%;
 }
 
+#currentpledges li:hover {
+    background-color: #D8EBEB;
+}
+
 #error, #errors, .finished {
     color: #990000;
     background-color: #ffcccc;

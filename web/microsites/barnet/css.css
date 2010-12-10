@@ -409,4 +409,5 @@ body.js #ms-signup-reveal {
     padding:0;
     background-position:center center;
     border-bottom: 4px solid #00ada1;
+    background-image: url(default-pledge-icon-background.png); /* override with inline style if there's an image for the pledge */
 }

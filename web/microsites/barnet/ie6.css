@@ -1,19 +1,36 @@
-.ms-pb-signed-roundel-open-person,
-.ms-pb-signed-roundel-open-people,
-.ms-pb-signed-roundel-closed-person,
-.ms-pb-signed-roundel-closed-people{
+#ms-pb-signed-roundel{
     background-image: none;
 }
+#ms-pb-signed-roundel-ie{
+    width: 200px;
+    height: 200px;
+    background-position: center right;
+    background-repeat: no-repeat;
+    float:right;
+    display: block;
+    border:1px solid red;
+}
 
-.ms-pb-signed-roundel-open-person{
-    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='person-has-signed-up.png');
+.ms-pb-signed-roundel-open-person-ie,
+.ms-pb-signed-roundel-open-people-ie,
+.ms-pb-signed-roundel-closed-person-ie,
+.ms-pb-signed-roundel-closed-people-ie{
 }
-.ms-pb-signed-roundel-open-people {
-    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='people-have-signed-up.png');
+
+.ms-pb-signed-roundel-open-person-ie{
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/microsites/barnet/person-has-signed-up.png');
 }
-.ms-pb-signed-roundel-closed-person {
-    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='person-signed-up.png');
+.ms-pb-signed-roundel-open-people-ie {
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/microsites/barnet/people-have-signed-up.png');
 }
-.ms-pb-signed-roundel-closed-people {
-    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='people-signed-up.png');
+.ms-pb-signed-roundel-closed-person-ie {
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/microsites/barnet/person-signed-up.png');
+}
+.ms-pb-signed-roundel-closed-people-ie {
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/microsites/barnet/people-signed-up.png');
+}
+
+#ms-pb-signed-roundel p {
+    left: 45px;
+    top:40px;
 }

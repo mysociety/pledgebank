@@ -7,9 +7,6 @@
 //
 ?>
 
-<!--[if lte IE 6]>
-             <link rel="stylesheet" type="text/css" href="/microsites/barnet/ie6.css">
-<![endif]-->
 
 <div id="ms-pb-status-plaque">
     <?
@@ -21,10 +18,12 @@
 
     <div class="ms-pb-top-img" style="background-image:url('/microsites/barnet/<?= strtolower($p->ref()) ?>.jpg');">
         <? $roundel_class = 'ms-pb-signed-roundel-' . ($p->finished()? 'closed':'open') . '-'  . ($p->signers()==1? 'person':'people'); ?>
-        <div id="ms-pb-signed-roundel" class="<?= $roundel_class ?> <?= $roundel_class ?>-ie">
-            <p>
-                <?= prettify_num($p->signers()) ?>
-            </p>
+        <div id="ms-pb-signed-roundel" class="<?= $roundel_class ?>">
+            <div id="ms-pb-signed-roundel-ie" class="<?= $roundel_class ?>-ie">
+                <p>
+                    <?= prettify_num($p->signers()) ?>
+                </p>
+            </div>
         </div>
     </div>
     <div id="ms-pb-pledge-text">

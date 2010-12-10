@@ -57,18 +57,9 @@ body.js #ms-signup-reveal {
 .ms-pb-signed-roundel-closed-people {
     background-image: url('people-signed-up.png');
 }
-
-/*
 #ms-pb-signed-roundel-ie {
-    width: 133px;
-    height: 26px;
-    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/i/mysociety-dark+50.png');
-    display: inline-block;
-    margin-right: 1em;
-    cursor: pointer;
+    display: none;
 }
-*/
-
 #ms-pb-signed-roundel p {
     margin: 0;
     padding: 0; /* align with graphic background */
@@ -220,6 +211,7 @@ body.js #ms-signup-reveal {
 }
 
 .ms-pb-bot-container {
+    overflow:auto;
     background-color: #68d0c7;
     background-color: #ffffff;
     position:relative;

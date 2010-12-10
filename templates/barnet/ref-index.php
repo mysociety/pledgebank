@@ -7,11 +7,9 @@
 //
 ?>
 
-<style class="text/css">
 <!--[if lte IE 6]>
              <link rel="stylesheet" type="text/css" href="/microsites/barnet/ie6.css">
 <![endif]-->
-</style>             
 
 <div id="ms-pb-status-plaque">
     <?

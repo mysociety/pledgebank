@@ -188,22 +188,26 @@ body.js #ms-signup-reveal {
 #ms-pb-spread {
     margin: 4px 0px 4px 270px;
     background: #ffffff;
+    text-align: center;
 }
 
 #ms-pb-spread ul {
    list-style: none;
    padding: 0;
-   margin: 8px auto;
+   margin: 4px auto;
    text-align: center;
 }
+
 #ms-pb-spread ul li {
     display: block;
     float:left;
+    height: 20px;
+    width:22%;
     background-image: none;
-    width: 20%;
-    padding: 8px;
-    border-left: 2px solid #ffffff;
-    border-right: 2px solid #ffffff;
+    text-align: center;
+    margin:0;
+    padding: 4px;
+    border: 2px solid #ffffff;
     background-color: #999999;
 }
 
@@ -346,14 +350,19 @@ body.js #ms-signup-reveal {
 	display: none;
   }
 
-#currentpledges li {
-    float: left;
-    width: 45%;
-    margin-right: 1%;
+#currentpledges {
+    position:relative;
+    overflow:auto;
 }
 
-#currentpledges li:hover {
-    background-color: #D8EBEB;
+#currentpledges ul {
+    overflow:auto;
+}
+
+#currentpledges li {
+    float: left;
+    width: 44%; /* 45% is too wide for IE6 */
+    margin-right: 1%;
 }
 
 #error, #errors, .finished {
@@ -361,4 +370,43 @@ body.js #ms-signup-reveal {
     background-color: #ffcccc;
     border: solid 2px #990000;
     padding: 3px;
+}
+
+
+#currentpledges ul.search_results {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+#currentpledges ul.search_results li{
+    background: none;
+}
+#currentpledges li:hover {
+    background-color: #D8EBEB;
+}
+#currentpledges ul.search_results li a{
+    font-size:120%;
+    font-weight: bold;
+    width: 100%;
+    display: block;
+    margin:0 0 -1em 0;
+    padding: 4px 0;
+}
+#currentpledges ul.search_results li a:hover{
+    background-color:#D8EBEB;
+}
+#currentpledges ul.search_results li small{
+    display: block;
+    border-top: 1px solid #00ada1;
+    margin: 6px 0 6px -4px;
+    padding: 4px 4px 4px 4px;
+}
+.ms-pledge-list-icon{
+    width:100%;
+    height: 50px;
+    margin:0;
+    padding:0;
+    background-position:center center;
+    border-bottom: 4px solid #00ada1;
 }

@@ -51,7 +51,11 @@ function format_pledge_list($pledges, $params) {
             $out .= ($c++%2) ? 'even' : 'odd';
             $out .= '"';
         }
-        $out .= '>' . $pledge->new_summary($params) . '</li>';
+        $out .= '>';
+        if (isset($params['iconpath'])) {
+            $out .= '<div class="ms-pledge-list-icon" style="background-image:url(' . $params['iconpath'] . strtolower($pledge->ref()) . '.jpg);"></div>'; 
+        }
+        $out .= $pledge->new_summary($params) . '</li>';
     }
     $out .= '</ul>';
     return $out;

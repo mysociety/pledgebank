@@ -270,6 +270,7 @@ body.js #ms-signup-reveal {
 #ms-pb-comments textarea{
     width:90%;
 }
+
 #ms-pb-signatories {
     position: relative;
     float: right;
@@ -279,6 +280,7 @@ body.js #ms-signup-reveal {
     background-position: top right;
     background-repeat: no-repeat; 
 }
+
 #ms-pb-sign-here {
     border-bottom: 4px solid #ffffff;
     /* top right corner rounded */
@@ -290,6 +292,7 @@ body.js #ms-signup-reveal {
     margin: 1em;
     padding: 1em;
 }
+
 #ms-pb-pledgepage .ms-pb-general h2 { /* in comments */
     margin-left: 0;
     padding-left: 0px;
@@ -299,6 +302,7 @@ body.js #ms-signup-reveal {
 #signpledge_row {
     text-align: center;
 }
+
 #signpledge_row input {
     margin: 4px auto;
 }
@@ -322,4 +326,39 @@ body.js #ms-signup-reveal {
     clear: both;
 }
 
-/* end */
+/* end of work for ref-index */
+ 
+#spreadword ul,  #spreadword ul li {
+  list-style-type:none;
+  background: none; /* override Barnet's setting */
+  list-style-position: inside;
+  vertical-align:middle;
+  margin:0;
+  }
+  #spreadword ul li{
+    display: inline;
+    padding: 0px;
+    margin-right:8px;
+    height:63px;
+    width:71px;
+  }
+  .ms-preload-images{
+	display: none;
+  }
+
+#currentpledges li {
+    float: left;
+    width: 45%;
+    margin-right: 1%;
+}
+
+#currentpledges li:hover {
+    background-color: #D8EBEB;
+}
+
+#error, #errors, .finished {
+    color: #990000;
+    background-color: #ffcccc;
+    border: solid 2px #990000;
+    padding: 3px;
+}

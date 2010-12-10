@@ -16,7 +16,7 @@
                           <li><a href="/">Introduction</a></li>
                           <li><a href="/WhitefieldSat">Create basic skills coaches</a></li>
                           <li><a href="/BurntOakIT">Provide computer training</a></li>
-                          <li><a href="/faq">Help</a></li>
+                          <li><a href="/contact">Suggest a pledge</a></li>
                       </ul>
                     </li>
                 </ul>

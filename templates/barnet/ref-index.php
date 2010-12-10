@@ -20,7 +20,7 @@
 </div>
 
 <div id="ms-pb-pledgepage">
-<!--
+
     <div class="ms-pb-top-img" style="background-image:url('/microsites/barnet/<?= strtolower($p->ref()) ?>.jpg');">
         <? $roundel_class = 'ms-pb-signed-roundel-' . ($p->finished()? 'closed':'open') . '-'  . ($p->signers()==1? 'person':'people'); ?>
         <div id="ms-pb-signed-roundel" class="<?= $roundel_class ?> <?= $roundel_class ?>-ie">
@@ -43,7 +43,7 @@
         will
         <span class='ms-signatory-action'><?=$r['signup']?></span>.
     </div>
--->
+
     <div class="ms-pb-mid-container">
         <div id="ms-pb-places-left">
             <span id="ms-pb-places-left-count">

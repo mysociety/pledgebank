@@ -29,15 +29,17 @@ if ($pledge_id && !preg_match('/^[1-9]\d*$/', $pledge_id)
     
 page_header(_("Contact Us"), $params);
 
+$errors = array();
 if (get_http_var('contactpost')) {
-    contact_form_submitted();
-} else {
-    contact_form();
+    $data = contact_form_submitted();
+    $errors = $data['errors'];
 }
 
-page_footer();
+if (isset($data['message'])) {
+    # Shortcut and only display success message if we have one.
+    print $data['message'];
+} else {
 
-function contact_form($errors = array()) {
     $name = get_http_var('name', true);
     $email = get_http_var('e');
     $ref = get_http_var('ref');
@@ -54,64 +56,14 @@ function contact_form($errors = array()) {
             $email = $P->email();
     }
 
-    print '<div id="tips">';
- 
-    if ($comment_id) {
-        print p(_('You are reporting the following comment to the PledgeBank team:'));
-        print '<blockquote>';
-        $row = db_getRow('select *,extract(epoch from ms_current_timestamp()-whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
-        if ($row)
-            print comments_show_one($row, true);
-        else
-            print 'Comment no longer exists';
-        print '</blockquote>';
-    } else {
-        microsites_contact_intro();
-    }
-
-    if (!$comment_id) {
-        print p(_('<a href="/faq">Read the FAQ</a> first, it might be a quicker way to answer your question.'));
-    }
-
-    print "</div>";
-
-    if (sizeof($errors)) {
-        print '<div id="errors"><ul><li>';
-        print join ('</li><li>', $errors);
-        print '</li></ul></div>';
-    } ?>
-<form name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>"><input type="hidden" name="referrer" value="<?=htmlspecialchars($referrer)?>"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($pledge_id)?>"><input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
-<?  if ($comment_id) {
-        print h2(_('Report abusive, suspicious or wrong comment'));
-        print p(_("Please let us know exactly what is wrong with the comment, and why you think it should be removed."));
-    } else {
-        print h2(_("Contact the PledgeBank team"));
-        if ($ref) {
-            $h_ref = htmlspecialchars($ref);
-        printf(p(_('To contact the creator of the <strong>%s</strong> pledge <a href="%s">leave a comment</a> on the pledge, or <a href="%s">contact the pledge creator</a>. The form below is for messages to the PledgeBank team only, <strong>not</strong> the pledge creator.')),
-            $h_ref, "/$h_ref#comments", "/$h_ref/contact");
-    } else { 
-        print p(_("To contact a pledge creator, please use the 'comments' section on the pledge, or the 'contact the pledge creator' feature. The form below is for messages to the PledgeBank team only, <strong>not</strong> a pledge creator."));
-    }
-?>
-<? } ?>
-
-<p><label for="name"><?=_('Your name:') ?></label> <input type="text" id="name" name="name" value="<?=htmlspecialchars($name) ?>" size="25">
-<br><label for="e"><?=_('Your email:') ?></label> <input type="text" id="e" name="e" value="<?=htmlspecialchars($email) ?>" size="30"></p>
-
-<p><label for="subject"><?=_('Subject') ?></label>: <input type="text" id="subject" name="subject" value="<?=htmlspecialchars(get_http_var('subject', true)) ?>" size="48"></p>
-
-<p><label for="message"><?=_('Your message:') ?></label>
-<br><textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
-
-<?  print '<p>';
-    if (!$comment_id)
-        print _('Did you <a href="/faq">read the FAQ</a> first?') . ' --&gt; ';
-    print '<input type="submit" name="submit" value="' . _('Send to PledgeBank team') . '"></p>';
-    print '</form>';
+    $site = $microsite;
+    if (!$site) $site = 'website';
+    include_once "../templates/$site/contact.php";
 }
+page_footer();
 
 function contact_form_submitted() {
+    global $microsite;
     $name = get_http_var('name', true);
     if ($name == _('<Enter your name>')) $name = '';
     $email = get_http_var('e');
@@ -126,7 +78,7 @@ function contact_form_submitted() {
     if (!$name) $errors[] = _('Please enter your name');
     if (!$email) $errors[] = _('Please enter your email address');
     elseif (!validate_email($email)) $errors[] = _('Please enter a valid email address');
-    if (!$subject) $errors[] = _('Please enter a subject');
+    if (!$subject && $microsite!='barnet') $errors[] = _('Please enter a subject');
     if (!$message) $errors[] = _('Please enter your message');
     if (!sizeof($errors)) {
         $vars = array(
@@ -140,11 +92,12 @@ function contact_form_submitted() {
         if ($result)
             $errors[] = _("I'm afraid that we rate limit the usage of the contact form to prevent abuse.");
     }
-    if (sizeof($errors)) {
-        contact_form($errors);
-    } else {
-        send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id);
+
+    $out = array( 'errors' => $errors );
+    if (!sizeof($errors)) {
+        $out['message'] = send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id);
     }
+    return $out;
 }
 
 function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $comment_id) {
@@ -181,9 +134,8 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
     if (!$success)
         err(_("Failed to send message.  Please try again, or <a href=\"mailto:team&#64;pledgebank.com\">email us</a>."));
     if ($comment_id) 
-        print p(_('<strong>Thank you!</strong> One of our team will investigate that comment as soon as possible'));
+        return p(_('<strong>Thank you!</strong> One of our team will investigate that comment as soon as possible'));
     else 
-        print _('Thanks for your feedback.  We\'ll get back to you as soon as we can!');
+        return _('Thanks for your feedback.  We\'ll get back to you as soon as we can!');
 }
 
-?>

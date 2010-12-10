@@ -1,328 +1,325 @@
 #content {
     margin-right:0;
-    margin-top: 0px;
-    padding-top: 180px;
-    padding-bottom:20px;
+    overflow:auto;
     position: relative;
-    background-image:url('barnet-pb-big.jpg');
-    background-repeat: no-repeat;
-    background-position: top center;
 }
-
-body.WhitefieldSat #content {
-    padding-top: 20px;
-    background-color: #001100;
-    background-image: url('whitefieldsat.jpg');
-    background-repeat: repeat;
-    background-position: top left;
-}
-
-body.BurntOakIT #content {
-    padding-top: 20px;
-    background-color: #001100;
-    background-image: url('burntoakit.jpg');
-    /* 
-		photo source:
-		http://www.flickr.com/photos/26735917@N06/3157281101/
-		non-commercial attrib. Barnet Council
-	*/
-    background-repeat: repeat;
-    background-position: top left;
-}
-
-  #pledge_main{
-	-moz-border-radius: 6px;
-    border-radius: 6px;
-    background-color: #003300;
-	color:white;
-    margin-left: 20px;
-    margin-right: 320px;
-    margin-top:24px;
-    padding: 0 12px;
-  }
-  #pledge_main p{
-    padding: 8px;
-  }
-  #pledge_main h2{
-    display: none; /* don't show */
-    font-size: 200%;
-    background-color: white;
-    margin:0;
-    padding-left: 30px;
-  }
-  p.ms-barnet-ref-head-mast{
-    font-size: 195%;
-    line-height: 1.5em;
-    margin: 2.5em 0 0;
-    color: #d8ebeb;
-  }
-  p.ms-barnet-ref-head-mast span{
-    color: #ffffff;
-  }
-  .ms-signers-finished, .ms-signers-unfinished{
-    margin: 0px 150px 0 20px;
-    color: #ffffff;
-  }
-
-   /* join of ms-signed-up and ms-target is problematic cross-browser: much better to
-      do this with a single elment, with the texts inside it. Hindsight. */
-  .ms-signed-up{
-	font-weight: bold;
-	height:40px;
-	line-height: 40px;
-	margin-left: 85px;
-	padding-left:20px;
-	display: block;
-	float:left;
-    font-size: 80%;
-    background-image: url('top-arrow-right.png');
-    background-repeat: repeat-x;
-    background-position: center right;
-  }
-  .ms-target{
-	font-weight: bold;
-    background-image: url('top-arrow-right.png');
-    background-repeat: repeat-x;
-    background-position: center left;
-    display: block;	
-    height: 40px;
-	line-height: 40px;
-    text-align: right;
-    margin-right: 20px;
-    padding-right: 55px;
-    font-size: 80%;
-  }
-  .ms-signers-unfinished{
-    font-size:180%;
-    position:relative;
-    height: 40px;
-  }
-  .ms-pledger{ /* e.g., Barnet council */
-  }
-  .ms-pledger-action{ /* e.g., will offer 2 sacks of bulbs */
-  }
-  .ms-pledge-people{ /* e.g., <span class='ms-qty'>12</span> people */
-  }
-  .ms-signatory-action{ /* e.g., will plant them */
-    font-weight: bold;
-  }
-  .ms-pledge-people .ms-qty{
-     /* display: inline; */ /* not in IE you don't */
-  }
-  .ms-signers-unfinished .ms-signed-up .ms-qty{
-    display: block;
-	position: absolute;
-	top: -40px;
-	left:-20px;
-    margin:0;
-    padding:0;
-    background-image: url('number-green.png');
-    background-repeat: no-repeat;
-    background-position: center center;
-    border:10px solid black;
-    line-height: 100px;
-    font-size: 80px;
-    height: 100px;
-    width: 100px;
-    text-align: center;
-    vertical-align: middle;
-    color: #ffffff;
-    -moz-border-radius: 60px;
-    border-radius: 60px;
-  }
-  .ms-signers-unfinished .ms-target .ms-qty{
-    display: block;
-	position: absolute;
-	top:-40px;
-	right:-50px;
-    margin:0;
-    padding:0;
-    background-image: url('number-red.png');
-    background-repeat: no-repeat;
-    background-position: center center;
-    border:10px solid black;
-    line-height: 100px;
-    font-size: 80px;
-    height: 100px;
-    width: 100px;
-    text-align: center;
-    vertical-align: middle;
-    color: #ffffff;
-    -moz-border-radius: 60px;
-    border-radius: 60px;
-  }
-  .ms-deadline{
-	margin:50px 0 0 0;
-	font-size: 140%;
-    text-align:center;
-    padding-top:0px;
-    color: #ffffff;
-    background-image: url('deadline.jpg');
-    background-repeat: no-repeat;
-    background-position: center center;
-	width:280px;
-	height:143px;
-  }
-  .ms-deadline p{
-	text-align:center;
-	line-height:1.1em;
-	padding:40px 0;
-  }
-  .ms-place{
-    font-size: 100%;
-    color:white;
-    text-align:right;
-   }
-
-  #ms-right-col{
-    width: 280px;
-    float:right;
-    margin:0 20px 0 0;
-    padding-bottom:0;
-  }
-  #ms-signup-box{
-    background-image: url('arrow-down.png');
-    background-repeat: repeat-y;
-    background-position: top center;
-    padding: 0px;
-    margin: 0 0 20px 0;
-    width:280px;
-	border:1px solid transparent; /* invisible border needed to show background image(?) */
-  }
-  .ms-signup-img{
-    margin-top:104px;	
-    width:280px;
-    height:157px;
-  }
-
-  #ms-signup-box form {
-    display: block;
-    position: relative;
-    color:#ffffff;	
-    margin:-10px 0 0 0;
-    padding: 0 18px 18px 18px;
-    background-image: url('sign-up-form.jpg');
-    background-repeat: no-repeat;
-    background-position: bottom center;
-  }
-  #ms-signup-box form p{
-    margin:4px 0;	
-  }
-  #ms-signup-box input {
-    margin-left: 1em;
-  }
-  #signpledge_row{
-	text-align:center;
-  }
-  #signpledge_row input {
-	margin-left:0;
-   }
 
 body.js #ms-signup-reveal {
     display: none;
 }
 
-#signatories{
-  background-image: url('signatories-repeat-y.jpg');
-  background-repeat: repeat-y;
-  background-position: top center;
-  margin: 0 0 20px 0;
-  width:280px;
-  color: #000000;
-  padding: 0 0px;
+.ms-pb-mid-container, .ms-pb-bot-container { /* float containers */
+    float: right;
+    position: relative;
 }
-.ms-signatories-img{
-  width:280px;
-  height:83px;
-}
-#ms-signatories-bottom{
-	width:280px;
-	height:34px;
-	background-image:url('signatories-bottom.jpg');
-}
-#signatories p{
-	margin: 0;
-	padding: 8px 20px;
-	text-align:center;
-}
-#signatories ul li{
-  list-style-type:disc;
-  line-height: 1.2em; /* wee bit tighter than Barnet's setting */
-  background: none; /* override Barnet's setting */
-  list-style-position: inside;
-  font-size: 120%;
-  margin-left:12px;
-}  
-
-#col1 .ms-pledgbank-logo{
-	margin:10px 0px;width:280px;height:114px;
+#ms-pb-pledgepage {
+    margin: 4px;
+    background-color:#ffffff;
+    overflow:auto;
 }
 
-#comments h2{
-	color:white;
-	margin: -8px -8px 8px -8px;
-	padding:8px 4px 4px 4px;
-	border-bottom:4px solid white;
-	background-color: #008184;
-	-moz-border-top-left-radius: 6px;
-    border-top-left-radius: 6px;
-	-moz-border-top-right-radius: 6px;
-    border-top-right-radius: 6px;
-	background-image: url('heading-repeat-x.jpg');
-	background-repeat: repeat-x;
-	background-position: top left;
-  }
-  #comments h2 a{ /* inert anchor tag */
-	color: white;
-	text-decoration: none;
-  }
-  #col1{
-	/*
-	-moz-border-radius: 6px;
-    border-radius: 6px;
-     background: #D8EBEB;
-     color: black;
-     padding: 8px;
-*/
-     padding: 0px;
-     margin-top:60px;
-  }
-  #col2{
-	-moz-border-radius: 6px;
-    border-radius: 6px;
-    background: #D8EBEB;
-    color: black;
-    margin-left: 20px;
-    margin-right: 320px;
-    margin-top:44px;
-    padding:8px;
-	background-image: url('under-heading-repeat-x.jpg');
-	background-repeat: repeat-x;
-	background-position: top left;
-  }
-  #spreadword{
-    margin-left: 20px;
-    margin-right: 320px;
-    margin-top:44px;
-    margin-bottom:30px;
-    padding: 1px;
+#ms-pb-pledgepage h2 {
+    margin: 2px auto 0 auto;
+    padding: 4px 1em;
+    text-align: center;
+    font-size: 140%;
+}
+
+.ms-pb-top-img {
+    overflow:auto;
+    height: 360px;
+    background: #ffffff;
+    position: relative;
+    background-position: center center;
+    background-repeat: repeat; /* really? */
+}
+
+.ms-pb-signed-roundel-open-person,
+.ms-pb-signed-roundel-open-people,
+.ms-pb-signed-roundel-closed-person,
+.ms-pb-signed-roundel-closed-people{
+    width: 200px;
+    height: 200px;
+    background-position: center right;
+    background-repeat: no-repeat;
+    float:right;
     position:relative;
-  }
+}
+.ms-pb-signed-roundel-open-person {
+    background-image: url('person-has-signed-up.png');
+}
+.ms-pb-signed-roundel-open-people {
+    background-image: url('people-have-signed-up.png');
+}
+.ms-pb-signed-roundel-closed-person {
+    background-image: url('person-signed-up.png');
+}
+.ms-pb-signed-roundel-closed-people {
+    background-image: url('people-signed-up.png');
+}
 
-  #spreadword ul,  #spreadword ul li {
-  list-style-type:none;
-  background: none; /* override Barnet's setting */
-  list-style-position: inside;
-  vertical-align:middle;
-  margin:0;
-  }
-  #spreadword ul li{
-    display: inline;
+/*
+#ms-pb-signed-roundel-ie {
+    width: 133px;
+    height: 26px;
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/i/mysociety-dark+50.png');
+    display: inline-block;
+    margin-right: 1em;
+    cursor: pointer;
+}
+*/
+
+#ms-pb-signed-roundel p {
+    margin: 0;
+    padding: 0; /* align with graphic background */
+    position: absolute;
+    top:50px;
+    left:55px;
+    width: 100px;
+    height: 100px;
+    line-height:100px; /* force mid-align */
+    text-align:center;
+    color: #ffffff;
+    font-size:80px;
+    font-weight:bold;
+}
+#ms-pb-pledge-text {
+    margin: 4px 0 0 0;
+    background-color:#00ada1;
+    color: white;
+    padding: 0.75em;
+    font-size: 160%;
+    line-height: 1.4em;
+    background-image:url('corner-sw-00ada1.png');
+    background-position: bottom left;
+    background-repeat: no-repeat;
+}
+.ms-pb-mid-container {
+    width: 100%;
+    overflow:auto;
+    position: relative; /* fixes ie6 bug in deadline postion, below */
+}
+#ms-pb-places-left {
+    width: 260px;
+    height: 135px;
+    background-image: url('places_left.png');
+    background-position: center left;
+    background-repeat: no-repeat;
+    float:left;
+    position:relative;
+    margin:0px;
     padding: 0px;
-    margin-right:8px;
-    height:63px;
-    width:71px;
-  }
-  .ms-preload-images{
-	display: none;
-  }
+}
+#ms-pb-places-left-count {
+    display: block;
+    margin: 0;
+    padding: 0; /* align with graphic background */
+    position: absolute;
+    top:0;
+    left:16px;
+    width: 100px;
+    text-align:center;
+    color: #ffffff;
+    font-size:80px;
+    font-weight:bold;
+    line-height:135px; /* force mid-align */
+}
+#ms-pb-places-left-label {
+    display: block;
+    margin: 0;
+    padding: 0; /* align with graphic background */
+    position: absolute;
+    top:30px;
+    right:16px;
+    width: 114px;
+    text-align:left;
+    color: #ffffff;
+    font-size:28px;
+    font-weight:bold;
+    line-height:1.2em; /* force mid-align */
+}
+
+#ms-pb-deadline {
+    margin: 4px 0px 0px 270px;
+    color: #ffffff;
+    background: #00ada1;
+    padding: 0.5em;
+    text-align: center;
+    background-image:url('corner-sw-00ada1.png');
+    background-position: bottom left;
+    background-repeat: no-repeat;
+    position: relative;
+    font-size: 140%;
+    zoom:1; /* fixed IE6 bug */
+}
+#ms-pb-deadline-footer {
+    width:15px;
+    height:15px;
+    position:absolute;
+    bottom:0px;
+    right:0px;
+    color: #ffffff;
+    background: #00ada1;
+    background-image:url('corner-se-00ada1.png');
+    background-position: bottom right;
+    background-repeat: no-repeat;    
+    clear:both;
+}
+#ms-pb-deadline h3 {
+    font-size: 100%;
+    color: #ffffff;
+    margin: 0 auto;
+    padding:0;
+    font-weight: normal;
+    text-align: center;
+    line-height: 1em;
+}
+#ms-pb-deadline p {
+    margin: -12px auto 0 auto;
+    padding: 0;
+    font-size: 160%;
+    line-height: 1.5em;
+    font-weight: bold;
+    text-align: center;
+}
+#ms-pb-deadline p sup{
+    font-size:66%;
+}
+#ms-pb-spread {
+    margin: 4px 0px 4px 270px;
+    background: #ffffff;
+}
+
+#ms-pb-spread ul {
+   list-style: none;
+   padding: 0;
+   margin: 8px auto;
+   text-align: center;
+}
+#ms-pb-spread ul li {
+    display: block;
+    float:left;
+    background-image: none;
+    width: 20%;
+    padding: 8px;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #ffffff;
+    background-color: #999999;
+}
+
+#ms-pb-spread ul li a {
+    color: #ffffff;
+    padding: 8px 8px;
+}
+#ms-pd-spread ul li a:hover {
+    background: #666666;
+}
+
+.ms-pb-bot-container {
+    background-color: #68d0c7;
+    background-color: #ffffff;
+    position:relative;
+    background-image:url('corner-nw-68d0c7.png');
+    background-position: top left;
+    background-repeat: no-repeat;    
+    padding-top:0;
+    margin-top:8px;
+}
+.ms-pb-bot-container-footer {
+    background-color: #68d0c7;
+    position:absolute;
+    bottom: 0px;
+    left:0px;
+    width: 15px;
+    height: 15px;
+    background-image:url('corner-sw-68d0c7.png');
+    background-position: bottom left;
+    background-repeat: no-repeat;   
+}
+
+#ms-pb-signatories-footer {
+    width:15px;
+    height:15px;
+    position:absolute;
+    bottom:0px;
+    right:0px;
+    background-color: #68d0c7;
+    background-image:url('corner-se-68d0c7.png');
+    background-position: top-left;
+    background-repeat: no-repeat;    
+}
+
+#ms-pb-comments {
+    margin-top:0;
+    margin-right: 244px;
+    padding:8px;    
+    background-color: #68d0c7;
+    background-image:url('corner-nw-68d0c7.png');
+    background-position: top left;
+    background-repeat: no-repeat;
+    position:relative;
+}
+#ms-pb-comments h2 {
+    text-align: left;
+}
+
+#ms-pb-comments .ms-pb-general h2 a {
+    display:none; /* suppress: duplication */
+}
+
+#ms-pb-comments textarea{
+    width:90%;
+}
+#ms-pb-signatories {
+    position: relative;
+    float: right;
+    width: 240px;
+    background-color: #68d0c7;
+    background-image:url('corner-ne-68d0c7.png');
+    background-position: top right;
+    background-repeat: no-repeat; 
+}
+#ms-pb-sign-here {
+    border-bottom: 4px solid #ffffff;
+    /* top right corner rounded */
+    padding: 0 1em;
+}
+
+.ms-pb-general {
+    background-color: #ffffff;
+    margin: 1em;
+    padding: 1em;
+}
+#ms-pb-pledgepage .ms-pb-general h2 { /* in comments */
+    margin-left: 0;
+    padding-left: 0px;
+    text-align: left;
+}
+
+#signpledge_row {
+    text-align: center;
+}
+#signpledge_row input {
+    margin: 4px auto;
+}
+
+#ms-pb-status-plaque {
+    margin: 4px;
+    text-align: center;
+}
+#ms-pb-status-plaque p {
+    padding: 8px 24px;
+    margin: 0;
+    font-size: 120%;
+    color: #ffffff;
+    background-color: #00ada1;
+    background-image:url('corner-ne-00ada1.png');
+    background-position: top right;
+    background-repeat: no-repeat;        
+}
+
+.ms-pb-clear {
+    clear: both;
+}
+
+/* end */

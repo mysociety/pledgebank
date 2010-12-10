@@ -1,0 +1,20 @@
+.ms-pb-signed-roundel-open-person,
+.ms-pb-signed-roundel-open-people,
+.ms-pb-signed-roundel-closed-person,
+.ms-pb-signed-roundel-closed-people{
+    background-image: none;
+    display: inline-block;
+}
+
+.ms-pb-signed-roundel-open-person{
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='person-has-signed-up.png');
+}
+.ms-pb-signed-roundel-open-people {
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='people-have-signed-up.png');
+}
+.ms-pb-signed-roundel-closed-person {
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='person-signed-up.png');
+}
+.ms-pb-signed-roundel-closed-people {
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='people-signed-up.png');
+}

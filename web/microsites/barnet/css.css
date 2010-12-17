@@ -57,7 +57,7 @@ body.js #ms-signup-reveal {
     background-image: url('people-signed-up.png');
 }
 #ms-pb-signed-roundel-ie {
-    display: none;
+    /* display: none; */
 }
 #ms-pb-signed-roundel p {
     margin: 0;

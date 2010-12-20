@@ -274,6 +274,15 @@ function microsites_location_allowed() {
     return true;
 }
 
+/* microsites_denied_access_redirect_url
+ * Returns a URL for microsites that need to redirect forbidden pages: 
+ * specifically this is for temp. Barnet block  */
+function microsites_denied_access_redirect_url() {
+    global $microsite;
+    if ($microsite == 'barnet') return 'http://pledgebank.barnet.gov.uk/';
+    return '';
+}
+
 /* microsites_private_allowed
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {

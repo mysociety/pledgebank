@@ -20,6 +20,12 @@ require_once "../commonlib/phplib/votingarea.php";
 require_once '../commonlib/phplib/countries.php';
 require_once '../commonlib/phplib/gaze.php';
 
+/* currently: Barnet microsite redirects rather than letting this page be displayed */
+if ($redirect_url = microsites_denied_access_redirect_url()) {
+    header("Location: $redirect_url");
+    exit;
+}
+
 # Whether the pledge location step is shown
 function has_step_2() {
     return microsites_location_allowed();

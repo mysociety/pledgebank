@@ -47,11 +47,8 @@
                 <?
                         if ($p->left() < 0) {
                             printf('%d', -$p->left() ); # over target
-                        } elseif ($p->left() > 0) {
-                            if ($p->finished()) # but we still needed...
-                                printf('%d', $p->left() );
-                            else # but we still need...
-                                printf('%d',$p->left() );
+                        } else {
+                            printf('%d', $p->left() ); # under target/still needed
                         }
                 ?>
             </span>
@@ -59,8 +56,8 @@
                 <?
                     if ($p->left() < 0) {
                         print('over target');
-                    } elseif ($p->left() > 0) {
-                        if ($p->finished()) # but we still needed...
+                    } elseif ($p->left() >= 0) {
+                        if ($p->finished()) # but we still needed... (NB "0 under target" is right... I think)
                             print('under target' );
                         else # but we still need...
                             print('still needed');

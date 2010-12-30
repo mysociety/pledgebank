@@ -53,7 +53,7 @@ function format_pledge_list($pledges, $params) {
         }
         $out .= '>';
         if (isset($params['iconpath'])) {
-            $out .= '<div class="ms-pledge-list-icon" style="background-image:url(' . $params['iconpath'] . strtolower($pledge->ref()) . '.jpg);"></div>'; 
+            $out .= '<a href="' . $pledge->url_main() . '" title="' . $pledge->ref() . '" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(' . $params['iconpath'] . strtolower($pledge->ref()) . '.jpg);"></div></a>'; 
         }
         $out .= $pledge->new_summary($params) . '</li>';
     }

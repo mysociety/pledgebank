@@ -61,7 +61,8 @@ deal_with_pin($p->url_main(), $p->ref(), $p->pin());
 
 # Okay, main display activity
 locale_push($p->lang());
-$title = "'" . _('I will') . ' ' . $p->h_title() . "'";
+
+$title = "'" . microsites_pledge_prefix(_('I will')) . ' ' . $p->h_title() . "'";
 locale_pop();
 $params = array(
     'ref' => $p->ref(),

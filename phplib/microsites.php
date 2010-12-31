@@ -283,6 +283,13 @@ function microsites_denied_access_redirect_url() {
     return '';
 }
 
+/* overrides the default pledge prefix of "I will" */
+function microsites_pledge_prefix($prefix) {
+    global $microsite;
+    if ($microsite == 'barnet') return 'Barnet Council will'; /* or "We will"? */
+    return $prefix;
+}
+
 /* microsites_private_allowed
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {

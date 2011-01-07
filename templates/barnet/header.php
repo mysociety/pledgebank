@@ -49,7 +49,7 @@
 <script type="text/javascript" src="http://barnet.fixmystreet.com/cobrands/barnet/javascript/2008-portsurf.js"></script>
 
 <link rel="stylesheet" type="text/css" href="/microsites/barnet/css.css">
-<link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
+<link rel="stylesheet" type="text/css" media="print" href="/microsites/barnet/pbprint.css">
 
     <title><?=$title?></title>
     
@@ -60,7 +60,7 @@
   <body<?=$params['body_id']?><?=$params['body_class']?>>
 
   <div id="iewrap">
-  <img id="print-logo" src="http://barnet.fixmystreet.com/cobrands/barnet/images/logo-barnet.gif" alt="">
+            <img id="print-logo" src="/microsites/barnet/logo-barnet-print-nice.png" alt="">
             <div id="header">
                 <a href="http://www.barnet.gov.uk/"><img src="http://barnet.fixmystreet.com/cobrands/barnet/images/logo-barnet.gif" alt="Barnet Logo"></a>
 

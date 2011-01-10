@@ -21,3 +21,6 @@ worthwhile.</p>
     print format_pledge_list($pledges, array('firstperson' => 'onlyname', 'iconpath' => '/microsites/barnet/'));
 ?>
 </div>
+<p style="font-size:1.25em;margin-top:1em;clear:both;">
+  Barnet needs you! You can even <a href="/contact">submit suggestions</a> for your own pledges too!
+</p>

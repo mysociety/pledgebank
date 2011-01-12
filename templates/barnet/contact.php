@@ -32,7 +32,10 @@
     } else {
         print h2("Suggest a pledge");
         $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
-        print "<p>Do you have a suggestion for a pledge that could appear on this site? Let us know! ";
+        
+        print "<p>Do you have an idea for a pledge that could appear on this site?</p>";
+        print "<p>What would you like to get done? (What are the prerequisites – does it have to be in Barnet?)</p>";
+
         printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
         print "</p>";
     }
@@ -49,4 +52,12 @@
 
 <p>
 <input type="submit" name="submit" value="Send to PledgeBank team"></p>
+<?  if (! $comment_id) { ?>
+  <p>The PledgeBank team will...</p>
+  <ul>
+    <li>review suggestions and add it to the website</li>
+    <li>Share your pledge through tweets, social networks and flyers</li>
+    <li>Recruit people to help and get things done.</li>
+  </ul>
+<? } ?>
 </form>

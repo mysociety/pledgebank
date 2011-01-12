@@ -55,9 +55,9 @@
 <?  if (! $comment_id) { ?>
   <p>The PledgeBank team will...</p>
   <ul>
-    <li>review suggestions and add it to the website</li>
+    <li>review suggestions and add them to the website</li>
     <li>Share your pledge through tweets, social networks and flyers</li>
-    <li>Recruit people to help and get things done.</li>
+    <li>Recruit people to help and get things done</li>
   </ul>
 <? } ?>
 </form>

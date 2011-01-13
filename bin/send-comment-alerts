@@ -58,8 +58,11 @@ function _send_aggregated_comment_mail($data) {
     locale_push($pledge->lang());
     $data['comment_url'] = $pledge->url_comments();
     $data['unsubscribe_url'] = alert_unsubscribe_link($data['alert_id'], $data['alerted_email']);
-    $f = pb_send_email_template(array(array($data['alerted_email'], $data['alerted_name'])),
-        'alert-comment', $data, array());
+    if ($data['alerted_name'])
+        $to = array(array($data['alerted_email'], $data['alerted_name']));
+    else
+        $to = array($data['alerted_email']);
+    $f = pb_send_email_template($to, 'alert-comment', $data, array());
     locale_pop();
     if (!$f) {
         # Revert record that it has been sent

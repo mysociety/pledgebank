@@ -33,7 +33,7 @@ $microsites_list = array('everywhere' => _('Everywhere'),
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 # If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
-$microsites_from_extra_domains = array();
+$microsites_from_extra_domains = array('pledgebank.barnet.gov.uk' => 'barnet');
 $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 
 /* These are listed on /where */
@@ -272,6 +272,22 @@ greater publicity and a greater chance of succeeding.');
 
 function microsites_location_allowed() {
     return true;
+}
+
+/* microsites_denied_access_redirect_url
+ * Returns a URL for microsites that need to redirect forbidden pages: 
+ * specifically this is for temp. Barnet block  */
+function microsites_denied_access_redirect_url() {
+    global $microsite;
+    if ($microsite == 'barnet') return 'http://pledgebank.barnet.gov.uk/';
+    return '';
+}
+
+/* overrides the default pledge prefix of "I will" */
+function microsites_pledge_prefix($prefix) {
+    global $microsite;
+    if ($microsite == 'barnet') return 'Barnet Council will'; /* or "We will"? */
+    return $prefix;
 }
 
 /* microsites_private_allowed

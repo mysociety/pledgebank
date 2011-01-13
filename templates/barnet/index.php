@@ -8,9 +8,7 @@
 ?>
 
 <div style="font-size: 200%">
-<p>Barnet PledgeBank is a site where your council is offering a service,
-but needs the help and pledge of residents for the service to be used and
-worthwhile.</p>
+<p>Barnet PledgeBank is a site to get things done.</p>
 </div>
 <div id="currentpledges">
 <?
@@ -21,3 +19,27 @@ worthwhile.</p>
     print format_pledge_list($pledges, array('firstperson' => 'onlyname', 'iconpath' => '/microsites/barnet/'));
 ?>
 </div>
+
+<div style="margin-top:2em;">
+  <p>
+    Barnet Pledgebank can be used to gather together people to get
+    projects done. These can be tasks such as clearing snow and ice from
+    pavements in the street, painting over graffiti or setting up computer
+    classes in your area.
+  </p>
+  <p>
+    The website is based on the simple principle that the person making
+    the online pledge will work to make it happen &ldquo;but only if&rdquo; a number
+    of other people commit too.
+  </p>
+  <p>
+    Pledges don't have to be started by the council &mdash; organisations,
+    schools, community and volunteer groups can all get involved.  
+    <a href="/contact">Submit your pledge ideas</a>.
+  </p>
+  <p>
+    PledgeBank is designed to help residents passionate about doing their
+    bit for the community. By working together, we can offer services that
+    are popular and worthwhile.
+  </p>
+</div>  

@@ -625,7 +625,8 @@ class Pledge {
         $html = array_key_exists('html', $params) ? $params['html'] : false;
         if (!array_key_exists('firstperson', $params) || !$params['firstperson'])
             err('Explicitly set "firstperson"');
-        $firstperson = $params['firstperson'];
+        $firstperson = microsite_conditional_firstperson($params['firstperson'], $r['name']);
+        
         
         if ($html) {
             $r['places'] = null; // is an array during pledge creation
@@ -828,7 +829,7 @@ you the option to unsubscribe from their list at any time.</p>';
             global $countries_code_to_name;
             $text .= $countries_code_to_name[$this->country_code()] . ": ";
         }
-        $params['firstperson'] = 'includename';
+        $params['firstperson'] = microsite_conditional_firstperson('includename', $this->name());
         $text .= $this->sentence($params) . ' ' . $this->status();
         return $text;
     }

@@ -62,7 +62,7 @@ deal_with_pin($p->url_main(), $p->ref(), $p->pin());
 # Okay, main display activity
 locale_push($p->lang());
 
-$title = "'" . microsites_pledge_prefix(_('I will')) . ' ' . $p->h_title() . "'";
+$title = "'" . microsites_pledge_prefix(_('I will'), $p->creator_name()) . ' ' . $p->h_title() . "'";
 locale_pop();
 $params = array(
     'ref' => $p->ref(),
@@ -80,7 +80,7 @@ $site = $microsite;
 if (!$site) $site = 'website';
 include_once "../templates/$site/ref-index.php";
 page_footer();
-
+ 
 // Internal
 function display_anonymous_signers($p, &$anon, &$anon_done, &$mobilesigners, &$facebooksigners, &$in_ul) {
     if ($anon || $mobilesigners || $facebooksigners) {

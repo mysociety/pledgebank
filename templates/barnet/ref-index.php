@@ -27,18 +27,11 @@
         </div>
     </div>
     <div id="ms-pb-pledge-text">
-        <?
-            $r = array_map('htmlspecialchars', $p->data);
-        ?>
-        <span class='ms-pledger'><?=$r['name']?></span> 
-        will
-        <span class='ms-pledger-action'><?=$r['title']?></span>
-        but only if
-        <span class='ms-pledge-people'>
-            <span class='ms-qty'><?=prettify_num($r['target'])?></span> <?=$r['type']?>
-        </span>
-        will
-        <span class='ms-signatory-action'><?=$r['signup']?></span>.
+      
+      <?=
+          $p->sentence(array('firstperson'=>'includename')); // in Barnet: firstperson is overridden conditionally on pledge name
+      ?>
+
     </div>
 
     <div class="ms-pb-mid-container">

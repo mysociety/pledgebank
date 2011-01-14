@@ -284,10 +284,27 @@ function microsites_denied_access_redirect_url() {
 }
 
 /* overrides the default pledge prefix of "I will" */
-function microsites_pledge_prefix($prefix) {
+function microsites_pledge_prefix($prefix, $name) {
     global $microsite;
-    if ($microsite == 'barnet') return 'Barnet Council will'; /* or "We will"? */
+    if ($microsite == 'barnet'){
+      if ($name == "Barnet Council"){
+        return 'Barnet Council will'; /* or "We will"? */
+      } else {
+        return _('I will');
+      }
+    }
     return $prefix;
+}
+
+/* allow firstname to be overridden, confitional on specific names:
+   If there no special conditions apply, return the firstname value unchanged
+ */
+function microsite_conditional_firstperson($firstperson, $name) {
+  global $microsite;
+  if ($microsite == 'barnet')
+    if ($name == "Barnet Council")
+      return 'onlyname';
+  return $firstperson;
 }
 
 /* microsites_private_allowed

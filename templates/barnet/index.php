@@ -15,7 +15,7 @@
     $pledges = pledge_get_list("date >= '$pb_today'",
         array('global'=>false, 'main'=>true, 'foreign'=>false)
     );
-    print format_pledge_list($pledges, array('firstperson' => 'onlyname', 'iconpath' => '/microsites/barnet/'));
+    print format_pledge_list($pledges, array('firstperson' => 'includename', 'iconpath' => '/microsites/barnet/'));
 ?>
 </div>
 

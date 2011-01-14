@@ -9,7 +9,6 @@
 
 require_once '../commonlib/phplib/conditional.php';
 require_once '../commonlib/phplib/db.php';
-require_once '../commonlib/phplib/tracking.php';
 require_once 'pbperson.php';
 require_once 'pledge.php'; # XXX: I don't think this is needed?
 
@@ -188,7 +187,7 @@ function page_header($title, $params = array()) {
  *  nolocalsignup
  *      If true, don't display the local alerts signup form.
  *  extra
- *      Supplies extra user-tracking information associated with this page view
+ *      Supplied extra user-tracking information associated with this page view
  *      to pass to track_event.
  */
 function page_footer($params = array()) {

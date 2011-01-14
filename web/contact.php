@@ -68,6 +68,7 @@ function contact_form_submitted() {
     if ($name == _('<Enter your name>')) $name = '';
     $email = get_http_var('e');
     $subject = get_http_var('subject', true);
+    if ($microsite == 'barnet') $subject = 'Barnet PledgeBank suggestion';
     $message = get_http_var('message', true);
     $ref = get_http_var('ref');
     if (!$ref && get_http_var('pledge_id'))
@@ -78,7 +79,7 @@ function contact_form_submitted() {
     if (!$name) $errors[] = _('Please enter your name');
     if (!$email) $errors[] = _('Please enter your email address');
     elseif (!validate_email($email)) $errors[] = _('Please enter a valid email address');
-    if (!$subject && $microsite!='barnet') $errors[] = _('Please enter a subject');
+    if (!$subject) $errors[] = _('Please enter a subject');
     if (!$message) $errors[] = _('Please enter your message');
     if (!sizeof($errors)) {
         $vars = array(

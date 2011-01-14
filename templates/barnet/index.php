@@ -7,9 +7,8 @@
 
 ?>
 
-<div style="font-size: 200%">
-<p>Barnet PledgeBank is a site to get things done.</p>
-</div>
+<h2>Barnet PledgeBank is a site to get things done.</h2>
+
 <div id="currentpledges">
 <?
     global $pb_today;
@@ -20,7 +19,7 @@
 ?>
 </div>
 
-<div style="margin-top:2em;">
+<div id="barnet_expl">
   <p>
     Barnet Pledgebank can be used to gather together people to get
     projects done. These can be tasks such as clearing snow and ice from

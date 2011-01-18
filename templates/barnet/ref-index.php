@@ -74,7 +74,7 @@
                     <a class="fb_share" name="fb_share" type="button" share_url="<?=$p->url_typein()?>" href="http://www.facebook.com/sharer.php">Share</a><script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
                 </li>
                 <?
-                    if (!$p->finished()) {
+                    if (False && !$p->finished()) { // suppressed for now: FIXME: need to sort out generation and wording of flyers and blog share
                       print '<li><a href="' . $p->url_flyers() . '" title="Print out customised flyers">Print&nbsp;flyers</a></li>';
                       print '<li><a href="/' . $p->ref() . '/promote" title="Promote on your site or blog">Blog&nbsp;it!</a></li>';
                     } 

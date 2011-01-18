@@ -1,4 +1,5 @@
 gettext
+netpbm
 libdatetime-format-strptime-perl
 libcairo-perl
 python-pgsql

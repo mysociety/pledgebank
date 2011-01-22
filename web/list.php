@@ -143,7 +143,8 @@ if ($q_type == 'open') {
 } elseif ($q_type == 'failed') {
     $heading = _("Failed pledges");
 } else {
-    err('Unknown type ' . $q_type);
+    header("Location: /list");
+    exit;
 }
 if ($rss) 
     rss_header($heading, $heading, array());

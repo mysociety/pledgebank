@@ -159,7 +159,7 @@ function page_header($title, $params = array()) {
     header('Content-Type: text/html; charset=utf-8');
     page_cache_headers($params);
     $site = $microsite;
-    if (!$site) $site = 'website';
+    if (!$site || $site == 'everywhere') $site = 'website';
     include_once "../templates/$site/header.php";
 
     // Warn that we are on a testing site
@@ -212,7 +212,7 @@ function page_footer($params = array()) {
     }
 
     $site = $microsite;
-    if (!$site) $site = 'website';
+    if (!$site || $site == 'everywhere') $site = 'website';
     include_once "../templates/$site/footer.php";
 
     header('Content-Length: ' . ob_get_length());

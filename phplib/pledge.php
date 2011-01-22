@@ -829,7 +829,7 @@ you the option to unsubscribe from their list at any time.</p>';
             global $countries_code_to_name;
             $text .= $countries_code_to_name[$this->country_code()] . ": ";
         }
-        $params['firstperson'] = microsite_conditional_firstperson('includename', $this->name());
+        $params['firstperson'] = 'includename';
         $text .= $this->sentence($params) . ' ' . $this->status();
         return $text;
     }

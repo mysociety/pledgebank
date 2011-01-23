@@ -47,7 +47,7 @@ function microsite_template($template) {
     $site = $microsite;
     if (!$site || $site == 'everywhere' || !file_exists("../templates/$site/$template.php"))
         $site = 'website';
-    include_once "../templates/$site/$template.php";
+    return "../templates/$site/$template.php";
 }
 
 /* As sometimes microsites.php is included before the locale is set... */

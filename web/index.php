@@ -33,7 +33,7 @@ page_header(null,
     )
 );
 debug_comment_timestamp("after page_header()");
-microsite_template('index');
+include_once microsite_template('index');
 debug_comment_timestamp("after front_page()");
 page_footer();
 

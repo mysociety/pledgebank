@@ -76,7 +76,7 @@ if (microsites_comments_allowed() && !$p->pin())
     $params['rss'] = array(sprintf(_("Comments on Pledge '%s'"), $p->ref()) => $p->url_comments_rss());
  
 page_header($title, $params);
-microsite_template('ref-index');
+include_once microsite_template('ref-index');
 page_footer();
  
 // Internal

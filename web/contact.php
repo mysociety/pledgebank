@@ -56,9 +56,7 @@ if (isset($data['message'])) {
             $email = $P->email();
     }
 
-    $site = $microsite;
-    if (!$site) $site = 'website';
-    include_once "../templates/$site/contact.php";
+    microsite_template('contact');
 }
 page_footer();
 

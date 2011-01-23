@@ -158,9 +158,7 @@ function page_header($title, $params = array()) {
     # Okay, actual output
     header('Content-Type: text/html; charset=utf-8');
     page_cache_headers($params);
-    $site = $microsite;
-    if (!$site || $site == 'everywhere') $site = 'website';
-    include_once "../templates/$site/header.php";
+    microsite_template('header');
 
     // Warn that we are on a testing site
     $devwarning = array();
@@ -211,9 +209,7 @@ function page_footer($params = array()) {
         $params['nolocalsignup'] = true; // don't show local signup form as well
     }
 
-    $site = $microsite;
-    if (!$site || $site == 'everywhere') $site = 'website';
-    include_once "../templates/$site/footer.php";
+    microsite_template('footer');
 
     header('Content-Length: ' . ob_get_length());
 }

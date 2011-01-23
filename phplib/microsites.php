@@ -41,6 +41,15 @@ $microsites_public_list = array('everywhere' => _('Everywhere &mdash; all countr
                                 'catcomm' => _('Catalytic Communities')
                                 );
 
+/* Include a template for a particular microsite. */
+function microsite_template($template) {
+    global $microsite;
+    $site = $microsite;
+    if (!$site || $site == 'everywhere' || !file_exists("../templates/$site/$template.php"))
+        $site = 'website';
+    include_once "../templates/$site/$template.php";
+}
+
 /* As sometimes microsites.php is included before the locale is set... */
 function microsites_for_locale() {
     global $microsites_list, $microsites_public_list;

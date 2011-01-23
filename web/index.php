@@ -33,9 +33,7 @@ page_header(null,
     )
 );
 debug_comment_timestamp("after page_header()");
-$site = $microsite;
-if (!$site) $site = 'website';
-include_once "../templates/$site/index.php";
+microsite_template('index');
 debug_comment_timestamp("after front_page()");
 page_footer();
 

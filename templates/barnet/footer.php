@@ -18,6 +18,7 @@
                           <li><a href="/GreenManClearing">Clear a patch of land</a></li>
                           <li><a href="/GreenManDays">Help the Green Man</a></li>
                           <li><a href="/KingEdwardLitter">Pick up litter</a></li>
+                          <li><a href="/WycherleyGrit">Grit a street</a></li>
                           <li><a href="/contact">Suggest a pledge</a></li>
                       </ul>
                     </li>

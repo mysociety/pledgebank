@@ -16,7 +16,7 @@
 
 <div id="ms-pb-pledgepage">
 
-    <div class="ms-pb-top-img" style="background-image:url('/microsites/barnet/<?= strtolower($p->ref()) ?>.jpg');">
+    <div class="ms-pb-top-img" <? if ($p->has_picture()) { ?> style="background-image:url('<?= $p->picture_url() ?>');"<? } ?> >
         <? $roundel_class = 'ms-pb-signed-roundel-' . ($p->finished()? 'closed':'open') . '-'  . ($p->signers()==1? 'person':'people'); ?>
         <div id="ms-pb-signed-roundel" class="<?= $roundel_class ?>">
             <div id="ms-pb-signed-roundel-ie" class="<?= $roundel_class ?>-ie">
@@ -62,7 +62,7 @@
             <h3>Deadline:</h3>
             <p>
                 <?=$p->h_pretty_date()?>
-            </p>
+            </p>            
             <div id="ms-pb-deadline-footer"></div>
         </div>
         <div id="ms-pb-spread">

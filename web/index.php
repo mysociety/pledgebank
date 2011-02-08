@@ -50,8 +50,12 @@ function format_pledge_list($pledges, $params) {
             $out .= '"';
         }
         $out .= '>';
-        if (isset($params['iconpath'])) {
-            $out .= '<a href="' . $pledge->url_main() . '" title="' . $pledge->ref() . '" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(' . $params['iconpath'] . strtolower($pledge->ref()) . '.jpg);"></div></a>'; 
+        if (isset($params['iconpath'])) { # hmm, we're no longer using iconpath, because we use pledge images directly now
+            $out .= '<a href="' . $pledge->url_main() . '" title="' . $pledge->ref() . '" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" ';
+            if ($pledge->has_picture()) {
+                $out .= 'style="background-image:url(' . $pledge->picture_url() . ');"';
+            }
+            $out.='></div></a>'; 
         }
         $out .= $pledge->new_summary($params) . '</li>';
     }

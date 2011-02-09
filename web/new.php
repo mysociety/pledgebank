@@ -1073,7 +1073,10 @@ function create_new_pledge($P, $data) {
     $url = htmlspecialchars(pb_domain_url() . urlencode($p->data['ref']));
     $facebook_url = htmlspecialchars($p->url_facebook());
 ?>
-    <p class="loudmessage"><?=_('Thank you for creating your pledge.') ?></p>
+    <p class="loudmessage">
+        <?=_('Thank you for creating your pledge.') ?>
+        <?= microsites_pledge_created_message($p) ?>
+    </p>
 <? if ($data['facebook_id']) { ?>
     <p class="loudmessage"><? printf(_('It is now live on Facebook at %s<br>and your friends can sign up to it there.'), '<a href="'.$facebook_url.'">'.$facebook_url.'</a>') ?></p>
     <p class="loudmessage"><? printf(_('Or sign up by email at %s'), '<a href="'.$url.'">'.$url.'</a>') ?></p>

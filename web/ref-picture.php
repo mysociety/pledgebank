@@ -181,10 +181,7 @@ if ($picture_upload_allowed) {
         print h2(_('Add a picture to your pledge'));
     } ?>
         <input type="hidden" name="MAX_FILE_SIZE" value="<?=$picture_size_limit*1024?>">
-    <?  print p(_('Choose the photo, logo or drawing that you would like to display on
-        your pledge.  Keep it small so it fits well on the page &mdash; it will be
-        automatically shrunk if it is too big.  You can use an image saved as
-        either GIF, JPEG or PNG type.')); ?>
+    <?  print p(microsite_picture_upload_advice()); ?>
     <p><input name="userfile" type="file"><input type="submit" value="<?=_('Submit') ?>">
 <?  if ($pledge->has_picture()) {
         printf(p(_('Or you can %s if you don\'t want any image on your pledge any more.')), '<input name="removepicture" type="submit" value="' . _('Remove the picture') . '">');

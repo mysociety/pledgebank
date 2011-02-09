@@ -189,6 +189,30 @@ function microsite_picture_dimension_limit(){
     return 250;
 }
 
+function microsite_picture_upload_advice(){
+    global $microsite;
+    if ($microsite == 'barnet'){
+      return _("Please choose a suitable image that you would like to display on the pledge.
+        The page layout will work best with an image that is <b>1087&nbsp;pixels&nbsp;wide</b> and 
+        <b>360&nbsp;pixels&nbsp;high</b>. If your image is taller, it will be cropped; if either
+        dimension is smaller, it will be tiled. Use GIF, JPEG or PNG. ");  
+    };    
+    return _('Choose the photo, logo or drawing that you would like to display on
+    your pledge.  Keep it small so it fits well on the page &mdash; it will be
+    automatically shrunk if it is too big.  You can use an image saved as
+    either GIF, JPEG or PNG type.');
+}
+
+function microsites_pledge_created_message($pledge){
+    global $microsite;
+    if ($microsite == 'barnet'){
+      return microsite_picture_upload_advice() . 
+          _("A default image will be used until you provide a picture.") . 
+          sprintf("<a href='%s'>%s</a>.", $pledge->url_picture(), _("Click here to add a picture"));  
+    };    
+    return "";
+}
+
 # Whether a site has local alerts at all!
 function microsites_local_alerts() {
     return true;

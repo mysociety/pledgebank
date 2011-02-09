@@ -20,7 +20,7 @@ require_once '../phplib/pledge.php';
 require_once '../commonlib/phplib/importparams.php';
 
 $picture_size_limit = 1000; // kilobytes
-$picture_dimension_limit = 250; // pixels, width and height limit
+$picture_dimension_limit = microsite_picture_dimension_limit(); // pixels, width and height limit
 
 $err = importparams(
             array('ref',   '/./',   '')

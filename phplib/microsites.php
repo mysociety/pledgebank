@@ -174,6 +174,21 @@ function microsites_navigation_menu($contact_ref) {
     return $menu;
 }
 
+/* microsite_picture_width_limit & microsite_picture_height_limit
+ * Returns the maximum size (in pixels) of an uploaded picture
+ *
+ * The Barnet design currently requires pictures that are 1087 x 360 pixels so we must allow
+ * files to be that wide. Letting the height get much bigger may encourage
+ * oversized images (really they should be cropped), but for now we're letting 
+ * that through -- the filesize is capped anyway, and images with smaller sizes or ratios
+ * will be tiled, which is OK if the pictures have been designed with that in mind.
+*/
+function microsite_picture_dimension_limit(){
+    global $microsite;
+    if ($microsite == 'barnet') return 1087;
+    return 250;
+}
+
 # Whether a site has local alerts at all!
 function microsites_local_alerts() {
     return true;

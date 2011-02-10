@@ -77,71 +77,82 @@ function upload_picture() {
         return true;
     }
 
-    if (!array_key_exists('userfile', $_FILES))
-        return false;
-
-    if (!$picture_upload_allowed) {
-        return _("Picture not available for private pledge");
-    }
-    $tmp_name = $_FILES['userfile']['tmp_name'];
-    if ($_FILES['userfile']['error'] > 0) {
-        $errors = array(
-            UPLOAD_ERR_INI_SIZE => _("There was an internal error uploading the picture.  The uploaded file exceeds the upload_max_filesize directive in php.ini"),
-            UPLOAD_ERR_FORM_SIZE => sprintf(_("Please use a smaller picture.  Try scaling it down in a paint program, reducing the number of colours, or saving it as a JPEG or PNG.  Files of up to %d kilobytes are allowed."), $picture_size_limit),
-            UPLOAD_ERR_PARTIAL => _("The uploaded file was only partially uploaded, please try again."),
-            UPLOAD_ERR_NO_FILE => _("No file was uploaded, please try again."),
-            UPLOAD_ERR_NO_TMP_DIR => _("There was an internal error uploading the picture.  Missing a temporary folder.")
-        );
-        return $errors[$_FILES['userfile']['error']];
-    }
-    if (!is_uploaded_file($tmp_name))
-        return _("Failed to upload the picture, please try again.");
-
-    if ($_FILES['userfile']['size'] > $picture_size_limit * 1024)
-        return sprintf(_("Please use a smaller picture.  Try scaling it down in a paint program, reducing the number of colours, or saving it as a JPEG or PNG.  Files of up to %d kilobytes are allowed. Your picture is about %d kilobytes in size."), $picture_size_limit, intval($_FILES['userfile']['size'] / 1024) );
-    elseif ($_FILES['userfile']['size'] == 0)
-        /* This can occur when the user names a nonexistent file in their
-         * browser. exif_imagetype barfs (fatal error) on an empty file, so
-         * try to detect it here. */
-        return _("We didn't receive a complete picture file.  Please check that you're uploading the picture you want to use.");
-    elseif ($_FILES['userfile']['size'] < 64)
-        /* Probably exif_imagetype can't cope with truncated files either. Why
-         * take the chance? */
-        return sprintf(_("That doesn't seem to be a valid picture file.  It is only %.2f kilobytes in size."), $_FILES['userfile']['size'] / 1024.);
-
-    // TODO: Add BMP, and convert them to PNG.
-
-    $picture_type = exif_imagetype($tmp_name);
-    if ($picture_type == IMAGETYPE_GIF) {
-        $ext = "gif";
-    } elseif ($picture_type == IMAGETYPE_JPEG) {
-        $ext = "jpeg";
-    } elseif ($picture_type == IMAGETYPE_PNG) {
-        $ext = "png";
+    if (microsite_preloaded_images(0) && $preloaded_id = get_http_var('preloaded_image')){
+        preg_match('/\.(\w+)$/', $preloaded_id, $matches); 
+        $ext = $matches[1]; # loads $ext with the file extension (assume internal files have sensible extensions)
+        $tmp_name = OPTION_PB_PRELOADED_IMAGES_DIR . $preloaded_id;
+        if (! file_exists($tmp_name)){
+            return "There was an internal error: couldn't find $preloaded_id";
+        }
     } else {
-        return _("Please upload pictures of type GIF, JPEG or PNG.  You can use a paint program to convert them before uploading.");
-    }
+        
+        if (!array_key_exists('userfile', $_FILES))
+            return false;
 
-    list($width, $height) = getimagesize($tmp_name);
-    if ($width > $picture_dimension_limit
-       || $height > $picture_dimension_limit) {
-       // Calculate new sizes
-       $fraction = floatval($picture_dimension_limit) / floatval(max($width, $height));
-       $newwidth = $width * $fraction;
-       $newheight = $height * $fraction;
-       // Resize image
-       $dest = imagecreatetruecolor($newwidth, $newheight);
-       if ($picture_type == IMAGETYPE_GIF) {
-            $source = imagecreatefromgif($tmp_name);
-       } elseif ($picture_type == IMAGETYPE_JPEG) {
-            $source = imagecreatefromjpeg($tmp_name);
-       } elseif ($picture_type == IMAGETYPE_PNG) {
-            $source = imagecreatefrompng($tmp_name);
-       }
-       imagecopyresized($dest, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
-       imagejpeg($dest, $tmp_name);
-       $ext = "jpeg";
-    } 
+        if (!$picture_upload_allowed) {
+            return _("Picture not available for private pledge");
+        }
+    
+        $tmp_name = $_FILES['userfile']['tmp_name'];
+        if ($_FILES['userfile']['error'] > 0) {
+            $errors = array(
+                UPLOAD_ERR_INI_SIZE => _("There was an internal error uploading the picture.  The uploaded file exceeds the upload_max_filesize directive in php.ini"),
+                UPLOAD_ERR_FORM_SIZE => sprintf(_("Please use a smaller picture.  Try scaling it down in a paint program, reducing the number of colours, or saving it as a JPEG or PNG.  Files of up to %d kilobytes are allowed."), $picture_size_limit),
+                UPLOAD_ERR_PARTIAL => _("The uploaded file was only partially uploaded, please try again."),
+                UPLOAD_ERR_NO_FILE => _("No file was uploaded, please try again."),
+                UPLOAD_ERR_NO_TMP_DIR => _("There was an internal error uploading the picture.  Missing a temporary folder.")
+            );
+            return $errors[$_FILES['userfile']['error']];
+        }
+        if (!is_uploaded_file($tmp_name))
+            return _("Failed to upload the picture, please try again.");
+
+        if ($_FILES['userfile']['size'] > $picture_size_limit * 1024)
+            return sprintf(_("Please use a smaller picture.  Try scaling it down in a paint program, reducing the number of colours, or saving it as a JPEG or PNG.  Files of up to %d kilobytes are allowed. Your picture is about %d kilobytes in size."), $picture_size_limit, intval($_FILES['userfile']['size'] / 1024) );
+        elseif ($_FILES['userfile']['size'] == 0)
+            /* This can occur when the user names a nonexistent file in their
+             * browser. exif_imagetype barfs (fatal error) on an empty file, so
+             * try to detect it here. */
+            return _("We didn't receive a complete picture file.  Please check that you're uploading the picture you want to use.");
+        elseif ($_FILES['userfile']['size'] < 64)
+            /* Probably exif_imagetype can't cope with truncated files either. Why
+             * take the chance? */
+            return sprintf(_("That doesn't seem to be a valid picture file.  It is only %.2f kilobytes in size."), $_FILES['userfile']['size'] / 1024.);
+
+        // TODO: Add BMP, and convert them to PNG.
+
+        $picture_type = exif_imagetype($tmp_name);
+        if ($picture_type == IMAGETYPE_GIF) {
+            $ext = "gif";
+        } elseif ($picture_type == IMAGETYPE_JPEG) {
+            $ext = "jpeg";
+        } elseif ($picture_type == IMAGETYPE_PNG) {
+            $ext = "png";
+        } else {
+            return _("Please upload pictures of type GIF, JPEG or PNG.  You can use a paint program to convert them before uploading.");
+        }
+
+        list($width, $height) = getimagesize($tmp_name);
+        if ($width > $picture_dimension_limit
+           || $height > $picture_dimension_limit) {
+           // Calculate new sizes
+           $fraction = floatval($picture_dimension_limit) / floatval(max($width, $height));
+           $newwidth = $width * $fraction;
+           $newheight = $height * $fraction;
+           // Resize image
+           $dest = imagecreatetruecolor($newwidth, $newheight);
+           if ($picture_type == IMAGETYPE_GIF) {
+                $source = imagecreatefromgif($tmp_name);
+           } elseif ($picture_type == IMAGETYPE_JPEG) {
+                $source = imagecreatefromjpeg($tmp_name);
+           } elseif ($picture_type == IMAGETYPE_PNG) {
+                $source = imagecreatefrompng($tmp_name);
+           }
+           imagecopyresized($dest, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+           imagejpeg($dest, $tmp_name);
+           $ext = "jpeg";
+        } 
+    }
     
     $base_name =  $pledge->ref() . "." . $ext;
     $picture_contents = file_get_contents($tmp_name);
@@ -180,8 +191,9 @@ if ($picture_upload_allowed) {
     } else {
         print h2(_('Add a picture to your pledge'));
     } ?>
-        <input type="hidden" name="MAX_FILE_SIZE" value="<?=$picture_size_limit*1024?>">
+    <input type="hidden" name="MAX_FILE_SIZE" value="<?=$picture_size_limit*1024?>">
     <?  print p(microsite_picture_upload_advice()); ?>
+    <?= microsite_picture_extra_form() ?>
     <p><input name="userfile" type="file"><input type="submit" value="<?=_('Submit') ?>">
 <?  if ($pledge->has_picture()) {
         printf(p(_('Or you can %s if you don\'t want any image on your pledge any more.')), '<input name="removepicture" type="submit" value="' . _('Remove the picture') . '">');

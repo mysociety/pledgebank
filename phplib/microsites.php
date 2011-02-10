@@ -192,15 +192,69 @@ function microsite_picture_dimension_limit(){
 function microsite_picture_upload_advice(){
     global $microsite;
     if ($microsite == 'barnet'){
-      return _("Please choose a suitable image that you would like to display on the pledge.
+      return _("Please choose an image that you would like to display on the pledge.
         The page layout will work best with an image that is <b>1087&nbsp;pixels&nbsp;wide</b> and 
-        <b>360&nbsp;pixels&nbsp;high</b>. If your image is taller, it will be cropped; if either
+        <b>360&nbsp;pixels&nbsp;high</b>. If your image is bigger, it will be cropped; if either
         dimension is smaller, it will be tiled. Use GIF, JPEG or PNG. ");  
     };    
     return _('Choose the photo, logo or drawing that you would like to display on
     your pledge.  Keep it small so it fits well on the page &mdash; it will be
     automatically shrunk if it is too big.  You can use an image saved as
     either GIF, JPEG or PNG type.');
+}
+
+/* microsite_preloaded_images
+ * returns either an array of filename -> description mappings,
+ * or nothing
+ * If a key is provided, returns the value for that key, or None
+ * Special case: key 'exists' will return array of those images that were found 
+ */
+function microsite_preloaded_images($key){
+    global $microsite;
+    if ($microsite == 'barnet'){
+        $files = array( 
+            "barnet_offices.jpg" => "Barnet NLBP Offices",
+            "purple_flower.jpg"  => "Purple flower", 
+            "yellow_flower.jpg"  => "Yellow flower",
+            "daisy_field.jpg"    => "Field of dog daisies",
+            "frosty_flower.jpg"  => "Frosty flower",
+        );
+        if ($key == 'exists'){
+            foreach ($files as $filename => $desc){
+                if (! file_exists(OPTION_PB_PRELOADED_IMAGES_DIR . $filename)){
+                    unset($files[$filename]);
+                }
+            }
+            return $files;
+        } elseif ($key){
+            return $files[$key];
+        } else {
+          return $files;
+        }
+    }
+    return array();
+}
+
+/* microsite_picture_extra_form()
+ * Adds an extra form to the picture upload form -- specifically, for Barnet, adds the preloaded images input
+ */
+function microsite_picture_extra_form(){
+    global $microsite;
+    $html = "";
+    if ($microsite == 'barnet'){
+        $images_available = microsite_preloaded_images('exists');
+        if (count($images_available)>0){
+            $html ="<p>If you don't have a suitable image of your own, you can choose one of the pre-loaded images instead.</p>
+                    <label for='preloaded_image'>Pre-loaded images</label>
+                    <select name='preloaded_image'>
+                    <option value='0'> </option>";
+            foreach ($images_available as $filename => $desc) {
+                $html .= "<option value='$filename'>$desc</option>\n";
+            }
+            $html .= "</select>";
+        }
+    }
+    return $html;
 }
 
 function microsites_pledge_created_message($pledge){

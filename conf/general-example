@@ -86,6 +86,9 @@ define('OPTION_PB_MAP_SHAPEFILE_WORLD', "/path/to/somewhere");
 
 define('OPTION_GOOGLE_MAPS_API_KEY', '');
 
+// Where preloaded images for illustrating pledges are kept (used by Barnet, where this dir is within the repo)
+define('OPTION_PB_PRELOADED_IMAGES_DIR', '/data/vhost/dave.pledgebank.com/pledgebank/web/microsites/barnet/preloaded/');
+
 // Log file (used in test harness, and later in admin scripts)
 define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');
 

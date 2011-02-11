@@ -212,12 +212,13 @@ function microsite_picture_upload_advice(){
 function microsite_preloaded_images($key){
     global $microsite;
     if ($microsite == 'barnet'){
-        $files = array( 
+        $files = array(              // alphabetic display order, fwiw
             "barnet_offices.jpg" => "Barnet NLBP Offices",
-            "purple_flower.jpg"  => "Purple flower", 
-            "yellow_flower.jpg"  => "Yellow flower",
             "daisy_field.jpg"    => "Field of dog daisies",
             "frosty_flower.jpg"  => "Frosty flower",
+            "hendon_library.jpg" => "Hendon library",
+            "purple_flower.jpg"  => "Purple flower", 
+            "yellow_flower.jpg"  => "Yellow flower",
         );
         if ($key == 'exists'){
             foreach ($files as $filename => $desc){

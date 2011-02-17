@@ -39,7 +39,6 @@ if (isset($data['message'])) {
     # Shortcut and only display success message if we have one.
     print $data['message'];
 } else {
-
     $name = get_http_var('name', true);
     $email = get_http_var('e');
     $ref = get_http_var('ref');
@@ -65,9 +64,10 @@ function contact_form_submitted() {
     $name = get_http_var('name', true);
     if ($name == _('<Enter your name>')) $name = '';
     $email = get_http_var('e');
-    $subject = get_http_var('subject', true);
-    if ($microsite == 'barnet') $subject = 'Barnet PledgeBank suggestion';
-    $message = get_http_var('message', true);
+    $topic = get_http_var('topic');
+    // both subject and message may be affected by the topic (otherwise, they're just the http var values)
+    $subject = microsites_email_subject_by_topic($topic, get_http_var('subject', true));
+    $message = microsites_email_message_body_by_topic($topic, get_http_var('message', true), $name, $email);
     $ref = get_http_var('ref');
     if (!$ref && get_http_var('pledge_id'))
         $ref = db_getOne('select ref from pledges where id = ?', get_http_var('pledge_id'));
@@ -78,7 +78,7 @@ function contact_form_submitted() {
     if (!$email) $errors[] = _('Please enter your email address');
     elseif (!validate_email($email)) $errors[] = _('Please enter a valid email address');
     if (!$subject) $errors[] = _('Please enter a subject');
-    if (!$message) $errors[] = _('Please enter your message');
+    if (!$message) $errors[] = microsites_email_error_msg_by_topic($topic, 'message', _('Please enter your message'));
     if (!sizeof($errors)) {
         $vars = array(
             'name' => array($name, "User's name"),
@@ -87,9 +87,15 @@ function contact_form_submitted() {
             'message' => array($message, 'Message entered'),
             'ref' => array($ref, 'Pledge reference'),
         );
+        
         $result = abuse_test($vars);
         if ($result)
             $errors[] = _("I'm afraid that we rate limit the usage of the contact form to prevent abuse.");
+
+        if (! microsites_email_send_from_users_address($topic)){
+            $name = "PledgeBank";
+            $email = OPTION_CONTACT_EMAIL;
+        }
     }
 
     $out = array( 'errors' => $errors );

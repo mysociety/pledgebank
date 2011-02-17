@@ -218,6 +218,7 @@ function microsite_preloaded_images($key){
             "frosty_flower.jpg"  => "Frosty flower",
             "hendon_library.jpg" => "Hendon library",
             "purple_flower.jpg"  => "Purple flower", 
+            "royal_wedding.jpg"  => "Royal Wedding street party",
             "yellow_flower.jpg"  => "Yellow flower",
         );
         if ($key == 'exists'){
@@ -496,6 +497,108 @@ function microsites_comments_allowed() {
  */
 function microsites_chivvy_sql() {
     return "microsite is null or (microsite <> 'livesimply' and microsite <> 'o2')";
+}
+
+/* microsites_email_subject_by_topic
+ * returns subject for email based on topic 
+ * subject is returned unchanged if there's no topic
+ */
+function microsites_email_subject_by_topic($topic, $subject) {
+    global $microsite;
+    if ($microsite == 'barnet'){
+        if ($topic == 'royalwedding'){
+            return 'Barnet PledgeBank: Royal Wedding Street Party request';
+        } else {
+            return 'Barnet PledgeBank suggestion';
+        }        
+    }
+    return $subject;
+}        
+
+/* microsites_email_message_body_by_topic
+ * returns message for email based on topic (or passes message back unchanged if there is no work to be done)
+ */
+function microsites_email_message_body_by_topic($topic, $message, $name, $email) {
+    global $microsite;
+    if ($microsite == 'barnet'){
+        if ($topic == 'royalwedding' && $message) {
+            $message = "
+
+Request for a Royal Wedding Street Party pledge in \"$message\".
+
+If there's not already a Street Party pledge in this area, please make one!
+http://pledgebank.barnet.gov.uk/new
+
+You can reply to $name at $email with one of these two templated emails:
+
+
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Hello $name
+
+Thank you for stepping up to the mark to try organise a street 
+party in $message.
+
+We've made a new pledge for you here: 
+
+http://pledgebank.barnet.gov.uk/FILL_IN_NAME_OF_PLEDGE
+
+Please sign up to that pledge and share that with as many of your neighbours as you can!
+
+Best wishes
+Barnet Council PledgeBank team
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+  or
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Hello $name
+
+Thank you for volunteering to organise a street party in $message.
+
+We're pleased to tell you such a pledge has already been started:
+
+http://pledgebank.barnet.gov.uk/FILL_IN_NAME_OF_PLEDGE
+
+Please sign up to that pledge and share that with as many of your neighbours as you can!
+
+Best wishes
+Barnet Council PledgeBank team
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                ";
+        }
+    }
+    return $message;
+}
+
+/* microsites_email_errors_by_topic
+ * returns error message for blank email field based on topic 
+ * (or passes error message back unchanged if there is none)
+ * 
+ * Currently this is only used for Barnet's royal wedding, where the message payload is actually the street name
+ */
+function microsites_email_error_msg_by_topic($topic, $subject, $error_message) {
+    global $microsite;
+    if ($microsite == 'barnet'){
+        if ($topic == 'royalwedding' && $subject == 'message'){
+            return 'Please enter the name of your street';
+        }        
+    }
+    return $error_message;
+}
+
+/* microsites_email_send_from_users_address
+ * returns true if contact-us emails should use the user's email address as the From: address
+ *  
+ * Normally this is what you want, so staff can simply hit reply.
+ * But if the message isn't a simple contact (e.g., Barnet's RoyalWedding) we can suppress this, to 
+ * discouarge accidental replies that quote the full message.
+ */
+function microsites_email_send_from_users_address($topic) {
+    global $microsite;
+    if ($microsite == 'barnet' && $topic == 'royalwedding') return false;
+    return true;
 }
 
 #############################################################################

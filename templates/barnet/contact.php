@@ -5,8 +5,10 @@
 // Copyright (c) 2010 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 
+$topic = get_http_var('topic');
+
     print '<div id="tips">';
- 
+     
     if ($comment_id) {
         print p(_('You are reporting the following comment to us:'));
         print '<blockquote>';
@@ -29,6 +31,42 @@
 <?  if ($comment_id) {
         print h2(_('Report abusive, suspicious or wrong comment'));
         print p(_("Please let us know exactly what is wrong with the comment, and why you think it should be removed."));
+    } elseif ($topic == 'royalwedding') { ?>
+        
+        <h2>Royal Wedding: Street Party in your street</h2>
+        <div class='ms-royalwedding-banner'></div>
+        <div style="font-size:1.126em;">
+            <p>
+                The Royal Wedding of HRH Prince William and Kate Middleton will take place on 29 April this year.
+                It's a wonderful excuse for a street party &mdash; not only is a street party a fun way for Londoners
+                to celebrate the event, it's also a great way to get to know your neighbours better.
+            </p>
+            <p style="color:#ccc;">[Dates? Targets?]</p>
+        </div>
+        <h3>
+            What we're pledging:
+        </h3>            
+        <ul>
+            <li>We can make sure road closures are handled legally and sensibly (you can't simply block your road off). </li>
+            <li>We'll help you coordinate with other organisers in your immediate neighbourhood. </li>
+            <li>We might be able to help out with tables and chairs, depending on the size of your party. </li>
+        </ul>
+        <p>
+            What we can't do:
+        </p>
+        <ul>
+            <li>We can't organise your party for you &mdash; that's down to you and your neighbours! </li>
+            <li>We can't guarantee bright, warm sunshine throughout Barnet on the day. Sorry.</li>
+        </ul>
+        <h3>
+            Get involved!
+        </h3>            
+        <p>
+            Start or join a pledge to organise a street party in your road. You'll need to get a minimum of 8 people
+            involved. If you don't meet your target you don't have to act, but if you do then .&nbsp;.&nbsp;. party&nbsp;on!
+        </p>
+        
+    <?
     } else {
         print h2("Suggest a pledge");
         $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
@@ -47,12 +85,34 @@
 
 <input type="hidden" id="subject" name="subject" value="">
 
-<p><label for="message">Your suggestion:</label>
-<br><textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
+<?
+    if ($topic == 'royalwedding'){
+?>
+        <input name="topic" type="hidden" value="<?= $topic ?>" />
+        <p>
+            <label for="street">Your street:</label><input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
+        </p>
+<?      
+    } else {
+?>
+    <p><label for="message">Your suggestion:</label>
+        <br><textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
+<? } ?>
 
 <p>
 <input type="submit" name="submit" value="Send to PledgeBank team"></p>
-<?  if (! $comment_id) { ?>
+<? if ($topic=='royalwedding') { ?>
+
+    <p>The PledgeBank team will...</p>
+    <ul>
+        <li>start a pledge to support for a party in your street and invite you to be the first to sign it</li>
+        <li>or, if we've created one already, we'll let you know so you can sign up to it<li>
+    </ul>
+    <p>
+        After that, it's up to you to spread the word to your neighbours to get them to sign your pledge too!
+    </p>
+
+<? } elseif (! $comment_id ) { ?>
   <p>The PledgeBank team will...</p>
   <ul>
     <li>review suggestions and add them to the website</li>
@@ -61,3 +121,5 @@
   </ul>
 <? } ?>
 </form>
+
+

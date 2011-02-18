@@ -422,3 +422,62 @@ body.js #ms-signup-reveal {
     background-position:center center;
     margin-bottom: 1em;
 }
+
+/* Breadcrumbs when creating a pledge */
+
+ol#breadcrumbs {
+    font-size: 100%;
+    display: block;
+    padding: 0;
+    margin-bottom: 1em;
+    margin-top: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    counter-reset: item;
+}
+
+ol#breadcrumbs li {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 1em;
+    padding-right: 1em;
+    color: #888;
+    display: inline;
+}
+ol#breadcrumbs li:before {
+    counter-increment: item;
+    content: counter(item) ". ";
+}
+ol#breadcrumbs li.hilight {
+    color: #000;
+    background-color: #eee;
+}
+ol#breadcrumbs li.hilight em {
+    font-style: normal;
+}
+
+#tips {
+    float: right;
+    width: 40%;
+    margin-top: 1em;
+    margin-left: 1em;
+}
+#tips, #pledge, #pledge_main, #all .pledge, #yourpledges .pledge {
+    border: solid 1px #008184;
+    background-color: #D8EBEB;
+    margin-bottom: 1em;
+    padding: 8px;
+}
+#tips li {
+    padding: 0;
+    margin: 0 0 1em 0;
+}
+#tips h2{
+    font-size: 18px;
+    color: #ffffff;
+    margin: -8px -8px 8px -8px;
+    padding: 4px 8px;
+    background: #008184;
+}

@@ -423,6 +423,8 @@ body.js #ms-signup-reveal {
     margin-bottom: 1em;
 }
 
+/* pledge creation styling */
+
 /* Breadcrumbs when creating a pledge */
 
 ol#breadcrumbs {
@@ -480,4 +482,7 @@ ol#breadcrumbs li.hilight em {
     margin: -8px -8px 8px -8px;
     padding: 4px 8px;
     background: #008184;
+}
+#preview h2 {
+    margin-top: 0;
 }

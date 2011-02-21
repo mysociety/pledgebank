@@ -219,6 +219,8 @@ function microsite_preloaded_images($key){
             "hendon_library.jpg" => "Hendon library",
             "purple_flower.jpg"  => "Purple flower", 
             "royal_wedding.jpg"  => "Royal Wedding street party",
+            "trees_and_leaves.jpg"=> "Trees and leaves",
+            "water_lilies.jpg"   => "Water lilies",
             "yellow_flower.jpg"  => "Yellow flower",
         );
         if ($key == 'exists'){

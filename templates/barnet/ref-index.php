@@ -131,7 +131,17 @@
             <div id="ms-pb-signatories-footer"></div>
         </div>
         <div id="ms-pb-comments">
-            <h2>Comments on this pledge</h2>
+            <? if ($p->has_details()) { 
+                $det = htmlspecialchars($p->data['detail']);
+                $det = ms_make_clickable($det, array('contract'=>true, 'nofollow'=>true));
+                $det = str_replace("\n", "<br>\n", $det);
+            ?>
+                <h2> More details about this pledge</h2>
+                <div class="ms-pb-general">
+                    <?= $det ?>
+                </div>
+            <? } ?>
+            <h2>Comments <? /* avoid repeated "...this pledge" in adjacent h2s */ if (! $p->has_details()) { print "on this pledge"; } ?> </h2>
             <div class="ms-pb-general">
                 <?
                     draw_comments($p);

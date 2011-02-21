@@ -764,6 +764,8 @@ function microsites_new_pledges_preview_extras($data) {
  * links around the place.
  */
 function microsites_change_microsite_allowed() {
+    global $microsite;
+    if ($microsite == 'barnet') return false;
     return true;
 }
 
@@ -772,6 +774,8 @@ function microsites_change_microsite_allowed() {
  * and "translate into your own language" at the bottom of every page.
  */
 function microsites_show_translate_blurb() {
+    global $microsite;
+    if ($microsite == 'barnet') return false;
     return true;
 }
 
@@ -780,6 +784,8 @@ function microsites_show_translate_blurb() {
  * just signed up for an email alert
  */
 function microsites_show_alert_advert() {
+    global $microsite;
+    if ($microsite == 'barnet') return false;
     return true;
 } 
 

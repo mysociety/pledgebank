@@ -299,6 +299,7 @@ function microsites_new_pledges_toptips() {
 
 function microsites_toptips_normal() {
     global $site_country;
+    global $microsite;
     $percent_successful_above_100 = percent_success_above(100);
     $out = '<h2>' . _('Top Tips for Successful Pledges') . '</h2>';
     $out .= '<ol>';
@@ -317,9 +318,15 @@ function microsites_toptips_normal() {
     /* $out .= '<li>' . _("<strong>Search first</strong>. Enter a keyword or two related to your pledge
 in the search box in the top righthand corner. If there's already a pledge related to yours, consider
 joining in on that pledge.") . '</li>'; */
-    $out .= '<li>' . _("<strong>A picture &ndash; or audio clip, or video &ndash; is worth a thousand
-words</strong>. You can add a picture to your pledge once you've created it, or consider including a
-link in your pledge to a picture, audio, or video if you have one.") . '</li>';
+    if ($microsite == 'barnet'){
+        $out .= '<li>' . _("<strong>You can add a picture when the pledge has been created</strong>.
+            You can upload your own, or choose from the pre-loaded images that are already the right
+            size for the Barnet page design.") . '</li>';
+    } else {
+        $out .= '<li>' . _("<strong>A picture &ndash; or audio clip, or video &ndash; is worth a thousand
+            words</strong>. You can add a picture to your pledge once you've created it, or consider including a
+            link in your pledge to a picture, audio, or video if you have one.") . '</li>';
+    }
     /* if ($site_country == 'US') {
         $out .= '<li>' . "If your pledge is about raising money and you want people to be able to
 donate straight away, think about using <a href=\"http://www.changingthepresent.org/PledgeBank\">Changing

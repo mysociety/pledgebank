@@ -274,6 +274,18 @@ function microsites_local_alerts() {
     return true;
 }
 
+/* microsites_default_location
+ * returns a default location for new pledges -- user can override this.
+ */
+function microsites_default_location() {
+    global $microsite;
+    if ($microsite == 'barnet'){
+        return array('local'=> 1, 'place'=> 'Barnet', 'country' => 'GB', 'state' => '', 'gaze_place' => '', 'postcode' => '', 'places' => null);
+    }
+    return array(); /* empty array, not null */
+}
+
+
 /* microsites_new_pledges_toptips
  * Tips on making a pledge that will work, for top of new pledge page.
  */

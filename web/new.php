@@ -208,7 +208,8 @@ size="40" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
 <small><?=_('(e.g. "resident of Tamilda Road")') ?></small>
 </p>
 
-<?  if (sizeof($data)) {
+<?  
+  if (sizeof($data)) {
         print '<input type="hidden" name="data" value="' . base64_encode(serialize($data)) . '">';
     }
     print p(_("Did you read the tips on the right of the page? They'll help you make a successful pledge."));
@@ -289,8 +290,10 @@ them to help you with something bigger.') ?></p>
 
 
 function pledge_form_two($data, $errors = array()) {
+        
     $local = (array_key_exists('local', $data)) && $data['local'] == '1';
     $notlocal = (array_key_exists('local', $data)) && $data['local'] == '0';
+        
     $isodate = $data['parseddate']['iso'];
     if (array_key_exists('gaze_place', $errors) && $errors['gaze_place'] == 'NOTICE') {
         unset($errors['gaze_place']); # remove NOTICE
@@ -509,16 +512,20 @@ function pledge_form_submitted() {
     }
 
     # Step 2 fixes
+        
     if (array_key_exists('local', $data) && !$data['local']) { 
         $data['gaze_place'] = ''; 
         $data['postcode'] = ''; 
         $data['place'] = ''; 
     }
-    if (!array_key_exists('local', $data)) $data['local'] = '';
+    if (!array_key_exists('local', $data)){
+        $data['local'] = '';
+        $data = array_merge($data, microsites_default_location());        
+    } 
     $location = gaze_controls_get_location();
     if ($location['country'] || !array_key_exists('country', $data))
         $data = array_merge($data, $location);
-
+    
     # Step 1, main pledge details
     if (get_http_var('tostep1')) {
         pledge_form_one($data, $errors);
@@ -547,6 +554,7 @@ function pledge_form_submitted() {
     }
     
     # Step 2, location
+    
     if (get_http_var('tostep2') || get_http_var('donetargetwarning')) {
         pledge_form_two($data, $errors);
         return;

@@ -7,9 +7,9 @@
 
 $topic = get_http_var('topic');
 
-    print '<div id="tips">';
      
     if ($comment_id) {
+        print '<div id="tips">';
         print p(_('You are reporting the following comment to us:'));
         print '<blockquote>';
         $row = db_getRow('select *,extract(epoch from ms_current_timestamp()-whenposted) as whenposted from comment where id = ? and not ishidden', $comment_id);
@@ -18,9 +18,8 @@ $topic = get_http_var('topic');
         else
             print '<em>Comment no longer exists</em>';
         print '</blockquote>';
+        print "</div>";
     }
-
-    print "</div>";
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';

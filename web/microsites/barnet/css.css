@@ -483,6 +483,12 @@ ol#breadcrumbs li.hilight em {
     padding: 4px 8px;
     background: #008184;
 }
+#preview {
+    float:right;
+    width: 47%;
+    margin-left: 1em;
+}
+
 #preview h2 {
     margin-top: 0;
 }

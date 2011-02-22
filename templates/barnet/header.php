@@ -49,6 +49,8 @@
 <script type="text/javascript" src="http://barnet.fixmystreet.com/cobrands/barnet/javascript/2008-portsurf.js"></script>
 
 <script type="text/javascript" src="/pb.js"></script>
+<script type="text/javascript" src="/jslib/utils.js"></script>
+<script type="text/javascript" src="/gaze.js"></script>
 <link rel="stylesheet" type="text/css" href="/microsites/barnet/css.css">
 <link rel="stylesheet" type="text/css" media="print" href="/microsites/barnet/pbprint.css">
 

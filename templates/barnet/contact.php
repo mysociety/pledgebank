@@ -42,19 +42,10 @@ $topic = get_http_var('topic');
             </p>
             <!--<p style="color:#ccc;">[Dates? Targets?]</p>-->
         </div>
-        <h3>
-            What we're pledging:
-        </h3>   
-        <div style="float:right; width:46%;margin-top:0;" class="pb-barnet-breakout">
-            <p>
-                What we can't do:
-            </p>
-            <ul>
-                <li>We can't organise your party for you &mdash; that's down to you and your neighbours! </li>
-                <li>We can't guarantee bright, warm sunshine throughout Barnet on the day. Sorry.</li>
-            </ul>
-        </div>
-        <div style="width:46%; margin-top:0;" class="pb-barnet-breakout">
+        <div style="float:right; width:45%;margin-left:1em;" class="pb-barnet-breakout">
+            <h3>
+                What we're pledging:
+            </h3>   
             <p>
                 What we can do:
             </p>         
@@ -63,8 +54,15 @@ $topic = get_http_var('topic');
                 <li>We'll help you coordinate with other organisers in your immediate neighbourhood. </li>
                 <li>We might be able to help out with tables and chairs, depending on the size of your party. </li>
             </ul>
+            <p>
+                What we can't do:
+            </p>
+            <ul>
+                <li>We can't organise your party for you &mdash; that's down to you and your neighbours! </li>
+                <li>We can't guarantee bright, warm sunshine throughout Barnet on the day. Sorry.</li>
+            </ul>
         </div>
-        <h3 style="clear:both;">
+        <h3>
             Get involved!
         </h3>            
         <p>
@@ -96,7 +94,7 @@ $topic = get_http_var('topic');
 ?>
         <input name="topic" type="hidden" value="<?= $topic ?>" />
         <p>
-            <label for="street">Your street:</label><input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
+            <label for="street">Your street:</label> <input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
         </p>
 <?      
     } else {

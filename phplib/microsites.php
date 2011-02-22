@@ -527,7 +527,7 @@ function microsites_comments_allowed() {
  * SQL fragment for whether a pledge gets any chivvy emails.
  */
 function microsites_chivvy_sql() {
-    return "microsite is null or (microsite <> 'livesimply' and microsite <> 'o2')";
+    return "microsite is null or (microsite <> 'livesimply' and microsite <> 'o2' and microsite <> 'barnet')";
 }
 
 /* microsites_email_subject_by_topic

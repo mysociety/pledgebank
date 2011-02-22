@@ -766,7 +766,7 @@ function microsites_step1_error_check($data) {
 
 # For displaying extra bits on the preview pledge page
 function microsites_new_pledges_preview_extras($data) {
-    return;
+    return "";
 }
 
 /* microsites_change_microsite_allowed

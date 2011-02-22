@@ -33,7 +33,7 @@ $microsites_list = array('everywhere' => _('Everywhere'),
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 # If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
-$microsites_from_extra_domains = array('pledgebank.barnet.gov.uk' => 'xxxbarnet');
+$microsites_from_extra_domains = array('pledgebank.barnet.gov.uk' => 'barnet');
 $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 
 /* These are listed on /where */
@@ -681,7 +681,7 @@ function microsites_filter_foreign(&$sql_params) {
  */
 function microsites_normal_prominences() {
     global $microsite;
-    if ($microsite == 'catcomm')
+    if (($microsite == 'catcomm') || ($microsite == 'barnet'))
         return " (cached_prominence = 'normal' or cached_prominence = 'backpage') ";
     return " (cached_prominence = 'normal') ";
 }

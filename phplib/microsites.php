@@ -33,7 +33,7 @@ $microsites_list = array('everywhere' => _('Everywhere'),
 
 /* Other domains which refer to microsites (must be one-to-one as reverse map used to make URLs) */
 # If you alter this, also alter web/poster.cgi which has a microsites_from_extra_domains variable
-$microsites_from_extra_domains = array('pledgebank.barnet.gov.uk' => 'barnet');
+$microsites_from_extra_domains = array('pledgebank.barnet.gov.uk' => 'xxxbarnet');
 $microsites_to_extra_domains = array_flip($microsites_from_extra_domains);
 
 /* These are listed on /where */
@@ -248,14 +248,14 @@ function microsite_picture_extra_form(){
     if ($microsite == 'barnet'){
         $images_available = microsite_preloaded_images('exists');
         if (count($images_available)>0){
-            $html ="<p>If you don't have a suitable image of your own, you can choose one of the pre-loaded images instead.</p>
-                    <label for='preloaded_image'>Pre-loaded images</label>
-                    <select name='preloaded_image'>
-                    <option value='0'> </option>";
+            $html ='<p style="padding-top:1em;">If you don\'t have a suitable image of your own, you can choose one of the pre-loaded images instead.</p>
+                    <label for="preloaded_image">Pre-loaded images</label>
+                    <select name="preloaded_image" id="preload-select">
+                    <option value="0"> </option>';
             foreach ($images_available as $filename => $desc) {
                 $html .= "<option value='$filename'>$desc</option>\n";
             }
-            $html .= "</select>";
+            $html .= '</select><div style="clear:both"></div>';
         }
     }
     return $html;
@@ -404,7 +404,17 @@ function microsites_location_allowed() {
  * specifically this is for temp. Barnet block  */
 function microsites_denied_access_redirect_url() {
     global $microsite;
-    if ($microsite == 'barnet') return 'http://pledgebank.barnet.gov.uk/';
+    if ($microsite == 'barnet'){
+         /* only allow barnet login with Barnet team email, or mysociety staff ... IP restrictions too? */
+        $P = person_if_signed_on();
+        if ($P) {
+            if ($P->email()=='pledgebank@barnet.gov.uk')
+                return '';
+            if (preg_match('/(matthew|tom|dave)@mysociety.org$/', $P->email()))
+                return '';
+        }
+        return 'http://pledgebank.barnet.gov.uk/';
+    } 
     return '';
 }
 

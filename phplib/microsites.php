@@ -412,9 +412,10 @@ function microsites_denied_access_redirect_url() {
                          'reason_email_subject' => _('Create pledges at Barnet PledgeBank.')
                      ));
         if ($P) {
-            if ($P->email()=='pledgebank@barnet.gov.uk')
+            $email_lc = strtolower($P->email());
+            if ($email_lc=='barnet.pledgebank@barnet.gov.uk')
                 return '';
-            if (preg_match('/(matthew|tom|dave)@mysociety.org$/', $P->email()))
+            if (preg_match('/^(matthew|tom|dave)@mysociety.org$/', $email_lc))
                 return '';
         }
         return 'http://pledgebank.barnet.gov.uk/';

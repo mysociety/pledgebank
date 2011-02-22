@@ -406,7 +406,11 @@ function microsites_denied_access_redirect_url() {
     global $microsite;
     if ($microsite == 'barnet'){
          /* only allow barnet login with Barnet team email, or mysociety staff ... IP restrictions too? */
-        $P = person_if_signed_on();
+        $P =  pb_person_signon(array(
+                         'reason_web' => _("You need to be logged in as an authorised user to create pledges."),
+                         'reason_email' => _("Then you will be able to create pledges."),
+                         'reason_email_subject' => _('Create pledges at Barnet PledgeBank.')
+                     ));
         if ($P) {
             if ($P->email()=='pledgebank@barnet.gov.uk')
                 return '';

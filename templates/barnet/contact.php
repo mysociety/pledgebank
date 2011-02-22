@@ -40,24 +40,31 @@ $topic = get_http_var('topic');
                 It's a wonderful excuse for a street party &mdash; not only is a street party a fun way for Londoners
                 to celebrate the event, it's also a great way to get to know your neighbours better.
             </p>
-            <p style="color:#ccc;">[Dates? Targets?]</p>
+            <!--<p style="color:#ccc;">[Dates? Targets?]</p>-->
         </div>
         <h3>
             What we're pledging:
-        </h3>            
-        <ul>
-            <li>We can make sure road closures are handled legally and sensibly (you can't simply block your road off). </li>
-            <li>We'll help you coordinate with other organisers in your immediate neighbourhood. </li>
-            <li>We might be able to help out with tables and chairs, depending on the size of your party. </li>
-        </ul>
-        <p>
-            What we can't do:
-        </p>
-        <ul>
-            <li>We can't organise your party for you &mdash; that's down to you and your neighbours! </li>
-            <li>We can't guarantee bright, warm sunshine throughout Barnet on the day. Sorry.</li>
-        </ul>
-        <h3>
+        </h3>   
+        <div style="float:right; width:46%;margin-top:0;" class="pb-barnet-breakout">
+            <p>
+                What we can't do:
+            </p>
+            <ul>
+                <li>We can't organise your party for you &mdash; that's down to you and your neighbours! </li>
+                <li>We can't guarantee bright, warm sunshine throughout Barnet on the day. Sorry.</li>
+            </ul>
+        </div>
+        <div style="width:46%; margin-top:0;" class="pb-barnet-breakout">
+            <p>
+                What we can do:
+            </p>         
+            <ul>
+                <li>We can make sure road closures are handled legally and sensibly (you can't simply block your road off). </li>
+                <li>We'll help you coordinate with other organisers in your immediate neighbourhood. </li>
+                <li>We might be able to help out with tables and chairs, depending on the size of your party. </li>
+            </ul>
+        </div>
+        <h3 style="clear:both;">
             Get involved!
         </h3>            
         <p>

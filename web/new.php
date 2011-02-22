@@ -844,37 +844,43 @@ function preview_pledge($data, $errors) {
     $partial_pledge->render_box(array('showdetails' => true));
 ?>
 
-    <div id="otherdetails">
-    <?=h3(_("Other Details"))?>
-    <ul>
-<?  if (microsites_categories_allowed() && microsites_categories_page3()) { ?>
-    <li><?=_('Category') ?>: <strong><?=
-        $data['category'] == -1
-            ? _('None')
-            : htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))) // XXX show enclosing cat?
-    ?></strong></li>
-<?  }
+<?
+    $otherdetails_li_html = "";
 
-    if ($data['tags']) {
-       $tag_array = make_web20_tags($data['tags']);
-       print "<li>Tags: <strong>";
-       foreach ($tag_array as $tag) {
-       print $tag . " "; 
-       }
-       print "</strong></li>";
+    if (microsites_categories_allowed() && microsites_categories_page3()) {
+        $otherdetails_li_html .= "<li>" .  _('Category') . ": <strong>";
+        if ($data['category'] == -1)
+            $otherdetails_li_html .= _('None');
+        else
+            $otherdetails_li_html .= htmlspecialchars(_(db_getOne('select name from category where id = ?', $data['category']))); // XXX show enclosing cat?
+        $otherdetails_li_html .= "</strong></li>";
     }
-
-    if (microsites_private_allowed()) { ?>
-    <li><?=_('Privacy status') ?>: <strong><?
-    if ($v=='all') print _('Public');
-    if ($v=='pin') print _('Pledge can only be seen by people who I give the PIN to');
-    ?></strong></li>
-<?  }
-
-    microsites_new_pledges_preview_extras($data);
+    if ($data['tags']) {
+        $tag_array = make_web20_tags($data['tags']);
+        $otherdetails_li_html .= "<li>Tags: <strong>";
+        foreach ($tag_array as $tag) {
+           $otherdetails_li_html .= $tag . " "; 
+        }
+        $otherdetails_li_html .= "</strong></li>";
+    }
+    if (microsites_private_allowed()) {
+        $otherdetails_li_html .= "<li>" . _('Privacy status') . ": <strong>";
+        if ($v=='all') $otherdetails_li_html .= _('Public');
+        if ($v=='pin') $otherdetails_li_html .= _('Pledge can only be seen by people who I give the PIN to');
+        $otherdetails_li_html .= "</strong></li>";
+    }
+    $otherdetails_li_html .= microsites_new_pledges_preview_extras($data);
+    
+    if ($otherdetails_li_html) {
 ?>
-    </ul>
+    <div id="otherdetails">
+        <?=h3(_("Other Details"))?>
+        <ul>
+            <?= $otherdetails_li_html ?>
+        </ul>
     </div>
+<? } ?>              
+
 </div>
 
 <form accept-charset="utf-8" method="post" action="/new">

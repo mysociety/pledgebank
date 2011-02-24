@@ -784,7 +784,10 @@ function send_pending_messages() {
      * signed-after-success and SMS options. We grab message and recipient
      * info for each signer-message pair which is pending on delivery. */
     verbose("sending pending signer messages");
-     
+
+    # XXX Special Xmarks exemption
+    $xmarks_md5 = file('/data/vhost/www.pledgebank.com/xmarks-no-email.txt', FILE_IGNORE_NEW_LINES);
+
     $q = db_query('
                 select message.*,
                     signers.id as signer_id,
@@ -982,6 +985,11 @@ function send_pending_messages() {
                     
                 /* Record that it is a late signer message */
                 $latesigners[$r['signer_id']] = 1;
+            }
+
+            # XXX Xmarks exemption
+            if ($pledge->ref() == 'XmarksPremium' && in_array(md5(strtolower(trim($r['signer_email']))), $xmarks_md5)) {
+                $send_it = false;
             }
 
             /* Send the message */

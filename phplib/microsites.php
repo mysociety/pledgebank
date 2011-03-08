@@ -413,7 +413,7 @@ function microsites_denied_access_redirect_url() {
                      ));
         if ($P) {
             $email_lc = strtolower($P->email());
-            if ($email_lc=='barnet.pledgebank@barnet.gov.uk')
+            if (($email_lc=='barnet.pledgebank@barnet.gov.uk') || ($email_lc=='christine.benn@barnet.gov.uk'))
                 return '';
             if (preg_match('/^(matthew|tom|dave)@mysociety.org$/', $email_lc))
                 return '';

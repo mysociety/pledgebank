@@ -38,7 +38,7 @@ $topic = get_http_var('topic');
             <p>
                  The Royal Wedding of HRH Prince William and Kate Middleton will take place on 29 April this year. 
                  It&rsquo;s a wonderful excuse for a street party &mdash; not only is a street party a fun way for residents 
-                 to celebrate the event, it's also a great way to get to know your neighbours better.               
+                 to celebrate the event, it&rsquo;s also a great way to get to know your neighbours better.               
             </p>
         </div>
         <div style="float:right; width:45%;margin-left:1em;" class="pb-barnet-breakout">
@@ -70,7 +70,7 @@ $topic = get_http_var('topic');
         </h3>            
         <p>
             Start or join a pledge to organise a street party in your road. Ideally, you'll need to get a minimum of 3&nbsp;households 
-            involved. If you don't meet your target you don't have to act, but if you do then .&nbsp;.&nbsp;. party&nbsp;on!
+            involved. If you don&rsquo;t meet your target you don't have to act, but if you do then .&nbsp;.&nbsp;. party&nbsp;on!
         </p>
         
     <?
@@ -110,7 +110,7 @@ $topic = get_http_var('topic');
 <input type="submit" name="submit" value="Send to PledgeBank team"></p>
 <? if ($topic=='royalwedding') { ?>
 
-  <p>The PledgeBank team will...</p>
+  <p>The PledgeBank team will . . .</p>
   <ul>
     <li>
         email you the <a href="http://www.barnet.gov.uk/royal-wedding-form.pdf">Royal Wedding street party application form</a> you will need to close off your street
@@ -119,11 +119,11 @@ $topic = get_http_var('topic');
         start a pledge page to help encourage people in your street to get involved and invite you to be the first to sign it
     </li>
     <li>
-      or, if we've created one already, we'll let you know so you can sign up to it
+      or, if we&rsquo;ve created one already, we'll let you know so you can sign up to it
     </li>
   </ul>
   <p>
-    After that, it's up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
+    After that, it&rsquo;s up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
   </p>
 
 <? } elseif (! $comment_id ) { ?>

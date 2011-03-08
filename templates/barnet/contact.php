@@ -33,40 +33,43 @@ $topic = get_http_var('topic');
     } elseif ($topic == 'royalwedding') { ?>
         
         <h2>Royal Wedding: Street Party in your street</h2>
-        <div class='ms-royalwedding-banner'></div>
-        <div style="font-size:1.126em;">
+        <div class='ms-royalwedding-banner' style="height:200px;"></div>
+        <div style="font-size:1.126em;padding-bottom:0.25em;">
             <p>
-                The Royal Wedding of HRH Prince William and Kate Middleton will take place on 29 April this year.
-                It's a wonderful excuse for a street party &mdash; not only is a street party a fun way for Londoners
-                to celebrate the event, it's also a great way to get to know your neighbours better.
+                 The Royal Wedding of HRH Prince William and Kate Middleton will take place on 29 April this year. 
+                 It&rsquo;s a wonderful excuse for a street party &mdash; not only is a street party a fun way for residents 
+                 to celebrate the event, it's also a great way to get to know your neighbours better.               
             </p>
-            <!--<p style="color:#ccc;">[Dates? Targets?]</p>-->
         </div>
         <div style="float:right; width:45%;margin-left:1em;" class="pb-barnet-breakout">
-            <h3>
-                What we're pledging:
-            </h3>   
-            <p>
-                What we can do:
-            </p>         
-            <ul>
-                <li>We can make sure road closures are handled legally and sensibly (you can't simply block your road off). </li>
-                <li>We'll help you coordinate with other organisers in your immediate neighbourhood. </li>
-                <li>We might be able to help out with tables and chairs, depending on the size of your party. </li>
-            </ul>
-            <p>
-                What we can't do:
-            </p>
-            <ul>
-                <li>We can't organise your party for you &mdash; that's down to you and your neighbours! </li>
-                <li>We can't guarantee bright, warm sunshine throughout Barnet on the day. Sorry.</li>
-            </ul>
+          <h3>
+              What you will need to do:
+          </h3>
+          <ul>
+            <li>
+                Read our guide to <a href="http://www.barnet.gov.uk/royal-wedding.htm">holding a Royal Wedding street party</a>.
+            </li>
+            <li>
+              Fill in a <a href="http://www.barnet.gov.uk/royal-wedding-form.pdf">Royal Wedding street party application form</a> telling us about the road or section of road you would like to close on the day.
+            </li>
+            <li>
+              Read the <a href="http://www.barnet.gov.uk/royal-wedding-insurance.pdf">policy wording of the public liability insurance cover</a> arranged by the Council.
+            </li>
+          </ul>
+          <h3>
+            What we're pledging: 
+          </h3>
+          <ul>
+            <li>
+              Barnet Council will support street parties on the day of the Royal Wedding, including arranging insurance free of charge, if at least three households in a street sign up to holding an event.
+            </li>
+          </ul>
         </div>
         <h3>
             Get involved!
         </h3>            
         <p>
-            Start or join a pledge to organise a street party in your road. You'll need to get a minimum of 8 people
+            Start or join a pledge to organise a street party in your road. Ideally, you'll need to get a minimum of 3&nbsp;households 
             involved. If you don't meet your target you don't have to act, but if you do then .&nbsp;.&nbsp;. party&nbsp;on!
         </p>
         
@@ -107,14 +110,21 @@ $topic = get_http_var('topic');
 <input type="submit" name="submit" value="Send to PledgeBank team"></p>
 <? if ($topic=='royalwedding') { ?>
 
-    <p>The PledgeBank team will...</p>
-    <ul>
-        <li>start a pledge to support for a party in your street and invite you to be the first to sign it</li>
-        <li>or, if we've created one already, we'll let you know so you can sign up to it<li>
-    </ul>
-    <p>
-        After that, it's up to you to spread the word to your neighbours to get them to sign your pledge too!
-    </p>
+  <p>The PledgeBank team will...</p>
+  <ul>
+    <li>
+        email you the <a href="http://www.barnet.gov.uk/royal-wedding-form.pdf">Royal Wedding street party application form</a> you will need to close off your street
+    </li>
+    <li>
+        start a pledge page to help encourage people in your street to get involved and invite you to be the first to sign it
+    </li>
+    <li>
+      or, if we've created one already, we'll let you know so you can sign up to it
+    </li>
+  </ul>
+  <p>
+    After that, it's up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
+  </p>
 
 <? } elseif (! $comment_id ) { ?>
   <p>The PledgeBank team will...</p>

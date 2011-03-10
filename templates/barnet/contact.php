@@ -34,14 +34,44 @@ $topic = get_http_var('topic');
         
         <h2>Royal Wedding: Street Party in your street</h2>
         <div class='ms-royalwedding-banner' style="height:200px;"></div>
-        <!--
         <div id="ms-explicit-party-list">
           <h3>Streets already partying: <span style="font-weight:normal;">click to join in!</span></h3>
           <ul>
-            <li><a href="/ExampleStreet">Example Street</a></li>
+            <li>
+              <a href="/dalegreenparty">Dale&nbsp;Green&nbsp;Road,&nbsp;N11</a>
+            </li>
+            <li>
+              <a href="/falklandroad">Falkland&nbsp;Road,&nbsp;EN5</a>
+            </li>
+            <li>
+              <a href="/harmandriveparty">Harman&nbsp;Drive,&nbsp;NW2</a>
+            </li>
+            <li>
+              <a href="/hartlandroad">Hartland&nbsp;Road,&nbsp;N11</a>
+            </li>
+            <li>
+              <a href="/lambertroad">Lambert&nbsp;Road,&nbsp;N12</a>
+            </li>
+            <li>
+              <a href="/mandevilleroad">Mandeville&nbsp;Road,&nbsp;N14</a>
+            </li>
+            <li>
+              <a href="/ravenscroftpark">Ravenscroft&nbsp;Park,&nbsp;EN5</a>
+            </li>
+            <li>
+              <a href="/rowlandsclose">Rowlands&nbsp;Close,&nbsp;NW7</a>
+            </li>
+            <li>
+              <a href="/southwayparty">Southway,&nbsp;N20</a>
+            </li>
+            <li>
+              <a href="/westburyroad">Westbury&nbsp;Road,&nbsp;N12</a>
+            </li>
+            <li>
+              <a href="/woodvilleroad">Woodville&nbsp;Road,&nbsp;New&nbsp;Barnet</a>
+            </li>            
           </ul>
         </div>
-        -->
         <div style="font-size:1.126em;padding-bottom:0.25em;">
             <p>
                  The Royal Wedding of HRH Prince William and Kate Middleton will take place on 29 April this year. 

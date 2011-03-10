@@ -106,6 +106,7 @@ $topic = get_http_var('topic');
         <input name="topic" type="hidden" value="<?= $topic ?>" />
         <p>
             <label for="street">Your street:</label> <input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
+            <br/><span style="padding-left:5em; font-size:90%;">(it helps us if you include your postcode&nbsp;too)</span>
         </p>
 <?      
     } else {

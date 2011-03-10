@@ -151,6 +151,16 @@ function microsites_site_country() {
     return $site_country;
 }
 
+/* microsite_requires_abuse_test
+ * by default should be doing abuse test
+ * except in Barnet, where all pledges are going out from the same email which is effectively
+ * an admin-authorised action
+ */
+function microsite_requires_abuse_test() {
+    global $microsite;
+    if ($microsite == 'barnet') return false;
+    return true;
+}
 
 #############################################################################
 # Styling

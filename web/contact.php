@@ -88,10 +88,12 @@ function contact_form_submitted() {
             'ref' => array($ref, 'Pledge reference'),
         );
         
-        $result = abuse_test($vars);
-        if ($result)
-            $errors[] = _("I'm afraid that we rate limit the usage of the contact form to prevent abuse.");
-
+        if (microsite_requires_abuse_test()){
+            $result = abuse_test($vars);
+            if ($result)
+                $errors[] = _("I'm afraid that we rate limit the usage of the contact form to prevent abuse.");
+        }
+        
         if (! microsites_email_send_from_users_address($topic)){
             $name = "PledgeBank";
             $email = OPTION_CONTACT_EMAIL;

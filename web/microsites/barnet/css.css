@@ -492,3 +492,33 @@ ol#breadcrumbs li.hilight em {
 #preview h2 {
     margin-top: 0;
 }
+
+#ms-explicit-party-list {
+    margin:-8px 0 0 0; 
+    background-color:#D8EBEB;
+    padding:0;
+}
+
+#ms-explicit-party-list h3 {
+    margin:0;
+    padding:4px 8px; 
+    color:#ffffff; 
+    background-color:#008184;
+}
+
+#ms-explicit-party-list ul {
+    padding:8px;
+    margin:0; 
+    font-size:120%;
+    font-weight:bold;
+    list-style: none;
+}
+
+#ms-explicit-party-list ul li {
+    padding:4px 1em 4px 0; 
+    display: inline;
+}
+
+#ms-explicit-party-list ul li a {
+  padding-left:16px;
+}

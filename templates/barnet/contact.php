@@ -34,6 +34,14 @@ $topic = get_http_var('topic');
         
         <h2>Royal Wedding: Street Party in your street</h2>
         <div class='ms-royalwedding-banner' style="height:200px;"></div>
+        <!--
+        <div id="ms-explicit-party-list">
+          <h3>Streets already partying: <span style="font-weight:normal;">click to join in!</span></h3>
+          <ul>
+            <li><a href="/ExampleStreet">Example Street</a></li>
+          </ul>
+        </div>
+        -->
         <div style="font-size:1.126em;padding-bottom:0.25em;">
             <p>
                  The Royal Wedding of HRH Prince William and Kate Middleton will take place on 29 April this year. 

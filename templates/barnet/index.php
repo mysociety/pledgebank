@@ -41,4 +41,14 @@
     bit for the community. By working together, we can offer services that
     are popular and worthwhile.
   </p>
+  <div style="border:1px solid white;">
+    <img alt="portrait of William and Kate" src="/microsites/barnet/royalwedding_small_portrait.jpg" style="float:right;width:170px;height:208px;border:none;"/>
+    <div style="border-top: 4px solid #00ada1;margin-top:32px;">
+      <h3><a href="/new/royalwedding" title="Street Party" >Royal Wedding Street Parties</a></h3>
+      <p>
+        We're pledging to support street parties for the Royal Wedding on 29 April.
+        If you can't see a pledge for <i>your</i> street here, why not get involved by <a href="/new/royalwedding">setting one&nbsp;up</a>? 
+      </p>
+    </div>
+  </div>
 </div>  

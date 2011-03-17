@@ -49,7 +49,7 @@
         We're pledging to support street parties for the Royal Wedding on 29 April.
         If you can't see a pledge for <i>your</i> street here, why not get involved by <a href="/new/royalwedding">setting one&nbsp;up</a>? 
       </p>
-      <ul>
+      <ul style="margin-left:2em;">
           <li><a href="/brownlow-road">Brownlow&nbsp;Road,&nbsp;N3</a></li>
           <li><a href="/chislehurst-ave">Chislehurst&nbsp;Avenue,&nbsp;N12</a></li>
           <li><a href="/corringham-road">Corringham&nbsp;Road,&nbsp;NW11</a></li>

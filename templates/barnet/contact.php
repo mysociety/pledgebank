@@ -35,18 +35,24 @@ $topic = get_http_var('topic');
         <h2>Royal Wedding: Street Party in your street</h2>
         <div class='ms-royalwedding-banner' style="height:200px;"></div>
         <div id="ms-explicit-party-list">
-          <h3>Streets already partying: <span style="font-weight:normal;">click to join in!</span></h3>
+          <h3>Sign up to a street party pledge:</h3>
           <ul>
-              <li><a href="/brownlow-road">Brownlow&nbsp;Road,&nbsp;N3
-              <li><a href="/chislehurst-ave">Chislehurst&nbsp;Avenue,&nbsp;N12
+              <li><a href="/brownlow-road">Brownlow&nbsp;Road,&nbsp;N3</li>
+              <li><a href="/chislehurst-ave">Chislehurst&nbsp;Avenue,&nbsp;N12</li>
+              <li><a href="/corringham-road">Corringham&nbsp;Road,&nbsp;NW11</li>
               <li><a href="/dalegreenparty">Dale&nbsp;Green&nbsp;Road,&nbsp;N11</a></li>
               <li><a href="/falklandroad">Falkland&nbsp;Road,&nbsp;EN5</a></li>
               <li><a href="/harmandriveparty">Harman&nbsp;Drive,&nbsp;NW2</a></li>
+          </ul>
+          <ul>
               <li><a href="/hartlandroad">Hartland&nbsp;Road,&nbsp;N11</a></li>
-              <li><a href="/hertfordclose">Hertford&nbsp;Close,&nbsp;EN4
+              <li><a href="/hertfordclose">Hertford&nbsp;Close,&nbsp;EN4</a></li>
+              <li><a href="/hertford-road">Hertford&nbsp;Road,&nbsp;N2</a></li>
               <li><a href="/lambertroad">Lambert&nbsp;Road,&nbsp;N12</a></li>
               <li><a href="/mandevilleroad">Mandeville&nbsp;Road,&nbsp;N14</a></li>
-              <li><a href="/PrincesAvenue">Princes&nbsp;Avenue,&nbsp;N3
+              <li><a href="/PrincesAvenue">Princes&nbsp;Avenue,&nbsp;N3</a></li>
+          </ul>
+          <ul>
               <li><a href="/ravenscroftpark">Ravenscroft&nbsp;Park,&nbsp;EN5</a></li>
               <li><a href="/rowlandsclose">Rowlands&nbsp;Close,&nbsp;NW7</a></li>
               <li><a href="/southwayparty">Southway,&nbsp;N20</a></li>
@@ -54,6 +60,7 @@ $topic = get_http_var('topic');
               <li><a href="/westchester">Westchester&nbsp;Drive,&nbsp;NW4
               <li><a href="/woodvilleroad">Woodville&nbsp;Road,&nbsp;EN5</a></li>
           </ul>
+          <div style="width:100%;clear:both;height:1px"></div>
         </div>
         <div style="font-size:1.126em;padding-bottom:0.25em;">
             <p>
@@ -82,15 +89,15 @@ $topic = get_http_var('topic');
           </h3>
           <ul>
             <li>
-              Barnet Council will support street parties on the day of the Royal Wedding, including arranging insurance free of charge, if at least three households in a street sign up to holding an event.
+              Barnet Council will support street parties on the day of the Royal Wedding, including arranging insurance free of charge, <strong>if at least three households in a street</strong> sign up to holding an event.
             </li>
           </ul>
         </div>
         <h3>
-            Get involved!
+            Can't see your road?  Start a new pledge!
         </h3>            
         <p>
-            Start or join a pledge to organise a street party in your road. Ideally, you'll need to get a minimum of 3&nbsp;households 
+            If there's not already a pledge for your road simply start one. Ideally, you'll need to get a minimum of 3&nbsp;households 
             involved. If you don&rsquo;t meet your target you don't have to act, but if you do then .&nbsp;.&nbsp;. party&nbsp;on!
         </p>
         

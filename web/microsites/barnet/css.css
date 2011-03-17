@@ -512,11 +512,15 @@ ol#breadcrumbs li.hilight em {
     font-size:120%;
     font-weight:bold;
     list-style: none;
+    width: 13em;
+    min-width:12em;
+    float:left;
 }
 
+
 #ms-explicit-party-list ul li {
-    padding:4px 1em 4px 0; 
-    display: inline;
+    /* padding:0px 1em 4px 0; */
+    padding-left: 0;
 }
 
 #ms-explicit-party-list ul li a {

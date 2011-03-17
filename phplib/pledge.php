@@ -587,6 +587,20 @@ class Pledge {
 
             }
 
+            if ($this->ref() == '8PMMovement') {
+                // Embed ChipIn widget
+                print '<div id="google_translate_element"></div><script>';
+		print 'function googleTranslateElementInit() {';
+		print '  new google.translate.TranslateElement({';
+		print '    pageLanguage: "en",';
+		print '    multilanguagePage: true,';
+		print '    layout: google.translate.TranslateElement.InlineLayout.SIMPLE';
+		print '  }, "google_translate_element");';
+		print '}';
+		print '</script><script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>';
+
+            }
+
             // More details
             print '<p id="moredetails"><strong>' . _('More details') . '</strong><br>' . $det . '</p>';
         }

@@ -184,6 +184,21 @@ function microsites_navigation_menu($contact_ref) {
     return $menu;
 }
 
+/* produces HTML for picture (used in pledge->render_box())
+   args: picture_url
+         pledge_microsite passed in so this works even when we're in an environment without
+                          microsites (e.g., admin)
+*/
+function microsite_render_picture($picture_url, $pledge_microsite) {
+    global $microsite;
+    if ($microsite == 'barnet' ||  $pledge_microsite == 'barnet') {
+        return "<div class='ms-pb-top-img' style='width: 100%;height:360px;background-position:50% 50%; background-repeat:repeat;background-image:url(" 
+            . $picture_url . ");margin-bottom:1em;'></div>";
+    } else {
+        return "<img class=\"creatorpicture\" src=\"".$picture_url."\" alt=\"\">"; 
+    }
+}
+
 /* microsite_picture_width_limit & microsite_picture_height_limit
  * Returns the maximum size (in pixels) of an uploaded picture
  *
@@ -446,15 +461,19 @@ function microsites_pledge_prefix($prefix, $name) {
     return $prefix;
 }
 
-/* allow firstname to be overridden, confitional on specific names:
-   If there no special conditions apply, return the firstname value unchanged
+/* allow firstname (used in pledge->sentence()) to be overridden, conditional on specific names:
+  * args: 
+  *       name -- name of pledger
+  *       pledge_microsite -- explicit microsite of the pledge (so this works even
+  *              if we're not in a microsite environment, e.g., admin)
+  * Returns a special value, if the name requires it
  */
-function microsite_conditional_firstperson($firstperson, $name) {
+function microsite_conditional_firstperson($name, $pledge_microsite) {
   global $microsite;
-  if ($microsite == 'barnet')
+  if ($microsite == 'barnet' || $pledge_microsite == 'barnet')
     if ($name == "Barnet Council")
       return 'onlyname';
-  return $firstperson;
+  return "onlyname";
 }
 
 /* microsites_private_allowed
@@ -813,6 +832,15 @@ function microsites_show_alert_advert() {
     if ($microsite == 'barnet') return false;
     return true;
 } 
+
+/* microsites_show_area()
+ * arg: pledge_microsite -- pledge's microsite value passed in so this works in admin
+ */
+function microsites_show_area($pledge_microsite) {
+    global $microsite;
+    if ($microsite == 'barnet' || $pledge_microsite == 'barnet') return false;
+    return true;    
+}
 
 /* microsites_sort_by_signers
  * If a microsite has an extra sort-by-signers option on list pages

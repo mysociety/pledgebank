@@ -489,8 +489,11 @@ ol#breadcrumbs li.hilight em {
     margin-left: 1em;
 }
 
-#preview h2 {
+#preview h2, .pledge h2 {
     margin-top: 0;
+}
+.pledge {
+    font-size:112%;
 }
 
 #ms-explicit-party-list {

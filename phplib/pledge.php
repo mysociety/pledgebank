@@ -444,10 +444,7 @@ class Pledge {
     //     facebook-share - add facebook share button
 
     function render_box($params = array()) {
-        $sentence_params = array('firstperson'=>true, 'html'=>true);
-        global $microsite;
-        if ($microsite == 'barnet')
-            $sentence_params['firstperson'] = 'onlyname';
+        $sentence_params = array('html' => true);
         if (array_key_exists('href', $params)) {
             $sentence_params['href'] = $params['href'];
         }
@@ -466,7 +463,10 @@ class Pledge {
         print '<h2 style="margin-bottom:0.5em">' . sprintf(_('Pledge &ldquo;%s&rdquo;'), $this->ref()) . '</h2>';
 ?>
 <p class="head_mast">
-<?      if ($this->has_picture()) { print "<img class=\"creatorpicture\" src=\"".$this->picture_url()."\" alt=\"\">"; } ?>
+<?      if ($this->has_picture()) { 
+            print microsite_render_picture($this->picture_url(), $this->microsite());
+        } 
+?>
 &quot;<?=$this->sentence($sentence_params) ?>&quot;
 <?      if ($this->url_translate_pledge()) { ?>
     (<a title="<?=_("Roughly translate the pledge into your language (using Altavista's Babel Fish machine translator)")?>" href="<?=htmlspecialchars($this->url_translate_pledge())?>"><?=_("translate")?></a>)
@@ -476,7 +476,7 @@ class Pledge {
     (<a href="<?=OPTION_ADMIN_URL?>?page=pb&amp;pledge=<?=$this->ref()?>"><?=_("admin")?></a>)
 <?      } ?>
 </p>
-<?      if (!$this->byarea() && $microsite != 'barnet') { ?>
+<?      if (!$this->byarea() && microsites_show_area($this->microsite())) { ?>
 <p style="text-align: right">&mdash; <?=$this->h_name_and_identity() ?> 
 
 <?          if (array_key_exists('showcontact', $params) && $params['showcontact'] && !$this->closed_for_comments()) { ?>
@@ -635,13 +635,17 @@ class Pledge {
      * XXX i18n -- this won't work at all in other languages */
     function sentence($params = array()) {
         $r = $this->data;
-    
         $html = array_key_exists('html', $params) ? $params['html'] : false;
-        if (!array_key_exists('firstperson', $params) || !$params['firstperson'])
-            err('Explicitly set "firstperson"');
-        $firstperson = microsite_conditional_firstperson($params['firstperson'], $r['name']);
-        
-        
+
+        $firstperson = microsite_conditional_firstperson($r['name'], $this->microsite());
+        if (!$firstperson){
+            if (array_key_exists('firstperson', $params) && $params['firstperson']){
+                $firstperson = $params['firstperson'];
+            } else {
+                err('Explicitly set "firstperson"');
+            }
+        }
+                
         if ($html) {
             $r['places'] = null; // is an array during pledge creation
             $r = array_map('htmlspecialchars', $r);

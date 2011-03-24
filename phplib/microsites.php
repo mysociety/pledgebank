@@ -264,6 +264,14 @@ function microsite_preloaded_images($key){
     return array();
 }
 
+/* microsite_preloaded_image_url()
+ * args: filename of image
+ * Returns; URL of preloaded image 
+ */
+function microsite_preloaded_image_url($filename){
+    return rtrim(OPTION_PB_PRELOADED_IMAGES_URL, '/'). '/' . $filename;
+}
+
 /* microsite_picture_extra_form()
  * Adds an extra form to the picture upload form -- specifically, for Barnet, adds the preloaded images input
  */

@@ -67,7 +67,8 @@ $picture_upload_allowed = is_null($pledge->pin());
 // Upload picture
 function upload_picture() {
     global $picture_upload_allowed, $picture_size_limit, $picture_dimension_limit, $pledge;
-
+    $picture_url = "";
+    $confirm_msg = "";
     if (get_http_var('removepicture')) {
         db_query("update pledges set picture = null where ref = ?",
             array($pledge->ref()));
@@ -77,13 +78,15 @@ function upload_picture() {
         return true;
     }
 
-    if (microsite_preloaded_images(0) && $preloaded_id = get_http_var('preloaded_image')){
+    if (microsite_preloaded_images(0) && $preloaded_id = get_http_var('preloaded_image')) {
         preg_match('/\.(\w+)$/', $preloaded_id, $matches); 
-        $ext = $matches[1]; # loads $ext with the file extension (assume internal files have sensible extensions)
-        $tmp_name = OPTION_PB_PRELOADED_IMAGES_DIR . $preloaded_id;
-        if (! file_exists($tmp_name)){
+        $ext = $matches[1]; # loads $ext with the file extension (assume internal files have sensible extensions) 
+        # check file exists -- basic validation
+        if (! file_exists(OPTION_PB_PRELOADED_IMAGES_DIR . $preloaded_id)){
             return "There was an internal error: couldn't find $preloaded_id";
         }
+        $picture_url = microsite_preloaded_image_url($preloaded_id);
+        $confirm_msg = _("Thanks for selecting a picture for the pledge.  You can see below what it now looks like.");
     } else {
         
         if (!array_key_exists('userfile', $_FILES))
@@ -152,25 +155,27 @@ function upload_picture() {
            imagejpeg($dest, $tmp_name);
            $ext = "jpeg";
         } 
-    }
     
-    $base_name =  $pledge->ref() . "." . $ext;
-    $picture_contents = file_get_contents($tmp_name);
-    if (!$picture_contents)
-        err("Failed to read file into memory");
+        $base_name =  $pledge->ref() . "." . $ext;
+        $picture_contents = file_get_contents($tmp_name);
+        if (!$picture_contents)
+            err("Failed to read file into memory");
 
-    db_query("delete from picture where filename = ?", $base_name);
-    db_query_literal("
-        insert into picture (filename, data)
-        values ('$base_name', '" . pg_escape_bytea($picture_contents) . "')");
+        db_query("delete from picture where filename = ?", $base_name);
+        db_query_literal("
+            insert into picture (filename, data)
+            values ('$base_name', '" . pg_escape_bytea($picture_contents) . "')");
+        $picture_url = OPTION_BASE_URL . "/pics/$base_name";
+        $confirm_msg = _("Thanks for uploading your picture to the pledge.  You can see below what it now looks like.");
+    }
     db_query("
         update pledges
         set picture = ?,
             changetime = ms_current_timestamp()
         where ref = ?",
-        OPTION_BASE_URL . "/pics/$base_name", $pledge->ref());
+        $picture_url, $pledge->ref());
     db_commit();
-    print _("Thanks for uploading your picture to the pledge.  You can see below what it now looks like.");
+    print $confirm_msg;
     $pledge = new Pledge($pledge->ref());
     return true;
 }

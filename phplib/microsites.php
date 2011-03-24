@@ -443,7 +443,7 @@ function microsites_denied_access_redirect_url() {
             if (preg_match('/^(matthew|tom|dave)@mysociety.org$/', $email_lc))
                 return '';
         }
-        return 'http://pledgebank.barnet.gov.uk/';
+        return OPTION_BASE_URL; 
     } 
     return '';
 }

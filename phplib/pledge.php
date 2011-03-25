@@ -444,7 +444,7 @@ class Pledge {
     //     facebook-share - add facebook share button
 
     function render_box($params = array()) {
-        $sentence_params = array('html' => true);
+        $sentence_params = array('firstperson'=>true, 'html' => true);
         if (array_key_exists('href', $params)) {
             $sentence_params['href'] = $params['href'];
         }
@@ -645,7 +645,7 @@ class Pledge {
                 err('Explicitly set "firstperson"');
             }
         }
-                
+               
         if ($html) {
             $r['places'] = null; // is an array during pledge creation
             $r = array_map('htmlspecialchars', $r);

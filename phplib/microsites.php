@@ -477,11 +477,15 @@ function microsites_pledge_prefix($prefix, $name) {
   * Returns a special value, if the name requires it
  */
 function microsite_conditional_firstperson($name, $pledge_microsite) {
-  global $microsite;
-  if ($microsite == 'barnet' || $pledge_microsite == 'barnet')
-    if ($name == "Barnet Council")
-      return 'onlyname';
-  return "onlyname";
+    global $microsite;
+    if ($microsite == 'barnet' || $pledge_microsite == 'barnet') {
+        if ($name == "Barnet Council") {
+            return 'onlyname';
+        } else {
+            return 'includename';
+        }
+    }
+    return "";
 }
 
 /* microsites_private_allowed

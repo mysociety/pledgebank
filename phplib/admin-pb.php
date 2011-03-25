@@ -470,7 +470,32 @@ class ADMIN_PAGE_PB_MAIN {
         print '</form>';
 
         print 'Comments: <strong>' . $pdata['comments']. '</strong>';
+        
+        print '<br />';
 
+        $picture_edit_verb = "Add";
+        if ($pledge_obj->has_picture()) {
+            $picture_edit_verb = "Change";   
+        }
+        if (get_http_var("edit_picture")) {
+            print '<h2>' . $picture_edit_verb . ' picture</h2>';
+            print '<form name="editform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="update_picture" value="1">';
+            print '<input type="text" name="picture_url" value="' . htmlspecialchars($pdata['picture']) . '" size="64">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            print '<input name="update" type="submit" value="Update">';
+            print '</form>';
+        } else {
+            print '<p>Picture: ';            
+            if ($pledge_obj->has_picture()) {
+              print "<a href='" . $pdata['picture'] . "'>" . $pdata['picture'] . "</a>";
+            } else {
+              print 'none';
+            }
+            print '<br/><a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit_picture=1">'. $picture_edit_verb . ' picture</a></p>';
+            
+        }
+        
         if (get_http_var("edit")) {
             print '<h2>Edit pledge text</h2>';
             print '<form name="editform" method="post" action="'.$this->self_link.'">';
@@ -756,6 +781,13 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         print p(_("<em>Change to pledge language saved</em>"));
     }
 
+    function update_picture($pledge_id) {
+        $new_picture = get_http_var('picture_url');
+        db_query('UPDATE pledges set picture = ? where id = ?', array($new_picture, $pledge_id));
+        db_commit();
+        print p(_("<em>Change to pledge picture saved</em>"));
+    }
+
     function update_categories($pledge_id) {
         $cats = get_http_var('categories');
         db_query('delete from pledge_category where pledge_id = ?', $pledge_id);
@@ -832,6 +864,9 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         } elseif (get_http_var('update_language')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_language($pledge_id);
+        } elseif (get_http_var('update_picture')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_picture($pledge_id);
         } elseif (get_http_var('remove_pledge_id')) {
             $remove_id = get_http_var('remove_pledge_id');
             if (ctype_digit($remove_id))

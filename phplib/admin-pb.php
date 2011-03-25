@@ -479,12 +479,20 @@ class ADMIN_PAGE_PB_MAIN {
         }
         if (get_http_var("edit_picture")) {
             print '<h2>' . $picture_edit_verb . ' picture</h2>';
-            print '<form name="editform" method="post" action="'.$this->self_link.'">';
+            print '<form name="editpicform" method="post" action="'.$this->self_link.'">';
             print '<input type="hidden" name="update_picture" value="1">';
+            print '<label for="picture_url">Picture URL: </label>';
             print '<input type="text" name="picture_url" value="' . htmlspecialchars($pdata['picture']) . '" size="64">';
             print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
-            print '<input name="update" type="submit" value="Update">';
-            print '</form>';
+            $preloaded_images = microsite_preloaded_images('exists', $pdata['microsite']);
+            if (count($preloaded_images)>0){
+                print '<br/><label for="preloaded_image">Or choose a preloaded image: </label>';
+                print '<select name="preloaded_image">';
+                print microsite_preloaded_image_select($pdata['microsite']);
+                print '</select>';
+            }
+            print '<br/><input name="update" type="submit" value="Update picture">';
+            print '</form><br/>';
         } else {
             print '<p>Picture: ';            
             if ($pledge_obj->has_picture()) {
@@ -494,6 +502,13 @@ class ADMIN_PAGE_PB_MAIN {
             }
             print '<br/><a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit_picture=1">'. $picture_edit_verb . ' picture</a></p>';
             
+        }
+        if ($pledge_obj->has_picture()) {
+            print '<form name="delpicform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="remove_picture" value="1">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            print '<input name="update" type="submit" value="Remove picture">';
+            print '</form>';
         }
         
         if (get_http_var("edit")) {
@@ -783,9 +798,20 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
 
     function update_picture($pledge_id) {
         $new_picture = get_http_var('picture_url');
+        $preloaded_image = get_http_var('preloaded_image');
+        if ($preloaded_image) {
+            $new_picture = microsite_preloaded_image_url($preloaded_image);
+        }
+        # if $preloaded_image, turn it into url and use it if it's not null
         db_query('UPDATE pledges set picture = ? where id = ?', array($new_picture, $pledge_id));
         db_commit();
         print p(_("<em>Change to pledge picture saved</em>"));
+    }
+    
+    function remove_picture($pledge_id) {
+        db_query('UPDATE pledges set picture = null where id = ?', $pledge_id);
+        db_commit();
+        print p(_("<em>Pledge picture removed</em>"));        
     }
 
     function update_categories($pledge_id) {
@@ -864,6 +890,9 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         } elseif (get_http_var('update_language')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_language($pledge_id);
+        } elseif (get_http_var('remove_picture')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->remove_picture($pledge_id);
         } elseif (get_http_var('update_picture')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_picture($pledge_id);

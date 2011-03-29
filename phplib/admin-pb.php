@@ -19,6 +19,20 @@ require_once "../commonlib/phplib/utility.php";
 require_once "../commonlib/phplib/importparams.php";
 require_once "../commonlib/phplib/gaze.php";
 
+$admin_update_prohibited = preg_split("/\s*,\s*/", strtolower(OPTION_ADMIN_LOCKED_FIELDS), -1, PREG_SPLIT_NO_EMPTY);
+
+/* admin_allow()
+ * returns false if the item is not explicitly prohibitted to this site's admin
+ */
+function admin_allow($item) {
+    global $admin_update_prohibited;
+    return ! in_array($item, $admin_update_prohibited);
+}
+
+function divOddEven($n){
+    return "<div class='admin-" . ($n % 2? "even":"odd") . "'>\n";
+}
+
 function facebook_display_name($facebook_id) {
     global $facebook;
     if (!$facebook)
@@ -335,6 +349,15 @@ class ADMIN_PAGE_PB_MAIN {
      }
 
     function show_one_pledge($pledge) {
+        
+        print "<style type='text/css'>
+                  .admin-even, .admin-odd { padding:6px; 4px; background-color: #ffffff; margin:0;   }
+                  .admin-odd { background-color: #eeeeee;}
+                  .admin-name { width:8em; float:left; margin-top:2px;  }
+                  .admin-value  { margin-left:8em;}
+                  .admin-value h2  { margin-top:0; font-size:1em;}
+               </style>\n";
+        
         $this->show_menu();
 
         $sort = get_http_var('s');
@@ -374,70 +397,119 @@ class ADMIN_PAGE_PB_MAIN {
         print ' (<a href="?page=pblatest&amp;ref='.$pdata['ref'].'">' . _('timeline') . '</a>)';
         print "</h2>";
 
-        print "<p>Set by: <b>" .
-              '<a href="?page=pb&amp;person=' . $pdata['person_id'] .'">' . htmlspecialchars($pdata['name']) . "</a>" .
-            " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</b>";
-        print "<br>Created: <b>" . prettify($pdata['creationtime']) . "</b>";
-        print "<br>Deadline: <b>" . prettify($pdata['date']) . "</b>";
-        print "<br>Target: <b>" . $pdata['target'] . " " .  htmlspecialchars($pdata['type']) . "</b>";
+        $parity=0;
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Set by:</div>";
+        print '<div class="admin-value"><a href="?page=pb&amp;person=' . $pdata['person_id'] .'">' . htmlspecialchars($pdata['name']) . "</a>" .
+            " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</div";
+        print "</div>";
+            
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Created:</div>";
+        print '<div class="admin-value">' . prettify($pdata['creationtime']) . "</div>";
+        print "</div>";
+        
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Deadline:</div>";
+        print '<div class="admin-value">' . prettify($pdata['date']) . "</div>";
+        print "</div>";
+        
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Target:</div>";
+        print '<div class="admin-value">' . $pdata['target'] . " " .  htmlspecialchars($pdata['type']);
         if ($pdata['target_type'] == "byarea") 
             print " (target is byarea)";
-
+        print "</div></div>";
+        
         // Microsite
-        global $microsites_list;
-        print '<form name="micrositeform" method="post" action="'.$this->self_link.'">';
-        print '<input type="hidden" name="update_microsite" value="1">';
-        print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
-        print _('Microsite:') . ' ';
-        print '<select id="microsite" name="microsite">';
-        print ' <option value="(none)">(none)</option>';
-        foreach ($microsites_list as $ms => $ms_name) {
-            $sel = '';
-            if ($ms == $pledge_obj->microsite())
-                $sel = ' selected';
-            print ' <option value="'.$ms.'"'.$sel.'>'.str_replace('<em>', '', str_replace('</em>', '', $ms_name))
-                .'</option>';
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Microsite:</div>";
+        print '<div class="admin-value">';
+        if (admin_allow('microsite')) {
+            global $microsites_list;
+            print '<form name="micrositeform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="update_microsite" value="1">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            print '<select id="microsite" name="microsite">';
+            print ' <option value="(none)">(none)</option>';
+            foreach ($microsites_list as $ms => $ms_name) {
+                $sel = '';
+                if ($ms == $pledge_obj->microsite())
+                    $sel = ' selected';
+                print ' <option value="'.$ms.'"'.$sel.'>'.str_replace('<em>', '', str_replace('</em>', '', $ms_name))
+                    .'</option>';
+            }
+            print '</select>';
+            print '<input name="update" type="submit" value="Update">';
+            print '</form>';
+        } else {
+            if ($pledge_obj->microsite()) {
+                print $pledge_obj->microsite();
+            } else {
+                print "&lt;none&gt;";
+            }
         }
-        print '</select>';
-        print '<input name="update" type="submit" value="Update">';
-        print '</form>';
+        print "</div></div>";
 
-        global $langs;
-        print '<form name="languageform" method="post" action="'.$this->self_link.'">';
-        print '<input type="hidden" name="update_language" value="1">';
-        print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
-        print _('Language:') . ' ';
-        print '<select id="lang" name="lang">';
-        print ' <option value="(unknown)">(unknown)</option>';
-        foreach ($langs as $lang_code => $lang_name) {
-            $sel = '';
-            if ($lang_code == $pdata['lang'])
-                $sel = ' selected';
-            print ' <option value="'.$lang_code.'"'.$sel.'>'.$lang_name.'</option>'; // lang_name already in HTML
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Language:</div>";
+        print '<div class="admin-value">';
+        if (admin_allow('lang')) {
+            global $langs;
+            print '<form name="languageform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="update_language" value="1">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            print '<select id="lang" name="lang">';
+            print ' <option value="(unknown)">(unknown)</option>';
+            foreach ($langs as $lang_code => $lang_name) {
+                $sel = '';
+                if ($lang_code == $pdata['lang'])
+                    $sel = ' selected';
+                print ' <option value="'.$lang_code.'"'.$sel.'>'.$lang_name.'</option>'; // lang_name already in HTML
+            }
+            print '</select>';
+            print '<input name="update" type="submit" value="Update">';
+            print '</form>';
+        } else {
+            print $pdata['lang'];
         }
-        print '</select>';
-        print '<input name="update" type="submit" value="Update">';
-        print '</form>';
+        print "</div></div>";
 
         if (array_key_exists('country', $pdata)) {
-            print '<form name="countryform" method="post" action="'.$this->self_link.'">';
-            print '<input type="hidden" name="update_country" value="1">';
-            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
-            print _('Country:') . ' ';
-            gaze_controls_print_country_choice($pdata['country'], $pdata['state'], array(), array());
-            print '<input name="update" type="submit" value="Update">';
-            if (array_key_exists('description', $pdata) && $pdata['description'])
-                print '<br>Place: <b>' . $pdata['description'].'</b>';
+            print divOddEven($parity++);
+            print "<div class='admin-name'>Country:</div>";
+            print '<div class="admin-value">';
+            if (admin_allow('country')) {
+                print '<form name="countryform" method="post" action="'.$this->self_link.'">';
+                print '<input type="hidden" name="update_country" value="1">';
+                print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+                gaze_controls_print_country_choice($pdata['country'], $pdata['state'], array(), array());
+                print '<input name="update" type="submit" value="Update">';
+                print '</form>';
+            } else {
+                print $pdata['country'];
+            }
+            print "</div></div>";
+            if (array_key_exists('description', $pdata) && $pdata['description']){
+                print divOddEven($parity++);
+                print "<div class='admin-name'>Place:</div>";
+                print '<div class="admin-value">' . $pdata['description'].'</div>';
+                print "</div>";
+            }
             if ($pdata['longitude']) {
                 $coords = round($pdata['longitude'],2).'E ' . round($pdata['latitude'],2).'N';
-                print " Longitude/Latitude WGS84: <b>$coords</b> ";
-                print '<a href="'.htmlspecialchars($pledge_obj->url_place_map()).'">(google maps)</a>';
+                print divOddEven($parity++);
+                print "<div class='admin-name'>Long/Lat:</div>";
+                print '<div class="admin-value">WGS84' . $coords;
+                print ' <a href="'.htmlspecialchars($pledge_obj->url_place_map()).'">(google maps)</a>';
+                print "</div></div>";
             }
-            print '</form>';
         }
 
-        // Tags
-        print _('Tags:') . " ";
+        // Tags        
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Tags:</div>";
+        print '<div class="admin-value">';
         $tags = $pledge_obj->tags();
         if ($tags) {
             print "<strong>";
@@ -448,36 +520,48 @@ class ADMIN_PAGE_PB_MAIN {
         } else {
             print _('none');
         }
-        print "<br>";
+        print "</div></div>";
 
         // Prominence
-        print '<form name="prominenceform" method="post" action="'.$this->self_link.'">';
-        print '<input type="hidden" name="update_prom" value="1">';
-        print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
-        print 'Prominence: ';
-        if ($pdata['pin'])
-            print "<b>private</b> ";
-        print '<select name="prominence">';
-        print '<option value="calculated"' . ($pdata['prominence']=='calculated'?' selected':'') . '>calculated</option>';
-        print '<option value="normal"' . ($pdata['prominence']=='normal'?' selected':'') . '>normal</option>';
-        print '<option value="frontpage"' . ($pdata['prominence']=='frontpage'?' selected':'') . '>frontpage</option>';
-        print '<option value="backpage"' . ($pdata['prominence']=='backpage'?' selected':'') . '>backpage</option>';
-        print '</select>';
-        print '<input name="update" type="submit" value="Update">';
-        if ($pdata['calculated_prominence'] <> $pdata['prominence']) {
-            print " calculated to: ". $pdata['calculated_prominence'];
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Prominence:</div>";
+        print '<div class="admin-value">';        
+        if (admin_allow('prominence')) {
+            print '<form name="prominenceform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="update_prom" value="1">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            if ($pdata['pin'])
+                print "<b>private</b> ";
+            print '<select name="prominence">';
+            print '<option value="calculated"' . ($pdata['prominence']=='calculated'?' selected':'') . '>calculated</option>';
+            print '<option value="normal"' . ($pdata['prominence']=='normal'?' selected':'') . '>normal</option>';
+            print '<option value="frontpage"' . ($pdata['prominence']=='frontpage'?' selected':'') . '>frontpage</option>';
+            print '<option value="backpage"' . ($pdata['prominence']=='backpage'?' selected':'') . '>backpage</option>';
+            print '</select>';
+            print '<input name="update" type="submit" value="Update">';
+            if ($pdata['calculated_prominence'] <> $pdata['prominence']) {
+                print " calculated to: ". $pdata['calculated_prominence'];
+            }
+            print '</form>';
+        } else {
+            print $pdata['prominence'];
+            if ($pdata['calculated_prominence'] <> $pdata['prominence']) {
+                print " (calculated to: ". $pdata['calculated_prominence'] . ")";
+            }
         }
-        print '</form>';
+        print "</div></div>";
 
-        print 'Comments: <strong>' . $pdata['comments']. '</strong>';
-        
-        print '<br />';
+        // Prominence
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Comments:</div>";
+        print '<div class="admin-value">'. $pdata['comments'] . '</div>';
+        print '</div>';
 
-        $picture_edit_verb = "Add";
-        if ($pledge_obj->has_picture()) {
-            $picture_edit_verb = "Change";   
-        }
-        if (get_http_var("edit_picture")) {
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Picture:</div>";
+        print '<div class="admin-value">';
+        $picture_edit_verb = $pledge_obj->has_picture()? "Change" : "Add";
+        if (admin_allow('picture') && get_http_var("edit_picture")) {
             print '<h2>' . $picture_edit_verb . ' picture</h2>';
             print '<form name="editpicform" method="post" action="'.$this->self_link.'">';
             print '<input type="hidden" name="update_picture" value="1">';
@@ -494,23 +578,31 @@ class ADMIN_PAGE_PB_MAIN {
             print '<br/><input name="update" type="submit" value="Update picture">';
             print '</form><br/>';
         } else {
-            print '<p>Picture: ';            
             if ($pledge_obj->has_picture()) {
-              print "<a href='" . $pdata['picture'] . "'>" . $pdata['picture'] . "</a>";
+                $pretty_picture = $pdata['picture'];
+                if (strlen($pretty_picture)>40) {
+                    $pretty_picture="..." . substr($pretty_picture, -36);
+                }
+                print "<a href='" . $pdata['picture'] . "' title='". $pdata['picture'] . "'>$pretty_picture</a><br>";
             } else {
-              print 'none';
+                print 'none: ';
             }
-            print '<br/><a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit_picture=1">'. $picture_edit_verb . ' picture</a></p>';
-            
+            if (admin_allow('picture')) {
+                print '<a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit_picture=1">'. $picture_edit_verb . ' picture</a>';
+            }
         }
-        if ($pledge_obj->has_picture()) {
+        if (admin_allow('picture') && $pledge_obj->has_picture()) {
             print '<form name="delpicform" method="post" action="'.$this->self_link.'">';
             print '<input type="hidden" name="remove_picture" value="1">';
             print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
             print '<input name="update" type="submit" value="Remove picture">';
             print '</form>';
         }
+        print "</div></div>";
         
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Pledge text:</div>";
+        print '<div class="admin-value">';
         if (get_http_var("edit")) {
             print '<h2>Edit pledge text</h2>';
             print '<form name="editform" method="post" action="'.$this->self_link.'">';
@@ -520,7 +612,7 @@ class ADMIN_PAGE_PB_MAIN {
             print '<br>will <input type="text" name="signup" value="'.htmlspecialchars($pdata['signup']).'" size="60">';
             print '<br>&mdash;<input type="text" name="name" value="'.htmlspecialchars($pdata['name']).'" size="20">, ';
             print '<input type="text" name="identity" value="'.htmlspecialchars($pdata['identity']).'" size="30">';
-            print '<br>More details: <textarea type="text" name="detail" cols="70" rows="7">'.htmlspecialchars($pdata['detail']).'</textarea>';
+            print '<br>More details:<br/> <textarea type="text" name="detail" cols="70" rows="7">'.htmlspecialchars($pdata['detail']).'</textarea>';
             print '<br>Notice: <input type="text" name="notice" value="'.htmlspecialchars($pdata['notice']).'" size="60">';
             print '<br>Cancelled text (also cancels pledge): <input type="text" name="cancelled" value="'.htmlspecialchars($pdata['cancelled']).'" size="60">';
             print '<input type="hidden" name="edit_pledge_text_id" value="' . $pdata['id'] . '">';
@@ -530,9 +622,10 @@ class ADMIN_PAGE_PB_MAIN {
             print ' <a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp">Cancel edit</a>';
             print "</form>";
         } else {
-            print '<p><a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit=1">Edit pledge text</a></p>';
+            print '<a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit=1">Edit pledge text</a>';
         }
-
+        print "</div></div>";
+        
         // Signers
         print "<h2>Signers (".$pdata['signers']."/".$pdata['target'].")</h2>";
         $query = 'SELECT signers.name as signname,person.email as signemail,
@@ -624,6 +717,11 @@ class ADMIN_PAGE_PB_MAIN {
         
         // Messages
         print h2(_("Messages"));
+        
+        if (microsites_admin_announce_link($pdata['microsite'])) {
+            print '<p><a href="' . $pledge_obj->url_announce() .'" title="Pledge creator can send">' . _('Send message to signers') . '</a></p>';
+        }
+        
         $q = db_query('select message.*, location.description as location_description from message 
                 left join location on location.id = message.byarea_location_id
                 where pledge_id = ? order by whencreated', $pdata['id']);
@@ -703,7 +801,7 @@ class ADMIN_PAGE_PB_MAIN {
         print '<h2>Actions</h2>';
         print '<form name="sendannounceform" method="post" action="'.$this->self_link.'"><input type="hidden" name="send_announce_token_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="send_announce_token" value="Send announce URL to creator"></form>';
 
-print '<form name="removepledgepermanentlyform" method="post" action="'.$this->self_link.'" style="clear:both"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
+print '<form name="removepledgepermanentlyform" method="post" action="'.$this->self_link.'" style="clear:both;margin-top:1em;"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
 
     }
 

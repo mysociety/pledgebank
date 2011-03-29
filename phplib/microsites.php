@@ -162,6 +162,18 @@ function microsite_requires_abuse_test() {
     return true;
 }
 
+/* microsites_admin_announce_link
+ * show a link to "Send message to signers" in the admin
+ * Doesn't really make sense in normal deployments, as admin is not the pledge creator
+ * But in Barnet's case, admin is probably same staff, and this avoids putting the announce
+ * link on the pledge page.
+ */
+function microsites_admin_announce_link($pledge_microsite) {
+    global $microsite;
+    if ($microsite == 'barnet' || $pledge_microsite == 'barnet') return true;
+    return false;    
+}
+
 #############################################################################
 # Styling
 

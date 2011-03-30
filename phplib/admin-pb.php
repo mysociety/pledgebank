@@ -302,16 +302,50 @@ class ADMIN_PAGE_PB_MAIN {
         $pdata = db_fetch_array($q);
         
         print "<h2>Person '" . htmlspecialchars($person->name_or_blank()) . "'</h2>";
-        print "<p>Name: " . ($person->has_name() ? htmlspecialchars($person->name()) : "<unknown>");
-        print "<br>Email: <a href=\"mailto:" . htmlspecialchars($person->email()) . "\">" . htmlspecialchars($person->email()) . '</a>';
-        print "<br>Mobile: " . htmlspecialchars($pdata['mobile']);
-        print "<br>Facebook: " . htmlspecialchars($pdata['facebook_id']);
+        
+        $parity=0;
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Name:</div><div class='admin-value'>";
+        print ($person->has_name() ? htmlspecialchars($person->name()) : "<unknown>");
+        print "</div></div>";
+        
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Email:</div><div class='admin-value'>";
+        print "<a href=\"mailto:" . htmlspecialchars($person->email()) . "\">" . htmlspecialchars($person->email()) . '</a>';
+        print "</div></div>";
 
-        print "<p>Has password: " . ($person->has_password() ? "true" : "false");
-        print "<br>Number of logins: " . htmlspecialchars($person->numlogins());
-        print '<br>Website: <a href="'.htmlspecialchars($person->website_or_blank()).'">' . htmlspecialchars($person->website_or_blank()) . "</a>";
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Mobile:</div><div class='admin-value'>";
+        print htmlspecialchars($pdata['mobile']);
+        print "</div></div>";
 
-        print '<p>' . $pdata['signers'] . " signatures, " . $pdata['pledges'] . " pledges, " . $pdata['comments'] . " comments";
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Facebook:</div><div class='admin-value'>";
+        print htmlspecialchars($pdata['facebook_id']);
+        print "</div></div>";
+
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Has password:</div><div class='admin-value'>";
+        print $person->has_password() ? "yes" : "no";
+        print "</div></div>";
+
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Number of logins:</div><div class='admin-value'>";        
+        print htmlspecialchars($person->numlogins());
+        print "</div></div>";
+
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Website:</div><div class='admin-value'>";        
+        print '<a href="'.htmlspecialchars($person->website_or_blank()).'">' . htmlspecialchars($person->website_or_blank()) . "</a>";
+        print "</div></div>";
+
+        print divOddEven($parity++);
+        print "<div class='admin-name'>Activity:</div><div class='admin-value'>";        
+        print $pdata['signers'] . " " . make_plural($pdata['signers'], "signature"); 
+        print ", " . $pdata['pledges'] . " " . make_plural($pdata['pledges'], "pledge");
+        print ", " . $pdata['comments'] . " " . make_plural($pdata['comments'], "comment");
+        print "</div></div>";
+
 
         print "<h2>Pledges created</h2>";
         $q = db_query('SELECT * from pledges where person_id = ?', $person_id);
@@ -344,20 +378,11 @@ class ADMIN_PAGE_PB_MAIN {
         print '<input type="hidden" name="edit_person_id" value="' . $person_id . '">';
         print '<input type="hidden" name="edit_person" value="1">';
         print '<input type="hidden" name="edit" value="1">';
-        print '<br><input type="submit" name="edit_person" value="Save updates"> ';
+        print '<input type="submit" name="edit_person" value="Save updates"> ';
         print "</form>";
      }
 
     function show_one_pledge($pledge) {
-        
-        print "<style type='text/css'>
-                  .admin-even, .admin-odd { padding:6px; 4px; background-color: #ffffff; margin:0;   }
-                  .admin-odd { background-color: #eeeeee;}
-                  .admin-name { width:8em; float:left; margin-top:2px;  }
-                  .admin-value  { margin-left:8em;}
-                  .admin-value h2  { margin-top:0; font-size:1em;}
-               </style>\n";
-        
         $this->show_menu();
 
         $sort = get_http_var('s');

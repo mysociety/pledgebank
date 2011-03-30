@@ -348,28 +348,40 @@ class ADMIN_PAGE_PB_MAIN {
 
 
         print "<h2>Pledges created</h2>";
+        $nRecords = 0;
         $q = db_query('SELECT * from pledges where person_id = ?', $person_id);
         while ($r = db_fetch_array($q)) {
             print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
                 htmlspecialchars($r['ref']) . '</a>';
             print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>) ';
+            $nRecords++;
         }
+        if ($nRecords == 0)
+            print "none";
 
         print "<h2>Pledges signed</h2>";
+        $nRecords = 0;
         $q = db_query('SELECT * from pledges where id in (select pledge_id from signers where person_id = ?)', $person_id);
         while ($r = db_fetch_array($q)) {
             print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
                 htmlspecialchars($r['ref']) . '</a>';
             print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>) ';
+            $nRecords++;
         }
-
+        if ($nRecords == 0)
+            print "none";
+        
         print "<h2>Pledges commented on</h2>";
+        $nRecords = 0;
         $q = db_query('SELECT * from pledges where id in (select pledge_id from comment where person_id = ?)', $person_id);
         while ($r = db_fetch_array($q)) {
             print '<a href="' . OPTION_BASE_URL . '/' . $r['ref'] . '">' .
                 htmlspecialchars($r['ref']) . '</a>';
             print' (<a href="?page=pb&amp;pledge='.$r['ref'].'">admin</a>) ';
+            $nRecords++;
         }
+        if ($nRecords == 0)
+            print "none";
 
          print "<h2>Edit person</h2>";
 

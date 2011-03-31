@@ -47,6 +47,7 @@ function facebook_display_name($facebook_id) {
 class ADMIN_PAGE_PB_SUMMARY {
     function ADMIN_PAGE_PB_SUMMARY() {
         $this->id = 'summary';
+        $this->navname = _("Summary");
     }
     function display() {
         global $pb_today;
@@ -59,8 +60,20 @@ class ADMIN_PAGE_PB_SUMMARY {
         $signatures = db_getOne('SELECT COUNT(*) FROM signers');
         $signers = db_getOne('SELECT COUNT(DISTINCT person_id) FROM signers');
         $local = db_getOne('SELECT COUNT(*) FROM pledges WHERE location_id is not null');
-        
-        print "Pledges: $pledges<br>$nonbackpage non-backpaged<br>$successful successful, $failed failed, $open open<br>$signatures signatures, $signers signers<br>$local non-global";
+
+                print <<< HTML
+        <ul style="list-style: none; line-height: 1.666em;">
+            <li>Pledges: $pledges</li>
+            <li>$nonbackpage non-backpaged</li>
+            <li>$successful successful, $failed failed, $open open</li>
+            <li>$signatures signatures, $signers signers</li>
+            <li>$local non-global</li>
+        </ul>
+        <div style="margin-top:3em">
+            <a href="http://www.mysociety.org/"><img class="mslogo" 
+                src="https://secure.mysociety.org/mysociety_sm.gif" border="0" alt="mySociety"></a>
+        </div>
+HTML;
     }
 }
 
@@ -1117,6 +1130,7 @@ class ADMIN_PAGE_PB_LATEST {
     # pledges use creationtime
     # signers use signtime
     function show_latest_changes() {
+        
         $time = array();
 
         global $pb_time;
@@ -1358,7 +1372,7 @@ class ADMIN_PAGE_PB_LATEST {
     }
 
     function display($self_link) {
-        db_connect();
+        db_connect();        
         $this->show_latest_changes();
     }
 }

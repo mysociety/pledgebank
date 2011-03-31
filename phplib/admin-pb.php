@@ -62,17 +62,13 @@ class ADMIN_PAGE_PB_SUMMARY {
         $local = db_getOne('SELECT COUNT(*) FROM pledges WHERE location_id is not null');
 
                 print <<< HTML
-        <ul style="list-style: none; line-height: 1.666em;">
+        <ul style="list-style: none; line-height: 1.666em;margin-bottom:3em;">
             <li>Pledges: $pledges</li>
             <li>$nonbackpage non-backpaged</li>
             <li>$successful successful, $failed failed, $open open</li>
             <li>$signatures signatures, $signers signers</li>
             <li>$local non-global</li>
         </ul>
-        <div style="margin-top:3em">
-            <a href="http://www.mysociety.org/"><img class="mslogo" 
-                src="https://secure.mysociety.org/mysociety_sm.gif" border="0" alt="mySociety"></a>
-        </div>
 HTML;
     }
 }

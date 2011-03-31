@@ -162,6 +162,18 @@ function microsite_requires_abuse_test() {
     return true;
 }
 
+/* microsites_admin_announce_link
+ * show a link to "Send message to signers" in the admin
+ * Doesn't really make sense in normal deployments, as admin is not the pledge creator
+ * But in Barnet's case, admin is probably same staff, and this avoids putting the announce
+ * link on the pledge page.
+ */
+function microsites_admin_announce_link($pledge_microsite) {
+    global $microsite;
+    if ($microsite == 'barnet' || $pledge_microsite == 'barnet') return true;
+    return false;    
+}
+
 #############################################################################
 # Styling
 
@@ -234,9 +246,9 @@ function microsite_picture_upload_advice(){
  * If a key is provided, returns the value for that key, or None
  * Special case: key 'exists' will return array of those images that were found 
  */
-function microsite_preloaded_images($key){
+function microsite_preloaded_images($key, $pledge_microsite = NULL){
     global $microsite;
-    if ($microsite == 'barnet'){
+    if ($microsite == 'barnet' || $pledge_microsite == 'barnet'){
         $files = array(              // alphabetic display order, fwiw
             "barnet_offices.jpg" => "Barnet NLBP Offices",
             "daisy_field.jpg"    => "Field of dog daisies",
@@ -256,7 +268,11 @@ function microsite_preloaded_images($key){
             }
             return $files;
         } elseif ($key){
-            return $files[$key];
+            if (array_key_exists($key, $files)) {
+                return $files[$key];                
+            } else {
+                return "";
+            }
         } else {
           return $files;
         }
@@ -272,6 +288,19 @@ function microsite_preloaded_image_url($filename){
     return rtrim(OPTION_PB_PRELOADED_IMAGES_URL, '/'). '/' . $filename;
 }
 
+function microsite_preloaded_image_select($pledge_microsite = NULL){
+    $html = "";
+    $images_available = microsite_preloaded_images('exists', $pledge_microsite);
+    if (count($images_available)>0){
+        $html ='<select name="preloaded_image" id="preload-select"><option value="0"> </option>';
+        foreach ($images_available as $filename => $desc) {
+            $html .= "<option value='$filename'>$desc</option>\n";
+        }
+        $html .= '</select>';
+    }
+    return $html;
+}
+
 /* microsite_picture_extra_form()
  * Adds an extra form to the picture upload form -- specifically, for Barnet, adds the preloaded images input
  */
@@ -281,14 +310,10 @@ function microsite_picture_extra_form(){
     if ($microsite == 'barnet'){
         $images_available = microsite_preloaded_images('exists');
         if (count($images_available)>0){
-            $html ='<p style="padding-top:1em;">If you don\'t have a suitable image of your own, you can choose one of the pre-loaded images instead.</p>
-                    <label for="preloaded_image">Pre-loaded images</label>
-                    <select name="preloaded_image" id="preload-select">
-                    <option value="0"> </option>';
-            foreach ($images_available as $filename => $desc) {
-                $html .= "<option value='$filename'>$desc</option>\n";
-            }
-            $html .= '</select><div style="clear:both"></div>';
+            $html ='<p style="padding-top:1em;">If you don\'t have a suitable image of your own, you can choose one of the pre-loaded images instead.</p>'
+                    . '<label for="preloaded_image">Pre-loaded images</label>'
+                    . microsite_preloaded_image_select()
+                    . '<div style="clear:both"></div>';
         }
     }
     return $html;

@@ -111,16 +111,18 @@ function mark_overall_pledges_successful() {
                     'succeeded-creator'
                 )", $pledge['id']);
 
-        db_query("
-                insert into message (
-                    pledge_id, circumstance,
-                    sendtocreator, sendtosigners, sendtolatesigners,
-                    emailtemplatename
-                ) values (
-                    ?, 'success-auto-signers',
-                    false, true, false,
-                    'succeeded-signer'
-                )", $pledge['id']);
+        if (microsites_send_to_signers()) {
+            db_query("
+                    insert into message (
+                        pledge_id, circumstance,
+                        sendtocreator, sendtosigners, sendtolatesigners,
+                        emailtemplatename
+                    ) values (
+                        ?, 'success-auto-signers',
+                        false, true, false,
+                        'succeeded-signer'
+                    )", $pledge['id']);
+        }
     }
 
     db_commit();
@@ -192,18 +194,20 @@ function mark_byarea_pledges_successful() {
                     'succeeded-creator-byarea'
                 )", $pledge['id'], $pledge['byarea_location_id']);
 
-        db_query("
-                insert into message (
-                    pledge_id, circumstance,
-                    sendtocreator, sendtosigners, sendtolatesigners,
-                    byarea_location_id,
-                    emailtemplatename
-                ) values (
-                    ?, 'success-auto-signers-byarea',
-                    false, true, false,
-                    ?,
-                    'succeeded-signer-byarea'
-                )", $pledge['id'], $pledge['byarea_location_id']);
+        if (microsites_send_to_signers()) {
+            db_query("
+                    insert into message (
+                        pledge_id, circumstance,
+                        sendtocreator, sendtosigners, sendtolatesigners,
+                        byarea_location_id,
+                        emailtemplatename
+                    ) values (
+                        ?, 'success-auto-signers-byarea',
+                        false, true, false,
+                        ?,
+                        'succeeded-signer-byarea'
+                    )", $pledge['id'], $pledge['byarea_location_id']);
+        }
     }
 
     db_commit();
@@ -402,17 +406,19 @@ function send_automatic_failure_messages_overall() {
         $sms = sprintf(_("PledgeBank here. Sorry, the %s pledge has failed. Better luck next time!"), $pledge['ref']);
         locale_pop();
 
-        $email_template = 'failed-signer';
-        db_query("
-                insert into message (
-                    pledge_id, circumstance,
-                    sendtocreator, sendtosigners, sendtolatesigners,
-                    emailtemplatename, sms
-                ) values (
-                    ?, 'failure-auto-signers',
-                    false, true, false,
-                    '$email_template', ?
-                )", array($pledge['id'], $sms));
+        if (microsites_send_to_signers()) {        
+            $email_template = 'failed-signer';
+            db_query("
+                    insert into message (
+                        pledge_id, circumstance,
+                        sendtocreator, sendtosigners, sendtolatesigners,
+                        emailtemplatename, sms
+                    ) values (
+                        ?, 'failure-auto-signers',
+                        false, true, false,
+                        '$email_template', ?
+                    )", array($pledge['id'], $sms));
+        }
     }
     
     db_commit();
@@ -488,18 +494,20 @@ function send_automatic_failure_messages_byarea() {
         $sms = sprintf(_("PledgeBank here. Sorry, the %s pledge has failed. Better luck next time!"), $pledge['ref']);
         locale_pop();
 
-        db_query("
-                insert into message (
-                    pledge_id, circumstance,
-                    sendtocreator, sendtosigners, sendtolatesigners,
-                    byarea_location_id,
-                    emailtemplatename, sms
-                ) values (
-                    ?, 'failure-auto-signers-byarea',
-                    false, true, false,
-                    ?,
-                    'failed-signer-byarea', ?
-                )", array($pledge['id'], $pledge['byarea_location_id'], $sms));
+        if (microsites_send_to_signers()) {
+            db_query("
+                    insert into message (
+                        pledge_id, circumstance,
+                        sendtocreator, sendtosigners, sendtolatesigners,
+                        byarea_location_id,
+                        emailtemplatename, sms
+                    ) values (
+                        ?, 'failure-auto-signers-byarea',
+                        false, true, false,
+                        ?,
+                        'failed-signer-byarea', ?
+                    )", array($pledge['id'], $pledge['byarea_location_id'], $sms));
+        }
     }
     
     db_commit();
@@ -612,7 +620,7 @@ function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_
  * Sends survey emails a few weeks after a successful pledge has closed
  */
 function send_surveys() {
-    global $pb_timestamp;
+    global $pb_timestamp;    
 
     verbose("finding pledges that need survey emails");
     if (!db_getOne("
@@ -623,6 +631,11 @@ function send_surveys() {
                     and (select id from message where pledge_id = pledges.id
                         and circumstance = 'survey') is null")) {
         verbose("... no such pledges found");
+        return;
+    }
+    
+    if (! microsites_send_to_signers()) {
+        verbose("ignoring surveys because sending to signers is disallowed");
         return;
     }
 
@@ -783,6 +796,11 @@ function send_pending_messages() {
     /* Messages to signers. Slightly nastier because of the
      * signed-after-success and SMS options. We grab message and recipient
      * info for each signer-message pair which is pending on delivery. */
+     if (! microsites_send_to_signers()) {
+         verbose("skipping pending signer messages because sending to signers is disallowed");
+         return;
+     }
+     
     verbose("sending pending signer messages");
 
     $q = db_query('
@@ -1044,6 +1062,9 @@ function compute_prominences() {
 // Main code
 db_connect();
 
+if (! microsites_send_to_signers())
+    verbose("running with sending to signers DISALLOWED");
+
 compute_prominences();
 mark_overall_pledges_successful();
 mark_byarea_pledges_successful();
@@ -1058,4 +1079,3 @@ if (OPTION_WEB_HOST != 'promise') { # either; XXX XXX
     send_surveys();
 }
 send_pending_messages();
-

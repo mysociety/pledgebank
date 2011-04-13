@@ -594,6 +594,15 @@ function microsites_comments_allowed() {
     return true;
 }
 
+function microsites_send_to_signers() { # set to false to never send auto emails to signers
+    global $microsite;
+    if ($microsite == 'barnet' || OPTION_WEB_DOMAIN == 'barnet.gov.uk') { # use OPTION, since this is called from scripts
+        return false;
+    }
+    return true;
+}
+
+
 /* microsites_chivvy_sql
  * SQL fragment for whether a pledge gets any chivvy emails.
  */

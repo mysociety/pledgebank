@@ -125,12 +125,12 @@ $topic = get_http_var('topic');
                 Read our guide to <a href="http://www.barnet.gov.uk/royal-wedding.htm">holding a Royal Wedding street party</a>.
             </li>
             <li>
-              Fill in a <a href="http://www.barnet.gov.uk/royal-wedding-form.pdf">Royal Wedding street party application form</a> telling us about the road or section of road you would like to close on the day.
-            </li>
-            <li>
               Read the <a href="http://www.barnet.gov.uk/royal-wedding-insurance.pdf">policy wording of the public liability insurance cover</a> arranged by the Council.
             </li>
           </ul>
+          <p>
+              Sorry &mdash; it&rsquo;s too late to notify us of a <i>new</i> party now.
+          </p>
           <h3>
             What we're pledging: 
           </h3>
@@ -141,12 +141,12 @@ $topic = get_http_var('topic');
           </ul>
         </div>
         <h3>
-            Can't see your road?  Start a new pledge!
+            Note: Deadline for applications is now closed
         </h3> 
-        <p style="font-weight:bold;font-size:120%">Note: application deadline is lunchtime <i>today</i>!</p>           
         <p>
-            If there's not already a pledge for your road, simply start one. Ideally, you'll need to get a minimum of 3&nbsp;households 
-            involved. If you don&rsquo;t meet your target you don't have to act, but if you do then .&nbsp;.&nbsp;. party&nbsp;on!
+            ...but do check above to see if there&rsquo;s one already being organised for your street!
+            You&rsquo;ve got until early next week to make sure a minimum of 3&nbsp;households 
+            have signed up to support it.
         </p>
         
     <?
@@ -159,48 +159,26 @@ $topic = get_http_var('topic');
 
         printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
         print "</p>";
+        ?>
+        <p><label for="name"><?=_('Your name:') ?></label> <input type="text" id="name" name="name" value="<?=htmlspecialchars($name) ?>" size="30">
+
+        <p><label for="e"><?=_('Your email:') ?></label> <input type="text" id="e" name="e" value="<?=htmlspecialchars($email) ?>" size="30"></p>
+
+        <input type="hidden" id="subject" name="subject" value="">
+
+        <p><label for="message">Your suggestion:</label>
+        <br><textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
+
+        <p>
+        <input type="submit" name="submit" value="Send to PledgeBank team"></p>
+        <?
     }
 ?>
 
-<p><label for="name"><?=_('Your name:') ?></label> <input type="text" id="name" name="name" value="<?=htmlspecialchars($name) ?>" size="30">
-
-<p><label for="e"><?=_('Your email:') ?></label> <input type="text" id="e" name="e" value="<?=htmlspecialchars($email) ?>" size="30"></p>
-
-<input type="hidden" id="subject" name="subject" value="">
-
-<?
-    if ($topic == 'royalwedding'){
-?>
-        <input name="topic" type="hidden" value="<?= $topic ?>" />
-        <p>
-            <label for="street">Your street:</label> <input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
-            <br/><span style="padding-left:5em; font-size:90%;">(it helps us if you include your postcode&nbsp;too)</span>
-        </p>
-<?      
-    } else {
-?>
-    <p><label for="message">Your suggestion:</label>
-        <br><textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
-<? } ?>
-
-<p>
-<input type="submit" name="submit" value="Send to PledgeBank team"></p>
 <? if ($topic=='royalwedding') { ?>
 
-  <p>The PledgeBank team will . . .</p>
-  <ul>
-    <li>
-        email you the <a href="http://www.barnet.gov.uk/royal-wedding-form.pdf">Royal Wedding street party application form</a> you will need to close off your street
-    </li>
-    <li>
-        start a pledge page to help encourage people in your street to get involved and invite you to be the first to sign it
-    </li>
-    <li>
-      or, if we&rsquo;ve created one already, we'll let you know so you can sign up to it
-    </li>
-  </ul>
   <p>
-    After that, it&rsquo;s up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
+    Remember, if you&rsquo;ve set up a pledge here that&rsquo;s not already got at least three households on it,  you need to spread the word to your neighbours to encourage them to sign up by <b>Tuesday morning</b>!
   </p>
 
 <? } elseif (! $comment_id ) { ?>

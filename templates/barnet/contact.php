@@ -142,7 +142,8 @@ $topic = get_http_var('topic');
         </div>
         <h3>
             Can't see your road?  Start a new pledge!
-        </h3>            
+        </h3> 
+        <p style="font-weight:bold;font-size:120%">Note: application deadline is lunchtime <i>today</i>!</p>           
         <p>
             If there's not already a pledge for your road, simply start one. Ideally, you'll need to get a minimum of 3&nbsp;households 
             involved. If you don&rsquo;t meet your target you don't have to act, but if you do then .&nbsp;.&nbsp;. party&nbsp;on!

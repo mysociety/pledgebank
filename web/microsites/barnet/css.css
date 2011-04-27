@@ -306,7 +306,9 @@ body.js #ms-signup-reveal {
 #ms-pb-status-plaque {
     margin: 4px;
     text-align: center;
+    border: none;
 }
+
 #ms-pb-status-plaque p {
     padding: 8px 24px;
     margin: 0;
@@ -357,7 +359,7 @@ body.js #ms-signup-reveal {
 #currentpledges li {
 }
 
-#error, #errors, .finished {
+#error, #errors { // NB for Barnet, removed .finished here
     color: #990000;
     background-color: #ffcccc;
     border: solid 2px #990000;

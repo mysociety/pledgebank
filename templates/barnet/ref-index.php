@@ -10,7 +10,7 @@
 
 <div id="ms-pb-status-plaque">
     <?
-    pledge_draw_status_plaque($p); # XXX
+    pledge_draw_status_plaque($p, array('always_show_success' => true)); # XXX
     ?>
 </div>
 
@@ -87,33 +87,35 @@
 
     <div class="ms-pb-bot-container">
         <div id="ms-pb-signatories">
-            <div id="ms-pb-sign-here">
-                <h2>Sign pledge</h2>
-                <form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=$p->ref()?>/sign" method="post">
-                    <input type="hidden" name="add_signatory" value="1">
-                    <input type="hidden" name="pledge" value="<?=$p->ref()?>">
-                    <input type="hidden" name="ref" value="<?=$p->ref()?>">
-                    <p id="name_row">
-                        <label for="name">Your name:</label> <input size="20" type="text" name="name" id="name" value="">
-                    </p>
-                    <div id="ms-signup-reveal">
-                        <p id="email_row">
-                            <label for="email">Your email:</label> <input type="text" size="20" id="email" name="email" value="">
+            <? if (!$p->finished()) { ?>
+                <div id="ms-pb-sign-here">
+                    <h2>Sign pledge</h2>
+                    <form accept-charset="utf-8" id="pledgeaction" name="pledge" action="/<?=$p->ref()?>/sign" method="post">
+                        <input type="hidden" name="add_signatory" value="1">
+                        <input type="hidden" name="pledge" value="<?=$p->ref()?>">
+                        <input type="hidden" name="ref" value="<?=$p->ref()?>">
+                        <p id="name_row">
+                            <label for="name">Your name:</label> <input size="20" type="text" name="name" id="name" value="">
                         </p>
-                        <p id="email_blurb">
-                            (we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)
+                        <div id="ms-signup-reveal">
+                            <p id="email_row">
+                                <label for="email">Your email:</label> <input type="text" size="20" id="email" name="email" value="">
+                            </p>
+                            <p id="email_blurb">
+                                (we only use this to tell you when the pledge is completed and to let the pledge creator get in touch)
+                            </p>
+                            <p id="showname_row">
+                                <label style="float:none"><input type="checkbox" name="showname" value="1" checked> Show my name publicly on this pledge.</label>
+                                <br>
+                            People searching for your name on the Internet might be able to find your signature.
+                            </p>
+                        </div>
+                        <p id="signpledge_row">
+                            <input type="submit" name="submit" id="next_step" value="Sign Pledge">
                         </p>
-                        <p id="showname_row">
-                            <label style="float:none"><input type="checkbox" name="showname" value="1" checked> Show my name publicly on this pledge.</label>
-                            <br>
-                        People searching for your name on the Internet might be able to find your signature.
-                        </p>
-                    </div>
-                    <p id="signpledge_row">
-                        <input type="submit" name="submit" id="next_step" value="Sign Pledge">
-                    </p>
-                </form>
-            </div>
+                    </form>
+                </div>
+            <? } ?>
             <h2>Signatories</h2>
             <div class="ms-pb-general">
                 <p>

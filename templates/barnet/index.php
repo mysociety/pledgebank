@@ -46,8 +46,7 @@
     <div style="border-top: 4px solid #00ada1;margin-top:32px;">
       <h3><a href="/new/royalwedding" title="Street Party" >Royal Wedding Street Parties</a></h3>
       <p>
-        We're pledging to support street parties for the Royal Wedding on 29 April.
-        If you can't see a pledge for <i>your</i> street here, why not get involved by <a href="/new/royalwedding">setting one&nbsp;up</a>? 
+        We're supporting street parties in Barnet for the Royal Wedding on 29 April with the following pledges:
       </p>
       <ul style="margin-left:2em;">
         <li><a href="/Alders-Close">Alders&nbsp;Close,&nbsp;HA8</a></li>

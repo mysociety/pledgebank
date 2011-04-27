@@ -35,7 +35,7 @@ $topic = get_http_var('topic');
         <h2>Royal Wedding: Street Party in your street</h2>
         <div class='ms-royalwedding-banner' style="height:200px;"></div>
         <div id="ms-explicit-party-list">
-          <h3>Sign up to a street party pledge:</h3>          
+          <h3>Our street party pledges:</h3>          
           <ul>
               <li><a href="/Alders-Close">Alders&nbsp;Close,&nbsp;HA8</a></li>
               <li><a href="/asmuns-hill">Asmuns&nbsp;Hill,&nbsp;NW11</a></li>
@@ -126,9 +126,8 @@ $topic = get_http_var('topic');
             Note: Deadline for applications is now closed
         </h3> 
         <p>
-            ...but do check above to see if there&rsquo;s one already being organised for your street!
-            You&rsquo;ve got until early next week to make sure a minimum of 3&nbsp;households 
-            have signed up to support it.
+            ...but do check above to see if there&rsquo;s one already being organised for your street.
+            If there is, ask your neighbours how you can&nbsp;help!
         </p>
         
     <?
@@ -159,9 +158,7 @@ $topic = get_http_var('topic');
 
 <? if ($topic=='royalwedding') { ?>
 
-  <p>
-    Remember, if you&rsquo;ve set up a pledge here that&rsquo;s not already got at least three households on it,  you need to spread the word to your neighbours to encourage them to sign up by <b>Tuesday morning</b>!
-  </p>
+  <!-- now closed: removed  -->
 
 <? } elseif (! $comment_id ) { ?>
   <p>The PledgeBank team will...</p>

@@ -251,6 +251,7 @@ function microsite_preloaded_images($key, $pledge_microsite = NULL){
     if ($microsite == 'barnet' || $pledge_microsite == 'barnet'){
         $files = array(              // alphabetic display order, fwiw
             "barnet_offices.jpg" => "Barnet NLBP Offices",
+            "the_big_lunch.jpg"  => "The Big Lunch street party",
             "daisy_field.jpg"    => "Field of dog daisies",
             "frosty_flower.jpg"  => "Frosty flower",
             "hendon_library.jpg" => "Hendon library",

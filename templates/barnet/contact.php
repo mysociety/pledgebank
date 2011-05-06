@@ -141,7 +141,6 @@ $topic = get_http_var('topic');
           <div id="ms-explicit-party-list">
             <h3>Sign up to a Big Lunch street party pledge:</h3>          
             <ul>
-              <li><a href="/biglunchsample">Sample&nbsp;Street,&nbsp;HA8</a></li>
             </ul>
             <div style="width:100%;clear:both;height:1px"></div>
           </div>
@@ -194,14 +193,14 @@ $topic = get_http_var('topic');
               If there&rsquo;s not already a pledge for your road, simply start one. 
               Ideally, you&rsquo;ll need to get a minimum of 3&nbsp;households involved. 
           </p>
-       <? } else { ?>
+       <? } else { 
 
           print h2("Suggest a pledge");
         
           print "<p>Do you have an idea for a pledge that could appear on this site?</p>";
           print "<p>What would you like to get done? </p>";
 
-      <? }
+        }
         print "<p>";
         $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
         printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');

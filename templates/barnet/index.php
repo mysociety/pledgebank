@@ -49,10 +49,10 @@
       <h3><a href="/new/thebiglunch" title="The Big Lunch" >The Big&nbsp;Lunch Street Parties</a></h3>
       <p>
         
-        We're supporting street parties in Barnet for the Big Lunch on the <strong>5&nbsp;June</strong> with the following pledges:
+        We're supporting street parties in Barnet for the Big Lunch on the <strong>5&nbsp;June</strong>. <!-- with the following pledges: -->
+        <a href="/new/thebiglunch">Start a pledge</a> for a street party in your street!
       </p>
       <ul style="margin-left:2em;">
-        <li><a href="/biglunchsample">Sample&nbsp;Street,&nbsp;HA8</a></li>
       </ul>
     </div>
   </div>

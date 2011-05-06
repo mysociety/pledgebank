@@ -93,42 +93,31 @@ $topic = get_http_var('topic');
         </div>
         <div style="font-size:1.126em;padding-bottom:0.25em;">
             <p>
-                 The Royal Wedding of HRH Prince William and Kate Middleton will take place on 29 April this year. 
-                 It&rsquo;s a wonderful excuse for a street party &mdash; not only is a street party a fun way for residents 
-                 to celebrate the event, it&rsquo;s also a great way to get to know your neighbours better.               
+                 The Royal Wedding of HRH Prince William and Kate Middleton took place on 29 April 2011. 
+                 It was a wonderful excuse for a street party &mdash; not only is a street party a fun way for residents 
+                 to celebrate such an event, it&rsquo;s also a great way to get to know your neighbours better.               
             </p>
         </div>
         <div style="float:right; width:45%;margin-left:1em;" class="pb-barnet-breakout">
           <h3>
               What you will need to do:
           </h3>
-          <ul>
-            <li>
-                Read our guide to <a href="http://www.barnet.gov.uk/royal-wedding.htm">holding a Royal Wedding street party</a>.
-            </li>
-            <li>
-              Read the <a href="http://www.barnet.gov.uk/royal-wedding-insurance.pdf">policy wording of the public liability insurance cover</a> arranged by the Council.
-            </li>
-          </ul>
           <p>
-              Sorry &mdash; it&rsquo;s too late to notify us of a <i>new</i> party now.
+              Sorry &mdash; it&rsquo;s too late to notify us of a <i>new</i> Royal Wedding street party now.
+              But you could sign up for a <a href="/new/thebiglunch">Big Lunch street party</a> for the <strong>5&nbsp;June</strong> instead!
           </p>
           <h3>
-            What we're pledging: 
+            What we pledged: 
           </h3>
           <ul>
             <li>
-              Barnet Council will support street parties on the day of the Royal Wedding, including arranging insurance free of charge, <strong>if at least three households in a street</strong> sign up to holding an event.
+              Barnet Council pledged support street parties on the day of the Royal Wedding, including arranging insurance free of charge, <strong>if at least three households in a street</strong> signed up to holding an event.
             </li>
           </ul>
         </div>
         <h3>
             Note: Deadline for applications is now closed
         </h3> 
-        <p>
-            ...but do check above to see if there&rsquo;s one already being organised for your street.
-            If there is, ask your neighbours how you can&nbsp;help!
-        </p>
         
     <? } else { ?>
        

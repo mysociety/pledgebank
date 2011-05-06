@@ -144,10 +144,11 @@ $topic = get_http_var('topic');
                 <strong>Sunday&nbsp;5&nbsp;June</strong>.
             </p>
             <p>
-              A Big Lunch can be anything from a few neighbours getting together in the garden to a street party.
-              If it is on the street, you will need to get Barnet Council&rsquo;s permission to make sure it is OK 
-              for you to close the road and sort out your insurance. To do this, we would like 3 households on each 
-              street to sign up to a pledge.
+                A Big Lunch can be anything from a few neighbours getting together in the garden or on the street, 
+                to a full blown party with food, music and decoration that quite literally stops the traffic.              
+                If it is on the street, you will need to get Barnet Council&rsquo;s permission to make sure it is OK 
+                for you to close the road and sort out your insurance. To do this, we would like 3 households on each 
+                street to sign up to a pledge.
             </p>
           </div>
           <div style="width:100%;clear:both;height:1px"></div>

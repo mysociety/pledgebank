@@ -42,60 +42,17 @@
     are popular and worthwhile.
   </p>
   <div style="border:1px solid white;">
-    <img alt="portrait of William and Kate" src="/microsites/barnet/royalwedding_small_portrait.jpg" style="float:right;width:170px;height:208px;border:none;"/>
-    <div style="border-top: 4px solid #00ada1;margin-top:32px;">
-      <h3><a href="/new/royalwedding" title="Street Party" >Royal Wedding Street Parties</a></h3>
+    <div style="border-top: 4px solid #00ada1;margin-top:1em;">
+      <a href="http://www.barnet.gov.uk/biglunch" title="about The Big Lunch"><img 
+        alt="The Big Lunch logo" src="/microsites/barnet/the_big_lunch_logo_212_x_90.png" 
+        style="float:right;width:212px;height:90px;border:none;margin:1em;"/></a>
+      <h3><a href="/new/thebiglunch" title="The Big Lunch" >The Big&nbsp;Lunch Street Parties</a></h3>
       <p>
-        We're supporting street parties in Barnet for the Royal Wedding on 29 April with the following pledges:
+        
+        We're supporting street parties in Barnet for the Big Lunch on the <strong>5&nbsp;June</strong> with the following pledges:
       </p>
       <ul style="margin-left:2em;">
-        <li><a href="/Alders-Close">Alders&nbsp;Close,&nbsp;HA8</a></li>
-        <li><a href="/asmuns-hill">Asmuns&nbsp;Hill,&nbsp;NW11</a></li>
-        <li><a href="/Athenaeum-Road">Athenaeum&nbsp;Road,&nbsp;N20</a></li>
-        <li><a href="/bevan-road">Bevan&nbsp;Road,&nbsp;EN4</a></li>
-        <li><a href="/Bosworth-Road">Bosworth&nbsp;Road,&nbsp;EN5</a></li>
-        <li><a href="/brownlow-road">Brownlow&nbsp;Road,&nbsp;N3</a></li>
-        <li><a href="/Brookland-Close">Brookland&nbsp;Close,&nbsp;NW11</a></li>
-        <li><a href="/Bryant-Close">Bryant&nbsp;Close,&nbsp;EN5</a></li>
-        <li><a href="/cissbury-road">Cissbury&nbsp;Road</a></li>
-        <li><a href="/corringham-road">Corringham&nbsp;Road,&nbsp;NW11</a></li>
-        <li><a href="/CrewysRoad">Crewys&nbsp;Road,&nbsp;NW2</a></li>
-        <li><a href="/dalegreenparty">Dale&nbsp;Green&nbsp;Road,&nbsp;N11</a></li>
-        <li><a href="/dukesavenue">Dukes&nbsp;Avenue</a></li>
-        <li><a href="/Eastholm">Eastholm,&nbsp;NW11</a></li>
-        <li><a href="/elm-gardens">Elm&nbsp;Gardens,&nbsp;N2</a></li>
-        <li><a href="/exeter-road">Exeter&nbsp;Road,&nbsp;N14</a></li>
-        <li><a href="/fairview-way">Fairview&nbsp;Way,&nbsp;HA8</a></li>
-        <li><a href="/falklandroad">Falkland&nbsp;Road,&nbsp;EN5</a></li>
-        <li><a href="/fallowsclose">Fallows&nbsp;Close,&nbsp;N2</a></li>
-        <li><a href="/grove-road">Grove&nbsp;Road,&nbsp;N12</a></li>
-        <li><a href="/harmandriveparty">Harman&nbsp;Drive,&nbsp;NW2</a></li>
-        <li><a href="/harrowes-meade">Harrowes&nbsp;Meade,&nbsp;HA8</a></li>
-        <li><a href="/hartlandroad">Hartland&nbsp;Road,&nbsp;N11</a></li>
-        <li><a href="/hatley-close">Hatley&nbsp;Close,&nbsp;N11</a></li>
-        <li><a href="/hertfordclose">Hertford&nbsp;Close,&nbsp;EN4</a></li>
-        <li><a href="/hertford-road">Hertford&nbsp;Road,&nbsp;N2</a></li>
-        <li><a href="/holly-park">Holly&nbsp;Park</a></li>
-        <li><a href="/lambertroad">Lambert&nbsp;Road,&nbsp;N12</a></li>
-        <li><a href="/Leicester-Road">Leicester&nbsp;Road,&nbsp;N2</a></li>
-        <li><a href="/Limes-Ave">Limes&nbsp;Avenue</a></li>
-        <li><a href="/marion-road">Marion&nbsp;Road,&nbsp;NW7</a></li>
-        <li><a href="/myddleton-park">Myddleton&nbsp;Park,&nbsp;N20</a></li>
-        <li><a href="/Norwich-Walk">Norwich&nbsp;Walk&nbsp;HA8</a></li>
-        <li><a href="/Ossulton-Way">Ossulton&nbsp;Way,&nbsp;N2</a></li>
-        <li><a href="/Park-Avenue">Park&nbsp;Avenue,&nbsp;N3</a></li>
-        <li><a href="/prospect-road">Prospect&nbsp;Road&nbsp;&amp;&nbsp;Place,&nbsp;NW2</a></li>
-        <li><a href="/quinta-green">Quinta&nbsp;Green,&nbsp;Mays&nbsp;Lane</a></li>
-        <li><a href="/ravenscroftpark">Ravenscroft&nbsp;Park,&nbsp;EN5</a></li>
-        <li><a href="/rowlandsclose">Rowlands&nbsp;Close,&nbsp;NW7</a></li>
-        <li><a href="/sandwick-close">Sandwick&nbsp;Close,&nbsp;NW7</a></li>
-        <li><a href="/Sellers-Hall">Sellers&nbsp;Hall&nbsp;Close,&nbsp;N3</a></li>
-        <li><a href="/southwayparty">Southway,&nbsp;N20</a></li>
-        <li><a href="/Stanaley-Road">Stanaley&nbsp;Road,&nbsp;N2</a></li>
-        <li><a href="/Victoria-Rd">Victoria&nbsp;Road</a></li>
-        <li><a href="/westburyroad">Westbury&nbsp;Road,&nbsp;N12</a></li>
-        <li><a href="/woodlands-avenue">Woodlands&nbsp;Ave,&nbsp;N3</a></li>
-        <li><a href="/woodvilleroad">Woodville&nbsp;Road,&nbsp;EN5</a></li>
+        <li><a href="/biglunchsample">Sample&nbsp;Street,&nbsp;HA8</a></li>
       </ul>
     </div>
   </div>

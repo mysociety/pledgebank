@@ -620,6 +620,8 @@ function microsites_email_subject_by_topic($topic, $subject) {
     if ($microsite == 'barnet'){
         if ($topic == 'royalwedding'){
             return 'Barnet PledgeBank: Royal Wedding Street Party request';
+        } elseif ($topic == 'thebiglunch'){
+            return 'Barnet PledgeBank: The Big Lunch Street Party request';
         } else {
             return 'Barnet PledgeBank suggestion';
         }        
@@ -633,10 +635,16 @@ function microsites_email_subject_by_topic($topic, $subject) {
 function microsites_email_message_body_by_topic($topic, $message, $name, $email) {
     global $microsite;
     if ($microsite == 'barnet'){
-        if ($topic == 'royalwedding' && $message) {
+        if (($topic == 'thebiglunch' || $topic == 'royalwedding') && $message) {
+            $topicTitle = "Street Party";
+            if ($topic == 'thebiglunch') {
+                $topicTitle = "The Big Lunch $topicTitle";
+            } elseif ($topic == 'royalwedding') {
+                $topicTitle = "Royal Wedding $topicTitle";
+            }
             $message = "
 
-Request for a Royal Wedding Street Party pledge in \"$message\".
+Request for a $topicTitle pledge in \"$message\".
 
 If there's not already a Street Party pledge in this area, please make one!
 http://pledgebank.barnet.gov.uk/new
@@ -678,7 +686,7 @@ Please sign up to that pledge and share that with as many of your neighbours as 
 Best wishes
 Barnet Council PledgeBank team
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                ";
+";
         }
     }
     return $message;
@@ -693,7 +701,7 @@ Barnet Council PledgeBank team
 function microsites_email_error_msg_by_topic($topic, $subject, $error_message) {
     global $microsite;
     if ($microsite == 'barnet'){
-        if ($topic == 'royalwedding' && $subject == 'message'){
+        if (($topic == 'royalwedding' || $topic == 'thebiglunch') && $subject == 'message'){
             return 'Please enter the name of your street';
         }        
     }
@@ -709,7 +717,7 @@ function microsites_email_error_msg_by_topic($topic, $subject, $error_message) {
  */
 function microsites_email_send_from_users_address($topic) {
     global $microsite;
-    if ($microsite == 'barnet' && $topic == 'royalwedding') return false;
+    if ($microsite == 'barnet' && ($topic == 'royalwedding' || $topic == 'thebiglunch')) return false;
     return true;
 }
 

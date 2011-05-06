@@ -130,14 +130,80 @@ $topic = get_http_var('topic');
             If there is, ask your neighbours how you can&nbsp;help!
         </p>
         
-    <?
-    } else {
-        print h2("Suggest a pledge");
-        $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
+    <? } else { ?>
+       
+       <? if ($topic == 'thebiglunch') { ?>
+      
+          <!-- =========================== the big lunch =================================== -->
         
-        print "<p>Do you have an idea for a pledge that could appear on this site?</p>";
-        print "<p>What would you like to get done? </p>";
+          <h2>The Big Lunch: a one day get-together for neighbours</h2>
+          <div class='ms-thebiglunch-banner' style="height:200px;"></div>
+          <div id="ms-explicit-party-list">
+            <h3>Sign up to a Big Lunch street party pledge:</h3>          
+            <ul>
+              <li><a href="/biglunchsample">Sample&nbsp;Street,&nbsp;HA8</a></li>
+            </ul>
+            <div style="width:100%;clear:both;height:1px"></div>
+          </div>
+          <div style="font-size:1.126em;padding-bottom:0.25em;">
+             <a href="http://www.barnet.gov.uk/biglunch" title="about The Big Lunch"><img 
+                alt="The Big Lunch logo" src="/microsites/barnet/the_big_lunch_logo_212_x_90.png" 
+                style="float:right;width:212px;height:90px;border:none;margin: 0 1em 1em 1em;"/></a>
+            <p>
+                <a href="http://www.barnet.gov.uk/biglunch">The Big Lunch</a> is a very simple idea from the Eden Project. 
+                The aim is to get as many people as possible across the whole of the UK to have lunch with their
+                neighbours in a simple act of community, friendship and fun. This year it&rsquo;s happening on 
+                <strong>Sunday&nbsp;5&nbsp;June</strong>.
+            </p>
+            <p>
+              A Big Lunch can be anything from a few neighbours getting together in the garden to a street party.
+              If it is on the street, you will need to get Barnet Council&rsquo;s permission to make sure it is OK 
+              for you to close the road and sort out your insurance. To do this, we would like 3 households on each 
+              street to sign up to a pledge.
+            </p>
+          </div>
+          <div style="width:100%;clear:both;height:1px"></div>
+          <div style="float:right; width:45%;margin-left:1em;" class="pb-barnet-breakout">
+            <h3>
+                What you will need to do:
+            </h3>
+            <ul>
+              <li>
+                  Read our guide to <a href="http://www.barnet.gov.uk/royal-wedding.htm">holding a Big Lunch street party</a>.
+              </li>
+              <li>
+                Read the <a href="http://www.barnet.gov.uk/royal-wedding-insurance.pdf">policy wording of the public liability insurance cover</a> arranged by the Council.
+              </li>
+              <li>
+                Fill in a <a href="http://www.barnet.gov.uk/Big-Lunch-A4-Form-web.pdf">The Big Lunch street party application form</a> telling us about the road or section of road you would like to close on the day.
+              </li>            
+            </ul>
+            <h3>
+              What we're pledging: 
+            </h3>
+            <ul>
+              <li>
+                Barnet Council will support street parties on the day of The Big Lunch, including arranging insurance free of charge, if at least three households in a street sign up to get involved. 
+              </li>
+            </ul>
+          </div>
+          <h3>
+              Can&rsquo;t see your road?  Start a new pledge!
+          </h3>            
+          <p>
+              If there&rsquo;s not already a pledge for your road, simply start one. 
+              Ideally, you&rsquo;ll need to get a minimum of 3&nbsp;households involved. 
+          </p>
+       <? } else { ?>
 
+          print h2("Suggest a pledge");
+        
+          print "<p>Do you have an idea for a pledge that could appear on this site?</p>";
+          print "<p>What would you like to get done? </p>";
+
+      <? }
+        print "<p>";
+        $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
         printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
         print "</p>";
         ?>
@@ -147,8 +213,20 @@ $topic = get_http_var('topic');
 
         <input type="hidden" id="subject" name="subject" value="">
 
-        <p><label for="message">Your suggestion:</label>
-        <br><textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
+        <?
+            if ($topic == 'thebiglunch'){
+        ?>
+                <input name="topic" type="hidden" value="<?= $topic ?>" />
+                <p>
+                    <label for="street">Your street:</label> <input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
+                    <br/><span style="padding-left:5em; font-size:90%;">(it helps us if you include your postcode&nbsp;too)</span>
+                </p>
+        <?      
+            } else {
+        ?>
+            <p><label for="message">Your suggestion:</label>
+            <br><textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>
+        <? } ?>
 
         <p>
         <input type="submit" name="submit" value="Send to PledgeBank team"></p>
@@ -159,6 +237,24 @@ $topic = get_http_var('topic');
 <? if ($topic=='royalwedding') { ?>
 
   <!-- now closed: removed  -->
+
+<? } elseif ($topic=='thebiglunch') { ?>
+
+  <p>The PledgeBank team will . . .</p>
+   <ul>
+     <li>
+         email you the <a href="http://www.barnet.gov.uk/Big-Lunch-A4-Form-web.pdf">Big Lunch street party application form</a> you will need to close off your street
+     </li>
+     <li>
+         start a pledge page to help encourage people in your street to get involved and invite you to be the first to sign it
+     </li>
+     <li>
+       or, if we&rsquo;ve created one already, we&rsquo;ll let you know so you can sign up to it
+     </li>
+   </ul>
+   <p>
+     After that, it&rsquo;s up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
+   </p>
 
 <? } elseif (! $comment_id ) { ?>
   <p>The PledgeBank team will...</p>

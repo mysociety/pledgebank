@@ -417,10 +417,18 @@ body.js #ms-signup-reveal {
     background-image: url('default-pledge-icon.jpg'); /* override with inline style if there's an image for the pledge */
 }
 
-.ms-royalwedding-banner{
+.ms-royalwedding-banner {
     width: 100%;
     height: 50px;
     background-image: url('preloaded/royal_wedding.jpg');
+    background-position:center center;
+    margin-bottom: 1em;
+}
+
+.ms-thebiglunch-banner {
+    width: 100%;
+    height: 50px;
+    background-image: url('preloaded/the_big_lunch.jpg');
     background-position:center center;
     margin-bottom: 1em;
 }

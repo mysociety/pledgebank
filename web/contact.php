@@ -65,9 +65,10 @@ function contact_form_submitted() {
     if ($name == _('<Enter your name>')) $name = '';
     $email = get_http_var('e');
     $topic = get_http_var('topic');
+    $custom_field = get_http_var('custom');
     // both subject and message may be affected by the topic (otherwise, they're just the http var values)
     $subject = microsites_email_subject_by_topic($topic, get_http_var('subject', true));
-    $message = microsites_email_message_body_by_topic($topic, get_http_var('message', true), $name, $email);
+    $message = microsites_email_message_body_by_topic($topic, get_http_var('message', true), $name, $email, $custom_field);
     $ref = get_http_var('ref');
     if (!$ref && get_http_var('pledge_id'))
         $ref = db_getOne('select ref from pledges where id = ?', get_http_var('pledge_id'));

@@ -207,8 +207,12 @@ $topic = get_http_var('topic');
         ?>
                 <input name="topic" type="hidden" value="<?= $topic ?>" />
                 <p>
-                    <label for="street">Your street:</label> <input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
-                    <br/><span style="padding-left:5em; font-size:90%;">(it helps us if you include your postcode&nbsp;too)</span>
+                    <label for="message">Your street:</label> <input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
+                    <br/><span style="padding-left:5em; font-size:90%;">(it helps us if you include your&nbsp;postcode)</span>
+                </p>
+                <p>
+                    <label for="custom">Your phone number:</label> <input id="custom" name="custom" type="text" value="<?=htmlspecialchars(get_http_var('custom', true)) ?>" size="20"/>
+                    <br/><span style="padding-left:5em; font-size:90%;">(optional, but it&rsquo;s really handy if we can call you&nbsp;too)</span>
                 </p>
         <?      
             } else {

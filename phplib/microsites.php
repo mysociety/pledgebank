@@ -632,20 +632,26 @@ function microsites_email_subject_by_topic($topic, $subject) {
 /* microsites_email_message_body_by_topic
  * returns message for email based on topic (or passes message back unchanged if there is no work to be done)
  */
-function microsites_email_message_body_by_topic($topic, $message, $name, $email) {
+function microsites_email_message_body_by_topic($topic, $message, $name, $email, $custom_field) {
     global $microsite;
     if ($microsite == 'barnet'){
         if (($topic == 'thebiglunch' || $topic == 'royalwedding') && $message) {
             $topicTitle = "Street Party";
+            $phonenumber = '';
             if ($topic == 'thebiglunch') {
                 $topicTitle = "The Big Lunch $topicTitle";
+                if ($custom_field) {
+                    $phonenumber = "Phone number: $custom_field\n";                    
+                } else {
+                    $phonenumber = "No phone number provided\n";
+                }
             } elseif ($topic == 'royalwedding') {
                 $topicTitle = "Royal Wedding $topicTitle";
             }
             $message = "
 
 Request for a $topicTitle pledge in \"$message\".
-
+$phonenumber
 If there's not already a Street Party pledge in this area, please make one!
 http://pledgebank.barnet.gov.uk/new
 

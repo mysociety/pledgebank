@@ -157,11 +157,11 @@ $topic = get_http_var('topic');
             </h3>
             <ul>
               <li>
-                  Read our guide to <a href="http://www.barnet.gov.uk/royal-wedding.htm">holding a Big Lunch street party</a>.
+                  Read our guide to <a href="http://www.barnet.gov.uk/biglunch">holding a Big Lunch street party</a>.
               </li>
-              <li>
+              <!-- <li>
                 Read the <a href="http://www.barnet.gov.uk/royal-wedding-insurance.pdf">policy wording of the public liability insurance cover</a> arranged by the Council.
-              </li>
+              </li>-->
               <li>
                 Fill in a <a href="http://www.barnet.gov.uk/Big-Lunch-A4-Form-web.pdf">The Big Lunch street party application form</a> telling us about the road or section of road you would like to close on the day.
               </li>            

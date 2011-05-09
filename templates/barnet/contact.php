@@ -130,6 +130,7 @@ $topic = get_http_var('topic');
           <div id="ms-explicit-party-list">
             <h3>Sign up to a Big Lunch street party pledge:</h3>          
             <ul>
+                <li><a href="/corringham-rd-bl">Corringham&nbsp;Road,&nbsp;NW11</a></li>
             </ul>
             <div style="width:100%;clear:both;height:1px"></div>
           </div>

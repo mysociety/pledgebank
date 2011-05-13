@@ -58,7 +58,7 @@ function pb_domain_url($params = array('path'=>'/')) {
     if (OPTION_PB_FIXED_SITE_URL) { # let standalone sites (e.g., Barnet, or fiddly dev URLs) simply pass an unchanged URL through
         $url = OPTION_PB_FIXED_SITE_URL;
         if (strpos($url, 'http://') === false) {
-            $url = 'http://' + $url;
+            $url = 'http://' . $url;
         }
         if (array_key_exists('path', $params) && $params['path'])
             $url .= htmlspecialchars($params['path']);

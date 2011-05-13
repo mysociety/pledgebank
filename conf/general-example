@@ -31,6 +31,14 @@ define('OPTION_PHP_MAINDB', 'PB');
 define('OPTION_WEB_HOST', 'www');
 define('OPTION_WEB_DOMAIN', 'pledgebank.com');
 
+/* Pledgebank includes locale/language and microsite names in its URLs when needed:
+   to keep this default behaviour, leave OPTION_PB_FIXED_SITE_URL blank.
+   But if you're running a standalone microsite which only serves a single, simple URL
+   (for example, as do for Barnet at pledgebank.barnet.gov.uk) then put that URL here.
+   Note: this can also be handy for staging sites!
+*/
+define('OPTION_PB_FIXED_SITE_URL', 'http://barnet.dave.pledgebank.com');
+
 // Top-level URL of current website, without trailing /
 define('OPTION_BASE_URL', 'http://' . OPTION_WEB_HOST . '.' . OPTION_WEB_DOMAIN);
 define('OPTION_ADMIN_URL', 'https://secure.../admin/index.php');

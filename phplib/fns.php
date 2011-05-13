@@ -55,6 +55,16 @@ if (OPTION_WEB_DOMAIN == 'pledgebank.com' && OPTION_WEB_HOST == 'www') {
 function pb_domain_url($params = array('path'=>'/')) {
     global $domain_lang, $microsite, $lang, $site_country, $locale_current, $locale_stack, $language_domains;
 
+    if (OPTION_PB_FIXED_SITE_URL) { # let standalone sites (e.g., Barnet, or fiddly dev URLs) simply pass an unchanged URL through
+        $url = OPTION_PB_FIXED_SITE_URL;
+        if (strpos($url, 'http://') === false) {
+            $url = 'http://' + $url;
+        }
+        if (array_key_exists('path', $params) && $params['path'])
+            $url .= htmlspecialchars($params['path']);
+        return $url;
+    }
+
     if (array_key_exists('explicit', $params) && $params['explicit']) {
         $params['lang'] = 'explicit';
         $params['country'] = 'explicit';

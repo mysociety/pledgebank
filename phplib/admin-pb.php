@@ -617,9 +617,7 @@ class ADMIN_PAGE_PB_MAIN {
             $preloaded_images = microsite_preloaded_images('exists', $pdata['microsite']);
             if (count($preloaded_images)>0){
                 print '<br/><label for="preloaded_image">Or choose a preloaded image: </label>';
-                print '<select name="preloaded_image">';
                 print microsite_preloaded_image_select($pdata['microsite']);
-                print '</select>';
             }
             print '<br/><input name="update" type="submit" value="Update picture">';
             print '</form><br/>';

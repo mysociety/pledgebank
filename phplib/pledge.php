@@ -400,7 +400,7 @@ class Pledge {
         global $locale_current;
         $explicit_url = pb_domain_url(array('lang'=>$this->lang(), 'path'=>"/".$this->ref()));
         $from_lang =  $this->lang(); 
-        $split_locale_current = split("-", $locale_current); # note that subcodes Google Translate offers won't work as we ditch them here
+        $split_locale_current = explode("-", $locale_current); # note that subcodes Google Translate offers won't work as we ditch them here
         $to_lang = $split_locale_current[0];
 
         /*

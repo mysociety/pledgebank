@@ -45,8 +45,7 @@
 <hr class="v">
 <div id="pbfooter">
 <a href="/translate/"><?=_('Translate PledgeBank into your language') ?></a>.
-<br><a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.
-<a href="http://www.easynet.net/publicsector/"><?=_('Powered by Easynet')?></a>.</div>
+<br><a href="http://www.mysociety.org/"><?=_('Built by mySociety') ?></a>.</div>
 </div>
 <?
         debug_timestamp(true, "change language links");

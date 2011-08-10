@@ -154,7 +154,7 @@ function default_faq() {
     Ben Furber for our favicon, 
     the entire free software community (FreeBSD, Linux, PHP, Perl, Python, Apache,
     MySQL, PostgreSQL, we love and use you all!) and
-    <a href="http://www.easynet.net/publicsector/">Easynet</a> (who kindly host all
+    <a href="http://www.m247.com/">M247</a> (who host all
     our servers).
 
     Let us know if we\'ve missed anyone.'));

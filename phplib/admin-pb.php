@@ -447,7 +447,7 @@ class ADMIN_PAGE_PB_MAIN {
         print divOddEven($parity++);
         print "<div class='admin-name'>Set by:</div>";
         print '<div class="admin-value"><a href="?page=pb&amp;person=' . $pdata['person_id'] .'">' . htmlspecialchars($pdata['name']) . "</a>" .
-            " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</div";
+            " &lt;" .  htmlspecialchars($pdata['email']) . "&gt;</div>";
         print "</div>";
             
         print divOddEven($parity++);

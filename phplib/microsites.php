@@ -622,6 +622,8 @@ function microsites_email_subject_by_topic($topic, $subject) {
             return 'Barnet PledgeBank: Royal Wedding Street Party request';
         } elseif ($topic == 'thebiglunch'){
             return 'Barnet PledgeBank: The Big Lunch Street Party request';
+        } elseif ($topic == 'adoptastreet'){
+            return 'Barnet PledgeBank: Adopt-a-Street request';
         } else {
             return 'Barnet PledgeBank suggestion';
         }        
@@ -635,8 +637,9 @@ function microsites_email_subject_by_topic($topic, $subject) {
 function microsites_email_message_body_by_topic($topic, $message, $name, $email, $custom_field) {
     global $microsite;
     if ($microsite == 'barnet'){
-        if (($topic == 'thebiglunch' || $topic == 'royalwedding') && $message) {
-            $topicTitle = "Street Party";
+        if (($topic == 'adoptastreet' || $topic == 'thebiglunch' || $topic == 'royalwedding') && $message) {
+            $topicTitle = $topic == 'adoptastreet'? "Adopt-a-Street" : "Street Party";
+            $topicAction = $topic == 'adoptastreet'? "adopt your street" : "organise a street party";
             $phonenumber = '';
             if ($topic == 'thebiglunch') {
                 $topicTitle = "The Big Lunch $topicTitle";
@@ -647,12 +650,18 @@ function microsites_email_message_body_by_topic($topic, $message, $name, $email,
                 }
             } elseif ($topic == 'royalwedding') {
                 $topicTitle = "Royal Wedding $topicTitle";
+            } elseif ($topic == 'adoptastreet') {
+              if ($custom_field) {
+                  $phonenumber = "Phone number: $custom_field\n";                    
+              } else {
+                  $phonenumber = "No phone number provided\n";
+              }                
             }
             $message = "
 
 Request for a $topicTitle pledge in \"$message\".
 $phonenumber
-If there's not already a Street Party pledge in this area, please make one!
+If there's not already a $topicTitle pledge in this area, please make one!
 http://pledgebank.barnet.gov.uk/new
 
 You can reply to $name at $email with one of these two templated emails:
@@ -663,8 +672,7 @@ You can reply to $name at $email with one of these two templated emails:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Hello $name
 
-Thank you for stepping up to the mark to try organise a street 
-party in $message.
+Thank you for stepping up to the mark to try to $topicAction in $message.
 
 We've made a new pledge for you here: 
 
@@ -681,7 +689,7 @@ Barnet Council PledgeBank team
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Hello $name
 
-Thank you for volunteering to organise a street party in $message.
+Thank you for volunteering to $topicAction in $message.
 
 We're pleased to tell you such a pledge has already been started:
 
@@ -707,7 +715,7 @@ Barnet Council PledgeBank team
 function microsites_email_error_msg_by_topic($topic, $subject, $error_message) {
     global $microsite;
     if ($microsite == 'barnet'){
-        if (($topic == 'royalwedding' || $topic == 'thebiglunch') && $subject == 'message'){
+        if (($topic == 'royalwedding' || $topic == 'thebiglunch' || $topic == 'adoptastreet') && $subject == 'message'){
             return 'Please enter the name of your street';
         }        
     }
@@ -723,7 +731,7 @@ function microsites_email_error_msg_by_topic($topic, $subject, $error_message) {
  */
 function microsites_email_send_from_users_address($topic) {
     global $microsite;
-    if ($microsite == 'barnet' && ($topic == 'royalwedding' || $topic == 'thebiglunch')) return false;
+    if ($microsite == 'barnet' && ($topic == 'royalwedding' || $topic == 'thebiglunch' || $topic == 'adoptastreet')) return false;
     return true;
 }
 

@@ -433,6 +433,14 @@ body.js #ms-signup-reveal {
     margin-bottom: 1em;
 }
 
+.ms-adoptastreet-banner {
+    width: 100%;
+    height: 50px;
+    background-image: url('preloaded/adopt_a_street.jpg');
+    background-position:center center;
+    margin-bottom: 1em;
+}
+
 /* pledge creation styling */
 
 /* Breadcrumbs when creating a pledge */

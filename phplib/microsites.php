@@ -250,6 +250,7 @@ function microsite_preloaded_images($key, $pledge_microsite = NULL){
     global $microsite;
     if ($microsite == 'barnet' || $pledge_microsite == 'barnet'){
         $files = array(              // alphabetic display order, fwiw
+            "adopt_a_street.jpg" => "Adopt a Street",
             "barnet_offices.jpg" => "Barnet NLBP Offices",
             "the_big_lunch.jpg"  => "The Big Lunch street party",
             "daisy_field.jpg"    => "Field of dog daisies",
@@ -986,4 +987,25 @@ function microsites_new_breadcrumbs($num) {
     $str .= "</ol>";
     print $str;
 }
+
+function microsites_custom_pledge_template_path($topic) {
+  if (preg_match("/^[_a-zA-Z0-9-]+$/i", $topic) && OPTION_PB_CUSTOM_TYPE_TEMPLATES_DIR) {
+    return OPTION_PB_CUSTOM_TYPE_TEMPLATES_DIR . $topic . ".php";
+  }
+  return '';
+}
+
+# whether or not this is an attempt to create a custom pledge type, and if that
+# pledge type is supported by this installation
+# returns false if not, otherwise returns the pledge type
+function microsites_valid_custom_pledge_type($pledge_type) {
+  if ($pledge_type) {
+    $pledge_type_canonical = preg_replace("/[^-a-z0-9_]/", '', strtolower($pledge_type));
+    if (is_readable(microsites_custom_pledge_template_path($pledge_type_canonical))) {
+      return $pledge_type_canonical;
+    }
+  }
+  return false;
+}
+
 

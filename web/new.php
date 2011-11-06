@@ -39,6 +39,7 @@ function has_step_3() {
 function has_step_addr() {
     return microsites_postal_address_allowed();
 }
+
 $number_of_steps = 2;
 if (has_step_2()) $number_of_steps++;
 if (has_step_3()) $number_of_steps++;
@@ -131,6 +132,8 @@ function pledge_form_one($data = array(), $errors = array()) {
         $data['identity'] = 'picnic lover';
     }
 
+    $data['pledge_type'] = get_http_var('pledge_type');
+
     // Can introduce initial tags via URL parameters
     if (get_http_var('tags')) {
         $data['tags'] = get_http_var('tags');
@@ -155,6 +158,20 @@ function pledge_form_one($data = array(), $errors = array()) {
 <p><small><?=sprintf(_('(<a href="%s">Want your pledge in a language other than %s?</a>)'),
     "/lang?r=/new", $langs[$lang]) ?></small></p>
 <? } ?>
+
+<? if ($data['pledge_type']) {
+     $canonical_pledge_type = microsites_valid_custom_pledge_type($data['pledge_type']);
+     if ($canonical_pledge_type) { ?>
+       <h2>
+          <?= sprintf(_('This is a custom "%s" pledge.'), htmlspecialchars($data['pledge_type'])); ?>
+       </h2>
+       <input type="hidden" name="pledge_type" value="<?= htmlspecialchars($data['pledge_type']) ?>" />
+       <p><?=sprintf(_('Reference for this pledge amongst other <b>%s</b> pledges:<br/>'), htmlspecialchars($data['pledge_type'])) ?>
+         <input id="ref_in_pledge_type" name="ref_in_pledge_type" value="<? if (isset($data['ref_in_pledge_type'])) print htmlspecialchars($data['ref_in_pledge_type']) ?>"> 
+         <small>(<?=sprintf(_('For example, a street name for a street party pledge')) ?>)</small>
+       </p>
+  <?   }
+} ?>
 
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="40"></p>
 

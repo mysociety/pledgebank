@@ -35,8 +35,9 @@ $topic = get_http_var('topic');
 
     } else {
       
-        $custom_pledge_type_template = OPTION_PB_CUSTOM_TYPE_TEMPLATES_DIR . $topic . ".php";
-        if (preg_match("/^[_a-zA-Z0-9-]+$/i", $topic) && is_readable($custom_pledge_type_template)) {
+      
+        $custom_pledge_type_template = microsites_custom_pledge_template_path($topic);
+        if ($custom_pledge_type_template && is_readable($custom_pledge_type_template)) {
 
           include $custom_pledge_type_template;
         

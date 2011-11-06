@@ -145,6 +145,7 @@ class Pledge {
     function finished() { 
         return $this->data['finished']; 
     } 
+    function ref_in_pledge_type() { return $this->data['ref_in_pledge_type']; }
 
     /* succeeded PLEDGE [LOCK]
      * Has PLEDGE completed successfully? That is, has it as many signers as its
@@ -824,8 +825,12 @@ you the option to unsubscribe from their list at any time.</p>';
             $text .= $countries_code_to_name[$this->country_code()] . ": ";
         }
         $text .= '<a href="' . $this->url_main() . '">';
-        $text .= $this->ref() . '</a>';
-        $text .= '<br>';
+        if ($this->ref_in_pledge_type()) {
+          $text .= $this->ref_in_pledge_type();
+        } else {
+          $text .= $this->ref();
+        }
+        $text .= '</a><br>';
         $text .= $this->sentence($params);
         $text .= '<br><small>' . str_replace(array('(',')'),'',$this->status());
         if (array_key_exists('creatorlinks', $params) && $params['creatorlinks']) {
@@ -1341,5 +1346,24 @@ function pledge_draw_status_plaque($p, $params = array()) {
     }
 }
 
+function pledge_get_ul_list_by_type($pledge_type, $n_columns=1, $ul_css_class="") {
+  # global $pb_today; # in SQL maybe?: date >= '$pb_today' AND 
+  $pledges = pledge_get_list("
+              pledge_type = '$pledge_type'
+              ORDER BY ref_in_pledge_type", array('global'=>false,'main'=>true,'foreign'=>false));
+  $max_pledges_in_each_column = intval((count($pledges)+$n_columns-1)/$n_columns);
+  $ul_tag = "<ul" . ($ul_css_class? " class='$ul_css_class'":'') . ">\n";
+  $retVal = $ul_tag;
+  $i = 0;
+  foreach ($pledges as $p) {
+    if (++$i > $max_pledges_in_each_column) {
+      $retVal .= "</ul>\n$ul_tag";
+      $i=1;
+    }
+    $retVal .= "<li><a href='" . $p->url_main() . "'>" . $p->ref_in_pledge_type() . "</a></li>\n";
+  }
+  $retVal .= '</ul>';
+  return $retVal;
+}
 
 ?>

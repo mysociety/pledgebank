@@ -27,27 +27,20 @@ $topic = get_http_var('topic');
         print '</li></ul></div>';
     } ?>
 <form name="contact" accept-charset="utf-8" action="/contact" method="post"><input type="hidden" name="contactpost" value="1"><input type="hidden" name="ref" value="<?=htmlspecialchars($ref)?>"><input type="hidden" name="referrer" value="<?=htmlspecialchars($referrer)?>"><input type="hidden" name="pledge_id" value="<?=htmlspecialchars($pledge_id)?>"><input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
+  
+  
 <?  if ($comment_id) {
         print h2(_('Report abusive, suspicious or wrong comment'));
         print p(_("Please let us know exactly what is wrong with the comment, and why you think it should be removed."));
-    } elseif ($topic == 'royalwedding') { ?>
 
-      <!-- including royalwedding.php -->
-      <? include 'types/royalwedding.php' ?>       
+    } else {
+      
+        $custom_pledge_type_template = OPTION_PB_CUSTOM_TYPE_TEMPLATES_DIR . $topic . ".php";
+        if (preg_match("/^[_a-zA-Z0-9-]+$/i", $topic) && is_readable($custom_pledge_type_template)) {
+
+          include $custom_pledge_type_template;
         
-    <? } else { ?>
-       
-       <? if ($topic == 'thebiglunch') { ?>
-         
-         <!-- including thebiglunch.php -->
-         <? include 'types/thebiglunch.php' ?>
-         
-      <? } elseif ($topic == 'star_wars') { ?>
-
-         <!-- including star_wars.php -->
-        <? include 'types/star_wars.php' ?>
-
-       <? } else { 
+        } else { 
 
           print h2("Suggest a pledge");
         
@@ -55,8 +48,6 @@ $topic = get_http_var('topic');
           print "<p>What would you like to get done? </p>";
 
         }
-        
-        
         
         print "<p>";
         $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);

@@ -240,7 +240,18 @@ create table pledges (
         cached_prominence = 'normal' or
         cached_prominence = 'frontpage' or
         cached_prominence = 'backpage'
-    )
+    ),
+    
+    -- pledge_type allows custom templates (implemented for Barnet microsite)
+    -- and in particular allows pages to show lists only of these particular types
+    -- Note: values here may be used to map to a template name so will usually be alphanums only.
+    pledge_type text,
+    
+    -- reference used as a display title for a pledge within its type
+    -- for example, in Street Party pledges, this is the Street Name (since that 
+    -- may not be suitable for a ref due to ambiguity/prior use)
+    -- Code generally falls back to using ref if no ref_in_pledge_type is provided, so it's optional
+    ref_in_pledge_type text
 );
 
 -- Contains an entry for each town for which a pledge with target "by area" has

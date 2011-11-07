@@ -167,10 +167,14 @@ function pledge_form_one($data = array(), $errors = array()) {
        </h2>
        <input type="hidden" name="pledge_type" value="<?= htmlspecialchars($data['pledge_type']) ?>" />
        <p><?=sprintf(_('Reference for this pledge amongst other <b>%s</b> pledges:<br/>'), htmlspecialchars($data['pledge_type'])) ?>
-         <input id="ref_in_pledge_type" name="ref_in_pledge_type" value="<? if (isset($data['ref_in_pledge_type'])) print htmlspecialchars($data['ref_in_pledge_type']) ?>"> 
+         <input type="text" id="ref_in_pledge_type" name="ref_in_pledge_type" <? if (array_key_exists('ref_in_pledge_type', $errors)) print 'class="error"' ?> value="<? if (isset($data['ref_in_pledge_type'])) print htmlspecialchars($data['ref_in_pledge_type']) ?>"> 
          <small>(<?=sprintf(_('For example, a street name for a street party pledge')) ?>)</small>
        </p>
-  <?   }
+  <?   } else { ?>
+      <p class="error">
+        <?= sprintf(_('Invalid pledge type for this PledgeBank: %s'), htmlspecialchars($data['pledge_type'])) ?>
+      </p> 
+  <? } 
 } ?>
 
 <p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="40"></p>
@@ -505,7 +509,7 @@ function pledge_form_submitted() {
     }
 
     # Step 1 fixes
-    foreach (array('title', 'target', 'type', 'signup', 'date', 'ref', 'detail', 'name', 'email', 'identity') as $v) {
+    foreach (array('title', 'target', 'type', 'signup', 'date', 'ref', 'detail', 'name', 'email', 'identity', 'pledge_type', 'ref_in_pledge_type') as $v) {
         if (!isset($data[$v])) $data[$v] = '';
     }
     $data['microsite'] = $microsite;
@@ -689,6 +693,17 @@ function step1_error_check($data) {
     }
     if (!$data['title']) $errors['title'] = _('Please enter a pledge');
 
+    if ($data['pledge_type']) {
+      $canonical_pledge_type = microsites_valid_custom_pledge_type($data['pledge_type']);
+      if (is_null($canonical_pledge_type)) {
+        $errors['pledge_type'] = _('That is not a valid custom pledge type for this PledgeBank');
+      } else {
+        if (! $data['ref_in_pledge_type']) {
+          $errors['ref_in_pledge_type'] = _('Please provide a reference to be used to identify this pledge within its type.');
+        }
+      }  
+    }
+    
     $pb_today_arr = explode('-', $pb_today);
     $deadline_limit_years = 5; # in years
     $deadline_limit = date('Y-m-d', mktime(12, 0, 0, $pb_today_arr[1], $pb_today_arr[2], $pb_today_arr[0] + $deadline_limit_years));
@@ -1043,7 +1058,8 @@ function create_new_pledge($P, $data) {
                     lang, location_id, microsite,
                     pin, identity, 
                     prominence, cached_prominence,
-                    via_facebook
+                    via_facebook,
+                    pledge_type, ref_in_pledge_type
                 ) values (
                     ?, ?, ?,
                     ?, ?, ?, ?,
@@ -1053,7 +1069,8 @@ function create_new_pledge($P, $data) {
                     ?, ?, ?,
                     ?, ?,
                     ?, ?,
-                    ?
+                    ?,
+                    ?, ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
                     $data['type'], $data['signup'], $isodate, $data['date'],
@@ -1062,7 +1079,8 @@ function create_new_pledge($P, $data) {
                     $data['lang'], $location_id, $data['microsite'],
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity'],
                     $prominence, $cached_prominence,
-                    $data['facebook_id'] ? 't' : 'f'
+                    $data['facebook_id'] ? 't' : 'f',
+                    microsites_valid_custom_pledge_type($data['pledge_type']), $data['ref_in_pledge_type']
                 ));
 
         if ($data['category'] != -1) {

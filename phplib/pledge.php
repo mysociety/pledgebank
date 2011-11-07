@@ -1346,12 +1346,25 @@ function pledge_draw_status_plaque($p, $params = array()) {
     }
 }
 
-function pledge_get_ul_list_by_type($pledge_type, $n_columns=1, $ul_css_class="") {
+# pledge_get_ul_list_by_type:
+# Returns HTML containing a list of plesges matching the type, broken into one or more <ul>s,
+# with the pledges presented as links using ref_in_pledge_type if possible.
+# This was introduced to allow Barnet's "adopt a street" pledges to be presented by street name,
+# even though in practice the street name cannot always be the pledge's ref.
+# Note: <ul>s were being floated, hence are tantamount to "columns" when displayed.
+#   Args:
+#   pledge_type:        type of pledge (e.g., Barnet's adoptastreet or royalwedding)
+#   n_columns:          how many ul's should the list be returned as 
+#   min_items_for_cols: don't bother breaking (just return on <ul>) for this number of pledges or fewer
+#   ul_css_class:       class to add to the <ul> tag(s), if any
+#
+function pledge_get_ul_list_by_type($pledge_type, $n_columns=1, $min_items_for_cols=3, $ul_css_class="") {
   # global $pb_today; # in SQL maybe?: date >= '$pb_today' AND 
   $pledges = pledge_get_list("
               pledge_type = '$pledge_type'
               ORDER BY ref_in_pledge_type", array('global'=>false,'main'=>true,'foreign'=>false));
-  $max_pledges_in_each_column = intval((count($pledges)+$n_columns-1)/$n_columns);
+  $max_pledges_in_each_column =  count($pledges) <= $min_items_for_cols? 
+                                    count($pledges) : intval((count($pledges)+$n_columns-1)/$n_columns);
   $ul_tag = "<ul" . ($ul_css_class? " class='$ul_css_class'":'') . ">\n";
   $retVal = $ul_tag;
   $i = 0;
@@ -1360,7 +1373,9 @@ function pledge_get_ul_list_by_type($pledge_type, $n_columns=1, $ul_css_class=""
       $retVal .= "</ul>\n$ul_tag";
       $i=1;
     }
-    $retVal .= "<li><a href='" . $p->url_main() . "'>" . $p->ref_in_pledge_type() . "</a></li>\n";
+    $ref =  $p->ref_in_pledge_type();
+    if (empty($ref)) { $ref = $p->ref(); } # use "normal" ref if there is no ref in type available
+    $retVal .= "<li><a href='" . $p->url_main() . "'>" . htmlspecialchars($ref) . "</a></li>\n";
   }
   $retVal .= '</ul>';
   return $retVal;

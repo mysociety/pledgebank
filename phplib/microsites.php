@@ -997,7 +997,7 @@ function microsites_custom_pledge_template_path($topic) {
 
 # whether or not this is an attempt to create a custom pledge type, and if that
 # pledge type is supported by this installation
-# returns false if not, otherwise returns the pledge type
+# returns null if not, otherwise returns the pledge type
 function microsites_valid_custom_pledge_type($pledge_type) {
   if ($pledge_type) {
     $pledge_type_canonical = preg_replace("/[^-a-z0-9_]/", '', strtolower($pledge_type));
@@ -1005,7 +1005,7 @@ function microsites_valid_custom_pledge_type($pledge_type) {
       return $pledge_type_canonical;
     }
   }
-  return false;
+  return null;
 }
 
 

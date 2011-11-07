@@ -62,7 +62,7 @@ $topic = get_http_var('topic');
         <input type="hidden" id="subject" name="subject" value="">
 
         <?
-            if ($topic == 'thebiglunch'){
+            if ($topic == 'thebiglunch' || $topic == 'adoptastreet'){
         ?>
                 <input name="topic" type="hidden" value="<?= $topic ?>" />
                 <p>
@@ -107,6 +107,24 @@ $topic = get_http_var('topic');
    <p>
      After that, it&rsquo;s up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
    </p>
+
+ <? } elseif ($topic=='adoptastreet') { ?>
+
+   <p>The PledgeBank team will . . .</p>
+    <ul>
+      <li>
+        Lorem ipsum dolor sit amet, consectetur adipisicing eli
+      </li>
+      <li>
+          start a pledge page to help encourage people in your street to get involved and invite you to be the first to sign it
+      </li>
+      <li>
+        or, if we&rsquo;ve created one already, we&rsquo;ll let you know so you can sign up to it
+      </li>
+    </ul>
+    <p>
+      After that, it&rsquo;s up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
+    </p>
 
 <? } elseif (! $comment_id ) { ?>
   <p>The PledgeBank team will...</p>

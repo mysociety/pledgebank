@@ -35,7 +35,6 @@ $topic = get_http_var('topic');
 
     } else {
       
-      
         $custom_pledge_type_template = microsites_custom_pledge_template_path($topic);
         if ($custom_pledge_type_template && is_readable($custom_pledge_type_template)) {
 

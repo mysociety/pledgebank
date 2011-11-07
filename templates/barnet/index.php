@@ -43,9 +43,10 @@
   </p>
   <div style="border:1px solid white;">
     <div style="border-top: 4px solid #00ada1;margin-top:1em;">
-      <h3><a href="/type/adoptastreet" title="Adopt a Street" >Adopt Your Street</a></h3>
+      <h3><a href="/type/adoptastreet" title="Adopt a Street" >Adopt a Street</a></h3>
       <p>        
-        We're running a new scheme to support the residents of 10 streets in Barnet:
+        We're supporting residents up to ten streets in Barnet to
+        adopt their street with the following pledges:
         sign up or <a href="/type/adoptastreet">start a pledge</a> to adopt your street!
       </p>
       <?  print pledge_get_ul_list_by_type('adoptastreet'); ?>

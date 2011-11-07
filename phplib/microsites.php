@@ -640,7 +640,9 @@ function microsites_email_message_body_by_topic($topic, $message, $name, $email,
     if ($microsite == 'barnet'){
         if (($topic == 'adoptastreet' || $topic == 'thebiglunch' || $topic == 'royalwedding') && $message) {
             $topicTitle = $topic == 'adoptastreet'? "Adopt-a-Street" : "Street Party";
-            $topicAction = $topic == 'adoptastreet'? "adopt your street" : "organise a street party";
+            $topicAction = $topic == 'adoptastreet'? "adopt your street" : "organise a street party";            
+            $url_for_new_pledge = OPTION_PB_FIXED_SITE_URL . "/new?pledge_type=$topic";
+            
             $phonenumber = '';
             if ($topic == 'thebiglunch') {
                 $topicTitle = "The Big Lunch $topicTitle";
@@ -663,7 +665,7 @@ function microsites_email_message_body_by_topic($topic, $message, $name, $email,
 Request for a $topicTitle pledge in \"$message\".
 $phonenumber
 If there's not already a $topicTitle pledge in this area, please make one!
-http://pledgebank.barnet.gov.uk/new
+$url_for_new_pledge
 
 You can reply to $name at $email with one of these two templated emails:
 

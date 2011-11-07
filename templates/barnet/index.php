@@ -43,23 +43,12 @@
   </p>
   <div style="border:1px solid white;">
     <div style="border-top: 4px solid #00ada1;margin-top:1em;">
-      <a href="http://www.barnet.gov.uk/biglunch" title="about The Big Lunch"><img 
-        alt="The Big Lunch logo" src="/microsites/barnet/the_big_lunch_logo_212_x_90.png" 
-        style="float:right;width:212px;height:90px;border:none;margin:1em;"/></a>
-      <h3><a href="/new/thebiglunch" title="The Big Lunch" >The Big&nbsp;Lunch Street Parties</a></h3>
-      <p>
-        
-        We're supporting street parties in Barnet for the Big Lunch on the <strong>5&nbsp;June</strong> with the following pledges:
-        sign up or <a href="/new/thebiglunch">start a pledge</a> for a party in your street!
+      <h3><a href="/type/adoptastreet" title="Adopt a Street" >Adopt Your Street</a></h3>
+      <p>        
+        We're running a new scheme to support the residents of 10 streets in Barnet:
+        sign up or <a href="/type/adoptastreet">start a pledge</a> to adopt your street!
       </p>
-      <ul style="margin-left:2em;">
-          <li><a href="/corringham-rd-bl">Corringham&nbsp;Road,&nbsp;NW11</a></li>
-          <li><a href="/heath-view-bl">Heath&nbsp;View,&nbsp;N2</a></li>
-          <li><a href="/jackson-rd-bl">Jackson&nbsp;Road,&nbsp;EN4</a></li>
-          <li><a href="/park-rd-bl">Park&nbsp;Road,&nbsp;EN5</a></li>
-          <li><a href="/salcombe-gdns-bl">Salcombe&nbsp;Gardens,&nbsp;NW7</a></li>
-          
-      </ul>
+      <?  print pledge_get_ul_list_by_type('adoptastreet'); ?>
     </div>
   </div>
 </div>  

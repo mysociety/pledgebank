@@ -1018,4 +1018,21 @@ function microsites_valid_custom_pledge_type($pledge_type) {
   return null;
 }
 
+# returns list of valid pldge_types as an array (might be empty if there are none)
+# or null if this option is not enabled for this site
+# A 'valid pledge type' is (currently) simply one for which there is a XXX.php template in the designated directory
+function microsites_get_custom_pledge_types() {
+  $pledge_types = null;
+  if (OPTION_PB_CUSTOM_TYPE_TEMPLATES_DIR) {
+    $pledge_types = array();
+    $files = scandir(OPTION_PB_CUSTOM_TYPE_TEMPLATES_DIR);
+    if ($files) {
+      # in later version of PHP, could use pgrep_filter
+      $pledge_types = preg_grep("/^[-a-z0-9_]+\.php$/", $files);
+      $pledge_types = preg_replace("/\.php$/", "", $pledge_types );      
+    }
+  }
+  return $pledge_types;    
+}
+
 

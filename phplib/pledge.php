@@ -145,6 +145,7 @@ class Pledge {
     function finished() { 
         return $this->data['finished']; 
     } 
+    function pledge_type() { return $this->data['pledge_type']; }
     function ref_in_pledge_type() { return $this->data['ref_in_pledge_type']; }
 
     /* succeeded PLEDGE [LOCK]

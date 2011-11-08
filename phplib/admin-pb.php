@@ -444,6 +444,63 @@ class ADMIN_PAGE_PB_MAIN {
         print "</h2>";
 
         $parity=0;
+
+        $pledge_types =  microsites_get_custom_pledge_types();
+        if ($pledge_types == null) {
+          print "<!-->Custom pledge types not enabled.</-->";
+        } else {
+            print divOddEven($parity++);
+            print "<div class='admin-name'>Type:</div>";
+            print '<div class="admin-value">';
+            print '<form name="pledge_typeform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="update_pledge_type" value="1">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            print '<select id="pledge_type" name="pledge_type">';
+            print ' <option value="0">(none)</option>';
+            foreach ($pledge_types as $p_type) {
+                $sel = '';
+                if ($p_type == $pledge_obj->pledge_type())
+                    $sel = ' selected';
+                print " <option $sel value='$p_type'>$p_type</option>";
+            }
+            print '</select>';
+            print '<input name="update" type="submit" value="Update">';
+            print '</form>';
+            print "</div>";
+            print "</div>";
+            
+            $is_valid_pledge_type = in_array($pledge_obj->pledge_type(), $pledge_types);
+            # report if the actual type isn't one we know about, just in case
+            if ($pledge_obj->pledge_type() and ! $is_valid_pledge_type) {
+                print divOddEven($parity++);            
+                print "<div class='admin-name'>Actual Type:</div>";
+                print '<div class="admin-value">'. $pledge_obj->pledge_type() . ' (not found!)</div>';
+                print "</div>";                
+            }
+
+            print divOddEven($parity++);
+            print "<div class='admin-name'>Ref in Type:</div>";
+            print '<div class="admin-value">';
+            if (! $is_valid_pledge_type && (get_http_var("edit_ref_in_pledge") || $pdata['ref_in_pledge_type'])) {
+                print "Warning: ref in type won't be used until the pledge has a valid pledge type!" . '<br/>';
+            }
+            if (get_http_var("edit_ref_in_pledge")) {
+                print '<form name="ref_in_pledge_typeform" method="post" action="'.$this->self_link.'">';
+                print '<input type="hidden" name="update_ref_in_pledge_type" value="1">';
+                print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+                print '<input type="text" name="ref_in_pledge_type" id="ref_in_pledge_type" value="' . htmlspecialchars($pdata['ref_in_pledge_type']) . '">';
+                print '<input name="update" type="submit" value="Update">';
+                print '</form>';
+            } else {
+                print htmlspecialchars($pdata['ref_in_pledge_type']);
+                if ($pdata['ref_in_pledge_type'])
+                    print "<br/>";
+                print '<a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit_ref_in_pledge=1">Edit ref</a>';
+            }
+            print '</div>';
+            print "</div>";
+        }
+        
         print divOddEven($parity++);
         print "<div class='admin-name'>Set by:</div>";
         print '<div class="admin-value"><a href="?page=pb&amp;person=' . $pdata['person_id'] .'">' . htmlspecialchars($pdata['name']) . "</a>" .
@@ -882,6 +939,28 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         print p(_("<em>Change to pledge prominence saved</em>"));
     }
 
+    function update_pledge_type($pledge_id) {
+        $new_pledge_type = get_http_var('pledge_type');
+        if (!$new_pledge_type || $new_pledge_type == '(none)') {
+            db_query('UPDATE pledges set pledge_type = null where id = ?', array($pledge_id));
+        } else {
+            $pledge_types = microsites_get_custom_pledge_types();
+            if ($pledge_types == null || ! in_array($new_pledge_type, $pledge_types)) {
+                err('Unknown pledge_type: ' . htmlspecialchars($new_pledge_type));
+            }
+            db_query('UPDATE pledges set pledge_type = ? where id = ?', array($new_pledge_type, $pledge_id));
+        }
+        db_commit();
+        print p(_("<em>Change to pledge type saved</em>"));
+    }
+    
+    function update_ref_in_pledge_type($pledge_id) {
+        $new_ref_in_pledge_type = get_http_var('ref_in_pledge_type');
+        db_query('UPDATE pledges set ref_in_pledge_type = ? where id = ?', array($new_ref_in_pledge_type, $pledge_id));
+        db_commit();
+        print p(_("<em>Change to ref in pledge type saved</em>"));
+    }
+
     function update_microsite($pledge_id) {
         global $microsites_list;
         $new_microsite = get_http_var('microsite');
@@ -1023,6 +1102,12 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         if (get_http_var('update_prom')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_prominence($pledge_id);
+        } elseif (get_http_var('update_pledge_type')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_pledge_type($pledge_id); 
+        } elseif (get_http_var('update_ref_in_pledge_type')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_ref_in_pledge_type($pledge_id);
         } elseif (get_http_var('update_microsite')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_microsite($pledge_id);

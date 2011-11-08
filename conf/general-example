@@ -103,6 +103,11 @@ define('OPTION_GOOGLE_MAPS_API_KEY', '');
 define('OPTION_PB_PRELOADED_IMAGES_DIR', '/path_to_pledgebank/web/microsites/barnet/preloaded/');
 define('OPTION_PB_PRELOADED_IMAGES_URL', 'http://this_base_domain/microsites/barnet/preloaded/');
 
+// Where custom templates are used for different pledge types, specify the directory
+// where the templates can be found (or leave blank if this site isn't using this facility)
+// (for example, to enable for Barnet, use '/path_to_pledgebank/templates/barnet/types/')
+define('OPTION_PB_CUSTOM_TYPE_TEMPLATES_DIR', '');
+
 // Log file (used in test harness, and later in admin scripts)
 define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');
 

@@ -6,13 +6,43 @@
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 
 ?>
-
+<style type="text/css">
+    #currentpledges .barnet-street-pledges {
+        margin: -1em 0 1em 15px;
+        border-bottom: 4px solid #00ada1;">
+    }
+    #currentpledges .barnet-street-pledges p {
+        margin-bottom: 0.3em;
+    }
+    #currentpledges .barnet-street-pledges ul {
+        margin:0;
+        padding:0 0 0.5em 0;
+        float: left;
+        width: 48%;
+        font-size: 110%;
+    }
+    
+</style>
 <h2>Barnet PledgeBank is a site to get things done.</h2>
 
 <div id="currentpledges">
+    
+    <ul class="search_results">
+        <li><a href="/type/adoptastreet" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/adopt_a_street.jpg);"></div></a><a href="/type/adoptastreet">Adopt-a-Street pledges</a><br>
+        </li>
+    </ul>
+    <div class="barnet-street-pledges">
+        <p>
+            We're supporting residents up to ten streets in Barnet to
+            adopt their street with the following pledges:
+            sign up or <a href="/type/adoptastreet">start a pledge</a> to adopt your street!
+        </p>
+        <?  print pledge_get_ul_list_by_type('adoptastreet', 2); ?>
+        <div style='clear:both;height:0.3em'></div>
+    </div>
 <?
     global $pb_today;
-    $pledges = pledge_get_list("date >= '$pb_today'",
+    $pledges = pledge_get_list("date >= '$pb_today' AND pledge_type is null",
         array('global'=>false, 'main'=>true, 'foreign'=>false)
     );
     print format_pledge_list($pledges, array('firstperson' => 'includename', 'iconpath' => '/microsites/barnet/'));
@@ -41,6 +71,7 @@
     bit for the community. By working together, we can offer services that
     are popular and worthwhile.
   </p>
+  <!--
   <div style="border:1px solid white;">
     <div style="border-top: 4px solid #00ada1;margin-top:1em;">
       <h3><a href="/type/adoptastreet" title="Adopt a Street" >Adopt a Street</a></h3>
@@ -52,4 +83,5 @@
       <?  print pledge_get_ul_list_by_type('adoptastreet'); ?>
     </div>
   </div>
+  -->
 </div>  

@@ -84,3 +84,5 @@
 <h3>
     Note: Deadline for applications is now closed
 </h3> 
+<!-- note: no contact form now, submissions are closed -->
+

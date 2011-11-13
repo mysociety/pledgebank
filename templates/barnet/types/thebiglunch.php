@@ -60,3 +60,19 @@
     If there&rsquo;s not already a pledge for your road, simply start one. 
     Ideally, you&rsquo;ll need to get a minimum of 3&nbsp;households involved. 
 </p>
+<? print_contact_form($name, $email, $topic, true) ?>
+<p>The PledgeBank team will . . .</p>
+<ul>
+   <li>
+       email you the <a href="http://www.barnet.gov.uk/Big-Lunch-A4-Form-web.pdf">Big Lunch street party application form</a> you will need to close off your street
+   </li>
+   <li>
+       start a pledge page to help encourage people in your street to get involved and invite you to be the first to sign it
+   </li>
+   <li>
+     or, if we&rsquo;ve created one already, we&rsquo;ll let you know so you can sign up to it
+   </li>
+</ul>
+<p>
+   After that, it&rsquo;s up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
+</p>

@@ -33,8 +33,7 @@
     </ul>
     <div class="barnet-street-pledges">
         <p>
-            We're supporting residents up to ten streets in Barnet to
-            adopt their street with the following pledges:
+            Barnet Council will support street adoption for 10 streets if at least six households in the street sign up to get involved:
             sign up or <a href="/type/adoptastreet">start a pledge</a> to adopt your street!
         </p>
         <?  print pledge_get_ul_list_by_type('adoptastreet', 2); ?>

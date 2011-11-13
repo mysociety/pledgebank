@@ -14,10 +14,9 @@
                     <li><strong>PledgeBank</strong>
                       <ul>
                           <li><a href="/">Introduction</a></li>
-                          <li><a href="/type/adoptastreet">Adopt a steet</a></li>
+                          <li><a href="/type/adoptastreet">Adopt-a-Street</a></li>
                           <li><a href="/HendonIT">Provide computer training</a></li>
                           <li><a href="/GreenManClearing">Clear a patch of land</a></li>
-                          <li><a href="/GreenManDays">Help the Green Man</a></li>
                           <li><a href="/KingEdwardLitter">Pick up litter</a></li>
                           <li><a href="/WycherleyGrit">Grit a street</a></li>
                           <li><a href="/new/royalwedding">Royal wedding street parties</a></li>

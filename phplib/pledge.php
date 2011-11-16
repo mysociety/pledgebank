@@ -1356,7 +1356,7 @@ function pledge_draw_status_plaque($p, $params = array()) {
 #   Args:
 #   pledge_type:        type of pledge (e.g., Barnet's adoptastreet or royalwedding)
 #   n_columns:          how many ul's should the list be returned as 
-#   min_items_for_cols: don't bother breaking (just return on <ul>) for this number of pledges or fewer
+#   min_items_for_cols: don't bother breaking (just return one <ul>) for this number of pledges or fewer
 #   ul_css_class:       class to add to the <ul> tag(s), if any
 #
 function pledge_get_ul_list_by_type($pledge_type, $n_columns=1, $min_items_for_cols=3, $ul_css_class="") {

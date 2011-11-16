@@ -63,27 +63,34 @@ if (sizeof($errors)) {
   // e.g. if a pledge_type stops accepting submissions (end of project), can remove print_contact_form from the type's template
 
 function print_contact_form($name, $email, $topic, $want_street_and_phone_number) {
-    print "<p>";
+    $pledge_type_details = microsites_get_pledge_type_details($topic);
     $contact_email = str_replace('@', '&#64;', OPTION_CONTACT_EMAIL);
     printf(_('If you prefer, you can email %s instead of using the form.'), '<a href="mailto:' . $contact_email . '">' . $contact_email . '</a>');
     print "</p>";
 ?>
-    <p><label for="name"><?=_('Your name:') ?></label> <input type="text" id="name" name="name" value="<?=htmlspecialchars($name) ?>" size="30">
+    <p><label for="name"><?=_('Your name:') ?></label> 
+      <input type="text" id="name" name="name" value="<?=htmlspecialchars($name) ?>" size="30">
+    </p>
     <p><label for="e"><?=_('Your email:') ?></label> <input type="text" id="e" name="e" value="<?=htmlspecialchars($email) ?>" size="30"></p>
     <input type="hidden" id="subject" name="subject" value="">
-    <? if ($want_street_and_phone_number){ ?>
-        <input name="topic" type="hidden" value="<?= $topic ?>" />
-        <p>
-            <label for="message">Your street:</label> <input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
-            <br/>
-            <span style="padding-left:5em; font-size:90%;">(it helps us if you include your&nbsp;postcode)</span>
-        </p>
-        <p>
-            <label for="custom">Your phone number:</label> <input id="custom" name="custom" type="text" value="<?=htmlspecialchars(get_http_var('custom', true)) ?>" size="20"/>
-            <br/>
-            <span style="padding-left:5em; font-size:90%;">(optional, but it&rsquo;s really handy if we can call you&nbsp;too)</span>
-        </p>
-    <? } else { ?>
+    <? if ($pledge_type_details['is_valid']){ ?>
+      <input name="topic" type="hidden" value="<?= $topic ?>" />
+    <? } ?>
+    <? if ($pledge_type_details['ref_label']){ ?>
+          <p>
+              <label for="message"><?= $pledge_type_details['ref_label'] ?>:</label> <input id="message" name="message" type="text" value="<?=htmlspecialchars(get_http_var('message', true)) ?>" size="30"/>
+              <br/>
+              <span style="padding-left:5em; font-size:90%;"><?= $pledge_type_details['ref_note'] ?></span>
+          </p>
+    <? } ?>
+    <? if ($pledge_type_details['use_custom_field']){ ?>
+          <p>
+              <label for="custom">Your phone number:</label> <input id="custom" name="custom" type="text" value="<?=htmlspecialchars(get_http_var('custom', true)) ?>" size="20"/>
+              <br/>
+              <span style="padding-left:5em; font-size:90%;">(optional, but it&rsquo;s really handy if we can call you&nbsp;too)</span>
+          </p>
+    <? } ?>
+    <? if (! $pledge_type_details['ref_label']){ ?>
         <p><label for="message">Your suggestion:</label>
         <br/>
         <textarea rows="7" cols="40" name="message" id="message"><?=htmlspecialchars(get_http_var('message', true)) ?></textarea></p>

@@ -620,12 +620,8 @@ function microsites_chivvy_sql() {
 function microsites_email_subject_by_topic($topic, $subject) {
     global $microsite;
     if ($microsite == 'barnet'){
-        if ($topic == 'royalwedding'){
-            return 'Barnet PledgeBank: Royal Wedding Street Party request';
-        } elseif ($topic == 'thebiglunch'){
-            return 'Barnet PledgeBank: The Big Lunch Street Party request';
-        } elseif ($topic == 'adoptastreet'){
-            return 'Barnet PledgeBank: Adopt-a-Street request';
+        if (microsites_get_pledge_type_details($topic, 'is_valid')) {
+            return 'Barnet PledgeBank: ' . microsites_get_pledge_type_details($topic, 'title') . ' request';
         } else {
             return 'Barnet PledgeBank suggestion';
         }        
@@ -639,33 +635,27 @@ function microsites_email_subject_by_topic($topic, $subject) {
 function microsites_email_message_body_by_topic($topic, $message, $name, $email, $custom_field) {
     global $microsite;
     if ($microsite == 'barnet'){
-        if (($topic == 'adoptastreet' || $topic == 'thebiglunch' || $topic == 'royalwedding') && $message) {
-            $topicTitle = $topic == 'adoptastreet'? "Adopt-a-Street" : "Street Party";
-            $topicAction = $topic == 'adoptastreet'? "adopt your street" : "organise a street party";            
+        if ($message && microsites_get_pledge_type_details($topic, 'is_valid')) {
+            $pledge_details = microsites_get_pledge_type_details($topic);
+            $topicTitle = $pledge_details['title'];
+            $topicAction = $pledge_details['action'];            
             $url_for_new_pledge = OPTION_PB_FIXED_SITE_URL . "/new?pledge_type=$topic";
             
-            $phonenumber = '';
-            if ($topic == 'thebiglunch') {
-                $topicTitle = "The Big Lunch $topicTitle";
-                if ($custom_field) {
-                    $phonenumber = "Phone number: $custom_field\n";                    
-                } else {
-                    $phonenumber = "No phone number provided\n";
-                }
-            } elseif ($topic == 'royalwedding') {
-                $topicTitle = "Royal Wedding $topicTitle";
-            } elseif ($topic == 'adoptastreet') {
-              if ($custom_field) {
-                  $phonenumber = "Phone number: $custom_field\n";                    
-              } else {
-                  $phonenumber = "No phone number provided\n";
-              }                
+            $custom_field_str = "(not provided)";
+            if ($pledge_details['use_custom_field']) {
+                $custom_field_str = $pledge_details['custom_field_name'] . ": " 
+                    . ($custom_field? $custom_field : "(not provided)");
             }
+            $indefinite_article = preg_match("/^[aeiou]/i", $topicTitle)? "an" : "a"; 
+            $summary = sprintf($pledge_details["summary_f"], $topicAction, $message);
             $message = "
 
 Request for a $topicTitle pledge in \"$message\".
-$phonenumber
-If there's not already a $topicTitle pledge in this area, please make one!
+
+Submitted by: $name ($email)
+$custom_field_str
+
+If there's not already $indefinite_article $topicTitle pledge in this area, please make one!
 $url_for_new_pledge
 
 You can reply to $name at $email with one of these two templated emails:
@@ -676,7 +666,7 @@ You can reply to $name at $email with one of these two templated emails:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Hello $name
 
-Thank you for stepping up to the mark to try to $topicAction in $message.
+Thank you for stepping up to the mark to try to $summary.
 
 We've made a new pledge for you here: 
 
@@ -693,7 +683,7 @@ Barnet Council PledgeBank team
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Hello $name
 
-Thank you for volunteering to $topicAction in $message.
+Thank you for volunteering to $summary.
 
 We're pleased to tell you such a pledge has already been started:
 
@@ -714,14 +704,15 @@ Barnet Council PledgeBank team
  * returns error message for blank email field based on topic 
  * (or passes error message back unchanged if there is none)
  * 
- * Currently this is only used for Barnet's royal wedding, where the message payload is actually the street name
+ * Currently this is only used for Barnet's pledge_types, where 
+ * the message payload is actually the street name
  */
 function microsites_email_error_msg_by_topic($topic, $subject, $error_message) {
     global $microsite;
     if ($microsite == 'barnet'){
-        if (($topic == 'royalwedding' || $topic == 'thebiglunch' || $topic == 'adoptastreet') && $subject == 'message'){
-            return 'Please enter the name of your street';
-        }        
+        if (microsites_get_pledge_type_details($topic, 'is_valid') && $subject == 'message') {
+            return microsites_get_pledge_type_details($topic, 'ref_error_msg'); 
+        }
     }
     return $error_message;
 }
@@ -735,9 +726,86 @@ function microsites_email_error_msg_by_topic($topic, $subject, $error_message) {
  */
 function microsites_email_send_from_users_address($topic) {
     global $microsite;
-    if ($microsite == 'barnet' && ($topic == 'royalwedding' || $topic == 'thebiglunch' || $topic == 'adoptastreet')) return false;
+    if ($microsite == 'barnet' && microsites_get_pledge_type_details($topic, 'is_valid')) return false;
     return true;
 }
+
+#############################################################################
+# pledge_type stuff
+# It's increasingly clear this should really be in the database, but for
+# now just hard-coding it so we can see how it pans out. Furthermore, 
+# pledge_type isn't really a microsite issue, but the fact is that it is only 
+# being used on the Barnet microsite right now.
+#----------------------------------------------------------------------------
+# microsites_get_pledge_type_details
+# returns customisable things that depend on pledge_type, either as a complete
+# hash (if no key is provided) or as a single value if a key is provided.
+#
+# Additional fields that the templates might one day need, but are currently
+# being assumed or hardcoded (examples only):
+#
+#   "image_url"        => "/microsites/barnet/preloaded/frosty_pine_needles.jpg"
+
+function microsites_get_pledge_type_details($pledge_type, $key=null) {
+    $details = null;
+    global $microsite;
+    $defaults = array(
+        "is_valid"         => true,
+        "use_custom_field" => true,
+        "custom_mandatory" => false,
+        "custom_field_name"=> "Phone number",
+        "custom_label"     => "Your phone number",
+        "custom_note"      => "(optional, but it’s really handy if we can call you too)",
+        "ref_label"        => "Your street",
+        "ref_error_msg"    => "Please enter the name of your street",
+        "ref_note"         => "(it helps us if you include your postcode)",
+        "summary_f"        => "%s (%s)" # sprintf(this, action, message) -- clumsy way of displaying "Street Party in Acacia Avenue"
+    );
+    if ($microsite == 'barnet') {
+        switch ($pledge_type) {
+            case "adoptastreet":
+                $details = array_merge($defaults, array(
+                    "title"     => "Adopt-a-Street",
+                    "action"    => "adopt your street"
+                ));
+                break;
+            case "grit_my_school":
+                $details = array_merge($defaults, array(
+                    "title"     => "Grit My School",
+                    "ref_label" => "Your school",
+                    "action"    => "grit your school",
+                    "ref_note"  => "(it helps us if you include the school's postcode, but don't worry if you don't know it)",
+                    "ref_error_msg" => "Please enter the name of your school"
+                ));
+                break;
+            case "grit_my_street":
+                $details = array_merge($defaults, array(
+                    "title"     => "Grit My Street",
+                    "action"    => "grit your street"
+                ));
+                break;
+            case "thebiglunch":
+                $details = array_merge($defaults, array(
+                    "title"     => "The Big Lunch Street Party",
+                    "action"    => "organise %s in %s",
+                ));
+                break;
+            case "royalwedding":
+                $details = array_merge($defaults, array(
+                    "title"     => "Royal Wedding Street Party",
+                    "action"    => "organise a %s in %s",
+                ));
+                break;
+        }
+    }
+    if ($key) {
+      return $details[$key];
+    } else {
+      return $details;
+    }
+}
+
+
 
 #############################################################################
 # Pledge indices

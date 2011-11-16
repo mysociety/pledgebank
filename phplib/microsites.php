@@ -750,6 +750,9 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
     $details = null;
     global $microsite;
     $defaults = array(
+                              # note: we could run  
+                              # is_valid => microsites_valid_custom_pledge_type($pledge_type)
+                              # which tests for the presence of the template, but seems a bit heavy-handed
         "is_valid"         => true,
         "use_custom_field" => true,
         "custom_mandatory" => false,
@@ -772,8 +775,8 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
             case "grit_my_school":
                 $details = array_merge($defaults, array(
                     "title"     => "Grit My School",
-                    "ref_label" => "Your school",
                     "action"    => "grit your school",
+                    "ref_label" => "Your school",
                     "ref_note"  => "(it helps us if you include the school's postcode, but don't worry if you don't know it)",
                     "ref_error_msg" => "Please enter the name of your school"
                 ));
@@ -787,13 +790,15 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
             case "thebiglunch":
                 $details = array_merge($defaults, array(
                     "title"     => "The Big Lunch Street Party",
-                    "action"    => "organise %s in %s",
+                    "action"    => "organise a Big Lunch street party",
+                    "summary_f" => "%s in %s"
                 ));
                 break;
             case "royalwedding":
                 $details = array_merge($defaults, array(
                     "title"     => "Royal Wedding Street Party",
-                    "action"    => "organise a %s in %s",
+                    "action"    => "organise a Royal Wedding street party",
+                    "summary_f" => "%s in %s"
                 ));
                 break;
         }
@@ -1087,7 +1092,7 @@ function microsites_valid_custom_pledge_type($pledge_type) {
   return null;
 }
 
-# returns list of valid pldge_types as an array (might be empty if there are none)
+# returns list of valid pledge_types as an array (might be empty if there are none)
 # or null if this option is not enabled for this site
 # A 'valid pledge type' is (currently) simply one for which there is a XXX.php template in the designated directory
 function microsites_get_custom_pledge_types() {

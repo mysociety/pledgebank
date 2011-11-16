@@ -551,3 +551,18 @@ ol#breadcrumbs li.hilight em {
 #ms-explicit-party-list ul li a {
   padding-left:16px;
 }
+
+#currentpledges .barnet-type-pledges {
+    margin: -1em 0 1em 15px;
+    border-bottom: 4px solid #00ada1;">
+}
+#currentpledges .barnet-type-pledges p {
+    margin-bottom: 0.3em;
+}
+#currentpledges .barnet-type-pledges ul {
+    margin:0;
+    padding:0 0 0.5em 0;
+    float: left;
+    width: 48%;
+    font-size: 110%;
+}

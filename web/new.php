@@ -132,8 +132,12 @@ function pledge_form_one($data = array(), $errors = array()) {
         $data['identity'] = 'picnic lover';
     }
 
-    $data['pledge_type'] = get_http_var('pledge_type');
-
+    if (get_http_var('pledge_type')) {
+        $data['pledge_type'] = get_http_var('pledge_type');
+    } else {
+        if (!array_key_exists('pledge_type', $data)) $data['pledge_type'] = '';
+    }
+    
     // Can introduce initial tags via URL parameters
     if (get_http_var('tags')) {
         $data['tags'] = get_http_var('tags');
@@ -507,7 +511,7 @@ function pledge_form_submitted() {
     
     if (array_key_exists('data', $data)) {
         $alldata = unserialize(base64_decode($data['data']));
-        if (!$alldata) err(_('Transferring the data from previous page failed :('));
+        if (!$alldata) err(_('Transferring the data from previous page failed :('));        
         unset($data['data']);
         $data = array_merge($alldata, $data);
     }

@@ -650,7 +650,7 @@ function microsites_email_message_body_by_topic($topic, $message, $name, $email,
             $summary = sprintf($pledge_details["summary_f"], $topicAction, $message);
             $message = "
 
-Request for a $topicTitle pledge in \"$message\".
+Request for $indefinite_article $topicTitle pledge for: \"$message\".
 
 Submitted by: $name ($email)
 $custom_field_str

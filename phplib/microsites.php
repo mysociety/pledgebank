@@ -255,6 +255,7 @@ function microsite_preloaded_images($key, $pledge_microsite = NULL){
             "the_big_lunch.jpg"  => "The Big Lunch street party",
             "daisy_field.jpg"    => "Field of dog daisies",
             "frosty_flower.jpg"  => "Frosty flower",
+            "frosty_pine_needles.jpg"  => "Frosty pine_needles",
             "hendon_library.jpg" => "Hendon library",
             "purple_flower.jpg"  => "Purple flower", 
             "royal_wedding.jpg"  => "Royal Wedding street party",

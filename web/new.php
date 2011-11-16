@@ -1056,6 +1056,15 @@ function create_new_pledge($P, $data) {
         if (in_array($data['microsite'], $microsites_no_pledge_field)) {
             $data['microsite'] = null;
         }
+        
+        $pledge_type = microsites_valid_custom_pledge_type($data['pledge_type']);
+        if (microsites_get_pledge_type_details($pledge_type, 'is_valid')) {
+            $picture = microsites_get_pledge_type_details($pledge_type, 'default_image_url');
+            if ($picture == "") $picture = null; 
+        } else {
+            $picture = null;
+        }
+        
         db_query('
                 insert into pledges (
                     id, title, target,
@@ -1067,7 +1076,8 @@ function create_new_pledge($P, $data) {
                     pin, identity, 
                     prominence, cached_prominence,
                     via_facebook,
-                    pledge_type, ref_in_pledge_type
+                    pledge_type, ref_in_pledge_type,
+                    picture
                 ) values (
                     ?, ?, ?,
                     ?, ?, ?, ?,
@@ -1078,7 +1088,8 @@ function create_new_pledge($P, $data) {
                     ?, ?,
                     ?, ?,
                     ?,
-                    ?, ?
+                    ?, ?,
+                    ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
                     $data['type'], $data['signup'], $isodate, $data['date'],
@@ -1088,7 +1099,8 @@ function create_new_pledge($P, $data) {
                     $data['pin'] ? sha1($data['pin']) : null, $data['identity'],
                     $prominence, $cached_prominence,
                     $data['facebook_id'] ? 't' : 'f',
-                    microsites_valid_custom_pledge_type($data['pledge_type']), $data['ref_in_pledge_type']
+                    $pledge_type, $data['ref_in_pledge_type'],
+                    $picture
                 ));
 
         if ($data['category'] != -1) {

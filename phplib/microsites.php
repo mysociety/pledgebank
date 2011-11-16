@@ -741,11 +741,6 @@ function microsites_email_send_from_users_address($topic) {
 # returns customisable things that depend on pledge_type, either as a complete
 # hash (if no key is provided) or as a single value if a key is provided.
 #
-# Additional fields that the templates might one day need, but are currently
-# being assumed or hardcoded (examples only):
-#
-#   "image_url"        => "/microsites/barnet/preloaded/frosty_pine_needles.jpg"
-
 function microsites_get_pledge_type_details($pledge_type, $key=null) {
     $details = null;
     global $microsite;
@@ -755,13 +750,14 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                               # which tests for the presence of the template, but seems a bit heavy-handed
         "is_valid"         => true,
         "use_custom_field" => true,
-        "custom_mandatory" => false,
+        "custom_mandatory" => false, # not used, but should be
         "custom_field_name"=> "Phone number",
         "custom_label"     => "Your phone number",
         "custom_note"      => "(optional, but it’s really handy if we can call you too)",
         "ref_label"        => "Your street",
         "ref_error_msg"    => "Please enter the name of your street",
         "ref_note"         => "(it helps us if you include your postcode)",
+        "default_image_url"=> "",
         "summary_f"        => "%s (%s)" # sprintf(this, action, message) -- clumsy way of displaying "Street Party in Acacia Avenue"
     );
     if ($microsite == 'barnet') {
@@ -769,7 +765,8 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
             case "adoptastreet":
                 $details = array_merge($defaults, array(
                     "title"     => "Adopt-a-Street",
-                    "action"    => "adopt your street"
+                    "action"    => "adopt your street",
+                    "default_image_url" => microsite_preloaded_image_url('adopt_a_street.jpg')                   
                 ));
                 break;
             case "grit_my_school":
@@ -778,13 +775,15 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                     "action"    => "grit your school",
                     "ref_label" => "Your school",
                     "ref_note"  => "(it helps us if you include the school's postcode, but don't worry if you don't know it)",
-                    "ref_error_msg" => "Please enter the name of your school"
+                    "ref_error_msg" => "Please enter the name of your school",
+                    "default_image_url" => microsite_preloaded_image_url('frosty_pine_needles.jpg')                   
                 ));
                 break;
             case "grit_my_street":
                 $details = array_merge($defaults, array(
                     "title"     => "Grit My Street",
                     "action"    => "grit your street"
+                    "default_image_url" => microsite_preloaded_image_url('frosty_flower.jpg')                   
                 ));
                 break;
             case "thebiglunch":

@@ -161,14 +161,18 @@ function pledge_form_one($data = array(), $errors = array()) {
 
 <? if ($data['pledge_type']) {
      $canonical_pledge_type = microsites_valid_custom_pledge_type($data['pledge_type']);
-     if ($canonical_pledge_type) { ?>
+     if (microsites_get_pledge_type_details($canonical_pledge_type, 'is_valid')) { ?>
        <h2>
           <?= sprintf(_('This is a custom "%s" pledge.'), htmlspecialchars($data['pledge_type'])); ?>
        </h2>
-       <input type="hidden" name="pledge_type" value="<?= htmlspecialchars($data['pledge_type']) ?>" />
-       <p><?=sprintf(_('Reference for this pledge amongst other <b>%s</b> pledges:<br/>'), htmlspecialchars($data['pledge_type'])) ?>
+       <input type="hidden" name="pledge_type" value="<?= $canonical_pledge_type ?>" />
+       <p>
+         <?= microsites_get_pledge_type_details( $canonical_pledge_type, 'ref_label') .":" ?>
          <input type="text" id="ref_in_pledge_type" name="ref_in_pledge_type" <? if (array_key_exists('ref_in_pledge_type', $errors)) print 'class="error"' ?> value="<? if (isset($data['ref_in_pledge_type'])) print htmlspecialchars($data['ref_in_pledge_type']) ?>"> 
-         <small>(<?=sprintf(_('For example, a street name for a street party pledge')) ?>)</small>
+         <small>
+             <?=sprintf(_('(This is the reference for this pledge amongst other <b>%s</b> pledges '
+              . '&mdash; for example, a street name for a street party pledge) '), htmlspecialchars($data['pledge_type'])) ?>
+         </small>
        </p>
   <?   } else { ?>
       <p class="error">

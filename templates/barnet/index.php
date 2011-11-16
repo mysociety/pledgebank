@@ -11,6 +11,8 @@
 
 <div id="currentpledges">
     
+    <!-- ============================= adopt a street ================================ -->
+    
     <ul class="search_results">
         <li><a href="/type/adoptastreet" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/adopt_a_street.jpg);"></div></a><a href="/type/adoptastreet">Adopt-a-Street pledges</a><br>
         </li>
@@ -24,8 +26,9 @@
         <div style='clear:both;height:0.3em'></div>
     </div>
 
+    <!-- ============================= grit_my_school ================================ -->
     <ul class="search_results">
-        <li><a href="/type/adoptastreet" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_pine_needles.jpg);"></div></a><a href="/type/grit_my_school">School gritting pledges</a><br>
+        <li><a href="/type/grit_my_school" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_pine_needles.jpg);"></div></a><a href="/type/grit_my_school">School gritting pledges</a><br>
         </li>
     </ul>
     <div class="barnet-type-pledges">
@@ -38,8 +41,10 @@
         <div style='clear:both;height:0.3em'></div>
     </div>
 
+    <!-- ============================= grit my street ================================ -->
+
     <ul class="search_results">
-        <li><a href="/type/adoptastreet" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/grit_my_street">Street gritting pledges</a><br>
+        <li><a href="/type/grit_my_street" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/grit_my_street">Street gritting pledges</a><br>
         </li>
     </ul>
     <div class="barnet-type-pledges">
@@ -51,6 +56,8 @@
         <?  print pledge_get_ul_list_by_type('grit_my_street', 2); ?>
         <div style='clear:both;height:0.3em'></div>
     </div>
+
+    <!-- ============================= standalone pledges ================================ -->
 
 <?
     global $pb_today;

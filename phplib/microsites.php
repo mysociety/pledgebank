@@ -782,7 +782,7 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
             case "grit_my_street":
                 $details = array_merge($defaults, array(
                     "title"     => "Grit My Street",
-                    "action"    => "grit your street"
+                    "action"    => "grit your street",
                     "default_image_url" => microsite_preloaded_image_url('frosty_flower.jpg')                   
                 ));
                 break;

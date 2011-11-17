@@ -797,7 +797,7 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                     "preloaded_data" => array(
                         "name"   => "Barnet Council",
                         "title"  => "provide grit, spreading equipment and public liability insurance (where needed) to %s",
-                        "target" => 3,
+                        "target" => 4,
                         "type"   => "volunteers",
                         "signup" => "agree to spread the grit"
                     )
@@ -811,8 +811,8 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                     "preloaded_data" => array(
                         "name"   => "Barnet Council",
                         "title"  => "provide grit, spreading equipment and public liability insurance (where needed) to %s",
-                        "target" => 3,
-                        "type"   => "volunteers",
+                        "target" => 4,
+                        "type"   => "residents",
                         "signup" => "agree to spread the grit"
                     )
                 ));

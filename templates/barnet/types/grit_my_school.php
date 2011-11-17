@@ -8,16 +8,16 @@
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
 <div style="font-size:1.126em;padding-bottom:0.25em;">
-  <p style="font-weight:bold;">
-    Barnet Council will assist residents clearing snow by offering grit and spreading equipment. 
-    Residents must agree to become community grit keepers and get as many people to sign up to a pledge. 
-  </p>
-  <p>
-    Health and Safety advice is provided and insurance cover is arranged. 
-  </p>
-  <p> 
-    Schools have the chance to take part and get parents and volunteers 
-    to help clear access to the school and playgrounds. 
+    <p style="font-weight:bold;">
+        Barnet Council will support volunteers who wish to clear snow by offering grit and spreading equipment. 
+        Four volunteers must sign up to the pledge (one of whom will be the community grit keeper).  
+    </p>
+    <p>
+        The council will provide advice and insurance cover.
+    </p>
+    <p> 
+        Schools have the chance to take part and get parents and volunteers 
+        to help clear access to the school and playgrounds. 
   </p>
   <p>
     If you would like to volunteer, you need to sign up to a pledge. If you can’t see your school, 
@@ -36,7 +36,7 @@
   </h3>
   <p>
   If there’s not already a pledge for your school, simply start one. 
-  You will need to get a minimum of 3 volunteers involved for the pledge to be successful.
+  You will need to get a minimum of 4 volunteers involved for the pledge to be successful.
   </p>
 </div>
 <ul style="font-size:1.126em;margin-bottom:2em;">
@@ -47,9 +47,6 @@
 </ul>
 <? print_contact_form($name, $email, $topic, true) ?>
 <ul>
-    <li>
-        Read our check list of ‘things to consider’ when becoming a grit keeper
-    </li>
     <li>
         Fill in the request form
     </li>

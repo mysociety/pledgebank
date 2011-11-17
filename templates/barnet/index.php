@@ -25,7 +25,37 @@
         <?  print pledge_get_ul_list_by_type('adoptastreet', 2); ?>
         <div style='clear:both;height:0.3em'></div>
     </div>
+    
+    <!-- ============================= grit my street ================================ -->
+    <ul class="search_results">
+        <li><a href="/type/grit_my_street" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/grit_my_street">Street gritting pledges</a><br>
+        </li>
+    </ul>
+    <div class="barnet-type-pledges">
+        <p>
+            Barnet Council will support residents who wish to clear snow by offering grit and spreading equipment. 
+            Four residents must sign up to the pledge (one of whom will be the community grit keeper):            
+            sign up or <a href="/type/grit_my_street">start a pledge</a> to grit your street!
+        </p>
+        <?  print pledge_get_ul_list_by_type('grit_my_street', 2); ?>
+        <div style='clear:both;height:0.3em'></div>
+    </div>
 
+     <!-- ============================= grit_my_school ================================ -->
+    <ul class="search_results">
+        <li><a href="/type/grit_my_school" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/grit_my_school">School gritting pledges</a><br>
+        </li>
+    </ul>
+    <div class="barnet-type-pledges">
+        <p>
+            Barnet Council will support volunteers who wish to clear snow by offering grit and spreading equipment.
+            Four volunteers must sign up to the pledge (one of whom will be the community grit keeper):
+            sign up or <a href="/type/grit_my_street">start a pledge</a> to grit your street!
+        </p>
+         <?  print pledge_get_ul_list_by_type('grit_my_school', 2); ?>
+         <div style='clear:both;height:0.3em'></div>
+    </div>
+    
     <!-- ============================= standalone pledges ================================ -->
 
 <?

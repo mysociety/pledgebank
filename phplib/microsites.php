@@ -778,7 +778,11 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                     "action"    => "adopt your street",
                     "default_image_url" => microsite_preloaded_image_url('adopt_a_street.jpg'),
                     "preloaded_data" => array(
-                        "name"   => "Barnet Council" # add more items when confirmed
+                        "name"   => "Barnet Council",
+                        "title"  => "provide training and equipment to %s",
+                        "target" => 3,
+                        "type"   => "residents",
+                        "signup" => "agree to adopt their street"
                     )
                 ));
                 break;

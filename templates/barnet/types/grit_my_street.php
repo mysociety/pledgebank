@@ -26,12 +26,12 @@
      What you need to do: Sign up to a pledge!
   </h3>
   <p>
-    Check to see if your road is shown at the top of this page &mdash; click on it and sign up!
+    Check to see if your street is shown at the top of this page &mdash; click on it and sign up!
   <h3>
   Can’t see your street? Start a new pledge! 
   </h3>
   <p>
-  If there’s not already a pledge for your road, simply start one. 
+  If there’s not already a pledge for your street, simply start one. 
   You will need to get a minimum of 4 volunteers involved for the pledge to be successful.
   </p>
 </div>

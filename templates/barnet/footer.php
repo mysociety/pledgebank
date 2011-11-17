@@ -15,8 +15,6 @@
                       <ul>
                           <li><a href="/">Introduction</a></li>
                           <li><a href="/type/adoptastreet">Adopt-a-Street</a></li>
-                          <li><a href="/type/grit_my_street">Grit your street</a></li>
-                          <li><a href="/type/grit_my_school">Grit your school</a></li>
                           <li><a href="/HendonIT">Provide computer training</a></li>
                           <li><a href="/GreenManClearing">Clear a patch of land</a></li>
                           <li><a href="/KingEdwardLitter">Pick up litter</a></li>

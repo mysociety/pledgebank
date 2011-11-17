@@ -639,8 +639,11 @@ function microsites_email_message_body_by_topic($topic, $message, $name, $email,
             $pledge_details = microsites_get_pledge_type_details($topic);
             $topicTitle = $pledge_details['title'];
             $topicAction = $pledge_details['action'];            
-            $url_for_new_pledge = OPTION_PB_FIXED_SITE_URL . "/new?pledge_type=$topic";
-            
+            $url_for_new_pledge = OPTION_PB_FIXED_SITE_URL . "/new?new_pledge_type=$topic";
+            # number: arbitrary limit, to prevent bloated URLs: this is typically just a street name, after all
+            if (strlen($message) < 64 && preg_match("/\w/", $message)) { 
+                $url_for_new_pledge .= "&ref=" . urlencode(trim($message));
+            }
             $custom_field_str = "(not provided)";
             if ($pledge_details['use_custom_field']) {
                 $custom_field_str = $pledge_details['custom_field_name'] . ": " 
@@ -741,6 +744,12 @@ function microsites_email_send_from_users_address($topic) {
 # returns customisable things that depend on pledge_type, either as a complete
 # hash (if no key is provided) or as a single value if a key is provided.
 #
+# Note i:  preloaded_data is itself a hash: keys are the http query vars that
+#          will be populated by the values; "%s" is special in there and will
+#          be replaced with the ref_in_pledge_type (e.g., the street name) if
+#          it is available.
+# Note ii: beware name clash: $details['title'] != the title in $details['preloaded_data']
+
 function microsites_get_pledge_type_details($pledge_type, $key=null) {
     $details = null;
     global $microsite;
@@ -754,6 +763,7 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
         "custom_field_name"=> "Phone number",
         "custom_label"     => "Your phone number",
         "custom_note"      => "(optional, but it’s really handy if we can call you too)",
+        "preloaded_data"   => null,
         "ref_label"        => "Your street",
         "ref_error_msg"    => "Please enter the name of your street",
         "ref_note"         => "(it helps us if you include your postcode)",
@@ -766,7 +776,10 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                 $details = array_merge($defaults, array(
                     "title"     => "Adopt-a-Street",
                     "action"    => "adopt your street",
-                    "default_image_url" => microsite_preloaded_image_url('adopt_a_street.jpg')                   
+                    "default_image_url" => microsite_preloaded_image_url('adopt_a_street.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council" # add more items when confirmed
+                    )
                 ));
                 break;
             case "grit_my_school":
@@ -776,14 +789,28 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                     "ref_label" => "Your school",
                     "ref_note"  => "(it helps us if you include the school's postcode, but don't worry if you don't know it)",
                     "ref_error_msg" => "Please enter the name of your school",
-                    "default_image_url" => microsite_preloaded_image_url('frosty_pine_needles.jpg')                   
+                    "default_image_url" => microsite_preloaded_image_url('frosty_pine_needles.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "provide grit, spreading equipment and public liability insurance (where needed) to %s",
+                        "target" => 3,
+                        "type"   => "volunteers",
+                        "signup" => "agree to spread the grit"
+                    )
                 ));
                 break;
             case "grit_my_street":
                 $details = array_merge($defaults, array(
                     "title"     => "Grit My Street",
                     "action"    => "grit your street",
-                    "default_image_url" => microsite_preloaded_image_url('frosty_flower.jpg')                   
+                    "default_image_url" => microsite_preloaded_image_url('frosty_flower.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "provide grit, spreading equipment and public liability insurance (where needed) to %s",
+                        "target" => 3,
+                        "type"   => "volunteers",
+                        "signup" => "agree to spread the grit"
+                    )
                 ));
                 break;
             case "thebiglunch":

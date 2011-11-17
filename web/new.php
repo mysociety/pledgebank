@@ -132,8 +132,22 @@ function pledge_form_one($data = array(), $errors = array()) {
         $data['identity'] = 'picnic lover';
     }
 
-    if (get_http_var('pledge_type')) {
-        $data['pledge_type'] = get_http_var('pledge_type');
+    # new_pledge_type is for initial creation only: can boldy load data without checking if it's set already
+    if (get_http_var('new_pledge_type')) {
+        $data['pledge_type'] = microsites_valid_custom_pledge_type(get_http_var('new_pledge_type'));
+        if (!$data['pledge_type']) {
+            $data['pledge_type'] = get_http_var('new_pledge_type'); # set back to invalid value to precipitate error
+        } else {
+            $preloaded_data = microsites_get_pledge_type_details($data['pledge_type'], 'preloaded_data');
+            if ($preloaded_data) {
+                $ref_in_pledge_type = get_http_var('ref', "");
+                $data['ref_in_pledge_type'] = $ref_in_pledge_type;
+                if ($ref_in_pledge_type == "") $ref_in_pledge_type = '???'; # for placeholders expecting it
+                foreach ($preloaded_data as $key => $value) {
+                    $data[$key] = preg_replace("/%s/", $ref_in_pledge_type, $value); # i18n here? e.g., _($value)
+                }            
+            }
+        }
     } else {
         if (!array_key_exists('pledge_type', $data)) $data['pledge_type'] = '';
     }

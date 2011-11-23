@@ -17,7 +17,7 @@
     </p>
     <p> 
         Schools have the chance to take part and get parents and volunteers 
-        to help clear access to the school and playgrounds. 
+        to help clear access to the school. 
   </p>
   <p>
     If you would like to volunteer, you need to sign up to a pledge. If you can’t see your school, 

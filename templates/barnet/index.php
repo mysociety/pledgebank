@@ -28,7 +28,7 @@
     
     <!-- ============================= grit my street ================================ -->
     <ul class="search_results">
-        <li><a href="/type/grit_my_street" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/grit_my_street">Street gritting pledges</a><br>
+        <li><a href="/type/grit_my_street" title="Grit my street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/grit_my_street">Street gritting pledges</a><br>
         </li>
     </ul>
     <div class="barnet-type-pledges">
@@ -43,7 +43,7 @@
 
      <!-- ============================= grit_my_school ================================ -->
     <ul class="search_results">
-        <li><a href="/type/grit_my_school" title="Adopt a street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/grit_my_school">School gritting pledges</a><br>
+        <li><a href="/type/grit_my_school" title="Grit my school" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/grit_my_school">School gritting pledges</a><br>
         </li>
     </ul>
     <div class="barnet-type-pledges">

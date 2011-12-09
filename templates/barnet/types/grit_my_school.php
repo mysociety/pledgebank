@@ -4,7 +4,7 @@
 <div class='ms-grit_my_school-banner' style="height:200px;"></div>
 <div id="ms-explicit-party-list">
   <h3>Sign up to a pledge to clear snow from your school:</h3>
-  <?  print pledge_get_ul_list_by_type('grit_my_school', 2); ?>
+  <?  print pledge_get_ul_list_by_type('grit_my_school', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
 <div style="font-size:1.126em;padding-bottom:0.25em;">

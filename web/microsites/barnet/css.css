@@ -538,7 +538,6 @@ ol#breadcrumbs li.hilight em {
     font-weight:bold;
     list-style: none;
     width: 13em;
-    min-width:12em;
     float:left;
 }
 
@@ -565,4 +564,9 @@ ol#breadcrumbs li.hilight em {
     float: left;
     width: 48%;
     font-size: 110%;
+}
+#ms-explicit-party-list ul.pledge_type_auto_width_column {
+  width: auto;
+  min-width: 13em;
+  max-width:20em;
 }

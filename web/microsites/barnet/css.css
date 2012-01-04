@@ -404,7 +404,7 @@ body.js #ms-signup-reveal {
 
 #barnet_expl {
     float: left;
-    width: 45%;
+    width: 45%;  
 }
 
 .ms-pledge-list-icon {
@@ -417,12 +417,17 @@ body.js #ms-signup-reveal {
     background-image: url('default-pledge-icon.jpg'); /* override with inline style if there's an image for the pledge */
 }
 
+.ms-pledge-banner, .ms-diamondjubilee-banner,
 .ms-royalwedding-banner, .ms-thebiglunch-banner, ms-adoptastreet-banner,
 .ms-grit_my_school-banner, .ms-grit_my_street-banner {
     width: 100%;
     height: 50px;
     background-position:center center;
     margin-bottom: 1em;
+}
+
+.ms-diamondjubilee-banner {
+  background-image: url('preloaded/diamond_jubilee.jpg');
 }
 
 .ms-royalwedding-banner {

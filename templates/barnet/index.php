@@ -25,6 +25,21 @@
         <?  print pledge_get_ul_list_by_type('adoptastreet', 2); ?>
         <div style='clear:both;height:0.3em'></div>
     </div>
+
+    <!-- ============================= grit my street ================================ -->
+    <ul class="search_results">
+        <li><a href="/type/diamondjubilee" title="Diamond Jubilee street parties" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/diamond_jubilee.jpg);"></div></a><a href="/type/diamondjubilee">Diamond Jubilee street party pledges</a><br>
+        </li>
+    </ul>
+    <div class="barnet-type-pledges">
+        <p>
+            Barnet Council will help you celebrate the Diamond Jubilee with a street party in your street on
+            Sunday 3rd&nbsp;June 2012 provided at least 4 households agree to help organise it.            
+            Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
+        </p>
+        <?  print pledge_get_ul_list_by_type('diamondjubilee', 2); ?>
+        <div style='clear:both;height:0.3em'></div>
+    </div>
     
     <!-- ============================= grit my street ================================ -->
     <ul class="search_results">

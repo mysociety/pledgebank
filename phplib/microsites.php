@@ -252,6 +252,7 @@ function microsite_preloaded_images($key, $pledge_microsite = NULL){
         $files = array(              // alphabetic display order, fwiw
             "adopt_a_street.jpg" => "Adopt a Street",
             "barnet_offices.jpg" => "Barnet NLBP Offices",
+            "diamond_jubilee.jpg" => "Diamond Jubilee street party",
             "the_big_lunch.jpg"  => "The Big Lunch street party",
             "daisy_field.jpg"    => "Field of dog daisies",
             "frosty_flower.jpg"  => "Frosty flower",
@@ -783,6 +784,20 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                         "target" => 3,
                         "type"   => "residents",
                         "signup" => "agree to adopt their street"
+                    )
+                ));
+                break;
+            case "diamondjubilee":
+                $details = array_merge($defaults, array(
+                    "title"     => "Diamond Jubilee Street Party",
+                    "action"    => "organise a Diamond Jubilee street party",
+                    "default_image_url" => microsite_preloaded_image_url('diamond_jubilee.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "arrange free public liability insurance for a Diamond Jubilee street party in %s on Sunday 3rd June 2012",
+                        "target" => 4,
+                        "type"   => "other households",
+                        "signup" => "volunteer to organise the party"
                     )
                 ));
                 break;

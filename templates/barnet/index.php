@@ -10,7 +10,22 @@
 <h2>Barnet PledgeBank is a site to get things done.</h2>
 
 <div id="currentpledges">
-    
+
+  <!-- ============================= diamond jubilee ================================ -->
+  <ul class="search_results">
+      <li><a href="/type/diamondjubilee" title="Diamond Jubilee street parties" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/diamond_jubilee.jpg);"></div></a><a href="/type/diamondjubilee">Diamond Jubilee street party pledges</a><br>
+      </li>
+  </ul>
+  <div class="barnet-type-pledges">
+      <p>
+          Barnet Council will help you celebrate the Diamond Jubilee with a street party in your street on
+          Sunday 3rd&nbsp;June 2012 provided at least 4 households agree to help organise it.            
+          Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
+      </p>
+      <?  print pledge_get_ul_list_by_type('diamondjubilee', 2); ?>
+      <div style='clear:both;height:0.3em'></div>
+  </div>
+
     <!-- ============================= adopt a street ================================ -->
     
     <ul class="search_results">
@@ -26,21 +41,6 @@
         <div style='clear:both;height:0.3em'></div>
     </div>
 
-    <!-- ============================= grit my street ================================ -->
-    <ul class="search_results">
-        <li><a href="/type/diamondjubilee" title="Diamond Jubilee street parties" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/diamond_jubilee.jpg);"></div></a><a href="/type/diamondjubilee">Diamond Jubilee street party pledges</a><br>
-        </li>
-    </ul>
-    <div class="barnet-type-pledges">
-        <p>
-            Barnet Council will help you celebrate the Diamond Jubilee with a street party in your street on
-            Sunday 3rd&nbsp;June 2012 provided at least 4 households agree to help organise it.            
-            Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
-        </p>
-        <?  print pledge_get_ul_list_by_type('diamondjubilee', 2); ?>
-        <div style='clear:both;height:0.3em'></div>
-    </div>
-    
     <!-- ============================= grit my street ================================ -->
     <ul class="search_results">
         <li><a href="/type/grit_my_street" title="Grit my street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/grit_my_street">Street gritting pledges</a><br>

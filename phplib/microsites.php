@@ -795,7 +795,7 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                     "preloaded_data" => array(
                         "name"   => "Barnet Council",
                         "title"  => "arrange free public liability insurance for a Diamond Jubilee street party in %s on Sunday 3rd June 2012",
-                        "target" => 4,
+                        "target" => 3,
                         "type"   => "other households",
                         "signup" => "volunteer to organise the party"
                     )

@@ -18,6 +18,17 @@
     It is a wonderful excuse for a street party &mdash; not only is a street party a fun way for residents 
     to celebrate such an event, it&rsquo;s also a great way to get to know your neighbours better.
   </p>
+  <div class="pb-barnet-breakout" style="margin-right:168px; position:relative;padding-top: 1em;">
+    <p class="corner-label">
+      Please note:
+    </p>
+    <h4>
+      Sharing your contact details with other volunteers
+    </h4>
+    <p>
+      If you agree to become a volunteer, we will automatically share your contact details with other participants in your street.
+    </p>
+  </div>
   <p>
     The council will provide advice and insurance cover.
   </p>

@@ -12,6 +12,25 @@
       Barnet Council will support residents who wish to clear snow by offering grit and spreading equipment. 
       Four residents must sign up to the pledge (one of whom will be the community grit keeper).  
   </p>
+  
+  <div class="pb-barnet-breakout" style="position:relative;padding-top: 1em;">
+    <p class="corner-label">
+      Please note:
+    </p>
+    <h4>
+      Storing the grit supplies
+    </h4>
+    <p>
+      If you agree to become a Community Grit Keeper you will need space on your property to store a one ton bag of grit (approximately 1m<span class="superscript">3</span> in size). If you do not have the appropriate storage space, we will put you in touch with the other volunteers that have signed up to your pledge so you can check whether they can store the grit supplies.
+    </p>
+    <h4>
+      Sharing your contact details with other volunteers
+    </h4>
+    <p>
+      If you agree to become a Community Grit Keeper or volunteer, we will automatically share your contact details  with other participants in your street.
+    </p>
+  </div>
+  
   <p>
       The council will provide advice and insurance cover.
   </p>

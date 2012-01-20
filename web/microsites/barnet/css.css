@@ -499,6 +499,17 @@ ol#breadcrumbs li.hilight em {
     margin-bottom: 1em;
     padding: 8px;
 }
+.pb-barnet-breakout .corner-label {
+  position:absolute;
+  top:0;
+  left:0;
+  padding:2px 6px 2px 2px;
+  margin:0; 
+  background-color:#008184;
+  color:#fff;
+  font-size: 0.9em;
+}
+
 #tips li {
     padding: 0;
     margin: 0 0 1em 0;
@@ -574,4 +585,9 @@ ol#breadcrumbs li.hilight em {
   width: auto;
   min-width: 13em;
   max-width:20em;
+}
+
+.superscript{
+  vertical-align:super;
+  font-size:0.666em;
 }

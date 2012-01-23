@@ -797,7 +797,9 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                         "title"  => "arrange free public liability insurance for a Diamond Jubilee street party in %s on Sunday 3rd June 2012",
                         "target" => 3,
                         "type"   => "other households",
-                        "signup" => "volunteer to organise the party"
+                        "signup" => "volunteer to organise the party",
+                        "detail" => "Please note:\nIf you agree to become a volunteer, we will automatically share your contact " .
+                                    "details with other participants in your street."
                     )
                 ));
                 break;
@@ -814,7 +816,14 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                         "title"  => "provide grit, spreading equipment and public liability insurance (where needed) to %s",
                         "target" => 4,
                         "type"   => "volunteers",
-                        "signup" => "agree to spread the grit"
+                        "signup" => "agree to spread the grit",
+                        "detail" => "Storing the grit supplies:\nIf you agree to become a Community Grit Keeper you will need space " .
+                                     "in your property to store a one ton bag of grit (approximately 1m cubed in size). If you do not " .
+                                     "have the appropriate storage space, we will put you in touch with the other volunteers that have " .
+                                     "signed up to your pledge so you can check whether they can store the grit supplies.\n\n" .
+                                     "Sharing your contact details with other volunteers:\nIf you agree to become a Community Grit ".
+                                     "Keeper or volunteer, we will automatically share your contact details that with other " .
+                                     "participants in your school."
                     )
                 ));
                 break;
@@ -828,7 +837,14 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                         "title"  => "provide grit, spreading equipment and public liability insurance (where needed) to %s",
                         "target" => 4,
                         "type"   => "residents",
-                        "signup" => "agree to spread the grit"
+                        "signup" => "agree to spread the grit",
+                        "detail" => "Storing the grit supplies:\nIf you agree to become a Community Grit Keeper you will need space " .
+                                     "on your property to store a one ton bag of grit (approximately 1m cubed in size). If you do not " .
+                                     "have the appropriate storage space, we will put you in touch with the other volunteers that " .
+                                     "have signed up to your pledge so you can check whether they can store the grit supplies.\n\n" .
+                                     "Sharing your contact details with other volunteers:\nIf you agree to become a Community Grit " .
+                                     "Keeper or volunteer, we will automatically share your contact details with other " .
+                                     "participants in your street."
                     )
                 ));
                 break;

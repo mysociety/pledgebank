@@ -7,6 +7,9 @@
 
 /* XXX @import url('...') uses single-quotes to hide the style-sheet
  * from Mac IE. Ugly, but it works. */
+
+  $announcement = "Would you like to work with the team that built this site? 
+   <strong><a href='http://mysocietyltd.theresumator.com/apply/'>We're recruiting.</a></strong>";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="<?=$lang ?>">
@@ -59,7 +62,7 @@
 
     // Start flyers-printing again
     if ($params['noprint']) print '</div> <!-- noprint -->';
-
+    
     // Display who is logged in 
     if ($P) {
         print '<p id="signedon" class="noprint">';
@@ -77,6 +80,12 @@
 <form id="nav_search" accept-charset="utf-8" action="/search" method="get">
 <?=_('Search for pledges:')?> <input type="text" id="q" name="q" size="25" value="<?=htmlspecialchars(get_http_var('q', true))?>"><input type="submit" value="<?=_('Search')?>">
 </form>
+
+<?   if ($announcement && ! $params['noprint']) { ?>
+  <div id="banner-announcement">
+    <?= $announcement ?>
+  </div>
+<? }?>
 
 <?=$params['banner']?>
 

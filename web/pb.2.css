@@ -169,6 +169,20 @@ h2 {
     text-decoration: none;
 }
 
+#banner-announcement {
+  clear:both;
+  color:#fff;
+  background-color: #9C7BBD;
+  border-bottom: solid 1px #522994;
+  border-top: solid 1px #522994;
+  font-size:83%;
+  padding:0.5em;
+  margin-bottom: 1em;
+}
+#banner-announcement a:visited{
+  color: #522994;
+}
+
 #language {
     width: 10em;
 }

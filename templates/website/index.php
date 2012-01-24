@@ -30,7 +30,8 @@ echo '<div id="startblurb1"><div id="startblurb">
 . '</ul>
 </div></div>';
 
-$news = file_get_contents('http://www.mysociety.org/category/pledgebank/feed/');
+#$news = file_get_contents('http://www.mysociety.org/category/pledgebank/feed/');
+$news = '';
 if (preg_match('#<item>.*?<title>(.*?)</title>.*?<link>(.*?)</link>.*?<description><!\[CDATA\[(.*?)\]\]></description>#s', $news, $m)) {
     $link = str_replace('www.mysociety.org', 'www.pledgebank.com/blog', $m[2]);
     $excerpt = preg_replace('#\s+\[\.\.\.\]#', '&hellip; <a href="'

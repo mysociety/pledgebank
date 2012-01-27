@@ -50,9 +50,23 @@
         <p>
             Barnet Council will support residents who wish to clear snow by offering grit and spreading equipment. 
             Four residents must sign up to the pledge (one of whom will be the community grit keeper):            
-            sign up or <a href="/type/grit_my_street">start a pledge</a> to grit your street!
+            sign up to grit your street!
         </p>
-        <?  print pledge_get_ul_list_by_type('grit_my_street', 2); ?>
+        <ul>
+            <li><a href='/asmuns-hill-grit'>Asmuns Hill, NW11,</a></li>
+            <li><a href='/blandford-close'>Blandford Close, N2,</a></li>
+            <li><a href='/brookland-hill'>Brookland Hill</a></li>
+            <li><a href='/denman-drive'>Denman Drive NW11</a></li>
+            <li><a href='/Greenhalgh'>Greenhalgh Walk, N2</a></li>
+            <li><a href='/hill-close'>Hill Close NW11</a></li>
+        </ul>
+        <ul>
+            <li><a href='/ludlow-way'>Ludlow Way N2</a></li>
+            <li><a href='/reynolds-close'>Reynolds Close NW11</a></li>
+            <li><a href='/sunny-gardens'>Sunny Gardens Road NW4</a></li>
+            <li><a href='/Willifield-Way'>Willifield Way, NW11,</a></li>
+            <li><a href='/Windermere-Ave'>Windermere Avenue, N3</a></li>
+        </ul>
         <div style='clear:both;height:0.3em'></div>
     </div>
 

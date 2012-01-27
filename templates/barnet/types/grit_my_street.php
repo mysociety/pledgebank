@@ -4,7 +4,28 @@
 <div class='ms-grit_my_street-banner' style="height:200px;"></div>
 <div id="ms-explicit-party-list">
   <h3>Sign up to a pledge to clear snow from your street:</h3>
-  <?  print pledge_get_ul_list_by_type('grit_my_street', 3, 3, "pledge_type_auto_width_column"); ?>
+  
+    <ul class='pledge_type_auto_width_column'>
+        <li><a href='/asmuns-hill-grit'>Asmuns Hill, NW11,</a></li>
+        <li><a href='/blandford-close'>Blandford Close, N2,</a></li>
+        <li><a href='/brookland-hill'>Brookland Hill</a></li>
+        <li><a href='/denman-drive'>Denman Drive NW11</a></li>
+    </ul>
+    <ul class='pledge_type_auto_width_column'>
+        <li><a href='/Greenhalgh'>Greenhalgh Walk, N2</a></li>
+        <li><a href='/hill-close'>Hill Close NW11</a></li>
+        <li><a href='/ludlow-way'>Ludlow Way N2</a></li>
+        <li><a href='/reynolds-close'>Reynolds Close NW11</a></li>
+    </ul>
+    <ul class='pledge_type_auto_width_column'>
+        <li><a href='/sunny-gardens'>Sunny Gardens Road NW4</a></li>
+        <li><a href='/Willifield-Way'>Willifield Way, NW11,</a></li>
+        <li><a href='/Windermere-Ave'>Windermere Avenue, N3</a></li>
+    </ul>  
+    
+    <div style="width:100%;clear:both;height:1px"></div>  
+
+
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
 <div style="font-size:1.126em;padding-bottom:0.25em;">
@@ -15,8 +36,23 @@
   
   <div class="pb-barnet-breakout" style="position:relative;padding-top: 1em;">
     <p class="corner-label">
-      Please note:
+      Closed:
     </p>
+    
+    <h4>
+    The council has now met its pledge to provide grit to 10 streets whose residents have agreed to clear snow in bad weather.
+    </h4>
+    <p>
+    Therefore we will no longer be processing any new requests for a “grit my street” pledge, or any current pledges that are yet to be fulfilled.
+    </p>
+    <p>
+    We will continue to review this situation in light of ongoing weather.
+    </p>
+  </div>
+  <div class="pb-barnet-breakout" style="position:relative;padding-top: 1em;">
+      <p class="corner-label">
+        Please note:
+      </p>
     <h4>
       Storing the grit supplies
     </h4>
@@ -47,11 +83,10 @@
   <p>
     Check to see if your street is shown at the top of this page &mdash; click on it and sign up!
   <h3>
-  Can’t see your street? Start a new pledge! 
+  Can’t see your street?
   </h3>
   <p>
-  If there’s not already a pledge for your street, simply start one. 
-  You will need to get a minimum of 4 volunteers involved for the pledge to be successful.
+  If there’s not already a pledge for your street, sorry &mdash; we’re not running any more “grit my street” pledges at the moment.
   </p>
 </div>
 <ul style="font-size:1.126em;margin-bottom:2em;">
@@ -59,18 +94,4 @@
       looking for your <strong>school</strong>? We're also running similar pledges for
       <a href="/type/grit_my_school">clearing snow from schools in Barnet</a>!
   </li>
-</ul>
-<? print_contact_form($name, $email, $topic, true) ?>
-<ul>
-    <li>
-        Fill in the request form
-    </li>
-    <li>
-      Barnet council will use this information to check the general practicalities, 
-      grit supplies and set up a pledge. We will email you to notify this is successful 
-      and send you a link to the pledge.
-    </li>
-    <li>
-      After that, it’s up to you to spread the word in your community and get people to sign the pledge.
-    </li>
 </ul>

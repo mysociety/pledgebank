@@ -11,7 +11,8 @@
   <img src="/microsites/barnet/diamond_jubilee_150_x_200.png" alt="2012 Diamond Jubilee logo" style="width:150px;height:200px;margin:0 0 8px 1em; float:right;" />
   <p style="font-weight:bold;">
     We&rsquo;re joining in with the 
-    <a href="http://www.thebiglunch.com/join-in/jubilee-2012.php">Big Jubilee Lunch</a> on Sunday&nbsp;3rd&nbsp;June&nbsp;2012.
+    <a href="http://www.thebiglunch.com/join-in/jubilee-2012.php">Big Jubilee Lunch</a> on Sunday&nbsp;3rd&nbsp;June&nbsp;2012
+    (although you can have your party on any day close to the Jubilee weekend!)
   </p>
   <p>
     The Diamond Jubilee marks Her Majesty Queen Elizabeth II&rsquo;s 60 years on the throne.

@@ -1358,12 +1358,15 @@ function pledge_draw_status_plaque($p, $params = array()) {
 #   n_columns:          how many ul's should the list be returned as 
 #   min_items_for_cols: don't bother breaking (just return one <ul>) for this number of pledges or fewer
 #   ul_css_class:       class to add to the <ul> tag(s), if any
+#   open_pledges_only:  true if only currently open pledges are wanted
 #
-function pledge_get_ul_list_by_type($pledge_type, $n_columns=1, $min_items_for_cols=3, $ul_css_class="") {
-  # global $pb_today; # in SQL maybe?: date >= '$pb_today' AND 
-  $pledges = pledge_get_list("
-              pledge_type = '$pledge_type'
-              ORDER BY ref_in_pledge_type", array('global'=>false,'main'=>true,'foreign'=>false));
+function pledge_get_ul_list_by_type($pledge_type, $n_columns=1, $min_items_for_cols=3, $ul_css_class="", $open_pledges_only=false) {
+  global $pb_today;
+  $where_clause = "pledge_type = '$pledge_type' ORDER BY ref_in_pledge_type";
+  if ($open_pledges_only) {
+    $where_clause = "date >= '$pb_today' AND " . $where_clause;
+  }
+  $pledges = pledge_get_list($where_clause, array('global'=>false,'main'=>true,'foreign'=>false));
   $max_pledges_in_each_column =  count($pledges) <= $min_items_for_cols? 
                                     count($pledges) : intval((count($pledges)+$n_columns-1)/$n_columns);
   $ul_tag = "<ul" . ($ul_css_class? " class='$ul_css_class'":'') . ">\n";

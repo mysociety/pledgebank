@@ -5,6 +5,8 @@
 // Copyright (c) 2010 UK Citizens Online Democracy. All rights reserved.
 // Email: matthew@mysociety.org. WWW: http://www.mysociety.org
 
+// note: calls to pledge_get_ul_list_by_type on the *front* page should probably only
+//       list open pledges, so set $open_pledges_only=true in the args
 ?>
 
 <h2>Barnet PledgeBank is a site to get things done.</h2>
@@ -22,7 +24,7 @@
           Sunday 3rd&nbsp;June 2012 provided at least 4 households agree to help organise it.            
           Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
       </p>
-      <?  print pledge_get_ul_list_by_type('diamondjubilee', 2); ?>
+      <?  print pledge_get_ul_list_by_type('diamondjubilee', 2, 3, "", true); ?>
       <div style='clear:both;height:0.3em'></div>
   </div>
 
@@ -37,7 +39,7 @@
             Barnet Council will support street adoption for 10 streets if at least six households in the street sign up to get involved:
             sign up or <a href="/type/adoptastreet">start a pledge</a> to adopt your street!
         </p>
-        <?  print pledge_get_ul_list_by_type('adoptastreet', 2); ?>
+        <?  print pledge_get_ul_list_by_type('adoptastreet', 2, 3, "", true); ?>
         <div style='clear:both;height:0.3em'></div>
     </div>
 

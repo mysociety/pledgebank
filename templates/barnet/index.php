@@ -18,9 +18,9 @@
   </ul>
   <div class="barnet-type-pledges">
       <p>
-          Barnet Council will help you celebrate the Diamond Jubilee with a street party in your street on
-          Sunday 3rd&nbsp;June 2012 provided at least 4 households agree to help organise it.            
-          Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
+            Barnet Council will help you celebrate the Diamond Jubilee with a street party in your street during the 
+            weekend of Saturday 2&nbsp;June – Tuesday 5&nbsp;June 2012 provided at least 4 households agree to help organise it.            
+            Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
       </p>
       <?  print pledge_get_ul_list_by_type('diamondjubilee', 2); ?>
       <div style='clear:both;height:0.3em'></div>
@@ -58,49 +58,6 @@
         <div style='clear:both;height:0.3em'></div>
     </div>
 
-    <!-- ============================= grit my street ================================ -->
-    <ul class="search_results">
-        <li><a href="/type/grit_my_street" title="Grit my street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/grit_my_street">Street gritting pledges</a><br>
-        </li>
-    </ul>
-    <div class="barnet-type-pledges">
-        <p>
-            Barnet Council will support residents who wish to clear snow by offering grit and spreading equipment. 
-            Four residents must sign up to the pledge (one of whom will be the community grit keeper):            
-            sign up to grit your street!
-        </p>
-        <ul>
-            <li><a href='/asmuns-hill-grit'>Asmuns Hill, NW11,</a></li>
-            <li><a href='/blandford-close'>Blandford Close, N2,</a></li>
-            <li><a href='/brookland-hill'>Brookland Hill</a></li>
-            <li><a href='/denman-drive'>Denman Drive NW11</a></li>
-            <li><a href='/Greenhalgh'>Greenhalgh Walk, N2</a></li>
-            <li><a href='/hill-close'>Hill Close NW11</a></li>
-        </ul>
-        <ul>
-            <li><a href='/ludlow-way'>Ludlow Way N2</a></li>
-            <li><a href='/reynolds-close'>Reynolds Close NW11</a></li>
-            <li><a href='/sunny-gardens'>Sunny Gardens Road NW4</a></li>
-            <li><a href='/Willifield-Way'>Willifield Way, NW11,</a></li>
-            <li><a href='/Windermere-Ave'>Windermere Avenue, N3</a></li>
-        </ul>
-        <div style='clear:both;height:0.3em'></div>
-    </div>
-
-     <!-- ============================= grit_my_school ================================ -->
-    <ul class="search_results">
-        <li><a href="/type/grit_my_school" title="Grit my school" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/grit_my_school">School gritting pledges</a><br>
-        </li>
-    </ul>
-    <div class="barnet-type-pledges">
-        <p>
-            Barnet Council will support volunteers who wish to clear snow by offering grit and spreading equipment.
-            Four volunteers must sign up to the pledge (one of whom will be the community grit keeper):
-            sign up or <a href="/type/grit_my_street">start a pledge</a> to grit your street!
-        </p>
-         <?  print pledge_get_ul_list_by_type('grit_my_school', 2); ?>
-         <div style='clear:both;height:0.3em'></div>
-    </div>
     
     <!-- ============================= standalone pledges ================================ -->
 

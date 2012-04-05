@@ -34,7 +34,7 @@ if (sizeof($errors)) {
     <input type="hidden" name="comment_id" value="<?=htmlspecialchars($comment_id)?>">
   
     <?  if ($comment_id) {
-        print h2(_('Report abusive, suspicious or wrong comment'));
+        print h1(_('Report abusive, suspicious or wrong comment'));
         print p(_("Please let us know exactly what is wrong with the comment, and why you think it should be removed."));
         print_contact_form($name, $email, "", false);
     } else { 
@@ -42,7 +42,7 @@ if (sizeof($errors)) {
         if ($custom_pledge_type_template && is_readable($custom_pledge_type_template)) {
             include $custom_pledge_type_template;
         } else { 
-            print h2("Suggest a pledge");
+            print h1("Suggest a pledge");
             print "<p>Do you have an idea for a pledge that could appear on this site?</p>";
             print "<p>What would you like to get done? </p>";
             print_contact_form($name, $email, "", false);

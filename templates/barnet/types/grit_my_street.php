@@ -1,6 +1,6 @@
 <!-- =========================== grit_my_street =================================== -->
 
-<h2>Help clear the snow in your neighbourhood this winter</h2>
+<h1>Help clear the snow in your neighbourhood this winter</h1>
 <div class='ms-grit_my_street-banner' style="height:200px;"></div>
 <div id="ms-explicit-party-list">
   <h3>Sign up to a pledge to clear snow from your street:</h3>
@@ -28,7 +28,7 @@
 
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
-<div style="font-size:1.126em;padding-bottom:0.25em;">
+<div style="ms-general-box">
   <p style="font-weight:bold;">
       Barnet Council will support residents who wish to clear snow by offering grit and spreading equipment. 
       Four residents must sign up to the pledge (one of whom will be the community grit keeper).  

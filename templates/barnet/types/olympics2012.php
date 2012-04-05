@@ -1,13 +1,13 @@
 <!-- =========================== olympics 2012 =================================== -->
 
-<h2>2012 Olympics: Street Party in your street</h2> 
+<h1>2012 Olympics: Street Party in your street</h1> 
 <div class='ms-olympics2012-banner' style="height:200px;"></div>
 <div id="ms-explicit-party-list">
   <h3>Our 2012 Olympic street party pledges:</h3>
   <?  print pledge_get_ul_list_by_type('olympics2012', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
-<div style="font-size:1.126em;padding-bottom:0.25em;position:relative;">
+<div style="ms-general-box">
   <p>
     The 2012 Games represent a unique opportunity for London and the UK. It is a wonderful excuse for a street party
     &mdash; not only is a street party a fun way for residents to celebrate such an event, it&rsquo;s also a great

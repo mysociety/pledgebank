@@ -166,7 +166,7 @@ body.js #ms-signup-reveal {
     line-height: 1em;
 }
 #ms-pb-deadline p {
-    margin: -12px auto 0 auto;
+    margin: 0 auto 0 auto;
     padding: 0;
     font-size: 160%;
     line-height: 1.5em;
@@ -413,7 +413,7 @@ body.js #ms-signup-reveal {
     margin:0;
     padding:0;
     background-position:center center;
-    border-bottom: 4px solid #00ada1;
+    border-bottom: 4px solid #21AAAA;
     background-image: url('default-pledge-icon.jpg'); /* override with inline style if there's an image for the pledge */
 }
 
@@ -573,8 +573,9 @@ ol#breadcrumbs li.hilight em {
 }
 
 #currentpledges .barnet-type-pledges {
-    margin: -1em 0 1em 15px;
-    border-bottom: 4px solid #00ada1;">
+    /*margin: -1em 0 1em 15px;*/
+    margin: 0 0 1em 0;
+    border-bottom: 6px solid #BED9DD;
 }
 #currentpledges .barnet-type-pledges p {
     margin-bottom: 0.3em;
@@ -584,7 +585,7 @@ ol#breadcrumbs li.hilight em {
     padding:0 0 0.5em 0;
     float: left;
     width: 48%;
-    font-size: 110%;
+    font-size: 100%;
 }
 #ms-explicit-party-list ul.pledge_type_auto_width_column {
   width: auto;
@@ -596,3 +597,9 @@ ol#breadcrumbs li.hilight em {
   vertical-align:super;
   font-size:0.666em;
 }
+
+.ms-general-box {
+  margin:1em 0;
+  padding-bottom:0.25em;position:relative;
+}
+

@@ -7,7 +7,7 @@
 
 ?>
 
-<h2>Barnet PledgeBank is a site to get things done.</h2>
+<h1>Barnet PledgeBank is a site to get things done.</h1>
 
 <div id="currentpledges">
 

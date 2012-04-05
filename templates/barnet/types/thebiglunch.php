@@ -1,19 +1,13 @@
 <!-- =========================== the big lunch =================================== -->
 
-<h2>The Big Lunch: a one day get-together for neighbours</h2>
+<h1>The Big Lunch: a one day get-together for neighbours</h1>
 <div class='ms-thebiglunch-banner' style="height:200px;"></div>
 <div id="ms-explicit-party-list">
   <h3>Sign up to a Big Lunch street party pledge:</h3>          
-  <ul>
-      <li><a href="/corringham-rd-bl">Corringham&nbsp;Road,&nbsp;NW11</a></li>
-      <li><a href="/heath-view-bl">Heath&nbsp;View,&nbsp;N2</a></li>
-      <li><a href="/jackson-rd-bl">Jackson&nbsp;Road,&nbsp;EN4</a></li>
-      <li><a href="/park-rd-bl">Park&nbsp;Road,&nbsp;EN5</a></li>
-      <li><a href="/salcombe-gdns-bl">Salcombe&nbsp;Gardens,&nbsp;NW7</a></li>
-  </ul>
+  <?  print pledge_get_ul_list_by_type('thebiglunch', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
-<div style="font-size:1.126em;padding-bottom:0.25em;">
+<div style="ms-general-box">
    <a href="http://www.barnet.gov.uk/biglunch" title="about The Big Lunch"><img 
       alt="The Big Lunch logo" src="/microsites/barnet/the_big_lunch_logo_212_x_90.png" 
       style="float:right;width:212px;height:90px;border:none;margin: 0 1em 1em 1em;"/></a>

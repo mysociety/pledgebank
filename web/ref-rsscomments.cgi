@@ -24,6 +24,7 @@ use mySociety::DBHandle qw(dbh);
 use mySociety::WatchUpdate;
 use mySociety::Web qw(ent);
 use PB;
+use Encode;
 use XML::RSS;
 use CGI::Carp;
 use mySociety::CGIFast qw(-no_xhtml);
@@ -81,5 +82,5 @@ sub run {
     }
 
     print CGI->header( -type => 'application/xml; charset=utf-8' );
-    print $rss->as_string;
+    print Encode::encode_utf8($rss->as_string);
 }

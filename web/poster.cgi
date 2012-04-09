@@ -15,13 +15,13 @@ import sys
 sys.path.append("../commonlib/pylib")
 
 import os
-import popen2
+import subprocess
 from time import time
 from pyPgSQL import PgSQL
 import fcgi, cgi
 import tempfile
 import string
-import sha
+import hashlib
 import locale
 import gettext
 import re
@@ -902,7 +902,7 @@ while fcgi.isFCGI():
             if 'pin' not in fs:
                 raise Exception, "Correct PIN needed for '%s' pledge" % ref
             userpin = fs['pin'].value
-            sha_calc = sha.new()
+            sha_calc = hashlib.sha1()
             sha_calc.update(userpin)
             crypt_userpin = sha_calc.hexdigest()
             #req.err.write("userpin %s\n" % crypt_userpin)
@@ -1024,12 +1024,11 @@ while fcgi.isFCGI():
             if format != 'pdf':
                 # Call out to "convert" from ImageMagick
                 cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=ppmraw -sOutputFile=- -r288 " + outpdf + " | pnmscale 0.25 | ppmquant 256 | pnmtopng > " + outfile
-                child = popen2.Popen3(cmd, True) # capture stderr
-                child.tochild.close()
-                # no need for stdout in log file, so ignore this
-                # req.err.write(child.fromchild.read()) 
+                child = subprocess.Popen([cmd], shell=True, stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+                child.stdin.close()
                 # fetch standard error lines
-                errorlines = child.childerr.readlines()
+                errorlines = child.stderr.readlines()
                 # filter out progress messages from errors
                 errorlines = filter(lambda x: 'making histogram' not in x, errorlines)
                 errorlines = filter(lambda x: 'colors found' not in x, errorlines)

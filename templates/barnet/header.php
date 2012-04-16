@@ -58,11 +58,8 @@
 						<div id="breadcrumb">
 <!-- googleoff:all -->
 							<ul>
-								<li><a href="http://www.barnet.gov.uk/">Home</a></li>
-								<? if (strpos($title, "PledgeBank") !== 0) { ?>
-								  <li><a href="/">PledgeBank</a></li>
-								<? } ?>
-								<li class="bc_end"><span><?=$title?>-</span></li><!-- CHANGE THIS -->
+								<li><a href="/">PledgeBank Home</a></li>
+								<li class="bc_end"><span><?=$title?></span></li><!-- CHANGE THIS -->
 							</ul>
 <!-- googleon:all -->
 						</div>

@@ -899,6 +899,20 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
     }
 }
 
+/* microsite_contact_title
+ * return the page title for the contact page (needed for pledge-type pages, because they are
+ * really hijacking the contact page)
+ */
+function microsite_contact_title($pledge_type) {
+	$contact_title = '';
+	if (microsites_get_pledge_type_details($pledge_type, 'is_valid')) {
+		$contact_title = microsites_get_pledge_type_details($pledge_type, 'title');
+	} 
+	if (!$contact_title) {
+		$contact_title = _("Contact Us");
+	}
+	return($contact_title);
+}
 
 
 #############################################################################

@@ -904,14 +904,17 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
  * really hijacking the contact page)
  */
 function microsite_contact_title($pledge_type) {
-	$contact_title = '';
-	if (microsites_get_pledge_type_details($pledge_type, 'is_valid')) {
-		$contact_title = microsites_get_pledge_type_details($pledge_type, 'title');
-	} 
-	if (!$contact_title) {
-		$contact_title = _("Contact Us");
-	}
-	return($contact_title);
+  $contact_title = '';
+  global $microsite;
+  if ($microsite == 'barnet') {
+    if (microsites_get_pledge_type_details($pledge_type, 'is_valid')) {
+      $contact_title = microsites_get_pledge_type_details($pledge_type, 'title');
+    }
+  }
+  if (!$contact_title) {
+    $contact_title = _("Contact Us");
+  }
+  return($contact_title);
 }
 
 

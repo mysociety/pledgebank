@@ -605,3 +605,7 @@ ol#breadcrumbs li.hilight em {
   padding-bottom:0.25em;position:relative;
 }
 
+/* new Barnet design: textareas lost on white background */
+textarea {
+    border: 1px solid #aaa;
+}

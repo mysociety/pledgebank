@@ -568,9 +568,11 @@ ol#breadcrumbs li.hilight em {
     padding-left: 0;
 }
 
+/*
 #ms-explicit-party-list ul li a {
   padding-left:16px;
 }
+*/
 
 #currentpledges .barnet-type-pledges {
     /*margin: -1em 0 1em 15px;*/
@@ -589,8 +591,8 @@ ol#breadcrumbs li.hilight em {
 }
 #ms-explicit-party-list ul.pledge_type_auto_width_column {
   width: auto;
-  min-width: 13em;
-  max-width:20em;
+  min-width: 10em;
+  max-width:24em;
 }
 
 .superscript{

@@ -30,11 +30,6 @@
 
 	</head>
 	<body<?=$params['body_id']?><?=$params['body_class']?>>
-	
-	<div style="text-align:center;margin:0;background:#f66;color:#fff;padding:8px;">This is a test site for developers only. You probably want
-<a href="http://pledgebank.barnet.gov.uk/">the real site</a></div>
-
-
 		<div id="wrapper">
 			<div id="ie_wrapper">
 <!-- googleoff: index -->

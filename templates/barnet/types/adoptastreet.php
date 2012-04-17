@@ -1,13 +1,13 @@
 <!-- =========================== adopt-a-street =================================== -->
 
- <h2>Adopt-a-Street</h2>
+ <h1>Adopt-a-Street</h1>
  <div class='ms-adoptastreet-banner' style="height:200px;"></div>
  <div id="ms-explicit-party-list">
    <h3>Sign up to an Adopt-a-Street pledge:</h3>
    <?  print pledge_get_ul_list_by_type('adoptastreet', 3, 3, "pledge_type_auto_width_column"); ?>
    <div style="width:100%;clear:both;height:1px"></div>
  </div>
- <div style="font-size:1.126em;padding-bottom:0.25em;">
+<div style="ms-general-box">
    <p style="font-weight:bold;">
      &lsquo;Adopt-a-street&rsquo; encourages local volunteers to improve and care for their area by carrying out
      extra work which will make their neighbourhoods look more attractive, including planting, 

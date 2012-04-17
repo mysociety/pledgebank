@@ -9,7 +9,7 @@
 //       list open pledges, so set $open_pledges_only=true in the args
 ?>
 
-<h2>Barnet PledgeBank is a site to get things done.</h2>
+<h1>Barnet PledgeBank is a site to get things done.</h1>
 
 <div id="currentpledges">
 
@@ -25,6 +25,23 @@
           Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
       </p>
       <?  print pledge_get_ul_list_by_type('diamondjubilee', 2, 3, "", true); ?>
+      <div style='clear:both;height:0.3em'></div>
+  </div>
+
+  <!-- ============================= London 2012 Olympics ================================ -->
+  <ul class="search_results">
+      <li><a href="/type/olympics2012" title="London 2012 Olympics street parties" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/olympics2012.jpg);"></div></a><a href="/type/olympics2012">London 2012 Olympic street party pledges</a><br>
+      </li>
+  </ul>
+  <div class="barnet-type-pledges">
+      <p>
+          Barnet Council will help you celebrate the London 2012 Olympics with a street party in your street 
+          between 27&nbsp;July and 12&nbsp;August 2012 provided at least 
+          <?= microsites_get_pledge_type_details('olympics2012', 'preloaded_data', 'target') ?>
+          households agree to help organise it.            
+          Sign up or <a href="/type/olympics2012">start a pledge</a> to arrange your party!
+      </p>
+      <?  print pledge_get_ul_list_by_type('olympics2012', 2); ?>
       <div style='clear:both;height:0.3em'></div>
   </div>
 

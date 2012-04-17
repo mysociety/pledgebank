@@ -1,102 +1,61 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <link rel="stylesheet" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/basic.css">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+	  <title><?=$title?>- London Borough of Barnet</title>
+		<link rel="stylesheet" type="text/css" href="/microsites/barnet/site/styles/standard.css" media="screen" />
+<!--[if lte IE 6]>
+		<link rel="stylesheet" type="text/css" href="/microsites/barnet/site/styles/generic/ie-six.css" media="screen" />
+		<link rel="stylesheet" type="text/css" href="/microsites/barnet/site/styles/generic/ie-six-print.css" media="print" />
+<![endif]-->
+<!--[if IE 7]>
+	    <link rel="stylesheet" type="text/css" href="/microsites/barnet/site/styles/generic/ie-seven.css" media="screen" />
+<![endif]-->		
+<!--[if IE 8]>
+	    <link rel="stylesheet" type="text/css" href="/microsites/barnet/site/styles/generic/ie-eight.css" media="screen" />
+<![endif]-->		
+		<link rel="stylesheet" type="text/css" href="/microsites/barnet/site/styles/generic/print.css" media="print" />
+		<link rel="stylesheet" type="text/css" href="/microsites/barnet/site/styles/generic/handheld.css" media="handheld" />
+		<link rel="Shortcut Icon" type="image/x-icon" href="/microsites/barnet/site/favicon.ico" />
+		<link rel="ToC" href="http://www.barnet.gov.uk/site_map" />
+		<meta name="Keywords" content="" />
+		<meta name="Description" content="" />
 
-        <style type="text/css">
-            @import url(http://barnet.fixmystreet.com/cobrands/barnet/css/layout.css);
-        </style>
-
-        <!-- Preferred style sheet enabled when the page is loaded -->
-        <link rel="stylesheet" title="default" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/light.css">
-
-        <!-- Alternate style sheets used for the light/relaxed style -->
-        <link rel="alternate stylesheet" title="relaxed light" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/light.css">
-        <link rel="alternate stylesheet" title="relaxed light" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/relaxed.css">
-
-        <!-- Alternate style sheets used for the dark style -->
-        <link rel="alternate stylesheet" title="dark" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/dark.css">
-
-        <!-- Alternate style sheets used for the dark/relaxed style -->
-        <link rel="alternate stylesheet" title="relaxed dark" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/dark.css">
-        <link rel="alternate stylesheet" title="relaxed dark" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/relaxed.css">
+    <script type="text/javascript" src="/pb.js"></script>
+    <script type="text/javascript" src="/jslib/utils.js"></script>
+		<script type="text/javascript" src="/jquery.js"></script>
+    <script type="text/javascript" src="/gaze.js"></script>
+    <link rel="stylesheet" type="text/css" href="/microsites/barnet/css.css">
+    <link rel="stylesheet" type="text/css" media="print" href="/microsites/barnet/pbprint.css">
 
 
-        <!--[if lte IE 6]>
-             <link rel="stylesheet" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/ie.css">
-
-             <link rel="alternate stylesheet" title="relaxed light" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/ie-relaxed.css">
-
-             <link rel="alternate stylesheet" title="dark" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/ie-dark.css">
-
-             <link rel="alternate stylesheet" title="relaxed dark" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/ie-dark.css">
-             <link rel="alternate stylesheet" title="relaxed dark" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/ie-relaxed.css">
-        <![endif]-->
-
-        <!--[if IE 7]>
-             <link rel="stylesheet" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/ie-seven.css">
-
-             <link rel="alternate stylesheet" title="relaxed light" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/ie-seven-relaxed.css">
-
-             <link rel="alternate stylesheet" title="relaxed dark" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/ie-seven-relaxed.css">
-        <![endif]-->
-        <link rel="stylesheet" media="print" type="text/css" href="http://barnet.fixmystreet.com/cobrands/barnet/css/print.css">
-
-<script type="text/javascript" src="http://barnet.fixmystreet.com/cobrands/barnet/javascript/jquery-1.2.6_common.js"></script>
-<script type="text/javascript" src="http://barnet.fixmystreet.com/cobrands/barnet/javascript/styleswitch.js"></script>
-<script type="text/javascript" src="http://barnet.fixmystreet.com/cobrands/barnet/javascript/jquery-cookie-min.js"></script>
-<script type="text/javascript" src="http://barnet.fixmystreet.com/cobrands/barnet/javascript/2008-portsurf.js"></script>
-
-<script type="text/javascript" src="/pb.js"></script>
-<script type="text/javascript" src="/jslib/utils.js"></script>
-<script type="text/javascript" src="/gaze.js"></script>
-<link rel="stylesheet" type="text/css" href="/microsites/barnet/css.css">
-<link rel="stylesheet" type="text/css" media="print" href="/microsites/barnet/pbprint.css">
-
-    <title><?=$title?></title>
-    
-  	<style type="text/css">
-  	  h2, .nounderline{border: none;} /* nounderline for h2 is from more recent Barnet CSS, perhaps?  */
-  	</style>
-  </head>
-  <body<?=$params['body_id']?><?=$params['body_class']?>>
-
-  <div id="iewrap">
-            <img id="print-logo" src="/microsites/barnet/logo-barnet-print-nice.png" alt="">
-            <div id="header">
-                <a href="http://www.barnet.gov.uk/"><img src="http://barnet.fixmystreet.com/cobrands/barnet/images/logo-barnet.gif" alt="Barnet Logo"></a>
-
-                <a href="#content" class="rm">Skip to Content</a>
-                <span class="rm">|</span>
-                <a href="#navigation" class="rm">Skip to Menu</a>
-                <span class="rm">|</span>
-
-                <form action="http://www.barnet.gov.uk/search">
-                    <div class="search-input">
-                        <input type="hidden" name="col" value="lbb">
-                        <input type="hidden" name="type" value="sitesearch">
-                        <label for="input-0" class="rm">Search:</label>
-                        <input type="text" value="Please enter your search" name="search" class="search">
-                    </div>
-                    <div class="search-button">
-                        <input type="submit" value="Search" class="submit" id="input-0">
-                    </div>
-                </form>
-
-                <div id="switcher" style="display:none">
-                    <p>Site preferences:</p>
-                    <ul>
-                        <li class="default"><a id="s1" class="styleswitch" rel="default" title="Light colours with the default layout">default</a></li>
-                        <li class="relaxed-light"><a id="s2" class="styleswitch" rel="relaxed light" title="Light colours with the relaxed layout" href="#">relaxed light</a></li>
-                        <li class="dark"><a id="s3" class="styleswitch" rel="dark" title="Dark colours with the default layout" href="#">dark</a></li>
-                        <li class="relaxed-dark"><a id="s4" class="styleswitch" rel="relaxed dark" title="Dark colours with the relaxed layout" href="#">relaxed dark</a></li>
-                    </ul>
-                </div><!-- end switcher -->
-            </div><!-- end header -->
-
-      <div id="wrap">
-          <div id="content">
-              <!-- <h1 style="margin-bottom:0.666em;">PledgeBank</h1> -->
-              <!-- end of head -->
-              
+	</head>
+	<body<?=$params['body_id']?><?=$params['body_class']?>>
+		<div id="wrapper">
+			<div id="ie_wrapper">
+<!-- googleoff: index -->
+				<div id="mobile_name">London Borough of Barnet</div>
+				<div id="mast">
+					<div class="pseudoH1">
+						<a href="http://www.barnet.gov.uk/"><span>London Borough of Barnet</span> <img src="/microsites/barnet/site/images/blank.gif" alt="London Borough of Barnet logo" /></a>
+					</div>
+					<ul id="skip" class="hidden">
+						<li><a href="#content" rel="nofollow">Skip to content</a></li>
+						<li><a href="#column_nav" rel="nofollow">Skip to main navigation</a></li>
+					</ul>
+					<div class="mast_links"></div>
+					<span class="clear"></span>
+					<div id="search"></div>
+					<div class="clear"></div>
+				</div>
+<!-- googleon: index -->
+				<div id="page_wrap">
+					<div id="page">
+						<div id="breadcrumb">
+<!-- googleoff:all -->
+							<ul>
+								<li><a href="/">PledgeBank Home</a></li>
+								<li class="bc_end"><span><?=$title?></span></li><!-- CHANGE THIS -->
+							</ul>
+<!-- googleon:all -->
+						</div>
+						<div id="content" class="withWidth fullWidth">

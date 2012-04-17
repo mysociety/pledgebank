@@ -258,6 +258,7 @@ function microsite_preloaded_images($key, $pledge_microsite = NULL){
             "frosty_flower.jpg"  => "Frosty flower",
             "frosty_mimosa.jpg"  => "Frosty mimosa",
             "hendon_library.jpg" => "Hendon library",
+            "olympics2012.jpg"   => "Olympics 2012",
             "purple_flower.jpg"  => "Purple flower", 
             "royal_wedding.jpg"  => "Royal Wedding street party",
             "trees_and_leaves.jpg"=> "Trees and leaves",
@@ -751,7 +752,7 @@ function microsites_email_send_from_users_address($topic) {
 #          it is available.
 # Note ii: beware name clash: $details['title'] != the title in $details['preloaded_data']
 
-function microsites_get_pledge_type_details($pledge_type, $key=null) {
+function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_key=null) {
     $details = null;
     global $microsite;
     $defaults = array(
@@ -848,6 +849,23 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                     )
                 ));
                 break;
+            case "olympics2012":
+                $details = array_merge($defaults, array(
+                    "title"     => "London Olympic 2012 Street Party",
+                    "action"    => "organise a London Olympic street party",
+                    "default_image_url" => microsite_preloaded_image_url('olympics2012.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "arrange free public liability insurance for an Olympic street party in %s,",
+                        "target" => 4,
+                        "type"   => "households",
+                        "signup" => "volunteer to organise the party",
+                        "detail" => "Please note:\nIf you agree to become a volunteer, we will automatically share your contact " .
+                                    "details with other participants in your street.",
+                        "date"   => "13 July 2012"
+                    )
+                ));
+                break;
             case "thebiglunch":
                 $details = array_merge($defaults, array(
                     "title"     => "The Big Lunch Street Party",
@@ -864,13 +882,40 @@ function microsites_get_pledge_type_details($pledge_type, $key=null) {
                 break;
         }
     }
-    if ($key) {
-      return $details[$key];
+    if ($key) { 
+      if (is_array($details)) {
+        if ($secondary_key and is_array($details[$key])) {
+          if (array_key_exists($secondary_key, $details[$key])) {
+            return $details[$key][$secondary_key];
+          }
+        } elseif (array_key_exists($key, $details)) {
+          return $details[$key];
+        }
+      }
+      // Policy here: if the key cannot be found, return null (rather than the whole array if it exists)
+      return null; 
     } else {
-      return $details;
+      return $details; //note this may be an array, in which case called must *not* provide a key
     }
 }
 
+/* microsite_contact_title
+ * return the page title for the contact page (needed for pledge-type pages, because they are
+ * really hijacking the contact page)
+ */
+function microsite_contact_title($pledge_type) {
+  $contact_title = '';
+  global $microsite;
+  if ($microsite == 'barnet') {
+    if (microsites_get_pledge_type_details($pledge_type, 'is_valid')) {
+      $contact_title = microsites_get_pledge_type_details($pledge_type, 'title');
+    }
+  }
+  if (!$contact_title) {
+    $contact_title = _("Contact Us");
+  }
+  return($contact_title);
+}
 
 
 #############################################################################

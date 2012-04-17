@@ -1,13 +1,13 @@
 <!-- =========================== grit_my_school =================================== -->
 
-<h2>Help clear the snow in your neighbourhood this winter</h2>
+<h1>Help clear the snow in your neighbourhood this winter</h1>
 <div class='ms-grit_my_school-banner' style="height:200px;"></div>
 <div id="ms-explicit-party-list">
   <h3>Pledges for clearing snow from schools:</h3>
   <?  print pledge_get_ul_list_by_type('grit_my_school', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
-<div style="font-size:1.126em;padding-bottom:0.25em;">
+<div style="ms-general-box">
     <p style="font-weight:bold;">
         Barnet Council supported volunteers who wished to clear snow by offering grit and spreading equipment. 
         Four volunteers needed sign up to a pledge for it to succeed.  

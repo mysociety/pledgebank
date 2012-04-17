@@ -162,7 +162,7 @@ function page_header($title, $params = array()) {
 
     // Warn that we are on a testing site
     $devwarning = array();
-    if (OPTION_PB_STAGING) {
+    if (OPTION_PB_STAGING and 0) { # XXX-FIXME
         $devwarning[] = _('This is a test site for developers only. You probably want
 <a href="http://www.pledgebank.com/">the real site</a>.');
     }

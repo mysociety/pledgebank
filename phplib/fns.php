@@ -20,6 +20,7 @@ require_once "pledge.php";
 
 // HTML shortcuts
 function p($s) { return "<p>$s</p>\n"; }
+function h1($s) { return "<h1>$s</h1>\n"; }
 function h2($s) { return "<h2>$s</h2>\n"; }
 function h3($s) { return "<h3>$s</h3>\n"; }
 function strong($s) { return "<strong>$s</strong>"; }

@@ -26,8 +26,8 @@ if ($pledge_id && !preg_match('/^[1-9]\d*$/', $pledge_id)
     header("Location: /");
     exit();
 }
-    
-page_header(_("Contact Us"), $params);
+
+page_header(microsite_contact_title(get_http_var('topic')), $params);
 
 $errors = array();
 if (get_http_var('contactpost')) {

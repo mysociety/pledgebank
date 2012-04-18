@@ -12,7 +12,7 @@
 								<li><a href="/type/adoptastreet">Adopt-a-Street</a></li>
 								<li><a href="/type/grit_my_street">Grit your street</a></li>
 								<li><a href="/type/grit_my_school">Grit your school</a></li>
-								<li><a href="/Recycling">Help encourage recyling</a></li>
+								<li><a href="/Recycling">Help encourage recycling</a></li>
 								<li><a href="/young-carers">Gifts for young carers</a></li>
 								<li class="lastItem"><a href="/contact">Suggest a pledge</a></li><!-- ENSURE LAST ITEM IN LIST RETAINS CLASS ATTRIBUTE -->
 							</ul>

@@ -49,14 +49,20 @@
     Can&rsquo;t see your street? Start a new pledge! 
   </h3>
   <p>
-    If there&rsquo;s not already a pledge for your street, simply start one by sending us your details
-    (don&rsquo;t forget to tell us the street name too!).
+    If there&rsquo;s not already a pledge for your street, simply start one by 
+    filling in the application form.
     You will need to get a minimum of 
     <?= microsites_get_pledge_type_details('olympics2012', 'preloaded_data', 'target') ?>
     households involved for the pledge to be successful.
   </p>
+  </form><!-- close existing global form :-( -->
+  <form class="basic_form xform" method="get"  action="http://www.barnet.gov.uk/forms/form/245/en/olympics_street_party_application" >
+  <p class="center">
+    <input type="submit" class="button next" title="Begin application" name="next" value="Begin application »">
+  </p>
+  </form>
+  <form action="#"> <!-- open global form, no action -->
 </div>
-<? print_contact_form($name, $email, $topic, true) ?>
 <p>The PledgeBank team will . . .</p>
 <ul>
   <li>

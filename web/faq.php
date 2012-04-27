@@ -301,35 +301,7 @@ function default_faq() {
     ############################################################################
 
     print h2('<a name="privacy">'._('Privacy Questions').'</a>');
-    print "<dl>\n";
-
-    print dt(_("I don't want my name visible to everyone when I sign a pledge!"));
-
-    print dd(sprintf(_("You can add yourself secretly to a pledge by unchecking the 'Show
-    my name on this pledge' box when you sign up.  Alternatively, you can sign
-    up by SMS (in %s only).  If you are about to make a sensitive pledge, you may want to 
-    make it private, which means only people with a PIN you give them can
-    view the pledge page."), sms_countries_description()));
-
-    print dt(_('Who gets to see my email address?'));
-
-    print dd(_("We will never disclose your email address to anyone, including the
-    creator of your pledge, unless we are obliged to by law. We do let the pledge
-    creators send emails to pledge subscribers to explain what's going on, to
-    motivate them etc. However, we don't show the pledge creator the addresses of
-    the subscribers getting their email. If you reply to an email from the pledge
-    creator yourself, you will give them your email address&mdash;please be
-    aware!"));
-
-    print dt(_('Will you send nasty, brutish spam to my email address?'));
-
-    print dd(_("Nope. After you sign up to a pledge we will send you emails in
-    relation to your pledge. These will be a mixture of status emails from
-    PledgeBank itself, and missives from the pledge creator, trying to encourage you
-    into greater support. We will never give or sell your email addresses to anyone
-    else, unless we are obliged to by law."));
-
-    print "</dl>\n";
+    print p(_('Please see our separate <a href="/privacy">privacy page</a>.'));
 }
 
 ############################################################################

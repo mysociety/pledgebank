@@ -183,6 +183,7 @@ function pledge_form_one($data = array(), $errors = array()) {
        <h2>
           <?= sprintf(_('This is a custom "%s" pledge.'), htmlspecialchars($data['pledge_type'])); ?>
        </h2>
+       <div class="ms-pledge-list-icon" style="background-image:url(<?= microsites_get_pledge_type_details( $canonical_pledge_type, 'default_image_url')?>);margin:1em 0 1em 0;width:400px;"></div>
        <input type="hidden" name="pledge_type" value="<?= $canonical_pledge_type ?>" />
        <p>
          <?= microsites_get_pledge_type_details( $canonical_pledge_type, 'ref_label') .":" ?>
@@ -199,7 +200,8 @@ function pledge_form_one($data = array(), $errors = array()) {
   <? } 
 } ?>
 
-<p><strong><?=_('I will') ?></strong> <input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="40"></p>
+<p><strong><?=_('I will') ?></strong> 
+	<input<? if (array_key_exists('title', $errors)) print ' class="error"' ?> title="<?=_('Pledge') ?>" type="text" name="title" id="title" value="<? if (isset($data['title'])) print htmlspecialchars($data['title']) ?>" size="40"></p>
 
 <p><strong><?=_('but only if') ?></strong> <input<? if (array_key_exists('target', $errors)) print ' class="error"' ?> onchange="pluralize(this.value)" title="<?=_('Target number of people') ?>" size="2" type="text" id="target" name="target" value="<?=(isset($data['target'])?htmlspecialchars($data['target']):'10') ?>">
 <input<? if (array_key_exists('type', $errors)) print ' class="error"' ?> type="text" id="type" name="type" size="24" value="<?=(isset($data['type'])?htmlspecialchars($data['type']):microsites_other_people()) ?>"></p>

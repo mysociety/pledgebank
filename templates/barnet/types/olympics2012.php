@@ -6,6 +6,8 @@
   <h3>Our 2012 Olympic street party pledges:</h3>
   <?  print pledge_get_ul_list_by_type('olympics2012', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
+  <?  print pledge_get_ul_list_by_type('olympicparkparty', 3, 3, "pledge_type_auto_width_column"); ?>
+  <div style="width:100%;clear:both;height:1px"></div>
 </div>
 <div style="ms-general-box">
   <p>

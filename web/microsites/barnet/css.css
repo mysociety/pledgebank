@@ -420,7 +420,7 @@ body.js #ms-signup-reveal {
 .ms-pledge-banner, .ms-diamondjubilee-banner,
 .ms-royalwedding-banner, .ms-thebiglunch-banner, ms-adoptastreet-banner,
 .ms-grit_my_school-banner, .ms-grit_my_street-banner,
-.ms-olympics2012-banner {
+.ms-olympics2012-banner, .ms-jubileeparkparty-banner, .ms-olympicparkparty-banner {
     width: 100%;
     height: 50px;
     background-position:center center;
@@ -453,6 +453,10 @@ body.js #ms-signup-reveal {
 
 .ms-olympics2012-banner  {
     background-image: url('preloaded/olympics2012.jpg');    
+}
+
+.ms-jubileeparkparty-banner, .ms-olympicparkparty-banner {
+  background-image: url('preloaded/trees_and_leaves.jpg');
 }
 
 /* pledge creation styling */
@@ -494,7 +498,7 @@ ol#breadcrumbs li.hilight em {
 
 #tips {
     float: right;
-    width: 40%;
+    width: 230px; /* Barnet layout is fixed width now */
     margin-top: 1em;
     margin-left: 1em;
 }

@@ -804,6 +804,27 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                     )
                 ));
                 break;
+            case "jubileeparkparty":
+                $details = array_merge($defaults, array(
+                    "title"     => "Party in the Park",
+                    "action"    => "organise a Diamond Jubnilee party in the park",
+                    "ref_label" => "The park",
+                    "ref_note"  => "(it helps us if you include the park's postcode, but don't worry if you don't know it)",
+                    "ref_error_msg" => "Please enter the name of the park you want to use",
+                    "default_image_url" => microsite_preloaded_image_url('trees_and_leaves.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "arrange free public liability insurance for a Diamond Jubilee/Olympics party in %s,",
+                        "target" => 3,
+                        "type"   => "households",
+                        "signup" => "volunteer to organise the party",
+                        "detail" => "Please note:\nIf you agree to become a volunteer, we will automatically share your contact " .
+                                    "details with other participants in your street.",
+                        "date"   => "13 July 2012"
+                    )
+                ));
+                break;
+
             case "grit_my_school":
                 $details = array_merge($defaults, array(
                     "title"     => "Grit My School",
@@ -846,6 +867,26 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                                      "Sharing your contact details with other volunteers:\nIf you agree to become a Community Grit " .
                                      "Keeper or volunteer, we will automatically share your contact details with other " .
                                      "participants in your street."
+                    )
+                ));
+                break;
+            case "olympicparkparty":
+                $details = array_merge($defaults, array(
+                    "title"     => "Party in the Park",
+                    "action"    => "organise a London Olympic 2012 party in the park",
+                    "ref_label" => "The park",
+                    "ref_note"  => "(it helps us if you include the park's postcode, but don't worry if you don't know it)",
+                    "ref_error_msg" => "Please enter the name of the park you want to use",
+                    "default_image_url" => microsite_preloaded_image_url('trees_and_leaves.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "arrange free public liability insurance for a Diamond Jubilee/Olympics party in %s,",
+                        "target" => 3,
+                        "type"   => "households",
+                        "signup" => "volunteer to organise the party",
+                        "detail" => "Please note:\nIf you agree to become a volunteer, we will automatically share your contact " .
+                                    "details with other participants in your street.",
+                        "date"   => "13 July 2012"
                     )
                 ));
                 break;

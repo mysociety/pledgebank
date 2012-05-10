@@ -25,8 +25,14 @@
           Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
       </p>
       <?  print pledge_get_ul_list_by_type('diamondjubilee', 2, 3, "", true); ?>
+      <p style="clear:both;"> 
+	      We can also help arrange  <a href="/type/jubileeparkparty">Jubilee parties in the park</a>.
+	  </p>
+	   <?  print pledge_get_ul_list_by_type('jubileeparkparty', 2, 3, "", true); ?>
       <div style='clear:both;height:0.3em'></div>
   </div>
+
+  <?  print pledge_get_ul_list_by_type('diamondjubilee', 2, 3, "", true); ?>
 
   <!-- ============================= London 2012 Olympics ================================ -->
   <ul class="search_results">
@@ -42,6 +48,10 @@
           Sign up or <a href="/type/olympics2012">start a pledge</a> to arrange your party!
       </p>
       <?  print pledge_get_ul_list_by_type('olympics2012', 2); ?>
+      <p style="clear:both;"> 
+	      We can also help arrange  <a href="/type/olympicparkparty">2012 Olympic parties in the park</a>.
+	  </p>
+	   <?  print pledge_get_ul_list_by_type('olympicparkparty', 2, 3, "", true); ?>
       <div style='clear:both;height:0.3em'></div>
   </div>
 

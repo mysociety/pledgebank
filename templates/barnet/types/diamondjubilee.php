@@ -6,6 +6,9 @@
   <h3>Our Big Jubilee Lunch street party pledges:</h3>
   <?  print pledge_get_ul_list_by_type('diamondjubilee', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
+  <?  print pledge_get_ul_list_by_type('jubileeparkparty', 3, 3, "pledge_type_auto_width_column"); ?>
+  <div style="width:100%;clear:both;height:1px"></div>
+
 </div>
 <div style="ms-general-box">
   <img src="/microsites/barnet/diamond_jubilee_150_x_200.png" alt="2012 Diamond Jubilee logo" style="width:150px;height:200px;margin:0 0 8px 1em; float:right;" />

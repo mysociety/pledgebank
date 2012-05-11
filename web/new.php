@@ -195,7 +195,7 @@ function pledge_form_one($data = array(), $errors = array()) {
        </p>
   <?   } else { ?>
       <p class="error">
-        <?= sprintf(_('Invalid pledge type for this PledgeBank: %s'), htmlspecialchars($data['pledge_type'])) ?>
+        <?= sprintf(_('Invalid pledge type for this PledgeBank: "%s"'), htmlspecialchars($data['pledge_type'])) ?>
       </p> 
   <? } 
 } ?>
@@ -265,8 +265,33 @@ size="40" value="<?=(isset($data['signup'])?htmlspecialchars($data['signup']):_(
     else print 'topreview';
 ?>" value="<?=_('Next step') ?>"></p>
 </form>
+
 <? 
-}
+    $custom_pledge_types = microsites_get_custom_pledge_types();
+    if ($custom_pledge_types && ! $data['pledge_type']){
+        ?>
+        <div class="pledge-type-init">
+            <h3>Alternatively: create a pledge by type</h3>
+            <form action="" method="get">
+                <label for="new_pledge_type">Pledge type:</label>
+                <select name="new_pledge_type">
+                    <option value="no type selected"></option> <!-- forces explanatory error on next page -->
+                    <?
+                        ksort($custom_pledge_types);
+                        foreach ($custom_pledge_types as $type) { ?>
+                            <option value="<?= $type ?>"><?= microsites_get_pledge_type_details($type, 'title'); ?></option>
+                        <? }
+                    ?>
+                </select>
+                <label for="ref">Ref (e.g., street name, etc)</label>
+                <input name="ref" type="text" value="" style="width:250px;"/>
+                <br/>
+                <input type="submit" value="Create new pledge by type"/>
+            </form>
+        </div>
+        <?
+    }
+} // end of pledge_form_one
 
 function pledge_form_target_warning($data, $errors) {
 

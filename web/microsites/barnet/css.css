@@ -359,7 +359,7 @@ body.js #ms-signup-reveal {
 #currentpledges li {
 }
 
-#error, #errors { // NB for Barnet, removed .finished here
+#error, #errors, .error { // NB for Barnet, removed .finished here
     color: #990000;
     background-color: #ffcccc;
     border: solid 2px #990000;
@@ -420,7 +420,7 @@ body.js #ms-signup-reveal {
 .ms-pledge-banner, .ms-diamondjubilee-banner,
 .ms-royalwedding-banner, .ms-thebiglunch-banner, ms-adoptastreet-banner,
 .ms-grit_my_school-banner, .ms-grit_my_street-banner,
-.ms-olympics2012-banner, .ms-jubileeparkparty-banner, .ms-olympicparkparty-banner {
+.ms-olympics2012-banner, .ms-diamondparkparty-banner, .ms-olympicparkparty-banner {
     width: 100%;
     height: 50px;
     background-position:center center;
@@ -455,7 +455,7 @@ body.js #ms-signup-reveal {
     background-image: url('preloaded/olympics2012.jpg');    
 }
 
-.ms-jubileeparkparty-banner, .ms-olympicparkparty-banner {
+.ms-diamondparkparty-banner, .ms-olympicparkparty-banner {
   background-image: url('preloaded/trees_and_leaves.jpg');
 }
 
@@ -502,7 +502,7 @@ ol#breadcrumbs li.hilight em {
     margin-top: 1em;
     margin-left: 1em;
 }
-#tips, #pledge, #pledge_main, #all .pledge, #yourpledges .pledge, .pb-barnet-breakout{
+#tips, #pledge, #pledge_main, #all .pledge, #yourpledges .pledge, .pb-barnet-breakout, .pledge-type-init{
     border: solid 1px #008184;
     background-color: #D8EBEB;
     margin-bottom: 1em;
@@ -517,6 +517,15 @@ ol#breadcrumbs li.hilight em {
   background-color:#008184;
   color:#fff;
   font-size: 0.9em;
+}
+.pledge-type-init {
+  margin-top: 3em;
+}
+#content .pledge-type-init h3 {
+  margin-top: 0;
+}
+.pledge-type-init input {
+  margin-bottom: 1em;
 }
 
 #tips li {

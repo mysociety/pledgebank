@@ -10,7 +10,7 @@
 								<li><a href="/type/olympics2012">Olympic street parties</a></li>
 								<li><a href="/type/olympicparkparty">Olympic parties in the park</a></li>
 								<li><a href="/type/diamondjubilee">Jubilee street parties</a></li>
-								<li><a href="/type/jubileeparkparty">Jubilee parties in the park</a></li>
+								<li><a href="/type/diamondparkparty">Jubilee parties in the park</a></li>
 								<li><a href="/type/adoptastreet">Adopt-a-Street</a></li>
 								<li><a href="/care-home">Visit care home residents</a></li>
 								<li><a href="/type/grit_my_street">Grit your street</a></li>

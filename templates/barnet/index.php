@@ -26,9 +26,9 @@
       </p>
       <?  print pledge_get_ul_list_by_type('diamondjubilee', 2, 3, "", true); ?>
       <p style="clear:both;"> 
-	      We can also help arrange  <a href="/type/jubileeparkparty">parties in the park</a>.
+	      We can also help arrange  <a href="/type/diamondparkparty">parties in the park</a>.
 	  </p>
-	   <?  print pledge_get_ul_list_by_type('jubileeparkparty', 2, 3, "", true); ?>
+	   <?  print pledge_get_ul_list_by_type('diamondparkparty', 2, 3, "", true); ?>
       <div style='clear:both;height:0.3em'></div>
   </div>
 

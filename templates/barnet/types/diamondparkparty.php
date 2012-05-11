@@ -1,10 +1,10 @@
 <!-- =========================== jubilee park party =================================== -->
 
 <h1>Arrange a Diamond Jubilee party in the park</h1> 
-<div class='ms-jubileeparkparty-banner' style="height:200px;"></div>
+<div class='ms-diamondparkparty-banner' style="height:200px;"></div>
 <div id="ms-explicit-party-list">
   <h3>Our Diamond Jubilee party in the park pledges:</h3>
-  <?  print pledge_get_ul_list_by_type('jubileeparkparty', 3, 3, "pledge_type_auto_width_column"); ?>
+  <?  print pledge_get_ul_list_by_type('diamondparkparty', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
 <div style="ms-general-box">
@@ -48,7 +48,7 @@
     If there&rsquo;s not already a pledge for the park, simply start one by 
     filling in the application form.
     You will need to get a minimum of 
-    <?= microsites_get_pledge_type_details('jubileeparkparty', 'preloaded_data', 'target') ?>
+    <?= microsites_get_pledge_type_details('diamondparkparty', 'preloaded_data', 'target') ?>
     households involved for the pledge to be successful.
   </p>
   </form><!-- close existing global form :-( -->

@@ -807,9 +807,9 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                     )
                 ));
                 break;
-            case "jubileeparkparty":
+            case "diamondparkparty":
                 $details = array_merge($defaults, array(
-                    "title"     => "Party in the Park",
+                    "title"     => "Diamond Jubilee party in the Park",
                     "action"    => "organise a Diamond Jubnilee party in the park",
                     "ref_label" => "The park",
                     "ref_note"  => "(it helps us if you include the park's postcode, but don't worry if you don't know it)",
@@ -875,7 +875,7 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                 break;
             case "olympicparkparty":
                 $details = array_merge($defaults, array(
-                    "title"     => "Party in the Park",
+                    "title"     => "London Olympic 2012 Party in the Park",
                     "action"    => "organise a London Olympic 2012 party in the park",
                     "ref_label" => "The park",
                     "ref_note"  => "(it helps us if you include the park's postcode, but don't worry if you don't know it)",
@@ -939,7 +939,7 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
       // Policy here: if the key cannot be found, return null (rather than the whole array if it exists)
       return null; 
     } else {
-      return $details; //note this may be an array, in which case called must *not* provide a key
+      return $details; //note this may be an array (of pledge types) in which case caller must *not* provide a key
     }
 }
 

@@ -3,7 +3,7 @@
 <h1>Arrange a Diamond Jubilee party in the park</h1> 
 <div class='ms-jubileeparkparty-banner' style="height:200px;"></div>
 <div id="ms-explicit-party-list">
-  <h3>Our Party-in-a-Park pledges:</h3>
+  <h3>Our Diamond Jubilee party in the park pledges:</h3>
   <?  print pledge_get_ul_list_by_type('jubileeparkparty', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
 </div>

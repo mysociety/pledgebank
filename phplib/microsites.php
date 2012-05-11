@@ -642,6 +642,7 @@ function microsites_email_message_body_by_topic($topic, $message, $name, $email,
             $topicTitle = $pledge_details['title'];
             $topicAction = $pledge_details['action'];            
             $url_for_new_pledge = OPTION_PB_FIXED_SITE_URL . "/new?new_pledge_type=$topic";
+            $url_for_logout = OPTION_PB_FIXED_SITE_URL . "/logout";
             # number: arbitrary limit, to prevent bloated URLs: this is typically just a street name, after all
             if (strlen($message) < 64 && preg_match("/\w/", $message)) { 
                 $url_for_new_pledge .= "&ref=" . urlencode(trim($message));
@@ -662,6 +663,8 @@ $custom_field_str
 
 If there's not already $indefinite_article $topicTitle pledge in this area, please make one!
 $url_for_new_pledge
+
+Note: if you don't see a \"new pledge\" form there, you're probably not logged in with the PledgeBank team account: click on $url_for_logout first.
 
 You can reply to $name at $email with one of these two templated emails:
 

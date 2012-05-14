@@ -5,10 +5,14 @@
 <div id="ms-explicit-party-list">
   <h3>Our 2012 Olympic street party pledges:</h3>
   <?  print pledge_get_ul_list_by_type('olympics2012', 3, 3, "pledge_type_auto_width_column"); ?>
+  <p style="padding-left:0.5em;clear:both;"> 
+    Prefer a park? We are also supporting pledges to arrange <a href="/type/olympicparkparty">parties in the park</a>.
+  </p>
+  <?  print pledge_get_ul_list_by_type('olympicparkparty', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
 </div>
 <div style="ms-general-box">
-  <p>
+  <p style="padding-top:1em;">
     The 2012 Games represent a unique opportunity for London and the UK. It is a wonderful excuse for a street party
     &mdash; not only is a street party a fun way for residents to celebrate such an event, it&rsquo;s also a great
     way to get to know your neighbours better.
@@ -54,6 +58,10 @@
     You will need to get a minimum of 
     <?= microsites_get_pledge_type_details('olympics2012', 'preloaded_data', 'target') ?>
     households involved for the pledge to be successful.
+  </p>
+  <p>
+    If you're interested in arranging a party in the <strong>park</strong> rather than your street,
+    please see the <a href="/type/olympicparkparty">Olympics 2012 parties in the park</a> page instead.
   </p>
   </form><!-- close existing global form :-( -->
   <form class="basic_form xform" method="get"  action="http://www.barnet.gov.uk/forms/form/245/en/olympics_street_party_application" >

@@ -642,6 +642,7 @@ function microsites_email_message_body_by_topic($topic, $message, $name, $email,
             $topicTitle = $pledge_details['title'];
             $topicAction = $pledge_details['action'];            
             $url_for_new_pledge = OPTION_PB_FIXED_SITE_URL . "/new?new_pledge_type=$topic";
+            $url_for_logout = OPTION_PB_FIXED_SITE_URL . "/logout";
             # number: arbitrary limit, to prevent bloated URLs: this is typically just a street name, after all
             if (strlen($message) < 64 && preg_match("/\w/", $message)) { 
                 $url_for_new_pledge .= "&ref=" . urlencode(trim($message));
@@ -662,6 +663,8 @@ $custom_field_str
 
 If there's not already $indefinite_article $topicTitle pledge in this area, please make one!
 $url_for_new_pledge
+
+Note: if you don't see a \"new pledge\" form there, you're probably not logged in with the PledgeBank team account: click on $url_for_logout first.
 
 You can reply to $name at $email with one of these two templated emails:
 
@@ -804,6 +807,27 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                     )
                 ));
                 break;
+            case "diamondparkparty":
+                $details = array_merge($defaults, array(
+                    "title"     => "Diamond Jubilee party in the Park",
+                    "action"    => "organise a Diamond Jubnilee party in the park",
+                    "ref_label" => "The park",
+                    "ref_note"  => "(it helps us if you include the park's postcode, but don't worry if you don't know it)",
+                    "ref_error_msg" => "Please enter the name of the park you want to use",
+                    "default_image_url" => microsite_preloaded_image_url('trees_and_leaves.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "arrange free public liability insurance for a Diamond Jubilee/Olympics party in %s,",
+                        "target" => 3,
+                        "type"   => "households",
+                        "signup" => "volunteer to organise the party",
+                        "detail" => "Please note:\nIf you agree to become a volunteer, we will automatically share your contact " .
+                                    "details with other participants in your street.",
+                        "date"   => "13 July 2012"
+                    )
+                ));
+                break;
+
             case "grit_my_school":
                 $details = array_merge($defaults, array(
                     "title"     => "Grit My School",
@@ -846,6 +870,26 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                                      "Sharing your contact details with other volunteers:\nIf you agree to become a Community Grit " .
                                      "Keeper or volunteer, we will automatically share your contact details with other " .
                                      "participants in your street."
+                    )
+                ));
+                break;
+            case "olympicparkparty":
+                $details = array_merge($defaults, array(
+                    "title"     => "London Olympic 2012 Party in the Park",
+                    "action"    => "organise a London Olympic 2012 party in the park",
+                    "ref_label" => "The park",
+                    "ref_note"  => "(it helps us if you include the park's postcode, but don't worry if you don't know it)",
+                    "ref_error_msg" => "Please enter the name of the park you want to use",
+                    "default_image_url" => microsite_preloaded_image_url('trees_and_leaves.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "arrange free public liability insurance for a Diamond Jubilee/Olympics party in %s,",
+                        "target" => 3,
+                        "type"   => "households",
+                        "signup" => "volunteer to organise the party",
+                        "detail" => "Please note:\nIf you agree to become a volunteer, we will automatically share your contact " .
+                                    "details with other participants in your street.",
+                        "date"   => "13 July 2012"
                     )
                 ));
                 break;
@@ -895,7 +939,7 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
       // Policy here: if the key cannot be found, return null (rather than the whole array if it exists)
       return null; 
     } else {
-      return $details; //note this may be an array, in which case called must *not* provide a key
+      return $details; //note this may be an array (of pledge types) in which case caller must *not* provide a key
     }
 }
 

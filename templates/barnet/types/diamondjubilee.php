@@ -5,7 +5,12 @@
 <div id="ms-explicit-party-list">
   <h3>Our Big Jubilee Lunch street party pledges:</h3>
   <?  print pledge_get_ul_list_by_type('diamondjubilee', 3, 3, "pledge_type_auto_width_column"); ?>
+  <p style="padding-left:0.5em;clear:both;"> 
+    Prefer a park? We are also supporting pledges to arrange <a href="/type/diamondparkparty">parties in the park</a>.
+  </p>
+  <?  print pledge_get_ul_list_by_type('diamondparkparty', 3, 3, "pledge_type_auto_width_column"); ?>
   <div style="width:100%;clear:both;height:1px"></div>
+
 </div>
 <div style="ms-general-box">
   <img src="/microsites/barnet/diamond_jubilee_150_x_200.png" alt="2012 Diamond Jubilee logo" style="width:150px;height:200px;margin:0 0 8px 1em; float:right;" />
@@ -50,6 +55,11 @@
     You will need to get a minimum of 3 households involved for the pledge to be successful.
   </p>
 </div>
+<p>
+    If you're interested in arranging a party in the <strong>park</strong> rather than your street,
+    please see the <a href="/type/diamondparkparty">Diamond Jubilee parties in the park</a> page instead.
+  </p>
+
 <? print_contact_form($name, $email, $topic, true) ?>
 <p>The PledgeBank team will . . .</p>
 <ul>

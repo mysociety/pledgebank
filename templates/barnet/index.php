@@ -25,6 +25,10 @@
           Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
       </p>
       <?  print pledge_get_ul_list_by_type('diamondjubilee', 2, 3, "", true); ?>
+      <p style="clear:both;"> 
+	      We can also help arrange  <a href="/type/diamondparkparty">parties in the park</a>.
+	  </p>
+	   <?  print pledge_get_ul_list_by_type('diamondparkparty', 2, 3, "", true); ?>
       <div style='clear:both;height:0.3em'></div>
   </div>
 
@@ -42,6 +46,10 @@
           Sign up or <a href="/type/olympics2012">start a pledge</a> to arrange your party!
       </p>
       <?  print pledge_get_ul_list_by_type('olympics2012', 2); ?>
+      <p style="clear:both;"> 
+	      We can also help arrange  <a href="/type/olympicparkparty">parties in the park</a>.
+	  </p>
+	   <?  print pledge_get_ul_list_by_type('olympicparkparty', 2, 3, "", true); ?>
       <div style='clear:both;height:0.3em'></div>
   </div>
 

@@ -51,6 +51,10 @@
     <?= microsites_get_pledge_type_details('diamondparkparty', 'preloaded_data', 'target') ?>
     households involved for the pledge to be successful.
   </p>
+	<p>
+		The final day to submit your application is <strong>Sunday 20&nbsp;May</strong>. If your application is approved, a pledge will be created 
+		and <strong>must be signed by three or more households by 5pm, Friday 25 May</strong>.
+	</p>
   </form><!-- close existing global form :-( -->
   <form class="basic_form xform" method="get"  action="http://www.barnet.gov.uk/forms/form/246/en/party_in_the_park_application" >
   <p class="center">

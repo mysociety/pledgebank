@@ -14,7 +14,7 @@
 </div>
 <div style="ms-general-box">
   <img src="/microsites/barnet/diamond_jubilee_150_x_200.png" alt="2012 Diamond Jubilee logo" style="width:150px;height:200px;margin:0 0 8px 1em; float:right;" />
-  <p style="font-weight:bold;">
+  <p style="font-weight:bold;margin-top:1em;">
     We&rsquo;re joining in with the 
     <a href="http://www.thebiglunch.com/join-in/jubilee-2012.php">Big Jubilee Lunch</a> on Sunday&nbsp;3rd&nbsp;June&nbsp;2012
     (although you can have your party on any day close to the Jubilee weekend!)
@@ -46,13 +46,15 @@
   </h3>
   <p>
     Check to see if your street is shown at the top of this page &mdash; click on it and sign up!
+    You will need to get a minimum of 3 households involved for the pledge to be successful.
   </p>
   <h3>
-    Can&rsquo;t see your street? Start a new pledge! 
+    Can&rsquo;t see your street? 
   </h3>
   <p>
-    If there&rsquo;s not already a pledge for your street, simply start one. 
-    You will need to get a minimum of 3 households involved for the pledge to be successful.
+	Sorry &mdash; applications for Diamond Jubilee street party pledges are now closed.
+	You could start planning a <a href="/type/olympics2012">2012 Olympics street party</a>
+	instead though!
   </p>
 </div>
 <p>
@@ -60,17 +62,11 @@
     please see the <a href="/type/diamondparkparty">Diamond Jubilee parties in the park</a> page instead.
   </p>
 
-<? print_contact_form($name, $email, $topic, true) ?>
-<p>The PledgeBank team will . . .</p>
-<ul>
-  <li>
-    start a pledge page to help encourage people in your street to get involved and invite you to be the first to sign it
-  </li>
-  <li>
-    or, if we&rsquo;ve created one already, we'll let you know so you can sign up to it
-  </li>
-</ul>
+<p><strong>
+	Applications for Diamond Jubilee street parties are now closed!
+</strong></p>
+
 <p>
-  After that, it&rsquo;s up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
+  Remember that it&rsquo;s up to you to spread the word to your neighbours to get them to sign your pledge and get involved!
 </p>
 

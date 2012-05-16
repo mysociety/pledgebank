@@ -21,8 +21,9 @@
   <div class="barnet-type-pledges">
       <p>
           Barnet Council will help you celebrate the Diamond Jubilee with a street party in your street during the 
-          weekend of Saturday 2&nbsp;June &ndash; Tuesday 5&nbsp;June 2012 provided at least 3 households agree to help organise it.            
-          Sign up or <a href="/type/diamondjubilee">start a pledge</a> to arrange your party!
+          weekend of Saturday 2&nbsp;June &ndash; Tuesday 5&nbsp;June 2012 provided at least 3 households agree to help organise it.
+          We've had a <a href="/type/diamondjubilee">tremendous response</a> &ndash; applications for Diamond Jubilee 
+          street parties are now closed.
       </p>
       <?  print pledge_get_ul_list_by_type('diamondjubilee', 2, 3, "", true); ?>
       <p style="clear:both;"> 

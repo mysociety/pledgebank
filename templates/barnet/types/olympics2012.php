@@ -23,7 +23,7 @@
       <strong>between 27&nbsp;July and 12&nbsp;August&nbsp;2012</strong>.
     </li>
     <li>
-      We have special LOCOG Olympic bunting packs available for the first 10 fulfilled street parties!
+      We have special LOCOG Olympic bunting packs available for the first 8 fulfilled street parties!
     </li>
   </ul>
   <div class="pb-barnet-breakout" style="position:relative;padding-top: 1em;">

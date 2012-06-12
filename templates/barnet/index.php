@@ -13,26 +13,6 @@
 
 <div id="currentpledges">
 
-  <!-- ============================= diamond jubilee ================================ -->
-  <ul class="search_results">
-      <li><a href="/type/diamondjubilee" title="Diamond Jubilee street parties" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/diamond_jubilee.jpg);"></div></a><a href="/type/diamondjubilee">Diamond Jubilee street party pledges</a><br>
-      </li>
-  </ul>
-  <div class="barnet-type-pledges">
-      <p>
-          Barnet Council will help you celebrate the Diamond Jubilee with a street party in your street during the 
-          weekend of Saturday 2&nbsp;June &ndash; Tuesday 5&nbsp;June 2012 provided at least 3 households agree to help organise it.
-          We've had a <a href="/type/diamondjubilee">tremendous response</a> &ndash; applications for Diamond Jubilee 
-          street parties are now closed.
-      </p>
-      <?  print pledge_get_ul_list_by_type('diamondjubilee', 2, 3, "", true); ?>
-      <p style="clear:both;"> 
-	      We can also help arrange  <a href="/type/diamondparkparty">parties in the park</a>.
-	  </p>
-	   <?  print pledge_get_ul_list_by_type('diamondparkparty', 2, 3, "", true); ?>
-      <div style='clear:both;height:0.3em'></div>
-  </div>
-
   <!-- ============================= London 2012 Olympics ================================ -->
   <ul class="search_results">
       <li><a href="/type/olympics2012" title="London 2012 Olympics street parties" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/olympics2012.jpg);"></div></a><a href="/type/olympics2012">London 2012 Olympic street party pledges</a><br>
@@ -103,17 +83,4 @@
     bit for the community. By working together, we can offer services that
     are popular and worthwhile.
   </p>
-  <!--
-  <div style="border:1px solid white;">
-    <div style="border-top: 4px solid #00ada1;margin-top:1em;">
-      <h3><a href="/type/adoptastreet" title="Adopt a Street" >Adopt a Street</a></h3>
-      <p>        
-        We're supporting residents up to ten streets in Barnet to
-        adopt their street with the following pledges:
-        sign up or <a href="/type/adoptastreet">start a pledge</a> to adopt your street!
-      </p>
-      <?  print pledge_get_ul_list_by_type('adoptastreet'); ?>
-    </div>
-  </div>
-  -->
 </div>  

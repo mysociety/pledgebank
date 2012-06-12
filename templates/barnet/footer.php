@@ -9,14 +9,12 @@
 								<li><a href="/">Introduction</a></li>
 								<li><a href="/type/olympics2012">Olympic street parties</a></li>
 								<li><a href="/type/olympicparkparty">Olympic parties in the park</a></li>
-								<li><a href="/type/diamondjubilee">Jubilee street parties</a></li>
-								<li><a href="/type/diamondparkparty">Jubilee parties in the park</a></li>
 								<li><a href="/type/adoptastreet">Adopt-a-Street</a></li>
 								<li><a href="/care-home">Visit care home residents</a></li>
-								<li><a href="/type/grit_my_street">Grit your street</a></li>
-								<li><a href="/type/grit_my_school">Grit your school</a></li>
+								<li><a href="/placements">Offer work placements</a></li>
 								<li><a href="/Recycling">Help encourage recycling</a></li>
 								<li><a href="/young-carers">Gifts for young carers</a></li>
+								<li><a href="/type/diamondjubilee">Jubilee street parties</a></li>
 								<li class="lastItem"><a href="/contact"><strong>Suggest a pledge</strong></a></li><!-- ENSURE LAST ITEM IN LIST RETAINS CLASS ATTRIBUTE -->
 							</ul>
 						</div>

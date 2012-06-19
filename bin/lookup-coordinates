@@ -42,7 +42,7 @@ my $s = dbh()->prepare("select id, postcode from pledges where country = 'GB' an
 $s->execute();
 while (my ($id, $postcode) = $s->fetchrow_array()) {
     try {
-        my $loc = mySociety::MaPit::get_location($postcode, 1);
+        my $loc = mySociety::MaPit::call('postcode', "partial/$postcode");
         dbh()->do('update pledges set latitude = ?, longitude = ? where id = ?', {}, $loc->{wgs84_lat}, $loc->{wgs84_lon}, $id);
     } catch RABX::Error with {
         my $e = shift;

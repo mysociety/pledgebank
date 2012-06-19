@@ -113,7 +113,7 @@ define('OPTION_HTTPD_ERROR_LOG', '/var/log/apache/error.log');
 
 // Where web services used are
 define('OPTION_EVEL_URL', 'http://services.mysociety.org/evel');
-define('OPTION_MAPIT_URL', 'http://services.mysociety.org/mapit');
+define('OPTION_MAPIT_URL', 'http://mapit.mysociety.org/');
 define('OPTION_GAZE_URL', 'http://gaze.mysociety.org/gaze');
 define('OPTION_RATTY_URL', 'http://services.mysociety.org/ratty');
 

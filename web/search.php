@@ -160,7 +160,7 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
     $is_partial_postcode = validate_partial_postcode($search);
     if ($is_postcode || $is_partial_postcode)  {
         $success = 1;
-        $location = mapit_get_location($search, $is_partial_postcode ? 1 : 0);
+        $location = mapit_call('postcode', $is_partial_postcode ? "partial/$search" : $search);
         if (mapit_get_error($location)) {
             if (!$rss)
                 print p(_("We couldn't find that postcode, please check it again."));

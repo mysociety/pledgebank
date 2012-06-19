@@ -325,7 +325,7 @@ function gaze_controls_validate_location(&$location, &$errors, $params = array()
     if ($location['postcode']) {
         if (!validate_partial_postcode($location['postcode']) && !validate_postcode($location['postcode']))
             $errors['postcode'] = _('Please enter a postcode, or just its first part; for example, OX1 3DR or WC1.');
-        elseif (mapit_get_error(mapit_get_location($location['postcode'], 1))) {
+        elseif (mapit_get_error(mapit_call('postcode', 'partial/' . $location['postcode']))) {
             if (preg_match('#^(IM|JE|GY)#i', $location['postcode'])) {
                 $errors['postcode'] = _("I'm afraid we don't know about Isle of Man or Channel Island postcodes. Please try entering a local town instead.");
             } else {

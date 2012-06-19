@@ -1408,7 +1408,7 @@ sub do_sms_pledge {
     $wth->browser_check_contents("Send announcement");
     $wth->browser_submit_form(form_name => 'pledge',
                 fields => { message_body => "It all worked, hurrah! Things are good when they work, especially messages to people when a pledge has been completed. Blah blah blah blah blah blah. " . name_n(100),
-                            message_sms => "Yippee! All the £ are yours!" . (split(m/ /,name_n(100)))[0]. " x"},
+                            message_sms => "Yippee! All the \x{00a3} are yours!" . (split(m/ /,name_n(100)))[0]. " x"},
         button => 'submit') or die "Failed to submit SMS/email announce form";
     $wth->browser_check_contents("Your message will now be sent to all the people who signed your pledge");
     call_frequentupdate();

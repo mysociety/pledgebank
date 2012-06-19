@@ -566,7 +566,7 @@ sub find_and_sign_pledge {
                 $wth->browser_follow_link(text_regex => qr/All Pledges/) or die "Failed to find 'All Pledges' link";
             }
             if ($find_type eq 'list_succeeded_open') {
-                $wth->browser_follow_link(text_regex => qr/Successful\xa0open/) or die "Failed to find 'Successful open' link";
+                $wth->browser_follow_link(text_regex => qr/Successful open/) or die "Failed to find 'Successful open' link";
             }
             $wth->browser_follow_link(text_regex => qr/$find_string/) or die "Failed to find '$find_string' link";
         }

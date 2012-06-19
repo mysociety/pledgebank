@@ -55,7 +55,7 @@ function alert_signup($person_id, $event_code, $params) {
             $params['postcode'] = canonicalise_partial_postcode($params['postcode']);
 
             /* Find out where on earth it is */
-            $location = mapit_call('postcode', 'partial/' . $params['postcode']);
+            $location = mapit_call('postcode/' . $params['postcode'], 'partial');
             if (mapit_get_error($location)) {
                 /* This error should never happen, as earlier postcode validation in form will stop it */
                 err('Invalid postcode while setting alert, please check and try again.');

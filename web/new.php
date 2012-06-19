@@ -1058,7 +1058,7 @@ function create_new_pledge($P, $data) {
         /* Optionally add a pledge location. */
         $location_id = null;
         if ($data['postcode']) {
-            $location = mapit_call('postcode', 'partial/' . $data['postcode']);
+            $location = mapit_call('postcode/' . $data['postcode'], 'partial');
             if (mapit_get_error($location))
                 /* This error should never happen, as earlier postcode validation in form will stop it */
                 err('Invalid postcode while creating pledge; please check and try again.');

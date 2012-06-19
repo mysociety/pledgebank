@@ -166,7 +166,11 @@ function search_pledge_by_postcode($search) {
 
     if ($is_postcode || $is_partial_postcode)  {
         $success = 1;
-        $location = mapit_call('postcode', $is_partial_postcode ? "partial/$search" : $search);
+        if ($is_partial_postcode) {
+            $location = mapit_call("postcode/$search", 'partial');
+        } else {
+            $location = mapit_call('postcode', $search);
+        }
         if (mapit_get_error($location)) {
                $pcoutput['errors'] = "We couldn't find that postcode, please check it again.";
         } else {

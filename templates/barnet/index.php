@@ -13,27 +13,6 @@
 
 <div id="currentpledges">
 
-  <!-- ============================= London 2012 Olympics ================================ -->
-  <ul class="search_results">
-      <li><a href="/type/olympics2012" title="London 2012 Olympics street parties" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/olympics2012.jpg);"></div></a><a href="/type/olympics2012">London 2012 Olympic street party pledges</a><br>
-      </li>
-  </ul>
-  <div class="barnet-type-pledges">
-      <p>
-          Barnet Council will help you celebrate the London 2012 Olympics with a street party in your street 
-          between 27&nbsp;July and 12&nbsp;August 2012 provided at least 
-          <?= microsites_get_pledge_type_details('olympics2012', 'preloaded_data', 'target') ?>
-          households agree to help organise it.            
-          Sign up or <a href="/type/olympics2012">start a pledge</a> to arrange your party!
-      </p>
-      <?  print pledge_get_ul_list_by_type('olympics2012', 2); ?>
-      <p style="clear:both;"> 
-	      We can also help arrange  <a href="/type/olympicparkparty">parties in the park</a>.
-	  </p>
-	   <?  print pledge_get_ul_list_by_type('olympicparkparty', 2, 3, "", true); ?>
-      <div style='clear:both;height:0.3em'></div>
-  </div>
-
     <!-- ============================= adopt a street ================================ -->
     
     <ul class="search_results">

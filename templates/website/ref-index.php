@@ -31,6 +31,10 @@ if (!$p->finished() && $p->ref() == 'us-patriot-drive') {
 }
 print '<ul>';
 if (!$p->pin()) {
+    $share_title = "'" . microsites_pledge_prefix(_('I will'), $p->creator_name()) . ' ' . $p->h_title() . "'";
+    if (mb_strlen($share_title) > 119) {
+        $share_title = mb_substr($share_title, 0, 118) . "\xC3\xA1";
+    }
 ?>
 <li>
 <div id="fb-root"></div>
@@ -41,7 +45,8 @@ if (!$p->pin()) {
   js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
-<a href="http://twitter.com/share" class="twitter-share-button" data-url="<?=$p->url_typein()?>" data-count="none">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="<?=$p->url_typein()?>" data-text="<?=$share_title?>" data-related="mysociety" data-count="none" data-dnt="true">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 <div class="fb-like" data-href="<?=$p->url_typein()?>" data-send="false" data-layout="button_count" data-width="90" data-show-faces="false" style="vertical-align:top"></div>
 <?
 } else {

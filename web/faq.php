@@ -108,7 +108,7 @@ function default_faq() {
     print dt(_('Do you need any help with the project?'));
 
     print dd(_('Yes, we can use help in all sorts of ways, technical or non-technical.
-    Please <a href="/contact">contact us</a> if you want to get in touch.'));
+    Please <a href="http://www.mysociety.org/helpus/volunteering-for-pledgebank/">see our volunteering page</a>.'));
 
     print dt(_('Where\'s the "source code" to PledgeBank?'));
 

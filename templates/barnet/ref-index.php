@@ -78,7 +78,15 @@
                     <a href="http://twitter.com/share" class="twitter-share-button" data-url="<?=$p->url_typein()?>" data-count="none">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>                    
                 </li>
                 <li>
-                    <a class="fb_share" name="fb_share" type="button" share_url="<?=$p->url_typein()?>" href="http://www.facebook.com/sharer.php">Share</a><script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<div class="fb-like" data-href="<?=$p->url_typein()?>" data-send="false" data-layout="button_count" data-width="90" data-show-faces="false" style="vertical-align:top"></div>
                 </li>
                 <?
                     if (False && !$p->finished()) { // suppressed for now: FIXME: need to sort out generation and wording of flyers and blog share

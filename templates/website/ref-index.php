@@ -33,7 +33,7 @@ print '<ul>';
 if (!$p->pin()) {
     $share_title = "'" . microsites_pledge_prefix(_('I will'), $p->creator_name()) . ' ' . $p->h_title() . "'";
     if (mb_strlen($share_title) > 119) {
-        $share_title = mb_substr($share_title, 0, 118) . "\xC3\xA1";
+        $share_title = mb_substr($share_title, 0, 118) . "\xE2\x80\xA6";
     }
 ?>
 <li>

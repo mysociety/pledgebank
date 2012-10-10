@@ -253,6 +253,8 @@ if ($q_submit) {
         array_push($errors, _("Please add instructions for the pledge signers to the email message."));
     if (strlen($q_message_body) < 50)
         array_push($errors, _("Please enter a longer message."));
+    if (!$q_message_subject)
+        array_push($errors, _("Please enter a subject for your message."));
 
 }
 

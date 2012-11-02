@@ -7,6 +7,8 @@
 							<h2><a href="#">PledgeBank</a></h2>
 							<ul>
 								<li><a href="/">Introduction</a></li>
+								<li><a href="/type/gritmystreet2012">Grit your street</a></li>
+								<li><a href="/type/gritmyschool2012">Grit your school</a></li>
 								<li><a href="/type/adoptastreet">Adopt-a-Street</a></li>
 								<li><a href="/care-home">Visit care home residents</a></li>
 								<li><a href="/placements">Offer work placements</a></li>

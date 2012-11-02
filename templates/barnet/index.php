@@ -12,6 +12,36 @@
 <h1>Barnet PledgeBank is a site to get things done.</h1>
 
 <div id="currentpledges">
+    <!-- ============================= grit my street 2012 ================================ -->
+    
+    <ul class="search_results">
+        <li><a href="/type/gritmystreet2012" title="Grit my street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/gritmystreet2012">Grit My Street pledges</a><br>
+        </li>
+    </ul>
+    <div class="barnet-type-pledges">
+        <p>
+			Barnet Council will support volunteers who wish to clear snow by offering grit and spreading equipment.
+			Four volunteers must sign up to the pledge (one of whom will be the community grit keeper):
+			sign up or <a href="/type/grit_my_street">start a pledge</a> to grit your street!        
+        </p>
+        <?  print pledge_get_ul_list_by_type('gritmystreet2012', 2, 3, "", true); ?>
+        <div style='clear:both;height:0.3em'></div>
+    </div>
+
+    <!-- ============================= grit my school 2012 ================================ -->
+    
+    <ul class="search_results">
+        <li><a href="/type/gritmyschool2012" title="Grit my school" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/gritmyschool2012">Grit My School pledges</a><br>
+        </li>
+    </ul>
+    <div class="barnet-type-pledges">
+        <p>
+			We're also supporting volunteers who want to help with "Grit My School" pledges again this year:
+			sign up or <a href="/type/grit_my_street">start a pledge</a> to grit your school!        
+        </p>
+        <?  print pledge_get_ul_list_by_type('gritmyschool2012', 2, 3, "", true); ?>
+        <div style='clear:both;height:0.3em'></div>
+    </div>
 
     <!-- ============================= adopt a street ================================ -->
     

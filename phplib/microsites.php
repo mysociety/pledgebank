@@ -827,10 +827,10 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                     )
                 ));
                 break;
-
             case "grit_my_school":
+            case "gritmyschool2012":
                 $details = array_merge($defaults, array(
-                    "title"     => "Grit My School",
+                    "title"     => "Grit My School " . ($pledge_type == 'grit_my_school'? '2011':'2012'),
                     "action"    => "grit your school",
                     "ref_label" => "Your school",
                     "ref_note"  => "(it helps us if you include the school's postcode, but don't worry if you don't know it)",
@@ -853,8 +853,9 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                 ));
                 break;
             case "grit_my_street":
+            case "gritmystreet2012":
                 $details = array_merge($defaults, array(
-                    "title"     => "Grit My Street",
+                    "title"     => "Grit My Street" . ($pledge_type == 'grit_my_street'? '2011':'2012'),
                     "action"    => "grit your street",
                     "default_image_url" => microsite_preloaded_image_url('frosty_flower.jpg'),
                     "preloaded_data" => array(

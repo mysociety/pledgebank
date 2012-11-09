@@ -9,15 +9,19 @@
 </div>
 <div style="font-size:1.126em;padding-bottom:0.25em;">
   <p style="font-weight:bold;">
-    Barnet Council will assist residents clearing snow by offering grit and spreading equipment. 
-    Residents must agree to become community grit keepers and get as many people to sign up to a pledge. 
+    Barnet Council will assist residents clearing snow by offering grit and spreading equipment
+    to the first 40 schools to get 
+    <?= microsites_get_pledge_type_details('gritmyschool2012', 'preloaded_data', 'target') ?>
+    volunteers signed up.
+    Residents must agree to become community Grit Keepers and get as many people to sign up to a pledge
+    as possible. 
   </p>
   <p>
     Health and Safety advice is provided and insurance cover is arranged. 
   </p>
   <p> 
     Schools have the chance to take part and get parents and volunteers 
-    to help clear access to the school and playgrounds. 
+    to help clear access to the school. 
   </p>
   <p>
     If you would like to volunteer, you need to sign up to a pledge. If you can’t see your school, 
@@ -27,12 +31,12 @@
 <div style="width:100%;clear:both;height:1px"></div>
 <div style="float:right; width:45%;margin-left:1em;position:relative;" class="pb-barnet-breakout">
   <h3>
-     What you need to do: Sign up to a pledge!
+     What you need to do: Sign up to a pledge.
   </h3>
   <p>
     Check to see if your school is shown at the top of this page &mdash; click on it and sign up!
   <h3>
-  Can’t see your school? Start a new pledge! 
+  Can’t see your school? Start a new pledge.
   </h3>
   <p>
   If there’s not already a pledge for your school, simply start one. 
@@ -54,13 +58,10 @@
 <ul style="font-size:1.126em;margin-bottom:2em;">
   <li>
       looking for your <strong>street</strong>? We're also running similar pledges for
-      <a href="/type/gritmystreet2012">clearing snow from streets in Barnet</a>!
+      <a href="/type/gritmystreet2012">clearing snow from streets in Barnet</a>.
   </li>
 </ul>
 <ul>
-    <li>
-        Read our check list of ‘things to consider’ when becoming a grit keeper
-    </li>
     <li>
         Fill in the request form
     </li>

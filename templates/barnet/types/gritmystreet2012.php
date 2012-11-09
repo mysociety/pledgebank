@@ -9,8 +9,11 @@
 </div>
 <div style="font-size:1.126em;padding-bottom:0.25em;">
   <p style="font-weight:bold;">
-    Barnet Council will assist residents clearing snow by offering grit and spreading equipment. 
-    Residents must agree to become community grit keepers and get as many people to sign up to a pledge. 
+    Barnet Council will assist residents clearing snow by offering grit and spreading equipment
+	to the first 20 streets to get 
+    <?= microsites_get_pledge_type_details('gritmyschool2012', 'preloaded_data', 'target') ?>
+    volunteers signed up.
+    Residents must agree to become community Grit Keepers and get as many people to sign up to a pledge. 
   </p>
   <p>
     Health and Safety advice is provided and insurance cover is arranged. 
@@ -23,12 +26,12 @@
 <div style="width:100%;clear:both;height:1px"></div>
 <div style="float:right; width:45%;margin-left:1em;position:relative;" class="pb-barnet-breakout">
   <h3>
-     What you need to do: Sign up to a pledge!
+     What you need to do: Sign up to a pledge.
   </h3>
   <p>
     Check to see if your road is shown at the top of this page &mdash; click on it and sign up!
   <h3>
-  Can’t see your street? Start a new pledge! 
+  Can’t see your street? Start a new pledge.
   </h3>
   <p>
   If there’s not already a pledge for your road, simply start one. 
@@ -50,14 +53,11 @@
 <ul style="font-size:1.126em;margin-bottom:2em;">
   <li>
       looking for your <strong>school</strong>? We're also running similar pledges for
-      <a href="/type/gritmyschool2012">clearing snow from schools in Barnet</a>!
+      <a href="/type/gritmyschool2012">clearing snow from schools in Barnet</a>.
   </li>
 </ul>
 
 <ul>
-    <li>
-        Read our check list of ‘things to consider’ when becoming a grit keeper
-    </li>
     <li>
         Fill in the request form
     </li>

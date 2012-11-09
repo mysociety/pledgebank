@@ -20,9 +20,13 @@
     </ul>
     <div class="barnet-type-pledges">
         <p>
-			Barnet Council will support volunteers who wish to clear snow by offering grit and spreading equipment.
-			Four volunteers must sign up to the pledge (one of whom will be the community grit keeper):
-			sign up or <a href="/type/grit_my_street">start a pledge</a> to grit your street!        
+			After the success of last year's griting pledges, Barnet Council is supporting volunteers
+			who wish to clear snow by offering grit and spreading equipment to the first 20 streets
+			to get four
+			<!-- <?= microsites_get_pledge_type_details('gritmystreet2012', 'preloaded_data', 'target') ?> -->
+			volunteers signed up.
+			Volunteers must sign up to the pledge (one of whom will be the community Grit Keeper).
+			Sign up or <a href="/type/gritmystreet2012">start a pledge</a> to grit your street.  
         </p>
         <?  print pledge_get_ul_list_by_type('gritmystreet2012', 2, 3, "", true); ?>
         <div style='clear:both;height:0.3em'></div>
@@ -36,8 +40,11 @@
     </ul>
     <div class="barnet-type-pledges">
         <p>
-			We're also supporting volunteers who want to help with "Grit My School" pledges again this year:
-			sign up or <a href="/type/grit_my_street">start a pledge</a> to grit your school!        
+			We're also supporting volunteers who want to help with "Grit My School" pledges again this year,
+			by offering grit and spreading equipment to the first 40 schools to get four
+			<!--<?= microsites_get_pledge_type_details('gritmyschool2012', 'preloaded_data', 'target') ?>-->
+			volunteers signed up.
+			Sign up or <a href="/type/gritmyschool2012">start a pledge</a> to grit your school!        
         </p>
         <?  print pledge_get_ul_list_by_type('gritmyschool2012', 2, 3, "", true); ?>
         <div style='clear:both;height:0.3em'></div>

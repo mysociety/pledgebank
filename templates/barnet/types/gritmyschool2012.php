@@ -17,7 +17,7 @@
     as possible. 
   </p>
   <p>
-    Health and Safety advice is provided and insurance cover is arranged. 
+    Health and Safety advice is provided and schools should note that they must cover all volunteers under their own public liability insurance.
   </p>
   <p> 
     Schools have the chance to take part and get parents and volunteers 

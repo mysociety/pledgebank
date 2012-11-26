@@ -10,10 +10,10 @@
 								<li><a href="/type/gritmystreet2012">Grit your street</a></li>
 								<li><a href="/type/gritmyschool2012">Grit your school</a></li>
 								<li><a href="/type/adoptastreet">Adopt-a-Street</a></li>
+								<li><a href="/donateagift2012">Gifts for young carers</a></li>
 								<li><a href="/care-home">Visit care home residents</a></li>
 								<li><a href="/placements">Offer work placements</a></li>
 								<li><a href="/Recycling">Help encourage recycling</a></li>
-								<li><a href="/young-carers">Gifts for young carers</a></li>
 								<li><a href="/type/olympics2012">Olympic street parties</a></li>
 								<li><a href="/type/olympicparkparty">Olympic parties in the park</a></li>
 								<li><a href="/type/diamondjubilee">Jubilee street parties</a></li>

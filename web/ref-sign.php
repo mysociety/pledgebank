@@ -225,14 +225,15 @@ function do_sign(&$location) {
         
         db_query('insert into signers (pledge_id, name, person_id, showname, signtime, ipaddr, byarea_location_id) values (?, ?, ?, ?, ms_current_timestamp(), ?, ?)', array($pledge->id(), ($P->has_name() ? $P->name() : null), $P->id(), $q_showname ? 't' : 'f', $_SERVER['REMOTE_ADDR'], $byarea_location_id));
         db_commit();
+
         print '<p class="noprint loudmessage" align="center">';
         if ($byarea_location_id) {
             $byarea_location_description = db_getOne("select description from
                     location where location.id = ?", $byarea_location_id);
             printf(_('Thanks for signing up to this pledge in %s!'), $byarea_location_description);
-        } else
+        } else {
             printf(_('Thanks for signing up to the <a href="%s">%s pledge</a>!'), '/' . htmlspecialchars($pledge->ref()), $pledge->ref());
-
+        }
         print '</p>';
 
         /* Grab the row again so the check is current. */

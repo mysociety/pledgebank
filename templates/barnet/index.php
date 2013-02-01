@@ -12,6 +12,28 @@
 <h1>Barnet PledgeBank is a site to get things done.</h1>
 
 <div id="currentpledges">
+    <!-- ============================= grit my school 2013 (note! not 2012) ================================ -->
+    
+    <ul class="search_results">
+        <li><a href="/type/gritmyschool2013" title="Grit my school" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/gritmyschool2013">Grit My School 2013 pledges</a><br>
+        </li>
+    </ul>
+    <div class="barnet-type-pledges">
+        <div class="pb-barnet-breakout">
+			We've opened up pledging for <strong>Grit&nbsp;My&nbsp;School 2013</strong>!
+			Sign up or <a href="/type/gritmyschool2013">start a pledge</a> to grit your school!
+		</div>
+		<p>
+			This means we're supporting volunteers who want to help with "Grit My School" pledges for the coming cold spell,
+			by offering grit and spreading equipment to the first 10 schools to get four
+			<!--<?= microsites_get_pledge_type_details('gritmyschool2013', 'preloaded_data', 'target') ?>-->
+			volunteers signed up.
+			Sign up or <a href="/type/gritmyschool2013">start a pledge</a> to grit your school!        
+        </p>
+        <?  print pledge_get_ul_list_by_type('gritmyschool2013', 2, 3, "", true); ?>
+        <div style='clear:both;height:0.3em'></div>
+    </div>
+
     <!-- ============================= grit my street 2012 ================================ -->
     
     <ul class="search_results">
@@ -29,24 +51,6 @@
 			Sign up or <a href="/type/gritmystreet2012">start a pledge</a> to grit your street.  
         </p>
         <?  print pledge_get_ul_list_by_type('gritmystreet2012', 2, 3, "", true); ?>
-        <div style='clear:both;height:0.3em'></div>
-    </div>
-
-    <!-- ============================= grit my school 2012 ================================ -->
-    
-    <ul class="search_results">
-        <li><a href="/type/gritmyschool2012" title="Grit my school" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/gritmyschool2012">Grit My School pledges</a><br>
-        </li>
-    </ul>
-    <div class="barnet-type-pledges">
-        <p>
-			We're also supporting volunteers who want to help with "Grit My School" pledges again this year,
-			by offering grit and spreading equipment to the first 40 schools to get four
-			<!--<?= microsites_get_pledge_type_details('gritmyschool2012', 'preloaded_data', 'target') ?>-->
-			volunteers signed up.
-			Sign up or <a href="/type/gritmyschool2012">start a pledge</a> to grit your school!        
-        </p>
-        <?  print pledge_get_ul_list_by_type('gritmyschool2012', 2, 3, "", true); ?>
         <div style='clear:both;height:0.3em'></div>
     </div>
 

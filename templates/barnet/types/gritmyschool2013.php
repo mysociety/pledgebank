@@ -11,7 +11,7 @@
 <div style="font-size:1.126em;padding-bottom:0.25em;">
   <p style="font-weight:bold;">
     Barnet Council will assist residents clearing snow by offering grit and spreading equipment
-    to the first 40 schools to get 
+    to the first 10 schools to get 
     <?= microsites_get_pledge_type_details('gritmyschool2013', 'preloaded_data', 'target') ?>
     volunteers signed up.
     Residents must agree to become community Grit Keepers and get as many people to sign up to a pledge

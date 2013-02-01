@@ -829,8 +829,11 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                 break;
             case "grit_my_school":
             case "gritmyschool2012":
+            case "gritmyschool2013":
+                
+                $gritting_year = preg_match("/(20\d\d)$/i", $pledge_type, $year_found)? $year_found[0] : '2011';
                 $details = array_merge($defaults, array(
-                    "title"     => "Grit My School " . ($pledge_type == 'grit_my_school'? '2011':'2012'),
+                    "title"     => "Grit My School " . $gritting_year,
                     "action"    => "grit your school",
                     "ref_label" => "Your school",
                     "ref_note"  => "(it helps us if you include the school's postcode, but don't worry if you don't know it)",

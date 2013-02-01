@@ -59,7 +59,7 @@
 <ul style="margin-bottom:2em;">
 	<li>
 		Note that these are <em>not</em> the Grit My School pledges from earlier this winter
-		&mdash; those are <a href="/type/gritmyschool2013">here</a> for reference, but are no longer open!
+		&mdash; those are <a href="/type/gritmyschool2012">here</a> for reference, but are no longer open!
 	</li>
 </ul>
 <ul>

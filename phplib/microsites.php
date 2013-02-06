@@ -845,18 +845,19 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                         "target" => 4,
                         "type"   => "volunteers",
                         "signup" => "agree to spread the grit",
-                        "detail" => "To apply for grit for your street or school you will need:\n\n* To share your contact details " .
-                                     "with other volunteers.\nIf you agree to become a Community Grit Keeper or volunteer, we will " .
-                                     "automatically share your contact details with other participants in your street or school.\n\n" .
-                                     "* Enough space on your property/school to store a one ton bag of grit (approximately 1.5m cubed " .
-                                     "in size).\nIf you do not have the appropriate storage space, we can put you in touch with the " .
-                                     "other volunteers that have signed up to this pledge for you to check if they can store the grit " .
-                                     "supplies.\n\n* To use your grit supplies on public land only.\n If you are requesting to become " .
-                                     "a Community Grit Keeper, you need to ensure that you are pledging to grit public land, i.e. " .
-                                     "public roads or footways. If you live on a private road you are not eligible to sign up to this " .
-                                     "pledge but you can buy grit supplies from the council\'s Highways Team by calling 020 8359 7200.\n\n" .
-                                     "* Insurance\nAny resident who pledges to spread grit on a public residential street will benefit " .
-                                     "from the council\'s public liability insurance policy as if they are a volunteer."
+                        "detail" => "To apply for grit for your school you will need:\n\n * Enough space on your" .
+                                     "school (approximately 1.5m cubed in size). If you do not have the appropriate" .
+                                     "storage space, we can put you in touch with the other volunteers that have" .
+                                     "signed up to your pledge for you to check if they can store the grit" .
+                                     "supplies.\n\n * To share your contact details with other volunteers. If you" .
+                                     "agree to become a Community Grit Keeper or volunteer, we will automatically" .
+                                     "share your contact details that with other participants in your school.\n\n *" .
+                                     "To use your grit supplies on public land only. If you are requesting to become" .
+                                     "a Community Grit Keeper, you need to ensure that you are pledging to grit" .
+                                     "public land, i.e. public roads or footways, NOT playgrounds.\n\n * Insurance -" .
+                                     "Schools should note that they must cover all volunteers under their own public" .
+                                     "liability insurance\n\nThis offer is limited to one delivery of grit per" .
+                                     "school. We cannot supply refills."
                     )
                 ));
                 break;

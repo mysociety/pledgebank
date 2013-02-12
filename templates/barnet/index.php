@@ -19,38 +19,10 @@
         </li>
     </ul>
     <div class="barnet-type-pledges">
-        <div class="pb-barnet-breakout">
-			We've opened up pledging for <strong>Grit&nbsp;My&nbsp;School 2013</strong>!
-			Sign up or <a href="/type/gritmyschool2013">start a pledge</a> to grit your school!
-		</div>
 		<p>
-			This means we're supporting volunteers who want to help with "Grit My School" pledges for the coming cold spell,
-			by offering grit and spreading equipment to the first 10 schools to get four
-			<!--<?= microsites_get_pledge_type_details('gritmyschool2013', 'preloaded_data', 'target') ?>-->
-			volunteers signed up.
-			Sign up or <a href="/type/gritmyschool2013">start a pledge</a> to grit your school!        
+			The <a href="/type/gritmyschool2013">Grit My School 2013</a> pledges have just closed.        
         </p>
         <?  print pledge_get_ul_list_by_type('gritmyschool2013', 2, 3, "", true); ?>
-        <div style='clear:both;height:0.3em'></div>
-    </div>
-
-    <!-- ============================= grit my street 2012 ================================ -->
-    
-    <ul class="search_results">
-        <li><a href="/type/gritmystreet2012" title="Grit my street" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_flower.jpg);"></div></a><a href="/type/gritmystreet2012">Grit My Street pledges</a><br>
-        </li>
-    </ul>
-    <div class="barnet-type-pledges">
-        <p>
-			After the success of last year's griting pledges, Barnet Council is supporting volunteers
-			who wish to clear snow by offering grit and spreading equipment to the first 20 streets
-			to get four
-			<!-- <?= microsites_get_pledge_type_details('gritmystreet2012', 'preloaded_data', 'target') ?> -->
-			volunteers signed up.
-			Volunteers must sign up to the pledge (one of whom will be the community Grit Keeper).
-			Sign up or <a href="/type/gritmystreet2012">start a pledge</a> to grit your street.  
-        </p>
-        <?  print pledge_get_ul_list_by_type('gritmystreet2012', 2, 3, "", true); ?>
         <div style='clear:both;height:0.3em'></div>
     </div>
 

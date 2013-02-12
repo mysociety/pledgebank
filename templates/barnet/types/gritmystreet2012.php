@@ -34,8 +34,9 @@
 
 <ul style="font-size:1.126em;margin-bottom:2em;">
   <li>
-	  Although street gritting pledges are now <strong>closed</strong> but we're running similar pledges for
-      <a href="/type/gritmyschool2012">clearing snow from schools in Barnet</a>.
+	  We also ran similar pledges for clearing snow from schools in Barnet at the
+      <a href="/type/gritmyschool2012">end of 2012</a> and at 
+      the <a href="/type/gritmyschool2013">start of 2013</a>.
   </li>
 </ul>
 

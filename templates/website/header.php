@@ -9,8 +9,7 @@
  * from Mac IE. Ugly, but it works. */
 
 // $announcement is displayed below the header if it's not empty; use HTML tags, etc., if you want.
-  $announcement = "Would you like to work with the team that built this site?
-    <strong><a href='http://mysocietyltd.theresumator.com/apply/'>We're recruiting.</a></strong>";
+  $announcement = "";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="<?=$lang ?>">

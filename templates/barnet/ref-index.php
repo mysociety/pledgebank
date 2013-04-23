@@ -19,7 +19,7 @@
     <div class="ms-pb-top-img" <? if ($p->has_picture()) { ?> style="background-image:url('<?= $p->picture_url() ?>');"<? } ?> >
         <? 
             if (strpos($p->picture_url(), 'the_big_lunch') !== false ) { ?>
-                <a href="http://www.barnet.gov.uk/biglunch" title="about The Big Lunch"><img 
+                <a href="http://www.thebiglunch.com" title="about The Big Lunch"><img 
                     alt="The Big Lunch logo" src="/microsites/barnet/the_big_lunch_logo_212_x_90.png" 
                     style="float:left;width:212px;height:90px;border:none;margin:1em;"/></a>
         <? } ?>

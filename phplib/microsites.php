@@ -791,6 +791,24 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                     )
                 ));
                 break;
+            case "biglunch2013":
+                $details = array_merge($defaults, array(
+                    "title"     => "The Big Lunch Street Party 2013",
+                    "action"    => "organise a Big Lunch street party",
+                    "default_image_url" => microsite_preloaded_image_url('the_big_lunch.jpg'),
+                    "preloaded_data" => array(
+                        "name"   => "Barnet Council",
+                        "title"  => "arrange free public liability insurance for a Big Lunch street party in %s",
+                        "target" => 3,
+                        "type"   => "other households",
+                        "signup" => "volunteer to organise the party",
+                        "detail" => "Please note:\nIf you agree to become a volunteer, we will automatically share your contact " .
+                                    "details with other participants in your street.",
+                        "date"   => "24 May 2013"
+                    )
+                ));
+                break;
+
             case "diamondjubilee":
                 $details = array_merge($defaults, array(
                     "title"     => "Diamond Jubilee Street Party",

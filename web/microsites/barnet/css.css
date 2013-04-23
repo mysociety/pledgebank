@@ -417,7 +417,7 @@ body.js #ms-signup-reveal {
     background-image: url('default-pledge-icon.jpg'); /* override with inline style if there's an image for the pledge */
 }
 
-.ms-pledge-banner, .ms-diamondjubilee-banner,
+.ms-pledge-banner, .ms-biglunch2013-banner, .ms-diamondjubilee-banner,
 .ms-royalwedding-banner, .ms-thebiglunch-banner, ms-adoptastreet-banner,
 .ms-grit_my_school-banner, .ms-grit_my_street-banner, .ms-gritmyschool2012-banner, .ms-gritmystreet2012-banner,
 .ms-olympics2012-banner, .ms-diamondparkparty-banner, .ms-olympicparkparty-banner {
@@ -435,6 +435,7 @@ body.js #ms-signup-reveal {
   background-image: url('preloaded/royal_wedding.jpg');
 }
 
+.ms-biglunch2013-banner,
 .ms-thebiglunch-banner {
     background-image: url('preloaded/the_big_lunch.jpg');
 }

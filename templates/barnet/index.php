@@ -12,19 +12,22 @@
 <h1>Barnet PledgeBank is a site to get things done.</h1>
 
 <div id="currentpledges">
-    <!-- ============================= grit my school 2013 (note! not 2012) ================================ -->
+    <!-- ============================= big lunch 2013 ================================ -->
     
     <ul class="search_results">
-        <li><a href="/type/gritmyschool2013" title="Grit my school" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/gritmyschool2013">Grit My School 2013 pledges</a><br>
+        <li><a href="/type/biglunch2013" title="Big Lunch 2013" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/the_big_lunch.jpg);"></div></a>
+        <a href="/type/biglunch2013">The Big Lunch 2013 pledges</a><br>
         </li>
     </ul>
     <div class="barnet-type-pledges">
-		<p>
-			The <a href="/type/gritmyschool2013">Grit My School 2013</a> pledges have just closed.        
+        <p>
+            We're supporting street parties in Barnet for <a href="/type/biglunch2013">the Big Lunch</a> on and around the <strong>2&nbsp;June</strong>.
+            Sign up or <a href="/type/biglunch2013">start a pledge</a> for a party in your street!
         </p>
-        <?  print pledge_get_ul_list_by_type('gritmyschool2013', 2, 3, "", true); ?>
+        <?  print pledge_get_ul_list_by_type('biglunch2013', 2, 3, "", true); ?>
         <div style='clear:both;height:0.3em'></div>
     </div>
+
 
     <!-- ============================= adopt a street ================================ -->
     
@@ -40,6 +43,21 @@
         <?  print pledge_get_ul_list_by_type('adoptastreet', 2, 3, "", true); ?>
         <div style='clear:both;height:0.3em'></div>
     </div>
+
+    <!-- ============================= grit my school 2013 (note! not 2012) ================================ -->
+    
+    <ul class="search_results">
+        <li><a href="/type/gritmyschool2013" title="Grit my school" class="ms-pledge-list-a"><div class="ms-pledge-list-icon" style="background-image:url(/microsites/barnet/preloaded/frosty_mimosa.jpg);"></div></a><a href="/type/gritmyschool2013">Grit My School 2013 pledges</a><br>
+        </li>
+    </ul>
+    <div class="barnet-type-pledges">
+		<p>
+			The <a href="/type/gritmyschool2013">Grit My School 2013</a> pledges have closed.        
+        </p>
+        <?  print pledge_get_ul_list_by_type('gritmyschool2013', 2, 3, "", true); ?>
+        <div style='clear:both;height:0.3em'></div>
+    </div>
+
 
     
     <!-- ============================= standalone pledges ================================ -->

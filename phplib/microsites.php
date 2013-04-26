@@ -803,8 +803,7 @@ function microsites_get_pledge_type_details($pledge_type, $key=null, $secondary_
                         "type"   => "other households",
                         "signup" => "volunteer to organise the party",
                         "detail" => "Please note:\nIf you agree to become a volunteer, we will automatically share your contact " .
-                                    "details with other participants in your street.",
-                        "date"   => "24 May 2013"
+                                    "details with other participants in your street."
                     )
                 ));
                 break;

@@ -21,7 +21,8 @@
     </ul>
     <div class="barnet-type-pledges">
         <p>
-            We're supporting street parties in Barnet for <a href="/type/biglunch2013">the Big Lunch</a> on and around the <strong>2&nbsp;June</strong>.
+            We're supporting street parties in Barnet for <a href="/type/biglunch2013">the Big Lunch</a> on or around the <strong>2&nbsp;June</strong>,
+            and <strong>throughout the summer</strong>.
             Sign up or <a href="/type/biglunch2013">start a pledge</a> for a party in your street!
         </p>
         <?  print pledge_get_ul_list_by_type('biglunch2013', 2, 3, "", true); ?>

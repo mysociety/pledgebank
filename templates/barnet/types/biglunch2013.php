@@ -19,16 +19,14 @@
   <p>
       In fact, you don&rsquo;t have to pick <em>exactly</em> that date &mdash; maybe 
       <strong>Friday&nbsp;31&nbsp;May</strong>,
-      <strong>Saturday&nbsp;1&nbsp;June</strong>, or even any other weekend near that time!
+      <strong>Saturday&nbsp;1&nbsp;June</strong>, or even any other weekend during the summer.
+      The last date on which your party can be held is <strong>31&nbsp;August</strong>.
   </p>
   <p>
       A Big Lunch can be anything from a few neighbours getting together in the garden or on the street, 
       to a full blown party with food, music and decoration that quite literally stops the traffic.              
       If it is on the street, you will need to get Barnet Council&rsquo;s permission to make sure it is OK 
       for you to close the road and sort out your insurance.
-      So sign up now: the council pledges to support <strong>the first 30 streets to reach their target of
-      <?= microsites_get_pledge_type_details('biglunch2013', 'preloaded_data', 'target') ?> households</strong>
-      signed up for a party in the street.
   </p>
 </div>
 <div style="width:100%;clear:both;height:1px"></div>
@@ -48,11 +46,12 @@
     households involved for the pledge to be successful.
   </p>
 </form><!-- close existing global form :-( -->
-<form class="basic_form xform" method="get"  action="https://www.barnet.gov.uk/forms/form/380/en/XXXXXX" >
+<form class="basic_form xform" method="get"  action="https://www.barnet.gov.uk/forms/form/388/en/big_lunch_street_party_application" >
   <p class="center">
     <input type="submit" class="button next" title="Begin application" name="next" value="Begin application »">
   </p>
 </form>
+<p>Closing date for applications: 24&nbsp;June&nbsp;2013<p>
 <form action="#"> <!-- open global form, no action -->
 </div>
 

@@ -45,13 +45,13 @@
     <?= microsites_get_pledge_type_details('biglunch2013', 'preloaded_data', 'target') ?>
     households involved for the pledge to be successful.
   </p>
+<p>Please allow at least <strong>four weeks</strong> of processing time in advance of your event.<p>
 </form><!-- close existing global form :-( -->
 <form class="basic_form xform" method="get"  action="https://www.barnet.gov.uk/forms/form/388/en/big_lunch_street_party_application" >
   <p class="center">
     <input type="submit" class="button next" title="Begin application" name="next" value="Begin application »">
   </p>
 </form>
-<p>Closing date for applications: 24&nbsp;June&nbsp;2013<p>
 <form action="#"> <!-- open global form, no action -->
 </div>
 

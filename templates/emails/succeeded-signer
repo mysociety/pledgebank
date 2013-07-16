@@ -11,6 +11,6 @@ has signed the pledge, just moments ago!
 Now it's your turn to do what you pledged.  <?=$values['creator_name']?> will
 email you soon to give you any further information you need and to help
 plan some next steps. And while you're at it, Why not take some photos of you
-fulfilling your pledge - we love pics :) Send any pictures to team@pledgebank.com
+fulfilling your pledge - we love pics :) Do send any pictures to us.
 
 <?=$values['signature']?>

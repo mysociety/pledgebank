@@ -502,8 +502,6 @@ def flyerRTF(c, x1, y1, x2, y2, size, papersize, **keywords):
     story.extend([ text_para, 
         PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(_('This pledge closes on ')), PyRTF.TEXT('%s' % rtf_repr(pledge['date'].decode('utf-8')), colour=ss.Colours.pb), rtf_repr(_('. Thanks!'))),
         PyRTF.Paragraph(ss.ParagraphStyles.normal, rtf_repr(microsites_poster_remember_text(pledge)) )
-#        PyRTF.Paragraph(ss.ParagraphStyles.smallprint, PyRTF.B('Small print:'),
-#            ' %s Questions? 08453 330 160 or team@pledgebank.com.' % sms_smallprint)
     ])
 
     c.Sections.append(story)
@@ -695,10 +693,6 @@ def flyer(c, x1, y1, x2, y2, size, **keywords):
     if remember:
         story.extend([
             Paragraph(remember.encode('utf-8'), p_normal)
-#        Paragraph('''
-#            <b>Small print:</b> %s Questions?
-#            08453 330 160 or team@pledgebank.com.
-#            ''' % sms_smallprint, p_smallprint)
         ])
 
     f = Frame(x1, y1, w, h, showBoundary = 0, 

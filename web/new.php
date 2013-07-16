@@ -806,8 +806,7 @@ function target_warning_error_check($data) {
             hard limit, just a way of encouraging people to aim at smaller and more
             achievable targets. If you want a target higher than 
             %d people, we\'d be glad to set it up for you.
-            Just drop us a quick email to <a
-            href="mailto:team@pledgebank.com">team@pledgebank.com</a> letting us
+            Just <a href="/contact">drop us a quick email</a> letting us
             know who you are and what you are aiming to do.'), OPTION_PB_TARGET_CAP, OPTION_PB_TARGET_CAP);
     } */
 

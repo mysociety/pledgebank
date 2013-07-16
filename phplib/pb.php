@@ -58,7 +58,7 @@ function pb_handle_error($num, $message, $file, $line, $context) {
             $err = "<p><em>$message</em></p>";
         else
             # Message will be in log file, don't display it for cleanliness
-            $err = p(_('Please try again later, or <a href="mailto:team&#64;pledgebank.com">email us</a> for help resolving the problem.'));
+            $err = p(_('Please try again later, or <a href="/contact">contact us</a> for help resolving the problem.'));
         if ($num & (E_USER_ERROR | E_USER_WARNING)) {
             $err = "<p><em>$message</em></p> $err";
         }

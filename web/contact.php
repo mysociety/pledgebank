@@ -140,7 +140,7 @@ function send_contact_form($name, $email, $subject, $message, $ref, $referrer, $
     else
         $success = pb_send_email($to, $subject, $message . "\n\n-- \n" . $postfix, $headers);
     if (!$success)
-        err(_("Failed to send message.  Please try again, or <a href=\"mailto:team&#64;pledgebank.com\">email us</a>."));
+        err(_("Failed to send message.  Please try again, or email us."));
     if ($comment_id) 
         return p(_('<strong>Thank you!</strong> One of our team will investigate that comment as soon as possible'));
     else 

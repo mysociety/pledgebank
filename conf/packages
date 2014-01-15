@@ -2,8 +2,8 @@ gettext
 netpbm
 libdatetime-format-strptime-perl
 libcairo-perl
-python-pgsql
-python2.5-pyrtf
+python-psycopg2
+python-pyrtf
 python-reportlab
 libdate-calc-perl
 libmath-round-perl

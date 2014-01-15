@@ -17,7 +17,7 @@ sys.path.append("../commonlib/pylib")
 import os
 import subprocess
 from time import time
-from pyPgSQL import PgSQL
+import psycopg2
 import fcgi, cgi
 import tempfile
 import string
@@ -169,7 +169,7 @@ add_standard_TTF('Arial', 'arial')
 add_standard_TTF('Georgia', 'georgia')
 add_standard_TTF('Trebuchet MS', 'trebuchet')
 
-db = PgSQL.connect(mysociety.config.get('PB_DB_HOST') + ':' + mysociety.config.get('PB_DB_PORT') + ':' + mysociety.config.get('PB_DB_NAME') + ':' + mysociety.config.get('PB_DB_USER') + ':' + mysociety.config.get('PB_DB_PASS'))
+db = psycopg2.connect(host=mysociety.config.get('PB_DB_HOST'), port=mysociety.config.get('PB_DB_PORT'), database=mysociety.config.get('PB_DB_NAME'), user=mysociety.config.get('PB_DB_USER'), password=mysociety.config.get('PB_DB_PASS'))
 
 types = ["flyers16", "flyers4", "flyers1", "flyers8"]
 sizes = ["A4", "A7", "letter"]
@@ -822,7 +822,7 @@ while fcgi.isFCGI():
             extract(epoch from pledge_last_change_time(pledges.id))
             FROM pledges
             LEFT JOIN location ON location.id = pledges.location_id
-            WHERE lower(ref) = %s''', ref.lower())
+            WHERE lower(ref) = %s''', (ref.lower(),))
         row = q.fetchone()
         if not row:
             raise Exception, "Unknown ref '%s'" % ref

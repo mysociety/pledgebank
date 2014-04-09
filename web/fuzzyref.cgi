@@ -24,7 +24,7 @@ BEGIN {
 
 use CGI;
 use mySociety::CGIFast;
-use Digest::SHA1 qw(sha1);
+use Digest::SHA qw(sha1);
 use MIME::Base64;
 use POSIX;
 use utf8;

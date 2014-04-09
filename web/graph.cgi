@@ -27,7 +27,7 @@ use CGI;
 use mySociety::CGIFast;
 use Date::Calc qw(Add_Delta_Days Add_Delta_YM Day_of_Week Delta_Days);
 use DateTime::Format::Strptime;
-use Digest::SHA1;
+use Digest::SHA;
 use Encode;
 use Errno;
 use Error qw(:try);
@@ -189,7 +189,7 @@ while (my $q = new mySociety::CGIFast()) {
         # Incorporate time to nearest 30 minutes; graphs will last that long.
         # XXX now we're using an accelerator we can do better than this.
         my $gparam = join(',', $pledge_id, $start_date, $end_date, int(time() / 1800));
-        my $hash = Digest::SHA1::sha1_hex($gparam);
+        my $hash = Digest::SHA::sha1_hex($gparam);
 
         # Determine hashed location for graph, creating the directories if
         # needed.

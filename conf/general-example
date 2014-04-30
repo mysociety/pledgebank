@@ -49,6 +49,14 @@ define('OPTION_ADMIN_AUTH_PASSWORD', '');
 // Normally, you'll want admin to be able to access everyting, so set this to  ''
 define('OPTION_ADMIN_LOCKED_FIELDS', 'microsite,lang,country,prominence,ratty');
 
+// if you enable OPTION_ADMIN_REMOTE_SUBADMIN then you allow remote users
+// to access admin, but perhaps with more restrictions
+define('OPTION_ADMIN_REMOTE_SUBADMIN', 1);
+define('OPTION_ADMIN_LOCKED_FIELDS_SUBADMIN', 'techy,ratty');
+
+// whether to enable pledges pre-moderation
+define('OPTION_MODERATE_PLEDGES', 0); 
+
 // Domain name for emails to current website
 define('OPTION_EMAIL_DOMAIN', 'sometestdomain.pledgebank.com');
 define('OPTION_CONTACT_EMAIL', 'contact@'.OPTION_EMAIL_DOMAIN);
@@ -141,7 +149,5 @@ define('OPTION_FACEBOOK_CANVAS', 'http://apps.facebook.com/blahblahblah/');
 define('OPTION_CSRF_SECRET', ''); // arbitary long string of random data
 // A Facebook user account for doing general stuff as
 define('OPTION_FACEBOOK_ROBOT_ID', -1);
-
-define('OPTION_MODERATE_PLEDGES', 0); // don't moderate pledges (the original behaviour)
 
 ?>

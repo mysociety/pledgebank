@@ -12,6 +12,7 @@ define('MAX_PAGE_COMMENTS', '50');
 
 require_once '../conf/general';
 require_once '../phplib/page.php';
+require_once '../phplib/moderation.php';
 require_once '../commonlib/phplib/conditional.php';
 require_once '../commonlib/phplib/db.php';
 
@@ -47,6 +48,8 @@ if ($ref != $p->ref()) {
     header("Location: /" . $p->ref());
     exit;
 }
+
+moderation_redirect($p);
 
 /* Redirect to correct microsite */
 microsites_redirect($p);

@@ -97,10 +97,13 @@ while (my $q = new mySociety::CGIFast()) {
     my @matches = sort { $res{$b} <=> $res{$a} } keys(%res);
     # limit to five results
     @matches = @matches[0 .. 4] if (@matches > 5);
+
+    my $moderated = $q->param('m') || 0;
     my $ser = RABX::serialise({
                     ref => $ref,
                     matches => \@matches,
-                    salt => int(rand(0xffffffff))
+                    salt => int(rand(0xffffffff)),
+                    moderated => $moderated,
                 });
 
     # 

@@ -18,7 +18,7 @@ require_once '../commonlib/phplib/db.php';
 require_once '../commonlib/phplib/utility.php';
 require_once '../commonlib/phplib/rabx.php';
 
-class Pledge {
+class Pledge { # till comment 'END OF class' below
     // Associative array of parameters about the pledge, taken from database
     var $data;
     // Escaped ref used for URLs
@@ -929,7 +929,11 @@ you the option to unsubscribe from their list at any time.</p>';
         return $text;
     }
 
-}
+    function ishidden () {
+        return $this->data['ishidden'] == 't';
+    }
+
+} # END OF class
 
 /* PLEDGE_...
  * Various codes for things which can happen to pledges. All such error codes

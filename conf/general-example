@@ -49,6 +49,9 @@ define('OPTION_ADMIN_AUTH_PASSWORD', '');
 // Normally, you'll want admin to be able to access everyting, so set this to  ''
 define('OPTION_ADMIN_LOCKED_FIELDS', 'microsite,lang,country,prominence,ratty');
 
+// whether to enable pledges pre-moderation
+define('OPTION_MODERATE_PLEDGES', 0); // don't moderate pledges (the original behaviour)
+
 // Domain name for emails to current website
 define('OPTION_EMAIL_DOMAIN', 'sometestdomain.pledgebank.com');
 define('OPTION_CONTACT_EMAIL', 'contact@'.OPTION_EMAIL_DOMAIN);

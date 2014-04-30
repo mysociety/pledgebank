@@ -39,7 +39,8 @@ $hash = substr($ser, strlen($ser) - 20, 20);
 if (sha1(db_secret() . substr($ser, 0, strlen($ser) - 20)) != bin2hex($hash))
     oops();
 
-$data = rabx_unserialise(substr($ser, 0, strlen($ser) - 20));
+$tmp = substr($ser, 0, strlen($ser) - 20);
+$data = rabx_unserialise($tmp);
 if (rabx_is_error($data))
     oops();
 

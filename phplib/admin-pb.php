@@ -955,8 +955,18 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
     }
 
     function deletecomment($id) {
-        db_query('UPDATE comment set ishidden = ? where id = ?', 
-            array(get_http_var('deletecomment_status') ? true : false, $id));
+        $admin_user = get_admin_user();
+        db_query("UPDATE comment set
+            ishidden = ?,
+            moderated_time = ms_current_timestamp(),
+            moderated_by = ?,
+            moderated_comment = 'admin panel'
+            where id = ?",
+            array(get_http_var('deletecomment_status') ? true : false,
+                $admin_user->id,
+                $id
+            )
+        );
         db_commit();
         print p(_('<em>That comment has been shown/hidden</em>'));
     }

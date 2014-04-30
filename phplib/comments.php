@@ -220,7 +220,7 @@ function comments_show_latest_internal($comments_to_show, $sql_params, $site_lim
                 FROM comment, pledges, location
                 WHERE comment.pledge_id = pledges.id
                     AND location.id = pledges.location_id
-                    AND NOT ishidden
+                    AND NOT comment.ishidden
                     AND pin IS NULL
                     AND pledges.cached_prominence <> 'backpage'
                     AND ($site_limit)

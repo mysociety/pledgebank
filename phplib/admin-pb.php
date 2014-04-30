@@ -422,7 +422,7 @@ class ADMIN_PAGE_PB_MAIN {
                 location.country, location.state, location.description,
                 location.longitude, location.latitude, location.method,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id AND NOT ishidden) AS comments,
+                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id AND NOT comment.ishidden) AS comments,
                 person.id as person_id
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id 

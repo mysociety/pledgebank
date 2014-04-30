@@ -78,7 +78,8 @@ function login_page() {
                     ));
         db_commit();
         $url = pb_domain_url(array("path" => "/L/$token"));
-        $template_data = rabx_unserialise(stash_get_extra($q_stash));
+        $tmp = stash_get_extra($q_stash);
+        $template_data = rabx_unserialise($tmp);
         $template_data['url'] = $url;
         $template_data['user_name'] = $q_name;
         if (is_null($template_data['user_name']))
@@ -123,7 +124,8 @@ function login_form($errors = array()) {
     if (is_null($q_name))
         $q_name = $q_h_name = '';   /* shouldn't happen */
 
-    $template_data = rabx_unserialise(stash_get_extra($q_stash));
+    $tmp = stash_get_extra($q_stash);
+    $template_data = rabx_unserialise($tmp);
     $reason = htmlspecialchars($template_data['reason_web']);
 
     if (sizeof($errors)) {

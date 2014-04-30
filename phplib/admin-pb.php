@@ -19,14 +19,42 @@ require_once "../commonlib/phplib/utility.php";
 require_once "../commonlib/phplib/importparams.php";
 require_once "../commonlib/phplib/gaze.php";
 
-$admin_update_prohibited = preg_split("/\s*,\s*/", strtolower(OPTION_ADMIN_LOCKED_FIELDS), -1, PREG_SPLIT_NO_EMPTY);
+function get_prohibited_list () {
+    $option = user_is_remote() ? 
+        OPTION_ADMIN_LOCKED_FIELDS_SUBADMIN
+        : OPTION_ADMIN_LOCKED_FIELDS;
+    return preg_split("/\s*,\s*/", strtolower($option), -1, PREG_SPLIT_NO_EMPTY);
+}
+
+function remote_user_name () {
+    return $_SERVER['REDIRECT_REMOTE_USER'] ? $_SERVER['REDIRECT_REMOTE_USER'] : $_SERVER['REMOTE_USER'];
+}
+
+function user_is_remote () {
+    if (OPTION_ADMIN_REMOTE_SUBADMIN) {
+        $username = remote_user_name();
+        # local users are of the form 'hakim'
+        # remote users are of the form 'joe.bloggs@rbwm.gov.uk'
+        if (preg_match('/\@/', $username)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function get_admin_user () {
+    $username = remote_user_name();
+    $email = user_is_remote() ? $username : $username . '@mysociety.org';
+    $P = person_get_or_create($email, $username);
+
+    return $P;
+}
 
 /* admin_allow()
  * returns false if the item is not explicitly prohibitted to this site's admin
  */
 function admin_allow($item) {
-    global $admin_update_prohibited;
-    return ! in_array($item, $admin_update_prohibited);
+    return ! in_array($item, get_prohibited_list());
 }
 
 function divOddEven($n){

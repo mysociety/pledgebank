@@ -199,7 +199,25 @@ class ADMIN_PAGE_PB_MAIN {
         if ($openness == 'closed') {
             $openness_condition = "'$pb_today' > date";
          } else {
+            $openness = 'open';
             $openness_condition = "'$pb_today' <= date";
+        }
+
+        $mode = $openness;
+
+        $moderation_condition = '';
+
+        if (OPTION_MODERATE_PLEDGES) {
+            $moderation_status = get_http_var('m') || 0;
+            if ($openness != 'closed') {
+                $moderation_condition = sprintf(' AND pledges.moderated_time IS %s NULL ',
+                    $moderation_status ? 'NOT' : '' );
+                if ($moderation_status) {
+                    $hidden_status = get_http_var('h');
+                    $moderation_condition .= sprintf(' AND %s pledges.ishidden ', $hidden_status ? '' : 'NOT');
+                }
+                $mode = $moderation_status ? ($hidden_status ? 'bad' : 'good') : 'unmoderated';
+            }
         }
 
         $q = db_query("
@@ -214,6 +232,7 @@ class ADMIN_PAGE_PB_MAIN {
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
             WHERE $openness_condition
+                  $moderation_condition
             " .  ($order ? ' ORDER BY ' . $order : '') );
         $found = array();
         while ($r = db_fetch_array($q)) {
@@ -279,22 +298,59 @@ class ADMIN_PAGE_PB_MAIN {
 
         print "<p>";
         $openness_url = "";
-        if ($openness == 'closed') {
-            print '<a href="?page=pb">';
-            print _('All Open Pledges');
-            print '</a>';
-            print " | ";
-            print _('All Closed Pledges');
-            print " (" . count($found) . ")";
-            $openness_url = "&amp;o=closed";
-         } else {
-            print _('All Open Pledges');
-            print " (" . count($found) . ")";
-            print " | ";
-            print '<a href="?page=pb&amp;o=closed">';
-            print _('All Closed Pledges');
-            print '</a>';
+
+        if (OPTION_MODERATE_PLEDGES) {
+            $tabs = [
+                [ 
+                  'mode' => 'unmoderated',
+                  'page' => '?page=pb&m=0',
+                  'title' => 'All Unmoderated Pledges' 
+                ],
+                [ 
+                  'mode' => 'good',
+                  'page' => '?page=pb&m=1&h=0',
+                  'title' => 'All Good Pledges' 
+                ],
+                [ 
+                  'mode' => 'bad',
+                  'page' => '?page=pb&m=1&h=1',
+                  'title' => 'All Bad Pledges' 
+                ],
+                [ 
+                  'mode' => 'closed',
+                  'page' => '?page=pb&o=closed',
+                  'title' => 'All Closed Pledges'
+                ],
+            ];
+        } else {
+            $tabs = [
+                [ 
+                  'mode' => 'open',
+                  'page' => '?page=pb',
+                  'title' => 'All Open Pledges' 
+                ],
+                [ 
+                  'mode' => 'closed',
+                  'page' => '?page=pb&o=closed',
+                  'title' => 'All Closed Pledges'
+                ],
+            ];
         }
+
+        $format_tab = function ($tab) use ($mode, $found) {
+            if ($mode == $tab['mode']) {
+                return sprintf('%s (%d)', _($tab['title']), count($found));
+            } else {
+                return sprintf('<a href="%s"> %s </a>', htmlspecialchars($tab['page']), _($tab['title']));
+            }
+        };
+
+        $display_tabs = array_map(
+            $format_tab, 
+            $tabs
+        );
+        print join(' | ', $display_tabs);
+
         print "</p>";
           
         $this->pledge_header($sort, $openness_url);

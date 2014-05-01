@@ -211,7 +211,7 @@ class ADMIN_PAGE_PB_MAIN {
             $moderation_status = get_http_var('m') || 0;
             if ($openness != 'closed') {
                 $moderation_condition = sprintf(' AND pledges.moderated_time IS %s NULL ',
-                    $moderation_status ? '' : 'NOT' );
+                    $moderation_status ? 'NOT' : '' );
                 if ($moderation_status) {
                     $hidden_status = get_http_var('h');
                     $moderation_condition .= sprintf(' AND %s pledges.ishidden ', $hidden_status ? '' : 'NOT');

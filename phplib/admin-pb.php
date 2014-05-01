@@ -300,6 +300,7 @@ class ADMIN_PAGE_PB_MAIN {
         $openness_url = "";
 
         if (OPTION_MODERATE_PLEDGES) {
+            print admin_moderation_styles();
             $tabs = [
                 [ 
                   'mode' => 'unmoderated',
@@ -582,6 +583,43 @@ class ADMIN_PAGE_PB_MAIN {
                 print '<a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit_ref_in_pledge=1">Edit ref</a>';
             }
             print '</div>';
+            print "</div>";
+        }
+
+        if (OPTION_MODERATE_PLEDGES) {
+            print admin_moderation_styles(); # hack
+            print divOddEven($parity++);
+            print "<div class='admin-name'>Moderation:</div>";
+            print '<div class="admin-value">';
+            print '<form name="moderationform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="update_moderation" value="1">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            if ($pdata['moderated_time']) {
+                $bad = $pledge_obj->ishidden();
+                printf('Moderated <span class="moderated_%s">%s</span> by %s at %s',
+                    $bad ? 'bad' : 'good',
+                    $bad ? 'BAD' : 'GOOD',
+                    $pledge_obj->moderator()->name(),
+                    $pdata['moderated_time']
+                );
+
+                print "<br />Remoderate as:";
+                if ($bad) {
+                    print '<input name="moderate_good" type="submit" value="Good">';
+                }
+                else {
+                    print '<input name="moderate_bad" type="submit" value="Bad">';
+                }
+            }
+            else {
+                print "Not yet moderated. Moderate as:";
+                print '<input name="moderate_good" type="submit" value="Good">';
+                print '<input name="moderate_bad" type="submit" value="Bad">';
+            }
+            printf('<br />Comment: <input type="text" name="moderated_comment" value="%s">',
+                htmlspecialchars( $pdata['moderated_comment']) );
+
+            print "</form>";
             print "</div>";
         }
         
@@ -1070,6 +1108,30 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         print p(_("<em>Change to pledge microsite saved</em>"));
     }
 
+    function update_moderation($pledge_id) {
+        $ishidden = null;
+        if (get_http_var('moderate_good')) $ishidden = false;
+        if (get_http_var('moderate_bad'))  $ishidden = true;
+        if (! isset($ishidden)) {
+            die("Unexpected error in moderation!");
+        }
+        db_query('UPDATE pledges SET
+            ishidden = ?,
+            moderated_time = ms_current_timestamp(),
+            moderated_by = ?,
+            moderated_comment = ?
+            WHERE id = ?',
+            [
+                $ishidden,
+                get_admin_user()->id,
+                get_http_var('moderated_comment'),
+                $pledge_id
+            ]);
+
+        db_commit();
+        print p(_("<em>Pledge has been moderated</em>"));
+    }
+
     function update_country($pledge_id) {
         $country = get_http_var('country');
         $state = null;
@@ -1202,6 +1264,9 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         } elseif (get_http_var('update_ref_in_pledge_type')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_ref_in_pledge_type($pledge_id);
+        } elseif (get_http_var('update_moderation')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_moderation($pledge_id);
         } elseif (get_http_var('update_microsite')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_microsite($pledge_id);
@@ -1681,6 +1746,16 @@ class ADMIN_PAGE_PB_STATS {
         }
         print '</table>';
     }
+}
+
+function admin_moderation_styles () {
+    # it seems currently hard to put this anywhere sane (requires editing the header
+    # in commonlib/phplib, so generating a snippet here, to be refactored later.)
+    return 
+        '<style>
+            .moderated_good { background-color: #aaffaa; }
+            .moderated_bad { background-color: #ffaaaa; }
+        </style>';
 }
 
 ?>

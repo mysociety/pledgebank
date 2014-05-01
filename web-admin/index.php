@@ -48,6 +48,12 @@ $pages = array(
     admin_allow('techy') ? new ADMIN_PAGE_PHPINFO    : null,
 );
 
+if (! get_http_var("page")) {
+    $_GET['page'] = 'summary'; 
+    # the front page view would otherwise just presents the same information
+    # but in a different format, which is confusing
+}
+
 admin_page_display(str_replace("http://", "", OPTION_BASE_URL), $pages, new ADMIN_PAGE_PB_SUMMARY, array ("shownavbar"  => true));
 
 ?>

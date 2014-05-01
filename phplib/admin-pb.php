@@ -300,6 +300,7 @@ class ADMIN_PAGE_PB_MAIN {
         $openness_url = "";
 
         if (OPTION_MODERATE_PLEDGES) {
+            print admin_moderation_styles();
             $tabs = [
                 [ 
                   'mode' => 'unmoderated',
@@ -586,6 +587,7 @@ class ADMIN_PAGE_PB_MAIN {
         }
 
         if (OPTION_MODERATE_PLEDGES) {
+            print admin_moderation_styles(); # hack
             print divOddEven($parity++);
             print "<div class='admin-name'>Moderation:</div>";
             print '<div class="admin-value">';
@@ -594,7 +596,8 @@ class ADMIN_PAGE_PB_MAIN {
             print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
             if ($pdata['moderated_time']) {
                 $bad = $pledge_obj->ishidden();
-                printf("Moderated %s by %s at %s",
+                printf('Moderated <span class="moderated_%s">%s</span> by %s at %s',
+                    $bad ? 'bad' : 'good',
                     $bad ? 'BAD' : 'GOOD',
                     $pledge_obj->moderator()->name(),
                     $pdata['moderated_time']
@@ -1743,6 +1746,16 @@ class ADMIN_PAGE_PB_STATS {
         }
         print '</table>';
     }
+}
+
+function admin_moderation_styles () {
+    # it seems currently hard to put this anywhere sane (requires editing the header
+    # in commonlib/phplib, so generating a snippet here, to be refactored later.)
+    return 
+        '<style>
+            .moderated_good { background-color: #aaffaa; }
+            .moderated_bad { background-color: #ffaaaa; }
+        </style>';
 }
 
 ?>

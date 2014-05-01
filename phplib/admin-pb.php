@@ -19,14 +19,42 @@ require_once "../commonlib/phplib/utility.php";
 require_once "../commonlib/phplib/importparams.php";
 require_once "../commonlib/phplib/gaze.php";
 
-$admin_update_prohibited = preg_split("/\s*,\s*/", strtolower(OPTION_ADMIN_LOCKED_FIELDS), -1, PREG_SPLIT_NO_EMPTY);
+function get_prohibited_list () {
+    $option = user_is_remote() ? 
+        OPTION_ADMIN_LOCKED_FIELDS_SUBADMIN
+        : OPTION_ADMIN_LOCKED_FIELDS;
+    return preg_split("/\s*,\s*/", strtolower($option), -1, PREG_SPLIT_NO_EMPTY);
+}
+
+function remote_user_name () {
+    return $_SERVER['REDIRECT_REMOTE_USER'];
+}
+
+function user_is_remote () {
+    if (OPTION_ADMIN_REMOTE_SUBADMIN) {
+        $username = remote_user_name();
+        # local users are of the form 'hakim'
+        # remote users are of the form 'joe.bloggs@rbwm.gov.uk'
+        if (preg_match('/\@/', $username)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function get_admin_user () {
+    $username = remote_user_name();
+    $email = user_is_remote() ? $username : $username . '@mysociety.org';
+    $P = person_get_or_create($email, $username);
+
+    return $P;
+}
 
 /* admin_allow()
  * returns false if the item is not explicitly prohibitted to this site's admin
  */
 function admin_allow($item) {
-    global $admin_update_prohibited;
-    return ! in_array($item, $admin_update_prohibited);
+    return ! in_array($item, get_prohibited_list());
 }
 
 function divOddEven($n){
@@ -171,7 +199,25 @@ class ADMIN_PAGE_PB_MAIN {
         if ($openness == 'closed') {
             $openness_condition = "'$pb_today' > date";
          } else {
+            $openness = 'open';
             $openness_condition = "'$pb_today' <= date";
+        }
+
+        $mode = $openness;
+
+        $moderation_condition = '';
+
+        if (OPTION_MODERATE_PLEDGES) {
+            $moderation_status = get_http_var('m') || 0;
+            if ($openness != 'closed') {
+                $moderation_condition = sprintf(' AND pledges.moderated_time IS %s NULL ',
+                    $moderation_status ? 'NOT' : '' );
+                if ($moderation_status) {
+                    $hidden_status = get_http_var('h');
+                    $moderation_condition .= sprintf(' AND %s pledges.ishidden ', $hidden_status ? '' : 'NOT');
+                }
+                $mode = $moderation_status ? ($hidden_status ? 'bad' : 'good') : 'unmoderated';
+            }
         }
 
         $q = db_query("
@@ -186,6 +232,7 @@ class ADMIN_PAGE_PB_MAIN {
             LEFT JOIN person ON person.id = pledges.person_id
             LEFT JOIN location ON location.id = pledges.location_id
             WHERE $openness_condition
+                  $moderation_condition
             " .  ($order ? ' ORDER BY ' . $order : '') );
         $found = array();
         while ($r = db_fetch_array($q)) {
@@ -251,22 +298,60 @@ class ADMIN_PAGE_PB_MAIN {
 
         print "<p>";
         $openness_url = "";
-        if ($openness == 'closed') {
-            print '<a href="?page=pb">';
-            print _('All Open Pledges');
-            print '</a>';
-            print " | ";
-            print _('All Closed Pledges');
-            print " (" . count($found) . ")";
-            $openness_url = "&amp;o=closed";
-         } else {
-            print _('All Open Pledges');
-            print " (" . count($found) . ")";
-            print " | ";
-            print '<a href="?page=pb&amp;o=closed">';
-            print _('All Closed Pledges');
-            print '</a>';
+
+        if (OPTION_MODERATE_PLEDGES) {
+            print admin_moderation_styles();
+            $tabs = [
+                [ 
+                  'mode' => 'unmoderated',
+                  'page' => '?page=pb&m=0',
+                  'title' => 'All Unmoderated Pledges' 
+                ],
+                [ 
+                  'mode' => 'good',
+                  'page' => '?page=pb&m=1&h=0',
+                  'title' => 'All Good Pledges' 
+                ],
+                [ 
+                  'mode' => 'bad',
+                  'page' => '?page=pb&m=1&h=1',
+                  'title' => 'All Bad Pledges' 
+                ],
+                [ 
+                  'mode' => 'closed',
+                  'page' => '?page=pb&o=closed',
+                  'title' => 'All Closed Pledges'
+                ],
+            ];
+        } else {
+            $tabs = [
+                [ 
+                  'mode' => 'open',
+                  'page' => '?page=pb',
+                  'title' => 'All Open Pledges' 
+                ],
+                [ 
+                  'mode' => 'closed',
+                  'page' => '?page=pb&o=closed',
+                  'title' => 'All Closed Pledges'
+                ],
+            ];
         }
+
+        $format_tab = function ($tab) use ($mode, $found) {
+            if ($mode == $tab['mode']) {
+                return sprintf('%s (%d)', _($tab['title']), count($found));
+            } else {
+                return sprintf('<a href="%s"> %s </a>', htmlspecialchars($tab['page']), _($tab['title']));
+            }
+        };
+
+        $display_tabs = array_map(
+            $format_tab, 
+            $tabs
+        );
+        print join(' | ', $display_tabs);
+
         print "</p>";
           
         $this->pledge_header($sort, $openness_url);
@@ -422,7 +507,7 @@ class ADMIN_PAGE_PB_MAIN {
                 location.country, location.state, location.description,
                 location.longitude, location.latitude, location.method,
                 (SELECT count(*) FROM signers WHERE pledge_id=pledges.id) AS signers,
-                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id AND NOT ishidden) AS comments,
+                (SELECT count(*) FROM comment WHERE pledge_id=pledges.id AND NOT comment.ishidden) AS comments,
                 person.id as person_id
             FROM pledges 
             LEFT JOIN person ON person.id = pledges.person_id 
@@ -498,6 +583,43 @@ class ADMIN_PAGE_PB_MAIN {
                 print '<a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit_ref_in_pledge=1">Edit ref</a>';
             }
             print '</div>';
+            print "</div>";
+        }
+
+        if (OPTION_MODERATE_PLEDGES) {
+            print admin_moderation_styles(); # hack
+            print divOddEven($parity++);
+            print "<div class='admin-name'>Moderation:</div>";
+            print '<div class="admin-value">';
+            print '<form name="moderationform" method="post" action="'.$this->self_link.'">';
+            print '<input type="hidden" name="update_moderation" value="1">';
+            print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
+            if ($pdata['moderated_time']) {
+                $bad = $pledge_obj->ishidden();
+                printf('Moderated <span class="moderated_%s">%s</span> by %s at %s',
+                    $bad ? 'bad' : 'good',
+                    $bad ? 'BAD' : 'GOOD',
+                    $pledge_obj->moderator()->name(),
+                    $pdata['moderated_time']
+                );
+
+                print "<br />Remoderate as:";
+                if ($bad) {
+                    print '<input name="moderate_good" type="submit" value="Good">';
+                }
+                else {
+                    print '<input name="moderate_bad" type="submit" value="Bad">';
+                }
+            }
+            else {
+                print "Not yet moderated. Moderate as:";
+                print '<input name="moderate_good" type="submit" value="Good">';
+                print '<input name="moderate_bad" type="submit" value="Bad">';
+            }
+            printf('<br />Comment: <input type="text" name="moderated_comment" value="%s">',
+                htmlspecialchars( $pdata['moderated_comment']) );
+
+            print "</form>";
             print "</div>";
         }
         
@@ -927,8 +1049,18 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
     }
 
     function deletecomment($id) {
-        db_query('UPDATE comment set ishidden = ? where id = ?', 
-            array(get_http_var('deletecomment_status') ? true : false, $id));
+        $admin_user = get_admin_user();
+        db_query("UPDATE comment set
+            ishidden = ?,
+            moderated_time = ms_current_timestamp(),
+            moderated_by = ?,
+            moderated_comment = 'admin panel'
+            where id = ?",
+            array(get_http_var('deletecomment_status') ? true : false,
+                $admin_user->id,
+                $id
+            )
+        );
         db_commit();
         print p(_('<em>That comment has been shown/hidden</em>'));
     }
@@ -974,6 +1106,30 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         }
         db_commit();
         print p(_("<em>Change to pledge microsite saved</em>"));
+    }
+
+    function update_moderation($pledge_id) {
+        $ishidden = null;
+        if (get_http_var('moderate_good')) $ishidden = false;
+        if (get_http_var('moderate_bad'))  $ishidden = true;
+        if (! isset($ishidden)) {
+            die("Unexpected error in moderation!");
+        }
+        db_query('UPDATE pledges SET
+            ishidden = ?,
+            moderated_time = ms_current_timestamp(),
+            moderated_by = ?,
+            moderated_comment = ?
+            WHERE id = ?',
+            [
+                $ishidden,
+                get_admin_user()->id,
+                get_http_var('moderated_comment'),
+                $pledge_id
+            ]);
+
+        db_commit();
+        print p(_("<em>Pledge has been moderated</em>"));
     }
 
     function update_country($pledge_id) {
@@ -1108,6 +1264,9 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         } elseif (get_http_var('update_ref_in_pledge_type')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_ref_in_pledge_type($pledge_id);
+        } elseif (get_http_var('update_moderation')) {
+            $pledge_id = get_http_var('pledge_id');
+            $this->update_moderation($pledge_id);
         } elseif (get_http_var('update_microsite')) {
             $pledge_id = get_http_var('pledge_id');
             $this->update_microsite($pledge_id);
@@ -1587,6 +1746,16 @@ class ADMIN_PAGE_PB_STATS {
         }
         print '</table>';
     }
+}
+
+function admin_moderation_styles () {
+    # it seems currently hard to put this anywhere sane (requires editing the header
+    # in commonlib/phplib, so generating a snippet here, to be refactored later.)
+    return 
+        '<style>
+            .moderated_good { background-color: #aaffaa; }
+            .moderated_bad { background-color: #ffaaaa; }
+        </style>';
 }
 
 ?>

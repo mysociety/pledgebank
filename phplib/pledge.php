@@ -18,7 +18,7 @@ require_once '../commonlib/phplib/db.php';
 require_once '../commonlib/phplib/utility.php';
 require_once '../commonlib/phplib/rabx.php';
 
-class Pledge {
+class Pledge { # till comment 'END OF class' below
     // Associative array of parameters about the pledge, taken from database
     var $data;
     // Escaped ref used for URLs
@@ -825,16 +825,26 @@ you the option to unsubscribe from their list at any time.</p>';
             global $countries_code_to_name;
             $text .= $countries_code_to_name[$this->country_code()] . ": ";
         }
-        $text .= '<a href="' . $this->url_main() . '">';
+
         if ($this->ref_in_pledge_type()) {
-          $text .= $this->ref_in_pledge_type();
+          $ref = $this->ref_in_pledge_type();
         } else {
-          $text .= $this->ref();
+          $ref = $this->ref();
         }
-        $text .= '</a><br>';
+
+        if ($this->ishidden()) {
+             $text .= sprintf( '<u>%s</u><br />', $ref );
+        }
+        else {
+            $text .= sprintf( '<a href="%s">%s</a><br />', $this->url_main(), $ref );
+        }
+
         $text .= $this->sentence($params);
         $text .= '<br><small>' . str_replace(array('(',')'),'',$this->status());
-        if (array_key_exists('creatorlinks', $params) && $params['creatorlinks']) {
+        if (array_key_exists('creatorlinks', $params) 
+            && $params['creatorlinks']
+            && ! $this->ishidden()) 
+        {
             $text .= ' <a href="' . $this->url_announce() . '">' . _('Send message to signers') . '</a>';
         }
         $text .= '</small>';
@@ -856,6 +866,20 @@ you the option to unsubscribe from their list at any time.</p>';
         $params['firstperson'] = 'includename';
         $text .= $this->sentence($params) . ' ' . $this->status();
         return $text;
+    }
+
+    function status_signatories() {
+        if ($this->ishidden()) {
+            return '';
+        }
+        return sprintf(
+            ngettext(
+                ', %d more signature needed', 
+                ', %d more signatures needed', 
+                $this->left()
+            ), 
+            $this->left()
+        );
     }
 
     function status() {
@@ -907,9 +931,7 @@ you the option to unsubscribe from their list at any time.</p>';
                 $hours = 24 - date('G');
                 $text .= '(';
                 $text .= sprintf(ngettext('Just %d hour left', 'Just %d hours left', $hours), $hours);
-                $text .= sprintf(ngettext(', %d more signature needed', ', %d more signatures needed', $this->left()), $this->left());
-                #$text .= sprintf(ngettext(', %d signature', ', %d signatures', $this->left()), $this->left());
-                #$text .= sprintf(_(' short of the target of %d'), $this->target()); // Tim's
+                $text .= $this->status_signatories();
                 $text .= ')';
             } elseif ($this->daysleft() < 0)
                 $text .= _('Deadline expired, pledge failed.');
@@ -920,16 +942,19 @@ you the option to unsubscribe from their list at any time.</p>';
                 } else {
                     $text .= sprintf(ngettext('%d day left', '%d days left', $this->daysleft()), $this->daysleft());
                 }
-                $text .= sprintf(ngettext(', %d more signature needed', ', %d more signatures needed', $this->left()), $this->left());
-                #$text .= sprintf(ngettext(', %d signature', ', %d signatures', $this->left()), $this->left());
-                #$text .= sprintf(_(' short of the target of %d'), $this->target()); // Tim's
+                $text .= $this->status_signatories();
                 $text .= ')';
             }
         }
         return $text;
     }
 
-}
+    function ishidden () {
+        return $this->data['ishidden'] == 't';
+    }
+    function moderator() { return new person($this->data['moderated_by']); }
+
+} # END OF class
 
 /* PLEDGE_...
  * Various codes for things which can happen to pledges. All such error codes

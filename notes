@@ -1,0 +1,5 @@
+stuff removed from Barnet
+
+-define('OPTION_ADMIN_LOCKED_FIELDS', 'microsite,lang,country,prominence,ratty');
+
+-define('OPTION_PB_CUSTOM_TYPE_TEMPLATES_DIR', '/data/vhost/pledgebank.barnet.gov.uk/pledgebank/templates/barnet/types/')o-define('OPTION_PB_PRELOADED_IMAGES_DIR', '/data/vhost/pledgebank.barnet.gov.uk/pledgebank/web/microsites/barnet/preloaded/-define('OPTION_PB_PRELOADED_IMAGES_URL', 'http://pledgebank.barnet.gov.uk/microsites/barnet/preloaded/');

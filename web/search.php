@@ -362,7 +362,7 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
                    WHERE pin IS NULL
                     '.$backpage_clause.'
                         AND comment.pledge_id = pledges.id 
-                        AND NOT ishidden 
+                        AND NOT comment.ishidden 
                         AND text ILIKE \'%\' || ? || \'%\'
                    ORDER BY whenposted', array($search));
     if (db_num_rows($q)) {

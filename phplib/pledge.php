@@ -932,6 +932,7 @@ you the option to unsubscribe from their list at any time.</p>';
     function ishidden () {
         return $this->data['ishidden'] == 't';
     }
+    function moderator() { return new person($this->data['moderated_by']); }
 
 } # END OF class
 

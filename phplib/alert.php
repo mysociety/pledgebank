@@ -205,9 +205,12 @@ function alert_list_pledges_local($person_id) {
  */
 function alert_list_comments($person_id, $all_comments = false) {
     $limit = 3;
-    $query = 'SELECT alert.* from alert where 
-            person_id = ? and event_code=\'comments/ref\'
-            and whendisabled is null order by id desc';
+    $query = 'SELECT alert.* from alert join pledges on alert.pledge_id = pledges.id 
+            WHERE
+            alert.person_id = ? and event_code=\'comments/ref\'
+            and whendisabled is null
+            and not pledges.ishidden
+            order by id desc';
     if (!$all_comments) {
         $query .= " LIMIT " . ($limit + 1);
     }

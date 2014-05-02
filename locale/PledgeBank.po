@@ -6695,8 +6695,11 @@ msgstr ""
 msgid "total number of signers"
 msgstr ""
 
+
+#. Sent when a new comment is posted on a pledge, to people who are subscribed for that notification.  This includes the pledge creator by default.
 #. In all of these email templates, should the first word "Subject:" be translated or not? Is it machine-read or human-read? (Tim Morley, 2005-11-23)
 #. It's machine-read, yes, so please leave as "Subject:". (Matthew Somerville, http://www.mysociety.org/pipermail/mysociety-i18n/2005-November/000104.html)
+
 
 #: pb/templates/emails/alert-comment
 msgid ""
@@ -6714,6 +6717,10 @@ msgid ""
 "\n"
 msgstr ""
 
+
+#. Sent when new pledges near to someone has been made.
+
+
 #: pb/templates/emails/alert-local-multiple
 msgid ""
 "Subject: <?=$values['pledges_count']?> new pledges near you! - <?=$values['alert_description']?> - PledgeBank.com\n"
@@ -6728,6 +6735,10 @@ msgid ""
 "<?=$values['alert_description']?>, click this link:\n"
 "<?=$values['unsubscribe_url']?>\n"
 msgstr ""
+
+
+#. Sent when a new pledge near to someone has been made.
+
 
 #: pb/templates/emails/alert-local-single
 msgid ""
@@ -6746,6 +6757,8 @@ msgid ""
 "<?=$values['unsubscribe_url']?>\n"
 msgstr ""
 
+#. Sent to creator when admin gives them an announcement to signers.
+
 #: pb/templates/emails/announce-post
 msgid ""
 "Subject: Send a message to your signers - '<?=$values['title']?>' at PledgeBank.com\n"
@@ -6758,6 +6771,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent if the rate of signups of a pledge seems too low.
+
 
 #: pb/templates/emails/chivvy-creator-lowrate-1
 msgid ""
@@ -6778,6 +6795,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent if the rate of signups of a pledge seems too low.
+
 
 #: pb/templates/emails/chivvy-creator-lowrate-2
 msgid ""
@@ -6803,6 +6824,10 @@ msgid ""
 "<?=$values['creator_name']?>\n"
 msgstr ""
 
+
+#. Sent if the rate of signups of a pledge seems too low.
+
+
 #: pb/templates/emails/chivvy-creator-lowrate-3
 msgid ""
 "Subject: A suggestion to help your pledge succeed\n"
@@ -6827,6 +6852,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent if the rate of signups of a pledge seems too low.
+
+
 #: pb/templates/emails/chivvy-creator-lowrate-4
 msgid ""
 "Subject: Your pledge needs to grow faster to succeed - here's a suggestion to help.\n"
@@ -6849,6 +6878,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent if the rate of signups of a pledge seems too low.
+
+
 #: pb/templates/emails/chivvy-creator-lowrate-5
 msgid ""
 "Subject: Need some help to get your pledge to grow faster?\n"
@@ -6870,6 +6903,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent if the rate of signups of a pledge seems too low.
+
 
 #: pb/templates/emails/chivvy-creator-lowrate-6
 msgid ""
@@ -6898,6 +6935,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent if the rate of signups of a pledge seems too low.
+
+
 #: pb/templates/emails/chivvy-creator-lowrate-7
 msgid ""
 "Subject: Bribe your friends to help spread your pledge.\n"
@@ -6925,6 +6966,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Used to send an email to the pledge creator by users of the site
+
+
 #: pb/templates/emails/email-creator
 msgid ""
 "Subject: Message about your <?=$values['ref']?> pledge\n"
@@ -6945,6 +6990,10 @@ msgid ""
 "<?=$values['message']?>\n"
 "\n"
 msgstr ""
+
+
+#. Sent by someone to tell their friends about a pledge.
+
 
 #: pb/templates/emails/email-friends
 msgid ""
@@ -6970,6 +7019,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent to creator when a pledge fails.
+
+
 #: pb/templates/emails/failed-creator
 msgid ""
 "Subject: Your pledge - '<?=$values['title']?>' at PledgeBank.com.\n"
@@ -6990,6 +7043,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent to creator when a pledge with a target by area fails in one area.
+
 
 #: pb/templates/emails/failed-creator-byarea
 msgid ""
@@ -7014,6 +7071,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent to creator when a pledge fails with zero signers
+
+
 #: pb/templates/emails/failed-creator-livesimply-zero
 msgid ""
 "Subject: The deadline for your promise has passed - '<?=$values['title']?>' at livesimply\n"
@@ -7035,6 +7096,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent to creator when a pledge fails.
+
+
 #: pb/templates/emails/failed-creator-zero
 msgid ""
 "Subject: Your pledge - '<?=$values['title']?>' at PledgeBank.com.\n"
@@ -7050,6 +7115,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent to each signer when a pledge fails.
+
 
 #: pb/templates/emails/failed-signer
 msgid ""
@@ -7070,6 +7139,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent to each signer when a pledge with a target by area fails in one area.
+
 
 #: pb/templates/emails/failed-signer-byarea
 msgid ""
@@ -7092,6 +7165,8 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+#. General purpose mail when someone performs an action, they are not logged in, and we need to confirm their email address.
+
 #: pb/templates/emails/generic-confirm
 msgid ""
 "Subject: <?=$values['reason_email_subject']?>\n"
@@ -7106,6 +7181,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent to pledge creator when they make a new pledge and need email authentication.
+
 
 #: pb/templates/emails/pledge-confirm
 msgid ""
@@ -7125,6 +7204,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent to signers when they need email authentication.
+
+
 #: pb/templates/emails/signature-confirm
 msgid ""
 "Subject: Signing up to '<?=$values['title']?>' at PledgeBank.com\n"
@@ -7142,6 +7225,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. NA
+
 
 #: pb/templates/emails/sms-confirm
 msgid ""
@@ -7161,6 +7248,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent to creator when a pledge succeeds.
+
 
 #: pb/templates/emails/succeeded-creator
 msgid ""
@@ -7191,6 +7282,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent to creator when a pledge with a target by area succeeds in one area.
+
+
 #: pb/templates/emails/succeeded-creator-byarea
 msgid ""
 "Subject: Pledge successful in <?=$values['location_description']?> - '<?=$values['title']?>' at PledgeBank.com\n"
@@ -7216,6 +7311,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#. Sent to creator 3 days after a pledge succeeds, if they haven't sent a success announce message.
+
+
 #: pb/templates/emails/succeeded-creator-reminder
 msgid ""
 "Subject: Reminder - Please write to your pledge signers - '<?=$values['title']?>'\n"
@@ -7235,6 +7334,10 @@ msgid ""
 "\n"
 "<?=$values['signature']?>\n"
 msgstr ""
+
+
+#. Sent to creator when a pledge with a target by area succeeds in one area.
+
 
 #: pb/templates/emails/succeeded-creator-reminder-byarea
 msgid ""
@@ -7260,6 +7363,10 @@ msgid ""
 "<?=$values['signature']?>\n"
 msgstr ""
 
+
+#.Sent to each signer when a pledge succeeds.
+
+
 #: pb/templates/emails/succeeded-signer
 msgid ""
 "Subject: Pledge successful - '<?=$values['title']?>' at PledgeBank.com\n"
@@ -7283,6 +7390,9 @@ msgid ""
 "area (max one email a day).  Click here and enter your postcode:\n"
 "<?=$values['local_alert_url']?>\n"
 msgstr ""
+
+
+#. Sent to each signer when a by area pledge succeeds in one area.
 
 #: pb/templates/emails/succeeded-signer-byarea
 msgid ""
@@ -7309,6 +7419,10 @@ msgid ""
 "area (max one email a day).  Click here and enter your postcode:\n"
 "<?=$values['local_alert_url']?>\n"
 msgstr ""
+
+
+#. Sent to signers 4 weeks after a signing a pledge
+
 
 #: pb/templates/emails/survey
 msgid ""

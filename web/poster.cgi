@@ -62,18 +62,23 @@ microsites_from_extra_domains = { 'pledgebank.barnet.gov.uk' : 'barnet' };
 # This is used to work out what to name the cache files.
 def microsites_poster_different_look(microsite):
     if microsite == 'barnet': return True
+    if microsite == 'rbwm': return True
     return False
 
 def microsites_has_target():
     return True
 
-def microsites_has_sms():
+def microsites_has_sms(microsite):
+    if microsite == 'barnet': return False
+    if microsite == 'rbwm': return False
     return True
 
 # Fill colour for background of logo
 def microsites_poster_box_fill_colour():
     if microsite == 'barnet':
         return (0, 0.506, 0.518)
+    if microsite == 'rbwm':
+        return (0.4, 0, 0.4) # 660066
     return (0.6, 0.45, 0.7)
 
 # Colour for key words and numbers in text
@@ -86,6 +91,8 @@ def microsites_poster_html_highlight_colour():
 def microsites_poster_rtf_colour():
     if microsite == 'barnet':
         return PyRTF.Colour('pb', 0, 129, 132)
+    if microsite == 'rbwm':
+        return PyRTF.Colour('pb', 102, 0, 102)
     return PyRTF.Colour('pb', 82, 41, 148) # 522994
 
 # Draw the logo at the bottom - x1 and y1
@@ -94,9 +101,15 @@ def microsites_poster_logo(c, x1, y1, w, h_purple, p_footer):
     c.setFillColorRGB(*microsites_poster_box_fill_colour())
     c.rect(x1, y1, w, h_purple, fill=1, stroke=0)
 
+    site_name = '<font color="#ffffff">Pledge</font>Bank'
+    if microsite == 'rbwm':
+        site_name = 'RBWM ' + site_name
+    else:
+        site_name = site_name + '.com'
+
     # Logo for main PledgeBank
     story = [
-        Paragraph(_('<font color="#ffffff">Pledge</font>Bank.com').encode('utf-8'), p_footer)
+        Paragraph(_(site_name).encode('utf-8'), p_footer)
     ]
     f = Frame(x1, y1+0.1*h_purple, w, h_purple, showBoundary = 0, id='Footer',
             topPadding = 0, bottomPadding = 0)
@@ -346,7 +359,7 @@ def format_integer(i):
 
 # Also update has_sms in phplib/pledge.php
 def has_sms(pledge):
-    if not microsites_has_sms():
+    if not microsites_has_sms(microsite):
         return False
     # Private pledges have no SMS for now
     if pledge['pin']:

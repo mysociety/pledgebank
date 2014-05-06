@@ -2,6 +2,10 @@
     background-image: none;
 }
 
+#sitemenu {
+    padding: 0; /* Removes some vertical space under the navigation */
+}
+
 .rbwm-content {
     width: 100%;
 }

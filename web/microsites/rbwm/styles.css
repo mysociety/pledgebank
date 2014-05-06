@@ -73,12 +73,11 @@ h1 span#logo_pledge {
     padding: 3%;
     width: 52.8%;
     margin-right: 3%;
-    border: none;
 }
 
 #new #preview,
 #tips {
-    width: 38.2%;
+    width: 37.2%;
     border: none;
     background-color: transparent;
     padding: 0;

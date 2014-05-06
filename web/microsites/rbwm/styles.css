@@ -1,0 +1,189 @@
+#front {
+    background-image: none;
+}
+
+#sitemenu {
+    padding: 0; /* Removes some vertical space under the navigation */
+}
+
+.rbwm-content {
+    width: 100%;
+}
+.breadcrumbs {
+    margin-bottom: 1em;
+}
+.rbwm-content h1 {
+    margin-right: 0;
+    background-color: transparent;
+    padding: 0;
+    border-color: #660066;
+}
+
+h1 span#logo_bank,
+h1 span#logo_pledge {
+    background-color: transparent;
+    color: #000;
+}
+
+#logo {
+    background-color: transparent;
+    border-bottom: none;
+    padding: 0;
+    margin: 1em 0;
+}
+
+#logo:hover {
+    background-color: transparent;
+    text-decoration: none;
+    color: black;
+}
+
+#nav_search {
+    width: 98%;
+    background-image: none;
+    background-color: #F5F5F5;
+    display: block;
+    padding: 0.75em 0 0.75em 2%;
+    border-bottom: 1px solid #CFCFCF;
+    font-size: 100%;
+}
+
+#nav_search #q {
+    border: 1px solid #CFCFCF;
+    padding: 0.33em;
+}
+
+#pbcontent {
+    /* Use the maximum available width */
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.rss {
+    padding: 0;
+}
+
+#pbcontent ol {
+    padding-left: 1.8em;
+}
+
+#pbcontent form {
+    display: block;
+}
+
+#new #pbcontent form {
+    padding: 3%;
+    width: 52.8%;
+    margin-right: 3%;
+}
+
+#new #preview,
+#tips {
+    width: 37.2%;
+    border: none;
+    background-color: transparent;
+    padding: 0;
+}
+
+#new #pledge {
+    margin-left: 0;
+}
+
+#setpassword,
+#new #pbcontent form,
+.pledge,
+#spreadword,
+#localsignupyourpage,
+#localsignupsearchpage,
+#localsignupfrontpage {
+    background-color: #f9f0f9;
+    border-color: #660066;
+    border-width: 1px;
+}
+
+#pledge_main,
+#new #pledge,
+#pledge {
+    border-color: #660066;
+    background-color: #933393;
+}
+
+#pledge_main a,
+#pledge_main h2,
+#pledge_main p,
+#new #pledge h2,
+#pledge h2,
+#new #pledge p,
+#pledge p {
+    color: #fff;
+}
+
+#startblurb {
+    border-color: #660066;
+    background-color: #933393;
+}
+
+#startblurb a {
+    text-align: left;
+    padding-left: 60px;
+    display: block;
+}
+
+#startblurb a:hover,
+#startblurb a:active,
+#startblurb a:focus {
+    text-decoration: none;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+#error, #errors, .finished {
+    color: #000;
+}
+
+#pbcontent .search_results {
+    list-style: none outside none;
+}
+
+#pbcontent .search_results li {
+    margin-bottom: 2em;
+}
+#currentpledges li:hover,
+#successfulpledges li:hover,
+#front #comments li:hover {
+    background-color: #f9f0f9;
+}
+
+#currentpledges {
+    padding: 1em 0;
+}
+
+.success,
+.finished {
+    width: 100%;
+    margin-bottom: 1em;
+    padding: 1em 0;
+}
+
+.pledge-info {
+    width: 48%;
+    float: left;
+    margin-bottom: 2em;
+}
+
+#pledgeaction {
+    margin-bottom: 2em;
+}
+
+/* Footer */
+html body #pbcontent #govmetric {
+    /* Just can't beat the specificity of the code without a giant selector */
+    background-color: transparent;
+    width: 100%; /* as above :( */;
+    margin-right: 0;
+    padding: 0;
+    border: none;
+}

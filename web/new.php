@@ -81,7 +81,7 @@ function check_facebook_params($data) {
 function pledge_form_one($data = array(), $errors = array()) {
     global $lang, $langs;
 
-    microsites_new_breadcrumbs(1);
+    microsites_new_breadcrumbs('basics');
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -369,7 +369,7 @@ function pledge_form_two($data, $errors = array()) {
         unset($errors['gaze_place']); # remove NOTICE
     }
 
-    microsites_new_breadcrumbs(2);
+    microsites_new_breadcrumbs('location');
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -439,7 +439,7 @@ function pledge_form_three($data, $errors = array()) {
     }
     $isodate = $data['parseddate']['iso'];
 
-    microsites_new_breadcrumbs(3);
+    microsites_new_breadcrumbs('category');
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -461,7 +461,9 @@ function pledge_form_three($data, $errors = array()) {
 </div>
 
 <form accept-charset="utf-8" name="pledge" method="post" action="/new">
-<h2><?=_('New Pledge &ndash; Category / Privacy')?></h2>
+<h2><?= microsites_private_allowed() ? _('New Pledge &ndash; Category / Privacy')
+        : _('New Pledge &ndash; Category '); ?>
+</h2>
 
 <?  if (microsites_categories_allowed()) { ?>
 <p><?=_('Which category does your pledge best fit into?') ?>
@@ -497,7 +499,7 @@ function pledge_form_addr($data = array(), $errors = array()) {
     global $lang, $langs, $number_of_steps;
 
     $curr_step = has_step_2() ? (has_step_3() ? 4 : 3) : 2;
-    microsites_new_breadcrumbs($curr_step);
+    microsites_new_breadcrumbs('address');
 
     $isodate = $data['parseddate']['iso'];
     if (sizeof($errors)) {
@@ -905,7 +907,7 @@ function preview_pledge($data, $errors) {
     $local = (isset($data['local'])) ? $data['local'] : '0';
     $isodate = $data['parseddate']['iso'];
 
-    microsites_new_breadcrumbs($number_of_steps);
+    microsites_new_breadcrumbs('preview');
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -990,7 +992,8 @@ longer be valid."))?>
  <input class="topbutton" type="submit" name="tostep2" value="<?=_('Change location') ?>">
 <? }
    if (has_step_3()) { ?>
- <input class="topbutton" type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
+ <input class="topbutton" type="submit" name="tostep3" value="<?= microsites_private_allowed() ? 
+    _('Change category/privacy') : _('Change category'); ?>">
 <? }
    if (has_step_addr()) { ?>
  <input type="submit" name="tostepaddr" value="<?=_('Change your postal address') ?>">

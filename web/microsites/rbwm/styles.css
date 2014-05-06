@@ -84,6 +84,22 @@ h1 span#logo_pledge {
     padding: 0;
 }
 
+#new #pledge {
+    margin-left: 0;
+}
+
+#pledge,
+#new #pledge,
+#pledge_main,
+.pledge,
+#spreadword,
+#localsignupyourpage,
+#localsignupsearchpage,
+#localsignupfrontpage {
+    background-color: #f9f0f9;
+    border-color: #660066;
+    border-width: 1px;
+}
 /* Footer */
 html body #pbcontent #govmetric {
     /* Just can't beat the specificity of the code without a giant selector */

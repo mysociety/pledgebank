@@ -20,28 +20,6 @@
      </div>
     </div>
 
-     <div class="" id="rbwm-navigation-related">
-      <div style="font-weight: bold" class="heading skiplinks">
-       e-Petition Links
-      </div>
-
-      <div>
-       <a href="/">Introduction</a>
-      </div>
-
-      <div>
-       <a href="/new">Create a petition</a>
-      </div>
-
-      <div>
-       <a href="/list">View petitions</a>
-      </div>
-
-      <div>
-       <a href="/terms">Terms &amp; conditions</a>
-      </div>
-
-   </div>
 
 
    <div class="clearer">
@@ -118,7 +96,7 @@
     <!-- START: SiteStat4 Analysis Code --> <script type="text/javascript">
 //<![CDATA[
 
-    <!-- 
+    <!--
     // S.Arthur - 2007-09-14
     var locHost = location.host
     var locPath = location.pathname
@@ -133,7 +111,7 @@
     var NScounter = "";
     var x = 1;
     if (myCount <= x) { NScounter == "main."; }
-    else { while (x < myCount) { NScounter += (myPathArray[x] + "."); x++; } } 
+    else { while (x < myCount) { NScounter += (myPathArray[x] + "."); x++; } }
     var locFile = myPathArray[myCount]
     var myFileString = locFile.toLowerCase()
     var regexp
@@ -151,23 +129,23 @@
 
     NScounter += (myFileArray);
 
-    document.write("SiteStat: " + NScounter + "<br />") 
-    // END 
+    document.write("SiteStat: " + NScounter + "<br />")
+    // END
 
     function sitestat(ns_l){
     ns_l+='&amp;ns__t='+(new Date()).getTime();
-    ns_pixelUrl=ns_l; 
-    ns_0=document.referrer; 
-    ns_0=(ns_0.lastIndexOf('/')==ns_0.length-1)?ns_0.substring(ns_0.lastIndexOf('/'),0):ns_0; 
-    if(ns_0.length>0)ns_l+='&amp;ns_referrer='+escape(ns_0); 
+    ns_pixelUrl=ns_l;
+    ns_0=document.referrer;
+    ns_0=(ns_0.lastIndexOf('/')==ns_0.length-1)?ns_0.substring(ns_0.lastIndexOf('/'),0):ns_0;
+    if(ns_0.length>0)ns_l+='&amp;ns_referrer='+escape(ns_0);
     if(document.images){
         ns_1=new Image();ns_1.src=ns_l;
     } else {
         document.write('<img src="'+ns_l+'" width="1" height="1" alt="">');
-    } 
     }
-    sitestat("http://uk.sitestat.com/rbwm/rbwm/s?" + NScounter); 
-    // --> 
+    }
+    sitestat("http://uk.sitestat.com/rbwm/rbwm/s?" + NScounter);
+    // -->
     //]]>
     </script> <noscript>
     <div>

@@ -65,6 +65,10 @@ h1 span#logo_pledge {
     padding-left: 1.8em;
 }
 
+#pbcontent form {
+    display: block;
+}
+
 #new #pbcontent form {
     padding: 2%;
     width: 54.8%;

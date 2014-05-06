@@ -1,0 +1,30 @@
+.rbwm-content {
+    width: 100%;
+}
+.breadcrumbs {
+    margin-bottom: 1em;
+}
+.rbwm-content h1 {
+    margin-right: 0;
+    background-color: transparent;
+    padding: 0;
+}
+
+h1 span#logo_bank,
+h1 span#logo_pledge {
+    background-color: transparent;
+    color: #000;
+}
+
+#logo {
+    background-color: transparent;
+    border-bottom: none;
+    padding: 0;
+    margin: 1em 0;
+}
+
+#logo:hover {
+    background-color: transparent;
+    text-decoration: none;
+    color: black;
+}

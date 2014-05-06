@@ -80,6 +80,10 @@ h1 span#logo_pledge {
 }
 
 /* Footer */
-#govmetric {
-    background-color: transparent !important; /* Just can't beat the specificity of the code making this purple and it never needs to be anything other than transparent */
+html body #pbcontent #govmetric {
+    /* Just can't beat the specificity of the code without a giant selector */
+    background-color: transparent;
+    width: 100%; /* as above :( */;
+    margin-right: 0;
+    padding: 0;
 }

@@ -51,3 +51,12 @@ h1 span#logo_pledge {
     border: 1px solid #CFCFCF;
     padding: 0.33em;
 }
+
+#pbcontent {
+    /* Use the maximum available width */
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+}

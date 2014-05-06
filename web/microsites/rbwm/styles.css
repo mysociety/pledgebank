@@ -60,3 +60,26 @@ h1 span#logo_pledge {
     margin-left: 0;
     margin-right: 0;
 }
+
+#pbcontent ol {
+    padding-left: 1.8em;
+}
+
+#new #pbcontent form {
+    padding: 2%;
+    width: 54.8%;
+    margin-right: 3%;
+    border: none;
+}
+
+#tips {
+    width: 38.2%;
+    border: none;
+    background-color: transparent;
+    padding: 0;
+}
+
+/* Footer */
+#govmetric {
+    background-color: transparent !important; /* Just can't beat the specificity of the code making this purple and it never needs to be anything other than transparent */
+}

@@ -70,12 +70,13 @@ h1 span#logo_pledge {
 }
 
 #new #pbcontent form {
-    padding: 2%;
-    width: 54.8%;
+    padding: 3%;
+    width: 52.8%;
     margin-right: 3%;
     border: none;
 }
 
+#new #preview,
 #tips {
     width: 38.2%;
     border: none;

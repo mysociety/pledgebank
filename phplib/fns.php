@@ -498,7 +498,7 @@ function pb_view_local_alert_quick_signup($class, $params = array('newflash'=>tr
 
     # Microsite specific changes
     $any_country = true;
-    $force_country = false;
+    $force_country = ! microsites_location_allowed();
 ?>
 <form accept-charset="utf-8" id="<?=$class?>" name="localalert" action="/alert" method="post">
 <input type="hidden" name="subscribe_local_alert" value="1">

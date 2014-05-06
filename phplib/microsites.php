@@ -1229,27 +1229,51 @@ function microsites_has_survey() {
     return true;
 }
 
-function microsites_new_breadcrumbs($num) {
-    $steps = array(_('Basics'));
+function microsites_new_breadcrumbs($page) {
+
+    $steps = [];
+    $steps[] = [
+        'step' => 'basics',
+        'text' => _('Basics')
+    ];
     if (microsites_location_allowed())
-        $steps[] = _('Location');
-    if (microsites_categories_page3() || microsites_private_allowed())
-        $steps[] = _('Category/Privacy');
+        $steps[] = [
+            'step' => 'location',
+            'text' => _('Location')
+        ];
+    if (microsites_private_allowed()) {
+        $steps[] = [
+            'step' => 'category',
+            'text' => _('Category/Privacy')
+        ];
+    } elseif (microsites_categories_allowed()) {
+        $steps[] = [
+            'step' => 'category',
+            'text' => _('Category'),
+        ];
+    }
     if (microsites_postal_address_allowed())
-        $steps[] = _('Address');
-    $steps[] = _('Preview');
+        $steps[] = [
+            'step' => 'address',
+            'text' => _('Address')
+        ];
+    $steps[] = [
+        'step' => 'preview',
+        'text' => _('Preview')
+    ];
 
     $str = '<ol id="breadcrumbs">';
-    for ($i = 0; $i < sizeof($steps); ++$i) {
-        if ($i == $num - 1)
-            $str .= "<li class=\"hilight\"><em>";
-        else
-            $str .= "<li>";
-        $str .= '<!--[if lte IE 6]>' . ($i+1) . '. <![endif]-->';
-        $str .= htmlspecialchars($steps[$i]);
-        if ($i == $num - 1)
-            $str .= "</em>";
-        $str .= "</li>";
+    $num = 1;
+    foreach ($steps as $item) {
+        $li = '<!--[if lte IE 6]>' . ($num++) . '. <![endif]-->' .
+              htmlspecialchars($item['text']);
+
+        if ($item['step'] == $page) {
+            $str .= sprintf('<li class="hilight"><em> %s </em></li>', $li);
+        }
+        else {
+            $str .= sprintf('<li> %s </li>', $li);
+        }
     }
     $str .= "</ol>";
     print $str;

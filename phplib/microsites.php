@@ -1214,6 +1214,7 @@ function microsites_no_target() {
 }
 
 # Return true if microsite has SMS at all
+# NB: you will also need to edit web/poster.cgi
 function microsites_has_sms() {
     global $microsite;
     if ($microsite == 'barnet') return false;

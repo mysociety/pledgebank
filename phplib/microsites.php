@@ -348,6 +348,9 @@ function microsites_default_location() {
     if ($microsite == 'barnet'){
         return array('local'=> 1, 'place'=> 'Barnet', 'country' => 'GB', 'state' => '', 'gaze_place' => '', 'postcode' => '', 'places' => null);
     }
+    if ($microsite == 'rbwm'){
+        return array('local'=> 1, 'place'=> 'Windsor', 'country' => 'GB', 'state' => '', 'gaze_place' => '', 'postcode' => '', 'places' => null);
+    }
     return array(); /* empty array, not null */
 }
 
@@ -460,6 +463,8 @@ greater publicity and a greater chance of succeeding.');
 # Features
 
 function microsites_location_allowed() {
+    global $microsite;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 
@@ -523,6 +528,7 @@ function microsite_conditional_firstperson($name, $pledge_microsite) {
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
     global $microsite;
+    if ($microsite == 'rbwm') return false;
     if ($microsite == 'barnet') return false;
     return true;
 }
@@ -1140,6 +1146,7 @@ function microsites_new_pledges_preview_extras($data) {
 function microsites_change_microsite_allowed() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 

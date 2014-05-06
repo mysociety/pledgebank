@@ -409,7 +409,6 @@
     }
 ?>
 
-<span id="countrytitle"><a href="/where"><?=pb_site_country_name()?></a></span>
 <span id="tagline"><small><br><?=_('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help')?></small></span></h1>
 
 <hr class="v">

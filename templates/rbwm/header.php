@@ -26,8 +26,8 @@
 //
 // // // // //
 //
-//    author: Andrew Scott / Andrew Scott 
-// published: 2010-10-25 
+//    author: Andrew Scott / Andrew Scott
+// published: 2010-10-25
 //   updated: 2010-11-10
 //  location: http://www.rbwm.gov.uk/web/meetings_council_epetitions.htm
 //  template: v5
@@ -133,7 +133,7 @@
 
  <script type="text/javascript">
 //<![CDATA[
-    if (location.href == "http://www.rbwm.gov.uk/index.htm" || location.href == "http://www.rbwm.gov.uk/" ) 
+    if (location.href == "http://www.rbwm.gov.uk/index.htm" || location.href == "http://www.rbwm.gov.uk/" )
     {
         document.write('<link rel="alternate" type="application/rss+xml" title="RSS News Feed" href="http://www.rbwm.gov.uk/news_rss.xml" />');
     }
@@ -143,8 +143,8 @@
 
  <title>Pledges | The Royal Borough of Windsor and Maidenhead</title>
 
- <link href="/pet.css" rel="stylesheet" type="text/css" />
- <link href="/assets/rbwm/css.css" type="text/css" rel="stylesheet" />
+
+ <link href="/microsites/rbwm/styles.css" type="text/css" rel="stylesheet" />
 </head>
 
 <body>
@@ -236,145 +236,7 @@
     <!--ZOOMSTOP-->
 
 
-    <div class="noprint" id="rbwm-navigation">
-     <div class="heading">
-      <strong class="skiplinks">Main Site Navigation</strong>
-     </div>
 
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/index.htm">Home</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/atoz_index.htm">A-Z Service Directory</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/advice_benefits.htm">Advice and Benefits</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/business.htm">Business</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/community_living.htm">Community and Living</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/council_democracy.htm">Council and Democracy</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/education_learning.htm">Education and Learning</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/environment_planning.htm">Environment and Planning</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/health_socialcare.htm">Health and Social Care</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/housing.htm">Housing</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/jobs_careers.htm">Jobs and Careers</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/leisure_culture.htm">Leisure and Culture</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/news_publications.htm">News and Publications</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/transport_streets.htm">Transport and Streets</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/faqs.htm" accesskey="5">Frequently Asked Questions</a>
-     </div>
-     <!-- START: 15706 Popular Links -->
-     <!--ZOOMSTOP-->
-
-
-     <div style="font-weight: bold" class="heading skiplinks">
-      Popular Links
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/tdbus_timetables_of_buses_that_serve_rbwm.htm">Bus Services</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/ctax_indexpage.htm">Council Tax</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/members_index.htm">Councillors</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/jobs_council.htm">Jobs at the Council</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/lc_leisure_centres_index.htm">Leisure Centres</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/libraries.htm">Libraries</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/parking_index.htm">Parking</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/dc_public_apps.htm">Planning Application Search</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/wm_recycling.htm">Recycling</a>
-     </div>
-
-
-     <div>
-      <a href="http://www.rbwm.gov.uk/web/ed_school_index.htm">Schools</a>
-     </div>
-     <!--ZOOMRESTART-->
-     <!-- END: 15706 Popular Links -->
-    </div>
     <!--ZOOMRESTART-->
     <!-- END: 8693 - LGNL -->
 
@@ -385,8 +247,8 @@
      <a name="content" id="content"></a>
 
      <div class="breadcrumbs">
-      Location: TODO_BREADCRUMBS?
-     </div>
+        Location: <a href="/index.htm">Home</a> » <a href="#">GrandParent</a> » <a href="#">Parent</a> » Pledgebank
+    </div>
      <!--ZOOMRESTART-->
 
 
@@ -409,17 +271,16 @@
     }
 ?>
 
-<span id="countrytitle"><a href="/where"><?=pb_site_country_name()?></a></span>
 <span id="tagline"><small><br><?=_('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help')?></small></span></h1>
 
 <hr class="v">
 
-<div id="pballheader"><? 
+<div id="pballheader"><?
 
     // Start flyers-printing again
     if ($params['noprint']) print '</div> <!-- noprint -->';
-    
-    // Display who is logged in 
+
+    // Display who is logged in
     if ($P) {
         print '<p id="signedon" class="noprint">';
         if ($P->has_name())

@@ -348,6 +348,9 @@ function microsites_default_location() {
     if ($microsite == 'barnet'){
         return array('local'=> 1, 'place'=> 'Barnet', 'country' => 'GB', 'state' => '', 'gaze_place' => '', 'postcode' => '', 'places' => null);
     }
+    if ($microsite == 'rbwm'){
+        return array('local'=> 1, 'place'=> 'Windsor', 'country' => 'GB', 'state' => '', 'gaze_place' => '', 'postcode' => '', 'places' => null);
+    }
     return array(); /* empty array, not null */
 }
 
@@ -460,6 +463,8 @@ greater publicity and a greater chance of succeeding.');
 # Features
 
 function microsites_location_allowed() {
+    global $microsite;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 
@@ -523,6 +528,7 @@ function microsite_conditional_firstperson($name, $pledge_microsite) {
  * Returns whether private pledges are offered in new pledge dialog. */
 function microsites_private_allowed() {
     global $microsite;
+    if ($microsite == 'rbwm') return false;
     if ($microsite == 'barnet') return false;
     return true;
 }
@@ -532,6 +538,7 @@ function microsites_private_allowed() {
 function microsites_categories_allowed() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 
@@ -1140,6 +1147,7 @@ function microsites_new_pledges_preview_extras($data) {
 function microsites_change_microsite_allowed() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 
@@ -1150,6 +1158,7 @@ function microsites_change_microsite_allowed() {
 function microsites_show_translate_blurb() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 
@@ -1160,6 +1169,7 @@ function microsites_show_translate_blurb() {
 function microsites_show_alert_advert() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 } 
 
@@ -1168,7 +1178,8 @@ function microsites_show_alert_advert() {
  */
 function microsites_show_area($pledge_microsite) {
     global $microsite;
-    if ($microsite == 'barnet' || $pledge_microsite == 'barnet') return false;
+    if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;    
 }
 
@@ -1203,9 +1214,11 @@ function microsites_no_target() {
 }
 
 # Return true if microsite has SMS at all
+# NB: you will also need to edit web/poster.cgi
 function microsites_has_sms() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 
@@ -1230,27 +1243,51 @@ function microsites_has_survey() {
     return true;
 }
 
-function microsites_new_breadcrumbs($num) {
-    $steps = array(_('Basics'));
+function microsites_new_breadcrumbs($page) {
+
+    $steps = [];
+    $steps[] = [
+        'step' => 'basics',
+        'text' => _('Basics')
+    ];
     if (microsites_location_allowed())
-        $steps[] = _('Location');
-    if (microsites_categories_page3() || microsites_private_allowed())
-        $steps[] = _('Category/Privacy');
+        $steps[] = [
+            'step' => 'location',
+            'text' => _('Location')
+        ];
+    if (microsites_private_allowed()) {
+        $steps[] = [
+            'step' => 'category',
+            'text' => _('Category/Privacy')
+        ];
+    } elseif (microsites_categories_allowed()) {
+        $steps[] = [
+            'step' => 'category',
+            'text' => _('Category'),
+        ];
+    }
     if (microsites_postal_address_allowed())
-        $steps[] = _('Address');
-    $steps[] = _('Preview');
+        $steps[] = [
+            'step' => 'address',
+            'text' => _('Address')
+        ];
+    $steps[] = [
+        'step' => 'preview',
+        'text' => _('Preview')
+    ];
 
     $str = '<ol id="breadcrumbs">';
-    for ($i = 0; $i < sizeof($steps); ++$i) {
-        if ($i == $num - 1)
-            $str .= "<li class=\"hilight\"><em>";
-        else
-            $str .= "<li>";
-        $str .= '<!--[if lte IE 6]>' . ($i+1) . '. <![endif]-->';
-        $str .= htmlspecialchars($steps[$i]);
-        if ($i == $num - 1)
-            $str .= "</em>";
-        $str .= "</li>";
+    $num = 1;
+    foreach ($steps as $item) {
+        $li = '<!--[if lte IE 6]>' . ($num++) . '. <![endif]-->' .
+              htmlspecialchars($item['text']);
+
+        if ($item['step'] == $page) {
+            $str .= sprintf('<li class="hilight"><em> %s </em></li>', $li);
+        }
+        else {
+            $str .= sprintf('<li> %s </li>', $li);
+        }
     }
     $str .= "</ol>";
     print $str;

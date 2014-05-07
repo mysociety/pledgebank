@@ -62,12 +62,15 @@ microsites_from_extra_domains = { 'pledgebank.barnet.gov.uk' : 'barnet' };
 # This is used to work out what to name the cache files.
 def microsites_poster_different_look(microsite):
     if microsite == 'barnet': return True
+    if microsite == 'rbwm': return True
     return False
 
 def microsites_has_target():
     return True
 
-def microsites_has_sms():
+def microsites_has_sms(microsite):
+    if microsite == 'barnet': return False
+    if microsite == 'rbwm': return False
     return True
 
 # Fill colour for background of logo
@@ -346,7 +349,7 @@ def format_integer(i):
 
 # Also update has_sms in phplib/pledge.php
 def has_sms(pledge):
-    if not microsites_has_sms():
+    if not microsites_has_sms(microsite):
         return False
     # Private pledges have no SMS for now
     if pledge['pin']:

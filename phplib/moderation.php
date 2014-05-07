@@ -14,7 +14,7 @@ function moderation_redirect($p) {
     }
 
     if ($p->ishidden()) {
-        header('Location: /TODO-moderation');
+        header( sprintf( 'Location: /fuzzyref.cgi?ref=%s&m=1', $p->ref() ) );
         exit();
     }
 

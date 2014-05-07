@@ -161,6 +161,23 @@ h1 span#logo_pledge {
     padding: 1em 0;
 }
 
+.success,
+.finished {
+    width: 100%;
+    margin-bottom: 1em;
+    padding: 1em 0;
+}
+
+.pledge-info {
+    width: 48%;
+    float: left;
+    margin-bottom: 2em;
+}
+
+#pledgeaction {
+    margin-bottom: 2em;
+}
+
 /* Footer */
 html body #pbcontent #govmetric {
     /* Just can't beat the specificity of the code without a giant selector */

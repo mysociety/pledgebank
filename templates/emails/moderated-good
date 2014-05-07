@@ -1,0 +1,13 @@
+Subject: Your pledge '<?=$values['title']?>' has been accepted!
+
+Thank you, your pledge has been accepted.  You can now view it at:
+
+    <?=$values['pledge_url']?>
+
+Your pledge reads:
+
+'<?=$values['sentence_first']?>'
+
+Thank you for submitting your pledge to PledgeBank.
+
+<?=$values['signature']?>

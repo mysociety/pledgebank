@@ -143,8 +143,9 @@ function pb_message_add_template_values($values) {
 
     if (array_key_exists('id', $values)) {
         $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
-        if ($values['actual'] >= $values['target'])
-            $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? _('exceeded') : _('met'));
+        $target = $p ? $p->target() : $values['target'];
+        if ($values['actual'] >= $target)
+            $values['exceeded_or_met'] = ($values['actual'] > $target ? _('exceeded') : _('met'));
     }
     if (array_key_exists('ref', $values)) {
         $values['pledge_url'] = pb_domain_url(array('path'=> "/" . $values['ref']));

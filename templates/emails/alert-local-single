@@ -1,4 +1,4 @@
-Subject: New pledge near you! - '<?=$values['title']?>' at PledgeBank.com
+Subject: New pledge near you! - '<?=$values['title']?>' at <?=$values['pledgebank_site_name']?>
 
 There's a new pledge near <?=$values['alert_description']?>.
 

@@ -141,6 +141,7 @@ define('OPTION_TRACKING_SECRET', 'really-secret-value');
 
 // Microsites
 define('OPTION_GLOBALCOOL_SECRET', 'really-secret-value');
+define('OPTION_FIXED_SITE_NAME', 0); // or use 'My Site Name' for overriding all emails
 
 // Facebook get these from http://developers.facebook.com
 define('OPTION_FACEBOOK_API_KEY', ''); // leave empty if not using Facebook

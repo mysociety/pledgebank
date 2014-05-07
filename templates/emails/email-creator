@@ -2,7 +2,7 @@ Subject: Message about your <?=$values['ref']?> pledge
 
 Hi <?=$values['creator_name']?>,
 
-<?=$values['from_name']?> has used PledgeBank's "contact the creator"
+<?=$values['from_name']?> has used <?=$values['pledgebank_site_name']?>'s "contact the creator"
 feature to send you the message below. Your details have not been
 given to anyone, unless you choose to reply to this message, which
 will then go directly to the person who wrote the message.

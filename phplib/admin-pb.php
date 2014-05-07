@@ -12,6 +12,7 @@
 
 require_once "../phplib/pb.php";
 require_once "../phplib/pledge.php";
+require_once "../phplib/microsites.php";
 require_once "../phplib/comments.php";
 require_once '../phplib/pbfacebook.php';
 require_once "../commonlib/phplib/db.php";
@@ -594,7 +595,10 @@ class ADMIN_PAGE_PB_MAIN {
             print '<form name="moderationform" method="post" action="'.$this->self_link.'">';
             print '<input type="hidden" name="update_moderation" value="1">';
             print '<input type="hidden" name="pledge_id" value="'.$pdata['id'].'">';
-            if ($pdata['moderated_time']) {
+
+            $is_moderated = $pdata['moderated_time'] ? true : false;
+
+            if ($is_moderated) {
                 $bad = $pledge_obj->ishidden();
                 printf('Moderated <span class="moderated_%s">%s</span> by %s at %s',
                     $bad ? 'bad' : 'good',
@@ -602,7 +606,12 @@ class ADMIN_PAGE_PB_MAIN {
                     $pledge_obj->moderator()->name(),
                     $pdata['moderated_time']
                 );
+            }
 
+            printf('<br />Comment: <input type="text" name="moderated_comment" value="%s">',
+                htmlspecialchars( $pdata['moderated_comment']) );
+
+            if ($is_moderated) {
                 print "<br />Remoderate as:";
                 if ($bad) {
                     print '<input name="moderate_good" type="submit" value="Good">';
@@ -616,8 +625,9 @@ class ADMIN_PAGE_PB_MAIN {
                 print '<input name="moderate_good" type="submit" value="Good">';
                 print '<input name="moderate_bad" type="submit" value="Bad">';
             }
-            printf('<br />Comment: <input type="text" name="moderated_comment" value="%s">',
-                htmlspecialchars( $pdata['moderated_comment']) );
+
+            printf('<input type="checkbox" name="send_moderation_email" %s> (send email)',
+                $is_moderated ? '' : 'checked');
 
             print "</form>";
             print "</div>";
@@ -1112,9 +1122,14 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
         $ishidden = null;
         if (get_http_var('moderate_good')) $ishidden = false;
         if (get_http_var('moderate_bad'))  $ishidden = true;
+
         if (! isset($ishidden)) {
             die("Unexpected error in moderation!");
         }
+
+        $send_moderation_email = get_http_var('send_moderation_email');
+        $moderated_comment = get_http_var('moderated_comment');
+
         db_query('UPDATE pledges SET
             ishidden = ?,
             moderated_time = ms_current_timestamp(),
@@ -1124,12 +1139,37 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
             [
                 $ishidden,
                 get_admin_user()->id,
-                get_http_var('moderated_comment'),
+                $moderated_comment,
                 $pledge_id
             ]);
 
         db_commit();
         print p(_("<em>Pledge has been moderated</em>"));
+
+        if ($send_moderation_email) {
+            $pledge = new Pledge($pledge_id);
+
+            $q_name = $pledge->creator_name();
+            $q_email = $pledge->creator_email();
+
+            $template_name = $ishidden ? 'moderated-bad' : 'moderated-good';
+
+            $template_data = [
+                'id' => $pledge_id,
+                'ref' => $pledge->ref(),
+                'pledge_url_microsite' => $pledge->url_typein($pledge->microsite()),
+                'title' => $pledge->title(),
+                'moderated_comment_clause' => $moderated_comment ?
+                    _("The reason was") . ": \n\n\t"  . $moderated_comment
+                    : '',
+            ];
+
+            pb_send_email_template($q_name ? [[ $q_email, $q_name ]] : $q_email,
+                $template_name,
+                $template_data);
+
+            print p(_("<em>Email sent to pledge creator</em>."));
+        }
     }
 
     function update_country($pledge_id) {

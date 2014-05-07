@@ -143,8 +143,9 @@ function pb_message_add_template_values($values) {
 
     if (array_key_exists('id', $values)) {
         $values['actual'] = db_getOne('select count(id) from signers where pledge_id = ?', $values['id']);
-        if ($values['actual'] >= $values['target'])
-            $values['exceeded_or_met'] = ($values['actual'] > $values['target'] ? _('exceeded') : _('met'));
+        $target = $p ? $p->target() : $values['target'];
+        if ($values['actual'] >= $target)
+            $values['exceeded_or_met'] = ($values['actual'] > $target ? _('exceeded') : _('met'));
     }
     if (array_key_exists('ref', $values)) {
         $values['pledge_url'] = pb_domain_url(array('path'=> "/" . $values['ref']));
@@ -167,8 +168,10 @@ function pb_message_add_template_values($values) {
     $values['sms_number'] = OPTION_PB_SMS_DISPLAY_NUMBER;
     $values['pledgebank_url'] = pb_domain_url(array('path'=>'/'));
     $values['pledgebank_facebook_url'] = OPTION_FACEBOOK_CANVAS;
+
+    $values['pledgebank_site_name'] = microsites_site_name();
         
-    $values['signature'] = _("Yours,  \nthe PledgeBank.com team");
+    $values['signature'] = _( sprintf("Yours,  \nthe %s team", microsites_site_name() ) );
     if (OPTION_PB_STAGING) {
         $values['signature'] .= ' - DEVELOPMENT SITE, NOT LIVE';
     }
@@ -206,7 +209,7 @@ function pb_send_email($to, $subject, $message, $headers = array()) {
 function pb_send_email_internal($to, $spec) {
     // Add standard PledgeBank from header
     if (!array_key_exists("From", $spec)) {
-        $spec['From'] = array(OPTION_CONTACT_EMAIL, _('PledgeBank.com'));
+        $spec['From'] = array(OPTION_CONTACT_EMAIL, microsites_site_name());
     }
 
     $spec['To'] = $to;

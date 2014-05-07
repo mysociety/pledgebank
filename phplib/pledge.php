@@ -366,7 +366,12 @@ class Pledge { # till comment 'END OF class' below
     function url_main() { return pb_domain_url() . $this->h_ref; }
     function url_typein() {
         global $microsite;
-        $m = $microsite;
+        $m = '';
+        if (func_num_args()) {
+            $m = func_get_arg(0);
+        } else {
+            $m = $microsite;
+        }
         if ($m == 'everywhere')
             $m = null;
         return pb_domain_url(array('lang'=>'', 'microsite'=>$m, 'path'=>'/')) . $this->h_ref;

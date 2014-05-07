@@ -2,7 +2,7 @@ Subject: Bribe your friends to help spread your pledge.
 
 Hello again,
 
-At PledgeBank we're always keen to help people make their pledges
+At <?=$values['pledgebank_site_name']?> we're always keen to help people make their pledges
 succeed. We've calculated that unless you do something then your
 pledge isn't going to grow fast enough to get the number of people it
 needs.

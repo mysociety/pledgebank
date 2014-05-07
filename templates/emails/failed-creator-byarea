@@ -1,4 +1,4 @@
-Subject: Your pledge '<?=$values['title']?>' at PledgeBank.com was unsuccessful in <?=$values['location_description']?>
+Subject: Your pledge '<?=$values['title']?>' at <?=$values['pledgebank_site_name'?> was unsuccessful in <?=$values['location_description']?>
 
 Unfortunately, your pledge did not meet its target for people in
 <?=$values['location_description']?> in the required time.  You required

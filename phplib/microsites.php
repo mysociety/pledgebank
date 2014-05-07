@@ -538,6 +538,7 @@ function microsites_private_allowed() {
 function microsites_categories_allowed() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 
@@ -1157,6 +1158,7 @@ function microsites_change_microsite_allowed() {
 function microsites_show_translate_blurb() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 
@@ -1167,6 +1169,7 @@ function microsites_show_translate_blurb() {
 function microsites_show_alert_advert() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 } 
 
@@ -1175,7 +1178,8 @@ function microsites_show_alert_advert() {
  */
 function microsites_show_area($pledge_microsite) {
     global $microsite;
-    if ($microsite == 'barnet' || $pledge_microsite == 'barnet') return false;
+    if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;    
 }
 
@@ -1210,9 +1214,11 @@ function microsites_no_target() {
 }
 
 # Return true if microsite has SMS at all
+# NB: you will also need to edit web/poster.cgi
 function microsites_has_sms() {
     global $microsite;
     if ($microsite == 'barnet') return false;
+    if ($microsite == 'rbwm') return false;
     return true;
 }
 

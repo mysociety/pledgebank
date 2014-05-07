@@ -33,7 +33,7 @@ print h2(_('Promoting your pledge'));
 -->
 
 <li>
-<p><strong><?=_('MySpace, LiveJournal') ?></strong>
+<p><strong><?=_('Facebook, Twitter, Pinterest') ?></strong>
 <small><?=_("(and other sites that don't allow JavaScript)") ?></small>:
 <?=_('Copy the text from the box below to have this automatically updating image:') ?></p>
 <a href="<?=$p->url_typein()?>"><img align="right" border="0" src="<?=$p->url_flyer('A7')?>_flyers1_live.png" alt="<?=_('Sign my pledge at PledgeBank') ?>"></a>

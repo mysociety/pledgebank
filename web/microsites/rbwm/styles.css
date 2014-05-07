@@ -91,9 +91,8 @@ h1 span#logo_pledge {
     margin-left: 0;
 }
 
+#setpassword,
 #new #pbcontent form,
-#pledge,
-#new #pledge,
 #pledge_main,
 .pledge,
 #spreadword,
@@ -103,6 +102,19 @@ h1 span#logo_pledge {
     background-color: #f9f0f9;
     border-color: #660066;
     border-width: 1px;
+}
+
+#new #pledge,
+#pledge {
+    border-color: #660066;
+    background-color: #933393;
+}
+
+#new #pledge h2,
+#pledge h2,
+#new #pledge p,
+#pledge p {
+    color: #fff;
 }
 
 #startblurb {

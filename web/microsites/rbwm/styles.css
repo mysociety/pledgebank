@@ -16,6 +16,7 @@
     margin-right: 0;
     background-color: transparent;
     padding: 0;
+    border-color: #660066;
 }
 
 h1 span#logo_bank,
@@ -93,7 +94,6 @@ h1 span#logo_pledge {
 
 #setpassword,
 #new #pbcontent form,
-#pledge_main,
 .pledge,
 #spreadword,
 #localsignupyourpage,
@@ -104,12 +104,16 @@ h1 span#logo_pledge {
     border-width: 1px;
 }
 
+#pledge_main,
 #new #pledge,
 #pledge {
     border-color: #660066;
     background-color: #933393;
 }
 
+#pledge_main a,
+#pledge_main h2,
+#pledge_main p,
 #new #pledge h2,
 #pledge h2,
 #new #pledge p,
@@ -126,6 +130,18 @@ h1 span#logo_pledge {
     text-align: left;
     padding-left: 60px;
     display: block;
+}
+
+#startblurb a:hover,
+#startblurb a:active,
+#startblurb a:focus {
+    text-decoration: none;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+#error, #errors, .finished {
+    color: #000;
 }
 
 /* Footer */

@@ -122,6 +122,12 @@ h1 span#logo_pledge {
     background-color: #933393;
 }
 
+#startblurb a {
+    text-align: left;
+    padding-left: 60px;
+    display: block;
+}
+
 /* Footer */
 html body #pbcontent #govmetric {
     /* Just can't beat the specificity of the code without a giant selector */

@@ -117,4 +117,5 @@ html body #pbcontent #govmetric {
     width: 100%; /* as above :( */;
     margin-right: 0;
     padding: 0;
+    border: none;
 }

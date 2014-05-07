@@ -90,6 +90,7 @@ h1 span#logo_pledge {
 #new #pledge {
     margin-left: 0;
 }
+
 #new #pbcontent form,
 #pledge,
 #new #pledge,
@@ -103,6 +104,12 @@ h1 span#logo_pledge {
     border-color: #660066;
     border-width: 1px;
 }
+
+#startblurb {
+    border-color: #660066;
+    background-color: #933393;
+}
+
 /* Footer */
 html body #pbcontent #govmetric {
     /* Just can't beat the specificity of the code without a giant selector */

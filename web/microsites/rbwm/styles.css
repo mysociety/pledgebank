@@ -144,6 +144,23 @@ h1 span#logo_pledge {
     color: #000;
 }
 
+#pbcontent .search_results {
+    list-style: none outside none;
+}
+
+#pbcontent .search_results li {
+    margin-bottom: 2em;
+}
+#currentpledges li:hover,
+#successfulpledges li:hover,
+#front #comments li:hover {
+    background-color: #f9f0f9;
+}
+
+#currentpledges {
+    padding: 1em 0;
+}
+
 /* Footer */
 html body #pbcontent #govmetric {
     /* Just can't beat the specificity of the code without a giant selector */

@@ -217,9 +217,6 @@
        <li><a href="http://www.rbwm.gov.uk/report_online.htm"><span>Report Online</span></a>
        </li>
 
-
-       <li><a href="http://www.rbwm.gov.uk/my_account.htm"><span>My Account</span></a>
-       </li>
       </ul>
      </div>
     </div>

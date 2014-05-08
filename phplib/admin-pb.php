@@ -1409,6 +1409,7 @@ class ADMIN_PAGE_PB_LATEST {
     # signers use signtime
     function show_latest_changes() {
         
+        print admin_moderation_styles(); # hack
         $time = array();
 
         global $pb_time;
@@ -1533,6 +1534,53 @@ class ADMIN_PAGE_PB_LATEST {
                 }
             }
         }
+
+        if (OPTION_MODERATE_PLEDGES) {
+            # Pledge Moderations
+            $q = db_query("SELECT 
+                            pledges.*,
+                            extract(epoch from pledges.moderated_time) as epoch,
+                            moderator.name as moderator_name,
+                            moderator.email as moderator_name,
+                            creator.name as creator_name,
+                            creator.email as creator_email
+                           FROM pledges
+                           JOIN person moderator ON pledges.moderated_by = moderator.id
+                           JOIN person creator ON pledges.person_id = creator.id
+
+                           WHERE moderated_time >= '$backto_iso'
+                         ORDER BY moderated_time DESC");
+            while ($r = db_fetch_array($q)) {
+                if (!$this->ref || $this->ref==$r['id']) {
+                    $time[$r['epoch']][] = $r;
+                }
+            }
+
+            # Comment Moderations
+            $q = db_query("SELECT 
+                            comment.*,
+                            pledges.id as pledge_id,
+                            pledges.ref as ref,
+                            pledges.title as title,
+                            extract(epoch from comment.moderated_time) as epoch,
+                            moderator.name as moderator_name,
+                            moderator.email as moderator_name,
+                            commenter.name as commenter_name,
+                            commenter.email as commenter_email
+                           FROM pledges
+                           JOIN comment ON comment.pledge_id = pledges.id
+                           JOIN person moderator ON comment.moderated_by = moderator.id
+                           JOIN person commenter ON comment.person_id = commenter.id
+
+                           WHERE comment.moderated_time >= '$backto_iso'
+                         ORDER BY comment.moderated_time DESC");
+            while ($r = db_fetch_array($q)) {
+                if (!$this->ref || $this->ref==$r['pledge_id']) {
+                    $time[$r['epoch']][] = $r;
+                }
+            }
+        }
+
         krsort($time);
 
         print '<a href="'.$this->self_link.'">Full log</a>';
@@ -1555,7 +1603,11 @@ class ADMIN_PAGE_PB_LATEST {
                 $date = $curdate;
             }
             print '<dt><b>' . date('H:i:s', $epoch) . ':</b></dt> <dd>';
+
+            # Iterate every type of timeline event.
             foreach ($datas as $data) {
+
+            ## Signatures 
             if (array_key_exists('signtime', $data)) {
                 print $this->pledge_link('ref', $data['ref']);
                 if ($data['showname'] == 'f')
@@ -1565,6 +1617,43 @@ class ADMIN_PAGE_PB_LATEST {
                 if ($data['email']) print ' &lt;'.htmlspecialchars($data['email']).'&gt;';
                 if ($data['mobile']) print ' (' . htmlspecialchars($data['mobile']) . ')';
                 if ($data['facebook_id']) print ' ' . facebook_display_name($data['facebook_id']);
+
+            ## Comment Moderation
+            } elseif (array_key_exists('commenter_name', $data)) {
+
+                $bad = ($data['ishidden'] == 't'); # silly PHP retrieves false as 'f', which is true.
+
+                printf("<span class='%s'>Comment</span> ",
+                    $bad ? 'moderated_bad' : 'moderated_good');
+                printf("'%s'", htmlspecialchars($data['text']));
+                printf(" by %s &lt;%s&gt;",
+                    htmlspecialchars($data['commenter_name']),
+                    $data['commenter_email']);
+                print " on ";
+                print $this->pledge_link('ref', $data['ref'], $data['title']);
+                printf('<br />Moderated %s by %s %s at %s',
+                    $bad ? 'bad' : 'good',
+                    $data['moderator_name'],
+                    htmlspecialchars(sprintf('<%s>', $data['moderator_name'])),
+                    $data['moderated_time']
+                );
+            ## Pledge Moderation
+            } elseif (array_key_exists('moderator_name', $data)) {
+
+                $bad = ($data['ishidden'] == 't'); # silly PHP retrieves false as 'f', which is true.
+
+                printf("<span class='%s'> Pledge $data[id]</span>, ref <em>$data[ref]</em>, ",
+                    $bad ? 'moderated_bad' : 'moderated_good');
+                print $this->pledge_link('ref', $data['ref'], $data['title']);
+                print " by ".htmlspecialchars($data['creator_name']);
+                print " &lt;".htmlspecialchars($data['creator_email'])."&gt;";
+
+                printf('<br />Moderated %s by %s %s at %s',
+                    $bad ? 'bad' : 'good',
+                    $data['moderator_name'],
+                    htmlspecialchars(sprintf('<%s>', $data['moderator_name'])),
+                    $data['moderated_time']
+                );
             } elseif (array_key_exists('creationtime', $data)) {
                 print "Pledge $data[id], ref <em>$data[ref]</em>, ";
                 print $this->pledge_link('ref', $data['ref'], $data['title']) . ' created (confirmed)';

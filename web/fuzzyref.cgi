@@ -108,9 +108,13 @@ while (my $q = new mySociety::CGIFast()) {
     # set of existing pledges into the 404 page) but let's handle it properly
     # anyway.
     # 
-    $ser .= sha1(PB::DB::secret() . $ser);
-    $ser = encode_base64($ser, '');
-    $ser =~ s/=+$//;
+    my $sig = sha1(PB::DB::secret() . $ser);
 
-    print $q->redirect("/bogusref?ser=$ser");
+    $ser = encode_base64($ser, '');
+    # $ser =~ s/=+$//;
+
+    $sig = encode_base64($sig, '');
+    # $sig =~ s/=+$//;
+
+    print $q->redirect("/bogusref?ser=$ser&sig=$sig");
 }

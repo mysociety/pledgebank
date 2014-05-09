@@ -24,8 +24,10 @@ function oops() {
     exit;
 }
 
-/* Only invoked by GET with ser=... param. */
+/* Only invoked by GET with ser=... and sig params. */
 if (!array_key_exists('ser', $_GET))
+    oops();
+if (!array_key_exists('sig', $_GET))
     oops();
 
 /* Check format and signature of ser */
@@ -34,13 +36,12 @@ if (!($ser = base64_decode($ser))
     || strlen($ser) < 21)
     oops();
 
-$hash = substr($ser, strlen($ser) - 20, 20);
+$hash = $_GET['sig'];
 
-if (sha1(db_secret() . substr($ser, 0, strlen($ser) - 20)) != bin2hex($hash))
+if (sha1(db_secret() . $ser) != bin2hex(base64_decode($hash)))
     oops();
 
-$tmp = substr($ser, 0, strlen($ser) - 20);
-$data = rabx_unserialise($tmp);
+$data = rabx_unserialise($ser);
 if (rabx_is_error($data))
     oops();
 

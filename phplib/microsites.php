@@ -337,6 +337,10 @@ function microsites_pledge_created_message($pledge){
 
 # Whether a site has local alerts at all!
 function microsites_local_alerts() {
+    global $microsite;
+    if ($microsite == 'rbwm'){
+        return false;
+    }
     return true;
 }
 
@@ -1336,4 +1340,13 @@ function microsites_site_name() {
     if ($microsite == 'barnet') return 'Barnet PledgeBank';
     if ($microsite == 'rbwm') return 'RBWM PledgeBank';
     return _('PledgeBank.com');
+}
+
+function microsites_show_banner() {
+    global $microsite;
+    if (! $microsite) {
+        return true;
+    }
+    if ($microsite == 'rbwm') return true;
+    return false;
 }

@@ -14,11 +14,14 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../phplib/pbperson.php';
 require_once '../phplib/success.php';
+require_once '../phplib/microsites.php';
 require_once '../commonlib/phplib/utility.php';
 
 $banner_src = 'howitworks.png';
 if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr' || $lang == 'sk')
     $banner_src = 'howitworks_' . $lang . '.png';
+
+$show_banner = microsites_show_banner();
 
 page_header(null,
     array(
@@ -29,7 +32,7 @@ page_header(null,
         ),
         'id' => 'front',
         #'cache-max-age' => 600,
-        'banner' => $microsite ? '' : '<p id="banner"><img src="/i/' . $banner_src . '" alt="' . _('How PledgeBank works: PledgeBank is a free site to help people get things done - especially things that require several people. It is very simple - you make a pledge, set a target, find people to agree and sign the pledge, and succeed!') . '"></p>',
+        'banner' => $show_banner ? '<p id="banner"><img src="/i/' . $banner_src . '" alt="' . _('How PledgeBank works: PledgeBank is a free site to help people get things done - especially things that require several people. It is very simple - you make a pledge, set a target, find people to agree and sign the pledge, and succeed!') . '"></p>' : '',
     )
 );
 debug_comment_timestamp("after page_header()");

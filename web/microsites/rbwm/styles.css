@@ -38,6 +38,37 @@ h1 span#logo_pledge {
     color: black;
 }
 
+#col {
+    float: none;
+    clear: both;
+    width: 100%;
+    *zoom: 1;
+    overflow: hidden;
+}
+
+#col #startblurb1 {
+    margin-top: 1em;
+    float: right;
+    width: 33%;
+}
+
+#col #currentpledges {
+    float: left;
+    clear: none;
+    width: 59%;
+    padding: 10px;
+}
+
+#comments {
+    margin-top: 1em;
+    float: right;
+    width: 33%;
+}
+
+#comments > a:first-child {
+    float: right;
+}
+
 #nav_search {
     width: 98%;
     background-image: none;
@@ -186,4 +217,19 @@ html body #pbcontent #govmetric {
     margin-right: 0;
     padding: 0;
     border: none;
+}
+
+a.login {
+    display: block;
+    margin-top: 0.25em;
+    padding: 0.5em;
+    background: #660066;
+    color: white;
+}
+a.login, a.login:hover, a.login:visited, a.login:visited, a.login:link {
+    text-decoration: none;
+}
+
+#signedon {
+    text-align: right;
 }

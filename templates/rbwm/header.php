@@ -144,7 +144,7 @@
  <title>Pledges | The Royal Borough of Windsor and Maidenhead</title>
 
 
- <link href="/microsites/rbwm/styles.css" type="text/css" rel="stylesheet" />
+ <link href="/microsites/rbwm/styles.css?v0.4" type="text/css" rel="stylesheet" />
 </head>
 
 <body>
@@ -278,16 +278,21 @@
     if ($params['noprint']) print '</div> <!-- noprint -->';
 
     // Display who is logged in
+    print '<p id="signedon" class="noprint">';
     if ($P) {
-        print '<p id="signedon" class="noprint">';
         if ($P->has_name())
             printf(_('Hello, %s'), htmlspecialchars($P->name));
         else
             printf(_('Hello, %s'), htmlspecialchars($P->email));
         print ' <small>(<a href="/logout">';
         print _('this isn\'t you?  click here');
-        print '</a>)</small></p>';
+        print '</a>)</small>';
+        print '<br /><a href="/my">View your pledges</a>';
     }
+    else {
+        print '<a class="login" href="/my">Log In</a>';
+    }
+    print '</p>';
 ?>
 </div>
 

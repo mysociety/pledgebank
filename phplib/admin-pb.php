@@ -833,31 +833,33 @@ class ADMIN_PAGE_PB_MAIN {
         }
         print "</div></div>";
         
-        print divOddEven($parity++);
-        print "<div class='admin-name'>Pledge text:</div>";
-        print '<div class="admin-value">';
-        if (get_http_var("edit")) {
-            print '<h2>Edit pledge text</h2>';
-            print '<form name="editform" method="post" action="'.$this->self_link.'">';
-            print 'I will <input type="text" name="title" value="'.htmlspecialchars($pdata['title']).'" size="60">';
-            print '<br>but only if <input type="text" name="target" value="'.htmlspecialchars($pdata['target']).'" size="4">';
-            print ' <input type="text" name="type" value="'.htmlspecialchars($pdata['type']).'" size="40">';
-            print '<br>will <input type="text" name="signup" value="'.htmlspecialchars($pdata['signup']).'" size="60">';
-            print '<br>&mdash;<input type="text" name="name" value="'.htmlspecialchars($pdata['name']).'" size="20">, ';
-            print '<input type="text" name="identity" value="'.htmlspecialchars($pdata['identity']).'" size="30">';
-            print '<br>More details:<br/> <textarea type="text" name="detail" cols="70" rows="7">'.htmlspecialchars($pdata['detail']).'</textarea>';
-            print '<br>Notice: <input type="text" name="notice" value="'.htmlspecialchars($pdata['notice']).'" size="60">';
-            print '<br>Cancelled text (also cancels pledge): <input type="text" name="cancelled" value="'.htmlspecialchars($pdata['cancelled']).'" size="60">';
-            print '<input type="hidden" name="edit_pledge_text_id" value="' . $pdata['id'] . '">';
-            print '<input type="hidden" name="edit_pledge_text" value="1">';
-            print '<input type="hidden" name="edit" value="1">';
-            print '<br><input type="submit" name="edit_pledge" value="Save updates"> ';
-            print ' <a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp">Cancel edit</a>';
-            print "</form>";
-        } else {
-            print '<a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit=1">Edit pledge text</a>';
+        if (admin_allow('techy')) {
+            print divOddEven($parity++);
+            print "<div class='admin-name'>Pledge text:</div>";
+            print '<div class="admin-value">';
+            if (get_http_var("edit")) {
+                print '<h2>Edit pledge text</h2>';
+                print '<form name="editform" method="post" action="'.$this->self_link.'">';
+                print 'I will <input type="text" name="title" value="'.htmlspecialchars($pdata['title']).'" size="60">';
+                print '<br>but only if <input type="text" name="target" value="'.htmlspecialchars($pdata['target']).'" size="4">';
+                print ' <input type="text" name="type" value="'.htmlspecialchars($pdata['type']).'" size="40">';
+                print '<br>will <input type="text" name="signup" value="'.htmlspecialchars($pdata['signup']).'" size="60">';
+                print '<br>&mdash;<input type="text" name="name" value="'.htmlspecialchars($pdata['name']).'" size="20">, ';
+                print '<input type="text" name="identity" value="'.htmlspecialchars($pdata['identity']).'" size="30">';
+                print '<br>More details:<br/> <textarea type="text" name="detail" cols="70" rows="7">'.htmlspecialchars($pdata['detail']).'</textarea>';
+                print '<br>Notice: <input type="text" name="notice" value="'.htmlspecialchars($pdata['notice']).'" size="60">';
+                print '<br>Cancelled text (also cancels pledge): <input type="text" name="cancelled" value="'.htmlspecialchars($pdata['cancelled']).'" size="60">';
+                print '<input type="hidden" name="edit_pledge_text_id" value="' . $pdata['id'] . '">';
+                print '<input type="hidden" name="edit_pledge_text" value="1">';
+                print '<input type="hidden" name="edit" value="1">';
+                print '<br><input type="submit" name="edit_pledge" value="Save updates"> ';
+                print ' <a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp">Cancel edit</a>';
+                print "</form>";
+            } else {
+                print '<a href="?page=pb&amp;pledge='.$pdata['ref'].'&amp;edit=1">Edit pledge text</a>';
+            }
+            print "</div></div>";
         }
-        print "</div></div>";
         
         // Signers
         print "<h2>Signers (".$pdata['signers']."/".$pdata['target'].")</h2>";
@@ -1034,7 +1036,9 @@ class ADMIN_PAGE_PB_MAIN {
         print '<h2>Actions</h2>';
         print '<form name="sendannounceform" method="post" action="'.$this->self_link.'"><input type="hidden" name="send_announce_token_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="send_announce_token" value="Send announce URL to creator"></form>';
 
+        if (admin_allow('techy')) {
 print '<form name="removepledgepermanentlyform" method="post" action="'.$this->self_link.'" style="clear:both;margin-top:1em;"><strong>Caution!</strong> This really is forever, you probably don\'t want to do it: <input type="hidden" name="remove_pledge_id" value="' . $pdata['id'] . '"><input type="submit" name="remove_pledge" value="Remove pledge permanently"></form>';
+        }
 
     }
 

@@ -1123,6 +1123,10 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
     }
 
     function update_moderation($pledge_id) {
+        # NOTE that update_moderation will override prominence also. This is
+        # requested behaviour for RBWM and seems like a reasonable default for
+        # other users of moderation in future.
+
         $ishidden = null;
         if (get_http_var('moderate_good')) $ishidden = false;
         if (get_http_var('moderate_bad'))  $ishidden = true;
@@ -1138,12 +1142,16 @@ print '<form name="removepledgepermanentlyform" method="post" action="'.$this->s
             ishidden = ?,
             moderated_time = ms_current_timestamp(),
             moderated_by = ?,
-            moderated_comment = ?
+            moderated_comment = ?,
+            prominence = ?,
+            cached_prominence = ?
             WHERE id = ?',
             [
                 $ishidden,
                 get_admin_user()->id,
                 $moderated_comment,
+                $ishidden ? 'backpage' : 'frontpage',
+                $ishidden ? 'backpage' : 'frontpage',
                 $pledge_id
             ]);
 

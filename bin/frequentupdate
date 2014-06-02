@@ -535,12 +535,15 @@ function send_automatic_failure_messages_byarea() {
  * criterion, so can record we've looked at the pledge and don't try and send
  * chivvy message later
  */
+
 function chivvy_creators_lowrate_new() {
     global $pb_timestamp;
     verbose("new finding pledges with too low a signup rate to succeed");
 
     // The number of chivvy-creator-lowrate-* templates
-    $chivvy_messages = 7;
+    $template_prefix = chivvy_creators_template_prefix();
+    $chivvy_messages = count(glob("../templates/emails/$template_prefix-*"));
+
     // The 6 here is 4 days from start of pledge, plus 2 days from end
     $interval = "((date - creationtime::date - 6.0) / ($chivvy_messages + 1))";
 
@@ -562,6 +565,16 @@ function chivvy_creators_lowrate_new() {
 
     db_commit();
     verbose("finished new finding pledges with too low a signup rate to succeed");
+}
+
+function chivvy_creators_template_prefix() {
+    global $microsite;
+    if ($microsite && count(glob("../templates/emails/$microsite/chivvy-creator-lowrate-*"))) {
+        return "$microsite/chivvy-creator-lowrate";
+    }
+    else {
+        return "chivvy-creator-lowrate";
+    }
 }
 
 function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_clause) {
@@ -590,6 +603,9 @@ function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_
             and (".microsites_chivvy_sql().")
         group by pledges.id, target, ref, date, creationtime
     ";
+
+    $template_prefix = chivvy_creators_template_prefix();
+
     $q = db_query($sql);
     while ($pledge = db_fetch_array($q)) {
         $last_sent = $pledge['last_chivvy_sent'] + 0;
@@ -604,7 +620,7 @@ function chivvy_creators_lowrate_part($sign_since, $sign_interval, $whencreated_
         ) values (
             ?, 'chivvy-creator-sequence',
             true, false, false,
-            'chivvy-creator-lowrate-$message'
+            '$template_prefix-$message'
             )", $pledge['id']);
             $max_sent = $message;
         } else {

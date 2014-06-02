@@ -141,7 +141,7 @@ define('OPTION_TRACKING_SECRET', 'really-secret-value');
 
 // Microsites
 define('OPTION_GLOBALCOOL_SECRET', 'really-secret-value');
-define('OPTION_FIXED_SITE_NAME', 0); // or use 'My Site Name' for overriding all emails
+define('OPTION_FIXED_MICROSITE', 'rbwm');
 define('OPTION_NO_SUCCESS_STORIES', 0);
 define('OPTION_COMMENTS_ON_NEW_ROW', 0);
 

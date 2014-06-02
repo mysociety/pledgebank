@@ -1336,7 +1336,6 @@ function microsites_get_custom_pledge_types() {
 
 function microsites_site_name() {
     global $microsite;
-    if (OPTION_FIXED_SITE_NAME) return OPTION_FIXED_SITE_NAME;
     if ($microsite == 'barnet') return 'Barnet PledgeBank';
     if ($microsite == 'rbwm') return 'RBWM PledgeBank';
     return _('PledgeBank.com');

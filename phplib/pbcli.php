@@ -16,6 +16,7 @@ require_once '../commonlib/phplib/phpcli.php';
 require_once '../commonlib/phplib/db.php';
 require_once '../commonlib/phplib/locale.php';
 require_once '../commonlib/phplib/countries.php';
+require_once '../phplib/microsites.php';
 
 /* Date which PledgeBank application believes it is */
 $pb_today = db_getOne('select ms_current_date()');
@@ -28,3 +29,7 @@ locale_change();
 locale_gettext_domain(OPTION_PB_GETTEXT_DOMAIN);
 
 $microsite = null;
+global $microsites_list;
+if (OPTION_FIXED_MICROSITE && array_key_exists(OPTION_FIXED_MICROSITE, $microsites_list)) {
+    $microsite = OPTION_FIXED_MICROSITE;
+}

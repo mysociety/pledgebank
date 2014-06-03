@@ -110,6 +110,7 @@
  <script type="text/javascript">
 //<![CDATA[
     <!-- // Non javascript aware browser will skip this bit and display plain HTML -->
+        document.write('<style> #pbcontent form[name=setpassword] { display: none; }</style>');
         document.write('<link href="http://www.rbwm.gov.uk/public/v5_default.css" rel="Stylesheet" title="style1" type="text/css" media="screen" />');
         document.write('<link href="http://www.rbwm.gov.uk/public/v5_largetext.css" rel="Alternate Stylesheet" title="style2" type="text/css" media="screen" />');
         document.write('<link href="http://www.rbwm.gov.uk/public/v5_print.css" rel="Alternate Stylesheet" title="style3" type="text/css" media="screen" />');
@@ -139,6 +140,22 @@
     }
  //]]>
  </script><!-- END: RSS Homepage Only -->
+ <script type="text/javascript">
+    $(function () {
+        var button = $('<button>Manage Password</button>');
+        var form = $('form[name=setpassword]');
+        form.before(button);
+
+        // move messages out of display:none
+        button.before( form.find('.success') ); 
+        button.before( form.find('#error') ); 
+
+        button.click( function () {
+            form.show();
+            button.hide();
+        });
+    });
+ </script>
 
 
  <title>Pledges | The Royal Borough of Windsor and Maidenhead</title>

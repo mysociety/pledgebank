@@ -233,3 +233,7 @@ a.login, a.login:hover, a.login:visited, a.login:visited, a.login:link {
 #signedon {
     text-align: right;
 }
+
+#pbcontent form[name=setpassword] {
+    display: none;
+}

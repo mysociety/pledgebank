@@ -139,6 +139,17 @@
     }
  //]]>
  </script><!-- END: RSS Homepage Only -->
+ <script type="text/javascript">
+    $(function () {
+        var button = $('<button>Manage Password</button>');
+        var form = $('form[name=setpassword]');
+        form.before(button);
+        button.click( function () {
+            form.show();
+            button.hide();
+        });
+    });
+ </script>
 
 
  <title>Pledges | The Royal Borough of Windsor and Maidenhead</title>

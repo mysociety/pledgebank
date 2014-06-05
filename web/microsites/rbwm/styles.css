@@ -59,13 +59,13 @@ h1 span#logo_pledge {
     padding: 10px;
 }
 
-#comments {
+#front #comments {
     margin-top: 1em;
     float: right;
     width: 33%;
 }
 
-#comments > a:first-child {
+#front #comments > a:first-child {
     float: right;
 }
 

@@ -161,7 +161,7 @@
  <title>Pledges | The Royal Borough of Windsor and Maidenhead</title>
 
 
- <link href="/microsites/rbwm/styles.css?v0.4" type="text/css" rel="stylesheet" />
+ <link href="/microsites/rbwm/styles.css?v0.5" type="text/css" rel="stylesheet" />
 </head>
 
 <body>

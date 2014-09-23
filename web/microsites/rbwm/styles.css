@@ -59,6 +59,10 @@ h1 span#logo_pledge {
     padding: 10px;
 }
 
+#currentpledges li {
+    background-image: url('/i/person-iwill_rbwm.png');
+}
+
 #front #comments {
     margin-top: 1em;
     float: right;
@@ -137,9 +141,11 @@ h1 span#logo_pledge {
 
 #pledge_main,
 #new #pledge,
-#pledge {
+#pledge,
+#startblurb
+{
     border-color: #660066;
-    background-color: #933393;
+    background-color: #660066;
 }
 
 #pledge_main a,
@@ -150,11 +156,6 @@ h1 span#logo_pledge {
 #new #pledge p,
 #pledge p {
     color: #fff;
-}
-
-#startblurb {
-    border-color: #660066;
-    background-color: #933393;
 }
 
 #startblurb a {

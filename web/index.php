@@ -17,10 +17,7 @@ require_once '../phplib/success.php';
 require_once '../phplib/microsites.php';
 require_once '../commonlib/phplib/utility.php';
 
-$banner_src = 'howitworks.png';
-if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr' || $lang == 'sk')
-    $banner_src = 'howitworks_' . $lang . '.png';
-
+$banner_src  = microsites_banner_source();
 $show_banner = microsites_show_banner();
 
 page_header(null,

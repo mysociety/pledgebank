@@ -1349,3 +1349,14 @@ function microsites_show_banner() {
     if ($microsite == 'rbwm') return true;
     return false;
 }
+
+
+function microsites_banner_source() {
+    global $microsite, $lang;
+
+    if ($microsite == 'rbwm') return 'howitworks_rbwm.png';
+
+    if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr' || $lang == 'sk')
+        return 'howitworks_' . $lang . '.png';
+    return 'howitworks.png';
+}

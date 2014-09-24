@@ -7,75 +7,34 @@
 // $announcement is displayed below the header if it's not empty; use HTML tags, etc., if you want.
   $announcement = "";
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<!--
-// // // // //
-//
-//  The Royal Borough of Windsor and Maidenhead
-//  The Townhall, St Ives Road, Maidenhead, SL6 1RF United Kingdom
-//
-//  Tel: +44 (0)1628 683800
-//  Fax: +44 (0)1628 685757
-//
-//  DX 6422 Maidenhead 1
-//
-//  Email: mailto:customer.service@rbwm.gov.uk
-//
-// // // // //
-//
-//    author: Andrew Scott / Andrew Scott
-// published: 2010-10-25
-//   updated: 2010-11-10
-//  location: http://www.rbwm.gov.uk/web/meetings_council_epetitions.htm
-//  template: v5
-//
-// // // // //
--->
-
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
 <head>
- <!-- PageID 29542 - published by RedDot 7.5 - 7.5.2.16 - 21542 -->
- <!-- START - Dublin Core DC Meta-Tags -->
- <meta name="DC.title" lang="en" content="e-Petitions" xml:lang="en" />
- <meta name="DC.description" lang="en" content="PARAM_DESCRIPTION." xml:lang="en" />
- <meta name="DC.identifier" scheme="URI" content="PARAM_DC_IDENTIFIER" />
- <meta name="DC.format" scheme="IMT" content="text/html" />
- <meta name="DC.language" scheme="RFC3066" content="en-GB" />
- <meta name="DC.language" scheme="ISO639-2/T" content="eng" />
- <meta name="DC.subject" lang="en" content="Local Government" xml:lang="en" />
- <meta name="eGMS.subject.category" scheme="IPSV" lang="en" content="Online petitions" xml:lang="en" />
- <meta name="eGMS.subject.service" scheme="LGSL" content=" 354" />
- <meta name="DC.coverage" content="UK" />
- <meta name="DC.coverage.spacial" lang="en" content="The Royal Borough of Windsor and Maidenhead, Berkshire, United Kingdom" xml:lang="en" />
- <meta name="DC.date.created" scheme="W3CDTF" content="2010-10-25" />
- <meta name="DC.date.issued" content="PARAM_DATE" />
- <meta name="DC.date.modified"  content="PARAM_DATE" />
- <meta name="DC.rights.copyright" lang="en" content="The Royal Borough of Windsor and Maidenhead" xml:lang="en" />
- <meta name="DC.rights" scheme="URI" content="http://www.rbwm.gov.uk/copyrite.htm" />
- <meta name="DC.creator" content="The Royal Borough of Windsor and Maidenhead, Web-Manager, email mailto:customer.service@rbwm.gov.uk" />
- <meta name="DC.date" content="PARAM_DATE" />
- <meta name="DC.publisher" lang="en" content=" The Royal Borough of Windsor and Maidenhead, The Townhall, St Ives Road, Maidenhead, SL6 1RF United Kingdom - Tel: +44 (0)1628 683800 - Fax: +44 (0)1628 685757 - Email: mailto:customer.service@rbwm.gov.uk" xml:lang="en" /><!-- END - Dublin Core DC Meta-Tags -->
- <!-- START - Standard Meta-Tags -->
- <meta name="identifier" content="PARAM_DC_IDENTIFIER" />
- <meta name="format" content="text/html" />
- <meta name="description" content="PARAM_DESCRIPTION." />
- <meta name="country" content="uk" />
- <meta name="language" content="en" />
- <meta name="rights" content="The Royal Borough of Windsor and Maidenhead. All rights reserved" />
- <meta name="author" content="Andrew Scott" />
- <meta name="creator" content="Andrew Scott" />
- <meta name="publisher" content="The Royal Borough of Windsor and Maidenhead, The Townhall, St Ives Road, Maidenhead, SL6 1RF United Kingdom - Tel: +44 (0)1628 683800 - Fax: +44 (0)1628 685757 - Email: mailto:customer.service@rbwm.gov.uk" />
- <meta name="subject" content="Unitary Authority, Local Government, Council Services" />
- <meta name="keywords" content="petitions, electronic" />
- <meta name="robots" content="all" />
- <meta name="revisit" content="7 days" />
- <meta name="created" content="2010-10-25" />
- <meta name="modified" content="PARAM_DATE" /><!-- END - Standard Meta-Tags -->
- <link rel="shortcut icon" href="http://www.rbwm.gov.uk/graphics/favicon.ico" />
- <meta http-equiv="imagetoolbar" content="no" /><!-- START - CSS Stylesheet Selection -->
+    <title>Pledges | The Royal Borough of Windsor and Maidenhead</title>
+    <meta name="description" content=" ">
+    <meta name="keywords" content="RBWM, Windsor, Maidenhead, Royal, Borough, Local Government, Unitary Authority,">
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="Simon Arthur">
+    <meta name="creator" content="The Royal Borough of Windsor and Maidenhead, Web-Manager, email mailto:customer.service@rbwm.gov.uk">
+    <meta name="publisher" content="The Royal Borough of Windsor and Maidenhead, The Townhall, St Ives Road, Maidenhead, SL6 1RF United Kingdom - Tel: +44 (0)1628 683800 - Fax: +44 (0)1628 685757 - Email: mailto:customer.service@rbwm.gov.uk">
+    <meta name="rights" content="The Royal Borough of Windsor and Maidenhead. All rights reserved">
+    <meta name="subject" content="Unitary Authority, Local Government, Council Services">
+    <meta name="country" content="uk">
+    <meta name="language" content="en">
+    <meta name="created" content="2005-09-16">
+    <meta name="modified" content="2014-09-23">
+    <meta name="format" content="text/html">
+    <meta name="revisit-after" content="3 days">
+    <meta name="robots" content="Index, Follow, NoArchive">
+    <meta http-equiv="imagetoolbar" content="no">
+    <meta name="eGMS.subject.category" scheme="IPSV" lang="en" content="Local government">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="shortcut icon" href="http://www.rbwm.gov.uk/graphics/favicon.ico">
+    <link rel="alternate" type="application/rss+xml" title="RBWM - Press Releases" href="http://www.rbwm.gov.uk/news_rss.xml">
+    <link rel="alternate" type="application/rss+xml" title="RBWM - Events" href="http://www.rbwm.gov.uk/events/common/rss.gif">
 
 <style type="text/css" media="all">@import url('/pb.2.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
@@ -110,7 +69,7 @@
  <script type="text/javascript">
 //<![CDATA[
     <!-- // Non javascript aware browser will skip this bit and display plain HTML -->
-        document.write('<style> #pbcontent form[name=setpassword] { display: none; }</style>');
+        document.write('<style> #pbcontent form[name=setpassword] { display: none; }<\/style>');
         document.write('<link href="http://www.rbwm.gov.uk/public/v5_default.css" rel="Stylesheet" title="style1" type="text/css" media="screen" />');
         document.write('<link href="http://www.rbwm.gov.uk/public/v5_largetext.css" rel="Alternate Stylesheet" title="style2" type="text/css" media="screen" />');
         document.write('<link href="http://www.rbwm.gov.uk/public/v5_print.css" rel="Alternate Stylesheet" title="style3" type="text/css" media="screen" />');
@@ -142,7 +101,7 @@
  </script><!-- END: RSS Homepage Only -->
  <script type="text/javascript">
     $(function () {
-        var button = $('<button>Manage Password</button>');
+        var button = $('<button>Manage Password<\/button>');
         var form = $('form[name=setpassword]');
         form.before(button);
 
@@ -156,15 +115,11 @@
         });
     });
  </script>
+ <link href="/microsites/rbwm/styles.css?v0.5" type="text/css" rel="stylesheet">
 
-
- <title>Pledges | The Royal Borough of Windsor and Maidenhead</title>
-
-
- <link href="/microsites/rbwm/styles.css?v0.5" type="text/css" rel="stylesheet" />
 </head>
 
-<body>
+<body<?=$params['body_id']?><?=$params['body_class']?>>
  <div id="rbwm-wrapper">
   <div id="rbwm-container">
    <a id="top" name="top"></a>
@@ -190,7 +145,7 @@
      </ul>
     </div>
     <!-- END - Hidden 'Skip' Links -->
-    <a href="http://www.rbwm.gov.uk/"><img src="http://www.rbwm.gov.uk/graphics/rbwm_crest-col_196x75.jpg" alt="The Royal Borough Of Windsor And Maidenhead" class="banner" /></a> <!-- START - Top Menu -->
+    <a href="http://www.rbwm.gov.uk/"><img src="http://www.rbwm.gov.uk/graphics/rbwm_crest-col_196x75.jpg" alt="The Royal Borough Of Windsor And Maidenhead" class="banner"></a> <!-- START - Top Menu -->
 
 
     <div class="topmenu smalltext">
@@ -202,7 +157,7 @@
 
     <div class="sitesearch">
      <form method="get" action="http://www.rbwm.gov.uk/search/search.asp">
-      <p><label for="searchbox" title="Access key: 4"><b>Search</b></label> <input type="text" size="20" value="Search" onfocus="form.zoom_query.value=&#39;&#39;" name="zoom_query" id="searchbox" accesskey="4" /> <input class="button" type="submit" value="Go" /></p>
+      <p><label for="searchbox" title="Access key: 4"><b>Search</b></label> <input type="text" size="20" value="Search" onfocus="form.zoom_query.value=&#39;&#39;" name="zoom_query" id="searchbox" accesskey="4"> <input class="button" type="submit" value="Go"></p>
      </form>
     </div>
     <!-- END - Search Box -->
@@ -253,9 +208,6 @@
 
     <!--ZOOMRESTART-->
     <!-- END: 8693 - LGNL -->
-
-</head>
-<body<?=$params['body_id']?><?=$params['body_class']?>>
 
     <div class="rbwm-content">
      <a name="content" id="content"></a>
@@ -326,4 +278,3 @@
 <?=$params['banner']?>
 
 <div id="pbcontent">
-

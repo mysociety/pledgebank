@@ -160,5 +160,7 @@
  <!-- END: Wrapper -->
  <!-- CSS: Resources -->
  <!-- /graphics/admin_OnlineTab.gif --><!-- /graphics/admin_OnlineTabLeft.gif --><!-- /graphics/admin_OnlineTabRight.gif -->
+ </div>
+ </div>
 </body>
 </html>

@@ -251,13 +251,7 @@ create table pledges (
     -- for example, in Street Party pledges, this is the Street Name (since that 
     -- may not be suitable for a ref due to ambiguity/prior use)
     -- Code generally falls back to using ref if no ref_in_pledge_type is provided, so it's optional
-    ref_in_pledge_type text,
-
-    -- columns for the moderation feature
-    ishidden boolean not null default false, -- hidden from view
-    moderated_time timestamp null,
-    moderated_by integer null references person(id),
-    moderated_comment text null
+    ref_in_pledge_type text
 );
 
 -- Contains an entry for each town for which a pledge with target "by area" has
@@ -297,12 +291,6 @@ create index pledges_date_idx on pledges(date);
 
 -- Make finding recently successful pledges faster.
 create index pledges_whensucceeded_idx on pledges(whensucceeded);
-
--- unsure we actually need all these indexes, but other similar fields
--- are indexed in this way above
-create index pledges_ishidden_idx on pledges(ishidden);
-create index pledges_moderated_by_idx on pledges(moderated_by);
-create index pledges_moderated_time on pledges(moderated_time);
 
 -- Prominence.
 create index pledges_cached_prominence_idx on pledges(cached_prominence);
@@ -856,8 +844,6 @@ create function pb_pledge_prominence(integer)
     -- more and we'll have to look in to setting a flag explicitly.
     returns text as '
 select case
-    when (select ishidden from pledges where id = $1)
-        then ''backpage''
     when (select prominence from pledges where id = $1) = ''backpage''
         then ''backpage''
     when (select prominence from pledges where id = $1) = ''frontpage''
@@ -865,8 +851,7 @@ select case
     when (select prominence from pledges where id = $1) = ''normal''
         then ''normal''
     else -- calculated
-        pb_pledge_prominence_calculated( (select count(id) from signers where pledge_id = $1)::integer, (select longitude from pledges, location where pledges.location_id = location.id and pledges.id = $1) is not null, (select target from pledges
- where id = $1) )
+        pb_pledge_prominence_calculated( (select count(id) from signers where pledge_id = $1)::integer, (select longitude from pledges, location where pledges.location_id = location.id and pledges.id = $1) is not null, (select target from pledges where id = $1) )
     end;
 ' language sql stable;
 
@@ -968,22 +953,14 @@ create table comment (
     -- add a reply_comment_id here if we ever want threading
     whenposted timestamp not null default ms_current_timestamp(),
     text text not null,                     -- as entered by comment author
-    ishidden boolean not null default false, -- hidden from view
+    ishidden boolean not null default false -- hidden from view
     -- other fields? one to indicate whether this was written by the pledge
     -- creator and should be highlighted in the display?
-
-    -- for the moderation feature
-    moderated_time timestamp null,
-    moderated_by integer null references person(id),
-    moderated_comment text null
 );
 
 create index comment_pledge_id_idx on comment(pledge_id);
 create index comment_pledge_id_whenposted_idx on comment(pledge_id, whenposted);
 create index comment_ishidden_idx on comment(ishidden);
-
-create index comment_moderated_by_idx on comment(moderated_by);
-create index comment_moderated_time on comment(moderated_time);
 
 -- Used for pledge change time calculation.
 create index comment_whenposted_idx on comment(whenposted);

@@ -27,7 +27,7 @@ function abuse_test($vars) {
 
     # If test suite, bypass so we can not be rate limited.
     # But not staging, as they can get spam...
-    if (OPTION_WEB_HOST == 'testharness')
+    if (preg_match( '/test\.mysociety\.org$/', OPTION_WEB_DOMAIN ))
         return false;
 
     $result = ratty_test('pb-abuse', $vars);

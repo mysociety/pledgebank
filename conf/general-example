@@ -49,6 +49,14 @@ define('OPTION_ADMIN_AUTH_PASSWORD', '');
 // Normally, you'll want admin to be able to access everyting, so set this to  ''
 define('OPTION_ADMIN_LOCKED_FIELDS', 'microsite,lang,country,prominence,ratty');
 
+// if you enable OPTION_ADMIN_REMOTE_SUBADMIN then you allow remote users
+// to access admin, but perhaps with more restrictions
+define('OPTION_ADMIN_REMOTE_SUBADMIN', 1);
+define('OPTION_ADMIN_LOCKED_FIELDS_SUBADMIN', 'techy,microsite,lang,country,prominence,ratty');
+
+// whether to enable pledges pre-moderation
+define('OPTION_MODERATE_PLEDGES', 0); 
+
 // Domain name for emails to current website
 define('OPTION_EMAIL_DOMAIN', 'sometestdomain.pledgebank.com');
 define('OPTION_CONTACT_EMAIL', 'contact@'.OPTION_EMAIL_DOMAIN);
@@ -133,6 +141,9 @@ define('OPTION_TRACKING_SECRET', 'really-secret-value');
 
 // Microsites
 define('OPTION_GLOBALCOOL_SECRET', 'really-secret-value');
+define('OPTION_FIXED_MICROSITE', 'rbwm');
+define('OPTION_NO_SUCCESS_STORIES', 0);
+define('OPTION_COMMENTS_ON_NEW_ROW', 0);
 
 // Facebook get these from http://developers.facebook.com
 define('OPTION_FACEBOOK_API_KEY', ''); // leave empty if not using Facebook

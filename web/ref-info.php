@@ -2,12 +2,12 @@
 /*
  * ref-info.php:
  * Information about an individual pledge.
- * 
+ *
  * Copyright (c) 2005 UK Citizens Online Democracy. All rights reserved.
  * Email: chris@mysociety.org; WWW: http://www.mysociety.org/
  *
  * $Id: ref-info.php,v 1.48 2007-10-12 13:12:48 matthew Exp $
- * 
+ *
  */
 
 require_once '../conf/general';
@@ -66,7 +66,7 @@ debug_timestamp(true, "pledge info box");
 
 ?>
 
-<div>
+<div class="pledge-info">
 <?=_('<h2>General pledge information</h2>') ?>
 <table border="0" cellpadding="3" cellspacing="0">
 <tr>
@@ -99,7 +99,7 @@ debug_timestamp(true, "pledge info box");
 </tr>
 <tr>
     <th><?=_('Number of signers') ?></th>
-    <td><?= $p->signers() ?> 
+    <td><?= $p->signers() ?>
         <? if (!$p->byarea() && !microsites_no_target()) { ?>
         / <?= $p->target() ?>
         <?= sprintf(_('(%.1f%% of target)'), 100. * $p->signers() / $p->target()) ?>
@@ -109,7 +109,7 @@ debug_timestamp(true, "pledge info box");
 <? debug_timestamp(true); ?>
 <tr>
     <th><?=_('Estimated signers by deadline') ?></th>
-    <td><?= $p->probable_will_reach() ?> 
+    <td><?= $p->probable_will_reach() ?>
         <? if (!$p->byarea() && !microsites_no_target()) { ?>
         <?= sprintf(_('(%.1f%% of target)<br><small>if signup rate continues as in last week</small>'), 100. * $p->probable_will_reach() / $p->target()) ?>
         <? } ?>

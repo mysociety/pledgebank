@@ -25,6 +25,7 @@ Values which are available in all emails are:
   - pledge_url, of the pledge page.
 
   - pledgebank_url, URL of localised site, including trailing slash (http://br.pledgebank.com/)
+  - pledgebank_site_name, title of the site (e.g. PledgeBank.com or RBWM PledgeBank)
 
   - sms_number, the short code phone number for SMS
 
@@ -158,5 +159,11 @@ Sent when a new pledge near to someone has been made.
   - description, the location which the new pledge is near to
   - distance, of the new pledge from the postcode in km
   - unsubscribe_url, link to unsubscribe from these alerts
+
+*************************************************************************
+
+* moderated-good
+* moderated-bad
+Sent when an email is moderated in phplib/moderation.php
 
 *************************************************************************

@@ -78,20 +78,38 @@ function pledges_you_might_like() {
 # Pledges you have created
 function show_your_pledges($type) {
     global $pb_today, $P;
-    $qdate = ($type == 'open') ? '<=' : '>';
+    $qdate = ($type != 'closed') ? '<=' : '>';
+
+    $moderation_condition = '';
+    if (OPTION_MODERATE_PLEDGES) {
+        if ($type == 'unmoderated') {
+            $moderation_condition = ' AND pledges.moderated_time IS NULL ';
+        }
+        else {
+            $moderation_condition = ' AND NOT pledges.ishidden ';
+        }
+    }
+
     $qrows = db_query("
                     SELECT pledges.*,
                         (select count(*) from signers where pledge_id = pledges.id) as signers
                     FROM pledges
                     WHERE pledges.person_id = ?
                     AND '$pb_today' $qdate pledges.date
+                        $moderation_condition
                     ORDER BY creationtime DESC
                 ", $P->id());
+
     if ($type == 'open')
         print h2(_('Open pledges you created'));
+
     if (db_num_rows($qrows) > 0) {
+
+        if ($type == 'unmoderated')
+            print h2(_('Pledges you created that are pending moderation'));
         if ($type == 'closed')
             print h2(_('Closed pledges you created'));
+
         echo '<ul class="search_results">';
         while ($r = db_fetch_array($qrows)) {
             $pledge = new Pledge($r);
@@ -173,6 +191,9 @@ pledges_you_might_like();
 print '</div>';
 
 print '<div id="yoursignaturesandpledges">';
+if (OPTION_MODERATE_PLEDGES) {
+    show_your_pledges('unmoderated');
+}
 show_your_pledges('open');
 if (microsites_local_alerts())
     alert_list_pledges_local($P->id());

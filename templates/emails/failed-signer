@@ -1,4 +1,4 @@
-Subject: Your pledge - '<?=$values['title']?>' at PledgeBank.com
+Subject: Your pledge - '<?=$values['title']?>' at <?=$values['pledgebank_site_name']?>
 
 Unfortunately, the pledge to which you signed up did not meet its target in the
 required time.  It required <?=$values['target']?> <?=$values['type']?>, but

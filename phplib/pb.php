@@ -183,7 +183,9 @@ if (!array_key_exists($ip_country, $countries_code_to_name))
 # Decide which country or microsite to use
 $microsite = null;
 
-if (array_key_exists(strtolower($_SERVER['HTTP_HOST']), $microsites_from_extra_domains)) {
+if (OPTION_FIXED_MICROSITE && array_key_exists(OPTION_FIXED_MICROSITE, $microsites_list)) {
+    $microsite = OPTION_FIXED_MICROSITE;
+} elseif (array_key_exists(strtolower($_SERVER['HTTP_HOST']), $microsites_from_extra_domains)) {
     $microsite = $microsites_from_extra_domains[strtolower($_SERVER['HTTP_HOST'])];
 } elseif (array_key_exists(strtolower($domain_country), $microsites_list)) {
     $microsite = strtolower($domain_country);

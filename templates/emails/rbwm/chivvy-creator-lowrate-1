@@ -1,0 +1,18 @@
+Subject: Helping to make your pledge succeed
+
+Hello there,
+
+We've noticed that the pledge you created isn't growing fast enough to
+succeed. We're just dropping you this mail to give you a suggestion on
+helping it to grow.
+
+The best way of helping your pledge to succeed is to email it to some
+friends right now.
+
+All you need to ask them is to visit <?=$values['pledge_url']?> and sign up.
+
+All the best,
+
+<?=$values['signature']?>
+
+This message is from Pledgebank, a service for bringing the power of your local community to your cause

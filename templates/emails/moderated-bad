@@ -1,0 +1,13 @@
+Subject: Your pledge '<?=$values['title']?>' has not been accepted.
+
+We are sorry, but your pledge was not accepted.
+<?=$values['moderated_comment_clause']?>
+
+Your pledge reads:
+
+'<?=$values['sentence_first']?>'
+
+Thank you for submitting your pledge to <?=$values['pledgebank_site_name']?> and we hope that
+you will submit future pledges successfully.
+
+<?=$values['signature']?>

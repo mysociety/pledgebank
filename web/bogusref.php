@@ -50,6 +50,7 @@ if (!array_key_exists('ref', $data) || !array_key_exists('matches', $data))
 
 $ref = $data['ref'];
 $matches = $data['matches'];
+$moderated = $data['moderated'];
 
 header('HTTP/1.1 404 Not found');
 
@@ -77,10 +78,21 @@ if (0 == sizeof($matches)) {
     print p(_('If none of those look like what you want, try the following:'));
 }
 
-print '<ul>
-    <li>' . _('If you typed in the location, check it carefully and try typing it again.') . '</li>
-    <li>' . _('Look for the pledge on <a href="/all">the list of all pledges</a>.') . '</li>
-    <li>' . _('Search for the pledge you want by entering words below.') . '</ul>';
+$li = [
+    _('If you typed in the location, check it carefully and try typing it again.'),
+    _('Look for the pledge on <a href="/all">the list of all pledges</a>.'),
+    _('Search for the pledge you want by entering words below.'),
+];
+if ($moderated) {
+    array_unshift($li, _('If the pledge is new, it may not yet have been moderated.  Please try again later.') );
+}
+    
+print '<ul>';
+foreach ($li as $item) {
+    printf('<li> %s </li>', $item);
+}
+print '</ul>';
+
 ?>
 <form accept-charset="utf-8" action="/search" method="get" class="pledge">
 <label for="s"><?=_('Search for a pledge') ?>:</label>

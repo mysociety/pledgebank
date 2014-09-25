@@ -81,7 +81,7 @@ function check_facebook_params($data) {
 function pledge_form_one($data = array(), $errors = array()) {
     global $lang, $langs;
 
-    microsites_new_breadcrumbs(1);
+    microsites_new_breadcrumbs('basics');
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -369,7 +369,7 @@ function pledge_form_two($data, $errors = array()) {
         unset($errors['gaze_place']); # remove NOTICE
     }
 
-    microsites_new_breadcrumbs(2);
+    microsites_new_breadcrumbs('location');
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -439,7 +439,7 @@ function pledge_form_three($data, $errors = array()) {
     }
     $isodate = $data['parseddate']['iso'];
 
-    microsites_new_breadcrumbs(3);
+    microsites_new_breadcrumbs('category');
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -461,7 +461,9 @@ function pledge_form_three($data, $errors = array()) {
 </div>
 
 <form accept-charset="utf-8" name="pledge" method="post" action="/new">
-<h2><?=_('New Pledge &ndash; Category / Privacy')?></h2>
+<h2><?= microsites_private_allowed() ? _('New Pledge &ndash; Category / Privacy')
+        : _('New Pledge &ndash; Category '); ?>
+</h2>
 
 <?  if (microsites_categories_allowed()) { ?>
 <p><?=_('Which category does your pledge best fit into?') ?>
@@ -497,7 +499,7 @@ function pledge_form_addr($data = array(), $errors = array()) {
     global $lang, $langs, $number_of_steps;
 
     $curr_step = has_step_2() ? (has_step_3() ? 4 : 3) : 2;
-    microsites_new_breadcrumbs($curr_step);
+    microsites_new_breadcrumbs('address');
 
     $isodate = $data['parseddate']['iso'];
     if (sizeof($errors)) {
@@ -905,7 +907,7 @@ function preview_pledge($data, $errors) {
     $local = (isset($data['local'])) ? $data['local'] : '0';
     $isodate = $data['parseddate']['iso'];
 
-    microsites_new_breadcrumbs($number_of_steps);
+    microsites_new_breadcrumbs('preview');
 
     if (sizeof($errors)) {
         print '<div id="errors"><ul><li>';
@@ -990,7 +992,8 @@ longer be valid."))?>
  <input class="topbutton" type="submit" name="tostep2" value="<?=_('Change location') ?>">
 <? }
    if (has_step_3()) { ?>
- <input class="topbutton" type="submit" name="tostep3" value="<?=_('Change category/privacy') ?>">
+ <input class="topbutton" type="submit" name="tostep3" value="<?= microsites_private_allowed() ? 
+    _('Change category/privacy') : _('Change category'); ?>">
 <? }
    if (has_step_addr()) { ?>
  <input type="submit" name="tostepaddr" value="<?=_('Change your postal address') ?>">
@@ -1105,6 +1108,13 @@ function create_new_pledge($P, $data) {
         } else {
             $picture = null;
         }
+
+        if (OPTION_MODERATE_PLEDGES) {
+            $ishidden = true;
+        }
+        else {
+            $ishidden = false;
+        }
         
         db_query('
                 insert into pledges (
@@ -1118,7 +1128,8 @@ function create_new_pledge($P, $data) {
                     prominence, cached_prominence,
                     via_facebook,
                     pledge_type, ref_in_pledge_type,
-                    picture
+                    picture,
+                    ishidden
                 ) values (
                     ?, ?, ?,
                     ?, ?, ?, ?,
@@ -1130,6 +1141,7 @@ function create_new_pledge($P, $data) {
                     ?, ?,
                     ?,
                     ?, ?,
+                    ?,
                     ?
                 )', array(
                     $data['id'], $data['title'], $data['target'],
@@ -1141,7 +1153,8 @@ function create_new_pledge($P, $data) {
                     $prominence, $cached_prominence,
                     $data['facebook_id'] ? 't' : 'f',
                     $pledge_type, $data['ref_in_pledge_type'],
-                    $picture
+                    $picture,
+                    $ishidden
                 ));
 
         if ($data['category'] != -1) {
@@ -1182,6 +1195,8 @@ function create_new_pledge($P, $data) {
 
     $url = htmlspecialchars(pb_domain_url() . urlencode($p->data['ref']));
     $facebook_url = htmlspecialchars($p->url_facebook());
+
+    # TODO: extract the following into a new view
 ?>
     <p class="loudmessage">
         <?=_('Thank you for creating your pledge.') ?>
@@ -1190,30 +1205,35 @@ function create_new_pledge($P, $data) {
 <? if ($data['facebook_id']) { ?>
     <p class="loudmessage"><? printf(_('It is now live on Facebook at %s<br>and your friends can sign up to it there.'), '<a href="'.$facebook_url.'">'.$facebook_url.'</a>') ?></p>
     <p class="loudmessage"><? printf(_('Or sign up by email at %s'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
-<? } else { ?>
-    <p class="loudmessage"><? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?></p>
-<? } ?>
-<?  if (microsites_new_pledges_prominence() != 'backpage') { ?>
-    <p class="noisymessage"><? printf(_('Your pledge needs <strong>your support</strong> if it is to succeed, so <br>print some %s now and hand them out today.<br>Put a %s up in the canteen.<br>%s straightaway!'),
-        '<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
-        '<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
-        '<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
-<?  } else { ?>
-    <p class="noisymessage"><? printf(_('Your pledge will <strong>not</strong> appear on the All Pledges page until <strong>you</strong> have recruited the first few signers.<br>Print some %s now and hand them out today.<br>Put a %s up in the canteen.<br>%s straightaway!'),
-        '<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
-        '<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
-        '<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
-<?  }
+    <? } else { 
+        if (OPTION_MODERATE_PLEDGES) { ?>
+        <p class="loudmessage"><? printf(_('It will be reviewed and posted to the site shortly.  We will email you when it is ready to view!')) ?></p>
+        <? } else { ?>
+        <p class="loudmessage">
+        <? printf(_('It is now live at %s<br>and people can sign up to it there.'), '<a href="'.$url.'">'.$url.'</a>') ?>
+        </p>
+        <? if (microsites_new_pledges_prominence() != 'backpage') { ?>
+        <p class="noisymessage"><? printf(_('Your pledge needs <strong>your support</strong> if it is to succeed, so <br>print some %s now and hand them out today.<br>Put a %s up in the canteen.<br>%s straightaway!'),
+            '<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
+            '<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
+            '<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
+        <? } else { ?>
+        <p class="noisymessage"><? printf(_('Your pledge will <strong>not</strong> appear on the All Pledges page until <strong>you</strong> have recruited the first few signers.<br>Print some %s now and hand them out today.<br>Put a %s up in the canteen.<br>%s straightaway!'),
+            '<a href="/flyers/'.$data['ref'].'_A4_flyers8.pdf">'._('flyers').'</a>',
+            '<a href="/flyers/'.$data['ref'].'_A4_flyers1.pdf">'._('poster').'</a>',
+            '<a href="'.$url.'/share">'._('Spread the word online').'</a>') ?></p>
+        <? }
+        }
 
-    if ($site_country == 'US') {
-?><p class="noisymessage" style="margin-bottom:0">
-If your pledge is about raising money and you want people to be able to donate straight away, why not use
-<a href="http://www.changingthepresent.org/PledgeBank">ChangingThePresent</a> if you're giving to a registered non-profit
-or <a href="http://www.chipin.com/">ChipIn</a> if you're raising money for something else?</p>
-<p align="center">(If you do that, <a href="/contact">email us</a> and we'll add a link to your pledge)</p>
-<?
-    } else {
-        post_confirm_advertise();
+        if ($site_country == 'US') { ?>
+        <p class="noisymessage" style="margin-bottom:0">
+        If your pledge is about raising money and you want people to be able to donate straight away, why not use
+        <a href="http://www.changingthepresent.org/PledgeBank">ChangingThePresent</a> if you're giving to a registered non-profit
+        or <a href="http://www.chipin.com/">ChipIn</a> if you're raising money for something else?</p>
+        <p align="center">(If you do that, <a href="/contact">email us</a> and we'll add a link to your pledge)</p> <?
+        } else {
+            post_confirm_advertise();
+        } 
     }
 
     microsites_google_conversion_tracking("default");

@@ -14,22 +14,22 @@ require_once '../phplib/pledge.php';
 require_once '../phplib/comments.php';
 require_once '../phplib/pbperson.php';
 require_once '../phplib/success.php';
+require_once '../phplib/microsites.php';
 require_once '../commonlib/phplib/utility.php';
 
-$banner_src = 'howitworks.png';
-if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr' || $lang == 'sk')
-    $banner_src = 'howitworks_' . $lang . '.png';
+$banner_src  = microsites_banner_source();
+$show_banner = microsites_show_banner();
 
-page_header(null, 
+page_header(null,
     array(
         'rss'=> array(
             _('New Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list')),
             _('Successful Pledges at PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/list/succeeded')),
             _('Comments on All Pledges PledgeBank.com') => pb_domain_url(array('explicit'=>true, 'path'=>'/rss/comments'))
-        ), 
+        ),
         'id' => 'front',
         #'cache-max-age' => 600,
-        'banner' => $microsite ? '' : '<p id="banner"><img src="/i/' . $banner_src . '" alt="' . _('How PledgeBank works: PledgeBank is a free site to help people get things done - especially things that require several people. It is very simple - you make a pledge, set a target, find people to agree and sign the pledge, and succeed!') . '"></p>',
+        'banner' => $show_banner ? '<p id="banner"><img src="/i/' . $banner_src . '" alt="' . _('How PledgeBank works: PledgeBank is a free site to help people get things done - especially things that require several people. It is very simple - you make a pledge, set a target, find people to agree and sign the pledge, and succeed!') . '"></p>' : '',
     )
 );
 debug_comment_timestamp("after page_header()");
@@ -55,7 +55,7 @@ function format_pledge_list($pledges, $params) {
             if ($pledge->has_picture()) {
                 $out .= 'style="background-image:url(' . $pledge->picture_url() . ');"';
             }
-            $out.='></div></a>'; 
+            $out.='></div></a>';
         }
         $out .= $pledge->new_summary($params) . '</li>';
     }
@@ -65,7 +65,7 @@ function format_pledge_list($pledges, $params) {
 
 function list_frontpage_pledges() {
     global $pb_today;
-    echo '<a href="', pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list")),
+    echo '<a class="rss" href="', pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list")),
         '"><img align="right" border="0" src="rss.gif" alt="', _('RSS feed of new pledges'), '"></a>';
     print '<h2 class="head_with_mast">';
     print _('Sign a pledge');
@@ -84,8 +84,8 @@ function list_frontpage_pledges() {
         $foreign_more = 3 - count($pledges);
         $pledges = pledge_get_list("
                     cached_prominence = 'frontpage' AND
-                    date >= '$pb_today' AND 
-                    pin is NULL AND 
+                    date >= '$pb_today' AND
+                    pin is NULL AND
                     whensucceeded IS NULL
                     ORDER BY RANDOM()
                     LIMIT $foreign_more", array('global'=>false,'main'=>false,'foreign'=>true));
@@ -93,7 +93,7 @@ function list_frontpage_pledges() {
             print p(_("Interesting pledges from other countries"));
             print format_pledge_list($pledges, array('showcountry'=>true));
         }
-    } 
+    }
     if ($more) {
         $succeeded_url = pb_domain_url(array('path'=>'/list'));
         print p("<a href=\"$succeeded_url\">"._('More pledges to sign...')."</a>");
@@ -101,7 +101,7 @@ function list_frontpage_pledges() {
 }
 
 function list_successful_pledges() {
-    echo '<a href="', pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list/succeeded")),
+    echo '<a class="rss" href="', pb_domain_url(array('explicit'=>true, 'path'=>"/rss/list/succeeded")),
         '"><img align="right" border="0" src="rss.gif" alt="', _('RSS feed of successful pledges'), '"></a>';
     print '<h2 class="head_with_mast">' . _('Recent successful pledges') . '</h2>';
 
@@ -109,7 +109,7 @@ function list_successful_pledges() {
     // Try to avoid global pledges
     $pledges = pledge_get_list("
                 (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
-                pin IS NULL AND 
+                pin IS NULL AND
                 whensucceeded IS NOT NULL
                 ORDER BY whensucceeded DESC
                 LIMIT $num_to_show", array('global'=>false, 'main'=>true,'foreign'=>false));
@@ -117,7 +117,7 @@ function list_successful_pledges() {
     if (count($pledges) < $num_to_show) {
         $pledges = pledge_get_list("
             (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
-            pin IS NULL AND 
+            pin IS NULL AND
             whensucceeded IS NOT NULL
             ORDER BY whensucceeded DESC
             LIMIT $num_to_show", array('global'=>true, 'main'=>true,'foreign'=>false));
@@ -148,7 +148,7 @@ function list_closing_pledges() {
     // Try to avoid global pledges
     $pledges = pledge_get_list("
                 (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
-                pin IS NULL AND 
+                pin IS NULL AND
                 whensucceeded IS NULL
                 AND date = ms_current_date()
                 ORDER BY RANDOM()
@@ -157,7 +157,7 @@ function list_closing_pledges() {
     if (count($pledges) < $num_to_show) {
         $pledges = pledge_get_list("
             (".microsites_normal_prominences()." OR cached_prominence = 'frontpage') AND
-            pin IS NULL AND 
+            pin IS NULL AND
             whensucceeded IS NULL
             AND date = ms_current_date()
             ORDER BY RANDOM()

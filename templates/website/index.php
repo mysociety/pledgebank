@@ -9,14 +9,16 @@ $banner_src = 'howitworks.png';
 if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr' || $lang == 'sk')
     $banner_src = 'howitworks_' . $lang . '.png';
 
-echo '<div id="tellworld">';
-echo h2(_('PledgeBank successes'));
-global $success_summary;
-shuffle($success_summary);
-echo $success_summary[0];
-echo '<p align="right"><a href="/success">' . _('More success stories') . '</a></p>';
-echo '</div>';
-debug_comment_timestamp("after tellworld");
+if (! OPTION_NO_SUCCESS_STORIES) {
+    echo '<div id="tellworld">';
+    echo h2(_('PledgeBank successes'));
+    global $success_summary;
+    shuffle($success_summary);
+    echo $success_summary[0];
+    echo '<p align="right"><a href="/success">' . _('More success stories') . '</a></p>';
+    echo '</div>';
+    debug_comment_timestamp("after tellworld");
+}
 
 echo '<div id="col">';
 
@@ -46,10 +48,17 @@ list_frontpage_pledges();
 debug_comment_timestamp("after list_frontpage_pledges()");
 echo '</div>';
 
-comments_show_latest();
-debug_comment_timestamp("after comments_show_latest()");
+if (! OPTION_COMMENTS_ON_NEW_ROW) {
+    comments_show_latest();
+    debug_comment_timestamp("after comments_show_latest()");
+}
 
 echo '</div>'; # col
+
+if (OPTION_COMMENTS_ON_NEW_ROW) {
+    comments_show_latest();
+    debug_comment_timestamp("after comments_show_latest()");
+}
 
 echo '<div id="successfulpledges">';
 list_closing_pledges();

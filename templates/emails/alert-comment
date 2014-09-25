@@ -1,4 +1,4 @@
-Subject: New comments on pledge - '<?=$values['title']?>' at PledgeBank.com
+Subject: New comments on pledge - '<?=$values['title']?>' at <?=$values['pledgebank_site_name']=>
 
 The following comments have been left on this pledge:
 

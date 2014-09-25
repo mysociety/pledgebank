@@ -1,4 +1,4 @@
-Subject: Your pledge in <?=$values['location_description']?> - '<?=$values['title']?>' at PledgeBank.com
+Subject: Your pledge in <?=$values['location_description']?> - '<?=$values['title']?>' at <?=$values['pledgebank_site_name']?>
 
 Unfortunately, the pledge to which you signed up did not meet its target in
 your town, <?=$values['location_description']?>, in the required time.  It

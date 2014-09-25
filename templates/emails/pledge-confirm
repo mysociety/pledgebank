@@ -1,6 +1,6 @@
-Subject: Confirm your new pledge - '<?=$values['title']?>' at PledgeBank.com
+Subject: Confirm your new pledge - '<?=$values['title']?>' at <?=$values['pledgebank_site_name']?>.
 
-Please click on the link below to confirm that you wish PledgeBank.com
+Please click on the link below to confirm that you wish <?=$values['pledgebank_site_name']?>
 to display the pledge at the bottom of this email in your name.
 
 <?=$values['url']?>
@@ -9,6 +9,6 @@ Your pledge reads:
 
 '<?=$values['sentence_first']?>'
 
-Thank you for submitting your pledge to PledgeBank.
+Thank you for submitting your pledge to <?=$values['pledgebank_site_name']?>.
 
 <?=$values['signature']?>

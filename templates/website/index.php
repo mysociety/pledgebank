@@ -9,7 +9,7 @@ $banner_src = 'howitworks.png';
 if ($lang == 'zh' || $lang == 'eo' || $lang == 'fr' || $lang == 'sk')
     $banner_src = 'howitworks_' . $lang . '.png';
 
-if (! OPTION_NO_SUCCESS_STORIES) {
+if (! microsites_no_success_stories()) {
     echo '<div id="tellworld">';
     echo h2(_('PledgeBank successes'));
     global $success_summary;
@@ -48,14 +48,14 @@ list_frontpage_pledges();
 debug_comment_timestamp("after list_frontpage_pledges()");
 echo '</div>';
 
-if (! OPTION_COMMENTS_ON_NEW_ROW) {
+if (microsites_comments_on_new_row()) {
     comments_show_latest();
     debug_comment_timestamp("after comments_show_latest()");
 }
 
 echo '</div>'; # col
 
-if (OPTION_COMMENTS_ON_NEW_ROW) {
+if (microsites_comments_on_new_row()) {
     comments_show_latest();
     debug_comment_timestamp("after comments_show_latest()");
 }

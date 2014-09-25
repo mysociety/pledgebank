@@ -1360,3 +1360,15 @@ function microsites_banner_source() {
         return 'howitworks_' . $lang . '.png';
     return 'howitworks.png';
 }
+
+function microsites_no_success_stories() {
+    global $microsite;
+    if ($microsite == 'rbwm') return true;
+    return OPTION_NO_SUCCESS_STORIES;;
+}
+
+function microsites_comments_on_new_row() {
+    global $microsite;
+    if ($microsite == 'rbwm') return true;
+    return OPTION_COMMENTS_ON_NEW_ROW;
+}

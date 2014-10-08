@@ -55,7 +55,7 @@ if (microsites_comments_on_new_row()) {
 
 echo '</div>'; # col
 
-if (microsites_comments_on_new_row()) {
+if (! microsites_comments_on_new_row()) {
     comments_show_latest();
     debug_comment_timestamp("after comments_show_latest()");
 }

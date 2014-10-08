@@ -231,6 +231,20 @@ a.login, a.login:hover, a.login:visited, a.login:visited, a.login:link {
     text-decoration: none;
 }
 
+a, a:visited, a:visited, a:link {
+    text-decoration: none;
+}
+a:hover {
+    color: #660066;
+    text-decoration: underline;
+}
+
+#rbwm-footer a:hover {
+    border-bottom: 1px solid #660066;
+    color: #660066;
+    background: #fff;
+}
+
 #signedon {
     text-align: right;
 }

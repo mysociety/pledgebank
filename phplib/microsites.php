@@ -1371,6 +1371,6 @@ function microsites_no_success_stories() {
 
 function microsites_comments_on_new_row() {
     global $microsite;
-    if ($microsite == 'rbwm') return true;
+    if ($microsite == 'rbwm') return false;
     return OPTION_COMMENTS_ON_NEW_ROW;
 }

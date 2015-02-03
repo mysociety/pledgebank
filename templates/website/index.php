@@ -38,14 +38,14 @@ list_frontpage_pledges();
 debug_comment_timestamp("after list_frontpage_pledges()");
 echo '</div>';
 
-if (microsites_comments_on_new_row()) {
+if (!microsites_comments_on_new_row()) {
     comments_show_latest();
     debug_comment_timestamp("after comments_show_latest()");
 }
 
 echo '</div>'; # col
 
-if (! microsites_comments_on_new_row()) {
+if (microsites_comments_on_new_row()) {
     comments_show_latest();
     debug_comment_timestamp("after comments_show_latest()");
 }

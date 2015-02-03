@@ -18,6 +18,9 @@
 <?=$params['robots']?>
 <title><?=$title?></title>
 
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600">
+<link rel="stylesheet" type="text/css" media="all" href="/assets/css/banner.css">
+
 <style type="text/css" media="all">@import url('/pb.2.css');</style>
 <link rel="stylesheet" type="text/css" media="print" href="/pbprint.css">
 <!--[if LT IE 7]><style type="text/css">@import url("/css/ie6.css");</style><![endif]-->
@@ -49,6 +52,19 @@
 </script>
 </head>
 <body<?=$params['body_id']?><?=$params['body_class']?>>
+
+<div class="retirement-banner retirement-banner--pledgebank">
+  <div class="retirement-banner__inner">
+    <a class="retirement-banner__logo" href="https://www.mysociety.org/">mySociety</a>
+    <p class="retirement-banner__description">With regret, we’ve made the
+    difficult decision to close this site down from the end of June.</p>
+    <p class="retirement-banner__description">You can still browse and sign
+    existing pledges, but you can no longer create new ones. <a
+    class="retirement-banner__more" href="https://www.mysociety.org/2015/01/28/goodbye-to-some-old-friends/">Find out more&hellip;</a></p>
+  </div>
+</div>
+<div class="retirement-replacement-body">
+
 <?
     // On the "print flyers from in-page image" page, these top parts are hidden from printing
     if ($params['noprint']) print '<div class="noprint">';

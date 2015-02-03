@@ -38,10 +38,6 @@
     if (!array_key_exists('nonav', $params) or !$params['nonav']) {
 ?>
 <div class="noprint">
-<?      if (microsites_local_alerts() && (!array_key_exists('nolocalsignup', $params) || !$params['nolocalsignup']))
-            pb_view_local_alert_quick_signup("localsignupeverypage");
-        debug_timestamp(true, "local alert quick timestamp");
-?>
 <hr class="v">
 <div id="pbfooter">
 <a href="/translate/"><?=_('Translate PledgeBank into your language') ?></a>.
@@ -54,6 +50,9 @@
 ?>
 
 </div>
+
+</div><!-- retirement div -->
+
 <script type="text/javascript">
 greyOutInputs();
 </script>

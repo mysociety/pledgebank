@@ -16,7 +16,3 @@ plan some next steps. And, while you're at it, why not take some photos of you
 fulfilling your pledge - we love pics :) Send any pictures to team@pledgebank.com
 
 <?=$values['signature']?>
-
-KEEP UP TO DATE - Sign up to get emails when people create new pledges in your
-area (max one email a day).  Click here and enter your postcode:
-<?=$values['local_alert_url']?>

@@ -190,10 +190,6 @@ function microsites_navigation_menu($contact_ref) {
 
     $menu = array();
     $menu[_('All Pledges')] = "/list";
-    if ($P)
-        $menu[_('My Pledges')] = "/my";
-    else
-        $menu[_('Login')] = "/my";
     $menu[_('About')] = "/faq";
 
     return $menu;

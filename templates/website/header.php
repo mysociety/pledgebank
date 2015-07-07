@@ -56,11 +56,11 @@
 <div class="retirement-banner retirement-banner--pledgebank">
   <div class="retirement-banner__inner">
     <a class="retirement-banner__logo" href="https://www.mysociety.org/">mySociety</a>
-    <p class="retirement-banner__description">With regret, we’ve made the
-    difficult decision to close this site down from the end of June.</p>
-    <p class="retirement-banner__description">You can still browse and sign
-    existing pledges, but you can no longer create new ones. <a
-    class="retirement-banner__more" href="https://www.mysociety.org/2015/01/28/goodbye-to-some-old-friends/">Find out more&hellip;</a></p>
+    <p class="retirement-banner__description">
+    PledgeBank is now closed to new submissions.
+    The site is available as an archive for you to
+    browse, but you can no longer create or sign pledges.
+    <a href="/">Find out more&hellip;</a></p>
   </div>
 </div>
 <div class="retirement-replacement-body">

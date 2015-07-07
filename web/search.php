@@ -40,7 +40,7 @@ if ($rss) {
     function compare_creationtime($a, $b) {
         return strcmp($b['creationtime'], $a['creationtime']);
     }
-    array_unique($rss_items);
+    $rss_items = array_unique($rss_items, SORT_REGULAR);
     usort($rss_items, "compare_creationtime");
     rss_footer($rss_items);
 }

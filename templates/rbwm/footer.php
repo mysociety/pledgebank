@@ -64,12 +64,12 @@
 						<img src="/microsites/rbwm/img/logo.png" alt="The Royal Borough of Windsor and Maidenhead">
 					</a>
 				</div>
-                <div class="back-top">
-    				<a href="#main">
-    					<span>BACK TO THE TOP</span>
-    					<i class="icon-arrow-up"></i>
-    				</a>
-    			</div>
+        <div class="back-top">
+          <a href="#main">
+            <span>Back to the top</span>
+            <i class="icon-arrow-up"></i>
+          </a>
+        </div>
             </div>
         </footer>
 

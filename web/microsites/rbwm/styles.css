@@ -248,3 +248,15 @@ a:hover {
 #signedon {
     text-align: right;
 }
+
+body {
+  /* We need to override some PB styles to revert to RBWM appearance */
+  text-align: left;
+  font-family: inherit;
+}
+
+.title-banner h1 {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}

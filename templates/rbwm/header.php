@@ -126,7 +126,7 @@
             <div class="title-banner">
                 <div class="container">
 <!-- PAGE TITLE -->   
-                    <h1>PledgeBank</h1>
+                    <a href="/"><h1>PledgeBank</h1></a>
 <!-- PAGE TITLE END -->
                 </div>
             </div>
@@ -144,30 +144,13 @@
                     </ol>
 <!-- BREADCRUMB END -->
                 </nav>
+                <span id="tagline"><?=_('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help')?></span>
             </div>
 
             <article class="main-content">
                 <div class="container">  
 <!-- MAIN CONTENT -->
 
-
-<?
-    // On the "print flyers from in-page image" page, these top parts are hidden from printing
-    if ($params['noprint']) print '<div class="noprint">';
-
-    if ($lang == 'zh') {
-?>
-<h1 style="padding-bottom:0.25em;"><a id="logo" href="/"><span id="logo_zh"><?=_('Pledge') . _('Bank')?></span>
-<small><span id="logo_pledge">Pledge</span><span id="logo_bank">Bank</span></small></a>
-<?
-    } else {
-?>
-<h1><a id="logo" href="/"><span id="logo_pledge"><?=_('Pledge')?></span><span id="logo_bank"><?=_('Bank')?></span></a>
-<?
-    }
-?>
-
-<span id="tagline"><small><br><?=_('I&rsquo;ll do it, but <strong>only</strong> if you&rsquo;ll help')?></small></span></h1>
 
 <hr class="v">
 

@@ -65,6 +65,7 @@ if (!$p->finished()) {
     print '</li>';
 } 
 ?>
+    <li><a rel="nofollow" href="/new/local/<?=$p->ref() ?>"><?=_('Create a local version of this pledge') ?></a></li>
     <li><small><?=_('Creator only:') ?> <a rel="nofollow" href="<?=$p->url_announce()?>" title="<?=_('Only if you made this pledge') ?>"><?=_('Send message to signers') ?></a>
 <?
 if (!$p->finished()) {

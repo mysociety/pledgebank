@@ -189,6 +189,7 @@ function microsites_navigation_menu($contact_ref) {
     debug_timestamp(true, "retrieved person record");
 
     $menu = array();
+    $menu[_('Start a Pledge')] = "/new";
     $menu[_('All Pledges')] = "/list";
     if ($P)
         $menu[_('My Pledges')] = "/my";

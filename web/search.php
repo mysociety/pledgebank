@@ -240,6 +240,13 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
         if (!$rss && count($places) > 1) {
             $success = 1;
             $out = "";
+            if (microsites_local_alerts()) {
+                print '<div id="local_alert_search">';
+                pb_view_local_alert_quick_signup("localsignupsearchpage", 
+                    array('newflash'=>false, 'place'=>$search));
+                $shown_alert_box = true;
+                print '</div>';
+            }
             usort($places, 'gaze_controls_sort_places');
             foreach ($places as $p) {
                 list($name, $in, $near, $lat, $lon, $state, $score) = $p;
@@ -252,6 +259,15 @@ vspace="5" align="right" border="0" src="/rss.gif" alt="<?=$rss_title ?>" title=
         } elseif (count($places) == 1) {
             $success = 1;
             $out = '';
+            if (!$rss) {
+                if (microsites_local_alerts()) {
+                    print '<div id="local_alert_search">';
+                    pb_view_local_alert_quick_signup("localsignupsearchpage", 
+                        array('newflash'=>false, 'place'=>$parts['name']));
+                    $shown_alert_box = true;
+                    print '</div>';
+                }
+            }
             list($name, $in, $near, $lat, $lon, $state, $score) = $places[0];
             list($desc, $url) = gaze_controls_get_place_details($places[0], $statecounts, true);
             list($location_results, $radius) = get_location_results($pledge_select, $lat, $lon);

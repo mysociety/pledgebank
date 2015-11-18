@@ -1136,7 +1136,10 @@ function send_announce_token($pledge_id) {
    Print relevant advertising */
 function post_confirm_advertise() {
     if (!microsites_local_alerts()) return;
-    return;
+    print _("<p>PledgeBank can send you email alerts when people
+        create local pledges in your area. Sign up - you don't know
+        what interesting things people might be getting up to.</p>");
+    pb_view_local_alert_quick_signup("localsignupfrontpage", array());
 }
 
 /* post_confirm_advertise_flyers PLEDGE_ROW

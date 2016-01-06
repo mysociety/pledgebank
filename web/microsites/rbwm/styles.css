@@ -78,14 +78,16 @@ h1 span#logo_pledge {
     background-image: none;
     background-color: #F5F5F5;
     display: block;
-    padding: 0.75em 0 0.75em 2%;
     border-bottom: 1px solid #CFCFCF;
-    font-size: 100%;
 }
 
-#nav_search #q {
+form #q {
     border: 1px solid #CFCFCF;
-    padding: 0.33em;
+    font-size: 1.4em;
+    font-weight: 600;
+    line-height: 1.7;
+    margin: .5em 0;
+    padding: 5px 12px;
 }
 
 #pbcontent {
@@ -238,6 +240,10 @@ a:hover {
     color: #660066;
     text-decoration: underline;
 }
+a.login:hover {
+  color: white;
+  background-color: #7b52a5;
+}
 
 #rbwm-footer a:hover {
     border-bottom: 1px solid #660066;
@@ -247,4 +253,25 @@ a:hover {
 
 #signedon {
     text-align: right;
+}
+
+body {
+  /* We need to override some PB styles to revert to RBWM appearance */
+  text-align: left;
+  font-family: inherit;
+}
+
+.title-banner h1 {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+#tagline {
+  font-size: 100%;
+}
+
+/* Stop "YOU HAVE NOT DONE WHAT YOU PLEDGED" button overflowing */
+li.done form input[type=submit] {
+  white-space: normal;
 }

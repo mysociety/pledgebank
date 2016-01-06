@@ -22,6 +22,16 @@ if (! microsites_no_success_stories()) {
 
 echo '<div id="col">';
 
+echo '<div id="startblurb1"><div id="startblurb">
+<div id="startbubble"></div>
+<p id="start"><a href="./new"><strong>', _('Start your pledge'), '&nbsp;&raquo;</strong></a></p>
+<ul>
+<li>' . _('Get your own page')
+. '<li>' . _('Help with promotion')
+. '<li>' . _('Use positive peer pressure to change your community')
+. '</ul>
+</div></div>';
+
 #$news = file_get_contents('http://www.mysociety.org/category/pledgebank/feed/');
 $news = '';
 if (preg_match('#<item>.*?<title>(.*?)</title>.*?<link>(.*?)</link>.*?<description><!\[CDATA\[(.*?)\]\]></description>#s', $news, $m)) {

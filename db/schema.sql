@@ -125,8 +125,6 @@ create table person (
     --facebook_id bigint, 
     facebook_id integer, 
 
-    check ( email is not null or mobile is not null or facebook_id is not null),
-
     -- extra data, added originally for Live Simply Promise
     address_1 text,
     address_2 text,
@@ -961,8 +959,6 @@ create table comment (
     name text not null,
     -- email is obsolete, from before we forced login for comments
     email text,
-    check ((person_id is null and email is not null) or
-           (person_id is not null and email is null)),
 
     website text,
     -- add a reply_comment_id here if we ever want threading

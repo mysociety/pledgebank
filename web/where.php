@@ -78,10 +78,6 @@ foreach ($countries_name_to_code as $name => $code) {
 }
 print "\n</p></div></div>";
 
-print '<p id="wheremakepledge">';
-print _('Your country isn\'t there? <a href="/new">Make a pledge</a> specific to your country, and get people to sign up to it.');
-print "</p>";
-
 // Show special sites
 print '<div id="wherespecial">';
 print h2(_('... or choose a special site'));
